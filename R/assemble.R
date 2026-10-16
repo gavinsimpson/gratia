@@ -113,7 +113,9 @@
   mrf_plot = c("effects", "qq"),
   interval = c("confidence", "simultaneous"),
   n_sim = 10000, n_cores = 1, seed = NULL,
-  interval_method = c("auto", "gaussian", "bootstrap"),
+  interval_method = c("auto", "gaussian", "bootstrap", "shape"),
+  frequentist = FALSE,
+  shape_source = c("gaussian", "bootstrap"),
   ...
 ) {
   if (missing(overall_uncertainty) && is_scasm_model(object)) {
@@ -183,12 +185,14 @@
       n_4d = n_4d,
       data = data,
       unconditional = unconditional,
+      frequentist = frequentist,
       overall_uncertainty = overall_uncertainty,
       dist = dist,
       clip = TRUE,
       unnest = FALSE,
       interval = interval, ci_level = ci_level,
       interval_method = interval_method,
+      shape_source = shape_source,
       n_sim = n_sim, n_cores = n_cores, seed = seed
     )
 

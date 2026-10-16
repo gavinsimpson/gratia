@@ -24,6 +24,22 @@ When reviewing a qualification, ask: “What misunderstanding does this sentence
 prevent, and has the surrounding text given the reader a reason to have it?”
 If there is no concrete answer, delete it.
 
+## Plot annotations
+
+Keep default plots free of implementation and methodological commentary.
+
+- Preserve the established caption format. Adding a feature does not authorize
+  expanding plot annotations.
+- Include labels needed to read the plotted values: axes, units, legends and
+  established basis or constraint labels.
+- Do not repeat settings the user requested, or add interval sources,
+  calibration details, numerical diagnostics, provenance or generic caveats.
+- Put those details in documentation, returned metadata or diagnostic output.
+- Before adding text, ask: "What specific misreading of this figure would this
+  prevent?" If there is no concrete answer, omit it.
+- Review rendered plots for unnecessary text before delivery, just as you
+  review them for incorrect values.
+
 ## Starting new work
 
 Unless the user explicitly instructs otherwise, always start new work on a

@@ -1184,6 +1184,7 @@ vars_from_label <- function(label) {
 #' @importFrom tidyselect any_of
 `transform_fun.smooth_estimates` <- function(object, fun = NULL,
     constant = NULL, ...) {
+  check_shape_effect_transform(attr(object, "interval_info"), constant, fun)
   # If constant supplied, use it to transform est and the upper and lower
   # interval
   if (!is.null(constant)) {

@@ -26,6 +26,11 @@
 #' @param ... arguments passed to [mgcv::predict.gam()]. Note that `type`,
 #'   `newdata`, and `se.fit` are already used and passed on to
 #'   [mgcv::predict.gam()].
+#' @param interval_method character; `"auto"` uses stored scasm bootstrap draws
+#'   for pointwise intervals when available and Gaussian intervals otherwise.
+#'   `"gaussian"` requests covariance-based limits and `"bootstrap"` requires
+#'   stored draws. Simultaneous bootstrap bands are unsupported. Shape-enforced
+#'   intervals are available for smooth components through [smooth_estimates()].
 #'
 #' @details
 #' Native scasm fits with stored bootstrap draws use mgcv's pointwise limits

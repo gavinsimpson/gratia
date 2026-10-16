@@ -3248,6 +3248,58 @@ This is mgcv 1.9-4. For overview type '?mgcv'.
 
 detaching ‘package:mgcv’, ‘package:nlme’
 
+> nameEx("shape_confidence_set")
+> ### * shape_confidence_set
+>
+> flush(stderr()); flush(stdout())
+>
+> ### Name: shape_confidence_set
+> ### Title: Intersect a band with linear restrictions on coefficients
+> ### Aliases: shape_confidence_set in_shape_set
+>
+> ### ** Examples
+>
+> # Two non-negative masses whose sum is one.
+> region <- shape_confidence_set(
++   X = diag(2), lower = c(0.1, 0.2), upper = c(0.8, 0.9),
++   Ain = diag(2), C = matrix(c(1, 1), nrow = 1), d = 1,
++   band_type = "simultaneous"
++ )
+> in_shape_set(region, c(0.4, 0.6))
+[1] TRUE
+> in_shape_set(region, c(0.4, 0.7))
+[1] FALSE
+>
+>
+>
+> cleanEx()
+> nameEx("shape_intervals")
+> ### * shape_intervals
+>
+> flush(stderr()); flush(stdout())
+>
+> ### Name: shape_intervals
+> ### Title: Enforce named shapes on estimates and interval endpoints
+> ### Aliases: shape_intervals
+>
+> ### ** Examples
+>
+> x <- c(0, 0.1, 0.4, 0.8, 1)
+> f <- c(0.1, 0.4, 0.2, 0.9, 0.7)
+> shape_intervals(f, f - 0.3, f + 0.3, data.frame(x = x),
++   constraints = list(x = c("+", "m+")))
+# A tibble: 5 x 4
+      x .estimate .lower_ci .upper_ci
+  <dbl>     <dbl>     <dbl>     <dbl>
+1   0         0.1       0         0.4
+2   0.1       0.2       0         0.5
+3   0.4       0.4       0.1       0.7
+4   0.8       0.7       0.4       1
+5   1         0.9       0.6       1.2
+>
+>
+>
+> cleanEx()
 > nameEx("simulate")
 > ### * simulate
 > 

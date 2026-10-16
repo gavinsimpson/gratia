@@ -59,7 +59,9 @@
   n_sim = 10000,
   n_cores = 1,
   seed = NULL,
-  interval_method = c("auto", "gaussian", "bootstrap"),
+  interval_method = c("auto", "gaussian", "bootstrap", "shape"),
+  frequentist = FALSE,
+  shape_source = c("gaussian", "bootstrap"),
   ...
 )
 }
@@ -321,7 +323,17 @@ caller's RNG state.}
 \item{interval_method}{character; "auto" uses stored scasm bootstrap draws
 for pointwise intervals when available, and Gaussian intervals otherwise.
 Use "gaussian" to request covariance-based limits or "bootstrap" to
-require stored draws. Simultaneous bootstrap bands are not supported.}
+require stored draws. Simultaneous bootstrap bands are not supported.
+\code{"shape"} applies \code{\link[=shape_intervals]{shape_intervals()}} to supported scasm smooth components,
+using the initial limits chosen by \code{shape_source}.}
+
+\item{frequentist}{logical; use frequentist covariance for smooth-component
+intervals? The default uses approximate Bayesian covariance. Parametric
+effect intervals retain their existing Bayesian covariance calculation.}
+
+\item{shape_source}{character; initial uncertainty for \code{interval_method = "shape"}: \code{"gaussian"} (the default) or stored \code{"bootstrap"} pointwise
+limits. Bootstrap sources require \code{frequentist = FALSE} and
+\code{unconditional = FALSE} because the stored draws hold smoothing fixed.}
 
 \item{...}{Additional smooth plotting arguments, including \code{title},
 \code{subtitle}, \code{xlab} and \code{ylab}.}

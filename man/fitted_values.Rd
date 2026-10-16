@@ -71,10 +71,11 @@ With \code{NULL}, the current random number state is used and advanced.}
 the Bayesian covariance matrix, if available. Otherwise a warning is
 issued and the uncorrected covariance is used.}
 
-\item{interval_method}{character; "auto" uses stored scasm bootstrap draws
-for pointwise intervals when available, and Gaussian intervals otherwise.
-Use "gaussian" to request covariance-based limits or "bootstrap" to
-require stored draws. Simultaneous bootstrap bands are not supported.}
+\item{interval_method}{character; \code{"auto"} uses stored scasm bootstrap draws
+for pointwise intervals when available and Gaussian intervals otherwise.
+\code{"gaussian"} requests covariance-based limits and \code{"bootstrap"} requires
+stored draws. Simultaneous bootstrap bands are unsupported. Shape-enforced
+intervals are available for smooth components through \code{\link[=smooth_estimates]{smooth_estimates()}}.}
 }
 \value{
 A tibble (data frame) whose first \emph{m} columns contain either the data

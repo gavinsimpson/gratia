@@ -127,7 +127,8 @@
   }
   default_caption <- scasm_shape_plot_caption(object, default_caption)
   interval_info <- attr(object, "interval_info")
-  if (!is.null(interval_info) && interval_info$interval == "simultaneous") {
+  if (!identical(interval_info$method, "shape") &&
+      !is.null(interval_info) && interval_info$interval == "simultaneous") {
     source <- if (identical(interval_info$method, "gaussian") &&
       length(attr(object, "shape_constraints"))) "Gaussian " else ""
     default_caption <- scasm_caption_append(default_caption,
