@@ -69,17 +69,26 @@ where the adjustment includes setting the contribution of all other model terms
 to the predicted value to zero. For partial derivatives (what *marginaleffects*
 would call a marginal effect or slope), gratia provides `derivatives()`.
 
-The resulting plot is intended as reasonable overview of the estimated model,
-but it offers limited option to modify the resulting plot. If you want full
-control, you can obtain the data used to create the plot above with 
-`smooth_estimates()`
+Use a ggplot2 theme to change the appearance of the plots. The `&` operator
+applies the settings to every panel:
+
+```{r theme-smooths}
+library("ggplot2")
+draw(m) & theme(
+  geom.gratia.smooth = element_geom(colour = "forestgreen", linewidth = 1.5),
+  geom.gratia.interval = element_geom(fill = "forestgreen")
+)
+```
+
+To choose different layers or map other variables to plot aesthetics, obtain
+the estimates with `smooth_estimates()` and build a plot yourself.
 ```{r smooth-estimates}
 sm <- smooth_estimates(m)
 sm
 ```
 which will evaluate all smooths at values that are evenly spaced over the range
 of the covariate(s). If you want to evaluate only selected smooths, you can
-specify which via the `smooth` argument. This takes the *smooth labels* which
+specify which via the `select` argument. This takes the *smooth labels* which
 are the names of the smooths as they are known to mgcv. To list the labels for
 the smooths in use
 ```{r smooths}
@@ -87,7 +96,7 @@ smooths(m)
 ```
 To evaluate only $f(x_2)$ use
 ```{r smooth-estimates-x2}
-sm <- smooth_estimates(m, smooth = "s(x2)")
+sm <- smooth_estimates(m, select = "s(x2)")
 sm
 ```
 Then you can generate your own plot using the ggplot2 package, for example

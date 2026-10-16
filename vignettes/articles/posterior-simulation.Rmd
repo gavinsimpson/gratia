@@ -101,8 +101,7 @@ Typically we're not too bothered about the particular values of the covariate at
 
 Objects returned by `smooth_samples()` have a `draw()` method available for them
 ```{r draw-smooth-samples-x0}
-sm_samp |>
-  draw(alpha = 0.3)
+draw(sm_samp) & theme(gratia.alpha.sample = 0.3)
 ```
 To only draw some of the posterior smooths you can set `n_samples` which will randomly select that many smooths to draw (a seed can be provided via argument `seed` to make the set of chosen smooths repeatable.)
 
@@ -265,7 +264,7 @@ sim_gaulss <- predicted_samples(m_gaulss, n_draws = n_sim, seed = 20) |>
 ```
 The benefit of all that data wrangling is now realised as we can replace the data in the plot we created earlier with the simulations from the distribution GAM, and then plot it
 ```{r}
-plt_gaulss <- plt_gau %+% sim_gaulss
+plt_gaulss <- plt_gau + sim_gaulss
 
 plt_gau + plt_gaulss +
   plot_annotation(tag_levels = "a") +
