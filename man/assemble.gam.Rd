@@ -66,7 +66,8 @@
   interval_method = c("auto", "gaussian", "bootstrap", "shape"),
   frequentist = FALSE,
   shape_source = c("gaussian", "bootstrap"),
-  ...
+  ...,
+  variables = NULL
 )
 
 \method{assemble}{scam}(object, ..., overall_uncertainty = FALSE, centre = c("model", "plot"))
@@ -362,6 +363,18 @@ limits. Bootstrap sources require \code{frequentist = FALSE} and
 
 \item{...}{Additional smooth plotting arguments, including \code{title},
 \code{subtitle}, \code{xlab} and \code{ylab}.}
+
+\item{variables}{Character vector giving every covariate of the selected
+smooths exactly once, in plotting order: x, y, then the conditioning
+covariate for 3D smooths, or facet rows and columns for 4D smooths.
+When supplied, selected smooths must use the same covariates. Use fitted coordinate names,
+such as \code{"log(x)"} for a transformed covariate. The default, \code{NULL}, favours
+a two-variable tensor margin for x and y, otherwise retaining fitted order.
+Grid resolution follows this order. Supplied \code{data} are evaluated unchanged.
+Drawing saved estimates can change the order but uses only points already
+evaluated; evaluate again to change grid resolution or conditioning values.
+Continuous covariates must precede factors. Spherical smooths retain their
+latitude/longitude convention and do not support reordering.}
 
 \item{centre}{character; for SCAM models, \code{"model"} retains each fitted
 smooth contribution. \code{"plot"} subtracts the evaluation-grid mean from

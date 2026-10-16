@@ -108,6 +108,14 @@
 
 ## New features
 
+* Smooth estimation and drawing, including `difference_smooths()`, now accept
+  `variables` to choose x and y axes and the order of conditioning facets.
+  Differences between 3D and 4D smooths can now be drawn as faceted surfaces
+  (#256, #257). Their automatic grids use `n_3d = 16` and `n_4d = 4`, matching
+  individual smooths; use `NULL` to use `n` for those dimensions. Resolved
+  covariate orders are retained when drawing saved estimates. Supply `data`
+  to choose explicit conditioning values.
+
 * Surrogate residuals are available for `mgcv::ocat()` and `mgcv::multinom()`
   GAMs through `surrogate_residuals()`, `type = "surrogate"` in ordinary and
   scalable residual diagnostic plots, and `add_residuals()`. Ordinal residuals
@@ -584,6 +592,9 @@
   recognised family name.
 
 ## Bug fixes
+
+* `draw.difference_smooth()` now uses supplied `xlab` and `caption` values
+  when drawing differences between curves.
 
 * `n_smooths()` now counts smooth terms in glmmTMB models across the
   conditional, zero-inflation and dispersion predictors, excluding native

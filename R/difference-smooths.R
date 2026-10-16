@@ -27,6 +27,9 @@
 #'   The default is 50 in plotting and plot-preparation functions. If `NULL`,
 #'   use `n` instead. Ignored when evaluation `data` are supplied. Factor levels
 #'   are retained, and curves with only one continuous covariate use `n`.
+#' @param n_3d,n_4d numeric; the number of conditioning values for smooths of
+#'   three or four covariates. The defaults are 16 and 4, respectively. If
+#'   `NULL`, use `n`. Ignored when evaluation `data` are supplied.
 #' @param ci_level numeric between 0 and 1; the coverage of credible interval.
 #' @param data data frame of locations at which to evaluate the difference
 #'   between smooths.
@@ -56,8 +59,15 @@
 #' approximate posterior probability `ci_level` when using the Bayesian
 #' covariance. They do not provide joint coverage across all pairs, outside
 #' the evaluation set, or between its points. With `data = NULL`, the evaluation
-#' set is generated using `n`. Differences and interval limits are on the
-#' linear predictor scale, including group means when requested.
+#' set is generated using `n`, `n_2d`, `n_3d`, and `n_4d`. Differences and interval
+#' limits are on the linear predictor scale, including group means when requested.
+#'
+#' `variables` determines the order used to generate and display the evaluation
+#' grid. The first two covariates are the x and y axes. The third covariate
+#' defines facets for three-dimensional smooths, or facet rows for
+#' four-dimensional smooths; the fourth defines facet columns. Use `data` to
+#' choose particular conditioning values. The resolved order is saved with the
+#' estimates for use by [draw()].
 #'
 #' The intervals use the joint coefficient covariance selected by
 #' `unconditional` and `frequentist`, retaining covariance between the two
@@ -97,6 +107,22 @@
 #' sm_dif3 <- difference_smooths(m,
 #'   select = c("s(x2):fac1", "s(x2):fac2"), partial_match = FALSE
 #' )
+#'
+#' # Choose two axes and condition on the third covariate
+#' m3 <- gam(y ~ fac + te(x0, x1, x2, by = fac, k = c(3, 3, 3)),
+#'   data = df, method = "REML")
+#' sm_dif_3d <- difference_smooths(m3, select = "te(x0,x1,x2)",
+#'   variables = c("x1", "x2", "x0"), n_2d = 20, n_3d = 3)
+#' draw(sm_dif_3d)
+#' # Redraw the evaluated points with the axes exchanged
+#' draw(sm_dif_3d, variables = c("x2", "x1", "x0"))
+#'
+#' # Supply particular conditioning values using a prediction grid
+#' grid <- data_slice(m3, x1 = evenly(x1, n = 20),
+#'   x2 = evenly(x2, n = 20), x0 = c(0.2, 0.8), fac = levels(fac))
+#' sm_dif_at <- difference_smooths(m3, select = "te(x0,x1,x2)",
+#'   data = grid, variables = c("x1", "x2", "x0"))
+#' draw(sm_dif_at)
 #' \dontshow{
 #' options(op)
 #' }
@@ -131,7 +157,10 @@
   interval = c("confidence", "simultaneous"),
   n_sim = 10000,
   n_cores = 1,
-  seed = NULL
+  seed = NULL,
+  variables = NULL,
+  n_3d = 16,
+  n_4d = 4
 ) {
   interval <- match.arg(interval)
   if (interval == "simultaneous") {
@@ -170,14 +199,25 @@
     smooths <- smooths[is_by]
     sm_ids <- sm_ids[is_by]
   }
+  model <- plan_smooth_variables(model, sm_ids, variables = variables)
   if (is.null(data)) {
-    sm_data <- map(sm_ids, smooth_data,
-      model = model, n = n, n_2d = n_2d, include_all = TRUE
-    )
+    sm_data <- map(sm_ids, function(id) smooth_data(model, id,
+      n = n, n_2d = n_2d, n_3d = n_3d, n_4d = n_4d,
+      var_order = smooth_plot_variables(model, id), include_all = TRUE))
     data <- bind_rows(sm_data)
   } else {
     data <- as_tibble(data)
     for (sm in smooths) data <- prepare_smooth_data(model, sm, data)
+    # Expressions such as `group = levels(group)` supply character values.
+    # Retain the fitted factor order when constructing their comparisons.
+    for (sm in smooths) {
+      by <- by_variable(sm)
+      if (is.character(data[[by]])) {
+        template <- prepare_smooth_data(model, sm)[[by]]
+        data[[by]] <- factor(data[[by]], levels = levels(template),
+          ordered = is.ordered(template))
+      }
+    }
   }
   if (length(select) == 1L) {
     by_var <- by_variable(smooths[[1L]])
@@ -237,11 +277,15 @@
     bind_rows(result)
   }
   # Scope the seed once: do not restart the same draw sequence for every pair.
-  if (identical(interval, "simultaneous") && !is.null(seed)) {
+  result <- if (identical(interval, "simultaneous") && !is.null(seed)) {
     withr::with_seed(seed, calculate())
   } else {
     calculate()
   }
+  attr(result, "plot_variables") <- setNames(
+    rep(list(smooth_plot_variables(model, sm_ids[[1L]])),
+      length(unique(result$.smooth))), unique(result$.smooth))
+  result
 }
 
 #' @export

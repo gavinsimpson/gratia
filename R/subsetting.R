@@ -43,6 +43,7 @@
   scam_info <- attr(x, "scam_smooth_info")
   interval_info <- attr(x, "interval_info")
   plot_info <- attr(x, "tensor_plot_info")
+  plot_variables <- attr(x, "plot_variables")
   support <- attr(x, "surface_support")
   cls <- class(x)
   coordinate_info <- attr(x, "coordinate_info")
@@ -68,6 +69,9 @@
   attr(x, "coordinate_info") <- coordinate_info
   attr(x, "tensor_plot_info") <- if (".smooth" %in% names(x)) {
     plot_info[intersect(names(plot_info), unique(x$.smooth))]
+  } else NULL
+  attr(x, "plot_variables") <- if (".smooth" %in% names(x)) {
+    plot_variables[intersect(names(plot_variables), unique(x$.smooth))]
   } else NULL
   attr(x, "surface_support") <- if (".smooth" %in% names(x)) {
     support[intersect(names(support), unique(x$.smooth))]

@@ -25,7 +25,10 @@ difference_smooths(model, ...)
   interval = c("confidence", "simultaneous"),
   n_sim = 10000,
   n_cores = 1,
-  seed = NULL
+  seed = NULL,
+  variables = NULL,
+  n_3d = 16,
+  n_4d = 4
 )
 
 \method{difference_smooths}{scam}(model, ..., unconditional = FALSE)
@@ -96,6 +99,22 @@ for simultaneous intervals. Parallel execution requires OpenMP support.}
 \item{seed}{integer or \code{NULL}; optional random seed for simultaneous
 intervals. An explicit seed preserves the caller's random number state.
 With \code{NULL}, the current random number state is used and advanced.}
+
+\item{variables}{Character vector giving every covariate of the selected
+smooths exactly once, in plotting order: x, y, then the conditioning
+covariate for 3D smooths, or facet rows and columns for 4D smooths.
+When supplied, selected smooths must use the same covariates. Use fitted coordinate names,
+such as \code{"log(x)"} for a transformed covariate. The default, \code{NULL}, favours
+a two-variable tensor margin for x and y, otherwise retaining fitted order.
+Grid resolution follows this order. Supplied \code{data} are evaluated unchanged.
+Drawing saved estimates can change the order but uses only points already
+evaluated; evaluate again to change grid resolution or conditioning values.
+Continuous covariates must precede factors. Spherical smooths retain their
+latitude/longitude convention and do not support reordering.}
+
+\item{n_3d, n_4d}{numeric; the number of conditioning values for smooths of
+three or four covariates. The defaults are 16 and 4, respectively. If
+\code{NULL}, use \code{n}. Ignored when evaluation \code{data} are supplied.}
 }
 \description{
 Estimates pairwise differences (comparisons) between factor smooth
@@ -109,8 +128,15 @@ the evaluated covariate combinations for each pair of factor levels, with
 approximate posterior probability \code{ci_level} when using the Bayesian
 covariance. They do not provide joint coverage across all pairs, outside
 the evaluation set, or between its points. With \code{data = NULL}, the evaluation
-set is generated using \code{n}. Differences and interval limits are on the
-linear predictor scale, including group means when requested.
+set is generated using \code{n}, \code{n_2d}, \code{n_3d}, and \code{n_4d}. Differences and interval
+limits are on the linear predictor scale, including group means when requested.
+
+\code{variables} determines the order used to generate and display the evaluation
+grid. The first two covariates are the x and y axes. The third covariate
+defines facets for three-dimensional smooths, or facet rows for
+four-dimensional smooths; the fourth defines facet columns. Use \code{data} to
+choose particular conditioning values. The resolved order is saved with the
+estimates for use by \code{\link[=draw]{draw()}}.
 
 The intervals use the joint coefficient covariance selected by
 \code{unconditional} and \code{frequentist}, retaining covariance between the two
@@ -180,6 +206,22 @@ draw(sm_sim)
 sm_dif3 <- difference_smooths(m,
   select = c("s(x2):fac1", "s(x2):fac2"), partial_match = FALSE
 )
+
+# Choose two axes and condition on the third covariate
+m3 <- gam(y ~ fac + te(x0, x1, x2, by = fac, k = c(3, 3, 3)),
+  data = df, method = "REML")
+sm_dif_3d <- difference_smooths(m3, select = "te(x0,x1,x2)",
+  variables = c("x1", "x2", "x0"), n_2d = 20, n_3d = 3)
+draw(sm_dif_3d)
+# Redraw the evaluated points with the axes exchanged
+draw(sm_dif_3d, variables = c("x2", "x1", "x0"))
+
+# Supply particular conditioning values using a prediction grid
+grid <- data_slice(m3, x1 = evenly(x1, n = 20),
+  x2 = evenly(x2, n = 20), x0 = c(0.2, 0.8), fac = levels(fac))
+sm_dif_at <- difference_smooths(m3, select = "te(x0,x1,x2)",
+  data = grid, variables = c("x1", "x2", "x0"))
+draw(sm_dif_at)
 \dontshow{
 options(op)
 }

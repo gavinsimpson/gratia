@@ -33,7 +33,8 @@ smooth_estimates(object, ...)
   seed = NULL,
   interval_method = c("auto", "gaussian", "bootstrap", "shape"),
   shape_source = c("gaussian", "bootstrap"),
-  ...
+  ...,
+  variables = NULL
 )
 
 \method{smooth_estimates}{gamlss}(
@@ -148,9 +149,23 @@ using the initial limits chosen by \code{shape_source}.}
 \item{shape_source}{character; initial uncertainty for \code{interval_method = "shape"}: \code{"gaussian"} (the default) or stored \code{"bootstrap"} pointwise
 limits. Bootstrap sources require \code{frequentist = FALSE} and
 \code{unconditional = FALSE} because the stored draws hold smoothing fixed.}
+
+\item{variables}{Character vector giving every covariate of the selected
+smooths exactly once, in plotting order: x, y, then the conditioning
+covariate for 3D smooths, or facet rows and columns for 4D smooths.
+When supplied, selected smooths must use the same covariates. Use fitted coordinate names,
+such as \code{"log(x)"} for a transformed covariate. The default, \code{NULL}, favours
+a two-variable tensor margin for x and y, otherwise retaining fitted order.
+Grid resolution follows this order. Supplied \code{data} are evaluated unchanged.
+Drawing saved estimates can change the order but uses only points already
+evaluated; evaluate again to change grid resolution or conditioning values.
+Continuous covariates must precede factors. Spherical smooths retain their
+latitude/longitude convention and do not support reordering.}
 }
 \value{
 A data frame (tibble), which is of class \code{"smooth_estimates"}.
+Its \code{plot_variables} attribute is a list of resolved covariate orders,
+named by smooth label, used when drawing the saved estimates.
 }
 \description{
 Evaluate a smooth at a grid of evenly spaced value over the range of the

@@ -53,9 +53,11 @@ test_that("smooth differences align covariates across factor levels", {
           X[, !keep] <- 0
           estimate <- unname(drop(X %*% coef(model)))
           se <- unname(sqrt(rowSums((X %*% vcov(model)) * X)))
-          expected_grid <- first[, vars, drop = FALSE]
-          rownames(expected_grid) <- NULL
-          expect_equal(as.data.frame(actual[, vars, drop = FALSE]), expected_grid)
+          # Compare covariate values and their order independently of the
+          # plotting metadata carried by the differences object.
+          for (variable in vars) {
+            expect_equal(actual[[variable]], first[[variable]])
+          }
           expect_equal(unname(actual$.diff), estimate)
           expect_equal(unname(actual$.se), se)
           expect_equal(unname(actual$.lower_ci), estimate - qnorm(0.9) * se)

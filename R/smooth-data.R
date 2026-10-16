@@ -96,6 +96,8 @@
   mf <- prepare_smooth_data(model, sm)
   plot_spec <- tensor_plot_spec(model, id)
   if (!is.null(plot_spec)) var_order <- plot_spec$variables
+  planned_order <- smooth_plot_variables(model, id)
+  if (!is.null(planned_order)) var_order <- planned_order
   orig_order <- unique(smooth_variable(sm))
   smooth_vars <- if (is.null(var_order)) {
     orig_order
@@ -103,8 +105,8 @@
     var_order
   }
   # Random-effect tensor conditioning dimensions follow the continuous axes.
-  if (!is.null(sm$margin) &&
-      any(vapply(sm$margin, inherits, logical(1), "random.effect"))) {
+  if (is.null(planned_order) && !is.null(sm[["margin"]]) &&
+      any(vapply(sm[["margin"]], inherits, logical(1), "random.effect"))) {
     smooth_vars <- tensor_plot_variables(smooth_vars, mf)
   }
   ## is smooth a by? If it is, extract the by variable
