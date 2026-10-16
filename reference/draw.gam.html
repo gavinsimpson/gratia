@@ -115,6 +115,9 @@ ggplot2::ggplot()."><meta property="og:image" content="https://gavinsimpson.gith
 <span>  envir <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  surface <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"raster"</span>, <span class="st">"tile"</span>, <span class="st">"3d"</span><span class="op">)</span>,</span>
 <span>  surface_3d <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  ci_3d <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  ci_3d_alpha <span class="op">=</span> <span class="fl">0.15</span>,</span>
+<span>  ci_3d_col <span class="op">=</span> <span class="st">"grey60"</span>,</span>
 <span>  back_transform <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  re_levels <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  mrf_plot <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"effects"</span>, <span class="st">"qq"</span><span class="op">)</span>,</span>
@@ -435,6 +438,24 @@ modify individual plots returned by <code><a href="assemble.html">assemble()</a>
 controls perspective; the top-level <code>dist</code> argument controls masking.</p></dd>
 
 
+<dt id="arg-ci-d">ci_3d<a class="anchor" aria-label="anchor" href="#arg-ci-d"></a></dt>
+<dd><p>logical; add lower and upper interval surfaces to numeric
+smooth and parametric effect panels when <code>surface = "3d"</code>? Defaults to
+<code>FALSE</code>. Applies across supported model classes and conditioning facets.
+Other panel types, including standard errors, retain their usual display.
+Smooth bounds follow <code>interval</code>; parametric bounds remain pointwise.</p></dd>
+
+
+<dt id="arg-ci-d-alpha">ci_3d_alpha<a class="anchor" aria-label="anchor" href="#arg-ci-d-alpha"></a></dt>
+<dd><p>numeric between 0 and 1; opacity of both interval
+surfaces, independent of <code>ci_alpha</code>. Defaults to <code>0.15</code>.</p></dd>
+
+
+<dt id="arg-ci-d-col">ci_3d_col<a class="anchor" aria-label="anchor" href="#arg-ci-d-col"></a></dt>
+<dd><p>one R colour; fill of both interval surfaces, independent
+of <code>ci_col</code> and the estimate's continuous fill scale. Defaults to <code>"grey60"</code>.</p></dd>
+
+
 <dt id="arg-back-transform">back_transform<a class="anchor" aria-label="anchor" href="#arg-back-transform"></a></dt>
 <dd><p>logical; plot covariates on their original scale?
 Defaults to <code>FALSE</code>, using model coordinates such as <code>log(x)</code> for a term
@@ -482,8 +503,8 @@ joint coverage set. <code>"credible"</code> aliases <code>"confidence"</code>, r
 approximate Bayesian credible interpretation of default-covariance bands.
 Parametric panels retain pointwise intervals and are labelled accordingly
 when simultaneous smooth bands are requested. Bands appear where the
-renderer displays interval bounds; surface and random-effect QQ plots
-retain their existing estimate or standard-error display.</p></dd>
+renderer displays interval bounds, including 3D effect surfaces when
+<code>ci_3d = TRUE</code>. Random-effect QQ plots retain their usual display.</p></dd>
 
 
 <dt id="arg-n-sim-n-cores">n_sim, n_cores<a class="anchor" aria-label="anchor" href="#arg-n-sim-n-cores"></a></dt>
@@ -555,14 +576,18 @@ covariates. Observation layers do not introduce additional surface panels.</p>
 <p>Three-dimensional faces retain the current diverging RdBu fill scale and
 effect-range rules, shared across conditioning facets. <code>continuous_fill</code>
 overrides the fill scale. Faces have no outlines; <code>contour_col</code> controls
-contour lines. Surface faces are fully opaque. Faces, contours, and floor
+contour lines. Estimate faces are fully opaque. Faces, contours, and floor
 observations are depth-sorted together, so nearer faces hide the parts behind
 them. The existing theme and facet styling are retained.</p>
 <p>The first two displayed covariates form the horizontal axes, and the effect
 (or standard error when requested) forms the vertical axis. Additional
 covariates retain their existing conditioning facets: <code>n_2d</code> controls surface
 resolution, while <code>n_3d</code> and <code>n_4d</code> control covariate slices. Fixed effect
-ranges are also used for the vertical axis. Confidence surfaces are not added.</p>
+ranges are also used for the vertical axis. With <code>ci_3d = TRUE</code>, translucent
+lower and upper interval surfaces use the same mesh and masking as the
+estimate. Their heights expand the vertical range, while the continuous
+fill scale retains its existing range rules. <code>ci_3d_alpha</code> and <code>ci_3d_col</code>
+style these surfaces separately from univariate interval ribbons.</p>
 <p>Contours follow the displayed mesh, and available observations are projected
 onto its floor. Observations are not assigned to conditioning slices. Soap
 boundary loops are also projected onto the floor.</p>
@@ -612,6 +637,8 @@ see the examples.</p>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"ggcube"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="va">m2</span>, surface <span class="op">=</span> <span class="st">"3d"</span>, n_2d <span class="op">=</span> <span class="fl">20</span>,</span></span>
 <span class="r-in"><span>    surface_3d <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>yaw <span class="op">=</span> <span class="fl">45</span>, persp <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="va">m2</span>, surface <span class="op">=</span> <span class="st">"3d"</span>, ci_3d <span class="op">=</span> <span class="cn">TRUE</span>, ci_3d_alpha <span class="op">=</span> <span class="fl">0.12</span>,</span></span>
+<span class="r-in"><span>    n_2d <span class="op">=</span> <span class="fl">20</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="va">panels</span> <span class="op">&lt;-</span> <span class="fu"><a href="assemble.html">assemble</a></span><span class="op">(</span><span class="va">m2</span>, surface <span class="op">=</span> <span class="st">"3d"</span>, n_2d <span class="op">=</span> <span class="fl">20</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="co"># Replace coordinates to customize a single term; retain the current theme.</span></span></span>
 <span class="r-in"><span>  <span class="va">panels</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">panels</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span> <span class="op">+</span></span></span>

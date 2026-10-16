@@ -35,6 +35,9 @@ draw(
   caption = TRUE,
   surface = c("raster", "tile", "3d"),
   surface_3d = list(),
+  ci_3d = FALSE,
+  ci_3d_alpha = 0.15,
+  ci_3d_col = "grey60",
   back_transform = FALSE,
   re_levels = NULL,
   mrf_plot = c("effects", "qq"),
@@ -211,6 +214,24 @@ draw(
   [`assemble()`](https://gavinsimpson.github.io/gratia/reference/assemble.md).
   The `dist` entry here controls perspective; the top-level `dist`
   argument controls masking.
+
+- ci_3d:
+
+  logical; add lower and upper interval surfaces to numeric smooth and
+  parametric effect panels when `surface = "3d"`? Defaults to `FALSE`.
+  Applies across supported model classes and conditioning facets. Other
+  panel types, including standard errors, retain their usual display.
+  Smooth bounds follow `interval`; parametric bounds remain pointwise.
+
+- ci_3d_alpha:
+
+  numeric between 0 and 1; opacity of both interval surfaces,
+  independent of `ci_alpha`. Defaults to `0.15`.
+
+- ci_3d_col:
+
+  one R colour; fill of both interval surfaces, independent of `ci_col`
+  and the estimate's continuous fill scale. Defaults to `"grey60"`.
 
 - back_transform:
 

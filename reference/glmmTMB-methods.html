@@ -209,7 +209,10 @@ random-effect coefficient panels.</p>
     <p>Smooth support requires stored smooth and random-effect metadata. Unsupported
 multi-penalty structures, mapped joint parameters and rank-deficient smooth
 models give errors. Factor-by and tensor smooth availability is determined
-by glmmTMB; gratia does not expand the smooth types glmmTMB can fit.</p>
+by glmmTMB; gratia does not expand the smooth types glmmTMB can fit.
+Use <code>draw(model, surface = "3d", ci_3d = TRUE)</code> for interval surfaces on
+smooths and numeric parametric interactions in any linear predictor.
+<code>ci_3d_alpha</code> and <code>ci_3d_col</code> control their opacity and fill colour.</p>
 <p>Parametric effects use fitted contrast coding and exclude smooth null-space
 coefficients. Their intervals include uncertainty in the intercept of their
 own linear predictor by default, as for GAMs. <code>overall_uncertainty = FALSE</code>
@@ -259,6 +262,10 @@ See <a href="diagnostic_support.html">diagnostic_support</a> for conditioning ch
 <span class="r-in"><span>    data <span class="op">=</span> <span class="va">d</span>, REML <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="va">mixed</span><span class="op">)</span> <span class="co"># separate QQ panels for intercepts and slopes</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="va">mixed</span>, ranef_lines <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="co"># random contributions only</span></span></span>
+<span class="r-in"><span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"ggcube"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>    <span class="va">interaction</span> <span class="op">&lt;-</span> <span class="fu">glmmTMB</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/glmmTMB/man/glmmTMB.html" class="external-link">glmmTMB</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="va">x</span><span class="op">:</span><span class="va">z</span>, data <span class="op">=</span> <span class="va">d</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="va">interaction</span>, surface <span class="op">=</span> <span class="st">"3d"</span>, ci_3d <span class="op">=</span> <span class="cn">TRUE</span>, n_2d <span class="op">=</span> <span class="fl">15</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="op">}</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-plt img"><img src="glmmTMB-methods-1.png" alt="" width="700" height="433"></span>
 </code></pre></div>

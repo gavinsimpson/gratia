@@ -178,7 +178,10 @@ or a flat named list of plots when <code>FALSE</code>.</p></dd>
 identify the distributional parameter using the parent model's margin and
 equation order, rather than the working family of the embedded GAMs.
 Single-predictor models omit these automatic labels. Existing smooth labels,
-selection, by-variable information and custom subtitles are retained.</p>
+selection, by-variable information and custom subtitles are retained.
+Pass <code>surface = "3d", ci_3d = TRUE</code> through <code>...</code> to add interval surfaces
+to smooths and numeric parametric interactions in any equation.
+<code>ci_3d_alpha</code> and <code>ci_3d_col</code> control their opacity and fill colour.</p>
     </div>
 
     <div class="section level2">
@@ -202,6 +205,11 @@ selection, by-variable information and custom subtitles are retained.</p>
 <span class="r-in"><span>  <span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/GJRM/man/gamlss.html" class="external-link">gamlss</a></span><span class="op">(</span><span class="va">fl</span>, data <span class="op">=</span> <span class="va">dataSim</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"ggcube"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>    <span class="va">surface</span> <span class="op">&lt;-</span> <span class="fu">GJRM</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/GJRM/man/gamlss.html" class="external-link">gamlss</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">y1</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x2</span>, <span class="va">x3</span>, k <span class="op">=</span> <span class="fl">10</span><span class="op">)</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x3</span>, k <span class="op">=</span> <span class="fl">6</span><span class="op">)</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>      data <span class="op">=</span> <span class="va">dataSim</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="va">surface</span>, surface <span class="op">=</span> <span class="st">"3d"</span>, ci_3d <span class="op">=</span> <span class="cn">TRUE</span>, n_2d <span class="op">=</span> <span class="fl">15</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="op">}</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-plt img"><img src="draw.gamlss-1.png" alt="" width="700" height="433"></span>
 </code></pre></div>

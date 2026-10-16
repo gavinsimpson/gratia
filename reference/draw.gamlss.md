@@ -125,7 +125,10 @@ identify the distributional parameter using the parent model's margin
 and equation order, rather than the working family of the embedded GAMs.
 Single-predictor models omit these automatic labels. Existing smooth
 labels, selection, by-variable information and custom subtitles are
-retained.
+retained. Pass `surface = "3d", ci_3d = TRUE` through `...` to add
+interval surfaces to smooths and numeric parametric interactions in any
+equation. `ci_3d_alpha` and `ci_3d_col` control their opacity and fill
+colour.
 
 ## Examples
 
@@ -149,5 +152,10 @@ if (suppressPackageStartupMessages(require("GJRM", quietly = TRUE))) {
   m <- gamlss(fl, data = dataSim)
 
   draw(m)
+  if (requireNamespace("ggcube", quietly = TRUE)) {
+    surface <- GJRM::gamlss(list(y1 ~ s(x2, x3, k = 10), ~ s(x3, k = 6)),
+      data = dataSim)
+    draw(surface, surface = "3d", ci_3d = TRUE, n_2d = 15)
+  }
 }
 ```

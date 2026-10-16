@@ -29,6 +29,9 @@ draw_parametric_effect(
   n_contour = NULL,
   surface = "raster",
   surface_3d = list(),
+  ci_3d = FALSE,
+  ci_3d_alpha = 0.15,
+  ci_3d_col = "grey60",
   continuous_fill = NULL,
   discrete_colour = NULL,
   discrete_fill = NULL,
@@ -69,7 +72,9 @@ draw_parametric_effect(
 
   function; a function that will be applied to the estimated values and
   confidence interval before plotting. Can be a function or the name of
-  a function. Function `fun` will be applied after adding any
+  a function. For simultaneous bands it must be monotone over the entire
+  band; endpoint transformation alone does not preserve non-monotone
+  band coverage. Function `fun` will be applied after adding any
   `constant`, if provided.
 
 - xlab:
@@ -165,6 +170,24 @@ draw_parametric_effect(
   [`assemble()`](https://gavinsimpson.github.io/gratia/reference/assemble.md).
   The `dist` entry here controls perspective; the top-level `dist`
   argument controls masking.
+
+- ci_3d:
+
+  logical; add lower and upper interval surfaces to numeric smooth and
+  parametric effect panels when `surface = "3d"`? Defaults to `FALSE`.
+  Applies across supported model classes and conditioning facets. Other
+  panel types, including standard errors, retain their usual display.
+  Smooth bounds follow `interval`; parametric bounds remain pointwise.
+
+- ci_3d_alpha:
+
+  numeric between 0 and 1; opacity of both interval surfaces,
+  independent of `ci_alpha`. Defaults to `0.15`.
+
+- ci_3d_col:
+
+  one R colour; fill of both interval surfaces, independent of `ci_col`
+  and the estimate's continuous fill scale. Defaults to `"grey60"`.
 
 - continuous_fill:
 
