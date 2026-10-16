@@ -2,10 +2,15 @@
 
 ## User visible changes
 
-* Plot aesthetic arguments for colours, opacity and line widths are deprecated.
-  Explicit values remain supported and override themes during migration.
-  Use the component settings documented in `gratia_theme_get()` instead.
-  gratia now requires ggplot2 >= 4.0.3 and patchwork >= 1.3.2.
+* Plot aesthetic arguments for colours, opacity and line widths are deprecated
+  in favour of ggplot2 component themes (#215). Existing default appearances are
+  unchanged, and explicitly supplied arguments remain fixed overrides during
+  migration. Apply `theme()` with `&` to every panel in a patchwork, or with `+`
+  to a single plot. For example, replace `smooth_col` with
+  `geom.gratia.smooth = element_geom(colour = ...)` and `ci_alpha` with
+  `gratia.alpha.interval` inside `theme()`. See `gratia_theme_get()` and the
+  Customizing plots article for migration examples. gratia now requires
+  ggplot2 >= 4.0.3 and patchwork >= 1.3.2.
 
 * Native `mgcv::scasm()` smooth estimation, drawing and `confint()` now default to
   `overall_uncertainty = FALSE`. An explicit request for unavailable overall
