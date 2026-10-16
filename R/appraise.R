@@ -41,11 +41,15 @@
 #'   Bands are omitted for dependent responses. Censored and multivariate
 #'   outcomes are unsupported. See [dharma_residuals()] for the calculation.
 #'
-#'   Use `type = "surrogate"` for [mgcv::ocat()] models. These residuals are
-#'   continuous draws on the latent logistic scale, centred at the fitted latent
-#'   mean. QQ and worm plots require `method = NULL` and compare to a logistic
-#'   distribution with location zero and scale one. Each appraisal shares one
-#'   residual vector across panels. See [surrogate_residuals()].
+#'   Use `type = "surrogate"` for [mgcv::ocat()] and [mgcv::multinom()] GAMs.
+#'   The former uses a scalar latent logistic residual; the latter retains
+#'   all category utilities, including category 0, as separate panels with
+#'   centred Gumbel references. QQ and worm plots require `method = NULL`.
+#'   Each appraisal shares one residual draw across panels, with the same
+#'   draw in ordinary and scalable displays. Multinomial residuals are plotted
+#'   against their own category probabilities; observed-versus-fitted panels
+#'   compare category indicators with those probabilities. Pointwise bands
+#'   are calculated separately for each utility. See [surrogate_residuals()].
 #'
 #'   With `type = NULL`, ordinary lm/glm/GAM fits use deviance residuals.
 #'   Models fitted with [mgcv::gfam()] use randomised quantile (Dunn--Smyth)
@@ -117,7 +121,7 @@
 #'   posterior predictive draws.
 #' @param type character or `NULL`; residual type: `"deviance"`, `"response"`,
 #'   `"pearson"`, `"pit"`, `"quantile"`, `"dharma"`, or `"surrogate"` (for
-#'   `ocat()` models). `NULL` uses the model-specific default:
+#'   `ocat()` or `multinom()` GAMs). `NULL` uses the model-specific default:
 #'   deviance for ordinary lm/glm/GAM fits, and quantile for supported grouped
 #'   families, GJRM, sdmTMB and full mixed-model checks. glmmTMB uses Pearson
 #'   residuals conditionally and response residuals marginally. Extracted GAM
@@ -321,6 +325,17 @@
       model <- cache_diagnostic_residuals(model, type, seed)
     }
     n_obs <- NROW(stats::model.frame(model))
+  }
+  if (is_multinom_surrogate(model, type)) {
+    d <- prepare_diagnostic_data(model, type, seed)
+    use_scalable <- diagnostic_scalable(scalable, scalable_threshold, d$n_obs)
+    return(multinom_appraise(d, method = method, level = level,
+      qq_bins = qq_bins, scalable = use_scalable, worm = isTRUE(use_worm),
+      density_bins = density_bins, density_method = match.arg(density_method),
+      bandwidth = bandwidth, n_bins = n_bins, rank = rank,
+      ci_col = ci_col, ci_alpha = ci_alpha, point_col = point_col,
+      point_alpha = point_alpha, line_col = line_col, ppcheck = plt3,
+      ncol = ncol, nrow = nrow, guides = guides, plot_args = plot_arguments))
   }
   mean_panel <- diagnostic_mean_panel(response_distribution(
     if (inherits(model, "gratia_diagnostics")) model$source else model))

@@ -116,7 +116,8 @@
 #'
 #' @param type character; the type of residuals to return. See
 #'   [mgcv::residuals.gam()] for options, or use `"surrogate"` for models fitted
-#'   with [mgcv::ocat()].
+#'   with [mgcv::ocat()] or [mgcv::multinom()]. Nominal surrogate residuals
+#'   form a matrix column retaining all category labels, including category 0.
 #' @param ... additional arguments passed to [mgcv::residuals.gam()] or, for
 #'   `type = "surrogate"`, to [surrogate_residuals()], including `seed`.
 #'
@@ -156,7 +157,8 @@
     residuals(used, type = type, ...)
   resid_vals <- residual_rows(resid_vals, model, data)
 
-  data <- add_column(data, !!value := drop(resid_vals), .after = ncol(data))
+  values <- if (identical(type, "surrogate") && is.matrix(resid_vals)) resid_vals else drop(resid_vals)
+  data <- add_column(data, !!value := values, .after = ncol(data))
 
   data
 }

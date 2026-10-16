@@ -102,7 +102,7 @@ error; a normal approximation must be requested explicitly.}
 
 \item{type}{character or \code{NULL}; residual type: \code{"deviance"}, \code{"response"},
 \code{"pearson"}, \code{"pit"}, \code{"quantile"}, \code{"dharma"}, or \code{"surrogate"} (for
-\code{ocat()} models). \code{NULL} uses the model-specific default:
+\code{ocat()} or \code{multinom()} GAMs). \code{NULL} uses the model-specific default:
 deviance for ordinary lm/glm/GAM fits, and quantile for supported grouped
 families, GJRM, sdmTMB and full mixed-model checks. glmmTMB uses Pearson
 residuals conditionally and response residuals marginally. Extracted GAM
@@ -198,7 +198,13 @@ quantiles with location zero and scale one. Set \code{method = NULL}. Independen
 observations have approximate pointwise bands obtained by applying
 \code{qlogis()} to beta order-statistic limits. Worm plots subtract the same
 logistic reference quantiles from residuals and bands. These references
-treat fitted parameters as fixed. See \code{\link[=surrogate_residuals]{surrogate_residuals()}}.
+treat fitted parameters as fixed. For \code{\link[mgcv:multinom]{mgcv::multinom()}} GAMs, surrogate
+residuals retain a utility component for every category, including 0.
+Components have separate facets and centred Gumbel reference quantiles,
+including when \code{by_family = FALSE}. The same reference is subtracted in
+worm plots, and pointwise beta order-statistic bands use the centred
+Gumbel quantile function separately for each component. Ordinary and
+scalable displays share their draw. See \code{\link[=surrogate_residuals]{surrogate_residuals()}}.
 
 Subtitles name the method. Captions identify conditioning and field choices,
 joint simulation bands or omitted bands. Routine pointwise bands are unlabelled.

@@ -108,11 +108,14 @@
 
 ## New features
 
-* Surrogate residuals are available for `mgcv::ocat()` models through
-  `surrogate_residuals()` and `type = "surrogate"` in residual diagnostic plots
-  and `add_residuals()`. QQ and worm plots use logistic reference quantiles.
-  The calculation follows Liu and Zhang (2018), requires no additional package,
-  and preserves accuracy in extreme tails (#359).
+* Surrogate residuals are available for `mgcv::ocat()` and `mgcv::multinom()`
+  GAMs through `surrogate_residuals()`, `type = "surrogate"` in ordinary and
+  scalable residual diagnostic plots, and `add_residuals()`. Ordinal residuals
+  follow Liu and Zhang (2018), with logistic references (#359). Nominal
+  residuals follow Cheng, Wang and Zhang (2021), retaining a centred Gumbel
+  utility component for every category, including category 0. All appraisal
+  panels share one draw, and categories have separate panels. Both methods
+  require no additional package and preserve accuracy in extreme tails.
 
 * `derivatives()`, `partial_derivatives()`, `smooth_samples()` and
   `difference_smooths()` now use workers configured by `mirai::daemons()`

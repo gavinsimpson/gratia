@@ -100,6 +100,8 @@ diagnostic_ordered_residuals <- function(model, type = NULL, seed = NULL, ...) {
 diagnostic_ordered_residuals.default <- function(model, type = NULL, seed = NULL, ...) {
   type <- type %||% if (inherits(model, "gratia_diagnostics")) model$type else "quantile"
   prepared <- diagnostic_data(model, type = type, seed = seed, ...)
+  if (is_multinom_diagnostics(prepared)) stop(
+    "For multinomial surrogate utilities, inspect each matrix column separately for ordered correlations.", call. = FALSE)
   data <- prepared$data
   compact_rows <- unique(data$.row)
   rows <- ordered_model_rows(prepared$source, prepared$n_obs, compact_rows)

@@ -6,6 +6,9 @@
 # diagnostic_qq_data.<source class>(). It returns list(data, method, intercept,
 # slope, center), with theoretical, residuals and optional lower/upper columns.
 # center gives the reference value subtracted for each point in a worm plot.
+# Multinomial surrogate diagnostics instead retain an observation table and a
+# wide utility matrix. They materialise one component table at a time before
+# passing it to the same QQ, histogram and density-summary renderers.
 # Plotting and aggregation consume these results without inspecting model classes.
 # These S3 methods remain internal while support for additional models develops.
 diagnostic_data <- function(model, type = NULL, seed = NULL, conditioning = NULL, ..., n_dharma = NULL) {
@@ -87,6 +90,8 @@ diagnostic_data.gam <- function(model, type = NULL, seed = NULL, conditioning = 
   action <- stats::na.action(model)
   rows <- which(!is.na(model_row_map(model)))
   model <- model_used_rows(model)
+  if (is_multinom_surrogate(model, type))
+    return(multinom_diagnostic_data(model, rows, action, seed))
   r <- diagnostic_residuals(model, type = type, seed = seed, n_dharma = n_dharma)
   if (type %in% c("pit", "quantile", "dharma", "surrogate")) {
     attr(model, "gratia.diagnostics") <- list(type = type, residuals = r, seed = seed, n_dharma = if (type == "dharma") dharma_simulation_count(model, n_dharma) else NULL)
@@ -219,6 +224,10 @@ diagnostic_qq_data.default <- function(
   by_family = NULL
 ) {
   type <- diagnostics$type
+  if (is_multinom_diagnostics(diagnostics)) {
+    if (!is.null(method)) stop("Surrogate residuals use a fixed reference; use method = NULL.", call. = FALSE)
+    return(multinom_qq_reference(diagnostics, level))
+  }
   by_family <- diagnostic_data_by_family(diagnostics, by_family)
   grouped <- ".family" %in% names(diagnostics$data)
   if (type == "dharma") {
@@ -461,6 +470,7 @@ render_diagnostic_qq <- function(
   intercept <- reference$intercept
   slope <- reference$slope
   method <- reference$method
+  reference_axis <- reference$axis
   reference_subtitle <- reference$subtitle
   reference_caption <- reference$caption
   by_family <- isTRUE(reference$by_family)
@@ -515,7 +525,7 @@ render_diagnostic_qq <- function(
   plt <- plt +
     ggplot2::labs(
       x = if (is.null(xlab)) {
-        calibrated_reference_axis(type)
+        reference_axis %||% calibrated_reference_axis(type)
       } else xlab,
       y = if (is.null(ylab)) {
         paste0(diagnostic_residual_label(type), if (worm) " (Deviation)" else "")
@@ -561,9 +571,14 @@ render_diagnostic_qq <- function(
 #'   Used only for `density_method = "kde"` and conditional density.
 #' @param type Residual type; `NULL` follows the model-specific defaults in
 #'   [appraise()]. PIT and quantile residuals are available for supported response
-#'   distributions. `"surrogate"` is available for `ocat()` models and uses
-#'   logistic QQ references with `method = NULL`; see [surrogate_residuals()]
-#'   and [diagnostic_support].
+#'   distributions. `"surrogate"` is available for `ocat()` and `multinom()`
+#'   GAMs with `method = NULL`: logistic references for ordinal residuals and
+#'   centred Gumbel references for each nominal category utility. Nominal
+#'   components always have separate panels. Their residuals are drawn once
+#'   per observation and shared with ordinary diagnostics. Components are
+#'   summarised one at a time; QQ bin limits apply to each category. Residuals
+#'   use category probabilities on the predictor axis, including category 0.
+#'   See [surrogate_residuals()] and [diagnostic_support].
 #' @inheritParams qq_plot
 #' @inheritParams appraise
 #' @param level Coverage of pointwise QQ reference intervals, strictly between
@@ -721,6 +736,9 @@ scalable_qq <- function(
     stop("Level must be 0 < level < 1.", call. = FALSE)
   }
   d <- prepare_diagnostic_data(model, type, seed, conditioning = conditioning, n_dharma = if (missing(n_dharma)) NULL else n_dharma, ...)
+  if (is_multinom_diagnostics(d)) return(multinom_qq_plot(d,
+    method, level, qq_bins, aggregate, worm, xlab, ylab, title, subtitle,
+    caption, ci_col, ci_alpha, point_col, point_alpha, line_col))
   by_family <- diagnostic_data_by_family(d, by_family)
   reference <- diagnostic_seed(
     seed,
@@ -957,6 +975,11 @@ scalable_residuals_linpred_plot <- function(
   density_method <- match.arg(density_method)
   validate_diagnostic_bandwidth(bandwidth)
   d <- prepare_diagnostic_data(model, type, seed, conditioning = conditioning, n_dharma = if (missing(n_dharma)) NULL else n_dharma, ...)
+  if (is_multinom_diagnostics(d)) return(multinom_residual_plot(d,
+    "predictor", TRUE, density_bins = density_bins, density = density,
+    density_method = density_method, bandwidth = bandwidth, rank = rank,
+    xlab = xlab, ylab = ylab, title = if (missing(title)) NULL else title,
+    subtitle = subtitle, caption = caption, line_col = line_col))
   if (missing(subtitle)) {
     subtitle <- paste("Family:", family(d$source)[["family"]])
   }
@@ -1029,6 +1052,11 @@ scalable_observed_fitted_plot <- function(
 ) {
   density <- match.arg(density)
   d <- prepare_diagnostic_data(model, conditioning = conditioning, ...)
+  if (is_multinom_diagnostics(d)) return(multinom_residual_plot(d,
+    "observed", TRUE, density_bins = density_bins, density = density,
+    xlab = if (missing(xlab)) NULL else xlab,
+    ylab = if (missing(ylab)) NULL else ylab,
+    title = title, subtitle = subtitle, caption = caption))
   subtitle <- subtitle %||% diagnostic_context_label(response_distribution(d$source))
   if (".family" %in% names(d$data)) {
     check_gfam_appraise(d$source)
@@ -1111,6 +1139,9 @@ scalable_residuals_hist_plot <- function(
   conditioning = NULL, ..., n_dharma = 250L
 ) {
   d <- prepare_diagnostic_data(model, type, seed, conditioning = conditioning, n_dharma = if (missing(n_dharma)) NULL else n_dharma, ...)
+  if (is_multinom_diagnostics(d)) return(multinom_residual_plot(d,
+    "histogram", TRUE, n_bins = n_bins, xlab = xlab, ylab = ylab,
+    title = title, subtitle = subtitle, caption = caption))
   subtitle <- subtitle %||% diagnostic_context_label(response_distribution(d$source))
   by_family <- diagnostic_data_by_family(d, by_family)
   if (".family" %in% names(d$data)) {

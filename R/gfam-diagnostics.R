@@ -195,6 +195,7 @@ gfam_cdf_support <- function(context) {
 diagnostic_type <- function(model, type = NULL, allow_pit = TRUE) {
   if (is.null(type)) {
     default <- attr(model, "gratia.default_residual_type") %||% model$diagnostic_default_type
+    if (is_multinom_diagnostics(model) && is.null(default)) default <- model$type
     if (!is.null(default)) return(default)
     if (!is_gfam_family(family(model))) return("deviance")
     unsupported <- gfam_cdf_support(gfam_diagnostic_context(model))

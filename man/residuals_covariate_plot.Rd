@@ -90,7 +90,7 @@ fitting call only when needed and verifying them in the same way.}
 
 \item{type}{character or \code{NULL}; residual type: \code{"deviance"}, \code{"pearson"},
 \code{"response"}, \code{"pit"}, \code{"quantile"}, \code{"dharma"}, or \code{"surrogate"} (for
-\code{ocat()} models). Grouped models automatically use
+\code{ocat()} or \code{multinom()} GAMs). Grouped models automatically use
 quantile residuals when all active components are supported, otherwise all
 use deviance residuals with a message. Ordinary models retain deviance
 residuals by default. See \code{\link[=appraise]{appraise()}} for distributional support.}

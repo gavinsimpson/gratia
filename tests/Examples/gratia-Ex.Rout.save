@@ -3680,7 +3680,7 @@ detaching ‘package:mgcv’
 > flush(stderr()); flush(stdout())
 >
 > ### Name: surrogate_residuals
-> ### Title: Surrogate residuals for ordered categorical GAMs
+> ### Title: Surrogate residuals for categorical GAMs
 > ### Aliases: surrogate_residuals surrogate_residuals.gam
 > ###   surrogate_residuals.default
 >
