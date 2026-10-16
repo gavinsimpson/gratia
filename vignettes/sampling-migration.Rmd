@@ -178,6 +178,20 @@ draws, such as `response_derivatives()` and `conditional_differences()`, keep
 their existing grid and simulation-count arguments; their internal sampling
 calls use this interface.
 
+## Likelihoods and external diagnostic wrappers
+
+`log_lik()`, `loo::loo()`, `loo::waic()` and `bayesplot::pp_check()` use the
+same `n_draws` convention. Likelihood and LOO/WAIC wrappers default to 4,000
+draws; bayesplot uses 50 for ordinary checks and 4,000 for leave-one-out plots.
+Supplied coefficient matrices determine their own counts. Pass `chains`,
+`diagnostics`, `method` and backend controls directly to `log_lik()`, or through
+`sampling_args` for LOO, WAIC and bayesplot. Likelihood matrices and these
+diagnostic results retain the coefficient sampling metadata. LOO reads stored
+chain iterations when estimating relative efficiency, while keeping likelihood
+and response draws in the same original order. Unlabelled supplied matrices
+still require explicit `chain_id` or `r_eff` for LOO. The old `n` argument and
+explicit controls for a different sampler produce errors.
+
 ## Location-scale-shape models
 
 `posterior_samples()` now accepts evaluation data for `gaulss()`, `gammals()`,

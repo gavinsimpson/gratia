@@ -15,16 +15,25 @@ data_sim(
   n_cat = 4,
   cuts = c(-1, 0, 5),
   seed = NULL,
-  gfam_families = c("binary", "tweedie", "normal")
+  gfam_families = c("binary", "tweedie", "normal"),
+  family = NULL,
+  predictors = NULL,
+  parameters = list(),
+  observation = NULL
 )
 }
 \arguments{
-\item{model}{character; either \code{"egX"} where \code{X} is an integer \code{1:7}, or
-the name of a model. See Details for possible options.}
+\item{model}{character; the name of a model, such as \code{"additive"} or its
+original name \code{"eg1"}. See Details for all names and aliases.}
 
 \item{n}{numeric; the number of observations to simulate.}
 
-\item{scale}{numeric; the level of noise to use.}
+\item{scale}{numeric; for normal responses, the standard deviation; for
+Poisson and negative binomial responses, a multiplier of the true
+function; for binary responses, a multiplier after subtracting 5; for
+Gamma and Tweedie responses, the dispersion. Ignored for ordinal
+responses. Legacy numeric vectors are recycled across observations.
+Use \code{parameters} with the family-object interface.}
 
 \item{theta}{numeric; the dispersion parameter \eqn{\theta} to use. The
 default is entirely arbitrary, chosen only to provide simulated data that
@@ -36,60 +45,108 @@ exhibits extra dispersion beyond that assumed by under a Poisson.}
 variable. \code{"ordered categorical"} is a synonym of \code{"ocat"}.}
 
 \item{n_cat}{integer; the number of categories for categorical response.
-Currently only used for \code{distr \%in\% c("ocat", "ordered categorical")}.}
+Currently only used for \code{dist \%in\% c("ocat", "ordered categorical")}.}
 
 \item{cuts}{numeric; vector of cut points on the latent variable, excluding
 the end points \code{-Inf} and \code{Inf}. Must be one fewer than the number of
 categories: \code{length(cuts) == n_cat - 1}.}
 
 \item{seed}{numeric; the seed for the random number generator. Passed to
-\code{\link[base:Random]{base::set.seed()}}.}
+\code{\link[base:set.seed]{base::set.seed()}}.}
 
 \item{gfam_families}{character; a vector of distributions to use in
 generating data with grouped families for use with \code{family = gfam()}. The
 allowed distributions as as per \code{dist}.}
+
+\item{family}{an instantiated family object, such as \code{poisson()} or
+\code{mgcv::gaulss()}. Cannot be combined with explicitly supplied \code{dist},
+\code{scale}, \code{theta}, \code{power}, \code{n_cat}, \code{cuts} or \code{gfam_families}. See
+\link{data_sim_families} for coverage and generating parameters.}
+
+\item{predictors}{\code{NULL} or a function of the generated data, including raw
+true-function columns. Return a finite numeric vector for one linear
+predictor or a matrix with one row per observation and one column per
+linear predictor, in the family's order. These values are on the link
+scale. \code{NULL} uses calibrated example predictors; see \link{data_sim_families}.}
+
+\item{parameters}{a named list of natural-scale generating parameters.
+Parameters fixed in the family constructor are used directly. Fitting
+starting values are not generating parameters: supply the corresponding
+entries explicitly. See \link{data_sim_families} for names and defaults.}
+
+\item{observation}{\code{NULL} or a named list with \code{left}, \code{right} and/or
+\code{interval_width}, for censored families. Limits and widths have length
+one or \code{n}. Complete responses are generated before censoring. See
+\link{data_sim_families} for response encodings.}
+}
+\value{
+A tibble containing responses, covariates and true-function columns.
+Legacy \code{f} is the predictor after its distribution-specific transformation;
+component columns retain their original function values. With \code{family},
+\code{f} is the first linear predictor, \code{y} can be a matrix column, and the
+\code{"truth"} attribute contains \code{eta} (all linear predictors), \code{parameters}
+(natural distribution parameters), \code{functions} (the original template),
+\code{response} (complete responses before censoring), and \code{family}. Grouped
+families also record \code{index} and component-specific parameter lists.
+Binomial family objects return proportions and a \code{trials} column for
+fitting weights. Cox models return observed times and a \code{status} column.
+An explicit \code{seed} restores the caller's RNG state, including its absence;
+\code{seed = NULL} advances the caller's RNG normally.
 }
 \description{
 A tidy reimplementation of the functions implemented in \code{\link[mgcv:gamSim]{mgcv::gamSim()}}
-that can be used to fit GAMs. An new feature is that the sampling
+that can be used to fit GAMs. The sampling
 distribution can be applied to all the example types.
 }
 \details{
 \code{data_sim()} can simulate data from several underlying models of
-known true functions. The available options currently are:
+known true functions. Descriptive names and their original short names
+are interchangeable, giving identical output for the same arguments and
+seed. The available options currently are:
 \itemize{
-\item \code{"eg1"}: a four term additive true model. This is the classic Gu & Wahba
+\item \code{"additive"} or \code{"eg1"}: a four term additive true model. This is the
+classic Gu & Wahba
 four univariate term test model. See \code{\link{gw_functions}} for more details of
 the underlying four functions.
-\item \code{"eg2"}: a bivariate smooth true model.
-\item \code{"eg3"}: an example containing a continuous by smooth (varying
-coefficient) true model. The model is \eqn{\hat{y}_i = f_2(x_{1i})x_{2i}}{
-yhat = f(x1)x2} where the function \eqn{f_2()} is \eqn{f_2(x) = 0.2 * x^{11} *
+\item \code{"bivariate_surface"} or \code{"eg2"}: a bivariate smooth true model.
+\item \code{"varying_coefficient"} or \code{"eg3"}: an example containing a continuous
+by smooth (varying
+coefficient) true model. The model is \eqn{\hat{y}_i = f_2(x_{2i})x_{1i}}{
+yhat = f(x2)x1} where the function \eqn{f_2()} is \eqn{f_2(x) = 0.2 * x^{11} *
 (10 * (1 - x))^6 + 10 * (10 * x)^3 * (1 - x)^{10}}{f(x) = 0.2 * x^11 * (10 *
 (1 - x))^6 + 10 * (10 * x)^3 * (1 - x)^10}.
-\item \code{"eg4"}: a factor by smooth true model. The true model contains a factor
+\item \code{"factor_by"} or \code{"eg4"}: a factor by smooth true model. The true model
+contains a factor
 with 3 levels, where the response for the \emph{n}th level follows the \emph{n}th
 Gu & Wahba function (for \eqn{n \in {1, 2, 3}}{n in {1,2,3}}).
-\item \code{"eg5"}: an additive plus factor true model. The response is a linear
+\item \code{"additive_factor"} or \code{"eg5"}: an additive plus factor true model. The
+response is a linear
 combination of the Gu & Wahba functions 2, 3, 4 (the latter is a null
 function) plus a factor term with four levels.
-\item \code{"eg6"}: an additive plus random effect term true model.
-\item ´"eg7"\verb{: a version of the model in }"eg1"`, but where the covariates are
+\item \code{"additive_group_effects"} or \code{"eg6"}: an additive model plus four
+group intercepts with fixed realised values \verb{3, 6, 9, 12}.
+\item \code{"additive_correlated"} or \code{"eg7"}: a version of the model in \code{"eg1"},
+but where the covariates are
 correlated.
-\item \code{"gwf2"}: a model where the response is Gu & Wahba's
+\item \code{"gu_wahba_f2"} or \code{"gwf2"}: a model where the response is Gu & Wahba's
 \eqn{f_2(x_i)}{f_2(x_i)} plus noise.
-\item \code{"lwf6"}: a model where the response is Luo & Wahba's "example 6"
+\item \code{"luo_wahba_f6"} or \code{"lwf6"}: a model where the response is Luo &
+Wahba's "example 6"
 function \eqn{sin(2(4x-2)) + 2 exp(-256(x-0.5)^2)}{
     sin(2 * ((4 * x) - 2)) + (2 * exp(-256 * (x - .5)^2))} plus noise.
 \item \code{"gfam"}: simulates data for use with GAMs with
 \code{family = gfam(families)}. See example in \code{\link[mgcv:gfam]{mgcv::gfam()}}. If this model
 is specified then \code{dist} is ignored and \code{gfam_families} is used to
 specify which distributions are included in the simulated data. Can be a
-vector of any of the families allowed by \code{dist}. For
-\code{"ocat" \%in\% gfam_families} (or \code{"ordered categorical"}), 4 classes are
-assumed, which can't be changed. Link functions used are \code{"identity"}
-for \code{"normal"}, \code{"logit"} for \code{"binary"}, \code{"ocat"}, and
-\code{"ordered categorical"}, and \code{"exp"} elsewhere.
+vector of the distributions allowed by \code{dist}, including repeated names.
+Defaults use Gaussian standard deviation 0.5, Gamma dispersion 0.5,
+Tweedie dispersion 1.5, negative binomial size 3 and Tweedie power 1.5.
+Historical grouped ordinal cuts are \code{c(1, 2, 2.5)}.
+Explicit \code{scale}, \code{theta}, \code{power}, \code{n_cat} and \code{cuts} override these
+settings. A supplied \code{scale} is the Gaussian standard deviation and the
+Gamma or Tweedie dispersion. Identity, logit and log links are used
+for normal, binary and positive-mean responses, respectively. Ordinal
+responses use a logistic latent variable.
 }
 
 The random component providing noise or sampling variation can follow one
@@ -106,14 +163,27 @@ of the distributions, specified via argument \code{dist}
 
 Other arguments provide the parameters for the distribution.
 }
+\section{Shape-constrained examples}{
+
+Models named \code{"sc_increasing"}, \code{"sc_decreasing"}, \code{"sc_convex"},
+\code{"sc_concave"}, \code{"sc_positive"}, \code{"sc_increasing_convex"},
+\code{"sc_increasing_concave"}, \code{"sc_decreasing_convex"} and
+\code{"sc_decreasing_concave"} provide univariate reference shapes on \verb{[0, 1]}.
+\code{"sc_additive"} combines four terms; \code{"sc_tensor"} is increasing in two
+coordinates; \code{"sc_location_scale"} has a concave log-mean and increasing
+log dispersion. The latter defaults to \code{family = mgcv::gammals()}; other
+shape templates default to Gaussian noise with standard deviation 0.2.
+See \link{data_sim_shapes} for functions, derivatives and \code{mgcv::scasm()} recipes.
+}
+
 \examples{
 \dontshow{
 op <- options(pillar.sigfig = 5, cli.unicode = FALSE)
 }
-data_sim("eg1", n = 100, seed = 1)
+data_sim("additive", n = 100, seed = 1)
 
 # an ordered categorical response
-data_sim("eg1", n = 100, dist = "ocat", n_cat = 4, cuts = c(-1, 0, 5))
+data_sim("additive", n = 100, dist = "ocat", n_cat = 4, cuts = c(-1, 0, 5))
 \dontshow{
 options(op)
 }
@@ -124,4 +194,7 @@ Bayesian "Confidence Intervals." \emph{J. Comput. Graph. Stat.} \strong{2}, 97�
 
 Luo, Z., Wahba, G., (1997). Hybrid adaptive splines. \emph{J. Am. Stat. Assoc.}
 \strong{92}, 107–116.
+}
+\seealso{
+\link{data_sim_families}, \link{data_sim_shapes}
 }

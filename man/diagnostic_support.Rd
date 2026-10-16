@@ -220,7 +220,7 @@ The sdmTMB definitions and recommendations are documented at
 
 PPCs use a separate approximation that draws fixed-effect, nuisance and field
 parameters together. Marginal PPCs simulate new fields at each parameter draw;
-smooths retain their posterior draws. Plot subtitles identify these choices.
+smooths retain their posterior draws. Plot captions identify conditioning.
 Parameter estimation, the Gaussian approximation to the posterior and finite
 simulation error affect these checks. None of these modes guarantees that
 goodness-of-fit tests attain their nominal false-positive rate after fitting.

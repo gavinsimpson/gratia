@@ -7,8 +7,10 @@
 A family can supply a \code{gratia_diagnostics} function to describe its response
 distribution without adding family-name checks to gratia. The function is
 called with named arguments \code{mu}, \code{wt}, \code{scale}, \code{y} and \code{eta}. These contain
-fitted values, diagnostic sampling weights, fitted scale, the fitting response
-and linear predictors, respectively. Missing fitting rows have been removed;
+response parameters, weights, fitted scale, the fitting response and linear
+predictors, respectively. Diagnostics use fitted parameters and sampling
+weights; \code{\link[=log_lik]{log_lik()}} uses draw-specific parameters and likelihood weights.
+Missing fitting rows have been removed;
 grouped families receive only their own rows. \code{eta} can be \code{NULL} when a
 distribution is constructed without a fitted model.
 }
@@ -28,6 +30,15 @@ logarithms. For an upper tail, \code{cdf_left} returns \code{P(Y >= q)}.
 \item \code{qf}: a function \verb{(p, log_p = FALSE, lower_tail = TRUE)} for quantiles.
 \item \code{rd}: a function with no arguments that draws a complete response vector
 (or response matrix), retaining any dependence between observations.
+\item \code{log_lik}: a function \code{(y)} returning one normalised log density or log
+probability mass per observation, including fitting weights. A response
+vector contributes one value; a multivariate response contributes one joint
+value per row. \code{\link[=log_lik]{log_lik()}} calls the factory at each coefficient draw with
+likelihood weights, which can differ from diagnostic sampling weights.
+Parameters represented by \code{mu} and \code{eta} vary with that draw; the hook must
+exclude smoothing penalties and priors. Finite positive log densities and
+\code{-Inf} for impossible observations are allowed; missing values and \code{Inf}
+are invalid.
 \item \code{bounds}: a function \code{(y)} returning a list with numeric \code{lower} and \code{upper}
 response bounds. Censoring intervals use their endpoints. Exact count
 observations can use \code{y - 1} and \code{y}. Alternatively, supply \code{cdf_left}:
@@ -67,7 +78,8 @@ the family or drawing random numbers in the factory itself.
 
 Adding this function does not extend a family's supported fitting methods.
 Posterior predictive sampling still uses the fitting package's parameter and
-response sampling methods; this interface describes checks at fitted parameters.
+response sampling methods. The likelihood hook also operates at supplied
+coefficient draws.
 }
 \examples{
 load_mgcv()

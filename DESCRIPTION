@@ -1,5 +1,5 @@
 Package: gratia
-Version: 0.11.2-50
+Version: 0.11.2-52
 Title: Graceful 'ggplot'-Based Graphics and Other Functions for GAMs Fitted Using 'mgcv'
 Authors@R: c(person(given = "Gavin L.", family = "Simpson",
                     email = "ucfagls@gmail.com",
@@ -40,6 +40,8 @@ Imports:
 Suggests:
     posterior,
     coda,
+    bayesplot,
+    loo,
     ggcube (>= 0.3.0),
     geometry,
     qgam,

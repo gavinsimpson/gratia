@@ -37,6 +37,7 @@ articles:
       for grouped surveys, mixed models or spatial surveys.
     contents:
       - articles/model-checking
+      - articles/bayesplot-loo
       - articles/gfam-support
       - articles/glmmTMB-support
       - articles/sdmTMB-support
@@ -81,6 +82,8 @@ reference:
       - draw.smooth_estimates
       - parametric_effects
       - draw.parametric_effects
+      - ale
+      - draw.ale
       - add_confint
       - confint.gam
       - add_constant
@@ -138,9 +141,14 @@ reference:
       - draw.rootogram
       - observed_fitted_plot
       - posterior_predictive_plot
+      - pp_check
+      - log_lik
+      - loo.gam
       - scalable_qq_plot
       - residuals_hist_plot
       - residuals_linpred_plot
+      - residuals_covariate_plot
+      - scalable_residuals_covariate_plot
       - quantile_residuals
       - dharma_residuals
       - residual_correlation
@@ -258,6 +266,8 @@ reference:
     desc: Generate example data or use bundled data sets to learn and demonstrate GAM workflows.
   - contents:
       - data_sim
+      - data_sim_families
+      - data_sim_shapes
       - gw_functions
       - rtw
       - bird_move

@@ -3,8 +3,10 @@
 #' A family can supply a `gratia_diagnostics` function to describe its response
 #' distribution without adding family-name checks to gratia. The function is
 #' called with named arguments `mu`, `wt`, `scale`, `y` and `eta`. These contain
-#' fitted values, diagnostic sampling weights, fitted scale, the fitting response
-#' and linear predictors, respectively. Missing fitting rows have been removed;
+#' response parameters, weights, fitted scale, the fitting response and linear
+#' predictors, respectively. Diagnostics use fitted parameters and sampling
+#' weights; [log_lik()] uses draw-specific parameters and likelihood weights.
+#' Missing fitting rows have been removed;
 #' grouped families receive only their own rows. `eta` can be `NULL` when a
 #' distribution is constructed without a fitted model.
 #'
@@ -24,6 +26,15 @@
 #' * `qf`: a function `(p, log_p = FALSE, lower_tail = TRUE)` for quantiles.
 #' * `rd`: a function with no arguments that draws a complete response vector
 #'   (or response matrix), retaining any dependence between observations.
+#' * `log_lik`: a function `(y)` returning one normalised log density or log
+#'   probability mass per observation, including fitting weights. A response
+#'   vector contributes one value; a multivariate response contributes one joint
+#'   value per row. [log_lik()] calls the factory at each coefficient draw with
+#'   likelihood weights, which can differ from diagnostic sampling weights.
+#'   Parameters represented by `mu` and `eta` vary with that draw; the hook must
+#'   exclude smoothing penalties and priors. Finite positive log densities and
+#'   `-Inf` for impossible observations are allowed; missing values and `Inf`
+#'   are invalid.
 #' * `bounds`: a function `(y)` returning a list with numeric `lower` and `upper`
 #'   response bounds. Censoring intervals use their endpoints. Exact count
 #'   observations can use `y - 1` and `y`. Alternatively, supply `cdf_left`:
@@ -62,7 +73,8 @@
 #'
 #' Adding this function does not extend a family's supported fitting methods.
 #' Posterior predictive sampling still uses the fitting package's parameter and
-#' response sampling methods; this interface describes checks at fitted parameters.
+#' response sampling methods. The likelihood hook also operates at supplied
+#' coefficient draws.
 #'
 #' @name family_diagnostics
 #' @seealso [diagnostic_support], [quantile_residuals()], [appraise()]
@@ -92,7 +104,7 @@ extend_family_distribution <- function(d, family, mu, wt, scale, y, eta) {
     "> gratia_diagnostics: ", message, call. = FALSE)
   if (!is.function(factory)) fail("must be a function.")
   extra <- factory(mu = mu, wt = wt, scale = scale, y = y, eta = eta)
-  fields <- c("mean", "variance", "rd", "cdf", "qf", "cdf_left", "bounds",
+  fields <- c("mean", "variance", "rd", "cdf", "qf", "cdf_left", "bounds", "log_lik",
     "diagnostic_residuals", "observe", "reference_available", "reference_reason",
     "mean_available", "variance_available", "moment_reason", "independent",
     "joint_available", "dependence_reason", "approximation", "continuous")
@@ -101,7 +113,7 @@ extend_family_distribution <- function(d, family, mu, wt, scale, y, eta) {
     fail("return a named list with unique field names.")
   unknown <- setdiff(names(extra), fields)
   if (length(unknown)) fail(paste0("unknown field(s): ", paste(unknown, collapse = ", "), "."))
-  hooks <- c("rd", "cdf", "qf", "cdf_left", "bounds", "diagnostic_residuals", "observe")
+  hooks <- c("rd", "cdf", "qf", "cdf_left", "bounds", "diagnostic_residuals", "observe", "log_lik")
   for (name in intersect(hooks, names(extra)))
     if (!is.null(extra[[name]]) && !is.function(extra[[name]]))
       fail(paste0(name, " must be a function or NULL."))
@@ -114,6 +126,20 @@ extend_family_distribution <- function(d, family, mu, wt, scale, y, eta) {
         length(extra[[name]]) != 1L || is.na(extra[[name]])))
       fail(paste0(name, " must be a single string or NULL."))
   d[names(extra)] <- extra
+  if (is.function(d$log_lik)) {
+    hook <- d$log_lik
+    n_observations <- NROW(mu)
+    d$log_lik <- local({
+      fun <- hook
+      function(y) {
+        value <- fun(y)
+        if (!is.numeric(value) || !is.null(dim(value)) ||
+            length(value) != n_observations || anyNA(value) || any(value == Inf))
+          fail("log_lik must return one valid log likelihood per observation.")
+        value
+      }
+    })
+  }
   d$cdf_bounds_supplied <- is.function(extra$bounds) || is.function(extra$cdf_left) ||
     isTRUE(extra$continuous)
   n <- if (is.matrix(d$mean)) length(d$mean) else NROW(mu)

@@ -21,6 +21,8 @@ elapsed seconds), \code{coefficients} (posterior summaries, or \code{NULL} if no
 requested), and \code{draws} (a coefficient matrix with chain identities, or
 \code{NULL} if unavailable). Coefficient matrices provide their own draws;
 other sampling outputs need \code{diagnostics = TRUE} to retain them.
+Likelihood matrices from \code{\link[=log_lik]{log_lik()}} also require \code{diagnostics = TRUE}
+for coefficient plots; use \code{\link[=as_mcmc_draws]{as_mcmc_draws()}} for their log-density draws.
 }
 \description{
 Diagnostics attached to fitted values or response samples describe the

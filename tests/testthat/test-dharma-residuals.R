@@ -80,8 +80,7 @@ test_that("extraction, QQ, worm and ordinary panels share the residual definitio
   expect_equal(q$data$lower, qbeta(.05, seq_along(r), rev(seq_along(r))))
   expect_equal(w$data$residuals, q$data$residuals - q$data$theoretical)
   expect_equal(w$data$lower, q$data$lower - q$data$theoretical)
-  expect_match(q$labels$subtitle, "approximate pointwise")
-  expect_match(q$labels$subtitle, "30 response simulations")
+  expect_identical(q$labels$subtitle, "Method: uniform")
   expect_identical(q$labels$y, "DHARMa-style residuals")
   for (scalable in c(FALSE, TRUE)) {
     a <- appraise(m, type = "dharma", n_dharma = 30, seed = 21,
@@ -170,8 +169,7 @@ test_that("dependent and marginal-only simulators omit independence-based bands"
   p <- dharma_test_proxy(function() rep(rpois(1, 1), 3), independent = FALSE)
   q <- qq_plot(p, type = "dharma", n_dharma = 20, seed = 3)
   expect_false("lower" %in% names(q$data))
-  expect_match(q$labels$subtitle, "bands omitted")
-  expect_match(q$labels$subtitle, "shared variation")
+  expect_identical(q$labels$subtitle, "Method: uniform")
   p$distribution$rd <- NULL
   p$distribution$joint_available <- FALSE
   expect_equal(q$data$residuals, sort(dharma_residuals(p, n = 20, seed = 3)))

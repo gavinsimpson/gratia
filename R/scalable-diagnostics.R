@@ -233,7 +233,8 @@ diagnostic_qq_data.default <- function(
       distribution = response_distribution(model), n_simulate = n_simulate)
     return(list(data = df, method = if (type == "pit") "uniform reference" else "normal",
       intercept = 0, slope = 1, center = df$theoretical, by_family = by_family,
-      subtitle = calibrated_reference_subtitle(type, attr(df, "band_method"), response_distribution(model)),
+      subtitle = calibrated_reference_subtitle(type),
+      caption = diagnostic_qq_caption(model, df),
       colour_family = grouped && !by_family))
   }
   if (!type %in% c("deviance", "response", "pearson"))
@@ -277,7 +278,8 @@ diagnostic_qq_data.default <- function(
     center = center,
     by_family = by_family,
     colour_family = FALSE,
-    subtitle = diagnostic_qq_subtitle(model, method, grouped)
+    subtitle = diagnostic_qq_subtitle(method),
+    caption = diagnostic_qq_caption(model, df)
   )
 }
 
@@ -456,6 +458,7 @@ render_diagnostic_qq <- function(
   slope <- reference$slope
   method <- reference$method
   reference_subtitle <- reference$subtitle
+  reference_caption <- reference$caption
   by_family <- isTRUE(reference$by_family)
   colour_family <- isTRUE(reference$colour_family)
   reference <- NULL
@@ -507,12 +510,12 @@ render_diagnostic_qq <- function(
   }
   plt <- plt +
     ggplot2::labs(
-      x = if (is.null(xlab)) "Theoretical quantiles" else xlab,
+      x = if (is.null(xlab)) {
+        if (type == "pit") "Uniform quantiles" else
+          if (type == "quantile") "Std. normal quantiles" else "Theoretical quantiles"
+      } else xlab,
       y = if (is.null(ylab)) {
-        if (type == "dharma") paste0(diagnostic_residual_label(type),
-          if (worm) " (Deviation)" else "") else paste(
-          stringr::str_to_title(type), "residuals",
-          if (worm) "(Deviation)" else "")
+        paste0(diagnostic_residual_label(type), if (worm) " (Deviation)" else "")
       } else {
         ylab
       },
@@ -521,8 +524,8 @@ render_diagnostic_qq <- function(
       } else {
         title
       },
-      subtitle = if (is.null(subtitle)) reference_subtitle %||% paste("Method:", method) else subtitle,
-      caption = caption
+      subtitle = if (is.null(subtitle)) reference_subtitle %||% diagnostic_qq_subtitle(method) else subtitle,
+      caption = caption %||% reference_caption
     )
   compact_diagnostic_plot(plt)
 }
@@ -589,6 +592,10 @@ render_diagnostic_qq <- function(
 #'   observations; observed-versus-fitted appraisals always separate components.
 #'   Pooled histograms use faint component-coloured fills with opaque stepped
 #'   upper boundaries, retaining common bin edges and component densities.
+#'
+#'   Residual-versus-predictor plots identify the response family in the subtitle
+#'   and show conditioning and field choices in the caption where relevant,
+#'   matching [residuals_linpred_plot()]. Supply `caption = ""` to omit the caption.
 #'
 #'   Kernel density estimates are calculated on a fixed grid before plotting.
 #'   Each predictor slice is normalized to integrate to one over the displayed
@@ -897,7 +904,7 @@ render_diagnostic_grid <- function(
   ) +
     ggplot2::geom_rect(colour = NA) +
     ggplot2::scale_fill_viridis_c(
-      name = if (density == "conditional") "Conditional density" else "Count",
+      name = if (density == "conditional") "Conditional\ndensity" else "Count",
       transform = fill_transform
     )
   if (!is.null(intercept)) {
@@ -943,7 +950,10 @@ scalable_residuals_linpred_plot <- function(
   density_method <- match.arg(density_method)
   validate_diagnostic_bandwidth(bandwidth)
   d <- prepare_diagnostic_data(model, type, seed, conditioning = conditioning, n_dharma = if (missing(n_dharma)) NULL else n_dharma, ...)
-  subtitle <- subtitle %||% diagnostic_context_label(response_distribution(d$source))
+  if (missing(subtitle)) {
+    subtitle <- paste("Family:", family(d$source)[["family"]])
+  }
+  caption <- caption %||% diagnostic_predictor_caption(d$source)
   by_family <- diagnostic_data_by_family(d, by_family)
   dat <- d$data
   if (".family" %in% names(dat)) {

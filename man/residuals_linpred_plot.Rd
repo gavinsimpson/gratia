@@ -84,3 +84,9 @@ traditional QQ reference calculations. Defaults to 250.}
 \description{
 Plot of residuals versus linear predictor values
 }
+\details{
+The default subtitle identifies the response family. Conditioning
+and field choices appear in the caption where relevant. Supply \code{caption}
+to replace this text, or \code{caption = ""} to omit it. The scalable version
+uses the same labels.
+}

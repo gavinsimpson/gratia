@@ -233,6 +233,10 @@ observations; observed-versus-fitted appraisals always separate components.
 Pooled histograms use faint component-coloured fills with opaque stepped
 upper boundaries, retaining common bin edges and component densities.
 
+Residual-versus-predictor plots identify the response family in the subtitle
+and show conditioning and field choices in the caption where relevant,
+matching \code{\link[=residuals_linpred_plot]{residuals_linpred_plot()}}. Supply \code{caption = ""} to omit the caption.
+
 Kernel density estimates are calculated on a fixed grid before plotting.
 Each predictor slice is normalized to integrate to one over the displayed
 residual grid. Bandwidths, rather than \code{density_bins}, control smoothing;

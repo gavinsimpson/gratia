@@ -148,7 +148,7 @@ are drawn from their fitted prior distributions, while smooth effects remain
 at fitted values; \code{field_method} does not add another draw of the fields.
 These approximations do not guarantee that goodness-of-fit tests have their
 intended false-positive rate after parameter estimation. Posterior predictive checks separately include
-coefficient and field uncertainty, as described in their plot subtitle.
+coefficient and field uncertainty; see \code{\link[=posterior_predictive_plot]{posterior_predictive_plot()}}.
 Student-t responses use the fitted location, scale and fixed or estimated
 degrees of freedom. The scale is not the response standard deviation.
 Pearson residuals require degrees of freedom greater than two, because

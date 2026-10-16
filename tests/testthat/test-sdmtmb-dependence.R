@@ -191,12 +191,13 @@ test_that("sdm field modes reach ordinary, scalable and prepared plot paths", {
       field_method = method)
     scalable <- scalable_qq_plot(m, type = "pit", seed = 4,
       n_simulate = 3, field_method = method)
-    expected <- if (method == "mle-eb") "does not recommend" else
-      if (method == "mle-mvn") "one native joint posterior" else "differ from[[:space:]]+native"
-    expect_match(gsub("[[:space:]]+", " ", ordinary$labels$subtitle), expected)
-    expect_match(gsub("[[:space:]]+", " ", scalable$labels$subtitle), expected)
+    expect_identical(ordinary$labels$subtitle, "Method: uniform")
+    for (label in c("x", "y", "title", "subtitle", "caption"))
+      expect_identical(scalable$labels[[label]], ordinary$labels[[label]])
+    expect_match(ordinary$labels$caption, paste("Fields:", method), fixed = TRUE)
     panel <- residuals_linpred_plot(m, seed = 4, field_method = method)
-    expect_match(gsub("[[:space:]]+", " ", panel$labels$subtitle), expected)
+    expect_identical(panel$labels$subtitle, paste("Family:", family(m)$family))
+    expect_match(panel$labels$caption, paste("Fields:", method), fixed = TRUE)
     changed <- diagnostic_data(prepared, seed = 4, field_method = method)
     direct <- diagnostic_data(m, seed = 4, field_method = method)
     expect_equal(changed$data, direct$data)

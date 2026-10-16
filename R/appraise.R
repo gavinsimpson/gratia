@@ -384,6 +384,9 @@
         point_alpha,
         line_col,
         line_intercept = if (type %in% c("pit", "dharma")) 0.5 else 0
+      ) + ggplot2::labs(
+        subtitle = paste("Family:", stats::family(d$source)[["family"]]),
+        caption = diagnostic_predictor_caption(d$source)
       )
       if (!ppcheck) {
         plt3 <- scalable_residuals_hist_plot(

@@ -40,7 +40,8 @@ test_that("gamm4 posterior defaults preserve fitted-effect uncertainty across pl
       expect_equal(default$data, explicit$data)
       expect_equal(lapply(default$layers, `[[`, "data"), lapply(explicit$layers, `[[`, "data"))
       expect_equal(default$labels, explicit$labels)
-      expect_match(gsub("\n", " ", default$labels$subtitle), "fixed/random-effect")
+      expect_null(default$labels$subtitle)
+      expect_match(default$labels$caption, "Conditioning: conditional", fixed = TRUE)
       appraisal <- appraise(model, ppcheck = TRUE, n_ppc = 3L, seed = 17,
         scalable = scalable)[[3]]
       expect_equal(appraisal$data, default$data)

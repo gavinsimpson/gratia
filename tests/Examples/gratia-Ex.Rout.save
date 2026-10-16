@@ -298,6 +298,36 @@ detaching ‘package:mgcv’
 
 detaching ‘package:mgcv’
 
+> nameEx("ale")
+> ### * ale
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: ale
+> ### Title: Accumulated local effects of a model covariate
+> ### Aliases: ale ale.default ale.gam ale.bam
+> 
+> ### ** Examples
+> 
+> library("mgcv")
+Loading required package: nlme
+This is mgcv 1.9-4. For overview type '?mgcv'.
+> df <- data_sim("eg1", n = 200, seed = 42)
+> m <- gam(y ~ s(x0) + te(x1, x2, k = c(5, 5)) + s(x3),
++   data = df, method = "REML")
+> a <- ale(m, focal = "x1")
+> draw(a)
+> 
+> # Standard deviation in its natural units, rather than reciprocal SD
+> ml <- gam(list(y ~ s(x1), ~ x2), data = df, family = gaulss())
+> ale(ml, "x2", parameter = "scale", scale = "response") |> draw()
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:mgcv’, ‘package:nlme’
+
 > nameEx("appraise")
 > ### * appraise
 > 
@@ -800,7 +830,7 @@ detaching ‘package:mgcv’
 > ## Don't show: 
 > op <- options(pillar.sigfig = 5, cli.unicode = FALSE)
 > ## End(Don't show)
-> data_sim("eg1", n = 100, seed = 1)
+> data_sim("additive", n = 100, seed = 1)
 # A tibble: 100 x 10
          y       x0      x1      x2       x3       f      f0     f1     f2    f3
      <dbl>    <dbl>   <dbl>   <dbl>    <dbl>   <dbl>   <dbl>  <dbl>  <dbl> <dbl>
@@ -817,7 +847,7 @@ detaching ‘package:mgcv’
 # i 90 more rows
 > 
 > # an ordered categorical response
-> data_sim("eg1", n = 100, dist = "ocat", n_cat = 4, cuts = c(-1, 0, 5))
+> data_sim("additive", n = 100, dist = "ocat", n_cat = 4, cuts = c(-1, 0, 5))
 # A tibble: 100 x 11
        y       x0      x1      x2       x3        f      f0     f1     f2    f3
    <int>    <dbl>   <dbl>   <dbl>    <dbl>    <dbl>   <dbl>  <dbl>  <dbl> <dbl>
@@ -840,6 +870,63 @@ detaching ‘package:mgcv’
 > 
 > 
 > cleanEx()
+> nameEx("data_sim_families")
+> ### * data_sim_families
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: data_sim_families
+> ### Title: Generating responses with mgcv family objects
+> ### Aliases: data_sim_families
+> 
+> ### ** Examples
+> 
+> # A beta response: precision is explicitly chosen, rather than estimated.
+> d <- data_sim(family = mgcv::betar(theta = 12), seed = 2)
+> attr(d, "truth")$parameters$precision
+[1] 12
+> 
+> # Binomial proportions: use trials as the fitting weights.
+> d <- data_sim(family = binomial(), parameters = list(trials = 10), seed = 2)
+> 
+> # Mean and standard deviation have separate predictors.
+> d <- data_sim("gwf2", family = mgcv::gaulss(), seed = 2,
++   predictors = function(d) cbind(d$f, log(0.2 + d$x)))
+> 
+> # Fit a censored normal model to the matrix response.
+> d <- data_sim("sc_increasing", family = mgcv::cnorm(theta = 0.2), seed = 2,
++   observation = list(left = 0.1, right = 0.9))
+> 
+> 
+> 
+> cleanEx()
+> nameEx("data_sim_shapes")
+> ### * data_sim_shapes
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: data_sim_shapes
+> ### Title: Reference functions for shape-constrained GAMs
+> ### Aliases: data_sim_shapes
+> 
+> ### ** Examples
+> 
+> library("mgcv")
+Loading required package: nlme
+This is mgcv 1.9-4. For overview type '?mgcv'.
+> d <- data_sim("sc_increasing", n = 200, seed = 2)
+> m <- scasm(y ~ s(x, bs = "sc", xt = "m+", k = 8), data = d)
+> 
+> d <- data_sim("sc_positive", n = 200, seed = 2)
+> m <- scasm(y ~ s(x, bs = "sc", xt = "+", k = 8) - 1, data = d)
+> 
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:mgcv’, ‘package:nlme’
+
 > nameEx("data_slice")
 > ### * data_slice
 > 
@@ -1102,6 +1189,30 @@ detaching ‘package:mgcv’
 > cleanEx()
 
 detaching ‘package:mgcv’
+
+> nameEx("draw.ale")
+> ### * draw.ale
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: draw.ale
+> ### Title: Plot accumulated local effects
+> ### Aliases: draw.ale
+> 
+> ### ** Examples
+> 
+> library("mgcv")
+Loading required package: nlme
+This is mgcv 1.9-4. For overview type '?mgcv'.
+> df <- data_sim("eg1", n = 100, seed = 2)
+> m <- gam(y ~ s(x2), data = df, method = "REML")
+> ale(m, "x2") |> draw()
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:mgcv’, ‘package:nlme’
 
 > nameEx("draw.basis")
 > ### * draw.basis
@@ -2035,6 +2146,85 @@ mu
 
 detaching ‘package:mgcv’
 
+> nameEx("log_lik")
+> ### * log_lik
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: log_lik
+> ### Title: Posterior draws of pointwise log likelihoods
+> ### Aliases: log_lik log_lik.gam log_lik.bam
+> 
+> ### ** Examples
+> 
+> library("mgcv")
+Loading required package: nlme
+This is mgcv 1.9-4. For overview type '?mgcv'.
+> m <- gam(mpg ~ s(wt, k = 5), data = mtcars, method = "REML")
+> ll <- log_lik(m, n_draws = 500, seed = 42)
+> dim(ll)
+[1] 500  32
+> if (requireNamespace("loo", quietly = TRUE)) {
++   loo::loo(ll, r_eff = 1)
++ }
+
+Computed from 500 by 32 log-likelihood matrix.
+
+         Estimate  SE
+elpd_loo    -78.5 3.8
+p_loo         2.9 0.8
+looic       156.9 7.5
+------
+MCSE of elpd_loo is 0.1.
+MCSE and ESS estimates assume independent draws (r_eff=1).
+
+All Pareto k estimates are good (k < 0.63).
+See help('pareto-k-diagnostic') for details.
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:mgcv’, ‘package:nlme’
+
+> nameEx("loo.gam")
+> ### * loo.gam
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: loo.gam
+> ### Title: Leave-one-out validation and WAIC for GAMs
+> ### Aliases: loo.gam loo.bam waic.gam waic.bam
+> 
+> ### ** Examples
+> 
+> if (requireNamespace("loo", quietly = TRUE)) {
++   library("mgcv")
++   m <- gam(mpg ~ s(wt, k = 5), data = mtcars, method = "REML")
++   loo::loo(m, n_draws = 500, seed = 42)
++ }
+Loading required package: nlme
+This is mgcv 1.9-4. For overview type '?mgcv'.
+
+Computed from 500 by 32 log-likelihood matrix.
+
+         Estimate  SE
+elpd_loo    -78.5 3.8
+p_loo         2.9 0.8
+looic       156.9 7.5
+------
+MCSE of elpd_loo is 0.1.
+MCSE and ESS estimates assume independent draws (r_eff=1).
+
+All Pareto k estimates are good (k < 0.63).
+See help('pareto-k-diagnostic') for details.
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:mgcv’, ‘package:nlme’
+
 > nameEx("lp_matrix")
 > ### * lp_matrix
 > 
@@ -2613,6 +2803,31 @@ detaching ‘package:mgcv’
 
 detaching ‘package:mgcv’
 
+> nameEx("pp_check")
+> ### * pp_check
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: pp_check
+> ### Title: Posterior checks with bayesplot
+> ### Aliases: pp_check pp_check.gam pp_check.bam pp_check.gamm
+> ###   pp_check.gamm4
+> 
+> ### ** Examples
+> 
+> if (requireNamespace("bayesplot", quietly = TRUE)) {
++   load_mgcv()
++   dat <- data_sim("eg1", n = 100, seed = 2)
++   fit <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat)
++   bayesplot::pp_check(fit, n_draws = 10, seed = 42)
++ }
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:mgcv’
+
 > nameEx("predicted_samples")
 > ### * predicted_samples
 > 
@@ -2804,6 +3019,36 @@ Levels: a b c d e
 > 
 > 
 > cleanEx()
+> nameEx("residuals_covariate_plot")
+> ### * residuals_covariate_plot
+>
+> flush(stderr()); flush(stdout())
+>
+> ### Name: residuals_covariate_plot
+> ### Title: Plot residuals against covariates
+> ### Aliases: residuals_covariate_plot scalable_residuals_covariate_plot
+>
+> ### ** Examples
+>
+> library("mgcv")
+Loading required package: nlme
+This is mgcv 1.9-4. For overview type '?mgcv'.
+> dat <- data_sim("eg1", n = 400, seed = 2)
+> m <- gam(y ~ x2 + s(x0) + s(x1), data = dat, method = "REML")
+> # A curve against x2 suggests reconsidering its linear effect.
+> residuals_covariate_plot(m, covariates = "x2", type = "pearson")
+> # Check a covariate omitted from the model.
+> residuals_covariate_plot(m, covariates = "x3", data = dat)
+> # Inspect individual covariates and possible remaining interaction structure.
+> scalable_residuals_covariate_plot(m, covariates = c("x0", "x2"),
++   pairs = list(c("x0", "x2")), bins = 6, type = "quantile", seed = 42)
+>
+>
+>
+> cleanEx()
+
+detaching ‘package:mgcv’, ‘package:nlme’
+
 > nameEx("response_derivatives")
 > ### * response_derivatives
 > 

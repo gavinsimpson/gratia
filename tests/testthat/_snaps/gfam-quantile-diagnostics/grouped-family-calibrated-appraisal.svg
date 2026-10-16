@@ -302,7 +302,7 @@
 <text x='173.21' y='276.09' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='4.89px' lengthAdjust='spacingAndGlyphs'>1</text>
 <text x='205.92' y='276.09' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='4.89px' lengthAdjust='spacingAndGlyphs'>2</text>
 <text x='238.63' y='276.09' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='4.89px' lengthAdjust='spacingAndGlyphs'>3</text>
-<text x='140.49' y='288.23' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='128.42px' lengthAdjust='spacingAndGlyphs'>Standard normal quantiles</text>
+<text x='140.49' y='288.23' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='103.34px' lengthAdjust='spacingAndGlyphs'>Std. normal quantiles</text>
 <text transform='translate(18.53,163.00) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='88.06px' lengthAdjust='spacingAndGlyphs'>Quantile residuals</text>
 <rect x='251.23' y='123.94' width='100.84' height='78.13' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
 <text x='256.71' y='138.13' style='font-size: 11.00px; font-family: sans;' textLength='89.89px' lengthAdjust='spacingAndGlyphs'>Family component</text>
@@ -315,7 +315,7 @@
 <text x='279.47' y='156.42' style='font-size: 8.80px; font-family: sans;' textLength='42.56px' lengthAdjust='spacingAndGlyphs'>1: binomial</text>
 <text x='279.47' y='173.70' style='font-size: 8.80px; font-family: sans;' textLength='45.02px' lengthAdjust='spacingAndGlyphs'>2: gaussian</text>
 <text x='279.47' y='190.98' style='font-size: 8.80px; font-family: sans;' textLength='40.12px' lengthAdjust='spacingAndGlyphs'>3: poisson</text>
-<text x='40.72' y='53.14' style='font-size: 11.00px; font-family: sans;' textLength='255.59px' lengthAdjust='spacingAndGlyphs'>Fixed standard-normal reference; pointwise intervals</text>
+<text x='40.72' y='53.14' style='font-size: 11.00px; font-family: sans;' textLength='97.22px' lengthAdjust='spacingAndGlyphs'>Method: std. normal</text>
 <text x='40.72' y='37.35' style='font-size: 13.20px; font-family: sans;' textLength='116.67px' lengthAdjust='spacingAndGlyphs'>QQ plot of residuals</text>
 </g>
 <defs>

@@ -55,14 +55,13 @@ test_that("unknown joint laws keep marginal checks without independent bands", {
   for (fun in list(qq_plot, worm_plot, scalable_qq_plot, scalable_worm_plot)) {
     p <- fun(model, type = "response", n_simulate = 3, seed = 8)
     expect_false(any(c("lower", "upper") %in% names(p$data)))
-    expect_match(p$labels$subtitle, "Marginal distribution check")
-    expect_match(p$labels$subtitle, "working correlation only")
+    expect_identical(p$labels$subtitle, "Method: marginal")
     expect_silent(ggplot2::ggplot_build(p))
     p <- fun(model, type = "quantile", n_simulate = 3, seed = 8)
     expect_false(any(c("lower", "upper") %in% names(p$data)))
-    expect_match(p$labels$subtitle, "bands omitted")
+    expect_identical(p$labels$subtitle, "Method: std. normal")
   }
   normal <- qq_plot(model, type = "response", method = "normal")
   expect_false("lower" %in% names(normal$data))
-  expect_match(normal$labels$subtitle, "Approximate normal marginal")
+  expect_identical(normal$labels$subtitle, "Method: std. normal")
 })

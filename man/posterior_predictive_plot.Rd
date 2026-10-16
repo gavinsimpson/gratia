@@ -89,6 +89,9 @@ Compare the observed response distribution with replicated data sets drawn
 from the approximate posterior predictive distribution of a fitted model.
 }
 \details{
+Mixed-model captions name the conditioning mode. Supply \code{caption} to replace this text, or
+\code{caption = ""} to omit it.
+
 Each replicated data set includes uncertainty in the coefficients and random
 variation in the responses, at the covariate values used to fit the model.
 Linear models and GLMs draw coefficients from a Gaussian distribution with

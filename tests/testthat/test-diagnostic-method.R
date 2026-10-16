@@ -16,7 +16,7 @@ test_that("Tweedie diagnostics default to simulation without computing quantiles
       expect_equal(plot_fun(m, method = NULL, n_simulate = 5, seed = 42)$data,
         explicit$data)
       expect_equal(plot_fun(m, method = "normal")$labels$subtitle,
-        "Method: normal")
+        "Method: std. normal")
     }
     for (use_worm in c(FALSE, TRUE)) {
       automatic <- appraise(m, use_worm = use_worm, n_simulate = 5, seed = 42)

@@ -84,6 +84,20 @@ test_that("GJRM adapters use final distributional means and residuals for each f
   }
 })
 
+test_that("GJRM NBII uses the expected negative-binomial parameterization", {
+  skip_if_not_installed("GJRM")
+  # Some upstream versions replace small-dispersion masses with Poisson
+  # probabilities and assign the wrong rows when only part of a vector needs
+  # replacement. Check the parameterization at a fixed moderate dispersion;
+  # the adapter tests above use independent CDFs for the actual fitted values.
+  y <- 0:8
+  mu <- seq(.5, 3, length.out = length(y))
+  sigma <- .5
+  density <- get("dNBII", asNamespace("GJRM"))
+  expect_equal(density(y, mu = mu, sigma = sigma),
+    dnbinom(y, mu = mu, size = mu / sigma))
+})
+
 test_that("GJRM class collisions and unsupported fits are rejected", {
   expect_error(
     diagnostic_data(structure(list(), class = "gamlss")),

@@ -32,7 +32,7 @@ jobs:
         shell: bash
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::pkgload, any::vdiffr, any::svglite, any::glmmTMB, TMB=?source&reinstall
+          extra-packages: any::pkgload, any::vdiffr, any::svglite, any::glmmTMB, any::rstantools, TMB=?source&reinstall
           needs: check
           install-pandoc: true
       # Fresh parallel workers cannot see pkgload's in-process namespace.
@@ -71,7 +71,7 @@ jobs:
           use-public-rspm: true
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::pkgload, any::glmmTMB
+          extra-packages: any::pkgload, any::glmmTMB, any::rstantools
           needs: check
       - name: Install current package for parallel workers
         run: R CMD INSTALL .

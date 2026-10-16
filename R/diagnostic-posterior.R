@@ -430,7 +430,7 @@ diagnostic_posterior_observed.glmmTMB <- function(model, conditioning = NULL, ..
     "effect covariance and other family parameters plugged in at fitted values.") else paste(
       "Joint Gaussian coefficient/fitted-effect draws marginalize covariance-parameter estimation;",
       "other family parameters plugged in at fitted values.")
-  out
+  diagnostic_posterior_labels(out, conditioning)
 }
 
 # Take the required coefficients and effects from TMB's full joint Gaussian
@@ -547,7 +547,7 @@ diagnostic_posterior_observed.sdmTMB <- function(model, conditioning = NULL,
     "smooth coefficients retain their posterior draws.") else paste(
       "Approximate joint coefficient, nuisance-parameter and fitted-field posterior draws;",
       "native observation simulation.")
-  out
+  diagnostic_posterior_labels(out, conditioning)
 }
 
 # sdmTMB's mle-mvn simulator draws random fields but keeps fixed coefficients
@@ -638,7 +638,7 @@ diagnostic_posterior_observed.gamm4 <- function(model, conditioning = NULL, ...)
     "Gaussian fixed-coefficient draws and new smooth/group effects;",
     "covariance hyperparameters fixed.") else paste(
       "Approximate joint fitted fixed/random-effect draws; covariance hyperparameters fixed.")
-  out
+  diagnostic_posterior_labels(out, conditioning)
 }
 
 #' @export
@@ -671,7 +671,7 @@ diagnostic_posterior_sampler.gamm4 <- function(model, n, seed = NULL,
     fam <- stats::family(mer)
     rd <- fix_family_rd(fam)$rd
     if (!is.function(rd)) stop("No gamm4 response sampler for family <", fam$family, ">.", call. = FALSE)
-    wt <- binomial_sampling_weights(mer,
+    wt <- list(...)$.response_weights %||% binomial_sampling_weights(mer,
       stats::weights(mer, type = "prior") %||% rep(1, nrow(X)))
     scale <- if (fam$family == "gaussian") stats::sigma(mer)^2 else 1
     return(function(i) {
@@ -693,7 +693,7 @@ diagnostic_posterior_sampler.gamm4 <- function(model, n, seed = NULL,
   fam <- stats::family(mer)
   rd <- fix_family_rd(fam)$rd
   if (!is.function(rd)) stop("No gamm4 response sampler for family <", fam$family, ">.", call. = FALSE)
-  wt <- binomial_sampling_weights(mer,
+  wt <- list(...)$.response_weights %||% binomial_sampling_weights(mer,
     stats::weights(mer, type = "prior") %||% rep(1, nrow(X)))
   scale <- if (fam$family == "gaussian") stats::sigma(mer)^2 else 1
   function(i) {
@@ -914,7 +914,7 @@ diagnostic_posterior_observed.gamm <- function(model, conditioning = NULL, ...) 
       "Gaussian fixed-coefficient draws and new smooth/group effects;",
       "fitted observation covariance retained.") else paste(
         "Joint Gaussian fitted coefficient/effect draws; fitted observation covariance retained.")
-  out
+  diagnostic_posterior_labels(out, conditioning)
 }
 
 
@@ -1070,4 +1070,9 @@ mixed_posterior_description <- function(conditioning, approximation = NULL) {
     "joint Gaussian coefficient and fitted-effect uncertainty"
   paste(c(paste0("Conditioning: ", conditioning), uncertainty,
     "fitted covariance parameters held fixed", approximation), collapse = "; ")
+}
+
+diagnostic_posterior_labels <- function(data, conditioning) {
+  attr(data, "diagnostic_conditioning") <- conditioning %||% "conditional"
+  data
 }

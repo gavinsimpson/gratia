@@ -199,13 +199,16 @@ as_mcmc_draws <- function(x,
 #'   requested), and `draws` (a coefficient matrix with chain identities, or
 #'   `NULL` if unavailable). Coefficient matrices provide their own draws;
 #'   other sampling outputs need `diagnostics = TRUE` to retain them.
+#'   Likelihood matrices from [log_lik()] also require `diagnostics = TRUE`
+#'   for coefficient plots; use [as_mcmc_draws()] for their log-density draws.
 #' @seealso [draw.sampling_diagnostics()], [as_mcmc_draws()]
 #' @export
 sampling_diagnostics <- function(x) {
   meta <- attr(x, "sampling")
   if (is.null(meta)) stop("No sampling diagnostics are attached; request ",
     "'diagnostics = TRUE' when sampling.", call. = FALSE)
-  draws <- if (is.matrix(x)) x else meta$coefficient_draws
+  draws <- if (is.matrix(x) && !identical(meta$quantity, "log_lik")) x else
+    meta$coefficient_draws
   if (!is.null(draws)) {
     if (is.null(colnames(draws))) {
       # Native single-chain matrices can be unnamed even when diagnostics

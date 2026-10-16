@@ -7,8 +7,10 @@
   grids. Sampling controls must be named. Obsolete names, including `n`,
   `n_sim`, `n_vals`, `freq`, `newdata`, and `ncores`, produce migration errors.
   `derivative_samples()` takes `model` rather than `object`; `add_*()` sampling
-  helpers take `data` rather than `object`. Generating draws requires an explicit
-  `n_draws`; supplied coefficient draws determine their own count and chains.
+  helpers take `data` rather than `object`. Coefficient and `*_samples()`
+  functions require an explicit `n_draws` when generating draws; supplied
+  coefficient draws determine their own count and chains. Likelihood, LOO,
+  WAIC and bayesplot wrappers use `n_draws` with their documented defaults.
   Derivative sampling now defaults to a grid resolution of 200, matching smooth
   sampling; supply `n_grid = 100` for the previous derivative resolution.
   Gaussian threads use `n_threads`, while `n_cores` limits concurrent MH chains.
@@ -122,6 +124,50 @@
   The default backend remains `mgcv::gam.mh()`.
   The new backends reject BAM fits with nonzero prescribed smooth contributions,
   where native fitting and prediction use different offsets.
+
+* `data_sim()` accepts descriptive aliases for the original example models,
+  including `"additive"`, `"bivariate_surface"`, `"gu_wahba_f2"` and
+  `"luo_wahba_f6"`. All existing names remain supported and produce identical
+  seeded output.
+
+* `ale()` computes accumulated local effects for numeric covariates in
+  `mgcv::gam()` and `mgcv::bam()` fits, with link and response scales,
+  distribution parameters, and pointwise or simultaneous intervals.
+  `draw()` plots saved results with parameter labels and a scale caption.
+
+* `data_sim()` now accepts family objects, explicit predictors and generating
+  parameters for scalar, location-scale, categorical, multivariate and Cox
+  models. Censored families can return observed intervals while retaining
+  complete responses and true distribution parameters. Grouped families can
+  use repeated distributions with separate parameters.
+
+* `data_sim()` gains analytic shape reference functions and fitting recipes
+  for `mgcv::scasm()`, including combined shape constraints, tensor surfaces
+  and Gamma models with constraints on the log mean and log dispersion.
+  The additive Poisson recipe uses 240 observations and `k = 6` for each
+  smooth to avoid fitting errors with mgcv 1.9-4.
+
+* `residuals_covariate_plot()` and `scalable_residuals_covariate_plot()`
+  plot complete-model residuals against numeric or categorical covariates and
+  pairs of numeric covariates. Exact mgcv smooth labels can select their
+  constituent covariates. Grouped displays, mean trends and joint maps help
+  identify remaining mean structure or changes in residual spread. By default,
+  mean trends are fitted only for groups with at most 20,000 observations;
+  `smooth = TRUE` or `FALSE` overrides this limit.
+
+* Optional `bayesplot::pp_check()` methods provide posterior predictive checks
+  for supported GAMs and mixed models (#278, reported by @nicholasjclark).
+  Sampling controls, including chains, are supplied through `sampling_args`.
+  Response draws remain aligned with likelihood draws for leave-one-out plots,
+  including supplied matrices with stored chain and draw identities.
+
+* `log_lik()` and optional `loo::loo()` and `loo::waic()` methods support
+  approximate predictive comparisons for independent GAM/BAM fits
+  (#278, reported by @nicholasjclark).
+  They retain coefficient diagnostics and chain identities. LOO uses stored
+  iteration order for relative effective sample sizes without changing the
+  likelihood draw order; unlabelled supplied draws need explicit efficiency
+  or chain information.
 
 * Diagnostic plots now support native inlaws families through their supplied
   `gratia_diagnostics` functions, including grouped-family fits and models
@@ -437,6 +483,14 @@
 ## Bug fixes
 
 * MH acceptance rates are extracted from the correct mgcv return components.
+
+* `data_sim()` now transforms the `eg6` predictor once and returns the
+  predictor used for sampling. Grouped-family simulations respect seeds,
+  parameters, ordinal aliases and repeated family positions; `dist` is
+  ignored throughout that legacy example. The `eg5` and `eg6` examples accept
+  sample sizes not divisible by four. Explicit seeds restore an absent RNG
+  state, and reference generation forwards the requested Tweedie power.
+  Vector Tweedie parameters now use the correct compound Poisson-Gamma law.
 
 * Large QQ reference simulations now close their file connections before
   removing temporary files, allowing cleanup to complete on Windows.
