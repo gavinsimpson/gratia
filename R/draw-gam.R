@@ -394,7 +394,7 @@
   interval_method = c("auto", "gaussian", "bootstrap", "shape"),
   frequentist = FALSE,
   shape_source = c("gaussian", "bootstrap"),
-  ...
+  ..., variables = NULL
 ) {
   .call <- match.call()
   .call[[1L]] <- if (is_scasm_model(object)) draw.scasm else draw_gam_impl
@@ -456,7 +456,7 @@ draw_gam_impl <- function(
   interval_method = c("auto", "gaussian", "bootstrap", "shape"),
   frequentist = FALSE,
   shape_source = c("gaussian", "bootstrap"),
-  ...
+  ..., variables = NULL
 ) {
   surface <- match.arg(surface)
   validate_surface_3d(surface_3d)

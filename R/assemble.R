@@ -118,7 +118,7 @@
   interval_method = c("auto", "gaussian", "bootstrap", "shape"),
   frequentist = FALSE,
   shape_source = c("gaussian", "bootstrap"),
-  ...
+  ..., variables = NULL
 ) {
   gratia_plot_arguments(c("ci_alpha", "ci_col", "smooth_col", "resid_col", "contour_col", "ci_3d_alpha", "ci_3d_col"), environment())
   if (missing(overall_uncertainty) && is_scasm_model(object)) {
@@ -187,6 +187,7 @@
       n_2d = n_2d,
       n_3d = n_3d,
       n_4d = n_4d,
+      variables = variables,
       data = data,
       unconditional = unconditional,
       frequentist = frequentist,
@@ -369,6 +370,7 @@
       ci_3d = ci_3d, ci_3d_alpha = ci_3d_alpha, ci_3d_col = ci_3d_col,
       surface_support = surface_support,
       tensor_plot_info = attr(sm_eval, "tensor_plot_info"),
+      plot_variables = attr(sm_eval, "plot_variables"),
       re_levels = re_levels,
       mrf_plot = mrf_plot,
       constant = constant,

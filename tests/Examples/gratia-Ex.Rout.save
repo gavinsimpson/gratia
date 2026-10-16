@@ -1061,6 +1061,7 @@ detaching ‘package:ggplot2’, ‘package:mgcv’
 # i 390 more rows
 # i 2 more variables: x2 <dbl>, x3 <dbl>
 > 
+>
 > ## derivatives for a selected smooth
 > derivatives(mod, type = "central", select = "s(x1)")
 # A tibble: 100 x 9
@@ -1175,6 +1176,22 @@ detaching ‘package:mgcv’
 > sm_dif3 <- difference_smooths(m,
 +   select = c("s(x2):fac1", "s(x2):fac2"), partial_match = FALSE
 + )
+>
+> # Choose two axes and condition on the third covariate
+> m3 <- gam(y ~ fac + te(x0, x1, x2, by = fac, k = c(3, 3, 3)),
++   data = df, method = "REML")
+> sm_dif_3d <- difference_smooths(m3, select = "te(x0,x1,x2)",
++   variables = c("x1", "x2", "x0"), n_2d = 20, n_3d = 3)
+> draw(sm_dif_3d)
+> # Redraw the evaluated points with the axes exchanged
+> draw(sm_dif_3d, variables = c("x2", "x1", "x0"))
+>
+> # Supply particular conditioning values using a prediction grid
+> grid <- data_slice(m3, x1 = evenly(x1, n = 20),
++   x2 = evenly(x2, n = 20), x0 = c(0.2, 0.8), fac = levels(fac))
+> sm_dif_at <- difference_smooths(m3, select = "te(x0,x1,x2)",
++   data = grid, variables = c("x1", "x2", "x0"))
+> draw(sm_dif_at)
 > ## Don't show: 
 > options(op)
 > ## End(Don't show)
@@ -1572,6 +1589,14 @@ detaching ‘package:mgcv’
 > # Render a bivariate smooth as vector tiles
 > m_surface <- gam(y ~ s(x0, x1), data = df, method = "REML")
 > draw(smooth_estimates(m_surface, n_2d = 20), surface = "tile")
+>
+> # Choose the axes before generating the evaluation grid
+> m_slices <- gam(y ~ s(x0, x1, x2), data = df, method = "REML")
+> estimates <- smooth_estimates(m_slices,
++   variables = c("x1", "x2", "x0"), n_2d = 20, n_3d = 3)
+> draw(estimates)
+> # A redraw changes roles using the points already evaluated
+> draw(estimates, variables = c("x2", "x1", "x0"))
 >
 >
 >
@@ -1991,6 +2016,7 @@ detaching ‘package:lme4’, ‘package:Matrix’, ‘package:mgcv’
 +   d <- data.frame(x = runif(150))
 +   d$y <- sin(6 * d$x) + rnorm(150, sd = 0.2)
 +   m <- glmmTMB::glmmTMB(y ~ s(x, k = 8), data = d, REML = TRUE)
++   n_smooths(m) # one smooth term
 +   draw(m)
 +   appraise(m, seed = 42)
 + 
@@ -3575,7 +3601,6 @@ detaching ‘package:mgcv’
 +   daemons(2)                          # only low for CRAN requirements
 +   smooth_estimates(m1)
 + }
-Loading required namespace: carrier
 # A tibble: 400 x 9
    .smooth .type .by   .estimate      .se         x0    x1    x2    x3
    <chr>   <chr> <chr>     <dbl>    <dbl>      <dbl> <dbl> <dbl> <dbl>

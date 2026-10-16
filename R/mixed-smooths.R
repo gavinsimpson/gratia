@@ -173,7 +173,8 @@ smooth_estimates.gratia_mixed_smooth <- function(
     )
   })
   out <- dplyr::bind_rows(results)
-  metadata <- c("tensor_term_order", "surface_support", "tensor_plot_info")
+  metadata <- c("tensor_term_order", "surface_support", "tensor_plot_info",
+    "plot_variables")
   for (attribute in metadata) {
     attr(out, attribute) <- do.call(c, lapply(results, attr, attribute))
   }

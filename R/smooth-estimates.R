@@ -27,6 +27,17 @@
 #'   `n_2d`. Supplied `data` are unchanged.
 #' @param data a data frame of covariate values at which to evaluate the
 #'   smooth.
+#' @param variables Character vector giving every covariate of the selected
+#'   smooths exactly once, in plotting order: x, y, then the conditioning
+#'   covariate for 3D smooths, or facet rows and columns for 4D smooths.
+#'   When supplied, selected smooths must use the same covariates. Use fitted coordinate names,
+#'   such as `"log(x)"` for a transformed covariate. The default, `NULL`, favours
+#'   a two-variable tensor margin for x and y, otherwise retaining fitted order.
+#'   Grid resolution follows this order. Supplied `data` are evaluated unchanged.
+#'   Drawing saved estimates can change the order but uses only points already
+#'   evaluated; evaluate again to change grid resolution or conditioning values.
+#'   Continuous covariates must precede factors. Spherical smooths retain their
+#'   latitude/longitude convention and do not support reordering.
 #' @param envir an optional environment supplying functions and constants used
 #'   in model expressions. The available model formula environment is used when
 #'   `NULL`. Covariate observations should be supplied in `data`.
@@ -84,6 +95,8 @@
 #' @param ... arguments passed to other methods.
 #'
 #' @return A data frame (tibble), which is of class `"smooth_estimates"`.
+#'   Its `plot_variables` attribute is a list of resolved covariate orders,
+#'   named by smooth label, used when drawing the saved estimates.
 #'
 #' @details
 #' For [GJRM::gamlss()] models, smooths are evaluated in equation and smooth
@@ -286,7 +299,7 @@
     n_sim = 10000, n_cores = 1, seed = NULL,
     interval_method = c("auto", "gaussian", "bootstrap", "shape"),
     shape_source = c("gaussian", "bootstrap"),
-    ...) {
+    ..., variables = NULL) {
   overall_supplied <- !missing(overall_uncertainty)
   check_scam_unconditional(object, unconditional)
   check_back_transform(back_transform)
@@ -315,6 +328,7 @@
 
   ## extract the mgcv.smooth objects
   smooths <- get_smooths_by_id(object, smooth_ids)
+  object <- plan_smooth_variables(object, smooth_ids, variables)
   interval_method <- match.arg(interval_method)
   shape_source <- match.arg(shape_source)
   enforce_shape <- interval_method == "shape"
@@ -449,6 +463,9 @@
 
   # add back any special attributes
   attr(sm_list, "tensor_term_order") <- do.call("c", tensor_term_order)
+  attr(sm_list, "plot_variables") <- stats::setNames(
+    lapply(smooth_ids, smooth_plot_variables, model = object),
+    vapply(smooths, smooth_label, character(1)))
   coordinate_labels <- unique(unlist(lapply(smooths, terms_in_smooth)))
   coordinate_info <- stats::setNames(lapply(coordinate_labels,
     smooth_coordinate_info, model = object, data = data), coordinate_labels)
@@ -517,7 +534,8 @@ smooth_estimates.gamlss <- function(object, select = NULL, smooth = deprecated()
   }
 
   out <- bind_rows(results)
-  for (attribute in c("tensor_term_order", "surface_support", "tensor_plot_info")) {
+  for (attribute in c("tensor_term_order", "surface_support", "tensor_plot_info",
+      "plot_variables")) {
     attr(out, attribute) <- do.call(c, lapply(results, attr, attribute))
   }
   coordinates <- lapply(results, attr, "coordinate_info")
@@ -1510,6 +1528,14 @@ smooth_estimates.gamlss <- function(object, select = NULL, smooth = deprecated()
 #' # Render a bivariate smooth as vector tiles
 #' m_surface <- gam(y ~ s(x0, x1), data = df, method = "REML")
 #' draw(smooth_estimates(m_surface, n_2d = 20), surface = "tile")
+#'
+#' # Choose the axes before generating the evaluation grid
+#' m_slices <- gam(y ~ s(x0, x1, x2), data = df, method = "REML")
+#' estimates <- smooth_estimates(m_slices,
+#'   variables = c("x1", "x2", "x0"), n_2d = 20, n_3d = 3)
+#' draw(estimates)
+#' # A redraw changes roles using the points already evaluated
+#' draw(estimates, variables = c("x2", "x1", "x0"))
 `draw.smooth_estimates` <- function(object,
                                     constant = NULL,
                                     fun = NULL,
@@ -1543,7 +1569,7 @@ smooth_estimates.gamlss <- function(object, select = NULL, smooth = deprecated()
                                     re_levels = NULL,
                                     mrf_plot = c("effects", "qq"),
                                     interval = NULL,
-                                    ...) {
+                                    ..., variables = NULL) {
   gratia_plot_arguments(c("contour_col", "ci_alpha", "ci_col", "smooth_col", "resid_col", "decrease_col", "increase_col", "change_lwd", "ci_3d_alpha", "ci_3d_col"), environment())
   dots <- names(match.call(expand.dots = FALSE)$...)
   controls <- intersect(dots, c("interval_method", "shape_source", "frequentist",
@@ -1566,6 +1592,7 @@ smooth_estimates.gamlss <- function(object, select = NULL, smooth = deprecated()
   scam_info <- attr(object, "scam_smooth_info")
   plot_info <- attr(object, "tensor_plot_info")
   surface_support <- attr(object, "surface_support")
+  plot_variables <- attr(object, "plot_variables")
   if ("data" %in% names(object) && !".estimate" %in% names(object)) {
     coordinate_info <- attr(object, "coordinate_info")
     tensor_term_order <- attr(object, "tensor_term_order")
@@ -1616,6 +1643,8 @@ smooth_estimates.gamlss <- function(object, select = NULL, smooth = deprecated()
     re_levels = re_levels,
     mrf_plot = mrf_plot,
     tensor_plot_info = plot_info,
+    plot_variables = plot_variables,
+    variables = variables,
     surface = surface, surface_3d = surface_3d,
     ci_3d = ci_3d, ci_3d_alpha = ci_3d_alpha, ci_3d_col = ci_3d_col,
     surface_support = surface_support,
@@ -1698,6 +1727,8 @@ smooth_estimates.gamlss <- function(object, select = NULL, smooth = deprecated()
                                     interval_info = NULL,
                                     shape_constraints = NULL,
                                     scam_smooth_info = NULL,
+                                    plot_variables = NULL,
+                                    variables = NULL,
                                     ...) {
   check_shape_effect_transform(interval_info, constant, fun)
   surface <- match.arg(surface)
@@ -1719,8 +1750,16 @@ smooth_estimates.gamlss <- function(object, select = NULL, smooth = deprecated()
       vars_from_label(unique(object[[".smooth"]]))
     }
   }
+  fitted_variables <- sm_vars
+  saved_variables <- plot_variables[[unique(object$.smooth)[1L]]]
+  if (!is.null(saved_variables)) sm_vars <- saved_variables
+  sm_vars <- validate_plot_variables(variables, sm_vars)
   sm_dim <- length(sm_vars)
   sm_type <- unique(object[[".type"]])
+  if (identical(sm_type, "SOS") && !is.null(variables) &&
+      !identical(unname(variables), unname(fitted_variables))) {
+    cli::cli_abort("`variables` cannot reorder latitude and longitude in a spline on the sphere.")
+  }
 
   # set some values to NULL in case these components don't exist
   rug_data <- NULL
@@ -1743,11 +1782,15 @@ smooth_estimates.gamlss <- function(object, select = NULL, smooth = deprecated()
     object <- unnest(object, cols = "data")
   }
 
+  if (!is.null(variables)) validate_plot_variable_types(sm_vars, object)
+
   if ((!is.null(plot_info) || is_tensor_plot_type(sm_type)) &&
       any(vapply(object[sm_vars], is.factor, logical(1)))) {
     object <- filter_tensor_levels(object, re_levels)
     if (!nrow(object)) cli::cli_abort("No tensor evaluation rows remain after selecting `re_levels`.")
-    sm_vars <- tensor_plot_variables(sm_vars, object)
+    if (is.null(variables) && is.null(saved_variables)) {
+      sm_vars <- tensor_plot_variables(sm_vars, object)
+    }
     if (!is.null(rug_data)) rug_data <- filter_tensor_levels(rug_data, re_levels)
   }
 
@@ -1882,6 +1925,8 @@ smooth_estimates.gamlss <- function(object, select = NULL, smooth = deprecated()
   }, logical(1)))) attr(object, "gratia.coordinate_display") <- TRUE
 
   support <- surface_support[[unique(object$.smooth)[1L]]]
+  support <- reorder_surface_support(support, sm_vars,
+    attr(coordinate_info, "smooth_variables")[[unique(object$.smooth)[1L]]])
   if (surface == "3d" && !is.null(support) && isTRUE(back_transform)) {
     # Domain checks use the coordinates where dist masking was calculated,
     # even when the displayed covariates are on their original scale.

@@ -1,5 +1,66 @@
 # Utilities involved in draw methods
 
+# Keep one covariate order from grid generation through saved estimates.
+validate_plot_variables <- function(variables, expected) {
+  if (is.null(variables)) return(expected)
+  if (!is.character(variables) || !length(variables) || anyNA(variables) ||
+      any(!nzchar(variables)) || anyDuplicated(variables)) {
+    cli::cli_abort("`variables` must be a character vector of unique covariate names without missing values.")
+  }
+  if (length(variables) != length(expected) || !setequal(variables, expected)) {
+    cli::cli_abort(c(
+      "`variables` must contain every covariate of each selected smooth exactly once.",
+      "i" = "Expected: {.val {expected}}. Use `select` to choose smooths with the same covariates."
+    ))
+  }
+  variables
+}
+
+smooth_plot_variables <- function(model, id) {
+  orders <- attr(model, "gratia.plot_variables")
+  # Soap components can share a label; use the first selected component's order.
+  for (i in id) {
+    if (!is.null(orders[[i]])) return(orders[[i]])
+  }
+  NULL
+}
+
+validate_plot_variable_types <- function(variables, data) {
+  factors <- vapply(data[variables], is.factor, logical(1))
+  if (any(factors) && any(diff(as.integer(factors)) < 0L)) {
+    cli::cli_abort("Continuous covariates must precede factor covariates in `variables`.")
+  }
+}
+
+plan_smooth_variables <- function(model, ids, variables = NULL) {
+  orders <- vector("list", length(model$smooth))
+  for (id in ids) {
+    sm <- model$smooth[[id]]
+    margins <- sm[["margin"]]
+    order <- if (inherits(sm, "fs.interaction")) {
+      reorder_fs_smooth_terms(sm)
+    } else if (!is.null(margins)) reorder_tensor_smooth_terms(sm) else {
+      smooth_variable(sm)
+    }
+    spec <- tensor_plot_spec(model, id)
+    if (!is.null(spec)) order <- spec$variables
+    if (!is.null(margins) &&
+        any(vapply(margins, inherits, logical(1), "random.effect"))) {
+      order <- tensor_plot_variables(order, prepare_smooth_data(model, sm))
+    }
+    orders[[id]] <- validate_plot_variables(variables, order)
+    if (!is.null(variables)) {
+      validate_plot_variable_types(variables, prepare_smooth_data(model, sm))
+    }
+    if (inherits(sm, "sos.smooth") &&
+        !identical(unname(orders[[id]]), unname(order))) {
+      cli::cli_abort("`variables` cannot reorder latitude and longitude in a spline on the sphere.")
+    }
+  }
+  attr(model, "gratia.plot_variables") <- orders
+  model
+}
+
 #' Reorder tensor product terms for nicer plotting
 #'
 #' If a tensor product smooth of 3 or more terms contains a 2d marginal smooth,

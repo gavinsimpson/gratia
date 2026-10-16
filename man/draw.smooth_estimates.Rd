@@ -39,7 +39,8 @@
   re_levels = NULL,
   mrf_plot = c("effects", "qq"),
   interval = NULL,
-  ...
+  ...,
+  variables = NULL
 )
 }
 \arguments{
@@ -214,6 +215,18 @@ Method and uncertainty controls such as \code{interval_method}, \code{shape_sour
 cannot change intervals when drawing saved estimates.}
 
 \item{...}{additional arguments passed to \code{\link[patchwork:wrap_plots]{patchwork::wrap_plots()}}.}
+
+\item{variables}{Character vector giving every covariate of the selected
+smooths exactly once, in plotting order: x, y, then the conditioning
+covariate for 3D smooths, or facet rows and columns for 4D smooths.
+When supplied, selected smooths must use the same covariates. Use fitted coordinate names,
+such as \code{"log(x)"} for a transformed covariate. The default, \code{NULL}, favours
+a two-variable tensor margin for x and y, otherwise retaining fitted order.
+Grid resolution follows this order. Supplied \code{data} are evaluated unchanged.
+Drawing saved estimates can change the order but uses only points already
+evaluated; evaluate again to change grid resolution or conditioning values.
+Continuous covariates must precede factors. Spherical smooths retain their
+latitude/longitude convention and do not support reordering.}
 }
 \description{
 Plot the result of a call to \code{smooth_estimates()}
@@ -253,4 +266,12 @@ smooth_estimates(m) |>
 # Render a bivariate smooth as vector tiles
 m_surface <- gam(y ~ s(x0, x1), data = df, method = "REML")
 draw(smooth_estimates(m_surface, n_2d = 20), surface = "tile")
+
+# Choose the axes before generating the evaluation grid
+m_slices <- gam(y ~ s(x0, x1, x2), data = df, method = "REML")
+estimates <- smooth_estimates(m_slices,
+  variables = c("x1", "x2", "x0"), n_2d = 20, n_3d = 3)
+draw(estimates)
+# A redraw changes roles using the points already evaluated
+draw(estimates, variables = c("x2", "x1", "x0"))
 }

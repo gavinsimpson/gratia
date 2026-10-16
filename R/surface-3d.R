@@ -118,7 +118,25 @@ surface_support <- function(data, x_var, y_var, observed, dist) {
     x = as.vector(observed[[x_var]]), y = as.vector(observed[[y_var]])
   )
   reference <- reference[is.finite(reference$x) & is.finite(reference$y), ]
-  list(observed = unique(reference), ranges = unname(ranges), dist = dist)
+  list(observed = unique(reference), ranges = unname(ranges), dist = dist,
+    variables = c(x_var, y_var))
+}
+
+# Keep masking coordinates aligned with the displayed axes when their order
+# changes. Older saved estimates retain the fitted order in coordinate metadata.
+reorder_surface_support <- function(support, variables,
+    original_variables = NULL) {
+  if (is.null(support)) return(NULL)
+  original <- support$variables %||% original_variables
+  if (length(original) != 2L || length(variables) < 2L ||
+      !setequal(original, variables[1:2])) return(support)
+  index <- match(variables[1:2], original)
+  support$observed <- support$observed[index]
+  names(support$observed) <- c("x", "y")
+  support$ranges <- support$ranges[index]
+  if (!is.null(support$columns)) support$columns <- support$columns[index]
+  support$variables <- variables[1:2]
+  support
 }
 
 # Closed polygon loops use even/odd membership, matching soap-film domains.

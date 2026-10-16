@@ -26,7 +26,8 @@
   subtitle = NULL,
   caption = NULL,
   angle = NULL,
-  ...
+  ...,
+  variables = NULL
 )
 }
 \arguments{
@@ -87,6 +88,12 @@ annotate plots}
 drawn passed to the \code{angle} argument of \code{\link[ggplot2:guide_axis]{ggplot2::guide_axis()}}.}
 
 \item{...}{additional arguments passed to \code{\link[patchwork:wrap_plots]{patchwork::wrap_plots()}}.}
+
+\item{variables}{character vector; every covariate of the selected smooth,
+in plotting order. The first two are the x and y axes; the third defines
+facets for three covariates, or facet rows for four covariates; the fourth
+defines facet columns. \code{NULL} uses the order saved with the estimates.
+Drawing rearranges evaluated points without generating a new grid.}
 }
 \description{
 Plot differences of smooths

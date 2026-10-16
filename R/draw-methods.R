@@ -823,6 +823,11 @@
 #'   annotate plots
 #' @param guides character; one of `"keep"` (the default), `"collect"`, or
 #'   `"auto"`. Passed to [patchwork::plot_layout()]
+#' @param variables character vector; every covariate of the selected smooth,
+#'   in plotting order. The first two are the x and y axes; the third defines
+#'   facets for three covariates, or facet rows for four covariates; the fourth
+#'   defines facet columns. `NULL` uses the order saved with the estimates.
+#'   Drawing rearranges evaluated points without generating a new grid.
 #' @inheritParams draw.gam
 #'
 #' @importFrom ggplot2 ggplot geom_ribbon aes geom_line labs lims
@@ -860,7 +865,8 @@
                                      title = NULL,
                                      subtitle = NULL,
                                      caption = NULL,
-                                     angle = NULL, ...) {
+                                     angle = NULL, ...,
+                                     variables = NULL) {
   gratia_plot_arguments(c("contour_col", "ci_alpha", "ci_col", "smooth_col", "line_col"), environment())
   scales <- match.arg(scales)
 
@@ -870,11 +876,34 @@
   select <- check_user_select_smooths(smooths = sm, select = select)
   sm <- sm[select]
 
-  plotlist <- vector("list", length = length(sm))
-
-  df_list <- split(object,
-    f = paste(object$.level_1, object$.level_2, sep = "-")
-  )
+  orders <- attr(object, "plot_variables")
+  tensor_orders <- attr(object, "tensor_term_order")
+  object <- object[object$.smooth %in% sm, , drop = FALSE]
+  attr(object, "plot_variables") <- orders
+  attr(object, "tensor_term_order") <- tensor_orders
+  if (!is.null(variables)) {
+    for (label in sm) {
+      validate_plot_variables(variables, difference_plot_variables(object, label))
+    }
+  }
+  # Match comparison tuples without joining factor labels into strings.
+  comparison <- vctrs::vec_group_id(object[c(".smooth", ".level_1", ".level_2")])
+  df_list <- split(object, f = factor(comparison, levels = unique(comparison)))
+  df_list <- lapply(df_list, function(x) {
+    attr(x, "plot_variables") <- orders
+    attr(x, "tensor_term_order") <- tensor_orders
+    x
+  })
+  dimensions <- vapply(df_list, function(x) {
+    label <- unique(x$.smooth)
+    length(difference_plot_variables(x, label))
+  }, integer(1L))
+  surface_limits <- if (scales == "fixed" && any(dimensions > 1L)) {
+    values <- unlist(lapply(df_list[dimensions > 1L], `[[`, ".diff"))
+    c(-1, 1) * max(c(0, abs(values[is.finite(values)])))
+  } else {
+    NULL
+  }
 
   plotlist <- map(df_list, draw_difference,
     ci_alpha = ci_alpha,
@@ -887,11 +916,28 @@
     contour_col = contour_col,
     n_contour = n_contour,
     xlab = xlab, ylab = ylab, title = title,
-    subtitle = subtitle, caption = caption, angle = angle
+    subtitle = subtitle, caption = caption, angle = angle,
+    variables = variables, fill_limits = surface_limits
   )
 
-  wrap_interval_plots(plotlist, object, scales = scales,
+  if (scales == "fixed" && any(dimensions == 1L)) {
+    curves <- bind_rows(df_list[dimensions == 1L])
+    limits <- range(curves$.lower_ci, curves$.upper_ci)
+    plotlist[dimensions == 1L] <- lapply(plotlist[dimensions == 1L],
+      function(p) p + lims(y = limits))
+  }
+  wrap_interval_plots(plotlist, object, scales = "free",
     ncol = ncol, nrow = nrow, guides = guides, ...)
+}
+
+difference_plot_variables <- function(object, label) {
+  variables <- attr(object, "plot_variables")[[label]]
+  if (is.null(variables)) {
+    variables <- attr(object, "tensor_term_order")
+    if (is.list(variables)) variables <- variables[[label]]
+  }
+  if (is.null(variables)) variables <- vars_from_label(label)
+  variables
 }
 
 `draw_difference` <- function(object,
@@ -906,9 +952,12 @@
                               n_contour = NULL,
                               xlab = NULL, ylab = NULL,
                               title = NULL, subtitle = NULL, caption = NULL,
-                              angle = NULL) {
-  xvars <- unique(object[[".smooth"]])
-  xvars <- vars_from_label(xvars)
+                              angle = NULL, variables = NULL,
+                              fill_limits = NULL) {
+  label <- unique(object[[".smooth"]])
+  xvars <- validate_plot_variables(variables,
+    difference_plot_variables(object, label))
+  if (!is.null(variables)) validate_plot_variable_types(xvars, object)
   n_xvars <- length(xvars)
   plt <- if (identical(n_xvars, 1L)) {
     draw_1d_difference(object, xvars,
@@ -925,7 +974,7 @@
       contour_col = contour_col, n_contour = n_contour,
       xlab = xlab, ylab = ylab,
       title = title, subtitle = subtitle,
-      caption = caption, angle = angle
+      caption = caption, angle = angle, fill_limits = fill_limits
     )
   } else if (identical(n_xvars, 3L)) {
     draw_3d_difference(object, xvars,
@@ -933,7 +982,7 @@
       contour_col = contour_col, n_contour = n_contour,
       xlab = xlab, ylab = ylab,
       title = title, subtitle = subtitle,
-      caption = caption, angle = angle
+      caption = caption, angle = angle, fill_limits = fill_limits
     )
   } else if (identical(n_xvars, 4L)) {
     draw_4d_difference(object, xvars,
@@ -941,7 +990,7 @@
       contour_col = contour_col, n_contour = n_contour,
       xlab = xlab, ylab = ylab,
       title = title, subtitle = subtitle,
-      caption = caption, angle = angle
+      caption = caption, angle = angle, fill_limits = fill_limits
     )
   } else {
     message("Can't plot differences for smooths of more than 4 variables.")
@@ -999,8 +1048,8 @@
     ribbon_mapping = aes(y = NULL), ribbon_alpha = ci_alpha,
     ribbon_fill = ci_col, ribbon_colour = NA, line_colour = smooth_col) +
     labs(
-      title = plt_title, x = xvars, y = y_label,
-      subtitle = plt_subtitle
+      title = plt_title, x = if (is.null(xlab)) xvars else xlab, y = y_label,
+      subtitle = plt_subtitle, caption = caption
     )
 
   if (isTRUE(rug)) {
@@ -1020,7 +1069,8 @@
                                  ylab = NULL,
                                  title = NULL,
                                  subtitle = NULL,
-                                 caption = NULL, angle = NULL) {
+                                 caption = NULL, angle = NULL,
+                                 fill_limits = NULL) {
   if (is.null(xlab)) {
     xlab <- xvars[1]
   }
@@ -1041,10 +1091,13 @@
   } else {
     subtitle
   }
+  if (is.null(fill_limits)) {
+    fill_limits <- c(-1, 1) * max(abs(object[[".diff"]]))
+  }
 
   prepare_surface_plot(object,
     x_var = xvars[1], y_var = xvars[2], fill_var = ".diff",
-    fill_limits = c(-1, 1) * max(abs(object[[".diff"]])),
+    fill_limits = fill_limits,
     fill_title = "Difference",
     labels = labs(title = plt_title, x = xlab, y = ylab,
       subtitle = plt_subtitle, caption = caption),
@@ -1053,15 +1106,22 @@
 
 }
 
+#' @importFrom ggplot2 facet_wrap facet_grid label_both
+#' @importFrom dplyr vars
 `draw_3d_difference` <- function(object, xvars, contour = FALSE,
                                  contour_col = "black", n_contour = NULL,
                                  xlab = NULL,
                                  ylab = NULL,
                                  title = NULL,
                                  subtitle = NULL,
-                                 caption = NULL, angle = NULL) {
-  warning("Plotting differences of 3D smooths is not yet implemented")
-  return(NULL)
+                                 caption = NULL, angle = NULL,
+                                 fill_limits = NULL) {
+  if (is.null(fill_limits)) fill_limits <- surface_fill_limits(object$.diff)
+  draw_2d_difference(object, xvars, contour = contour,
+    contour_col = contour_col, n_contour = n_contour,
+    xlab = xlab, ylab = ylab, title = title, subtitle = subtitle,
+    caption = caption, angle = angle, fill_limits = fill_limits) +
+    facet_wrap(vars(.data[[xvars[3L]]]), labeller = label_both)
 }
 
 `draw_4d_difference` <- function(object, xvars, contour = FALSE,
@@ -1070,9 +1130,15 @@
                                  ylab = NULL,
                                  title = NULL,
                                  subtitle = NULL,
-                                 caption = NULL, angle = NULL) {
-  warning("Plotting differences of 4D smooths is not yet implemented")
-  return(NULL)
+                                 caption = NULL, angle = NULL,
+                                 fill_limits = NULL) {
+  if (is.null(fill_limits)) fill_limits <- surface_fill_limits(object$.diff)
+  draw_2d_difference(object, xvars, contour = contour,
+    contour_col = contour_col, n_contour = n_contour,
+    xlab = xlab, ylab = ylab, title = title, subtitle = subtitle,
+    caption = caption, angle = angle, fill_limits = fill_limits) +
+    facet_grid(rows = vars(.data[[xvars[3L]]]),
+      cols = vars(.data[[xvars[4L]]]), labeller = label_both)
 }
 
 #' Display penalty matrices of smooths using `ggplot`
