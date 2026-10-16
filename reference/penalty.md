@@ -18,6 +18,7 @@ penalty(
   knots = NULL,
   constraints = FALSE,
   diagonalize = FALSE,
+  margins = FALSE,
   ...
 )
 
@@ -28,6 +29,7 @@ penalty(
   smooth = deprecated(),
   rescale = FALSE,
   partial_match = FALSE,
+  margins = FALSE,
   ...
 )
 
@@ -35,13 +37,13 @@ penalty(
 penalty(object, rescale = FALSE, ...)
 
 # S3 method for class 'tensor.smooth'
-penalty(object, margins = FALSE, ...)
+penalty(object, margins = FALSE, rescale = FALSE, ...)
 
 # S3 method for class 't2.smooth'
-penalty(object, margins = FALSE, ...)
+penalty(object, margins = FALSE, rescale = FALSE, ...)
 
 # S3 method for class 're.smooth.spec'
-penalty(object, data, ...)
+penalty(object, data, rescale = FALSE, margins = FALSE, ...)
 ```
 
 ## Arguments
@@ -86,6 +88,14 @@ penalty(object, data, ...)
   turning the last diagonal elements of the penalty to zero, which
   highlights the penalty null space.
 
+- margins:
+
+  logical; if `FALSE`, extract the stored tensor product penalty
+  matrices. If `TRUE`, extract the stored marginal penalties instead,
+  with labels identifying the parent tensor and each margin. Marginal
+  penalties need not use the parameterisation of the fitted tensor
+  product.
+
 - select:
 
   character, logical, or numeric; which smooths to extract penalties
@@ -104,11 +114,6 @@ penalty(object, data, ...)
 
   logical; should smooths be selected by partial matches with `select`?
   If `TRUE`, `select` can only be a single string to match against.
-
-- margins:
-
-  logical; extract the penalty matrices for the tensor product or the
-  marginal smooths of the tensor product?
 
 ## Value
 

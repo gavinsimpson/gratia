@@ -4,6 +4,14 @@
 
 ### User visible changes
 
+- Native [`mgcv::scasm()`](https://rdrr.io/pkg/mgcv/man/scasm.html)
+  smooth estimation, drawing and
+  [`confint()`](https://rdrr.io/r/stats/confint.html) now default to
+  `overall_uncertainty = FALSE`. An explicit request for unavailable
+  overall mean uncertainty warns once
+  ([\#372](https://github.com/gavinsimpson/gratia/issues/372),
+  [\#373](https://github.com/gavinsimpson/gratia/issues/373)).
+
 - **Breaking change:** Sampling functions now use `n_draws` for the
   total retained draw count and `n_grid` for automatically constructed
   evaluation grids. Sampling controls must be named. Obsolete names,
@@ -123,6 +131,63 @@
   so the development version of glmmTMB is no longer needed.
 
 ### New features
+
+- [`shape_intervals()`](https://gavinsimpson.github.io/gratia/reference/shape_intervals.md)
+  applies monotone rearrangement and convex or concave envelopes to
+  existing interval endpoints on a finite grid. Supported scasm smooths
+  expose this through `interval_method = "shape"` and an explicit
+  Gaussian or stored-bootstrap initial source. The transformation
+  preserves whole-grid containment events; it does not establish nominal
+  coverage or preserve marginal coverage of pointwise limits.
+  [`shape_confidence_set()`](https://gavinsimpson.github.io/gratia/reference/shape_confidence_set.md)
+  and
+  [`in_shape_set()`](https://gavinsimpson.github.io/gratia/reference/shape_confidence_set.md)
+  represent and inspect intersections with coefficient inequalities and
+  equalities. See the shape-constrained intervals article for supported
+  combinations, tensor requirements and examples
+  ([\#372](https://github.com/gavinsimpson/gratia/issues/372),
+  [\#373](https://github.com/gavinsimpson/gratia/issues/373)).
+  [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)
+  and
+  [`assemble()`](https://gavinsimpson.github.io/gratia/reference/assemble.md)
+  also accept `frequentist` for the initial smooth covariance
+  calculation. General `pc` replacements and derivative bases are
+  rejected when they do not justify the named function shape. Curvature
+  requires equally spaced fitted knots to rounding precision, and
+  extrapolation is rejected. Convex envelope interpolation preserves
+  exactly flat segments. Saved estimates reject interval computation
+  controls that require the fitted model.
+
+- `interval_method` selects native scasm bootstrap or Gaussian pointwise
+  intervals for smooths, fitted values, smooth derivatives and
+  [`confint()`](https://rdrr.io/r/stats/confint.html). Shifting or
+  transforming smooth confidence intervals retains asymmetric limits.
+  Replacing saved intervals with
+  [`add_confint()`](https://gavinsimpson.github.io/gratia/reference/add_confint.md)
+  records their Gaussian source. Automatic selection uses stored
+  bootstrap draws, including mgcv’s smoothing-bias correction.
+  Simultaneous bootstrap bands remain unsupported
+  ([\#372](https://github.com/gavinsimpson/gratia/issues/372),
+  [\#373](https://github.com/gavinsimpson/gratia/issues/373)).
+
+- Scasm captions show retained shape constraints with portable
+  mathematical arrows. Saved estimates retain constraint metadata for
+  each tensor margin; ignored requests are labelled and produce a
+  warning ([\#373](https://github.com/gavinsimpson/gratia/issues/373)).
+  This includes named requests replaced by general `pc` inequalities.
+  Shape-enforced intervals keep the basis and constraint caption without
+  adding interval details; those remain in the documentation and
+  metadata.
+
+- Gaussian simultaneous bands now support positive-semidefinite
+  coefficient covariance matrices, including scasm fits with exact
+  equality constraints.
+
+- [`penalty()`](https://gavinsimpson.github.io/gratia/reference/penalty.md)
+  extracts stored tensor and
+  [`t2()`](https://rdrr.io/pkg/mgcv/man/t2.html) penalty matrices,
+  including marginal penalties via `margins = TRUE` and their original
+  scaling.
 
 - Posterior sampling supports multiple chains, including parallel MH
   chains using mirai. Workers started for sampling exit cleanly so
@@ -677,6 +742,10 @@
   needing a recognised family name.
 
 ### Bug fixes
+
+- B-spline evaluation handles empty data and factor-by calls whose
+  evaluation data omit fitted levels, including constrained tensor
+  products.
 
 - MH acceptance rates are extracted from the correct mgcv return
   components.

@@ -29,6 +29,7 @@
     <li><h6 class="dropdown-header" data-toc-skip>Workflows</h6></li>
     <li><a class="dropdown-item" href="../articles/prediction-comparisons.html">Comparing treatments and finding rates of change</a></li>
     <li><a class="dropdown-item" href="../articles/smooth-effects.html">Read smooth effects, interactions and surfaces</a></li>
+    <li><a class="dropdown-item" href="../articles/shape-constrained-intervals.html">Intervals for shape-constrained smooths</a></li>
     <li><a class="dropdown-item" href="../articles/spatial-smooths.html">Choose a smooth for the spatial question</a></li>
     <li><a class="dropdown-item" href="../articles/response-distributions.html">Checking different response distributions</a></li>
     <li><a class="dropdown-item" href="../articles/transformed-covariates.html">Functions of covariates and evaluation environments</a></li>
@@ -75,6 +76,7 @@
 <span>  knots <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  constraints <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  diagonalize <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  margins <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -85,6 +87,7 @@
 <span>  smooth <span class="op">=</span> <span class="fu">deprecated</span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  rescale <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  partial_match <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  margins <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -92,13 +95,13 @@
 <span><span class="fu">penalty</span><span class="op">(</span><span class="va">object</span>, rescale <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'tensor.smooth'</span></span>
-<span><span class="fu">penalty</span><span class="op">(</span><span class="va">object</span>, margins <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">penalty</span><span class="op">(</span><span class="va">object</span>, margins <span class="op">=</span> <span class="cn">FALSE</span>, rescale <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 't2.smooth'</span></span>
-<span><span class="fu">penalty</span><span class="op">(</span><span class="va">object</span>, margins <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">penalty</span><span class="op">(</span><span class="va">object</span>, margins <span class="op">=</span> <span class="cn">FALSE</span>, rescale <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 're.smooth.spec'</span></span>
-<span><span class="fu">penalty</span><span class="op">(</span><span class="va">object</span>, <span class="va">data</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">penalty</span><span class="op">(</span><span class="va">object</span>, <span class="va">data</span>, rescale <span class="op">=</span> <span class="cn">FALSE</span>, margins <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -142,6 +145,13 @@ turning the last diagonal elements of the penalty to zero, which highlights
 the penalty null space.</p></dd>
 
 
+<dt id="arg-margins">margins<a class="anchor" aria-label="anchor" href="#arg-margins"></a></dt>
+<dd><p>logical; if <code>FALSE</code>, extract the stored tensor product
+penalty matrices. If <code>TRUE</code>, extract the stored marginal penalties instead,
+with labels identifying the parent tensor and each margin. Marginal
+penalties need not use the parameterisation of the fitted tensor product.</p></dd>
+
+
 <dt id="arg-select">select<a class="anchor" aria-label="anchor" href="#arg-select"></a></dt>
 <dd><p>character, logical, or numeric; which smooths to extract
 penalties for. If <code>NULL</code>, the default, then penalties for all model
@@ -160,11 +170,6 @@ the order that smooths are stored.</p></dd>
 <dd><p>logical; should smooths be selected by partial matches
 with <code>select</code>? If <code>TRUE</code>, <code>select</code> can only be a single string to match
 against.</p></dd>
-
-
-<dt id="arg-margins">margins<a class="anchor" aria-label="anchor" href="#arg-margins"></a></dt>
-<dd><p>logical; extract the penalty matrices for the tensor
-product or the marginal smooths of the tensor product?</p></dd>
 
 </dl></div>
     <div class="section level2">

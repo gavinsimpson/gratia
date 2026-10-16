@@ -23,6 +23,8 @@ complete workflow for grouped surveys, mixed models or spatial surveys.
   change](https://gavinsimpson.github.io/gratia/articles/prediction-comparisons.md):
 - [Read smooth effects, interactions and
   surfaces](https://gavinsimpson.github.io/gratia/articles/smooth-effects.md):
+- [Intervals for shape-constrained
+  smooths](https://gavinsimpson.github.io/gratia/articles/shape-constrained-intervals.md):
 - [Choose a smooth for the spatial
   question](https://gavinsimpson.github.io/gratia/articles/spatial-smooths.md):
 - [Checking different response

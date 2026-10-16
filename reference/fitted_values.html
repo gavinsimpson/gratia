@@ -29,6 +29,7 @@
     <li><h6 class="dropdown-header" data-toc-skip>Workflows</h6></li>
     <li><a class="dropdown-item" href="../articles/prediction-comparisons.html">Comparing treatments and finding rates of change</a></li>
     <li><a class="dropdown-item" href="../articles/smooth-effects.html">Read smooth effects, interactions and surfaces</a></li>
+    <li><a class="dropdown-item" href="../articles/shape-constrained-intervals.html">Intervals for shape-constrained smooths</a></li>
     <li><a class="dropdown-item" href="../articles/spatial-smooths.html">Choose a smooth for the spatial question</a></li>
     <li><a class="dropdown-item" href="../articles/response-distributions.html">Checking different response distributions</a></li>
     <li><a class="dropdown-item" href="../articles/transformed-covariates.html">Functions of covariates and evaluation environments</a></li>
@@ -76,7 +77,8 @@
 <span>  n_sim <span class="op">=</span> <span class="fl">10000</span>,</span>
 <span>  n_cores <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  seed <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  unconditional <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  unconditional <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  interval_method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"auto"</span>, <span class="st">"gaussian"</span>, <span class="st">"bootstrap"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'gamm'</span></span>
@@ -153,6 +155,14 @@ With <code>NULL</code>, the current random number state is used and advanced.</p
 the Bayesian covariance matrix, if available. Otherwise a warning is
 issued and the uncorrected covariance is used.</p></dd>
 
+
+<dt id="arg-interval-method">interval_method<a class="anchor" aria-label="anchor" href="#arg-interval-method"></a></dt>
+<dd><p>character; <code>"auto"</code> uses stored scasm bootstrap draws
+for pointwise intervals when available and Gaussian intervals otherwise.
+<code>"gaussian"</code> requests covariance-based limits and <code>"bootstrap"</code> requires
+stored draws. Simultaneous bootstrap bands are unsupported. Shape-enforced
+intervals are available for smooth components through <code><a href="smooth_estimates.html">smooth_estimates()</a></code>.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -170,7 +180,17 @@ is the predicted probability for a single category of the response.</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>Formula offsets are included in predictions. Offsets supplied only through
+    <p>Native scasm fits with stored bootstrap draws use mgcv's pointwise limits
+by default, including its <code>svar.only</code> correction for smoothing bias.
+<code>interval_method = "gaussian"</code> restores covariance-based limits. <code>.se</code>
+retains its existing covariance-based meaning. No replicates are generated.
+Bootstrap limits use existing scalar and location-scale parameter
+transformations. Unsupported nonlinear family outputs give an error for
+an explicit bootstrap request; automatic selection warns and uses Gaussian
+limits. Simultaneous bootstrap bands are not supported. Automatic
+simultaneous intervals warn when stored bootstrap draws are left unused.
+The <code>interval_info</code> attribute records the method and correction.</p>
+<p>Formula offsets are included in predictions. Offsets supplied only through
 the fitting function's <code>offset</code> argument are omitted, including when
 <code>data = NULL</code>: this function evaluates explicit prediction rows internally.
 In contrast, <code><a href="fitted_samples.html">fitted_samples()</a></code> retains fitting-argument offsets when its
@@ -207,7 +227,7 @@ predictions, not prediction intervals for future observations.</p>
 value based on the maximum absolute standardized deviation over the supplied
 rows. Their limits are computed on the link scale and transformed if
 <code>scale = "response"</code>; <code>.se</code> remains on the link scale. The simulation
-covariance must be positive definite. Supported families are Gaussian,
+covariance may be positive semidefinite. Supported families are Gaussian,
 Poisson, binomial, Gamma, inverse Gaussian, quasi families, negative binomial,
 Tweedie, beta regression, and scaled t, fitted by <code><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam()</a></code> or <code><a href="https://rdrr.io/pkg/mgcv/man/bam.html" class="external-link">bam()</a></code> (including
 the <code>gam</code> component of a <code><a href="https://rdrr.io/pkg/mgcv/man/gamm.html" class="external-link">gamm()</a></code> fit). Other families and <code>scam</code> models

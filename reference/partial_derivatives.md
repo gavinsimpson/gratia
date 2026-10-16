@@ -37,7 +37,8 @@ partial_derivatives(
   ...,
   newdata = NULL,
   envir = NULL,
-  wrt = c("smooth", "covariate")
+  wrt = c("smooth", "covariate"),
+  interval_method = c("auto", "gaussian", "bootstrap")
 )
 
 # S3 method for class 'gamm4'
@@ -170,6 +171,12 @@ partial_derivatives(object, ...)
   expression, such as `log(x)`; `"covariate"` uses a raw covariate, such
   as `x`, and reevaluates expressions at each finite-difference point.
 
+- interval_method:
+
+  character; use stored scasm bootstrap draws for pointwise intervals
+  with `"auto"` (the default), or explicitly select `"gaussian"` or
+  `"bootstrap"`. Bootstrap simultaneous bands are unavailable.
+
 ## Value
 
 A tibble, currently with the following variables:
@@ -182,7 +189,7 @@ A tibble, currently with the following variables:
 
 - `.crit`: the critical value such that `derivative` ± `(crit * se)`
   gives the upper and lower bounds of the requested confidence or
-  simultaneous interval (given `level`),
+  simultaneous interval (given `level`); `NA` for bootstrap limits,
 
 - `.lower_ci`: the lower bound of the confidence or simultaneous
   interval,

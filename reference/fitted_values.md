@@ -19,7 +19,8 @@ fitted_values(
   n_sim = 10000,
   n_cores = 1,
   seed = NULL,
-  unconditional = FALSE
+  unconditional = FALSE,
+  interval_method = c("auto", "gaussian", "bootstrap")
 )
 
 # S3 method for class 'gamm'
@@ -99,6 +100,15 @@ fitted_values(object, ...)
   covariance matrix, if available. Otherwise a warning is issued and the
   uncorrected covariance is used.
 
+- interval_method:
+
+  character; `"auto"` uses stored scasm bootstrap draws for pointwise
+  intervals when available and Gaussian intervals otherwise.
+  `"gaussian"` requests covariance-based limits and `"bootstrap"`
+  requires stored draws. Simultaneous bootstrap bands are unsupported.
+  Shape-enforced intervals are available for smooth components through
+  [`smooth_estimates()`](https://gavinsimpson.github.io/gratia/reference/smooth_estimates.md).
+
 ## Value
 
 A tibble (data frame) whose first *m* columns contain either the data
@@ -123,6 +133,18 @@ Models fitted with certain families will include additional variables
   the predicted probability for a single category of the response.
 
 ## Details
+
+Native scasm fits with stored bootstrap draws use mgcv's pointwise
+limits by default, including its `svar.only` correction for smoothing
+bias. `interval_method = "gaussian"` restores covariance-based limits.
+`.se` retains its existing covariance-based meaning. No replicates are
+generated. Bootstrap limits use existing scalar and location-scale
+parameter transformations. Unsupported nonlinear family outputs give an
+error for an explicit bootstrap request; automatic selection warns and
+uses Gaussian limits. Simultaneous bootstrap bands are not supported.
+Automatic simultaneous intervals warn when stored bootstrap draws are
+left unused. The `interval_info` attribute records the method and
+correction.
 
 Formula offsets are included in predictions. Offsets supplied only
 through the fitting function's `offset` argument are omitted, including
@@ -171,8 +193,8 @@ Simultaneous intervals use joint Gaussian coefficient draws and a
 critical value based on the maximum absolute standardized deviation over
 the supplied rows. Their limits are computed on the link scale and
 transformed if `scale = "response"`; `.se` remains on the link scale.
-The simulation covariance must be positive definite. Supported families
-are Gaussian, Poisson, binomial, Gamma, inverse Gaussian, quasi
+The simulation covariance may be positive semidefinite. Supported
+families are Gaussian, Poisson, binomial, Gamma, inverse Gaussian, quasi
 families, negative binomial, Tweedie, beta regression, and scaled t,
 fitted by [`gam()`](https://rdrr.io/pkg/mgcv/man/gam.html) or
 [`bam()`](https://rdrr.io/pkg/mgcv/man/bam.html) (including the `gam`

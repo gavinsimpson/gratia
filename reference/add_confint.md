@@ -31,3 +31,13 @@ add_confint(object, coverage = 0.95, ...)
 - ...:
 
   arguments passed to other methods.
+
+## Details
+
+For smooth estimates, this function computes Gaussian pointwise
+intervals from the saved estimates and standard errors. It replaces any
+existing limits and updates their interval metadata. To retain stored
+bootstrap, shape-enforced or simultaneous limits, draw the estimates
+directly with
+[`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)
+without calling `add_confint()`.

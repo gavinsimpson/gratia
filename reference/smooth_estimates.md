@@ -36,6 +36,8 @@ smooth_estimates(
   n_sim = 10000,
   n_cores = 1,
   seed = NULL,
+  interval_method = c("auto", "gaussian", "bootstrap", "shape"),
+  shape_source = c("gaussian", "bootstrap"),
   ...
 )
 ```
@@ -178,6 +180,24 @@ smooth_estimates(
   RNG state. Shared coefficient draws make results independent of
   selected smooth order and parallel evaluation scheduling.
 
+- interval_method:
+
+  character; "auto" uses stored scasm bootstrap draws for pointwise
+  intervals when available, and Gaussian intervals otherwise. Use
+  "gaussian" to request covariance-based limits or "bootstrap" to
+  require stored draws. Simultaneous bootstrap bands are not supported.
+  `"shape"` applies
+  [`shape_intervals()`](https://gavinsimpson.github.io/gratia/reference/shape_intervals.md)
+  to supported scasm smooth components, using the initial limits chosen
+  by `shape_source`.
+
+- shape_source:
+
+  character; initial uncertainty for `interval_method = "shape"`:
+  `"gaussian"` (the default) or stored `"bootstrap"` pointwise limits.
+  Bootstrap sources require `frequentist = FALSE` and
+  `unconditional = FALSE` because the stored draws hold smoothing fixed.
+
 ## Value
 
 A data frame (tibble), which is of class `"smooth_estimates"`.
@@ -210,8 +230,72 @@ changed. Pointwise intervals use the covariance of the constrained
 coefficients. With `overall_uncertainty = TRUE`, their standard errors
 also include intercept uncertainty and its covariance with the smooth;
 estimates remain centred. Models without an intercept use smooth-only
-uncertainty for either setting. Smoothing-parameter uncertainty is not
-currently supported for SCAM models; use `unconditional = FALSE`.
+uncertainty for either setting. Native scasm fits use component-only
+uncertainty by default. Explicitly requesting
+`overall_uncertainty = TRUE` warns once if selected smooths lack the
+centring information needed to add mean uncertainty. Ordinary GAM
+defaults are unchanged.
+
+Bootstrap pointwise limits follow mgcv's percentiles and its `svar.only`
+correction for smoothing bias. The correction can move limits beyond the
+fitted shape constraints. Estimates and covariance-based standard errors
+are unchanged; `.crit` is `NA` for asymmetric bootstrap limits. No new
+replicates are generated. Simultaneous intervals use Gaussian draws and
+warn if automatic selection leaves stored bootstrap draws unused.
+
+The `interval_info` attribute records the interval source and
+correction. The `shape_constraints` attribute identifies requests and
+retained inequalities for each fitted smooth and tensor margin. Captions
+use plotmath arrows for increasing and decreasing constraints while
+`.type` and
+[`smooth_type()`](https://gavinsimpson.github.io/gratia/reference/smooth_type.md)
+keep their existing basis names. Unsupported tensor requests produce a
+warning and are labelled as not retained.
+
+Shape enforcement is explicit and leaves the existing interval defaults
+unchanged. It preserves containment of a shape-restricted target
+whenever the entire initial band contains that target on the evaluation
+grid. This does not establish nominal coverage of the initial band, or
+preserve marginal coverage of transformed pointwise limits. The default
+Gaussian source uses approximate Bayesian covariance and does not
+construct a constrained posterior. Standard errors describe the initial
+calculation; `.crit` is `NA` after shape enforcement. Metadata records
+the initial source, correction, named shapes, model coordinates and
+whole-grid guarantee.
+
+Every selected term must have retained named scasm restrictions.
+Supported combinations are positivity, monotonicity in any directions
+and curvature in at most one direction. Tensor smooths require
+`te(..., np = FALSE)` with univariate B-spline margins (`"sc"` or
+`"bs"`). Normal reparameterisation and other complementary bases can
+invalidate the named surface shape even when coefficient inequalities
+were retained. Curvature additionally requires equally spaced fitted
+knots to rounding precision and degree at least two. Irregular
+evaluation coordinates are supported. Complete product grids, finite
+endpoints and evaluation inside the fitted B-spline domains are
+required; use `dist = 0` for tensors. Numeric `by` variables are
+unsupported; factor-by components and separate linear predictors are
+treated separately. Function-valued bases are required; derivative bases
+are unsupported. General `pc` inequalities can replace the named
+coefficient restrictions while leaving their original `xt` request in
+the fitted object. These replacements are labelled as general
+constraints and rejected for automatic shape intervals. Point equalities
+that retain the named inequalities are supported.
+
+Shape intervals use component-only uncertainty: explicit
+`overall_uncertainty = TRUE`, effect shifts and effect transformations
+are rejected. Coordinate transformations used in the model remain
+supported; their named shapes concern model coordinates. The transformed
+endpoints need not belong to the fitted spline space or obey centring
+equalities. See
+[`shape_confidence_set()`](https://gavinsimpson.github.io/gratia/reference/shape_confidence_set.md)
+for explicit coefficient restrictions and the [shape-constrained
+intervals
+article](https://gavinsimpson.github.io/gratia/articles/shape-constrained-intervals.html)
+for examples.
+
+Smoothing-parameter uncertainty is not currently supported for SCAM
+models; use `unconditional = FALSE`.
 
 For explicit `data`, missing covariates needed by a smooth produce `NA`
 estimates and standard errors at those positions. Missing values in

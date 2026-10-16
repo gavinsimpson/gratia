@@ -29,6 +29,7 @@
     <li><h6 class="dropdown-header" data-toc-skip>Workflows</h6></li>
     <li><a class="dropdown-item" href="../articles/prediction-comparisons.html">Comparing treatments and finding rates of change</a></li>
     <li><a class="dropdown-item" href="../articles/smooth-effects.html">Read smooth effects, interactions and surfaces</a></li>
+    <li><a class="dropdown-item" href="../articles/shape-constrained-intervals.html">Intervals for shape-constrained smooths</a></li>
     <li><a class="dropdown-item" href="../articles/spatial-smooths.html">Choose a smooth for the spatial question</a></li>
     <li><a class="dropdown-item" href="../articles/response-distributions.html">Checking different response distributions</a></li>
     <li><a class="dropdown-item" href="../articles/transformed-covariates.html">Functions of covariates and evaluation environments</a></li>
@@ -306,7 +307,10 @@ Specialist maps and graph plots are outside the scope of this display.</p></dd>
 <dd><p>character or <code>NULL</code>; the default draws stored interval bounds
 unchanged, adding pointwise bounds if absent. An explicit choice validates
 stored interval metadata; <code>"credible"</code> aliases <code>"confidence"</code>. Simultaneous
-bands must first be computed from the fitted model by <code><a href="smooth_estimates.html">smooth_estimates()</a></code>.</p></dd>
+bands must first be computed from the fitted model by <code><a href="smooth_estimates.html">smooth_estimates()</a></code>.
+Method and uncertainty controls such as <code>interval_method</code>, <code>shape_source</code>,
+<code>frequentist</code>, and <code>unconditional</code> also require the fitted model; they
+cannot change intervals when drawing saved estimates.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>

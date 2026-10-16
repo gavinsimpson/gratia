@@ -119,7 +119,11 @@ confint(object, ...)
 
 - ...:
 
-  additional arguments for methods. Not used.
+  additional arguments passed to
+  [`smooth_estimates()`](https://gavinsimpson.github.io/gratia/reference/smooth_estimates.md),
+  including `interval_method` to select Gaussian, stored scasm
+  bootstrap, or shape-enforced intervals, and `shape_source` to choose
+  their initial source.
 
 - newdata:
 
@@ -146,7 +150,8 @@ a tibble with components:
 
 7.  `.se`; standard error of the estimated value of the smooth,
 
-8.  `.crit`; critical value for the `100 * level`% confidence interval.
+8.  `.crit`; critical value for the `100 * level`% confidence interval;
+    `NA` for bootstrap limits.
 
 9.  `.lower_ci`; lower limit of the confidence or simultaneous interval,
 
@@ -156,7 +161,14 @@ a tibble with components:
 
 `overall_uncertainty` applies to both pointwise and simultaneous
 intervals. Each simultaneous band covers the evaluation points of one
-fitted smooth; separate smooths do not form a joint coverage set.
+fitted smooth; separate smooths do not form a joint coverage set. Native
+scasm fits default to `overall_uncertainty = FALSE` and use stored
+bootstrap draws for pointwise intervals when available, as in
+[`smooth_estimates()`](https://gavinsimpson.github.io/gratia/reference/smooth_estimates.md).
+Shifting and transforming a smooth preserves its interval limits,
+including asymmetric bootstrap limits. Shape-enforced intervals describe
+unshifted smooth components on the model scale; `shift = TRUE` and
+effect transformations are unsupported.
 
 ## Author
 

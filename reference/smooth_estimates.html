@@ -37,6 +37,7 @@ been removed from the package."><meta property="og:image" content="https://gavin
     <li><h6 class="dropdown-header" data-toc-skip>Workflows</h6></li>
     <li><a class="dropdown-item" href="../articles/prediction-comparisons.html">Comparing treatments and finding rates of change</a></li>
     <li><a class="dropdown-item" href="../articles/smooth-effects.html">Read smooth effects, interactions and surfaces</a></li>
+    <li><a class="dropdown-item" href="../articles/shape-constrained-intervals.html">Intervals for shape-constrained smooths</a></li>
     <li><a class="dropdown-item" href="../articles/spatial-smooths.html">Choose a smooth for the spatial question</a></li>
     <li><a class="dropdown-item" href="../articles/response-distributions.html">Checking different response distributions</a></li>
     <li><a class="dropdown-item" href="../articles/transformed-covariates.html">Functions of covariates and evaluation environments</a></li>
@@ -100,6 +101,8 @@ been removed from the package.</p>
 <span>  n_sim <span class="op">=</span> <span class="fl">10000</span>,</span>
 <span>  n_cores <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  seed <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  interval_method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"auto"</span>, <span class="st">"gaussian"</span>, <span class="st">"bootstrap"</span>, <span class="st">"shape"</span><span class="op">)</span>,</span>
+<span>  shape_source <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"gaussian"</span>, <span class="st">"bootstrap"</span><span class="op">)</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -241,6 +244,21 @@ for simultaneous bands. Parallel simulation requires OpenMP support.</p></dd>
 caller's RNG state. Shared coefficient draws make results independent of
 selected smooth order and parallel evaluation scheduling.</p></dd>
 
+
+<dt id="arg-interval-method">interval_method<a class="anchor" aria-label="anchor" href="#arg-interval-method"></a></dt>
+<dd><p>character; "auto" uses stored scasm bootstrap draws
+for pointwise intervals when available, and Gaussian intervals otherwise.
+Use "gaussian" to request covariance-based limits or "bootstrap" to
+require stored draws. Simultaneous bootstrap bands are not supported.
+<code>"shape"</code> applies <code><a href="shape_intervals.html">shape_intervals()</a></code> to supported scasm smooth components,
+using the initial limits chosen by <code>shape_source</code>.</p></dd>
+
+
+<dt id="arg-shape-source">shape_source<a class="anchor" aria-label="anchor" href="#arg-shape-source"></a></dt>
+<dd><p>character; initial uncertainty for <code>interval_method = "shape"</code>: <code>"gaussian"</code> (the default) or stored <code>"bootstrap"</code> pointwise
+limits. Bootstrap sources require <code>frequentist = FALSE</code> and
+<code>unconditional = FALSE</code> because the stored draws hold smoothing fixed.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -270,7 +288,58 @@ the covariance of the constrained coefficients. With
 <code>overall_uncertainty = TRUE</code>, their standard errors also include intercept
 uncertainty and its covariance with the smooth; estimates remain centred.
 Models without an intercept use smooth-only uncertainty for either setting.
-Smoothing-parameter uncertainty is not currently supported for SCAM models;
+Native scasm fits use component-only uncertainty by default. Explicitly
+requesting <code>overall_uncertainty = TRUE</code> warns once if selected smooths lack
+the centring information needed to add mean uncertainty. Ordinary GAM
+defaults are unchanged.</p>
+<p>Bootstrap pointwise limits follow mgcv's percentiles and its <code>svar.only</code>
+correction for smoothing bias. The correction can move limits beyond the
+fitted shape constraints. Estimates and covariance-based standard errors
+are unchanged; <code>.crit</code> is <code>NA</code> for asymmetric bootstrap limits. No new
+replicates are generated. Simultaneous intervals use Gaussian draws and
+warn if automatic selection leaves stored bootstrap draws unused.</p>
+<p>The <code>interval_info</code> attribute records the interval source and correction.
+The <code>shape_constraints</code> attribute identifies requests and retained
+inequalities for each fitted smooth and tensor margin. Captions use
+plotmath arrows for increasing and decreasing constraints while <code>.type</code>
+and <code><a href="smooth_type.html">smooth_type()</a></code> keep their existing basis names. Unsupported tensor
+requests produce a warning and are labelled as not retained.</p>
+<p>Shape enforcement is explicit and leaves the existing interval defaults
+unchanged. It preserves containment of a shape-restricted target whenever
+the entire initial band contains that target on the evaluation grid. This
+does not establish nominal coverage of the initial band, or preserve
+marginal coverage of transformed pointwise limits. The default Gaussian
+source uses approximate Bayesian covariance and does not construct a
+constrained posterior. Standard errors describe the initial calculation;
+<code>.crit</code> is <code>NA</code> after shape enforcement. Metadata records the initial source,
+correction, named shapes, model coordinates and whole-grid guarantee.</p>
+<p>Every selected term must have retained named scasm restrictions. Supported
+combinations are positivity, monotonicity in any directions and curvature
+in at most one direction. Tensor smooths require <code>te(..., np = FALSE)</code> with
+univariate B-spline margins (<code>"sc"</code> or <code>"bs"</code>). Normal reparameterisation
+and other complementary bases can invalidate the named surface shape even
+when coefficient inequalities were retained. Curvature additionally
+requires equally spaced fitted knots to rounding precision and degree at
+least two. Irregular evaluation
+coordinates are supported. Complete product grids, finite endpoints and
+evaluation inside the fitted B-spline domains are required; use <code>dist = 0</code>
+for tensors. Numeric <code>by</code> variables are unsupported; factor-by components
+and separate linear predictors are treated separately.
+Function-valued bases are required; derivative bases are unsupported.
+General <code>pc</code> inequalities can replace the named coefficient restrictions
+while leaving their original <code>xt</code> request in the fitted object. These
+replacements are labelled as general constraints and rejected for automatic
+shape intervals. Point equalities that retain the named inequalities are
+supported.</p>
+<p>Shape intervals use component-only uncertainty: explicit
+<code>overall_uncertainty = TRUE</code>, effect shifts and effect transformations are
+rejected. Coordinate transformations used in the model remain supported;
+their named shapes concern model coordinates. The transformed endpoints
+need not belong to the fitted spline space or obey centring equalities.
+See <code><a href="shape_confidence_set.html">shape_confidence_set()</a></code> for explicit coefficient restrictions and the
+<a href="https://gavinsimpson.github.io/gratia/articles/shape-constrained-intervals.html">shape-constrained intervals article</a>
+for examples.</p>
+<p>Smoothing-parameter uncertainty is not currently supported for SCAM models;
 use <code>unconditional = FALSE</code>.</p>
 <p>For explicit <code>data</code>, missing covariates needed by a smooth produce <code>NA</code>
 estimates and standard errors at those positions. Missing values in variables

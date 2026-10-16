@@ -29,6 +29,7 @@
     <li><h6 class="dropdown-header" data-toc-skip>Workflows</h6></li>
     <li><a class="dropdown-item" href="articles/prediction-comparisons.html">Comparing treatments and finding rates of change</a></li>
     <li><a class="dropdown-item" href="articles/smooth-effects.html">Read smooth effects, interactions and surfaces</a></li>
+    <li><a class="dropdown-item" href="articles/shape-constrained-intervals.html">Intervals for shape-constrained smooths</a></li>
     <li><a class="dropdown-item" href="articles/spatial-smooths.html">Choose a smooth for the spatial question</a></li>
     <li><a class="dropdown-item" href="articles/response-distributions.html">Checking different response distributions</a></li>
     <li><a class="dropdown-item" href="articles/transformed-covariates.html">Functions of covariates and evaluation environments</a></li>
@@ -63,6 +64,16 @@
 <p>State what the evidence shows. Add a limitation only when it materially changes how the reader should interpret or use that result. Connect it to a specific claim or decision in the surrounding text, and explain its practical consequence. Do not introduce an unasked alternative claim merely to disclaim it. Omit generic cautions about causality, uncertainty or generalisation when they add no useful information.</p>
 <p>When reviewing a qualification, ask: “What misunderstanding does this sentence prevent, and has the surrounding text given the reader a reason to have it?” If there is no concrete answer, delete it.</p>
 </div>
+<div class="section level2">
+<h2 id="plot-annotations">Plot annotations<a class="anchor" aria-label="anchor" href="#plot-annotations"></a></h2>
+<p>Keep default plots free of implementation and methodological commentary.</p>
+<ul><li>Preserve the established caption format. Adding a feature does not authorize expanding plot annotations.</li>
+<li>Include labels needed to read the plotted values: axes, units, legends and established basis or constraint labels.</li>
+<li>Do not repeat settings the user requested, or add interval sources, calibration details, numerical diagnostics, provenance or generic caveats.</li>
+<li>Put those details in documentation, returned metadata or diagnostic output.</li>
+<li>Before adding text, ask: “What specific misreading of this figure would this prevent?” If there is no concrete answer, omit it.</li>
+<li>Review rendered plots for unnecessary text before delivery, just as you review them for incorrect values.</li>
+</ul></div>
 <div class="section level2">
 <h2 id="starting-new-work">Starting new work<a class="anchor" aria-label="anchor" href="#starting-new-work"></a></h2>
 <p>Unless the user explicitly instructs otherwise, always start new work on a new feature branch created from <code>main</code>. Use the <code>gls/</code> branch prefix.</p>

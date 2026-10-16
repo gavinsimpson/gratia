@@ -262,6 +262,10 @@ draw(
   `"confidence"`. Simultaneous bands must first be computed from the
   fitted model by
   [`smooth_estimates()`](https://gavinsimpson.github.io/gratia/reference/smooth_estimates.md).
+  Method and uncertainty controls such as `interval_method`,
+  `shape_source`, `frequentist`, and `unconditional` also require the
+  fitted model; they cannot change intervals when drawing saved
+  estimates.
 
 - ...:
 

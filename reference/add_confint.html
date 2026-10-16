@@ -29,6 +29,7 @@
     <li><h6 class="dropdown-header" data-toc-skip>Workflows</h6></li>
     <li><a class="dropdown-item" href="../articles/prediction-comparisons.html">Comparing treatments and finding rates of change</a></li>
     <li><a class="dropdown-item" href="../articles/smooth-effects.html">Read smooth effects, interactions and surfaces</a></li>
+    <li><a class="dropdown-item" href="../articles/shape-constrained-intervals.html">Intervals for shape-constrained smooths</a></li>
     <li><a class="dropdown-item" href="../articles/spatial-smooths.html">Choose a smooth for the spatial question</a></li>
     <li><a class="dropdown-item" href="../articles/response-distributions.html">Checking different response distributions</a></li>
     <li><a class="dropdown-item" href="../articles/transformed-covariates.html">Functions of covariates and evaluation environments</a></li>
@@ -91,6 +92,14 @@
 <dd><p>arguments passed to other methods.</p></dd>
 
 </dl></div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>For smooth estimates, this function computes Gaussian pointwise
+intervals from the saved estimates and standard errors. It replaces any
+existing limits and updates their interval metadata. To retain stored
+bootstrap, shape-enforced or simultaneous limits, draw the estimates directly with
+<code><a href="draw.html">draw()</a></code> without calling <code>add_confint()</code>.</p>
+    </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>

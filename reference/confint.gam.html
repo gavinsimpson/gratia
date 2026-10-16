@@ -31,6 +31,7 @@ terms of a fitted GAM."><meta property="og:image" content="https://gavinsimpson.
     <li><h6 class="dropdown-header" data-toc-skip>Workflows</h6></li>
     <li><a class="dropdown-item" href="../articles/prediction-comparisons.html">Comparing treatments and finding rates of change</a></li>
     <li><a class="dropdown-item" href="../articles/smooth-effects.html">Read smooth effects, interactions and surfaces</a></li>
+    <li><a class="dropdown-item" href="../articles/shape-constrained-intervals.html">Intervals for shape-constrained smooths</a></li>
     <li><a class="dropdown-item" href="../articles/spatial-smooths.html">Choose a smooth for the spatial question</a></li>
     <li><a class="dropdown-item" href="../articles/response-distributions.html">Checking different response distributions</a></li>
     <li><a class="dropdown-item" href="../articles/transformed-covariates.html">Functions of covariates and evaluation environments</a></li>
@@ -178,7 +179,9 @@ an exact match? Can only be used if <code>length(parm)</code> is <code>1</code>.
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
-<dd><p>additional arguments for methods. Not used.</p></dd>
+<dd><p>additional arguments passed to <code><a href="smooth_estimates.html">smooth_estimates()</a></code>, including
+<code>interval_method</code> to select Gaussian, stored scasm bootstrap, or
+shape-enforced intervals, and <code>shape_source</code> to choose their initial source.</p></dd>
 
 
 <dt id="arg-newdata">newdata<a class="anchor" aria-label="anchor" href="#arg-newdata"></a></dt>
@@ -197,7 +200,8 @@ per the variables in the smooth,</p></li>
 <li><p>zero or more variables containing values of the by variable,</p></li>
 <li><p><code>.estimate</code>; estimated value of the smooth,</p></li>
 <li><p><code>.se</code>; standard error of the estimated value of the smooth,</p></li>
-<li><p><code>.crit</code>; critical value for the <code>100 * level</code>% confidence interval.</p></li>
+<li><p><code>.crit</code>; critical value for the <code>100 * level</code>% confidence interval;
+<code>NA</code> for bootstrap limits.</p></li>
 <li><p><code>.lower_ci</code>; lower limit of the confidence or simultaneous interval,</p></li>
 <li><p><code>.upper_ci</code>; upper limit of the confidence or simultaneous interval,</p></li>
 </ol></div>
@@ -205,7 +209,13 @@ per the variables in the smooth,</p></li>
     <h2 id="note">Note<a class="anchor" aria-label="anchor" href="#note"></a></h2>
     <p><code>overall_uncertainty</code> applies to both pointwise and simultaneous
 intervals. Each simultaneous band covers the evaluation points of one
-fitted smooth; separate smooths do not form a joint coverage set.</p>
+fitted smooth; separate smooths do not form a joint coverage set.
+Native scasm fits default to <code>overall_uncertainty = FALSE</code> and use stored
+bootstrap draws for pointwise intervals when available, as in
+<code><a href="smooth_estimates.html">smooth_estimates()</a></code>. Shifting and transforming a smooth preserves its
+interval limits, including asymmetric bootstrap limits.
+Shape-enforced intervals describe unshifted smooth components on the
+model scale; <code>shift = TRUE</code> and effect transformations are unsupported.</p>
     </div>
     <div class="section level2">
     <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>

@@ -35,7 +35,8 @@ derivatives(
   newdata = NULL,
   envir = NULL,
   wrt = c("smooth", "covariate"),
-  focal = NULL
+  focal = NULL,
+  interval_method = c("auto", "gaussian", "bootstrap")
 )
 
 # S3 method for class 'gamm4'
@@ -163,6 +164,12 @@ derivatives(object, ...)
   when a smooth depends on multiple raw inputs. A single name can be
   used for all selected univariate smooths.
 
+- interval_method:
+
+  character; use stored scasm bootstrap draws for pointwise intervals
+  with `"auto"` (the default), or explicitly select `"gaussian"` or
+  `"bootstrap"`. Bootstrap simultaneous bands are unavailable.
+
 ## Value
 
 A tibble, currently with the following variables:
@@ -179,7 +186,7 @@ A tibble, currently with the following variables:
 
 - `.crit`: the critical value such that `.derivative` ± `(.crit * .se)`
   gives the upper and lower bounds of the requested confidence or
-  simultaneous interval (given `level`),
+  simultaneous interval (given `level`); `NA` for bootstrap limits,
 
 - `.lower_ci`: the lower bound of the confidence or simultaneous
   interval,

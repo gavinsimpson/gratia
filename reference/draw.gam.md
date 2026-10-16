@@ -62,7 +62,18 @@ draw(
   n_sim = 10000,
   n_cores = 1,
   seed = NULL,
+  interval_method = c("auto", "gaussian", "bootstrap", "shape"),
+  frequentist = FALSE,
+  shape_source = c("gaussian", "bootstrap"),
   ...
+)
+
+# S3 method for class 'scasm'
+draw(
+  object,
+  ...,
+  overall_uncertainty = FALSE,
+  interval_method = c("auto", "gaussian", "bootstrap", "shape")
 )
 ```
 
@@ -172,7 +183,10 @@ draw(
   in the standard errors of smooth and parametric effects? For
   parametric effects this includes the intercept variance and its
   covariance with the term, without changing the partial estimates. Each
-  term uses the intercept of its own linear predictor.
+  term uses the intercept of its own linear predictor. Native scasm
+  models are routed to `draw.scasm()` with
+  `overall_uncertainty = FALSE`. An explicit request for unavailable
+  mean uncertainty warns once. The stored model class is unchanged.
 
 - constant:
 
@@ -436,6 +450,30 @@ draw(
 
   integer or `NULL`; an explicit simulation seed preserves the caller's
   RNG state.
+
+- interval_method:
+
+  character; "auto" uses stored scasm bootstrap draws for pointwise
+  intervals when available, and Gaussian intervals otherwise. Use
+  "gaussian" to request covariance-based limits or "bootstrap" to
+  require stored draws. Simultaneous bootstrap bands are not supported.
+  `"shape"` applies
+  [`shape_intervals()`](https://gavinsimpson.github.io/gratia/reference/shape_intervals.md)
+  to supported scasm smooth components, using the initial limits chosen
+  by `shape_source`.
+
+- frequentist:
+
+  logical; use frequentist covariance for smooth-component intervals?
+  The default uses approximate Bayesian covariance. Parametric effect
+  intervals retain their existing Bayesian covariance calculation.
+
+- shape_source:
+
+  character; initial uncertainty for `interval_method = "shape"`:
+  `"gaussian"` (the default) or stored `"bootstrap"` pointwise limits.
+  Bootstrap sources require `frequentist = FALSE` and
+  `unconditional = FALSE` because the stored draws hold smoothing fixed.
 
 - ...:
 

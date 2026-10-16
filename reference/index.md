@@ -14,6 +14,7 @@ plots](https://gavinsimpson.github.io/gratia/articles/custom-plotting.md).
   Generic plotting via `ggplot2`
 
 - [`draw(`*`<gam>`*`)`](https://gavinsimpson.github.io/gratia/reference/draw.gam.md)
+  [`draw(`*`<scasm>`*`)`](https://gavinsimpson.github.io/gratia/reference/draw.gam.md)
   : Plot smooth and parametric terms from a fitted GAM
 
 - [`draw(`*`<gamlss>`*`)`](https://gavinsimpson.github.io/gratia/reference/draw.gamlss.md)
@@ -88,6 +89,13 @@ residuals, and transform effects for interpretation.
   [`confint(`*`<gamm>`*`)`](https://gavinsimpson.github.io/gratia/reference/confint.gam.md)
   [`confint(`*`<gamm4>`*`)`](https://gavinsimpson.github.io/gratia/reference/confint.gam.md)
   : Point-wise and simultaneous confidence intervals for smooths
+
+- [`shape_intervals()`](https://gavinsimpson.github.io/gratia/reference/shape_intervals.md)
+  : Enforce named shapes on estimates and interval endpoints
+
+- [`shape_confidence_set()`](https://gavinsimpson.github.io/gratia/reference/shape_confidence_set.md)
+  [`in_shape_set()`](https://gavinsimpson.github.io/gratia/reference/shape_confidence_set.md)
+  : Intersect a band with linear restrictions on coefficients
 
 - [`add_constant()`](https://gavinsimpson.github.io/gratia/reference/add_constant.md)
   : Add a constant to estimated values

@@ -18,6 +18,7 @@
 <url><loc>https://gavinsimpson.github.io/gratia/articles/response-distributions.html</loc></url>
 <url><loc>https://gavinsimpson.github.io/gratia/articles/sampling-migration.html</loc></url>
 <url><loc>https://gavinsimpson.github.io/gratia/articles/sdmTMB-support.html</loc></url>
+<url><loc>https://gavinsimpson.github.io/gratia/articles/shape-constrained-intervals.html</loc></url>
 <url><loc>https://gavinsimpson.github.io/gratia/articles/smooth-effects.html</loc></url>
 <url><loc>https://gavinsimpson.github.io/gratia/articles/spatial-smooths.html</loc></url>
 <url><loc>https://gavinsimpson.github.io/gratia/articles/transformed-covariates.html</loc></url>
@@ -163,6 +164,8 @@
 <url><loc>https://gavinsimpson.github.io/gratia/reference/scale_fill_partial_effect.html</loc></url>
 <url><loc>https://gavinsimpson.github.io/gratia/reference/sdmTMB-methods.html</loc></url>
 <url><loc>https://gavinsimpson.github.io/gratia/reference/seq_min_max_eps.html</loc></url>
+<url><loc>https://gavinsimpson.github.io/gratia/reference/shape_confidence_set.html</loc></url>
+<url><loc>https://gavinsimpson.github.io/gratia/reference/shape_intervals.html</loc></url>
 <url><loc>https://gavinsimpson.github.io/gratia/reference/shift_values.html</loc></url>
 <url><loc>https://gavinsimpson.github.io/gratia/reference/simulate.html</loc></url>
 <url><loc>https://gavinsimpson.github.io/gratia/reference/smallAges.html</loc></url>
