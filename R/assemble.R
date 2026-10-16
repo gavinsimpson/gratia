@@ -108,14 +108,19 @@
   envir = NULL,
   surface = c("raster", "tile", "3d"),
   surface_3d = list(),
+  ci_3d = FALSE,
+  ci_3d_alpha = 0.15, ci_3d_col = "grey60",
   back_transform = FALSE,
   re_levels = NULL,
   mrf_plot = c("effects", "qq"),
   interval = c("confidence", "simultaneous"),
   n_sim = 10000, n_cores = 1, seed = NULL,
-  interval_method = c("auto", "gaussian", "bootstrap"),
+  interval_method = c("auto", "gaussian", "bootstrap", "shape"),
+  frequentist = FALSE,
+  shape_source = c("gaussian", "bootstrap"),
   ...
 ) {
+  gratia_plot_arguments(c("ci_alpha", "ci_col", "smooth_col", "resid_col", "contour_col", "ci_3d_alpha", "ci_3d_col"), environment())
   if (missing(overall_uncertainty) && is_scasm_model(object)) {
     overall_uncertainty <- FALSE
   }
@@ -125,6 +130,7 @@
   check_back_transform(back_transform)
   surface <- match.arg(surface)
   validate_surface_3d(surface_3d)
+  validate_ci_3d(ci_3d, ci_3d_alpha, ci_3d_col)
   check_surface_dots(match.call(expand.dots = FALSE))
 
   .call <- match.call()
@@ -140,10 +146,10 @@
   #    discrete_colour <- scale_colour_discrete()
   # }
   if (is.null(continuous_colour)) {
-    continuous_colour <- scale_colour_continuous()
+    continuous_colour <- gratia_default_scale(scale_colour_continuous())
   }
   if (is.null(continuous_fill)) {
-    continuous_fill <- scale_fill_distiller(palette = "RdBu", type = "div")
+    continuous_fill <- gratia_default_scale(scale_fill_distiller(palette = "RdBu", type = "div"))
   }
 
   # Include parametric terms by default unless smooths were selected explicitly.
@@ -183,12 +189,14 @@
       n_4d = n_4d,
       data = data,
       unconditional = unconditional,
+      frequentist = frequentist,
       overall_uncertainty = overall_uncertainty,
       dist = dist,
       clip = TRUE,
       unnest = FALSE,
       interval = interval, ci_level = ci_level,
       interval_method = interval_method,
+      shape_source = shape_source,
       n_sim = n_sim, n_cores = n_cores, seed = seed
     )
 
@@ -199,6 +207,7 @@
 
     interval_info <- attr(sm_eval, "interval_info")
     shape_constraints <- attr(sm_eval, "shape_constraints")
+    scam_info <- attr(sm_eval, "scam_smooth_info")
 
     # Take the range of the smooths & their confidence intervals now
     # before we put rug and residuals on
@@ -357,6 +366,7 @@
     sm_plts <- map(sm_l,
       draw_smooth_estimates,
       surface = surface, surface_3d = surface_3d,
+      ci_3d = ci_3d, ci_3d_alpha = ci_3d_alpha, ci_3d_col = ci_3d_col,
       surface_support = surface_support,
       tensor_plot_info = attr(sm_eval, "tensor_plot_info"),
       re_levels = re_levels,
@@ -384,6 +394,7 @@
       coordinate_info = coordinate_info, back_transform = back_transform,
       interval_info = interval_info,
       shape_constraints = shape_constraints,
+      scam_smooth_info = scam_info,
       caption = caption,
       grouped_by = grouped_by,
       ... # FIXME: temporary fix to allow captions to be suppressed-ish
@@ -486,7 +497,7 @@
               ci_level = ci_level,
               caption = if (isTRUE(caption) && interval == "simultaneous") {
                 paste0(format(100 * ci_level), "% pointwise intervals (parametric effect)")
-              } else NULL,
+              } else if (identical(caption, FALSE)) FALSE else NULL,
               ci_col = ci_col,
               ci_alpha = ci_alpha,
               line_col = smooth_col,
@@ -501,6 +512,7 @@
               back_transform = back_transform,
               contour = contour, contour_col = contour_col, n_contour = n_contour,
               surface = surface, surface_3d = surface_3d,
+              ci_3d = ci_3d, ci_3d_alpha = ci_3d_alpha, ci_3d_col = ci_3d_col,
               continuous_fill = continuous_fill,
               discrete_colour = discrete_colour, discrete_fill = discrete_fill
             )
@@ -572,4 +584,14 @@
   cli_ol(names(x))
   cli_par()
   cli_end()
+}
+
+#' @export
+#' @rdname assemble.gam
+#' @inheritParams draw.gam
+`assemble.scam` <- function(object, ..., overall_uncertainty = FALSE,
+  centre = c("model", "plot")) {
+  object <- scam_gam_adapter(object)
+  attr(object, "gratia.scam.centre") <- match.arg(centre)
+  assemble.gam(object, overall_uncertainty = overall_uncertainty, ...)
 }

@@ -166,16 +166,14 @@ test_that("SCAM smoothing-parameter uncertainty is rejected consistently", {
     "fitted parameters")
 })
 
-test_that("SCAM posterior predictive plots report the scalable limitation", {
+test_that("SCAM posterior predictive plots support ordinary and scalable paths", {
   model <- scam_release_models$models$mpi
-  message <- paste("Scalable posterior predictive plots are not currently available",
-    "for SCAM models. Use scalable = FALSE.")
-  expect_error(posterior_predictive_plot(model, n = 3, scalable = TRUE, seed = 4),
-    message, fixed = TRUE)
-  expect_error(posterior_predictive_plot(model, n = 3, scalable_threshold = 1,
-    seed = 4), message, fixed = TRUE)
-  ordinary <- posterior_predictive_plot(model, n = 3, scalable = FALSE, seed = 4)
-  expect_s3_class(ordinary, "ggplot")
-  expect_true(all(0:3 %in% ordinary$data$.draw))
-  expect_silent(ggplot2::ggplot_build(ordinary))
+  for (scalable in c(FALSE, TRUE)) {
+    plot <- posterior_predictive_plot(model, n = 3, scalable = scalable, seed = 4)
+    expect_s3_class(plot, "ggplot")
+    expect_true(all(0:3 %in% plot$data$.draw))
+    expect_silent(ggplot2::ggplot_build(plot))
+  }
+  expect_s3_class(posterior_predictive_plot(model, n = 3,
+    scalable_threshold = 1, seed = 4), "ggplot")
 })

@@ -204,7 +204,8 @@
 #' @param ref_line logical; draw a reference line at zero?
 #' @param warn_limits logical; draw Tukey's warning limit lines at +/- 1?
 #' @param fitted_colour,bar_colour,bar_fill,ref_line_colour,warn_line_colour
-#'   colours used to draw the respective element of the rootogram.
+#'   Deprecated; use [gratia_theme_get()] theme settings instead. Colours used
+#'   to draw the respective element of the rootogram.
 #' @param xlab,ylab character; labels for the x and y axis of the rootogram.
 #'   May be missing (`NULL`), in which case suitable labels will be used.
 #''
@@ -249,6 +250,7 @@
                              ref_line_colour = "black",
                              warn_line_colour = "black",
                              ylab = NULL, xlab = NULL, ...) {
+  gratia_plot_arguments(c("fitted_colour", "bar_colour", "bar_fill", "ref_line_colour", "warn_line_colour"), environment())
   type <- match.arg(type)
 
   if (as.logical(sqrt)) {
@@ -307,8 +309,8 @@
     )
   }
 
-  plt <- ggplot(object) +
-    geom_rect(
+  plt <- gratia_plot(object) +
+    geom_gratia_rootogram_bar_rect(
       aes(
         xmin = .data$x_low,
         xmax = .data$x_high,
@@ -317,14 +319,14 @@
       ),
       fill = bar_fill, col = bar_colour
     ) +
-    geom_line(
+    geom_gratia_rootogram_fitted_line(
       aes(
         x = .data$.bin,
         y = .data$.fitted
       ),
       colour = fitted_colour, linewidth = 1
     ) +
-    geom_point(
+    geom_gratia_rootogram_fitted_point(
       aes(
         x = .data$.bin,
         y = .data$.fitted
@@ -333,11 +335,11 @@
     )
 
   if (as.logical(ref_line) & type != "standing") {
-    plt <- plt + geom_hline(yintercept = 0, colour = ref_line_colour)
+    plt <- plt + geom_gratia_rootogram_reference_hline(yintercept = 0, colour = ref_line_colour)
   }
 
   if (as.logical(warn_limits) & type != "standing") {
-    plt <- plt + geom_hline(
+    plt <- plt + geom_gratia_rootogram_warning_hline(
       yintercept = c(-1, 1), lty = "dashed",
       colour = warn_line_colour
     )

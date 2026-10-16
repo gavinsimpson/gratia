@@ -2,7 +2,7 @@
 #' @export
 #' @rdname draw.gam
 draw.scasm <- function(object, ..., overall_uncertainty = FALSE,
-                       interval_method = c("auto", "gaussian", "bootstrap")) {
+                       interval_method = c("auto", "gaussian", "bootstrap", "shape")) {
   draw_gam_impl(object, ..., overall_uncertainty = overall_uncertainty,
     interval_method = interval_method)
 }

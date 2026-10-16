@@ -19,6 +19,7 @@ test_that("draw.gam works for m_1_smooth with angled labels", {
 })
 
 test_that("draw.gam works for m_1_smooth with partial residuals", {
+  withr::local_options(lifecycle_verbosity = "quiet")
   expect_silent(plt <- draw(m_1_smooth,
     residuals = TRUE,
     resid_col = "hotpink", rug = FALSE

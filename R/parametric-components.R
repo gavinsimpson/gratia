@@ -119,7 +119,8 @@ parametric_component_facets <- function(variables, columns, numeric_vars,
 # are applied to the component and its intervals together.
 draw_parametric_component <- function(object, info, ci_level, ci_col, ci_alpha,
     line_col, constant, fun, xlab, ylab, title, subtitle, caption, rug, ylim,
-    angle, contour, contour_col, n_contour, surface, surface_3d, continuous_fill,
+    angle, contour, contour_col, n_contour, surface, surface_3d,
+    ci_3d, ci_3d_alpha, ci_3d_col, continuous_fill,
     discrete_colour, discrete_fill) {
   if (!all(c(".lower_ci", ".upper_ci") %in% names(object))) {
     crit <- coverage_normal(ci_level)
@@ -130,6 +131,7 @@ draw_parametric_component <- function(object, info, ci_level, ci_col, ci_alpha,
     column = c(".partial", ".lower_ci", ".upper_ci"))
   object <- transform_fun(object, fun = fun,
     column = c(".partial", ".lower_ci", ".upper_ci"))
+  object <- order_interval_bounds(object)
   cols <- info$columns
   numeric <- info$numeric
   discrete <- info$discrete
@@ -140,6 +142,7 @@ draw_parametric_component <- function(object, info, ci_level, ci_col, ci_alpha,
   }
   if (is.null(title)) title <- unique(object$.term)
   if (is.null(caption)) caption <- "Parametric term contribution"
+  if (identical(caption, FALSE)) caption <- NULL
   is_surface <- length(numeric) >= 2L
   x <- info$variables[1L]
   labels <- info$axis_labels
@@ -176,6 +179,7 @@ draw_parametric_component <- function(object, info, ci_level, ci_col, ci_alpha,
       labels = ggplot2::labs(x = xlab, y = ylab, title = title,
         subtitle = subtitle, caption = caption),
       surface = surface, surface_3d = surface_3d,
+      ci_3d = ci_3d, ci_3d_alpha = ci_3d_alpha, ci_3d_col = ci_3d_col,
       continuous_fill = continuous_fill, contour = contour,
       contour_data = contour_data,
       contour_col = contour_col, n_contour = n_contour, angle = angle,
@@ -187,21 +191,21 @@ draw_parametric_component <- function(object, info, ci_level, ci_col, ci_alpha,
   group <- if (length(numeric)) discrete[1L] else discrete[2L]
   extra <- if (length(numeric)) discrete[-1L] else discrete[-c(1L, 2L)]
   group_col <- cols[[group]]
-  plt <- ggplot2::ggplot(object, ggplot2::aes(
+  plt <- gratia_plot(object, ggplot2::aes(
     x = .data[[cols[[x]]]], y = .data$.partial,
     colour = .data[[group_col]], group = .data[[group_col]]))
   if (length(numeric)) {
-    plt <- plt + ggplot2::geom_ribbon(ggplot2::aes(
+    plt <- plt + geom_gratia_interval_ribbon(ggplot2::aes(
       ymin = .data$.lower_ci, ymax = .data$.upper_ci,
       fill = .data[[group_col]]), alpha = ci_alpha, colour = NA) +
-      ggplot2::geom_line()
+      geom_gratia_effect_line()
     if (isTRUE(rug) && !is.null(info$observed)) {
-      plt <- plt + ggplot2::geom_rug(data = info$observed,
+      plt <- plt + geom_gratia_rug(data = info$observed,
         mapping = ggplot2::aes(x = .data[[cols[[x]]]]),
         inherit.aes = FALSE, sides = "b", alpha = 0.5)
     }
   } else {
-    plt <- plt + ggplot2::geom_pointrange(ggplot2::aes(
+    plt <- plt + geom_gratia_effect_pointrange(ggplot2::aes(
       ymin = .data$.lower_ci, ymax = .data$.upper_ci),
       position = ggplot2::position_dodge(width = 0.5))
   }

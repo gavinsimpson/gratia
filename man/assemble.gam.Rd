@@ -2,6 +2,7 @@
 % Please edit documentation in R/assemble.R
 \name{assemble.gam}
 \alias{assemble.gam}
+\alias{assemble.scam}
 \title{Plot smooth and parametric terms from a fitted GAM}
 \usage{
 \method{assemble}{gam}(
@@ -52,6 +53,9 @@
   envir = NULL,
   surface = c("raster", "tile", "3d"),
   surface_3d = list(),
+  ci_3d = FALSE,
+  ci_3d_alpha = 0.15,
+  ci_3d_col = "grey60",
   back_transform = FALSE,
   re_levels = NULL,
   mrf_plot = c("effects", "qq"),
@@ -59,9 +63,13 @@
   n_sim = 10000,
   n_cores = 1,
   seed = NULL,
-  interval_method = c("auto", "gaussian", "bootstrap"),
+  interval_method = c("auto", "gaussian", "bootstrap", "shape"),
+  frequentist = FALSE,
+  shape_source = c("gaussian", "bootstrap"),
   ...
 )
+
+\method{assemble}{scam}(object, ..., overall_uncertainty = FALSE, centre = c("model", "plot"))
 }
 \arguments{
 \item{object}{a fitted GAM, the result of a call to \code{\link[mgcv:gam]{mgcv::gam()}}.}
@@ -170,17 +178,22 @@ the distinct values?}
 per level of the factor (\code{FALSE}, the default), or should the individual
 smooths be combined into a single panel containing all levels (\code{TRUE})?}
 
-\item{ci_alpha}{numeric; alpha transparency for confidence or simultaneous
+\item{ci_alpha}{Deprecated; use \code{\link[=gratia_theme_get]{gratia_theme_get()}} theme
+settings instead. Numeric; alpha transparency for confidence or simultaneous
 interval.}
 
-\item{ci_col}{colour specification for the confidence/credible intervals
+\item{ci_col}{Deprecated; use \code{\link[=gratia_theme_get]{gratia_theme_get()}} theme
+settings instead. Colour specification for the confidence/credible intervals
 band. Affects the fill of the interval.}
 
-\item{smooth_col}{colour specification for the smooth line.}
+\item{smooth_col}{Deprecated; use \code{\link[=gratia_theme_get]{gratia_theme_get()}} theme
+settings instead. Colour specification for the smooth line.}
 
-\item{resid_col}{colour specification for the partial residuals.}
+\item{resid_col}{Deprecated; use \code{\link[=gratia_theme_get]{gratia_theme_get()}} theme
+settings instead. Colour specification for the partial residuals.}
 
-\item{contour_col}{colour specification for contour lines.}
+\item{contour_col}{Deprecated; use \code{\link[=gratia_theme_get]{gratia_theme_get()}} theme
+settings instead. Colour specification for contour lines.}
 
 \item{n_contour}{numeric; the number of contour bins. Will result in
 \code{n_contour - 1} contour lines being drawn. See \code{\link[ggplot2:geom_contour]{ggplot2::geom_contour()}}.}
@@ -269,6 +282,20 @@ These options affect all 3D panels in a call. For different views per term,
 modify individual plots returned by \code{\link[=assemble]{assemble()}}. The \code{dist} entry here
 controls perspective; the top-level \code{dist} argument controls masking.}
 
+\item{ci_3d}{logical; add lower and upper interval surfaces to numeric
+smooth and parametric effect panels when \code{surface = "3d"}? Defaults to
+\code{FALSE}. Applies across supported model classes and conditioning facets.
+Other panel types, including standard errors, retain their usual display.
+Smooth bounds follow \code{interval}; parametric bounds remain pointwise.}
+
+\item{ci_3d_alpha}{Deprecated; use \code{\link[=gratia_theme_get]{gratia_theme_get()}} theme
+settings instead. Numeric between 0 and 1; opacity of both interval
+surfaces, independent of \code{ci_alpha}. Defaults to \code{0.15}.}
+
+\item{ci_3d_col}{Deprecated; use \code{\link[=gratia_theme_get]{gratia_theme_get()}} theme
+settings instead. One R colour; fill of both interval surfaces, independent
+of \code{ci_col} and the estimate's continuous fill scale. Defaults to \code{"grey60"}.}
+
 \item{back_transform}{logical; plot covariates on their original scale?
 Defaults to \code{FALSE}, using model coordinates such as \code{log(x)} for a term
 containing \code{log(x)}. With \code{TRUE}, recover the raw covariates, generate a
@@ -309,8 +336,8 @@ joint coverage set. \code{"credible"} aliases \code{"confidence"}, reflecting th
 approximate Bayesian credible interpretation of default-covariance bands.
 Parametric panels retain pointwise intervals and are labelled accordingly
 when simultaneous smooth bands are requested. Bands appear where the
-renderer displays interval bounds; surface and random-effect QQ plots
-retain their existing estimate or standard-error display.}
+renderer displays interval bounds, including 3D effect surfaces when
+\code{ci_3d = TRUE}. Random-effect QQ plots retain their usual display.}
 
 \item{n_sim, n_cores}{positive integers; coefficient draws and simulation cores
 for simultaneous bands. Parallel simulation requires OpenMP support.}
@@ -321,10 +348,26 @@ caller's RNG state.}
 \item{interval_method}{character; "auto" uses stored scasm bootstrap draws
 for pointwise intervals when available, and Gaussian intervals otherwise.
 Use "gaussian" to request covariance-based limits or "bootstrap" to
-require stored draws. Simultaneous bootstrap bands are not supported.}
+require stored draws. Simultaneous bootstrap bands are not supported.
+\code{"shape"} applies \code{\link[=shape_intervals]{shape_intervals()}} to supported scasm smooth components,
+using the initial limits chosen by \code{shape_source}.}
+
+\item{frequentist}{logical; use frequentist covariance for smooth-component
+intervals? The default uses approximate Bayesian covariance. Parametric
+effect intervals retain their existing Bayesian covariance calculation.}
+
+\item{shape_source}{character; initial uncertainty for \code{interval_method = "shape"}: \code{"gaussian"} (the default) or stored \code{"bootstrap"} pointwise
+limits. Bootstrap sources require \code{frequentist = FALSE} and
+\code{unconditional = FALSE} because the stored draws hold smoothing fixed.}
 
 \item{...}{Additional smooth plotting arguments, including \code{title},
 \code{subtitle}, \code{xlab} and \code{ylab}.}
+
+\item{centre}{character; for SCAM models, \code{"model"} retains each fitted
+smooth contribution. \code{"plot"} subtracts the evaluation-grid mean from
+each bivariate smooth to match \code{\link[scam:plot.scam]{scam::plot.scam()}}. The same linear
+transformation is applied to its covariance. Univariate curves and
+\code{\link[=smooth_estimates]{smooth_estimates()}} retain the fitted centring for either setting.}
 }
 \value{
 A list of \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}} objects.

@@ -230,7 +230,8 @@
 #' @param partial_match logical; should matching `parm` use a partial match or
 #'   an exact match? Can only be used if `length(parm)` is `1`.
 #' @param ... additional arguments passed to [smooth_estimates()], including
-#'   `interval_method` to select Gaussian or stored scasm bootstrap intervals.
+#'   `interval_method` to select Gaussian, stored scasm bootstrap, or
+#'   shape-enforced intervals, and `shape_source` to choose their initial source.
 #' @param newdata DEPRECATED! data frame; containing new values of the
 #'   covariates used in the model fit. The selected smooth(s) will be evaluated
 #'   at the supplied values.
@@ -245,6 +246,8 @@
 #'   bootstrap draws for pointwise intervals when available, as in
 #'   [smooth_estimates()]. Shifting and transforming a smooth preserves its
 #'   interval limits, including asymmetric bootstrap limits.
+#'   Shape-enforced intervals describe unshifted smooth components on the
+#'   model scale; `shift = TRUE` and effect transformations are unsupported.
 #' 
 #' @return a tibble with components:
 #' 1. `.smooth`; character indicating to which term each row relates,
@@ -339,6 +342,14 @@
     frequentist = frequentist, overall_uncertainty = overall_uncertainty,
     interval = type, ci_level = level, n_sim = nsim, n_cores = ncores, ...))
 
+  interval_info <- attr(out[[1L]], "interval_info")
+  if (identical(interval_info$method, "shape")) {
+    validate_shape_flag(shift, "shift")
+    if (shift || !identical(transform, FALSE)) {
+      cli::cli_abort("Shape intervals describe the unshifted smooth on the model scale; shift and transform are unsupported.")
+    }
+  }
+
   ilink <- if (is.logical(transform)) {
     if (isTRUE(transform)) family(object)$linkinv else identity
   } else if (!is.null(transform)) match.fun(transform)
@@ -351,8 +362,6 @@
   } else {
     const <- 0
   }
-
-  interval_info <- attr(out[[1L]], "interval_info")
 
   ## simplify to a data frame for return
   metadata <- lapply(out, attr, "coordinate_info")

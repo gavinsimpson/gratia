@@ -1,0 +1,206 @@
+"basis","operation","error","max_difference"
+"cpop","gaussian_draws_mvnfast","",NA
+"cpop","gaussian_draws_mgcv","",NA
+"cpop","smooth_samples","Unknown type of smooth",NA
+"cpop","fitted_samples","",0
+"cpop","derivative_samples","",5.2331283306728e-08
+"cv","gaussian_draws_mvnfast","",NA
+"cv","gaussian_draws_mgcv","",NA
+"cv","smooth_samples","",0
+"cv","fitted_samples","",0
+"cv","derivative_samples","",1.06483155626336e-10
+"cvBy","gaussian_draws_mvnfast","",NA
+"cvBy","gaussian_draws_mgcv","",NA
+"cvBy","smooth_samples","Unknown type of smooth",NA
+"cvBy","fitted_samples","",0
+"cvBy","derivative_samples","",1.24640520127173e-10
+"cx","gaussian_draws_mvnfast","chol(): decomposition failed",NA
+"cx","gaussian_draws_mgcv","mu dimensions wrong",NA
+"cxBy","gaussian_draws_mvnfast","chol(): decomposition failed",NA
+"cxBy","gaussian_draws_mgcv","mu dimensions wrong",NA
+"dpo","gaussian_draws_mvnfast","",NA
+"dpo","gaussian_draws_mgcv","",NA
+"dpo","smooth_samples","Unknown type of smooth",NA
+"dpo","fitted_samples","",0
+"dpo","derivative_samples","",1.14079445889814e-09
+"ipo","gaussian_draws_mvnfast","",NA
+"ipo","gaussian_draws_mgcv","",NA
+"ipo","smooth_samples","Unknown type of smooth",NA
+"ipo","fitted_samples","",0
+"ipo","derivative_samples","",5.05963049235447e-10
+"lipl","gaussian_draws_mvnfast","",NA
+"lipl","gaussian_draws_mgcv","",NA
+"lipl","smooth_samples","non-conformable arguments",NA
+"lipl","fitted_samples","",0
+"lipl","derivative_samples","",1.78971661934924e-08
+"lmpi","gaussian_draws_mvnfast","",NA
+"lmpi","gaussian_draws_mgcv","",NA
+"lmpi","smooth_samples","Unknown type of smooth",NA
+"lmpi","fitted_samples","",0
+"lmpi","derivative_samples","",2.10230517438958e-08
+"mdcv","gaussian_draws_mvnfast","chol(): decomposition failed",NA
+"mdcv","gaussian_draws_mgcv","",NA
+"mdcv","smooth_samples","",0
+"mdcv","fitted_samples","",0
+"mdcv","derivative_samples","",8.6817220079638e-11
+"mdcvBy","gaussian_draws_mvnfast","",NA
+"mdcvBy","gaussian_draws_mgcv","",NA
+"mdcvBy","smooth_samples","Unknown type of smooth",NA
+"mdcvBy","fitted_samples","",0
+"mdcvBy","derivative_samples","",1.01956443288032e-10
+"mdcx","gaussian_draws_mvnfast","",NA
+"mdcx","gaussian_draws_mgcv","",NA
+"mdcx","smooth_samples","",0
+"mdcx","fitted_samples","",0
+"mdcx","derivative_samples","",2.16284989917881e-10
+"mdcxBy","gaussian_draws_mvnfast","",NA
+"mdcxBy","gaussian_draws_mgcv","",NA
+"mdcxBy","smooth_samples","Unknown type of smooth",NA
+"mdcxBy","fitted_samples","",0
+"mdcxBy","derivative_samples","",1.00178199069489e-10
+"micv","gaussian_draws_mvnfast","",NA
+"micv","gaussian_draws_mgcv","",NA
+"micv","smooth_samples","",0
+"micv","fitted_samples","",0
+"micv","derivative_samples","",8.66675620159185e-11
+"micvBy","gaussian_draws_mvnfast","",NA
+"micvBy","gaussian_draws_mgcv","",NA
+"micvBy","smooth_samples","Unknown type of smooth",NA
+"micvBy","fitted_samples","",0
+"micvBy","derivative_samples","",1.13961506897908e-10
+"micx","gaussian_draws_mvnfast","",NA
+"micx","gaussian_draws_mgcv","",NA
+"micx","smooth_samples","",0
+"micx","fitted_samples","",0
+"micx","derivative_samples","",1.8422594560974e-09
+"micxBy","gaussian_draws_mvnfast","",NA
+"micxBy","gaussian_draws_mgcv","",NA
+"micxBy","smooth_samples","Unknown type of smooth",NA
+"micxBy","fitted_samples","",0
+"micxBy","derivative_samples","",1.60763846679401e-10
+"mifo","gaussian_draws_mvnfast","",NA
+"mifo","gaussian_draws_mgcv","",NA
+"mifo","smooth_samples","non-conformable arguments",NA
+"mifo","fitted_samples","",0
+"mifo","derivative_samples","",4.76838346585851e-10
+"miso","gaussian_draws_mvnfast","",NA
+"miso","gaussian_draws_mgcv","",NA
+"miso","smooth_samples","non-conformable arguments",NA
+"miso","fitted_samples","",0
+"miso","derivative_samples","",7.15197234768539e-10
+"mpd","gaussian_draws_mvnfast","",NA
+"mpd","gaussian_draws_mgcv","",NA
+"mpd","smooth_samples","",0
+"mpd","fitted_samples","",0
+"mpd","derivative_samples","",3.39099470725301e-10
+"mpdBy","gaussian_draws_mvnfast","",NA
+"mpdBy","gaussian_draws_mgcv","",NA
+"mpdBy","smooth_samples","Unknown type of smooth",NA
+"mpdBy","fitted_samples","",0
+"mpdBy","derivative_samples","",2.25425678124225e-10
+"mpi","gaussian_draws_mvnfast","",NA
+"mpi","gaussian_draws_mgcv","",NA
+"mpi","smooth_samples","",0
+"mpi","fitted_samples","",0
+"mpi","derivative_samples","",4.73360683983515e-10
+"mpiBy","gaussian_draws_mvnfast","",NA
+"mpiBy","gaussian_draws_mgcv","",NA
+"mpiBy","smooth_samples","Unknown type of smooth",NA
+"mpiBy","fitted_samples","",0
+"mpiBy","derivative_samples","",2.31627828028991e-10
+"po","gaussian_draws_mvnfast","",NA
+"po","gaussian_draws_mgcv","",NA
+"po","smooth_samples","Unknown type of smooth",NA
+"po","fitted_samples","",0
+"po","derivative_samples","",1.2785630332246e-08
+"tecvcv","gaussian_draws_mvnfast","chol(): decomposition failed",NA
+"tecvcv","gaussian_draws_mgcv","",NA
+"tecvcv","smooth_samples","Unknown type of smooth",NA
+"tecvcv","fitted_samples","",0
+"tecvcv","derivative_samples","",2.60975685506537e-10
+"tecxcv","gaussian_draws_mvnfast","",NA
+"tecxcv","gaussian_draws_mgcv","",NA
+"tecxcv","smooth_samples","Unknown type of smooth",NA
+"tecxcv","fitted_samples","",0
+"tecxcv","derivative_samples","",4.63780347459419e-10
+"tecxcx","gaussian_draws_mvnfast","",NA
+"tecxcx","gaussian_draws_mgcv","",NA
+"tecxcx","smooth_samples","Unknown type of smooth",NA
+"tecxcx","fitted_samples","",0
+"tecxcx","derivative_samples","",4.82894835229786e-10
+"tedecv","gaussian_draws_mvnfast","chol(): decomposition failed",NA
+"tedecv","gaussian_draws_mgcv","mu dimensions wrong",NA
+"tedecx","gaussian_draws_mvnfast","chol(): decomposition failed",NA
+"tedecx","gaussian_draws_mgcv","mu dimensions wrong",NA
+"tedmd","gaussian_draws_mvnfast","chol(): decomposition failed",NA
+"tedmd","gaussian_draws_mgcv","",NA
+"tedmd","smooth_samples","Unknown type of smooth",NA
+"tedmd","fitted_samples","",0
+"tedmd","derivative_samples","",3.83391385464073e-13
+"tedmi","gaussian_draws_mvnfast","",NA
+"tedmi","gaussian_draws_mgcv","",NA
+"tedmi","smooth_samples","Unknown type of smooth",NA
+"tedmi","fitted_samples","",0
+"tedmi","derivative_samples","",3.60636631668854e-10
+"temicv","gaussian_draws_mvnfast","chol(): decomposition failed",NA
+"temicv","gaussian_draws_mgcv","",NA
+"temicv","smooth_samples","Unknown type of smooth",NA
+"temicv","fitted_samples","",0
+"temicv","derivative_samples","",3.3915981134669e-10
+"temicx","gaussian_draws_mvnfast","chol(): decomposition failed",NA
+"temicx","gaussian_draws_mgcv","mu dimensions wrong",NA
+"tescv","gaussian_draws_mvnfast","",NA
+"tescv","gaussian_draws_mgcv","",NA
+"tescv","smooth_samples","Unknown type of smooth",NA
+"tescv","fitted_samples","",0
+"tescv","derivative_samples","",4.80479211972806e-10
+"tescx","gaussian_draws_mvnfast","",NA
+"tescx","gaussian_draws_mgcv","",NA
+"tescx","smooth_samples","Unknown type of smooth",NA
+"tescx","fitted_samples","",0
+"tescx","derivative_samples","",4.59682070186318e-10
+"tesmd1","gaussian_draws_mvnfast","",NA
+"tesmd1","gaussian_draws_mgcv","",NA
+"tesmd1","smooth_samples","Unknown type of smooth",NA
+"tesmd1","fitted_samples","",0
+"tesmd1","derivative_samples","",4.55646138677483e-11
+"tesmd2","gaussian_draws_mvnfast","chol(): decomposition failed",NA
+"tesmd2","gaussian_draws_mgcv","",NA
+"tesmd2","smooth_samples","Unknown type of smooth",NA
+"tesmd2","fitted_samples","",0
+"tesmd2","derivative_samples","",4.67102800882913e-10
+"tesmi1","gaussian_draws_mvnfast","",NA
+"tesmi1","gaussian_draws_mgcv","",NA
+"tesmi1","smooth_samples","Unknown type of smooth",NA
+"tesmi1","fitted_samples","",0
+"tesmi1","derivative_samples","",3.75814046549294e-10
+"tesmi2","gaussian_draws_mvnfast","",NA
+"tesmi2","gaussian_draws_mgcv","",NA
+"tesmi2","smooth_samples","Unknown type of smooth",NA
+"tesmi2","fitted_samples","",0
+"tesmi2","derivative_samples","",2.50124809753061e-10
+"tismd","gaussian_draws_mvnfast","",NA
+"tismd","gaussian_draws_mgcv","",NA
+"tismd","smooth_samples","non-conformable arguments",NA
+"tismd","fitted_samples","",0
+"tismd","derivative_samples","",9.81819288311043e-11
+"tismi","gaussian_draws_mvnfast","",NA
+"tismi","gaussian_draws_mgcv","",NA
+"tismi","smooth_samples","non-conformable arguments",NA
+"tismi","fitted_samples","",0
+"tismi","derivative_samples","",6.79616363186142e-10
+"cr","gaussian_draws_mvnfast","",NA
+"cr","gaussian_draws_mgcv","",NA
+"cr","smooth_samples","",0
+"cr","fitted_samples","",0
+"cr","derivative_samples","",1.54848822653264e-09
+"tp","gaussian_draws_mvnfast","",NA
+"tp","gaussian_draws_mgcv","",NA
+"tp","smooth_samples","",0
+"tp","fitted_samples","",0
+"tp","derivative_samples","",2.48620168896707e-09
+"ps","gaussian_draws_mvnfast","",NA
+"ps","gaussian_draws_mgcv","",NA
+"ps","smooth_samples","",0
+"ps","fitted_samples","",0
+"ps","derivative_samples","",1.02380481870057e-09

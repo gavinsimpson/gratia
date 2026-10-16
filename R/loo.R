@@ -4,7 +4,8 @@
 #' posterior coefficient draws and return the usual objects from \pkg{loo}.
 #' Neither method changes [stats::logLik()] for fitted GAMs.
 #'
-#' @param x a GAM or BAM fitted by \pkg{mgcv}.
+#' @param x a GAM or BAM fitted by \pkg{mgcv}, or an independent-response
+#'   SCAM fitted by \pkg{scam}.
 #' @param n_draws total posterior coefficient draws across all chains. Defaults
 #'   to 4000 when generating draws; supplied draws determine their own count.
 #' @param seed random seed for posterior sampling.

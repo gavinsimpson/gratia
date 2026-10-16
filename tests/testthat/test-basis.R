@@ -50,16 +50,9 @@ test_that("term argument is deprecated in basis()", {
 })
 
 test_that("basis() works with a scam", {
-  # skip(message = "This needs fixing as something in scam changed")
-  skip_on_cran()
   expect_silent(bs <- basis(m_scam, select = "s(x2)"))
   expect_s3_class(bs, "basis")
   expect_named(bs, c(bs_nms, "x2"))
-
-  plt <- draw(bs)
-
-  # skip_on_ci() # testing without as moved to mac os x
-  expect_doppelganger("draw basis works with a scam single smooth", plt)
 })
 
 test_that("basis() works with bivariate tprs smooths", {

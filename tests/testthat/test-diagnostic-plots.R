@@ -1,6 +1,7 @@
 ## Test qq_plot() methods
 
 test_that("appraise() works", {
+  withr::local_options(lifecycle_verbosity = "quiet")
   plt <- with_seed(
     3476, # seed
     appraise(m_tiny_eg1, method = "simulate",

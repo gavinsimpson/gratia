@@ -531,30 +531,30 @@ characters")
     )
 
   # base plot
-  plt <- ggplot(data = object)
+  plt <- gratia_plot(data = object)
 
   # if x channel is a numeric we have a continuous x axis
   if (isTRUE(is.numeric(object[[channels$x]]))) {
     if (is.null(channels$colour)) {
       plt <- plt +
-        geom_ribbon(
+        geom_gratia_interval_ribbon(
           mapping = aes(x = .data[[channels$x]], y = .data$.fitted,
             ymin = .data[[".lower_ci"]], ymax = .data[[".upper_ci"]]),
           alpha = 0.2
         ) +
-        geom_line(
+        geom_gratia_effect_line(
           mapping = aes(x = .data[[channels$x]], y = .data$.fitted)
         )
     } else {
       plt <- plt +
-        geom_ribbon(
+        geom_gratia_interval_ribbon(
           mapping = aes(x = .data[[channels$x]], y = .data$.fitted,
             ymin = .data[[".lower_ci"]], ymax = .data[[".upper_ci"]],
             fill = factor(.data[[channels$colour]])
           ),
           alpha = 0.2
         ) +
-        geom_line(
+        geom_gratia_effect_line(
           mapping = aes(x = .data[[channels$x]], y = .data$.fitted,
             colour = factor(.data[[channels$colour]])
           )
@@ -563,14 +563,14 @@ characters")
   } else { # categorical x axis
     if (is.null(channels$colour)) {
       plt <- plt +
-        geom_pointrange(
+        geom_gratia_effect_pointrange(
           mapping = aes(x = .data[[channels$x]], y = .data$.fitted,
             ymin = .data[[".lower_ci"]], ymax = .data[[".upper_ci"]]
           )
         )
     } else {
       plt <- plt +
-        geom_pointrange(
+        geom_gratia_effect_pointrange(
           mapping = aes(x = .data[[channels$x]], y = .data$.fitted,
             ymin = .data[[".lower_ci"]], ymax = .data[[".upper_ci"]],
             colour = factor(.data[[channels$colour]])
@@ -587,17 +587,17 @@ characters")
     n_levs <- nlevels(object[[channels$colour]])
     if (is.null(discrete_colour)) {
       discrete_colour <- if (n_levs > 9L) {
-        scale_colour_hue()
+        gratia_default_scale(scale_colour_hue())
       } else {
-        scale_colour_okabe_ito()
+        gratia_default_scale(scale_colour_okabe_ito())
       }
     }
 
     if (is.null(discrete_fill)) {
       discrete_fill <- if (n_levs > 9L) {
-        scale_fill_hue()
+        gratia_default_scale(scale_fill_hue())
       } else {
-        scale_fill_okabe_ito()
+        gratia_default_scale(scale_fill_okabe_ito())
       }
     }
     plt <- plt +

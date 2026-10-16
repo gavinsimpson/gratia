@@ -164,7 +164,7 @@ detaching ‘package:mgcv’
 > ### Name: add_partial_residuals
 > ### Title: Add partial residuals
 > ### Aliases: add_partial_residuals add_partial_residuals.gam
-> ###   add_partial_residuals.gamm4
+> ###   add_partial_residuals.gamm4 add_partial_residuals.scam
 > 
 > ### ** Examples
 > 
@@ -305,7 +305,7 @@ detaching ‘package:mgcv’
 > 
 > ### Name: ale
 > ### Title: Accumulated local effects of a model covariate
-> ### Aliases: ale ale.default ale.gam ale.bam
+> ### Aliases: ale ale.default ale.gam ale.bam ale.scam
 > 
 > ### ** Examples
 > 
@@ -330,42 +330,36 @@ detaching ‘package:mgcv’, ‘package:nlme’
 
 > nameEx("appraise")
 > ### * appraise
-> 
+>
 > flush(stderr()); flush(stdout())
-> 
+>
 > ### Name: appraise
 > ### Title: Model diagnostic plots
 > ### Aliases: appraise appraise.gam appraise.lm appraise.gamlss
 > ###   appraise.default appraise.gamm4 appraise.gamm
 > ###   appraise.gratia_diagnostic_proxy appraise.lme appraise.merMod
 > ###   appraise.sdmTMB
-> 
+>
 > ### ** Examples
-> 
+>
 > load_mgcv()
 > ## simulate some data...
 > dat <- data_sim("eg1", n = 400, dist = "normal", scale = 2, seed = 2)
 > mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat)
 > ## run some basic model checks
-> appraise(mod, point_col = "steelblue", point_alpha = 0.4)
+> appraise(mod) & ggplot2::theme(
++   geom.gratia.diagnostic.point = ggplot2::element_geom(colour = "steelblue"),
++   gratia.alpha.diagnostic.point = 0.4)
 > ## replace the residual histogram with a posterior predictive check
 > appraise(mod, ppcheck = TRUE, n_ppc = 20, seed = 42)
-> 
+>
 > ## To change the theme for all panels use the & operator, for example to
 > ## change the ggplot theme for all panels
 > library("ggplot2")
-> if (packageVersion("ggplot2") <= "3.5.2") {
-+   # Throws warning with ggplot rc 4.0.0 and patchwork 1.3.1 - will be fixed
-+   # in patchwork 1.3.2 - so temporarily skipping during ggplot release
-+   # process
-+   appraise(mod, seed = 42,
-+     point_col = "steelblue", point_alpha = 0.4,
-+     line_col = "black"
-+   ) & theme_minimal()
-+ }
-> 
-> 
-> 
+> appraise(mod, seed = 42) & theme_minimal()
+>
+>
+>
 > cleanEx()
 
 detaching ‘package:ggplot2’, ‘package:mgcv’
@@ -377,7 +371,7 @@ detaching ‘package:ggplot2’, ‘package:mgcv’
 > 
 > ### Name: assemble.gam
 > ### Title: Plot smooth and parametric terms from a fitted GAM
-> ### Aliases: assemble.gam
+> ### Aliases: assemble.gam assemble.scam
 > 
 > ### ** Examples
 > 
@@ -447,7 +441,7 @@ detaching ‘package:mgcv’
 > ### Name: basis_size
 > ### Title: Extract basis dimension of a smooth
 > ### Aliases: basis_size basis_size.mgcv.smooth basis_size.gam
-> ###   basis_size.gamm basis_size.gamm4
+> ###   basis_size.gamm basis_size.gamm4 basis_size.scam
 > 
 > ### ** Examples
 > 
@@ -525,7 +519,7 @@ detaching ‘package:mgcv’
 > ### Name: conditional_differences
 > ### Title: Conditional differences of fitted values from a GAM
 > ### Aliases: conditional_differences conditional_differences.gam
-> ###   conditional_differences.gamm4
+> ###   conditional_differences.gamm4 conditional_differences.scam
 > 
 > ### ** Examples
 > 
@@ -614,7 +608,7 @@ detaching ‘package:mgcv’
 > ### Name: conditional_values
 > ### Title: Conditional predictions from a GAM
 > ### Aliases: conditional_values conditional_values.gam
-> ###   conditional_values.gamm4
+> ###   conditional_values.gamm4 conditional_values.scam
 > 
 > ### ** Examples
 > 
@@ -768,7 +762,7 @@ detaching ‘package:mgcv’
 > 
 > ### Name: confint.gam
 > ### Title: Point-wise and simultaneous confidence intervals for smooths
-> ### Aliases: confint.gam confint.gamm confint.gamm4
+> ### Aliases: confint.gam confint.gamm confint.gamm4 confint.scam
 > 
 > ### ** Examples
 > 
@@ -1037,7 +1031,7 @@ detaching ‘package:ggplot2’, ‘package:mgcv’
 > ### Name: derivatives
 > ### Title: Derivatives of estimated smooths via finite differences
 > ### Aliases: derivatives derivatives.default derivatives.gamm
-> ###   derivatives.gam derivatives.gamm4
+> ###   derivatives.gam derivatives.gamm4 derivatives.scam
 > 
 > ### ** Examples
 > 
@@ -1137,6 +1131,7 @@ detaching ‘package:mgcv’
 > ### Name: difference_smooths
 > ### Title: Differences of factor smooth interactions
 > ### Aliases: difference_smooths difference_smooths.gam
+> ###   difference_smooths.scam
 > 
 > ### ** Examples
 > 
@@ -1321,36 +1316,38 @@ detaching ‘package:mgcv’
 
 > nameEx("draw.gam")
 > ### * draw.gam
-> 
+>
 > flush(stderr()); flush(stdout())
-> 
+>
 > ### Name: draw.gam
 > ### Title: Plot smooth and parametric terms from a fitted GAM
-> ### Aliases: draw.gam draw.scasm
-> 
+> ### Aliases: draw.gam draw.scam draw.scasm
+>
 > ### ** Examples
-> 
+>
 > load_mgcv()
-> 
+>
 > # simulate some data
 > df1 <- data_sim("eg1", n = 400, dist = "normal", scale = 2, seed = 2)
 > # fit GAM
 > m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df1, method = "REML")
-> 
+>
 > # plot all smooths
 > draw(m1)
-> 
+>
 > # can add partial residuals
 > draw(m1, residuals = TRUE)
-> 
+>
 > df2 <- data_sim("eg2", n = 1000, dist = "normal", scale = 1, seed = 2)
 > m2 <- gam(y ~ s(x, z, k = 40), data = df2, method = "REML")
 > draw(m2, contour = FALSE, n_2d = 50)
 > draw(m2, surface = "tile", n_2d = 30)
-> 
+>
 > if (requireNamespace("ggcube", quietly = TRUE)) {
 +   draw(m2, surface = "3d", n_2d = 20,
 +     surface_3d = list(yaw = 45, persp = FALSE))
++   draw(m2, surface = "3d", ci_3d = TRUE, n_2d = 20) &
++     ggplot2::theme(gratia.alpha.surface.interval = 0.12)
 +   panels <- assemble(m2, surface = "3d", n_2d = 20)
 +   # Replace coordinates to customize a single term; retain the current theme.
 +   panels[[1]] <- panels[[1]] +
@@ -1360,14 +1357,14 @@ detaching ‘package:mgcv’
 + }
 Coordinate system already present.
 i Adding new coordinate system, which will replace the existing one.
-> 
+>
 > # See https://gavinsimpson.github.io/gratia/articles/custom-plotting.html
 > # for more examples and for details on how to modify the theme of all the
 > # plots produced by draw(). To modify all panels, for example to change the
 > # theme, use the & operator
-> 
-> 
-> 
+>
+>
+>
 > cleanEx()
 
 detaching ‘package:mgcv’
@@ -1402,6 +1399,11 @@ detaching ‘package:mgcv’
 +   m <- gamlss(fl, data = dataSim)
 + 
 +   draw(m)
++   if (requireNamespace("ggcube", quietly = TRUE)) {
++     surface <- GJRM::gamlss(list(y1 ~ s(x2, x3, k = 10), ~ s(x3, k = 6)),
++       data = dataSim)
++     draw(surface, surface = "3d", ci_3d = TRUE, n_2d = 15)
++   }
 + }
 > 
 > 
@@ -1527,15 +1529,15 @@ detaching ‘package:mgcv’
 
 > nameEx("draw.smooth_estimates")
 > ### * draw.smooth_estimates
-> 
+>
 > flush(stderr()); flush(stdout())
-> 
+>
 > ### Name: draw.smooth_estimates
 > ### Title: Plot the result of a call to 'smooth_estimates()'
 > ### Aliases: draw.smooth_estimates
-> 
+>
 > ### ** Examples
-> 
+>
 > load_mgcv()
 > # example data
 > df <- data_sim("eg1", seed = 21)
@@ -1550,41 +1552,44 @@ detaching ‘package:mgcv’
 > sm <- smooth_estimates(m, select = "s(x2)")
 > # plot it
 > draw(sm)
-> 
+>
 > # customising some plot elements
-> draw(sm, ci_col = "steelblue", smooth_col = "forestgreen", ci_alpha = 0.3)
-> 
+> draw(sm) & ggplot2::theme(
++   geom.gratia.interval = ggplot2::element_geom(fill = "steelblue"),
++   geom.gratia.smooth = ggplot2::element_geom(colour = "forestgreen"),
++   gratia.alpha.interval = 0.3)
+>
 > # Add a constant to the plotted smooth
 > draw(sm, constant = coef(m)[1])
-> 
+>
 > # Adding change indicators to smooths based on derivatives of the smooth
 > d <- derivatives(m, n = 100) # n to match smooth_estimates()
-> 
+>
 > smooth_estimates(m) |>
 +   add_sizer(derivatives = d, type = "sizer") |>
 +   draw()
-> 
+>
 > # Render a bivariate smooth as vector tiles
 > m_surface <- gam(y ~ s(x0, x1), data = df, method = "REML")
 > draw(smooth_estimates(m_surface, n_2d = 20), surface = "tile")
-> 
-> 
-> 
+>
+>
+>
 > cleanEx()
 
 detaching ‘package:mgcv’
 
 > nameEx("draw.smooth_samples")
 > ### * draw.smooth_samples
-> 
+>
 > flush(stderr()); flush(stdout())
-> 
+>
 > ### Name: draw.smooth_samples
 > ### Title: Plot posterior smooths
 > ### Aliases: draw.smooth_samples
-> 
+>
 > ### ** Examples
-> 
+>
 > load_mgcv()
 > dat1 <- data_sim("eg1", n = 400, dist = "normal", scale = 1, seed = 1)
 > ## a single smooth GAM
@@ -1592,10 +1597,10 @@ detaching ‘package:mgcv’
 > ## posterior smooths from m1
 > sm1 <- smooth_samples(m1, n_draws = 15, seed = 23478)
 > ## plot
-> draw(sm1, alpha = 0.7)
+> draw(sm1) & ggplot2::theme(gratia.alpha.sample = 0.7)
 > ## plot only 5 randomly smapled draws
-> draw(sm1, n_samples = 5, alpha = 0.7)
-> 
+> draw(sm1, n_samples = 5) & ggplot2::theme(gratia.alpha.sample = 0.7)
+>
 > ## A factor-by smooth example
 > dat2 <- data_sim("eg4", n = 400, dist = "normal", scale = 1, seed = 1)
 > ## a multi-smooth GAM with a factor-by smooth
@@ -1603,11 +1608,12 @@ detaching ‘package:mgcv’
 > ## posterior smooths from m1
 > sm2 <- smooth_samples(m2, n_draws = 15, seed = 23478)
 > ## plot, this time selecting only the factor-by smooth
-> draw(sm2, select = "s(x2)", partial_match = TRUE, alpha = 0.7)
-> 
-> 
-> 
-> 
+> draw(sm2, select = "s(x2)", partial_match = TRUE) &
++   ggplot2::theme(gratia.alpha.sample = 0.7)
+>
+>
+>
+>
 > cleanEx()
 
 detaching ‘package:mgcv’
@@ -1619,7 +1625,7 @@ detaching ‘package:mgcv’
 > 
 > ### Name: edf
 > ### Title: Effective degrees of freedom for smooths and GAMs
-> ### Aliases: edf edf.gam model_edf edf.gamm4
+> ### Aliases: edf edf.gam model_edf edf.gamm4 edf.scam
 > 
 > ### ** Examples
 > 
@@ -1938,7 +1944,7 @@ detaching ‘package:mgcv’
 > ### Title: Extract fixed effects estimates from a fitted model
 > ### Aliases: fixed_effects fixed_effects.gam fixed_effects.gamm
 > ###   fixed_effects.gamm4 fixed_effects.lm fixed_effects.glm
-> ###   fixed_effects.default
+> ###   fixed_effects.default fixed_effects.scam
 > 
 > ### ** Examples
 > 
@@ -1996,6 +2002,10 @@ detaching ‘package:lme4’, ‘package:Matrix’, ‘package:mgcv’
 +     data = d, REML = TRUE)
 +   draw(mixed) # separate QQ panels for intercepts and slopes
 +   draw(mixed, ranef_lines = TRUE) # random contributions only
++   if (requireNamespace("ggcube", quietly = TRUE)) {
++     interaction <- glmmTMB::glmmTMB(y ~ x:z, data = d)
++     draw(interaction, surface = "3d", ci_3d = TRUE, n_2d = 15)
++   }
 + }
 Loading required package: nlme
 This is mgcv 1.9-4. For overview type '?mgcv'.
@@ -2005,6 +2015,66 @@ This is mgcv 1.9-4. For overview type '?mgcv'.
 > cleanEx()
 
 detaching ‘package:mgcv’, ‘package:nlme’
+
+> nameEx("gratia_palette")
+> ### * gratia_palette
+>
+> flush(stderr()); flush(stdout())
+>
+> ### Name: gratia_palette
+> ### Title: Discrete palettes for gratia plots
+> ### Aliases: gratia_palette
+>
+> ### ** Examples
+>
+> pal <- gratia_palette("tol_muted")
+> pal(5)
+[1] "#CC6677" "#332288" "#DDCC77" "#117733" "#88CCEE"
+> ggplot2::theme(
++   palette.colour.discrete = pal,
++   palette.fill.discrete = pal
++ )
+<theme> List of 2
+ $ palette.colour.discrete:function (n)
+ $ palette.fill.discrete  :function (n)
+ @ complete: logi FALSE
+ @ validate: logi TRUE
+>
+>
+>
+> cleanEx()
+> nameEx("gratia_theme_get")
+> ### * gratia_theme_get
+>
+> flush(stderr()); flush(stdout())
+>
+> ### Name: gratia_theme_get
+> ### Title: Native themes for gratia plots
+> ### Aliases: gratia_theme_get gratia_theme_set gratia_theme_update
+>
+> ### ** Examples
+>
+> library("ggplot2")
+> old <- gratia_theme_set(theme(
++   geom.gratia.smooth = element_geom(colour = "navy"),
++   gratia.alpha.interval = 0.15
++ ))
+> gratia_theme_update(geom.gratia.contour = element_geom(colour = "grey40"))
+> gratia_theme_set(old)
+>
+> pal <- gratia_palette("tol_banded_16")
+> theme(palette.colour.discrete = pal, palette.fill.discrete = pal)
+<theme> List of 2
+ $ palette.colour.discrete:function (n)
+ $ palette.fill.discrete  :function (n)
+ @ complete: logi FALSE
+ @ validate: logi TRUE
+>
+>
+>
+> cleanEx()
+
+detaching ‘package:ggplot2’
 
 > nameEx("gw_functions")
 > ### * gw_functions
@@ -2153,7 +2223,7 @@ detaching ‘package:mgcv’
 > 
 > ### Name: log_lik
 > ### Title: Posterior draws of pointwise log likelihoods
-> ### Aliases: log_lik log_lik.gam log_lik.bam
+> ### Aliases: log_lik log_lik.gam log_lik.bam log_lik.scam
 > 
 > ### ** Examples
 > 
@@ -2194,7 +2264,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > 
 > ### Name: loo.gam
 > ### Title: Leave-one-out validation and WAIC for GAMs
-> ### Aliases: loo.gam loo.bam waic.gam waic.bam
+> ### Aliases: loo.gam loo.bam waic.gam waic.bam loo.scam waic.scam
 > 
 > ### ** Examples
 > 
@@ -2232,7 +2302,8 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > 
 > ### Name: lp_matrix
 > ### Title: Return the linear prediction matrix of a fitted GAM
-> ### Aliases: lp_matrix lp_matrix.gamm4 lp_matrix.gam
+> ### Aliases: lp_matrix lp_matrix.gamm4 lp_matrix.gam lp_matrix.scam
+> ###   model.matrix.scam
 > 
 > ### ** Examples
 > 
@@ -2296,7 +2367,7 @@ detaching ‘package:mgcv’
 > ### Name: model_concurvity
 > ### Title: Concurvity of an estimated GAM
 > ### Aliases: model_concurvity model_concurvity.gam concrvity
-> ###   model_concurvity.gamm4
+> ###   model_concurvity.gamm4 model_concurvity.scam
 > 
 > ### ** Examples
 > 
@@ -2336,7 +2407,7 @@ detaching ‘package:mgcv’, ‘package:tibble’
 > ### Name: model_constant
 > ### Title: Extract the model constant term
 > ### Aliases: model_constant model_constant.gamm4 model_constant.gam
-> ###   model_constant.gamlss model_constant.glm
+> ###   model_constant.gamlss model_constant.glm model_constant.scam
 > 
 > ### ** Examples
 > 
@@ -2379,7 +2450,7 @@ detaching ‘package:mgcv’
 > ### Name: model_terms
 > ### Title: Find the names of model terms
 > ### Aliases: model_terms model_terms.gam model_terms.gamm model_terms.gamm4
-> ###   model_terms.lm
+> ###   model_terms.lm model_terms.scam
 > 
 > ### ** Examples
 > 
@@ -2411,7 +2482,7 @@ detaching ‘package:mgcv’
 > ### Name: model_vars
 > ### Title: List the variables involved in a model fitted with a formula
 > ### Aliases: model_vars model_vars.gam model_vars.default model_vars.bam
-> ###   model_vars.gamm model_vars.gamm4
+> ###   model_vars.gamm model_vars.gamm4 model_vars.scam
 > 
 > ### ** Examples
 > 
@@ -2470,7 +2541,7 @@ detaching ‘package:mgcv’
 > 
 > ### Name: overview
 > ### Title: Provides an overview of a model and the terms in that model
-> ### Aliases: overview overview.gamm4 overview.gam
+> ### Aliases: overview overview.gamm4 overview.gam overview.scam
 > 
 > ### ** Examples
 > 
@@ -2512,7 +2583,7 @@ detaching ‘package:mgcv’
 > ### Name: parametric_effects
 > ### Title: Estimated values for parametric model terms
 > ### Aliases: parametric_effects parametric_effects.gamm4
-> ###   parametric_effects.gam
+> ###   parametric_effects.gam parametric_effects.scam
 > 
 > ### ** Examples
 > 
@@ -2566,7 +2637,7 @@ detaching ‘package:mgcv’
 > ###   differences
 > ### Aliases: partial_derivatives partial_derivatives.default
 > ###   partial_derivatives.gamm partial_derivatives.gam
-> ###   partial_derivatives.gamm4
+> ###   partial_derivatives.gamm4 partial_derivatives.scam
 > 
 > ### ** Examples
 > 
@@ -2634,7 +2705,7 @@ detaching ‘package:mgcv’, ‘package:patchwork’, ‘package:ggplot2’
 > 
 > ### Name: partial_residuals
 > ### Title: Partial residuals
-> ### Aliases: partial_residuals partial_residuals.gam
+> ### Aliases: partial_residuals partial_residuals.gam partial_residuals.scam
 > 
 > ### ** Examples
 > 
@@ -2718,7 +2789,7 @@ detaching ‘package:mgcv’
 > ### Title: Extract and tidy penalty matrices
 > ### Aliases: penalty penalty.gamm4 penalty.default penalty.gam
 > ###   penalty.mgcv.smooth penalty.tensor.smooth penalty.t2.smooth
-> ###   penalty.re.smooth.spec
+> ###   penalty.re.smooth.spec penalty.scam
 > 
 > ### ** Examples
 > 
@@ -2811,7 +2882,7 @@ detaching ‘package:mgcv’
 > ### Name: pp_check
 > ### Title: Posterior checks with bayesplot
 > ### Aliases: pp_check pp_check.gam pp_check.bam pp_check.gamm
-> ###   pp_check.gamm4
+> ###   pp_check.gamm4 pp_check.scam
 > 
 > ### ** Examples
 > 
@@ -3134,7 +3205,7 @@ detaching ‘package:mgcv’, ‘package:patchwork’, ‘package:ggplot2’
 > 
 > ### Name: rootogram
 > ### Title: Rootograms to assess goodness of model fit
-> ### Aliases: rootogram rootogram.gamm4 rootogram.gam
+> ### Aliases: rootogram rootogram.gamm4 rootogram.gam rootogram.scam
 > 
 > ### ** Examples
 > 
@@ -3230,6 +3301,10 @@ detaching ‘package:mgcv’, ‘package:nlme’
 +   draw(m)
 +   smooth_estimates(m, select = "s(x)")
 +   assemble(m)
++   if (requireNamespace("ggcube", quietly = TRUE)) {
++     surface <- sdmTMB::sdmTMB(y ~ s(x, z, k = 8), data = d, spatial = "off")
++     draw(surface, surface = "3d", ci_3d = TRUE, n_2d = 15)
++   }
 + 
 +   d$y <- ifelse(runif(150) < 0.3, 0, exp(d$y))
 +   delta <- sdmTMB::sdmTMB(y ~ z + s(x, k = 6),
@@ -3248,6 +3323,58 @@ This is mgcv 1.9-4. For overview type '?mgcv'.
 
 detaching ‘package:mgcv’, ‘package:nlme’
 
+> nameEx("shape_confidence_set")
+> ### * shape_confidence_set
+>
+> flush(stderr()); flush(stdout())
+>
+> ### Name: shape_confidence_set
+> ### Title: Intersect a band with linear restrictions on coefficients
+> ### Aliases: shape_confidence_set in_shape_set
+>
+> ### ** Examples
+>
+> # Two non-negative masses whose sum is one.
+> region <- shape_confidence_set(
++   X = diag(2), lower = c(0.1, 0.2), upper = c(0.8, 0.9),
++   Ain = diag(2), C = matrix(c(1, 1), nrow = 1), d = 1,
++   band_type = "simultaneous"
++ )
+> in_shape_set(region, c(0.4, 0.6))
+[1] TRUE
+> in_shape_set(region, c(0.4, 0.7))
+[1] FALSE
+>
+>
+>
+> cleanEx()
+> nameEx("shape_intervals")
+> ### * shape_intervals
+>
+> flush(stderr()); flush(stdout())
+>
+> ### Name: shape_intervals
+> ### Title: Enforce named shapes on estimates and interval endpoints
+> ### Aliases: shape_intervals
+>
+> ### ** Examples
+>
+> x <- c(0, 0.1, 0.4, 0.8, 1)
+> f <- c(0.1, 0.4, 0.2, 0.9, 0.7)
+> shape_intervals(f, f - 0.3, f + 0.3, data.frame(x = x),
++   constraints = list(x = c("+", "m+")))
+# A tibble: 5 x 4
+      x .estimate .lower_ci .upper_ci
+  <dbl>     <dbl>     <dbl>     <dbl>
+1   0         0.1       0         0.4
+2   0.1       0.2       0         0.5
+3   0.4       0.4       0.1       0.7
+4   0.8       0.7       0.4       1
+5   1         0.9       0.6       1.2
+>
+>
+>
+> cleanEx()
 > nameEx("simulate")
 > ### * simulate
 > 
@@ -3387,7 +3514,7 @@ detaching ‘package:mgcv’
 > 
 > ### Name: smooth_estimates
 > ### Title: Evaluate smooths at covariate values
-> ### Aliases: smooth_estimates smooth_estimates.gam
+> ### Aliases: smooth_estimates smooth_estimates.gam smooth_estimates.gamlss
 > 
 > ### ** Examples
 > 
@@ -3432,6 +3559,16 @@ detaching ‘package:mgcv’
 10 s(x0)   TPRS  <NA>  -0.594641 0.194685 0.0971693     NA
 # i 190 more rows
 > 
+> # Direct evaluation of a GJRM distributional model
+> if (requireNamespace("GJRM", quietly = TRUE)) {
++   set.seed(82)
++   d <- data.frame(x = runif(100), z = runif(100))
++   d$y <- sin(6 * d$x) + rnorm(100, sd = exp(0.3 * d$z))
++   m <- GJRM::gamlss(list(y ~ s(x, k = 4), ~ s(z, k = 4)), data = d)
++   estimates <- smooth_estimates(m, n = 50)
++   draw(estimates)
++ }
+>
 > # parallel processing of smooths
 > if (requireNamespace("mirai") && requireNamespace("carrier")) {
 +   library("mirai")

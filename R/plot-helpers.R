@@ -20,19 +20,19 @@
 add_curve_interval <- function(plot, lower_var = NULL, upper_var = NULL,
   ribbon_mapping = aes(), line_mapping = aes(), ribbon_alpha = 0.2,
   ribbon_colour = NULL, ribbon_fill = NULL, line_colour = NULL,
-  line_alpha = NULL) {
+  line_alpha = NULL, curve_role = "smooth", interval_role = "interval") {
   if (!is.null(lower_var)) {
     mapping <- aes(ymin = .data[[lower_var]], ymax = .data[[upper_var]])
     mapping[names(ribbon_mapping)] <- ribbon_mapping
     params <- list(mapping = mapping, alpha = ribbon_alpha)
     if (!is.null(ribbon_colour)) params$colour <- ribbon_colour
     if (!is.null(ribbon_fill)) params$fill <- ribbon_fill
-    plot <- plot + do.call(geom_ribbon, params)
+    plot <- plot + gratia_geom(interval_role, do.call(geom_ribbon, params))
   }
   params <- list(mapping = line_mapping)
   if (!is.null(line_colour)) params$colour <- line_colour
   if (!is.null(line_alpha)) params$alpha <- line_alpha
-  plot + do.call(geom_line, params)
+  plot + gratia_geom(curve_role, do.call(geom_line, params))
 }
 
 #' Resolve the default arrangement of plot panels
@@ -95,7 +95,7 @@ prepare_derivative_plot <- function(object, x_var, y_var, labels,
   if (!is.null(colour_var)) {
     mapping$colour <- aes(colour = .data[[colour_var]])$colour
   }
-  add_curve_interval(ggplot(object, mapping),
+  add_curve_interval(gratia_plot(object, mapping), curve_role = "derivative",
     lower_var = if (interval) ".lower_ci" else NULL, upper_var = ".upper_ci",
     ribbon_mapping = aes(y = NULL), ribbon_alpha = alpha) +
     guides(x = guide_axis(angle = angle)) + labels

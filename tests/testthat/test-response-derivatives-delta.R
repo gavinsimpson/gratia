@@ -125,10 +125,6 @@ test_that("delta validates inputs and does not use the RNG or sampling controls"
     se.fit = TRUE), "se.fit")
   expect_error(response_derivatives(m, focal = "x", uncertainty = "delta",
     data = data.frame(x = c(0, NA))), "finite.*retain")
-  class(m) <- c("scam", class(m))
-  expect_error(response_derivatives(m, focal = "x", uncertainty = "delta"),
-    "not supported")
-  class(m) <- setdiff(class(m), "scam")
   class(m$family) <- c("general.family", class(m$family))
   expect_error(response_derivatives(m, focal = "x", uncertainty = "delta"),
     "not supported")

@@ -35,9 +35,11 @@ plots have separate coefficient scales and rank plots share a count scale.}
 
 \item{ncol, nrow}{Number of columns or rows in the panel layout.}
 
-\item{alpha}{Transparency of the chain lines.}
+\item{alpha}{Deprecated; use \code{\link[=gratia_theme_get]{gratia_theme_get()}} theme
+settings instead. Transparency of the chain lines.}
 
-\item{linewidth}{Width of the chain lines.}
+\item{linewidth}{Deprecated; use \code{\link[=gratia_theme_get]{gratia_theme_get()}} theme
+settings instead. Width of the chain lines.}
 
 \item{discrete_colour}{An optional ggplot2 discrete colour scale. Defaults
 follow gratia's smooth plots: Okabe-Ito for up to nine chains, then hue.}

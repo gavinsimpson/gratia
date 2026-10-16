@@ -26,6 +26,11 @@
 #' @param ... arguments passed to [mgcv::predict.gam()]. Note that `type`,
 #'   `newdata`, and `se.fit` are already used and passed on to
 #'   [mgcv::predict.gam()].
+#' @param interval_method character; `"auto"` uses stored scasm bootstrap draws
+#'   for pointwise intervals when available and Gaussian intervals otherwise.
+#'   `"gaussian"` requests covariance-based limits and `"bootstrap"` requires
+#'   stored draws. Simultaneous bootstrap bands are unsupported. Shape-enforced
+#'   intervals are available for smooth components through [smooth_estimates()].
 #'
 #' @details
 #' Native scasm fits with stored bootstrap draws use mgcv's pointwise limits
@@ -84,8 +89,10 @@
 #' covariance may be positive semidefinite. Supported families are Gaussian,
 #' Poisson, binomial, Gamma, inverse Gaussian, quasi families, negative binomial,
 #' Tweedie, beta regression, and scaled t, fitted by `gam()` or `bam()` (including
-#' the `gam` component of a `gamm()` fit). Other families and `scam` models
-#' currently support pointwise intervals only.
+#' the `gam` component of a `gamm()` fit), and by `scam()`. For SCAM models,
+#' the Gaussian approximation uses transformed coefficients conditional on
+#' the fitted smoothing parameters. Other families support pointwise intervals
+#' only.
 #'
 #' Response-scale simultaneous intervals support the identity, log, logit,
 #' probit, cloglog, cauchit, square-root, inverse, and inverse-squared links.
@@ -264,7 +271,7 @@ fit_vals_simultaneous <- function(
     "quasi", "quasipoisson", "quasibinomial", "negative_binomial",
     "tweedie", "beta_regression", "scaled_t"
   )
-  if (inherits(object, "scam") || inherits(fam, "general.family") ||
+  if (inherits(fam, "general.family") ||
       !family_type(object) %in% supported) {
     stop("Simultaneous intervals are not supported for this model family or class.",
       call. = FALSE)

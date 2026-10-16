@@ -54,9 +54,11 @@ columns of a matrix. \code{index} is useful if you have a set of posterior draws
 for the entire model (say from \code{\link[mgcv:gam.mh]{mgcv::gam.mh()}}) and you wish to use those
 draws for an individual smooth, via \code{\link[=smooth_samples]{smooth_samples()}}.
 
-User-supplied coefficient draws are not currently supported for
-SCAM models. Scalable posterior predictive plots need this sampling path;
-use \code{scalable = FALSE} for an ordinary SCAM posterior predictive plot.
+For SCAM models, supplied draws must contain finite transformed
+coefficients in the order returned by \code{coef(model)}. If column names are
+supplied they must match exactly. Entries identified by \code{model$p.ident}
+must be nonnegative. Draws returned with \code{parametrized = FALSE} cannot be
+supplied directly for prediction; transform them first.
 }
 \seealso{
 \link{gamm4_support}

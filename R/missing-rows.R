@@ -32,7 +32,8 @@ model_used_rows <- function(model) {
     "linear.predictors",
     "residuals",
     "weights",
-    "prior.weights"
+    "prior.weights",
+    "AR.start"
   )) {
     x <- model[[nm]]
     if (is.null(x)) {
@@ -255,7 +256,9 @@ predict_mat_rows <- function(smooth, data) {
     } else {
       smooth$df
     }
-    return(matrix(numeric(), 0L, nc))
+    out <- matrix(numeric(), 0L, nc)
+    if (is_scam_smooth(smooth)) attr(out, "gratia.fitted_columns") <- TRUE
+    return(out)
   }
   vars <- term_names(smooth)
   valid <- finite_predictor_rows(data[, vars, drop = FALSE])
@@ -268,7 +271,9 @@ predict_mat_rows <- function(smooth, data) {
     } else {
       smooth$df
     }
-    return(matrix(NA_real_, NROW(data), nc))
+    out <- matrix(NA_real_, NROW(data), nc)
+    if (is_scam_smooth(smooth)) attr(out, "gratia.fitted_columns") <- TRUE
+    return(out)
   }
   x <- mgcv::PredictMat(smooth, data[valid, , drop = FALSE])
   map <- match(seq_len(NROW(data)), which(valid))

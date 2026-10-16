@@ -126,8 +126,10 @@
     title <- unique(object[[".smooth"]])
   }
   default_caption <- scasm_shape_plot_caption(object, default_caption)
+  default_caption <- scam_shape_plot_caption(object, default_caption)
   interval_info <- attr(object, "interval_info")
-  if (!is.null(interval_info) && interval_info$interval == "simultaneous") {
+  if (!identical(interval_info$method, "shape") &&
+      !is.null(interval_info) && interval_info$interval == "simultaneous") {
     source <- if (identical(interval_info$method, "gaussian") &&
       length(attr(object, "shape_constraints"))) "Gaussian " else ""
     default_caption <- scasm_caption_append(default_caption,
@@ -180,8 +182,8 @@
     list(colour = scale_colour_okabe_ito, fill = scale_fill_okabe_ito)
   }
   list(
-    colour = if (is.null(discrete_colour)) palette$colour() else discrete_colour,
-    fill = if (is.null(discrete_fill)) palette$fill() else discrete_fill
+    colour = if (is.null(discrete_colour)) gratia_default_scale(palette$colour()) else discrete_colour,
+    fill = if (is.null(discrete_fill)) gratia_default_scale(palette$fill()) else discrete_fill
   )
 }
 
@@ -229,22 +231,29 @@
 #'   applied to estimates and interval bounds via `transform_fun()`. `NULL`
 #'   leaves them untransformed. Neither `constant` nor `fun` modifies residuals
 #'   or SiZer columns.
-#' @param ci_alpha Numeric opacity for interval ribbons, between 0 and 1.
-#' @param ci_col Fixed interval fill colour when `colour_var` is `NULL`.
-#' @param smooth_col Fixed curve colour when `colour_var` is `NULL`. Also used
+#' @param ci_alpha Deprecated; use [gratia_theme_get()] theme
+#'   settings instead. Numeric opacity for interval ribbons, between 0 and 1.
+#' @param ci_col Deprecated; use [gratia_theme_get()] theme
+#'   settings instead. Fixed interval fill colour when `colour_var` is `NULL`.
+#' @param smooth_col Deprecated; use [gratia_theme_get()] theme
+#'   settings instead. Fixed curve colour when `colour_var` is `NULL`. Also used
 #'   for `.change` overlays in that case.
 #' @param partial_residuals Optional data frame containing `x_var` and
 #'   `partial_residual`, drawn as points beneath the ribbons and curves.
 #'   `NULL` omits the points.
-#' @param resid_col Fixed colour for partial residual points.
+#' @param resid_col Deprecated; use [gratia_theme_get()] theme
+#'   settings instead. Fixed colour for partial residual points.
 #' @param sizer Logical; add change overlays when their columns are present?
 #'   `.change` takes precedence; otherwise both `.increase` and `.decrease`
 #'   are used. With none of these columns present, no overlays are added.
-#' @param decrease_col Fixed colour for `.decrease` overlays when `colour_var`
+#' @param decrease_col Deprecated; use [gratia_theme_get()] theme
+#'   settings instead. Fixed colour for `.decrease` overlays when `colour_var`
 #'   is `NULL`; otherwise overlays use the mapped curve colours.
-#' @param increase_col Fixed colour for `.increase` overlays when `colour_var`
+#' @param increase_col Deprecated; use [gratia_theme_get()] theme
+#'   settings instead. Fixed colour for `.increase` overlays when `colour_var`
 #'   is `NULL`; otherwise overlays use the mapped curve colours.
-#' @param change_lwd Numeric line width for SiZer overlays, passed to the
+#' @param change_lwd Deprecated; use [gratia_theme_get()] theme
+#'   settings instead. Numeric line width for SiZer overlays, passed to the
 #'   `linewidth` argument of `ggplot2::geom_line()`.
 #' @param angle Optional x-axis tick-label angle, passed to
 #'   `ggplot2::guide_axis()`. `NULL` uses the theme's setting.
@@ -271,7 +280,7 @@
   object <- order_interval_bounds(object)
 
   # String column names also support transformed covariates such as log2(x).
-  plt <- ggplot(object, aes(x = .data[[x_var]], y = .data$.estimate)) +
+  plt <- gratia_plot(object, aes(x = .data[[x_var]], y = .data$.estimate)) +
     guides(x = guide_axis(angle = angle))
   if (!is.null(colour_var)) {
     plt <- plt + aes(colour = .data[[colour_var]])
@@ -283,7 +292,7 @@
 
   # do we want partial residuals? Only for univariate smooths without by vars
   if (!is.null(partial_residuals)) {
-    plt <- plt + geom_point(
+    plt <- plt + geom_gratia_partial_residual_point(
       data = partial_residuals,
       aes(
         x = .data[[x_var]],
@@ -304,7 +313,7 @@
     # Keep an explicit NULL mapping to suppress inherited ribbon outlines.
     ribbon_mapping["colour"] <- list(NULL)
   }
-  plt <- add_curve_interval(plt,
+  plt <- add_curve_interval(plt, interval_role = "smooth.interval",
     lower_var = if (interval) ".lower_ci" else NULL, upper_var = ".upper_ci",
     ribbon_mapping = ribbon_mapping, ribbon_alpha = ci_alpha,
     ribbon_colour = if (is.null(colour_var)) NA else ribbon_colour,
@@ -316,15 +325,15 @@
 
   if (any(do_sizer)) {
     change_vars <- if (do_sizer[[1]]) ".change" else c(".increase", ".decrease")
-    change_cols <- if (do_sizer[[1]]) smooth_col else c(increase_col, decrease_col)
+    change_cols <- if (do_sizer[[1]]) list(smooth_col) else list(increase_col, decrease_col)
     for (i in seq_along(change_vars)) {
       change_var <- change_vars[[i]]
       if (is.null(colour_var)) {
-        plt <- plt + geom_line(aes(y = .data[[change_var]]),
+        plt <- plt + gratia_change_geom(change_var, aes(y = .data[[change_var]]),
           colour = change_cols[[i]], linewidth = change_lwd,
           na.rm = TRUE, show.legend = FALSE)
       } else {
-        plt <- plt + geom_line(
+        plt <- plt + gratia_change_geom(change_var,
           aes(y = .data[[change_var]], colour = .data[[colour_var]]),
           linewidth = change_lwd, na.rm = TRUE,
           show.legend = if (do_sizer[[1]]) NA else FALSE)
@@ -341,7 +350,7 @@
     if (!is.null(rug_colour_var)) {
       rug_mapping <- aes(x = .data[[x_var]], colour = .data[[rug_colour_var]])
     }
-    plt <- plt + geom_rug(data = rug, mapping = rug_mapping,
+    plt <- plt + geom_gratia_rug(data = rug, mapping = rug_mapping,
       inherit.aes = FALSE, sides = "b", alpha = 0.5)
   }
   if (!is.null(ylim)) {
@@ -407,6 +416,9 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
 #'   Changed covariate scales with irregular spacing use rectangles bounded by
 #'   adjacent coordinate midpoints for flat surfaces.
 #' @param surface_3d Named options for the 3D coordinate system.
+#' @param ci_3d Enable 3D interval surfaces.
+#' @param ci_3d_alpha,ci_3d_col Deprecated; use [gratia_theme_get()] theme
+#'   settings instead. Style 3D interval surfaces.
 #' @param facet_vars Column names that identify separate mesh panels.
 #' @param surface_support Recorded support and normalization for masking.
 #' @param isotropic Preserve equal horizontal units by default.
@@ -414,7 +426,8 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
 #' @param continuous_fill Optional ggplot2 fill scale. `NULL` uses the diverging
 #'   RdBu distiller scale.
 #' @param contour Logical; add contour lines for `fill_var`?
-#' @param contour_col Fixed colour for contour lines.
+#' @param contour_col Deprecated; use [gratia_theme_get()] theme
+#'   settings instead. Fixed colour for contour lines.
 #' @param n_contour Optional number of contour bins passed to `geom_contour()`.
 #' @param angle Optional x-axis tick-label angle passed to `guide_axis()`.
 #' @param facet Optional ggplot2 facet specification supplied by the caller.
@@ -443,7 +456,9 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
 `prepare_surface_plot` <- function(
   object, x_var, y_var, fill_var, fill_limits = NULL, fill_title = NULL,
   labels = labs(), surface = c("raster", "tile", "3d"),
-  surface_3d = list(), continuous_fill = NULL,
+  surface_3d = list(),
+  ci_3d = FALSE,
+  ci_3d_alpha = 0.15, ci_3d_col = "grey60", continuous_fill = NULL,
   contour = TRUE, contour_col = "black", n_contour = NULL, angle = NULL,
   facet = NULL, coord = NULL, rug = NULL, boundary = NULL, boundary_group = NULL,
   mapping = NULL, contour_mapping = NULL, contour_na_rm = TRUE,
@@ -456,18 +471,24 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
 ) {
   surface <- match.arg(surface)
   validate_surface_3d(surface_3d)
+  validate_ci_3d(ci_3d, ci_3d_alpha, ci_3d_col)
   if (surface == "3d") {
     if (is.numeric(object[[x_var]]) && is.numeric(object[[y_var]])) {
+      ci_3d <- ci_3d && fill_var %in% c(".estimate", ".partial")
+      if (ci_3d && !all(c(".lower_ci", ".upper_ci") %in% names(object))) {
+        stop("3D interval surfaces require both interval-bound columns.", call. = FALSE)
+      }
       return(prepare_surface_3d(object, x_var, y_var, fill_var, fill_limits,
         fill_title, labels, continuous_fill, contour, contour_col, n_contour,
         facet, facet_vars, rug, boundary, boundary_group, surface_3d,
-        isotropic || inherits(coord, "CoordFixed"), surface_support, z_limits))
+        isotropic || inherits(coord, "CoordFixed"), surface_support, z_limits,
+        ci_3d, ci_3d_alpha, ci_3d_col))
     }
     message("3D surfaces require two numeric axes; retaining the flat display.")
     surface <- "raster"
   }
   if (is.null(continuous_fill)) {
-    continuous_fill <- scale_fill_distiller(palette = "RdBu", type = "div")
+    continuous_fill <- gratia_default_scale(scale_fill_distiller(palette = "RdBu", type = "div"))
   }
   if (is.null(mapping)) {
     mapping <- aes(x = .data[[x_var]], y = .data[[y_var]])
@@ -496,27 +517,27 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
     cells$.cell_xmax <- xb[, 2L]
     cells$.cell_ymin <- yb[, 1L]
     cells$.cell_ymax <- yb[, 2L]
-    surface_geom <- ggplot2::geom_rect(data = cells, mapping = aes(
+    surface_geom <- geom_gratia_surface_rect(data = cells, mapping = aes(
       xmin = .data$.cell_xmin, xmax = .data$.cell_xmax,
       ymin = .data$.cell_ymin, ymax = .data$.cell_ymax,
       fill = .data[[fill_var]]), colour = tile_colour)
   } else {
     surface_geom <- switch(surface,
-      raster = geom_raster(aes(fill = .data[[fill_var]]), interpolate = FALSE),
+      raster = geom_gratia_surface_raster(aes(fill = .data[[fill_var]]), interpolate = FALSE),
       tile = if (is.null(tile_colour)) {
-        geom_tile(aes(fill = .data[[fill_var]]))
+        geom_gratia_surface_tile(aes(fill = .data[[fill_var]]))
       } else {
-        geom_tile(aes(fill = .data[[fill_var]]), colour = tile_colour)
+        geom_gratia_surface_tile(aes(fill = .data[[fill_var]]), colour = tile_colour)
       })
   }
-  plt <- ggplot(object, mapping) +
+  plt <- gratia_plot(object, mapping) +
     surface_geom + facet + coord
 
   if (isTRUE(contour)) {
     if (is.null(contour_mapping)) {
       contour_mapping <- aes(z = .data[[fill_var]])
     }
-    plt <- plt + geom_contour(contour_mapping, data = contour_data,
+    plt <- plt + geom_gratia_contour(contour_mapping, data = contour_data,
       colour = contour_col, bins = n_contour, na.rm = contour_na_rm)
   }
   plt <- plt + labels + continuous_fill
@@ -528,16 +549,16 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
     plt <- plt + guides(fill = fill_guide)
   }
   if (!is.null(legend_position)) {
-    plt <- plt + theme(legend.position = legend_position)
+    plt <- gratia_plot_theme_defaults(plt, legend.position = legend_position)
   }
 
   if (!is.null(rug)) {
-    plt <- plt + geom_point(data = rug,
+    plt <- plt + geom_gratia_surface_rug_point(data = rug,
       mapping = aes(x = .data[[x_var]], y = .data[[y_var]]),
       inherit.aes = FALSE, alpha = 0.1)
   }
   if (!is.null(boundary)) {
-    plt <- plt + geom_path(data = boundary,
+    plt <- plt + geom_gratia_boundary_path(data = boundary,
       mapping = aes(x = .data[[x_var]], y = .data[[y_var]],
         group = .data[[boundary_group]]),
       linewidth = 2, colour = "black")
@@ -571,11 +592,14 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
   angle = NULL,
   surface = c("raster", "tile", "3d"),
   surface_3d = list(),
+  ci_3d = FALSE,
+  ci_3d_alpha = 0.15, ci_3d_col = "grey60",
   surface_support = NULL,
   ...
 ) {
   surface <- match.arg(surface)
   validate_surface_3d(surface_3d)
+  validate_ci_3d(ci_3d, ci_3d_alpha, ci_3d_col)
   if (is.null(variables)) {
     variables <- vars_from_label(unique(object[[".smooth"]]))
   }
@@ -589,6 +613,7 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
   )
   prepare_surface_plot(object,
     x_var = variables[1], y_var = variables[2], surface = surface, surface_3d = surface_3d,
+    ci_3d = ci_3d, ci_3d_alpha = ci_3d_alpha, ci_3d_col = ci_3d_col,
     fill_var = prepared$fill_var, fill_limits = prepared$fill_limits,
     fill_title = prepared$fill_title, labels = labels,
     continuous_fill = continuous_fill, contour = contour,
@@ -622,11 +647,14 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
   angle = NULL,
   surface = c("raster", "tile", "3d"),
   surface_3d = list(),
+  ci_3d = FALSE,
+  ci_3d_alpha = 0.15, ci_3d_col = "grey60",
   surface_support = NULL,
   ...
 ) {
   surface <- match.arg(surface)
   validate_surface_3d(surface_3d)
+  validate_ci_3d(ci_3d, ci_3d_alpha, ci_3d_col)
   if (is.null(variables)) {
     variables <- attr(object, "tensor_term_order")
     if (is.null(variables)) {
@@ -646,6 +674,7 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
   coord <- if (inherits(object, "isotropic_smooth")) coord_equal() else NULL
   prepare_surface_plot(object,
     x_var = variables[1], y_var = variables[2], surface = surface, surface_3d = surface_3d,
+    ci_3d = ci_3d, ci_3d_alpha = ci_3d_alpha, ci_3d_col = ci_3d_col,
     fill_var = prepared$fill_var, fill_limits = prepared$fill_limits,
     fill_title = prepared$fill_title, labels = labels,
     continuous_fill = continuous_fill, contour = contour,
@@ -681,11 +710,14 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
   angle = NULL,
   surface = c("raster", "tile", "3d"),
   surface_3d = list(),
+  ci_3d = FALSE,
+  ci_3d_alpha = 0.15, ci_3d_col = "grey60",
   surface_support = NULL,
   ...
 ) {
   surface <- match.arg(surface)
   validate_surface_3d(surface_3d)
+  validate_ci_3d(ci_3d, ci_3d_alpha, ci_3d_col)
   if (is.null(variables)) {
     variables <- vars_from_label(unique(object[[".smooth"]]))
   }
@@ -703,6 +735,7 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
   coord <- if (inherits(object, "isotropic_smooth")) coord_equal() else NULL
   prepare_surface_plot(object,
     x_var = variables[1], y_var = variables[2], surface = surface, surface_3d = surface_3d,
+    ci_3d = ci_3d, ci_3d_alpha = ci_3d_alpha, ci_3d_col = ci_3d_col,
     fill_var = prepared$fill_var, fill_limits = prepared$fill_limits,
     fill_title = prepared$fill_title, labels = labels,
     continuous_fill = continuous_fill, contour = contour,
@@ -719,16 +752,21 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
   object,
   surface = c("raster", "tile", "3d"),
   surface_3d = list(),
+  ci_3d = FALSE,
+  ci_3d_alpha = 0.15, ci_3d_col = "grey60",
   surface_support = NULL,
   ...
 ) {
   surface <- match.arg(surface)
   validate_surface_3d(surface_3d)
+  validate_ci_3d(ci_3d, ci_3d_alpha, ci_3d_col)
   # Preserve equal horizontal units even when this method is called directly.
   class(object) <- unique(c("isotropic_smooth", class(object)))
   # plot as per a bivariate smooth
   plt <- plot_smooth.bivariate_smooth(object, surface = surface,
-    surface_3d = surface_3d, surface_support = surface_support, ...)
+    surface_3d = surface_3d,
+    ci_3d = ci_3d, ci_3d_alpha = ci_3d_alpha, ci_3d_col = ci_3d_col,
+    surface_support = surface_support, ...)
 
   # but set the x/y coordinates to have aspect ratio = 1
   if (surface != "3d") plt <- plt + coord_equal(ratio = 1)
@@ -768,8 +806,8 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
   attr(object, "interval_info") <- NULL
 
   ## base plot with computed QQs
-  plt <- ggplot(object, aes(sample = .data[[".estimate"]])) +
-    geom_point(stat = "qq") +
+  plt <- gratia_plot(object, aes(sample = .data[[".estimate"]])) +
+    geom_gratia_smooth_point(stat = "qq") +
     guides(x = guide_axis(angle = angle))
 
   ## add a QQ reference line
@@ -779,7 +817,7 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
     slope <- diff(sampq) / diff(gaussq)
     intercept <- sampq[1L] - slope * gaussq[1L]
 
-    plt <- plt + geom_abline(slope = slope, intercept = intercept)
+    plt <- plt + geom_gratia_reference_abline(slope = slope, intercept = intercept)
   }
 
   plt <- plt + prepare_smooth_labels(object,
@@ -862,7 +900,7 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
   }
 
   if (is.null(discrete_colour)) {
-    discrete_colour <- scale_colour_discrete()
+    discrete_colour <- gratia_default_scale(scale_colour_discrete())
   }
 
   labels <- prepare_smooth_labels(object, x_var = variables[1],
@@ -895,13 +933,13 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
   object <- transform_fun(object, fun = fun)
   object <- order_interval_bounds(object)
 
-  plt <- ggplot(object, aes(
+  plt <- gratia_plot(object, aes(
     x = .data[[variables[1]]],
     y = .data[[".estimate"]],
     ymin = .data[[".lower_ci"]],
     ymax = .data[[".upper_ci"]]
   )) +
-    ggplot2::geom_pointrange() +
+    geom_gratia_smooth_pointrange() +
     facet_wrap(vars(.data[[variables[2]]]), labeller = ggplot2::label_both)
   plt <- plt + guides(x = guide_axis(angle = angle))
 
@@ -910,7 +948,7 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
 
   ## add rug?
   if (!is.null(rug)) {
-    plt <- plt + geom_rug(
+    plt <- plt + geom_gratia_rug(
       data = rug,
       mapping = aes(x = .data[[variables[1]]]),
       inherit.aes = FALSE,
@@ -1103,6 +1141,8 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
   lims_method = "geometry_bbox",
   angle = NULL,
   surface = "raster", surface_3d = list(),
+  ci_3d = FALSE,
+  ci_3d_alpha = 0.15, ci_3d_col = "grey60",
   grouped_by = FALSE,
   ...
 ) {
@@ -1196,18 +1236,18 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
     sos_project(cells, crs = crs)
   })
   if (is.null(continuous_fill)) {
-    continuous_fill <- scale_fill_distiller(palette = "RdBu", type = "div")
+    continuous_fill <- gratia_default_scale(scale_fill_distiller(palette = "RdBu", type = "div"))
   }
-  plt <- ggplot(object)
+  plt <- gratia_plot(object)
   for (i in seq_along(geometry)) {
-    plt <- plt + ggplot2::geom_sf(data = geometry[[i]],
+    plt <- plt + geom_gratia_surface_sf(data = geometry[[i]],
       mapping = aes(fill = .data[[plot_var]]), inherit.aes = FALSE,
       colour = if (prepared[[i]]$rectangular) NA else "black", shape = 21)
   }
   plt <- plt + labels + continuous_fill + expand_limits(fill = guide_limits) +
     guides(x = guide_axis(angle = angle),
-      fill = guide_colourbar(title = guide_title, direction = "vertical")) +
-    theme(legend.position = "right")
+      fill = guide_colourbar(title = guide_title, direction = "vertical"))
+  plt <- gratia_plot_theme_defaults(plt, legend.position = "right")
   if (!is.null(panel)) plt <- plt + facet_wrap(vars(!!rlang::sym(panel)))
   if (!any(vapply(geometry, nrow, integer(1))) && !is.null(sos_ortho_view(crs))) {
     # An entirely hidden supplied grid still needs finite panel bounds. An
@@ -1224,7 +1264,7 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
       if (!is.null(paths)) {
         if (!is.null(panel)) paths[[panel]] <- group$data[[panel]][rep(1L, nrow(paths))]
         paths <- sos_project(paths, crs = crs)
-        plt <- plt + ggplot2::geom_sf(data = paths, inherit.aes = FALSE,
+        plt <- plt + geom_gratia_contour_sf(data = paths, inherit.aes = FALSE,
           colour = contour_col, fill = NA)
       }
     }
@@ -1232,7 +1272,7 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
   if (!is.null(rug)) {
     points <- sos_points(rug, longitude = variables[2], latitude = variables[1])
     points <- sos_project(points, crs = crs)
-    plt <- plt + ggplot2::geom_sf(data = points, inherit.aes = FALSE, alpha = 0.1)
+    plt <- plt + geom_gratia_surface_rug_sf(data = points, inherit.aes = FALSE, alpha = 0.1)
   }
   plt + coord_sf(crs = crs, default_crs = default_crs, lims_method = lims_method)
 
@@ -1266,11 +1306,14 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
   angle = NULL,
   surface = c("raster", "tile", "3d"),
   surface_3d = list(),
+  ci_3d = FALSE,
+  ci_3d_alpha = 0.15, ci_3d_col = "grey60",
   surface_support = NULL,
   ...
 ) {
   surface <- match.arg(surface)
   validate_surface_3d(surface_3d)
+  validate_ci_3d(ci_3d, ci_3d_alpha, ci_3d_col)
   if (is.null(variables)) {
     variables <- vars_from_label(unique(object[[".smooth"]]))
   }
@@ -1286,6 +1329,7 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
   )
   prepare_surface_plot(object,
     x_var = variables[1], y_var = variables[2], surface = surface, surface_3d = surface_3d,
+    ci_3d = ci_3d, ci_3d_alpha = ci_3d_alpha, ci_3d_col = ci_3d_col,
     fill_var = prepared$fill_var, fill_limits = prepared$fill_limits,
     fill_title = prepared$fill_title, labels = labels,
     continuous_fill = continuous_fill, contour = contour,

@@ -280,6 +280,9 @@ sdmtmb_smooth_model <- function(
 #' in their component's overall mean by default; parametric intervals include
 #' the component's intercept. Use `overall_uncertainty = FALSE` for term-only
 #' intervals. `fun` transforms displayed partial effects, not full predictions.
+#' Use `surface = "3d", ci_3d = TRUE` in `draw()` or `assemble()` to add
+#' interval surfaces to smooths and numeric parametric interactions in either
+#' component. `ci_3d_alpha` and `ci_3d_col` control their opacity and fill colour.
 #'
 #' Delta components have separate smooth and parametric coefficients and are
 #' drawn separately, with component subtitles. Upstream sdmTMB restrictions on
@@ -322,6 +325,10 @@ sdmtmb_smooth_model <- function(
 #'   draw(m)
 #'   smooth_estimates(m, select = "s(x)")
 #'   assemble(m)
+#'   if (requireNamespace("ggcube", quietly = TRUE)) {
+#'     surface <- sdmTMB::sdmTMB(y ~ s(x, z, k = 8), data = d, spatial = "off")
+#'     draw(surface, surface = "3d", ci_3d = TRUE, n_2d = 15)
+#'   }
 #'
 #'   d$y <- ifelse(runif(150) < 0.3, 0, exp(d$y))
 #'   delta <- sdmTMB::sdmTMB(y ~ z + s(x, k = 6),

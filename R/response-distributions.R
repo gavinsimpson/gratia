@@ -99,12 +99,20 @@ response_distribution.gam <- function(model, conditioning = NULL, ...) {
   bam_response_dependence(model, d, f)
 }
 
+#' @export
+response_distribution.scam <- response_distribution.gam
+
 bam_response_dependence <- function(model, d, f) {
   if (!is.null(model$AR1.rho) && model$AR1.rho != 0) {
     d$independent <- FALSE
     if (family_type(f) == "gaussian" && identical(f$link, "identity")) {
       rho <- model$AR1.rho
-      start <- model$model[["(AR.start)"]] %||% rep(FALSE, NROW(model$model))
+      start <- if (inherits(model, "scam")) model$AR.start else
+        model$model[["(AR.start)"]]
+      start <- start %||% rep(FALSE, NROW(model$model))
+      if (length(start) != NROW(model$model) || anyNA(start)) stop(
+        "AR.start must identify series starts for every fitting observation.",
+        call. = FALSE)
       start[1L] <- TRUE
       sd <- sqrt(model$sig2 / model$prior.weights)
       d$rd <- function() {

@@ -86,10 +86,10 @@ residual_correlation <- function(model, type = NULL, lag_max = 20L,
 residual_correlation_plot <- function(model, type = NULL, lag_max = 20L,
                                       series = NULL, seed = NULL, ..., n_dharma = 250L) {
   data <- residual_correlation(model, type, lag_max, series, seed, n_dharma = if (missing(n_dharma)) NULL else n_dharma, ...)
-  ggplot2::ggplot(data, ggplot2::aes(x = .data$lag, y = .data$correlation)) +
-    ggplot2::geom_hline(yintercept = 0, colour = "grey60") +
-    ggplot2::geom_segment(ggplot2::aes(xend = .data$lag, yend = 0)) +
-    ggplot2::geom_point() + ggplot2::labs(x = "Observation lag",
+  gratia_plot(data, ggplot2::aes(x = .data$lag, y = .data$correlation)) +
+    geom_gratia_correlation_reference_hline(yintercept = 0, colour = "grey60") +
+    geom_gratia_correlation_segment(ggplot2::aes(xend = .data$lag, yend = 0)) +
+    geom_gratia_correlation_point() + ggplot2::labs(x = "Observation lag",
       y = "Residual lag correlation", title = "Ordered residual correlation")
 }
 

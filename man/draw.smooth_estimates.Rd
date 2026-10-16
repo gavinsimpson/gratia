@@ -32,6 +32,9 @@
   caption = TRUE,
   surface = c("raster", "tile", "3d"),
   surface_3d = list(),
+  ci_3d = FALSE,
+  ci_3d_alpha = 0.15,
+  ci_3d_col = "grey60",
   back_transform = FALSE,
   re_levels = NULL,
   mrf_plot = c("effects", "qq"),
@@ -60,27 +63,34 @@ provided.}
 per level of the factor (\code{FALSE}, the default), or should the individual
 smooths be combined into a single panel containing all levels (\code{TRUE})?}
 
-\item{contour_col}{colour specification for contour lines.}
+\item{contour_col}{Deprecated; use \code{\link[=gratia_theme_get]{gratia_theme_get()}} theme
+settings instead. Colour specification for contour lines.}
 
 \item{n_contour}{numeric; the number of contour bins. Will result in
 \code{n_contour - 1} contour lines being drawn. See \code{\link[ggplot2:geom_contour]{ggplot2::geom_contour()}}.}
 
-\item{ci_alpha}{numeric; alpha transparency for confidence or simultaneous
+\item{ci_alpha}{Deprecated; use \code{\link[=gratia_theme_get]{gratia_theme_get()}} theme
+settings instead. Numeric; alpha transparency for confidence or simultaneous
 interval.}
 
-\item{ci_col}{colour specification for the confidence/credible intervals
+\item{ci_col}{Deprecated; use \code{\link[=gratia_theme_get]{gratia_theme_get()}} theme
+settings instead. Colour specification for the confidence/credible intervals
 band. Affects the fill of the interval.}
 
-\item{smooth_col}{colour specification for the smooth line.}
+\item{smooth_col}{Deprecated; use \code{\link[=gratia_theme_get]{gratia_theme_get()}} theme
+settings instead. Colour specification for the smooth line.}
 
-\item{resid_col}{colour specification for the partial residuals.}
+\item{resid_col}{Deprecated; use \code{\link[=gratia_theme_get]{gratia_theme_get()}} theme
+settings instead. Colour specification for the partial residuals.}
 
-\item{decrease_col, increase_col}{colour specifications to use for
+\item{decrease_col, increase_col}{Deprecated; use \code{\link[=gratia_theme_get]{gratia_theme_get()}} theme
+settings instead. Colour specifications to use for
 indicating periods of change. \code{col_change} is used when
 \code{change_type = "change"}, while \code{col_decrease} and \code{col_increase} are used
 when `change_type = "sizer"``.}
 
-\item{change_lwd}{numeric; the value to set the \code{linewidth} to in
+\item{change_lwd}{Deprecated; use \code{\link[=gratia_theme_get]{gratia_theme_get()}} theme
+settings instead. Numeric; the value to set the \code{linewidth} to in
 \code{\link[ggplot2:geom_line]{ggplot2::geom_line()}}, used to represent the periods of change.}
 
 \item{partial_match}{logical; should smooths be selected by partial matches
@@ -148,6 +158,20 @@ These options affect all 3D panels in a call. For different views per term,
 modify individual plots returned by \code{\link[=assemble]{assemble()}}. The \code{dist} entry here
 controls perspective; the top-level \code{dist} argument controls masking.}
 
+\item{ci_3d}{logical; add lower and upper interval surfaces to numeric
+smooth and parametric effect panels when \code{surface = "3d"}? Defaults to
+\code{FALSE}. Applies across supported model classes and conditioning facets.
+Other panel types, including standard errors, retain their usual display.
+Smooth bounds follow \code{interval}; parametric bounds remain pointwise.}
+
+\item{ci_3d_alpha}{Deprecated; use \code{\link[=gratia_theme_get]{gratia_theme_get()}} theme
+settings instead. Numeric between 0 and 1; opacity of both interval
+surfaces, independent of \code{ci_alpha}. Defaults to \code{0.15}.}
+
+\item{ci_3d_col}{Deprecated; use \code{\link[=gratia_theme_get]{gratia_theme_get()}} theme
+settings instead. One R colour; fill of both interval surfaces, independent
+of \code{ci_col} and the estimate's continuous fill scale. Defaults to \code{"grey60"}.}
+
 \item{back_transform}{logical; plot covariates on their original scale?
 Defaults to \code{FALSE}, using model coordinates such as \code{log(x)} for a term
 containing \code{log(x)}. With \code{TRUE}, recover the raw covariates, generate a
@@ -184,7 +208,10 @@ Specialist maps and graph plots are outside the scope of this display.}
 \item{interval}{character or \code{NULL}; the default draws stored interval bounds
 unchanged, adding pointwise bounds if absent. An explicit choice validates
 stored interval metadata; \code{"credible"} aliases \code{"confidence"}. Simultaneous
-bands must first be computed from the fitted model by \code{\link[=smooth_estimates]{smooth_estimates()}}.}
+bands must first be computed from the fitted model by \code{\link[=smooth_estimates]{smooth_estimates()}}.
+Method and uncertainty controls such as \code{interval_method}, \code{shape_source},
+\code{frequentist}, and \code{unconditional} also require the fitted model; they
+cannot change intervals when drawing saved estimates.}
 
 \item{...}{additional arguments passed to \code{\link[patchwork:wrap_plots]{patchwork::wrap_plots()}}.}
 }
@@ -208,7 +235,10 @@ sm <- smooth_estimates(m, select = "s(x2)")
 draw(sm)
 
 # customising some plot elements
-draw(sm, ci_col = "steelblue", smooth_col = "forestgreen", ci_alpha = 0.3)
+draw(sm) & ggplot2::theme(
+  geom.gratia.interval = ggplot2::element_geom(fill = "steelblue"),
+  geom.gratia.smooth = ggplot2::element_geom(colour = "forestgreen"),
+  gratia.alpha.interval = 0.3)
 
 # Add a constant to the plotted smooth
 draw(sm, constant = coef(m)[1])

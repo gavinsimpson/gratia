@@ -95,7 +95,7 @@ response_derivatives_delta <- function(object, focal, data, order, type,
   supported <- c("gaussian", "poisson", "binomial", "gamma",
     "inverse_gaussian", "quasi", "quasipoisson", "quasibinomial",
     "negative_binomial", "tweedie", "beta_regression", "scaled_t")
-  if (inherits(object, "scam") || inherits(fam, "general.family") ||
+  if (inherits(fam, "general.family") ||
       !family_type(object) %in% supported) {
     cli::cli_abort(
       "Delta-method response derivatives are not supported for this model family or class."

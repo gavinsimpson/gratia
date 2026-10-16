@@ -323,16 +323,16 @@ calibrated_qq_plot <- function(model, method, level, detrend, by_family,
   if (!is.numeric(level) || length(level) != 1L || !is.finite(level) ||
       level <= 0 || level >= 1) stop("'level' must be between zero and one.", call. = FALSE)
   data <- calibrated_qq_data(model, level, detrend, by_family, type, n_simulate)
-  plt <- ggplot2::ggplot(data, ggplot2::aes(x = .data$theoretical, y = .data$residuals))
-  if (detrend) plt <- plt + ggplot2::geom_hline(yintercept = 0, colour = line_col)
-  else plt <- plt + ggplot2::geom_abline(intercept = 0, slope = 1, colour = line_col)
-  if ("lower" %in% names(data)) plt <- plt + ggplot2::geom_ribbon(
+  plt <- gratia_plot(data, ggplot2::aes(x = .data$theoretical, y = .data$residuals))
+  if (detrend) plt <- plt + geom_gratia_diagnostic_reference_hline(yintercept = 0, colour = line_col)
+  else plt <- plt + geom_gratia_diagnostic_reference_abline(intercept = 0, slope = 1, colour = line_col)
+  if ("lower" %in% names(data)) plt <- plt + geom_gratia_diagnostic_interval_ribbon(
     ggplot2::aes(ymin = .data$lower, ymax = .data$upper), fill = ci_col, alpha = ci_alpha)
   if (".family" %in% names(data) && !by_family) {
-    plt <- plt + ggplot2::geom_point(ggplot2::aes(colour = .data$.family), alpha = point_alpha) +
-      ggokabeito::scale_colour_okabe_ito(limits = gfam_diagnostic_labels(model),
-        drop = FALSE)
-  } else plt <- plt + ggplot2::geom_point(colour = point_col, alpha = point_alpha)
+    plt <- plt + geom_gratia_diagnostic_point(ggplot2::aes(colour = .data$.family), alpha = point_alpha) +
+      gratia_default_scale(ggokabeito::scale_colour_okabe_ito(limits = gfam_diagnostic_labels(model),
+        drop = FALSE))
+  } else plt <- plt + geom_gratia_diagnostic_point(colour = point_col, alpha = point_alpha)
   plt <- plt + ggplot2::labs(x = xlab %||% calibrated_reference_axis(type),
     y = ylab %||% paste0(diagnostic_residual_label(type),
       if (detrend) " (Deviation)" else ""),

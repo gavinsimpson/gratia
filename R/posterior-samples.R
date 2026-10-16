@@ -70,7 +70,7 @@
 #'   to singular.
 #'
 #' @details
-#' For Gaussian identity-link `bam` fits, first-order autoregressive (AR1) errors
+#' For Gaussian identity-link `bam` and `scam` fits, first-order autoregressive (AR1) errors
 #' make consecutive responses correlated. Responses are drawn together to retain
 #' this fitted correlation, restarting at each `AR.start` segment. These draws
 #' currently use the fitting observations only. For other families or links,
@@ -1899,15 +1899,7 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
     # Resolve calls before matrix construction and output-column selection.
     data <- prepare_smooth_data(model, sm, data)
     Xp <- smooth_predict_matrix(sm, data, model)
-    simu <- {
-      # In a scam model, the intercept seems to be parametrised into the
-      # smooth as PredictMat returns a constant column
-      if (isTRUE(length(idx) < ncol(Xp))) {
-        Xp[, -1, drop = FALSE] %*% t(betas[, idx, drop = FALSE])
-      } else {
-        Xp %*% t(betas[, idx, drop = FALSE])
-      }
-    }
+    simu <- Xp %*% t(betas[, idx, drop = FALSE])
     colnames(simu) <- paste0("..V", seq_len(NCOL(simu)))
     simu <- as_tibble(simu)
     nr_simu <- nrow(simu)

@@ -28,7 +28,7 @@
 \item{legend}{logical; should a legend by drawn to indicate basis functions?}
 
 \item{labeller}{a labeller function with which to label facets. The default
-is to use \code{\link[ggplot2:labellers]{ggplot2::label_both()}}.}
+is to use \code{\link[ggplot2:label_both]{ggplot2::label_both()}}.}
 
 \item{ylab}{character or expression; the label for the y axis. If not
 supplied, a suitable label will be generated from \code{object}.}
@@ -57,7 +57,8 @@ drawn passed to the \code{angle} argument of \code{\link[ggplot2:guide_axis]{ggp
 \item{n_contour}{numeric; the number of contour bins. Will result in
 \code{n_contour - 1} contour lines being drawn. See \code{\link[ggplot2:geom_contour]{ggplot2::geom_contour()}}.}
 
-\item{contour_col}{colour specification for contour lines.}
+\item{contour_col}{Deprecated; use \code{\link[=gratia_theme_get]{gratia_theme_get()}} theme
+settings instead. Colour specification for contour lines.}
 
 \item{...}{arguments passed to other methods. Not used by this method.}
 }

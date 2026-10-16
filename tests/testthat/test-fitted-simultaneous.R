@@ -133,7 +133,7 @@ test_that("BAM, GAMM and covariance fallback use the same joint calculation", {
 })
 
 test_that("unsupported simultaneous models keep their existing pointwise path", {
-  for (model in list(m_ocat, m_gaulss, m_ziP, m_scam)) {
+  for (model in list(m_ocat, m_gaulss, m_ziP)) {
     expect_error(fitted_values(model, interval = "simultaneous"), "not supported")
     expect_silent(fitted_values(model, interval = "confidence"))
   }

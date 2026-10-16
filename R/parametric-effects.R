@@ -136,6 +136,11 @@
                                      back_transform = FALSE, ...) {
   back_transform <- parametric_back_transform(back_transform, transform,
     supplied = !missing(back_transform))
+  # SCAM retains prediction variables in its terms, without pred.formula.
+  # Data recovery and prediction must use the same variables.
+  if (is.null(object$pred.formula)) {
+    object$pred.formula <- stats::delete.response(stats::terms(object))
+  }
   object <- with_model_envir(object, envir)
   envir <- model_envir(object)
   supplied_data <- !is.null(data)
@@ -305,7 +310,8 @@
 #'
 #' @param position Position adjustment, either as a string, or the result of a
 #'   call to a position adjustment function.
-#' @param line_col colour specification used for regression lines of linear
+#' @param line_col Deprecated; use [gratia_theme_get()] theme
+#'   settings instead. Colour specification used for regression lines of linear
 #'   continuous terms.
 #'
 #' @inheritParams draw.gam
@@ -338,9 +344,12 @@ draw.parametric_effects <- function(object,
                                     n_contour = NULL,
                                     surface = c("raster", "tile", "3d"),
                                     surface_3d = list(),
+                                    ci_3d = FALSE,
+                                    ci_3d_alpha = 0.15, ci_3d_col = "grey60",
                                     continuous_fill = NULL,
                                     discrete_colour = NULL, discrete_fill = NULL,
                                     back_transform = FALSE) {
+  gratia_plot_arguments(c("ci_col", "ci_alpha", "line_col", "contour_col", "ci_3d_alpha", "ci_3d_col"), environment())
   check_back_transform(back_transform)
   axis_info <- attr(object, "axis_info")
   from_raw <- isTRUE(attr(object, "back_transform"))
@@ -353,6 +362,7 @@ draw.parametric_effects <- function(object,
   }
   surface <- match.arg(surface)
   validate_surface_3d(surface_3d)
+  validate_ci_3d(ci_3d, ci_3d_alpha, ci_3d_col)
   check_surface_dots(match.call(expand.dots = FALSE))
   # Add CI
   crit <- coverage_normal(ci_level)
@@ -399,6 +409,7 @@ draw.parametric_effects <- function(object,
         back_transform = back_transform,
         contour = contour, contour_col = contour_col, n_contour = n_contour,
         surface = surface, surface_3d = surface_3d,
+        ci_3d = ci_3d, ci_3d_alpha = ci_3d_alpha, ci_3d_col = ci_3d_col,
         continuous_fill = continuous_fill,
         discrete_colour = discrete_colour, discrete_fill = discrete_fill
       )
@@ -456,6 +467,8 @@ draw.parametric_effects <- function(object,
                                      term_info = NULL,
                                      contour = TRUE, contour_col = "black",
                                      n_contour = NULL, surface = "raster", surface_3d = list(),
+                                     ci_3d = FALSE,
+                                     ci_3d_alpha = 0.15, ci_3d_col = "grey60",
                                      continuous_fill = NULL,
                                      discrete_colour = NULL, discrete_fill = NULL,
                                      axis_info = NULL, from_raw = FALSE,
@@ -477,6 +490,7 @@ draw.parametric_effects <- function(object,
       caption = caption, rug = rug, ylim = ylim, angle = angle,
       contour = contour, contour_col = contour_col, n_contour = n_contour,
       surface = surface, surface_3d = surface_3d,
+      ci_3d = ci_3d, ci_3d_alpha = ci_3d_alpha, ci_3d_col = ci_3d_col,
       continuous_fill = continuous_fill,
       discrete_colour = discrete_colour, discrete_fill = discrete_fill))
   }
@@ -519,14 +533,14 @@ draw.parametric_effects <- function(object,
   )
 
   # base plot
-  plt <- ggplot(
+  plt <- gratia_plot(
     object,
     aes(x = .data[[x_val]], y = .data$.partial)
   ) +
     guides(x = guide_axis(angle = angle))
 
   if (is_fac) {
-    plt <- plt + geom_pointrange(aes(
+    plt <- plt + geom_gratia_effect_pointrange(aes(
       ymin = .data$.lower_ci,
       ymax = .data$.upper_ci
     ))
@@ -536,21 +550,21 @@ draw.parametric_effects <- function(object,
         observed <- display_parametric_axes(attr(axes, "observed"), axes,
           from_raw = TRUE, back_transform = back_transform)$data
         if (!is.null(observed)) {
-          plt <- plt + geom_rug(data = observed, inherit.aes = FALSE,
+          plt <- plt + geom_gratia_rug(data = observed, inherit.aes = FALSE,
             aes(x = .data$.value), sides = "b", position = position, alpha = 0.5)
         }
       } else {
-        plt <- plt + geom_rug(sides = "b", position = position, alpha = 0.5)
+        plt <- plt + geom_gratia_rug(sides = "b", position = position, alpha = 0.5)
       }
     }
-    plt <- plt + geom_ribbon(
+    plt <- plt + geom_gratia_interval_ribbon(
       aes(
         ymin = .data$.lower_ci,
         ymax = .data$.upper_ci
       ),
       alpha = ci_alpha, fill = ci_col, colour = NA
     ) +
-      geom_line(colour = line_col)
+      geom_gratia_effect_line(colour = line_col)
   }
 
   ## default axis labels if none supplied

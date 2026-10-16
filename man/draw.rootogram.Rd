@@ -31,7 +31,8 @@
 
 \item{warn_limits}{logical; draw Tukey's warning limit lines at +/- 1?}
 
-\item{fitted_colour, bar_colour, bar_fill, ref_line_colour, warn_line_colour}{colours used to draw the respective element of the rootogram.}
+\item{fitted_colour, bar_colour, bar_fill, ref_line_colour, warn_line_colour}{Deprecated; use \code{\link[=gratia_theme_get]{gratia_theme_get()}} theme settings instead. Colours used
+to draw the respective element of the rootogram.}
 
 \item{xlab, ylab}{character; labels for the x and y axis of the rootogram.
 May be missing (\code{NULL}), in which case suitable labels will be used.

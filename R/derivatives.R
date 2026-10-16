@@ -1235,8 +1235,9 @@
 #' Delta uncertainty supports single-linear-predictor `gam` and `bam` models
 #' with an ordinary scalar inverse-link mean (including negative binomial,
 #' Tweedie, beta regression, and scaled t families), and `gamm` via its GAM
-#' component. It is not supported for `scam` or general multi-predictor families;
-#' their existing simulation support is unchanged.
+#' component. SCAM models use transformed-coefficient covariance conditional on
+#' the fitted smoothing parameters. General multi-predictor families do not
+#' support delta uncertainty; their existing simulation support is unchanged.
 #' The `uncertainty` attribute records the selected method.
 #'
 #' @examples

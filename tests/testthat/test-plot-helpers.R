@@ -7,7 +7,7 @@ test_that("curve layers preserve interval mappings and surrounding layers", {
     ribbon_mapping = ggplot2::aes(fill = f, colour = NULL, y = NULL),
     ribbon_alpha = 0.4) + ggplot2::geom_rug()
   expect_equal(unname(vapply(p$layers, function(l) class(l$geom)[1L], character(1))),
-    c("GeomHline", "GeomRibbon", "GeomLine", "GeomRug"))
+    c("GeomHline", "GeomGratiaInterval", "GeomGratiaSmooth", "GeomRug"))
   b <- ggplot2::ggplot_build(p)
   expect_equal(b$data[[2]]$ymin, d$lo)
   expect_equal(b$data[[2]]$ymax, d$hi)
@@ -18,8 +18,8 @@ test_that("curve layers preserve interval mappings and surrounding layers", {
   line <- add_curve_interval(ggplot2::ggplot(d, ggplot2::aes(x, y)),
     line_colour = "red", line_alpha = 0.3)
   expect_length(line$layers, 1L)
-  expect_equal(line$layers[[1]]$aes_params$colour, "red")
-  expect_equal(line$layers[[1]]$aes_params$alpha, 0.3)
+  expect_equal(unique(ggplot2::ggplot_build(line)$data[[1]]$colour), "red")
+  expect_equal(unique(ggplot2::ggplot_build(line)$data[[1]]$alpha), 0.3)
 })
 
 test_that("layout defaults preserve explicit dimensions and zero-panel behaviour", {
@@ -36,6 +36,7 @@ test_that("layout defaults preserve explicit dimensions and zero-panel behaviour
 })
 
 test_that("derivative panels retain selection, interval limits and patchwork options", {
+  withr::local_options(lifecycle_verbosity = "quiet")
   d <- tibble::tibble(.smooth = rep(c("s(x)", "s(z)"), each = 5),
     .fs = NA_character_, x = rep(1:5, 2), z = rep(2:6, 2),
     .derivative = c(1:5, 11:15), .lower_ci = .derivative - 1,

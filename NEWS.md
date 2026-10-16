@@ -2,6 +2,16 @@
 
 ## User visible changes
 
+* Plot aesthetic arguments for colours, opacity and line widths are deprecated
+  in favour of ggplot2 component themes (#215). Existing default appearances are
+  unchanged, and explicitly supplied arguments remain fixed overrides during
+  migration. Apply `theme()` with `&` to every panel in a patchwork, or with `+`
+  to a single plot. For example, replace `smooth_col` with
+  `geom.gratia.smooth = element_geom(colour = ...)` and `ci_alpha` with
+  `gratia.alpha.interval` inside `theme()`. See `gratia_theme_get()` and the
+  Customizing plots article for migration examples. gratia now requires
+  ggplot2 >= 4.0.3 and patchwork >= 1.3.2.
+
 * Native `mgcv::scasm()` smooth estimation, drawing and `confint()` now default to
   `overall_uncertainty = FALSE`. An explicit request for unavailable overall
   mean uncertainty warns once (#372, #373).
@@ -104,6 +114,48 @@
   The calculation follows Liu and Zhang (2018), requires no additional package,
   and preserves accuracy in extreme tails (#359).
 
+* Plots now support native ggplot2 theme settings for smooths, intervals,
+  residuals, diagnostics and other components, including completed patchwork
+  figures. `gratia_theme_get()`, `gratia_theme_set()` and
+  `gratia_theme_update()` manage the optional `gratia.plot.theme` override.
+  `gratia_palette()` provides optional Paul Tol palettes. Current default
+  appearances are retained, including group legends without symbols for
+  fixed-colour partial residuals (#215).
+* All 41 smooth constructors in scam 1.2-22 are supported for smooth estimates,
+  bases, sampling and plots, including bivariate smooths, cyclic margins,
+  interactions and explicit `By` classes. `draw()` and `assemble()` accept
+  `centre = "plot"` to match scam's centring of bivariate displays; the default
+  retains the fitted function. SCAM `smooth_type()` labels use compact
+  descriptions such as `P spline (inc)` and `Tensor (inc, free)`.
+  Saved estimates with earlier type labels remain drawable.
+  Plot captions describe the basis and constraints separately, using arrows
+  for monotonicity, covariate names for tensor constraints and fitted change
+  points for local constraints. Saved smooth estimates retain these captions.
+
+* SCAM models gain conditional simultaneous smooth bands, derivatives,
+  contrasts, conditional predictions, parametric effects, residual helpers,
+  model summaries, concurvity, penalties and variance-component ratios.
+  Independent-response likelihoods, LOO/WAIC, supplied coefficient draws and
+  scalable posterior predictive plots are also supported. See the SCAM
+  support article for supported combinations and uncertainty calculations.
+
+* `shape_intervals()` applies monotone rearrangement and convex or concave
+  envelopes to existing interval endpoints on a finite grid. Supported scasm
+  smooths expose this through `interval_method = "shape"` and an explicit
+  Gaussian or stored-bootstrap initial source. The transformation preserves
+  whole-grid containment events; it does not establish nominal coverage or
+  preserve marginal coverage of pointwise limits. `shape_confidence_set()`
+  and `in_shape_set()` represent and inspect intersections with coefficient
+  inequalities and equalities. See the shape-constrained intervals article
+  for supported combinations, tensor requirements and examples (#372, #373).
+  `draw()` and `assemble()` also accept `frequentist` for the initial smooth
+  covariance calculation.
+  General `pc` replacements and derivative bases are rejected when they do
+  not justify the named function shape. Curvature requires equally spaced
+  fitted knots to rounding precision, and extrapolation is rejected.
+  Convex envelope interpolation preserves exactly flat segments. Saved
+  estimates reject interval computation controls that require the fitted model.
+
 * `interval_method` selects native scasm bootstrap or Gaussian pointwise
   intervals for smooths, fitted values, smooth derivatives and `confint()`.
   Shifting or transforming smooth confidence intervals retains asymmetric limits.
@@ -114,6 +166,9 @@
 * Scasm captions show retained shape constraints with portable mathematical
   arrows. Saved estimates retain constraint metadata for each tensor margin;
   ignored requests are labelled and produce a warning (#373).
+  This includes named requests replaced by general `pc` inequalities.
+  Shape-enforced intervals keep the basis and constraint caption without
+  adding interval details; those remain in the documentation and metadata.
 
 * Gaussian simultaneous bands now support positive-semidefinite coefficient
   covariance matrices, including scasm fits with exact equality constraints.
@@ -444,6 +499,11 @@
   ggcube's theme. Lighting defaults to `backface_scale = 1`; supply a custom
   `light` through `surface_3d` to override it. Opaque faces, contours and
   floor observations share depth ordering so hidden features are occluded.
+  Set `ci_3d = TRUE` to add translucent lower and upper interval surfaces to
+  smooths and numeric parametric interactions across supported model classes.
+  `ci_3d_alpha` and `ci_3d_col` style the bounds independently of curve ribbons.
+  Interval surfaces retain the estimate's mesh and masking; their heights
+  expand the vertical range without training the continuous fill scale.
 
 * `draw()` and `assemble()` now accept `surface = "tile"` to draw flat smooth
   surfaces with vector rectangles; the default remains `surface = "raster"`
@@ -510,6 +570,13 @@
 
 ## Bug fixes
 
+* Direct calls to `smooth_estimates()` now work for `GJRM::gamlss()` models
+  (#352). Estimates use the final fitted coefficients and covariance, with
+  smooth selection across equations and parameter labels retained for drawing
+  saved estimates. Frequentist covariance also comes from the final fit;
+  unavailable smoothing-parameter corrections warn and use its Bayesian
+  covariance.
+
 * B-spline evaluation handles empty data and factor-by calls whose evaluation
   data omit fitted levels, including constrained tensor products.
 
@@ -532,10 +599,16 @@
   covariance with the smooth; `FALSE` includes smooth uncertainty alone.
   `unconditional = TRUE` now gives an explicit error because SCAM calculations
   do not support smoothing-parameter uncertainty.
+  Smooth and full-model predictions now share coefficient mappings, including
+  endpoint and local constraints. Formula transformations, offsets and missing
+  training rows retain their fitted meaning. The `mifo` smooth is rendered.
 
-* Scalable posterior predictive plots for SCAM models now give an explicit
-  error explaining that `scalable = FALSE` is required. Ordinary posterior
-  predictive plots remain available.
+* SCAM coefficient draws now sample unrestricted fitting parameters and apply
+  the fitted positivity transformation, preserving the smooth constraints.
+  Singular positive semidefinite covariance matrices are supported; invalid
+  covariance matrices and non-finite transformed draws give explicit errors.
+  Gaussian AR1 response simulation now uses fitted correlation and series
+  boundaries instead of drawing independent responses.
 
 * Partial derivatives, fitted samples and smooth samples of soap-film smooths
   include the contribution from known boundary values. Complete-predictor

@@ -25,6 +25,9 @@
   n_contour = NULL,
   surface = c("raster", "tile", "3d"),
   surface_3d = list(),
+  ci_3d = FALSE,
+  ci_3d_alpha = 0.15,
+  ci_3d_col = "grey60",
   continuous_fill = NULL,
   discrete_colour = NULL,
   discrete_fill = NULL,
@@ -39,13 +42,16 @@ or separate ranges (\code{free}). Surface covariate axes are not affected.}
 
 \item{ci_level}{numeric between 0 and 1; the coverage of credible interval.}
 
-\item{ci_col}{colour specification for the confidence/credible intervals
+\item{ci_col}{Deprecated; use \code{\link[=gratia_theme_get]{gratia_theme_get()}} theme
+settings instead. Colour specification for the confidence/credible intervals
 band. Affects the fill of the interval.}
 
-\item{ci_alpha}{numeric; alpha transparency for confidence or simultaneous
+\item{ci_alpha}{Deprecated; use \code{\link[=gratia_theme_get]{gratia_theme_get()}} theme
+settings instead. Numeric; alpha transparency for confidence or simultaneous
 interval.}
 
-\item{line_col}{colour specification used for regression lines of linear
+\item{line_col}{Deprecated; use \code{\link[=gratia_theme_get]{gratia_theme_get()}} theme
+settings instead. Colour specification used for regression lines of linear
 continuous terms.}
 
 \item{constant}{numeric; a constant to add to the estimated values of the
@@ -54,7 +60,9 @@ before the confidence band is computed.}
 
 \item{fun}{function; a function that will be applied to the estimated values
 and confidence interval before plotting. Can be a function or the name of a
-function. Function \code{fun} will be applied after adding any \code{constant}, if
+function. For simultaneous bands it must be monotone over the entire band;
+endpoint transformation alone does not preserve non-monotone band coverage.
+Function \code{fun} will be applied after adding any \code{constant}, if
 provided.}
 
 \item{rug}{logical; draw a rug plot at the bottom of each plot for 1-D
@@ -77,7 +85,8 @@ spread the plots}
 \item{contour}{logical; should contours be draw on the plot using
 \code{\link[ggplot2:geom_contour]{ggplot2::geom_contour()}}.}
 
-\item{contour_col}{colour specification for contour lines.}
+\item{contour_col}{Deprecated; use \code{\link[=gratia_theme_get]{gratia_theme_get()}} theme
+settings instead. Colour specification for contour lines.}
 
 \item{n_contour}{numeric; the number of contour bins. Will result in
 \code{n_contour - 1} contour lines being drawn. See \code{\link[ggplot2:geom_contour]{ggplot2::geom_contour()}}.}
@@ -103,6 +112,19 @@ These options affect all 3D panels in a call. For different views per term,
 modify individual plots returned by \code{\link[=assemble]{assemble()}}. The \code{dist} entry here
 controls perspective; the top-level \code{dist} argument controls masking.}
 
+\item{ci_3d}{logical; add lower and upper interval surfaces to numeric
+smooth and parametric effect panels when \code{surface = "3d"}? Defaults to
+\code{FALSE}. Applies across supported model classes and conditioning facets.
+Other panel types, including standard errors, retain their usual display.
+Smooth bounds follow \code{interval}; parametric bounds remain pointwise.}
+
+\item{ci_3d_alpha}{Deprecated; use \code{\link[=gratia_theme_get]{gratia_theme_get()}} theme
+settings instead. Numeric between 0 and 1; opacity of both interval
+surfaces, independent of \code{ci_alpha}. Defaults to \code{0.15}.}
+
+\item{ci_3d_col}{Deprecated; use \code{\link[=gratia_theme_get]{gratia_theme_get()}} theme
+settings instead. One R colour; fill of both interval surfaces, independent
+of \code{ci_col} and the estimate's continuous fill scale. Defaults to \code{"grey60"}.}
 
 \item{continuous_fill}{a suitable fill scale to be used when plotting
 continuous variables.}

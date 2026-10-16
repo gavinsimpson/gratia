@@ -49,17 +49,17 @@ plot_smooth.mrf_smooth <- function(object, variables = NULL,
       caption = caption, angle = angle, ylim = ylim)
     if (grouped) {
       plt <- plt + ggplot2::aes(group = .data[[by_var]])
-      if (isTRUE(qq_line)) plt <- plt + ggplot2::geom_qq_line()
+      if (isTRUE(qq_line)) plt <- plt + geom_gratia_reference_qq_line()
     }
   } else {
     object <- add_constant(object, constant = constant)
     object <- transform_fun(object, fun = fun)
     object <- order_interval_bounds(object)
-    plt <- ggplot2::ggplot(object,
+    plt <- gratia_plot(object,
       ggplot2::aes(x = .data[[variables]], y = .data$.estimate)) +
-      ggplot2::geom_linerange(ggplot2::aes(ymin = .data$.lower_ci,
+      geom_gratia_smooth_linerange(ggplot2::aes(ymin = .data$.lower_ci,
         ymax = .data$.upper_ci), colour = ci_col) +
-      ggplot2::geom_point(colour = smooth_col) +
+      geom_gratia_smooth_point(colour = smooth_col) +
       ggplot2::guides(x = ggplot2::guide_axis(angle = angle)) +
       prepare_smooth_labels(object, x_var = variables, xlab = xlab,
         ylab = ylab, title = title, subtitle = subtitle, caption = caption,

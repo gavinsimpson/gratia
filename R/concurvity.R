@@ -130,8 +130,10 @@
 #' @param caption character; the plot caption
 #' @param fill_lab character; the label to use for the fill guide.
 #' @param continuous_colour function; continuous colour (fill) scale to use.
-#' @param bar_col colour specification for the bar colour.
-#' @param bar_fill colour specification for the bar fill
+#' @param bar_col Deprecated; use [gratia_theme_get()] theme
+#'   settings instead. Colour specification for the bar colour.
+#' @param bar_fill Deprecated; use [gratia_theme_get()] theme
+#'   settings instead. Colour specification for the bar fill
 #' @param ... arguments passed to other methods.
 #'
 #' @export
@@ -143,7 +145,7 @@
                                        x_lab = "Term", y_lab = "With",
                                        fill_lab = "Concurvity",
                                        continuous_colour = NULL, ...) {
-  plt <- ggplot(
+  plt <- gratia_plot(
     object,
     aes(
       x = .data[[".term"]],
@@ -151,7 +153,7 @@
       group = .data[[".type"]]
     )
   ) +
-    geom_tile(aes(fill = .data[[".concurvity"]])) +
+    geom_gratia_surface_tile(aes(fill = .data[[".concurvity"]])) +
     facet_wrap(vars(.data[[".type"]])) +
     coord_equal()
 
@@ -162,7 +164,7 @@
     )
 
   if (is.null(continuous_colour)) {
-    continuous_colour <- scale_fill_viridis_c(option = "cividis")
+    continuous_colour <- gratia_default_scale(scale_fill_viridis_c(option = "cividis"))
   }
   plt <- plt + continuous_colour
 
@@ -178,12 +180,13 @@
                                       x_lab = NULL,
                                       bar_col = "steelblue", bar_fill = "steelblue",
                                       ...) {
-  plt <- ggplot(object, aes(
+  gratia_plot_arguments(c("bar_col", "bar_fill"), environment())
+  plt <- gratia_plot(object, aes(
     x = .data[[".term"]],
     y = .data[[".concurvity"]],
     group = .data[[".type"]]
   )) +
-    geom_col(colour = bar_col, fill = bar_fill) +
+    geom_gratia_concurvity_bar_col(colour = bar_col, fill = bar_fill) +
     facet_wrap(vars(.data[[".type"]])) +
     labs(
       title = title, subtitle = subtitle, caption = caption,

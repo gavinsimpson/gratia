@@ -3,6 +3,7 @@
 \name{smooth_estimates}
 \alias{smooth_estimates}
 \alias{smooth_estimates.gam}
+\alias{smooth_estimates.gamlss}
 \title{Evaluate smooths at covariate values}
 \usage{
 smooth_estimates(object, ...)
@@ -30,18 +31,28 @@ smooth_estimates(object, ...)
   n_sim = 10000,
   n_cores = 1,
   seed = NULL,
-  interval_method = c("auto", "gaussian", "bootstrap"),
+  interval_method = c("auto", "gaussian", "bootstrap", "shape"),
+  shape_source = c("gaussian", "bootstrap"),
   ...
+)
+
+\method{smooth_estimates}{gamlss}(
+  object,
+  select = NULL,
+  smooth = deprecated(),
+  ...,
+  partial_match = FALSE
 )
 }
 \arguments{
-\item{object}{an object of class \code{"gam"} or \code{"gamm"}.}
+\item{object}{a fitted model, including objects of class \code{"gam"}, \code{"gamm"}
+or models fitted by \code{\link[GJRM:gamlss]{GJRM::gamlss()}}.}
 
 \item{...}{arguments passed to other methods.}
 
-\item{select}{character; select which smooth's posterior to draw from.
-The default (\code{NULL}) means the posteriors of all smooths in \code{model}
-will be sampled from. If supplied, a character vector of requested terms.}
+\item{select}{character, numeric or logical; smooths to evaluate, using labels
+from \code{\link[=smooths]{smooths()}} or indices in fitted smooth order. The default (\code{NULL})
+evaluates all smooths.}
 
 \item{smooth}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{select} instead.}
 
@@ -130,7 +141,13 @@ selected smooth order and parallel evaluation scheduling.}
 \item{interval_method}{character; "auto" uses stored scasm bootstrap draws
 for pointwise intervals when available, and Gaussian intervals otherwise.
 Use "gaussian" to request covariance-based limits or "bootstrap" to
-require stored draws. Simultaneous bootstrap bands are not supported.}
+require stored draws. Simultaneous bootstrap bands are not supported.
+\code{"shape"} applies \code{\link[=shape_intervals]{shape_intervals()}} to supported scasm smooth components,
+using the initial limits chosen by \code{shape_source}.}
+
+\item{shape_source}{character; initial uncertainty for \code{interval_method = "shape"}: \code{"gaussian"} (the default) or stored \code{"bootstrap"} pointwise
+limits. Bootstrap sources require \code{frequentist = FALSE} and
+\code{unconditional = FALSE} because the stored draws hold smoothing fixed.}
 }
 \value{
 A data frame (tibble), which is of class \code{"smooth_estimates"}.
@@ -143,6 +160,17 @@ implementation of \code{evaluate_smooth()}, and replaces that function, which ha
 been removed from the package.
 }
 \details{
+For \code{\link[GJRM:gamlss]{GJRM::gamlss()}} models, smooths are evaluated in equation and smooth
+order using the final fitted GJRM coefficients and covariance matrices.
+Selection uses the model-wide labels returned by \code{\link[=smooths]{smooths()}}, including
+suffixes such as \code{s.1(x)} for repeated labels. Equations without smooths
+are skipped; a model without any smooths gives an error. All grid, data,
+environment, coordinate transformation and interval controls are passed to
+the GAM method for each selected equation. \code{frequentist = TRUE} uses the
+final GJRM frequentist covariance. A smoothing-parameter uncertainty
+correction is unavailable: \code{unconditional = TRUE} warns and uses the
+uncorrected final covariance, as for GAMs without that correction.
+
 For distributional and glmmTMB models with multiple linear predictors,
 an optional \code{.model} column identifies the model part or parameter
 associated with each smooth. This display metadata is retained in nested
@@ -160,7 +188,6 @@ separate coverage sets when grouped in one plot. This finite-grid band does
 not claim joint coverage across selected smooths or the full fitted model.
 Increasing grid resolution improves the approximation to whole-curve coverage.
 \code{overall_uncertainty} and covariance options apply to both interval types.
-Simultaneous intervals for SCAM models are unsupported.
 SCAM smooth estimates retain the fitted centring and coefficient
 transformation when evaluation points are changed. Pointwise intervals use
 the covariance of the constrained coefficients. With
@@ -185,6 +212,50 @@ inequalities for each fitted smooth and tensor margin. Captions use
 plotmath arrows for increasing and decreasing constraints while \code{.type}
 and \code{\link[=smooth_type]{smooth_type()}} keep their existing basis names. Unsupported tensor
 requests produce a warning and are labelled as not retained.
+
+SCAM captions describe the basis and its constraints separately from the
+compact \code{.type} values. Increasing and decreasing constraints use plotmath
+arrows. Tensor captions name each covariate and its constraint; local
+constraints include the fitted change point. The \code{scam_smooth_info}
+attribute preserves these descriptions when plotting saved estimates.
+
+Shape enforcement is explicit and leaves the existing interval defaults
+unchanged. It preserves containment of a shape-restricted target whenever
+the entire initial band contains that target on the evaluation grid. This
+does not establish nominal coverage of the initial band, or preserve
+marginal coverage of transformed pointwise limits. The default Gaussian
+source uses approximate Bayesian covariance and does not construct a
+constrained posterior. Standard errors describe the initial calculation;
+\code{.crit} is \code{NA} after shape enforcement. Metadata records the initial source,
+correction, named shapes, model coordinates and whole-grid guarantee.
+
+Every selected term must have retained named scasm restrictions. Supported
+combinations are positivity, monotonicity in any directions and curvature
+in at most one direction. Tensor smooths require \code{te(..., np = FALSE)} with
+univariate B-spline margins (\code{"sc"} or \code{"bs"}). Normal reparameterisation
+and other complementary bases can invalidate the named surface shape even
+when coefficient inequalities were retained. Curvature additionally
+requires equally spaced fitted knots to rounding precision and degree at
+least two. Irregular evaluation
+coordinates are supported. Complete product grids, finite endpoints and
+evaluation inside the fitted B-spline domains are required; use \code{dist = 0}
+for tensors. Numeric \code{by} variables are unsupported; factor-by components
+and separate linear predictors are treated separately.
+Function-valued bases are required; derivative bases are unsupported.
+General \code{pc} inequalities can replace the named coefficient restrictions
+while leaving their original \code{xt} request in the fitted object. These
+replacements are labelled as general constraints and rejected for automatic
+shape intervals. Point equalities that retain the named inequalities are
+supported.
+
+Shape intervals use component-only uncertainty: explicit
+\code{overall_uncertainty = TRUE}, effect shifts and effect transformations are
+rejected. Coordinate transformations used in the model remain supported;
+their named shapes concern model coordinates. The transformed endpoints
+need not belong to the fitted spline space or obey centring equalities.
+See \code{\link[=shape_confidence_set]{shape_confidence_set()}} for explicit coefficient restrictions and the
+\href{https://gavinsimpson.github.io/gratia/articles/shape-constrained-intervals.html}{shape-constrained intervals article}
+for examples.
 
 Smoothing-parameter uncertainty is not currently supported for SCAM models;
 use \code{unconditional = FALSE}.
@@ -230,6 +301,16 @@ smooth_estimates(m1)
 
 ## or selected smooths
 smooth_estimates(m1, select = c("s(x0)", "s(x1)"))
+
+# Direct evaluation of a GJRM distributional model
+if (requireNamespace("GJRM", quietly = TRUE)) {
+  set.seed(82)
+  d <- data.frame(x = runif(100), z = runif(100))
+  d$y <- sin(6 * d$x) + rnorm(100, sd = exp(0.3 * d$z))
+  m <- GJRM::gamlss(list(y ~ s(x, k = 4), ~ s(z, k = 4)), data = d)
+  estimates <- smooth_estimates(m, n = 50)
+  draw(estimates)
+}
 
 # parallel processing of smooths
 if (requireNamespace("mirai") && requireNamespace("carrier")) {

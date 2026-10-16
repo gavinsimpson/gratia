@@ -258,6 +258,10 @@ simulate.gamm <- function(object, nsim = 1, seed = NULL, data = newdata,
 #' @export
 `simulate.scam` <- function(object, nsim = 1, seed = NULL, data = newdata,
                             weights = NULL, ..., newdata = NULL, envir = NULL) {
+  if (!is.null(object$AR1.rho) && object$AR1.rho != 0 && !is.null(data)) {
+    stop("AR1 response draws require fitting observations; a joint correlation structure for new data is not defined.",
+      call. = FALSE)
+  }
   out <- simulate.gam(object, nsim = nsim, seed = seed, data = data,
                       weights = weights, ..., newdata = newdata, envir = envir)
   rng <- attr(out, "seed")

@@ -69,13 +69,18 @@
 #'   [ggplot2::labs()]. May be a vector, one per penalty.
 #' @param caption character or expression; the plot caption. See
 #'   [ggplot2::labs()]. May be a vector, one per penalty.
-#' @param ci_col fill colour for reference intervals, including bands for
+#' @param ci_col Deprecated; use [gratia_theme_get()] theme
+#'   settings instead. Fill colour for reference intervals, including bands for
 #'   quantile residuals.
-#' @param ci_alpha alpha transparency for reference intervals.
-#' @param point_col constant point colour when family components are not mapped
+#' @param ci_alpha Deprecated; use [gratia_theme_get()] theme
+#'   settings instead. Alpha transparency for reference intervals.
+#' @param point_col Deprecated; use [gratia_theme_get()] theme
+#'   settings instead. Constant point colour when family components are not mapped
 #'   to colour. Pooled grouped diagnostics instead colour points by component.
-#' @param point_alpha alpha transparency of points on the QQ plot.
-#' @param line_col colour used to draw the reference line.
+#' @param point_alpha Deprecated; use [gratia_theme_get()] theme
+#'   settings instead. Alpha transparency of points on the QQ plot.
+#' @param line_col Deprecated; use [gratia_theme_get()] theme
+#'   settings instead. Colour used to draw the reference line.
 #' @param ... arguments passed to other methods.
 #'
 #' @note The wording used in [mgcv::qq.gam()] uses *direct* in reference to the
@@ -202,6 +207,7 @@ qq_plot.default <- function(model, ...) {
   point_alpha = 1,
   line_col = "red", by_family = NULL, conditioning = NULL, ..., n_dharma = 250L
 ) {
+  gratia_plot_arguments(c("ci_col", "ci_alpha", "point_col", "point_alpha", "line_col"), environment())
   if (!is.null(type)) type <- diagnostic_type(model, type)
   if (identical(type, "dharma") ||
       (is.null(type) && identical(attr(model, "gratia.default_residual_type"), "dharma"))) {
@@ -269,7 +275,7 @@ qq_plot.default <- function(model, ...) {
   }
   caption <- caption %||% diagnostic_qq_caption(model, df)
   ## base plot
-  plt <- ggplot(df, aes(
+  plt <- gratia_plot(df, aes(
     x = .data$theoretical,
     y = .data$residuals
   ))
@@ -290,14 +296,14 @@ qq_plot.default <- function(model, ...) {
 
   if (method == "normal" && ".family" %in% names(df)) {
     lines <- unique(df[c(".family", ".qq_slope", ".qq_intercept")])
-    plt <- plt + geom_abline(data = lines,
+    plt <- plt + geom_gratia_diagnostic_reference_abline(data = lines,
       aes(slope = .data$.qq_slope, intercept = .data$.qq_intercept), col = line_col)
   } else {
-    plt <- plt + geom_abline(slope = qq_slope, intercept = qq_intercept, col = line_col)
+    plt <- plt + geom_gratia_diagnostic_reference_abline(slope = qq_slope, intercept = qq_intercept, col = line_col)
   }
   ## add reference interval
   if (all(c("lower", "upper") %in% names(df))) {
-    plt <- plt + geom_ribbon(
+    plt <- plt + geom_gratia_diagnostic_interval_ribbon(
       aes(
         ymin = .data$lower,
         ymax = .data$upper,
@@ -308,7 +314,7 @@ qq_plot.default <- function(model, ...) {
     )
   }
   ## add point layer
-  plt <- plt + geom_point(colour = point_col, alpha = point_alpha,
+  plt <- plt + geom_gratia_diagnostic_point(colour = point_col, alpha = point_alpha,
       data = function(d) d[stats::complete.cases(d), , drop = FALSE])
   ## add labels
   plt <- plt + labs(
@@ -532,10 +538,13 @@ qq_uniform <- function(model, n = 10,
 #'   [ggplot2::labs()].
 #' @param caption character or expression; the plot caption. See
 #'   [ggplot2::labs()].
-#' @param point_col constant point colour when components are not mapped to
+#' @param point_col Deprecated; use [gratia_theme_get()] theme
+#'   settings instead. Constant point colour when components are not mapped to
 #'   colour. Pooled grouped diagnostics instead colour points by component.
-#' @param point_alpha numeric; alpha transparency for points in plots.
-#' @param line_col colour specification for 1:1 line.
+#' @param point_alpha Deprecated; use [gratia_theme_get()] theme
+#'   settings instead. Numeric; alpha transparency for points in plots.
+#' @param line_col Deprecated; use [gratia_theme_get()] theme
+#'   settings instead. Colour specification for 1:1 line.
 #' @param by_family logical or `NULL`; separate indexed grouped-family components
 #'   into facets. The default pools quantile residuals with component colours
 #'   and facets traditional residuals. `TRUE` and `FALSE` explicitly select the
@@ -578,6 +587,7 @@ qq_uniform <- function(model, n = 10,
   rank = NULL,
   conditioning = NULL, ..., n_dharma = 250L
 ) {
+  gratia_plot_arguments(c("point_col", "point_alpha", "line_col"), environment())
   model <- diagnostic_plot_source(model, type = type, seed = seed, conditioning = conditioning, n_dharma = if (missing(n_dharma)) NULL else n_dharma, ...)
   original <- model
   model <- model_used_rows(model)
@@ -621,20 +631,20 @@ qq_uniform <- function(model, n = 10,
   df <- diagnostic_component_data(data.frame(eta = unname(eta), residuals = unname(r)), original)
   df <- diagnostic_predictor_data(df, original, by_family, rank)
   coloured <- is_gfam_family(family(model)) && !by_family
-  plt <- ggplot(df, aes(
+  plt <- gratia_plot(df, aes(
     x = .data$eta,
     y = .data$residuals
   )) +
-    geom_hline(yintercept = y_intercept, col = line_col)
+    geom_gratia_diagnostic_reference_hline(yintercept = y_intercept, col = line_col)
 
   ## add point layer
   if (coloured) {
-    plt <- plt + geom_point(aes(colour = .data$.family), alpha = point_alpha,
+    plt <- plt + geom_gratia_diagnostic_point(aes(colour = .data$.family), alpha = point_alpha,
       data = function(d) d[stats::complete.cases(d), , drop = FALSE]) +
-      ggokabeito::scale_colour_okabe_ito(limits = gfam_diagnostic_labels(original),
-        drop = FALSE)
+      gratia_default_scale(ggokabeito::scale_colour_okabe_ito(limits = gfam_diagnostic_labels(original),
+        drop = FALSE))
   } else {
-    plt <- plt + geom_point(colour = point_col, alpha = point_alpha,
+    plt <- plt + geom_gratia_diagnostic_point(colour = point_col, alpha = point_alpha,
       data = function(d) d[stats::complete.cases(d), , drop = FALSE])
   }
 
@@ -684,6 +694,7 @@ qq_uniform <- function(model, n = 10,
   by_family = NULL,
   conditioning = NULL, ...
 ) {
+  gratia_plot_arguments(c("point_col", "point_alpha"), environment())
   model <- diagnostic_plot_source(model, type = "response", conditioning = conditioning, ...)
   original <- model
   model <- model_used_rows(model)
@@ -709,13 +720,13 @@ qq_uniform <- function(model, n = 10,
   df <- data.frame(observed = unname(obs), fitted = unname(fit))
 
   ## base plot
-  plt <- ggplot(df, aes(
+  plt <- gratia_plot(df, aes(
     x = .data$fitted,
     y = .data$observed
   ))
 
   ## add point layer
-  plt <- plt + geom_point(colour = point_col, alpha = point_alpha,
+  plt <- plt + geom_gratia_diagnostic_point(colour = point_col, alpha = point_alpha,
       data = function(d) d[stats::complete.cases(d), , drop = FALSE])
 
   ## add labels
@@ -807,7 +818,7 @@ qq_uniform <- function(model, n = 10,
   }
 
   ## base plot
-  plt <- ggplot(df, aes(x = .data$residuals))
+  plt <- gratia_plot(df, aes(x = .data$residuals))
 
   ## add point layer
   if (pooled) {
@@ -817,21 +828,21 @@ qq_uniform <- function(model, n = 10,
     limits <- range(c(valid, 0))
     if (diff(limits) == 0) limits <- limits + c(-.5, .5)
     breaks <- seq(limits[1L], limits[2L], length.out = max(2L, n_bins + 1L))
-    plt <- plt + geom_histogram(aes(y = ggplot2::after_stat(.data$density), fill = .data$.family),
+    plt <- plt + geom_gratia_histogram(aes(y = ggplot2::after_stat(.data$density), fill = .data$.family),
       data = function(d) d[is.finite(d$residuals), , drop = FALSE],
       breaks = breaks, colour = NA, position = "identity", alpha = .15) +
-      ggplot2::geom_step(
+      geom_gratia_histogram_step(
         aes(y = ggplot2::after_stat(.data$density), colour = .data$.family),
         data = function(d) d[is.finite(d$residuals), , drop = FALSE],
         stat = "bin", breaks = breaks, pad = TRUE, position = "identity",
         direction = "mid", linewidth = .6, alpha = 1) +
-      ggokabeito::scale_fill_okabe_ito(limits = gfam_diagnostic_labels(original),
-        drop = FALSE) +
-      ggokabeito::scale_colour_okabe_ito(limits = gfam_diagnostic_labels(original),
-        drop = FALSE) +
+      gratia_default_scale(ggokabeito::scale_fill_okabe_ito(limits = gfam_diagnostic_labels(original),
+        drop = FALSE)) +
+      gratia_default_scale(ggokabeito::scale_colour_okabe_ito(limits = gfam_diagnostic_labels(original),
+        drop = FALSE)) +
       labs(fill = "Family component", colour = "Family component")
   } else {
-    plt <- plt + geom_histogram(
+    plt <- plt + geom_gratia_histogram(
       data = function(d) d[!is.na(d$residuals), , drop = FALSE], bins = n_bins,
       colour = "white", fill = "grey20", center = 0)
   }
@@ -931,6 +942,7 @@ worm_plot.default <- function(model, ...) {
   by_family = NULL,
   conditioning = NULL, ..., n_dharma = 250L
 ) {
+  gratia_plot_arguments(c("ci_col", "ci_alpha", "point_col", "point_alpha", "line_col"), environment())
   if (!is.null(type)) type <- diagnostic_type(model, type)
   if (identical(type, "dharma") ||
       (is.null(type) && identical(attr(model, "gratia.default_residual_type"), "dharma"))) {
@@ -1013,17 +1025,17 @@ worm_plot.default <- function(model, ...) {
   caption <- caption %||% diagnostic_qq_caption(model, df)
 
   ## base plot
-  plt <- ggplot(df, aes(
+  plt <- gratia_plot(df, aes(
     x = .data$theoretical,
     y = .data$residuals
   ))
 
   ## Now need a reference horizonta line
-  plt <- plt + geom_hline(yintercept = 0, col = line_col)
+  plt <- plt + geom_gratia_diagnostic_reference_hline(yintercept = 0, col = line_col)
 
   ## add reference interval
   if (all(c("lower", "upper") %in% names(df))) {
-    plt <- plt + geom_ribbon(
+    plt <- plt + geom_gratia_diagnostic_interval_ribbon(
       aes(
         ymin = .data$lower,
         ymax = .data$upper,
@@ -1035,7 +1047,7 @@ worm_plot.default <- function(model, ...) {
   }
 
   ## add point layer
-  plt <- plt + geom_point(colour = point_col, alpha = point_alpha,
+  plt <- plt + geom_gratia_diagnostic_point(colour = point_col, alpha = point_alpha,
       data = function(d) d[stats::complete.cases(d), , drop = FALSE])
 
   ## add labels

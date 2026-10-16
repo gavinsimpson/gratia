@@ -39,6 +39,7 @@ articles:
       - articles/model-checking
       - articles/bayesplot-loo
       - articles/gfam-support
+      - articles/scam-support
       - articles/glmmTMB-support
       - articles/sdmTMB-support
   - title: Predictions, effects and response distributions
@@ -46,6 +47,7 @@ articles:
     contents:
       - articles/prediction-comparisons
       - articles/smooth-effects
+      - articles/shape-constrained-intervals
       - articles/spatial-smooths
       - articles/response-distributions
       - transformed-covariates
@@ -72,6 +74,8 @@ reference:
       - assemble
       - assemble.gam
       - scale_fill_partial_effect
+      - gratia_theme_get
+      - gratia_palette
 
   - title: Estimate smooths and parametric effects
     desc: >
@@ -86,6 +90,8 @@ reference:
       - draw.ale
       - add_confint
       - confint.gam
+      - shape_intervals
+      - shape_confidence_set
       - add_constant
       - transform_fun
       - partial_residuals

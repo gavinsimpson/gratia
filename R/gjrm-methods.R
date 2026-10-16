@@ -24,6 +24,9 @@
 #'   equation order, rather than the working family of the embedded GAMs.
 #'   Single-predictor models omit these automatic labels. Existing smooth labels,
 #'   selection, by-variable information and custom subtitles are retained.
+#'   Pass `surface = "3d", ci_3d = TRUE` through `...` to add interval surfaces
+#'   to smooths and numeric parametric interactions in any equation.
+#'   `ci_3d_alpha` and `ci_3d_col` control their opacity and fill colour.
 #'
 #' @examples
 #' if (suppressPackageStartupMessages(require("GJRM", quietly = TRUE))) {
@@ -45,6 +48,11 @@
 #'   m <- gamlss(fl, data = dataSim)
 #'
 #'   draw(m)
+#'   if (requireNamespace("ggcube", quietly = TRUE)) {
+#'     surface <- GJRM::gamlss(list(y1 ~ s(x2, x3, k = 10), ~ s(x3, k = 6)),
+#'       data = dataSim)
+#'     draw(surface, surface = "3d", ci_3d = TRUE, n_2d = 15)
+#'   }
 #' }
 `draw.gamlss` <- function(object,
                           scales = c("free", "fixed"),
@@ -96,9 +104,29 @@
   if (!length(plts)) return(invisible(NULL))
 
   if (identical(scales, "fixed")) {
-    y_lim <- get_ylim_from_plots(plts)
-    y_lim <- exec("range", !!!y_lim)
-    plts <- lapply(plts, \(p) p + lims(y = y_lim))
+    is_3d <- vapply(plts, function(p) inherits(p$coordinates, "Coord3D"), logical(1))
+    if (any(is_3d)) {
+      ranges <- lapply(seq_along(plts), function(i) {
+        if (is_3d[i]) {
+          ggplot2::ggplot_build(plts[[i]])$plot$scales$get_scales("z")$get_limits()
+        } else if (!inherits(plts[[i]]$coordinates, "CoordSf")) {
+          get_ylim_from_plot(plts[[i]])
+        }
+      })
+      effect_limits <- range(unlist(ranges), finite = TRUE)
+      plts <- lapply(seq_along(plts), function(i) {
+        p <- plts[[i]]
+        if (is_3d[i]) {
+          p + ggplot2::expand_limits(z = effect_limits)
+        } else if (!inherits(p$coordinates, "CoordSf")) {
+          p + ggplot2::expand_limits(y = effect_limits)
+        } else p
+      })
+    } else {
+      y_lim <- get_ylim_from_plots(plts)
+      y_lim <- exec("range", !!!y_lim)
+      plts <- lapply(plts, \(p) p + lims(y = y_lim))
+    }
   }
   if (!wrap) return(plts)
 
@@ -141,7 +169,8 @@ gjrm_gamlss_smooth_labels <- function(components) {
 #' @rdname smooths
 #' @details For GJRM GAMLSS models, labels follow equation and smooth order.
 #'   Labels repeated in later equations receive suffixes such as `s.1(x)`.
-#'   These labels can be supplied to [draw()] to select smooths across equations.
+#'   These labels can be supplied to [draw()] or [smooth_estimates()] to select
+#'   smooths across equations.
 smooths.gamlss <- function(object, ...) {
   gjrm_gamlss_smooth_labels(gjrm_gamlss_components(object))
 }
@@ -199,8 +228,12 @@ smooths.gamlss <- function(object, ...) {
 
   # modify the GAM
   gam_obj$coefficients <- object$coefficients[i]
-  gam_obj$Vp <- object$Vb[i, i]
-  gam_obj$Vp.t <- object$Vb.t[i, i]
+  gam_obj$Vp <- object$Vb[i, i, drop = FALSE]
+  gam_obj$Vp.t <- object$Vb.t[i, i, drop = FALSE]
+  gam_obj$Ve <- object$Ve[i, i, drop = FALSE]
+  # The working GAM's smoothing-parameter correction does not describe the
+  # final GJRM fit. Use the ordinary unavailable-correction warning and fallback.
+  gam_obj$Vc <- NULL
   gam_obj$sig2 <- 1
   gam_obj$edf <- diag(object$F)[i]
   gam_obj$scale.estimated <- FALSE

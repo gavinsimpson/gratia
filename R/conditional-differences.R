@@ -160,7 +160,7 @@ conditional_differences.gam <- function(model, by, condition = NULL, data = NULL
   supported <- c("gaussian", "poisson", "binomial", "gamma",
     "inverse_gaussian", "quasi", "quasipoisson", "quasibinomial",
     "negative_binomial", "tweedie", "beta_regression", "scaled_t")
-  if (inherits(model, "scam") || inherits(fam, "general.family") ||
+  if (inherits(fam, "general.family") ||
       !family_type(model) %in% supported) {
     cli::cli_abort("Conditional differences are not supported for this model family or class.")
   }
@@ -381,7 +381,7 @@ draw.conditional_differences <- function(object, facet_scales = "fixed",
   draw.conditional_values(object, facet_scales = facet_scales,
     discrete_colour = discrete_colour, discrete_fill = discrete_fill,
     xlab = xlab, ylab = ylab, ...) +
-    ggplot2::geom_hline(yintercept = 0, linetype = "dashed", colour = "grey50") +
+    geom_gratia_reference_hline(yintercept = 0, linetype = "dashed", colour = "grey50") +
     ggplot2::facet_wrap(ggplot2::vars(!!!rlang::syms(facets)),
       scales = facet_scales,
       labeller = ggplot2::labeller(

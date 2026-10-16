@@ -32,12 +32,14 @@ posterior_predictive_plot(
 \item{seed}{numeric; optional random seed. With an explicit seed, the
 caller's random-number state is preserved.}
 
-\item{observed_col, replicated_col}{colours for the observed and replicated
+\item{observed_col, replicated_col}{Deprecated; use \code{\link[=gratia_theme_get]{gratia_theme_get()}} theme
+settings instead. Colours for the observed and replicated
 distributions, respectively. Standalone plots default to orange-red
 (\code{"#D55E00"}) and blue (\code{"#0072B2"}). When called by \code{\link[=appraise]{appraise()}}, the check
 uses that function's \code{line_col} and \code{ci_col} instead.}
 
-\item{replicated_alpha}{numeric or \code{NULL}; opacity of replicated
+\item{replicated_alpha}{Deprecated; use \code{\link[=gratia_theme_get]{gratia_theme_get()}} theme
+settings instead. Numeric or \code{NULL}; opacity of replicated
 distributions. The default, \code{NULL}, uses \code{0.8} for discrete posterior
 median points and interval bars, and \code{0.2} for continuous density curves.}
 
@@ -118,8 +120,9 @@ fixed coefficients and random fields, and uses sdmTMB's response simulator
 to generate the complete response. These plots do not require an analytic
 residual distribution, so native simulated families such as Student-t and
 beta-binomial are available.
-SCAM models currently require \code{scalable = FALSE}; explicit or automatic
-scalable selection gives an error explaining this restriction.
+SCAM models support ordinary and scalable predictive checks using transformed
+coefficient draws. Gaussian identity-link AR1 fits retain the fitted response
+correlation and the series boundaries stored in \code{AR.start}.
 Gaussian \code{gamm} and \code{gamm4} models draw fixed and random effects together,
 keeping covariance parameters at fitted values; marginal checks draw new
 effects.

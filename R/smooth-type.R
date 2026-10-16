@@ -1,7 +1,14 @@
-#' Determine the type of smooth and return it n a human readable form
+#' Determine the type of smooth and return it in a human readable form
 #'
 #' Soap-film boundary and wiggly components use the `sf.film` and `sf.wiggly`
 #' classes introduced in mgcv 1.9-4.
+#'
+#' @details SCAM smooth types use compact constraint descriptions: `inc` for
+#'   increasing, `dec` for decreasing, and `pos` for positive. For tensor
+#'   smooths, the two descriptions follow the covariate order in the smooth
+#'   specification; `free` denotes an unconstrained direction. `Tensor int.`
+#'   identifies an interaction. Explicit `By` bases share the type label of
+#'   the corresponding ordinary basis.
 #'
 #' @param smooth an object inheriting from class `mgcv.smooth`.
 #'
@@ -184,69 +191,239 @@
 #' @export
 #' @rdname smooth_type
 `smooth_type.mpi.smooth` <- function(smooth) {
-  sm_type <- "Mono inc P spline"
+  sm_type <- "P spline (inc)"
   sm_type
 }
 
 #' @export
 #' @rdname smooth_type
 `smooth_type.mpd.smooth` <- function(smooth) {
-  sm_type <- "Mono dec P spline"
+  sm_type <- "P spline (dec)"
   sm_type
 }
 
 #' @export
 #' @rdname smooth_type
 `smooth_type.cx.smooth` <- function(smooth) {
-  sm_type <- "Convex P spline"
+  sm_type <- "P spline (convex)"
   sm_type
 }
 
 #' @export
 #' @rdname smooth_type
 `smooth_type.cv.smooth` <- function(smooth) {
-  sm_type <- "Concave P spline"
+  sm_type <- "P spline (concave)"
   sm_type
 }
 
 #' @export
 #' @rdname smooth_type
 `smooth_type.micx.smooth` <- function(smooth) {
-  sm_type <- "Mono inc conv P spline"
+  sm_type <- "P spline (inc, convex)"
   sm_type
 }
 
 #' @export
 #' @rdname smooth_type
 `smooth_type.micv.smooth` <- function(smooth) {
-  sm_type <- "Mono inc conc P spline"
+  sm_type <- "P spline (inc, concave)"
   sm_type
 }
 
 #' @export
 #' @rdname smooth_type
 `smooth_type.mdcx.smooth` <- function(smooth) {
-  sm_type <- "Mono dec conv P spline"
+  sm_type <- "P spline (dec, convex)"
   sm_type
 }
 
 #' @export
 #' @rdname smooth_type
 `smooth_type.mdcv.smooth` <- function(smooth) {
-  sm_type <- "Mono dec conc P spline"
+  sm_type <- "P spline (dec, concave)"
   sm_type
 }
 
 #' @export
 #' @rdname smooth_type
 `smooth_type.miso.smooth` <- function(smooth) {
-  sm_type <- "Mono inc 0 start P spline"
+  sm_type <- "P spline (inc, left=0)"
   sm_type
 }
 
 #' @export
 #' @rdname smooth_type
 `smooth_type.mifo.smooth` <- function(smooth) {
-  sm_type <- "Mono inc 0 end P spline"
+  sm_type <- "P spline (inc, right=0)"
   sm_type
 }
+
+#' @export
+#' @rdname smooth_type
+`smooth_type.po.smooth` <- function(smooth) {
+  "P spline (pos)"
+}
+
+#' @export
+#' @rdname smooth_type
+`smooth_type.ipo.smooth` <- function(smooth) {
+  "P spline (pos, inc)"
+}
+
+#' @export
+#' @rdname smooth_type
+`smooth_type.dpo.smooth` <- function(smooth) {
+  "P spline (pos, dec)"
+}
+
+#' @export
+#' @rdname smooth_type
+`smooth_type.cpopspline.smooth` <- function(smooth) {
+  "Cyclic P spline (pos)"
+}
+
+#' @export
+#' @rdname smooth_type
+`smooth_type.lmpi.smooth` <- function(smooth) {
+  "P spline (local inc)"
+}
+
+#' @export
+#' @rdname smooth_type
+`smooth_type.lipl.smooth` <- function(smooth) {
+  "P spline (inc then flat)"
+}
+
+#' @export
+#' @rdname smooth_type
+`smooth_type.tedmi.smooth` <- function(smooth) {
+  "Tensor (inc, inc)"
+}
+
+#' @export
+#' @rdname smooth_type
+`smooth_type.tedmd.smooth` <- function(smooth) {
+  "Tensor (dec, dec)"
+}
+
+#' @export
+#' @rdname smooth_type
+`smooth_type.temicx.smooth` <- function(smooth) {
+  "Tensor (inc, convex)"
+}
+
+#' @export
+#' @rdname smooth_type
+`smooth_type.temicv.smooth` <- function(smooth) {
+  "Tensor (inc, concave)"
+}
+
+#' @export
+#' @rdname smooth_type
+`smooth_type.tedecx.smooth` <- function(smooth) {
+  "Tensor (dec, convex)"
+}
+
+#' @export
+#' @rdname smooth_type
+`smooth_type.tedecv.smooth` <- function(smooth) {
+  "Tensor (dec, concave)"
+}
+
+#' @export
+#' @rdname smooth_type
+`smooth_type.tecxcx.smooth` <- function(smooth) {
+  "Tensor (convex, convex)"
+}
+
+#' @export
+#' @rdname smooth_type
+`smooth_type.tecvcv.smooth` <- function(smooth) {
+  "Tensor (concave, concave)"
+}
+
+#' @export
+#' @rdname smooth_type
+`smooth_type.tecxcv.smooth` <- function(smooth) {
+  "Tensor (convex, concave)"
+}
+
+#' @export
+#' @rdname smooth_type
+`smooth_type.tesmi1.smooth` <- function(smooth) {
+  "Tensor (inc, free)"
+}
+
+#' @export
+#' @rdname smooth_type
+`smooth_type.tesmi2.smooth` <- function(smooth) {
+  "Tensor (free, inc)"
+}
+
+#' @export
+#' @rdname smooth_type
+`smooth_type.tesmd1.smooth` <- function(smooth) {
+  "Tensor (dec, free)"
+}
+
+#' @export
+#' @rdname smooth_type
+`smooth_type.tesmd2.smooth` <- function(smooth) {
+  "Tensor (free, dec)"
+}
+
+#' @export
+#' @rdname smooth_type
+`smooth_type.tescx.smooth` <- function(smooth) {
+  "Tensor (free, convex)"
+}
+
+#' @export
+#' @rdname smooth_type
+`smooth_type.tescv.smooth` <- function(smooth) {
+  "Tensor (free, concave)"
+}
+
+#' @export
+#' @rdname smooth_type
+`smooth_type.tismi.smooth` <- function(smooth) {
+  "Tensor int. (inc, free)"
+}
+
+#' @export
+#' @rdname smooth_type
+`smooth_type.tismd.smooth` <- function(smooth) {
+  "Tensor int. (dec, free)"
+}
+
+#' @export
+#' @rdname smooth_type
+`smooth_type.mpiBy.smooth` <- smooth_type.mpi.smooth
+
+#' @export
+#' @rdname smooth_type
+`smooth_type.mpdBy.smooth` <- smooth_type.mpd.smooth
+
+#' @export
+#' @rdname smooth_type
+`smooth_type.cxBy.smooth` <- smooth_type.cx.smooth
+
+#' @export
+#' @rdname smooth_type
+`smooth_type.cvBy.smooth` <- smooth_type.cv.smooth
+
+#' @export
+#' @rdname smooth_type
+`smooth_type.micxBy.smooth` <- smooth_type.micx.smooth
+
+#' @export
+#' @rdname smooth_type
+`smooth_type.micvBy.smooth` <- smooth_type.micv.smooth
+
+#' @export
+#' @rdname smooth_type
+`smooth_type.mdcxBy.smooth` <- smooth_type.mdcx.smooth
+
+#' @export
+#' @rdname smooth_type
+`smooth_type.mdcvBy.smooth` <- smooth_type.mdcv.smooth

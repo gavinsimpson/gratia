@@ -1,0 +1,146 @@
+---
+title: "Working with shape-constrained additive models"
+output:
+  rmarkdown::html_vignette:
+    fig_width: 8
+    fig_height: 5
+    dev: png
+    dpi: 96
+vignette: >
+  %\VignetteIndexEntry{Working with shape-constrained additive models}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>", message = FALSE)
+```
+
+gratia supports the 24 univariate and 17 bivariate smooth constructors in
+scam 1.2-22, including cyclic margins, endpoint constraints, local constraints,
+`by` smooths and smooth interactions. Ordinary mgcv smooths fitted through
+`scam()` are also supported. The same fitted coefficient mapping is used for
+smooth estimates, bases, derivatives, predictions and sampled smooths.
+
+```{r packages}
+library("mgcv")
+library("scam")
+library("gratia")
+
+set.seed(46)
+d <- data.frame(x = runif(200), z = runif(200))
+d$y <- exp(d$x) + d$z + rnorm(nrow(d), sd = 0.15)
+m <- scam(y ~ s(x, bs = "mpi", k = 8) + s(z, bs = "mpi", k = 8),
+  data = d, not.exp = TRUE)
+draw(m)
+```
+
+## Fitted functions and native plots
+
+Plot captions describe basis and shape separately. Increasing and decreasing
+constraints use arrows; tensor captions name the covariate for each constraint.
+Local constraints show their fitted change point. These captions are also
+available when drawing saved `smooth_estimates()`. The `.type` column and
+`smooth_type()` retain compact ASCII labels such as `P spline (inc)` and
+`Tensor (inc, free)`.
+
+By default, `draw()` retains the fitted function's centring. Evaluating a
+smooth on a different grid therefore evaluates the same function. This agrees
+with scam's univariate plots. Its bivariate plots instead subtract the mean
+of the evaluated surface. Use `centre = "plot"` to match that convention;
+both estimates and their covariance receive the same centring operation.
+`assemble()` accepts the same argument. Match grids and exclusion distances
+when comparing plots from the two packages.
+
+```{r surface}
+b <- scam(y ~ s(x, z, bs = "tedmi", k = c(5, 5)), data = d,
+  not.exp = TRUE)
+draw(b, centre = "plot", n_2d = 40)
+```
+
+scam's default univariate limits use two standard errors; gratia's default
+95% normal limits use `qnorm(0.975)`. Some scam smooth classes also use a
+different coefficient gradient for the displayed function and its standard
+error. gratia computes uncertainty for the actual function it returns, using
+its coefficient gradient. This can produce different limits even when the
+fitted curves agree.
+
+## Conditional uncertainty and sampled functions
+
+Pointwise intervals, simultaneous smooth bands, smooth derivatives and contrasts use
+scam's covariance for the transformed coefficients (`Vp.t`, or `Ve.t` with
+`frequentist = TRUE`). These are local Gaussian or delta approximations,
+conditional on the fitted smoothing parameters. Including intercept
+uncertainty is controlled by `overall_uncertainty`.
+
+```{r estimates}
+e <- smooth_estimates(m, overall_uncertainty = FALSE)
+e <- add_confint(e)
+head(e)
+derivatives(m, select = "s(x)")
+confint(m, parm = "s(x)", type = "simultaneous", seed = 53)
+```
+
+Coefficient sampling uses a different approximation: draw a Gaussian vector in
+the unrestricted fitting coordinates using `Vp` (or `Ve`), then apply the
+positivity transformation used in the fit. This preserves the fitted shape
+constraints. This is a Gaussian approximation in fitting coordinates, rather
+than an exact constrained posterior. Because the transformation is nonlinear,
+these samples need not have the mean or covariance used for analytic intervals. Individual analytic
+interval endpoints need not satisfy the shape constraint.
+
+Fitted, smooth, derivative and response sampling functions project these same
+transformed coefficient draws. `response_derivatives()` also uses them with its
+default `uncertainty = "simulation"`; `uncertainty = "delta"` instead uses the
+local transformed-coefficient covariance.
+
+```{r samples}
+draws <- gaussian_draws(m, n_draws = 100, seed = 54)
+samples <- smooth_samples(m, n_draws = 5, seed = 55)
+head(samples)
+```
+
+`method = "user"` requires finite draws in the transformed coordinates, with
+columns in `coef(m)` order and nonnegative constrained coefficients.
+`gaussian_draws(m, parametrized = FALSE)` returns unrestricted draws for
+inspection; these cannot be supplied as transformed draws. A singular
+positive semidefinite covariance is supported. A materially indefinite
+covariance is rejected. When a very large unrestricted variance causes the
+exponential transformation to overflow, sampling reports an error; it does
+not truncate those draws. Finite transformed draws from an appropriate
+alternative sampler can still be supplied.
+
+## Other GAM operations
+
+Supported methods include model summaries and term extraction, parametric
+effects, fitted and conditional predictions, smooth differences, analytic
+response derivatives, accumulated local effects, residual helpers,
+concurvity, penalties and response diagnostics. `lp_matrix()` and
+`model.matrix()` return a design whose columns match `coef(m)`. Formula
+expressions retain their fitted prediction parameters, formula offsets are
+evaluated on new data, and training predictions also retain an `offset`
+argument used in fitting. Missing-row handling is shared across these methods.
+
+Likelihood evaluation and LOO/WAIC use the supported independent-response
+family adapters, conditional on smoothing and other fitted family parameters.
+They use the same coefficient sampling approximation described above.
+`variance_comp()` reports response scale divided by smoothing parameters;
+these ratios describe penalties on unrestricted fitting parameters. They are
+not Gaussian variances of the transformed smooth coefficients, and their
+confidence limits are unavailable.
+
+For Gaussian identity-link fits with AR1 dependence, response simulation uses
+the fitted correlation and `AR.start` series boundaries, including observation
+weights. It requires the fitting observations: a joint correlation structure
+for arbitrary new data is not defined. Other families with scam's working AR1
+correction do not automatically have a joint response simulator. Independent
+pointwise likelihood adapters reject correlated fits.
+
+GCV and UBRE fits do not supply the smoothing-parameter covariance needed for
+`unconditional = TRUE`, unconditional EDF, or likelihood-based confidence
+limits for variance components. MH and INLA coefficient sampling are also
+unavailable. `model_edf(type = "unconditional")` follows the shared GAM
+convention: it warns and returns standard EDF when the correction is missing.
+Automatic `interval_method = "shape"` integration remains specific
+to supported scasm smooths; `shape_intervals()` can be used explicitly on
+supplied estimates and grids when its named shape restrictions apply.

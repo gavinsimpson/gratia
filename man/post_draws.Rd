@@ -7,6 +7,7 @@
 \alias{post_draws.default}
 \alias{generate_draws}
 \alias{generate_draws.gam}
+\alias{generate_draws.scam}
 \title{Low-level Functions to generate draws from the posterior distribution of
 model coefficients}
 \usage{
@@ -66,6 +67,8 @@ generate_draws(model, ...)
   dense_limit = 5e+06,
   index = NULL
 )
+
+\method{generate_draws}{scam}(model, ...)
 }
 \arguments{
 \item{model}{a fitted model from \code{\link[mgcv:gam]{mgcv::gam()}}, \code{\link[mgcv:bam]{mgcv::bam()}},
@@ -151,9 +154,10 @@ for the gratia MH backend. Use zero to force blockwise evaluation.}
 \item{index}{numeric; vector of indices of coefficients to use. Can be used
 to subset the mean vector and covariance matrix extracted from \code{model}.}
 
-\item{parametrized}{logical; use parametrized coefficients and covariance
-matrix, which respect the linear inequality constraints of the model. Only
-for \code{scam::scam()} model fits.}
+\item{parametrized}{logical; for SCAM fits, transform Gaussian draws from
+the unrestricted fitting coefficients using the fitted positivity transform.
+This preserves the smooth's constraints. With \code{FALSE}, return Gaussian draws
+in the unrestricted fitting coordinates. Only for \code{scam::scam()} fits.}
 }
 \description{
 Low-level Functions to generate draws from the posterior distribution of
@@ -165,6 +169,19 @@ Generate posterior draws from a fitted model
 Sampling controls must be named. Removed arguments produce migration errors;
 see \code{vignette("sampling-migration")}. Explicit controls that the selected
 method cannot use are rejected.
+
+For SCAM models, Gaussian draws approximate the distribution of the unrestricted
+fitting coefficients using \code{Vp} (or \code{Ve} with \code{frequentist = TRUE}), then apply
+scam's fitted exponential or \code{notExp} transformation. This is an approximation
+in fitting coordinates, rather than an exact constrained posterior. Supplied
+draws must already use the transformed coordinates in \code{coef(model)} order.
+Numerically singular covariance matrices are sampled by eigen decomposition;
+negative eigenvalues within \code{100 * .Machine$double.eps * ncol(V)} times the
+largest absolute eigenvalue are treated as zero. Larger negatives are errors.
+For weakly identified exponential coefficients, a very large fitting-coordinate
+variance can yield non-finite transformed draws. Sampling then reports an
+error because this Gaussian approximation cannot provide usable draws; supply
+finite transformed draws from a suitable alternative sampler.
 
 For multiple chains, \code{n_draws} is the total retained count and must be divisible
 by \code{chains}. Coefficient matrices carry a chain mapping; use

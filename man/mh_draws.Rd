@@ -4,6 +4,7 @@
 \alias{mh_draws}
 \alias{mh_draws.gamm4}
 \alias{mh_draws.gam}
+\alias{mh_draws.scam}
 \title{Posterior samples using Metropolis Hastings}
 \usage{
 \method{mh_draws}{gamm4}(model, ...)
@@ -27,6 +28,8 @@ mh_draws(model, ...)
   index = NULL,
   seed = NULL
 )
+
+\method{mh_draws}{scam}(model, ...)
 }
 \arguments{
 \item{model}{a fitted model from \code{\link[mgcv:gam]{mgcv::gam()}}, \code{\link[mgcv:bam]{mgcv::bam()}},
@@ -89,6 +92,19 @@ Posterior samples using Metropolis Hastings
 Sampling controls must be named. Removed arguments produce migration errors;
 see \code{vignette("sampling-migration")}. Explicit controls that the selected
 method cannot use are rejected.
+
+For SCAM models, Gaussian draws approximate the distribution of the unrestricted
+fitting coefficients using \code{Vp} (or \code{Ve} with \code{frequentist = TRUE}), then apply
+scam's fitted exponential or \code{notExp} transformation. This is an approximation
+in fitting coordinates, rather than an exact constrained posterior. Supplied
+draws must already use the transformed coordinates in \code{coef(model)} order.
+Numerically singular covariance matrices are sampled by eigen decomposition;
+negative eigenvalues within \code{100 * .Machine$double.eps * ncol(V)} times the
+largest absolute eigenvalue are treated as zero. Larger negatives are errors.
+For weakly identified exponential coefficients, a very large fitting-coordinate
+variance can yield non-finite transformed draws. Sampling then reports an
+error because this Gaussian approximation cannot provide usable draws; supply
+finite transformed draws from a suitable alternative sampler.
 
 For multiple chains, \code{n_draws} is the total retained count and must be divisible
 by \code{chains}. Coefficient matrices carry a chain mapping; use

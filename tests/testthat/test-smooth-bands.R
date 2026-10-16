@@ -197,7 +197,8 @@ test_that("smooth band calibration preserves RNG and validates unsupported reque
     }
   }
   expect_error(smooth_estimates(model, interval = "incorrect"), "arg")
-  expect_error(draw(m_scam, interval = "simultaneous"), "SCAM")
+  expect_s3_class(draw(m_scam, interval = "simultaneous", n = 10,
+    n_sim = 120, seed = 7), "patchwork")
   # Entirely missing supplied grids retain all positions with NA bounds.
   nd <- data.frame(x = rep(NA_real_, 3))
   a <- smooth_estimates(model, select = "s(x)", data = nd,

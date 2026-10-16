@@ -30,6 +30,6 @@ Add a confidence interval to an existing object
 For smooth estimates, this function computes Gaussian pointwise
 intervals from the saved estimates and standard errors. It replaces any
 existing limits and updates their interval metadata. To retain stored
-bootstrap or simultaneous limits, draw the estimates directly with
+bootstrap, shape-enforced or simultaneous limits, draw the estimates directly with
 \code{\link[=draw]{draw()}} without calling \code{add_confint()}.
 }

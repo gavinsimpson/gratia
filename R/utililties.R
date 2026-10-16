@@ -577,7 +577,13 @@ get_vcov.default <- function(object, unconditional = FALSE,
 # SCAM supplies covariance for its constrained coefficients, but no correction
 # for uncertainty in the estimated smoothing parameters.
 check_scam_unconditional <- function(object, unconditional = FALSE) {
-  if (inherits(object, "scam") && isTRUE(unconditional)) {
+  if (!inherits(object, "scam")) return(invisible(NULL))
+  if (!is.logical(unconditional) || length(unconditional) != 1L ||
+      is.na(unconditional)) {
+    stop("`unconditional` must be a single non-missing logical value.",
+      call. = FALSE)
+  }
+  if (unconditional) {
     stop("Smoothing-parameter uncertainty is not currently supported for SCAM models. Use unconditional = FALSE.",
       call. = FALSE)
   }
@@ -1184,6 +1190,7 @@ vars_from_label <- function(label) {
 #' @importFrom tidyselect any_of
 `transform_fun.smooth_estimates` <- function(object, fun = NULL,
     constant = NULL, ...) {
+  check_shape_effect_transform(attr(object, "interval_info"), constant, fun)
   # If constant supplied, use it to transform est and the upper and lower
   # interval
   if (!is.null(constant)) {
@@ -1559,149 +1566,14 @@ twlss_theta_2_power <- function(theta, a, b) {
 
 reclass_scam_smooth <- function(smooth) {
   stop_if_not_mgcv_smooth(smooth)
-  uni_sm <- c(
-    "mpi.smooth", "mpd.smooth", "cv.smooth", "cx.smooth",
-    "po.smooth", "mdcv.smooth", "mdcx.smooth", "micv.smooth", "micx.smooth",
-    "mifo.smooth", "miso.smooth", "mpdBy.smooth", "cxBy.smooth",
-    "mpiBy.smooth", "cvBy.smooth", "mdcxBy.smooth", "mdcvBy.smooth",
-    "micxBy.smooth", "micvBy.smooth"
-  )
-
-  uni_by_sm <- c(
-    "mpdBy.smooth", "cxBy.smooth", "mpiBy.smooth", "cvBy.smooth",
-    "mdcxBy.smooth", "mdcvBy.smooth", "micxBy.smooth", "micvBy.smooth"
-  )
-
-  uni_zero_sm <- c("mifo.smooth", "miso.smooth")
-
-  tensor_sm <- c(
-    "tedmi.smooth", "tedmd.smooth", "tesmi1.smooth",
-    "tesmi2.smooth", "tesmd1.smooth", "tesmd2.smooth", "temicx.smooth",
-    "temicv.smooth", "tedecx.smooth", "tedecv.smooth", "tescx.smooth",
-    "tescv.smooth", "tecvcv.smooth", "tecxcx.smooth", "tecxcv.smooth"
-  )
-
-  double_mono <- c(
-    "tedmi.smooth", "tedmd.smooth", "temicx.smooth",
-    "temicv.smooth", "tedecx.smooth", "tedecv.smooth", "tecvcv.smooth",
-    "tecxcx.smooth", "tecxcv.smooth"
-  )
-
-  single_mono <- c(
-    "tesmi1.smooth", "tesmi2.smooth", "tesmd1.smooth",
-    "tesmd2.smooth", "tescx.smooth", "tescv.smooth"
-  )
-
-  new_cls <- NULL
-
-  if (inherits(smooth, uni_sm)) {
-    new_cls <- c("univariate_scam_smooth", "scam_smooth")
-
-    if (inherits(smooth, uni_by_sm)) {
-      new_cls <- append(new_cls, "univariate_by_scam_smooth", after = 0)
-    }
-
-    if (inherits(smooth, uni_zero_sm)) {
-      new_cls <- append(new_cls, "zero_point_scam_smooth", after = 0)
-    }
+  if (is_scam_smooth(smooth)) {
+    cls <- if (smooth_dim(smooth) == 1L) {
+      "univariate_scam_smooth"
+    } else "tensor_scam_smooth"
+    class(smooth) <- unique(append(class(smooth), c(cls, "scam_smooth"),
+      after = 1L))
   }
-
-  if (inherits(smooth, tensor_sm)) {
-    new_cls <- c("tensor_scam_smooth", "scam_smooth")
-
-    if (inherits(smooth, double_mono)) {
-      new_cls <- append(new_cls, "double_mono_tensor_scam_smooth",
-        after = 0L
-      )
-    }
-
-    if (inherits(smooth, single_mono)) {
-      new_cls <- append(new_cls, "single_mono_tensor_scam_smooth",
-        after = 0L
-      )
-    }
-  }
-
-  class(smooth) <- append(class(smooth), new_cls, after = 1L)
-
   smooth
-}
-
-`which_exp_scam_coefs` <- function(model) {
-  model$p.ident
-}
-
-`exp_fun` <- function(model) {
-  not_exp <- model$not.exp
-  fun <- exp # set the default
-  if (isTRUE(not_exp)) { # not_exp == NULL --> FALSE (not TRUE)
-    fun <- mgcv::notExp
-  }
-  fun
-}
-
-`scam_beta_se` <- function(smooth, ...) {
-  UseMethod("scam_beta_se")
-}
-
-#' @export
-`scam_beta_se.univariate_scam_smooth` <- function(
-  smooth,
-  X,
-  beta,
-  ndata,
-  V,
-  ...
-) {
-  # Current SCAM bases retain their fitted centring. Recentring the basis on
-  # evaluation rows changes the fitted function and fails on short grids.
-  idx <- smooth_coef_indices(smooth)
-  vc <- V[idx, idx, drop = FALSE]
-  se <- sqrt(pmax(0, rowSums((X %*% vc) * X)))
-
-  list(betas = beta, se = se)
-}
-
-#' @export
-`scam_beta_se.univariate_by_scam_smooth` <- function(
-  smooth,
-  X,
-  beta,
-  V,
-  ...
-) {
-  # return the coefs unmodified, so just compute se
-  idx <- smooth_coef_indices(smooth)
-  V <- V[idx, idx, drop = FALSE]
-  se <- sqrt(pmax(0, rowSums((X %*% V) * X)))
-  list(betas = beta, se = se)
-}
-
-#' @export
-`scam_beta_se.po.smooth` <- function(smooth, X, beta, V, ...) {
-  # extending betas with a 0 - will zero out constant column in Xp
-  beta <- c(0, beta)
-  idx <- smooth_coef_indices(smooth)
-  vc <- vv <- V[idx, idx, drop = FALSE]
-  vc[, 1] <- rep(0, nrow(vv))
-  vc[1, ] <- rep(0, ncol(vv))
-  se <- sqrt(pmax(0, rowSums((X %*% vc) * X)))
-  list(betas = beta, se = se)
-}
-
-#' @export
-`scam_beta_se.zero_point_scam_smooth` <- function(smooth, X, beta, V, ...) {
-  nz <- smooth$n.zero
-  lnz <- length(nz)
-  beta_z <- rep(0, length(beta) + length(nz))
-  beta_z[-nz] <- beta
-  idx <- smooth_coef_indices(smooth)
-  V <- V[idx, idx, drop = FALSE]
-  ## adding rows and columns of 0's...
-  vc <- matrix(0, nrow(V) + lnz, ncol(V) + lnz)
-  vc[-nz, -nz] <- V
-  se <- sqrt(pmax(0, rowSums((X %*% vc) * X)))
-  list(betas = beta_z, se = se)
 }
 
 # my own version of a label_both to remove '.' prefix when plotting

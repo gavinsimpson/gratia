@@ -1,0 +1,161 @@
+"basis","dimension","fit_error","fit_warning","smooth_class","converged","selection","plot_error","plot_warning","predict_error","estimates_error","draw_error","draw_panels","predict_vs_plot","predict_plot_difference_range","basis_error","derivatives_error","overview_error","estimate_vs_predict","se_vs_predict","estimate_vs_plot","se_vs_plot","plot_difference_range"
+"cpop",1,"","","cpopspline.smooth",TRUE,"GCV","","","","ℹ In index: 1.
+Caused by error in `X %*% coefs`:
+! non-conformable arguments","Unknown type of smooth",NA,0,0,"ℹ In index: 1.
+Caused by error in `gratia::tidy_basis()` at gratia/R/basis-funs.R:263:3:
+! identical(NCOL(tbl), length(coefs)) is not TRUE","Don't know how to calculate derivatives for <scam>","no applicable method for 'overview' applied to an object of class ""c('scam', 'glm', 'lm')""",NA,NA,NA,NA,NA
+"cv",1,"","","cv.smooth",TRUE,"GCV","","","","","",1,0,0,"","Don't know how to calculate derivatives for <scam>","no applicable method for 'overview' applied to an object of class ""c('scam', 'glm', 'lm')""",0,0,0,0,0
+"cvBy",1,"","","cvBy.smooth",TRUE,"GCV","","","","ℹ In index: 1.
+Caused by error in `smooth_type.default()`:
+! Unknown type of smooth","Unknown type of smooth",NA,0,0,"ℹ In index: 1.
+Caused by error in `gratia::tidy_basis()` at gratia/R/basis-funs.R:263:3:
+! identical(sum(p_ident), length(coefs)) is not TRUE","Don't know how to calculate derivatives for <scam>","no applicable method for 'overview' applied to an object of class ""c('scam', 'glm', 'lm')""",NA,NA,NA,NA,NA
+"cx",1,"","","cx.smooth",TRUE,"GCV","","","","","",1,0,0,"","Don't know how to calculate derivatives for <scam>","no applicable method for 'overview' applied to an object of class ""c('scam', 'glm', 'lm')""",0,0,0,0,0
+"cxBy",1,"","","cxBy.smooth",TRUE,"GCV","","","","ℹ In index: 1.
+Caused by error in `smooth_type.default()`:
+! Unknown type of smooth","Unknown type of smooth",NA,0,0,"ℹ In index: 1.
+Caused by error in `gratia::tidy_basis()` at gratia/R/basis-funs.R:263:3:
+! identical(sum(p_ident), length(coefs)) is not TRUE","Don't know how to calculate derivatives for <scam>","no applicable method for 'overview' applied to an object of class ""c('scam', 'glm', 'lm')""",NA,NA,NA,NA,NA
+"dpo",1,"","","dpo.smooth",TRUE,"GCV","","","","ℹ In index: 1.
+Caused by error in `X %*% coefs`:
+! non-conformable arguments","Unknown type of smooth",NA,0,0,"ℹ In index: 1.
+Caused by error in `gratia::tidy_basis()` at gratia/R/basis-funs.R:263:3:
+! identical(NCOL(tbl), length(coefs)) is not TRUE","Don't know how to calculate derivatives for <scam>","no applicable method for 'overview' applied to an object of class ""c('scam', 'glm', 'lm')""",NA,NA,NA,NA,NA
+"ipo",1,"","","ipo.smooth",TRUE,"GCV","","","","ℹ In index: 1.
+Caused by error in `X %*% coefs`:
+! non-conformable arguments","Unknown type of smooth",NA,0,0,"ℹ In index: 1.
+Caused by error in `gratia::tidy_basis()` at gratia/R/basis-funs.R:263:3:
+! identical(NCOL(tbl), length(coefs)) is not TRUE","Don't know how to calculate derivatives for <scam>","no applicable method for 'overview' applied to an object of class ""c('scam', 'glm', 'lm')""",NA,NA,NA,NA,NA
+"lipl",1,"","","lipl.smooth",TRUE,"GCV","","","","ℹ In index: 1.
+Caused by error in `X %*% coefs`:
+! non-conformable arguments","Unknown type of smooth",NA,0,0,"ℹ In index: 1.
+Caused by error in `gratia::tidy_basis()` at gratia/R/basis-funs.R:263:3:
+! identical(NCOL(tbl), length(coefs)) is not TRUE","Don't know how to calculate derivatives for <scam>","no applicable method for 'overview' applied to an object of class ""c('scam', 'glm', 'lm')""",NA,NA,NA,NA,NA
+"lmpi",1,"","","lmpi.smooth",TRUE,"GCV","","","","ℹ In index: 1.
+Caused by error in `smooth_type.default()`:
+! Unknown type of smooth","Unknown type of smooth",NA,0,0,"ℹ In index: 1.
+Caused by error in `gratia::tidy_basis()` at gratia/R/basis-funs.R:263:3:
+! identical(sum(p_ident), length(coefs)) is not TRUE","Don't know how to calculate derivatives for <scam>","no applicable method for 'overview' applied to an object of class ""c('scam', 'glm', 'lm')""",NA,NA,NA,NA,NA
+"mdcv",1,"","","mdcv.smooth",TRUE,"GCV","","","","","",1,0,0,"","Don't know how to calculate derivatives for <scam>","no applicable method for 'overview' applied to an object of class ""c('scam', 'glm', 'lm')""",0,0,0,0,0
+"mdcvBy",1,"","","mdcvBy.smooth",TRUE,"GCV","","","","ℹ In index: 1.
+Caused by error in `smooth_type.default()`:
+! Unknown type of smooth","Unknown type of smooth",NA,0,0,"ℹ In index: 1.
+Caused by error in `gratia::tidy_basis()` at gratia/R/basis-funs.R:263:3:
+! identical(sum(p_ident), length(coefs)) is not TRUE","Don't know how to calculate derivatives for <scam>","no applicable method for 'overview' applied to an object of class ""c('scam', 'glm', 'lm')""",NA,NA,NA,NA,NA
+"mdcx",1,"","","mdcx.smooth",TRUE,"GCV","","","","","",1,0,0,"","Don't know how to calculate derivatives for <scam>","no applicable method for 'overview' applied to an object of class ""c('scam', 'glm', 'lm')""",0,0,0,0,0
+"mdcxBy",1,"","","mdcxBy.smooth",TRUE,"GCV","","","","ℹ In index: 1.
+Caused by error in `smooth_type.default()`:
+! Unknown type of smooth","Unknown type of smooth",NA,0,0,"ℹ In index: 1.
+Caused by error in `gratia::tidy_basis()` at gratia/R/basis-funs.R:263:3:
+! identical(sum(p_ident), length(coefs)) is not TRUE","Don't know how to calculate derivatives for <scam>","no applicable method for 'overview' applied to an object of class ""c('scam', 'glm', 'lm')""",NA,NA,NA,NA,NA
+"micv",1,"","","micv.smooth",TRUE,"GCV","","","","","",1,0,0,"","Don't know how to calculate derivatives for <scam>","no applicable method for 'overview' applied to an object of class ""c('scam', 'glm', 'lm')""",0,0,0,0,0
+"micvBy",1,"","","micvBy.smooth",TRUE,"GCV","","","","ℹ In index: 1.
+Caused by error in `smooth_type.default()`:
+! Unknown type of smooth","Unknown type of smooth",NA,0,0,"ℹ In index: 1.
+Caused by error in `gratia::tidy_basis()` at gratia/R/basis-funs.R:263:3:
+! identical(sum(p_ident), length(coefs)) is not TRUE","Don't know how to calculate derivatives for <scam>","no applicable method for 'overview' applied to an object of class ""c('scam', 'glm', 'lm')""",NA,NA,NA,NA,NA
+"micx",1,"","","micx.smooth",TRUE,"GCV","","","","","",1,0,0,"","Don't know how to calculate derivatives for <scam>","no applicable method for 'overview' applied to an object of class ""c('scam', 'glm', 'lm')""",0,0,0,0,0
+"micxBy",1,"","","micxBy.smooth",TRUE,"GCV","","","","ℹ In index: 1.
+Caused by error in `smooth_type.default()`:
+! Unknown type of smooth","Unknown type of smooth",NA,0,0,"ℹ In index: 1.
+Caused by error in `gratia::tidy_basis()` at gratia/R/basis-funs.R:263:3:
+! identical(sum(p_ident), length(coefs)) is not TRUE","Don't know how to calculate derivatives for <scam>","no applicable method for 'overview' applied to an object of class ""c('scam', 'glm', 'lm')""",NA,NA,NA,NA,NA
+"mifo",1,"","","mifo.smooth",TRUE,"GCV","","","","","",0,0,0,"ℹ In index: 1.
+Caused by error in `gratia::tidy_basis()` at gratia/R/basis-funs.R:263:3:
+! identical(sum(p_ident), length(coefs)) is not TRUE","Don't know how to calculate derivatives for <scam>","no applicable method for 'overview' applied to an object of class ""c('scam', 'glm', 'lm')""",0,0,0,1.38777878078145e-17,0
+"miso",1,"","","miso.smooth",TRUE,"GCV","","","","","",1,0,0,"ℹ In index: 1.
+Caused by error in `gratia::tidy_basis()` at gratia/R/basis-funs.R:263:3:
+! identical(NCOL(tbl), length(coefs)) is not TRUE","Don't know how to calculate derivatives for <scam>","no applicable method for 'overview' applied to an object of class ""c('scam', 'glm', 'lm')""",0,0,0,6.93889390390723e-18,0
+"mpd",1,"","","mpd.smooth",TRUE,"GCV","","","","","",1,0,0,"","Don't know how to calculate derivatives for <scam>","no applicable method for 'overview' applied to an object of class ""c('scam', 'glm', 'lm')""",0,0,0,0,0
+"mpdBy",1,"","","mpdBy.smooth",TRUE,"GCV","","","","ℹ In index: 1.
+Caused by error in `smooth_type.default()`:
+! Unknown type of smooth","Unknown type of smooth",NA,0,0,"ℹ In index: 1.
+Caused by error in `gratia::tidy_basis()` at gratia/R/basis-funs.R:263:3:
+! identical(sum(p_ident), length(coefs)) is not TRUE","Don't know how to calculate derivatives for <scam>","no applicable method for 'overview' applied to an object of class ""c('scam', 'glm', 'lm')""",NA,NA,NA,NA,NA
+"mpi",1,"","","mpi.smooth",TRUE,"GCV","","","","","",1,0,0,"","Don't know how to calculate derivatives for <scam>","no applicable method for 'overview' applied to an object of class ""c('scam', 'glm', 'lm')""",0,0,0,0,0
+"mpiBy",1,"","","mpiBy.smooth",TRUE,"GCV","","","","ℹ In index: 1.
+Caused by error in `smooth_type.default()`:
+! Unknown type of smooth","Unknown type of smooth",NA,0,0,"ℹ In index: 1.
+Caused by error in `gratia::tidy_basis()` at gratia/R/basis-funs.R:263:3:
+! identical(sum(p_ident), length(coefs)) is not TRUE","Don't know how to calculate derivatives for <scam>","no applicable method for 'overview' applied to an object of class ""c('scam', 'glm', 'lm')""",NA,NA,NA,NA,NA
+"po",1,"","","po.smooth",TRUE,"GCV","","","","ℹ In index: 1.
+Caused by error in `smooth_type.default()`:
+! Unknown type of smooth","Unknown type of smooth",NA,0,0,"ℹ In index: 1.
+Caused by error in `gratia::tidy_basis()` at gratia/R/basis-funs.R:263:3:
+! identical(NCOL(tbl), length(coefs)) is not TRUE","Don't know how to calculate derivatives for <scam>","no applicable method for 'overview' applied to an object of class ""c('scam', 'glm', 'lm')""",NA,NA,NA,NA,NA
+"tecvcv",2,"","Non-finite exponentiated coefficients at iteration 1 | Step size truncated due to divergence | Non-finite exponentiated coefficients at iteration 2 | Non-finite exponentiated coefficients at iteration 3 | Non-finite exponentiated coefficients at iteration 7 | Non-finite exponentiated coefficients at iteration 4 | Non-finite exponentiated coefficients at iteration 6","tecvcv.smooth",TRUE,"GCV","","","","ℹ In index: 1.
+Caused by error in `UseMethod()`:
+! no applicable method for 'smooth_values' applied to an object of class ""c('tecvcv.smooth', 'double_mono_tensor_scam_smooth', 'tensor_scam_smooth', 'scam_smooth', 'double_mono_tensor_scam_smooth', 'tensor_scam_smooth', 'scam_smooth', 'mgcv.smooth')""","Unknown type of smooth",NA,0.0133181774389896,2.1094237467878e-15,"ℹ In index: 1.
+Caused by error in `gratia::tidy_basis()` at gratia/R/basis-funs.R:263:3:
+! identical(NCOL(tbl), length(coefs)) is not TRUE","Don't know how to calculate partial derivatives for <scam>","no applicable method for 'overview' applied to an object of class ""c('scam', 'glm', 'lm')""",NA,NA,NA,NA,NA
+"tecxcv",2,"","Non-finite exponentiated coefficients at iteration 1 | Step size truncated due to divergence | Non-finite exponentiated coefficients at iteration 5 | Non-finite exponentiated coefficients at iteration 6 | Non-finite exponentiated coefficients at iteration 4 | Non-finite exponentiated coefficients at iteration 26","tecxcv.smooth",TRUE,"GCV","","","","ℹ In index: 1.
+Caused by error in `UseMethod()`:
+! no applicable method for 'smooth_values' applied to an object of class ""c('tecxcv.smooth', 'double_mono_tensor_scam_smooth', 'tensor_scam_smooth', 'scam_smooth', 'double_mono_tensor_scam_smooth', 'tensor_scam_smooth', 'scam_smooth', 'mgcv.smooth')""","Unknown type of smooth",NA,1.08763072753979,3.10862446895044e-15,"ℹ In index: 1.
+Caused by error in `gratia::tidy_basis()` at gratia/R/basis-funs.R:263:3:
+! identical(NCOL(tbl), length(coefs)) is not TRUE","Don't know how to calculate partial derivatives for <scam>","no applicable method for 'overview' applied to an object of class ""c('scam', 'glm', 'lm')""",NA,NA,NA,NA,NA
+"tecxcx",2,"","","tecxcx.smooth",TRUE,"GCV","","","","ℹ In index: 1.
+Caused by error in `UseMethod()`:
+! no applicable method for 'smooth_values' applied to an object of class ""c('tecxcx.smooth', 'double_mono_tensor_scam_smooth', 'tensor_scam_smooth', 'scam_smooth', 'double_mono_tensor_scam_smooth', 'tensor_scam_smooth', 'scam_smooth', 'mgcv.smooth')""","Unknown type of smooth",NA,0.0108335394377659,6.27276008913213e-15,"ℹ In index: 1.
+Caused by error in `gratia::tidy_basis()` at gratia/R/basis-funs.R:263:3:
+! identical(NCOL(tbl), length(coefs)) is not TRUE","Don't know how to calculate partial derivatives for <scam>","no applicable method for 'overview' applied to an object of class ""c('scam', 'glm', 'lm')""",NA,NA,NA,NA,NA
+"tedecv",2,"","Non-finite exponentiated coefficients at iteration 17 | Step size truncated due to divergence | Non-finite exponentiated coefficients at iteration 18 | Non-finite exponentiated coefficients at iteration 2 | Non-finite exponentiated coefficients at iteration 32 | Non-finite exponentiated coefficients at iteration 33 | Non-finite exponentiated coefficients at iteration 34","tedecv.smooth",TRUE,"GCV","","","","ℹ In index: 1.
+Caused by error in `UseMethod()`:
+! no applicable method for 'smooth_values' applied to an object of class ""c('tedecv.smooth', 'double_mono_tensor_scam_smooth', 'tensor_scam_smooth', 'scam_smooth', 'double_mono_tensor_scam_smooth', 'tensor_scam_smooth', 'scam_smooth', 'mgcv.smooth')""","Unknown type of smooth",NA,1.0046373498837,3.77475828372553e-15,"ℹ In index: 1.
+Caused by error in `gratia::tidy_basis()` at gratia/R/basis-funs.R:263:3:
+! identical(NCOL(tbl), length(coefs)) is not TRUE","Don't know how to calculate partial derivatives for <scam>","no applicable method for 'overview' applied to an object of class ""c('scam', 'glm', 'lm')""",NA,NA,NA,NA,NA
+"tedecx",2,"","","tedecx.smooth",TRUE,"GCV","","","","ℹ In index: 1.
+Caused by error in `UseMethod()`:
+! no applicable method for 'smooth_values' applied to an object of class ""c('tedecx.smooth', 'double_mono_tensor_scam_smooth', 'tensor_scam_smooth', 'scam_smooth', 'double_mono_tensor_scam_smooth', 'tensor_scam_smooth', 'scam_smooth', 'mgcv.smooth')""","Unknown type of smooth",NA,0.473550498070053,8.10462807976364e-15,"ℹ In index: 1.
+Caused by error in `gratia::tidy_basis()` at gratia/R/basis-funs.R:263:3:
+! identical(NCOL(tbl), length(coefs)) is not TRUE","Don't know how to calculate partial derivatives for <scam>","no applicable method for 'overview' applied to an object of class ""c('scam', 'glm', 'lm')""",NA,NA,NA,NA,NA
+"tedmd",2,"","","tedmd.smooth",TRUE,"GCV","","","","ℹ In index: 1.
+Caused by error in `UseMethod()`:
+! no applicable method for 'smooth_values' applied to an object of class ""c('tedmd.smooth', 'double_mono_tensor_scam_smooth', 'tensor_scam_smooth', 'scam_smooth', 'double_mono_tensor_scam_smooth', 'tensor_scam_smooth', 'scam_smooth', 'mgcv.smooth')""","Unknown type of smooth",NA,4.08878662488009e-16,4.73316543132607e-29,"ℹ In index: 1.
+Caused by error in `gratia::tidy_basis()` at gratia/R/basis-funs.R:263:3:
+! identical(NCOL(tbl), length(coefs)) is not TRUE","Don't know how to calculate partial derivatives for <scam>","no applicable method for 'overview' applied to an object of class ""c('scam', 'glm', 'lm')""",NA,NA,NA,NA,NA
+"tedmi",2,"","Non-finite exponentiated coefficients at iteration 1 | Step size truncated due to divergence | Non-finite exponentiated coefficients at iteration 2 | Non-finite exponentiated coefficients at iteration 3 | Non-finite exponentiated coefficients at iteration 4 | Non-finite exponentiated coefficients at iteration 5","tedmi.smooth",TRUE,"GCV","","","","ℹ In index: 1.
+Caused by error in `UseMethod()`:
+! no applicable method for 'smooth_values' applied to an object of class ""c('tedmi.smooth', 'double_mono_tensor_scam_smooth', 'tensor_scam_smooth', 'scam_smooth', 'double_mono_tensor_scam_smooth', 'tensor_scam_smooth', 'scam_smooth', 'mgcv.smooth')""","Unknown type of smooth",NA,0.0105931699781706,6.66133814775094e-16,"ℹ In index: 1.
+Caused by error in `gratia::tidy_basis()` at gratia/R/basis-funs.R:263:3:
+! identical(NCOL(tbl), length(coefs)) is not TRUE","Don't know how to calculate partial derivatives for <scam>","no applicable method for 'overview' applied to an object of class ""c('scam', 'glm', 'lm')""",NA,NA,NA,NA,NA
+"temicv",2,"","Step size truncated due to divergence | Non-finite exponentiated coefficients at iteration 2 | Non-finite exponentiated coefficients at iteration 1 | Non-finite exponentiated coefficients at iteration 3 | Non-finite exponentiated coefficients at iteration 4 | Non-finite exponentiated coefficients at iteration 5 | Non-finite exponentiated coefficients at iteration 6 | Non-finite exponentiated coefficients at iteration 8 | Non-finite exponentiated coefficients at iteration 9 | Non-finite exponentiated coefficients at iteration 7 | Non-finite exponentiated coefficients at iteration 10 | Non-finite exponentiated coefficients at iteration 12 | Non-finite exponentiated coefficients at iteration 13 | Non-finite exponentiated coefficients at iteration 14 | Non-finite exponentiated coefficients at iteration 15 | Non-finite exponentiated coefficients at iteration 18","temicv.smooth",TRUE,"GCV","","","","ℹ In index: 1.
+Caused by error in `UseMethod()`:
+! no applicable method for 'smooth_values' applied to an object of class ""c('temicv.smooth', 'double_mono_tensor_scam_smooth', 'tensor_scam_smooth', 'scam_smooth', 'double_mono_tensor_scam_smooth', 'tensor_scam_smooth', 'scam_smooth', 'mgcv.smooth')""","Unknown type of smooth",NA,1.66666319122501,3.99680288865056e-15,"ℹ In index: 1.
+Caused by error in `gratia::tidy_basis()` at gratia/R/basis-funs.R:263:3:
+! identical(NCOL(tbl), length(coefs)) is not TRUE","Don't know how to calculate partial derivatives for <scam>","no applicable method for 'overview' applied to an object of class ""c('scam', 'glm', 'lm')""",NA,NA,NA,NA,NA
+"temicx",2,"","Step size truncated due to divergence","temicx.smooth",TRUE,"GCV","","","","ℹ In index: 1.
+Caused by error in `UseMethod()`:
+! no applicable method for 'smooth_values' applied to an object of class ""c('temicx.smooth', 'double_mono_tensor_scam_smooth', 'tensor_scam_smooth', 'scam_smooth', 'double_mono_tensor_scam_smooth', 'tensor_scam_smooth', 'scam_smooth', 'mgcv.smooth')""","Unknown type of smooth",NA,1.48437273053545,3.5527136788005e-15,"ℹ In index: 1.
+Caused by error in `gratia::tidy_basis()` at gratia/R/basis-funs.R:263:3:
+! identical(NCOL(tbl), length(coefs)) is not TRUE","Don't know how to calculate partial derivatives for <scam>","no applicable method for 'overview' applied to an object of class ""c('scam', 'glm', 'lm')""",NA,NA,NA,NA,NA
+"tescv",2,"","Non-finite exponentiated coefficients at iteration 21 | Step size truncated due to divergence | Non-finite exponentiated coefficients at iteration 1 | Non-finite exponentiated coefficients at iteration 2 | Non-finite exponentiated coefficients at iteration 3 | Non-finite exponentiated coefficients at iteration 4 | Non-finite exponentiated coefficients at iteration 5 | Non-finite exponentiated coefficients at iteration 6","tescv.smooth",TRUE,"GCV","","","","ℹ In index: 1.
+Caused by error in `UseMethod()`:
+! no applicable method for 'smooth_values' applied to an object of class ""c('tescv.smooth', 'single_mono_tensor_scam_smooth', 'tensor_scam_smooth', 'scam_smooth', 'single_mono_tensor_scam_smooth', 'tensor_scam_smooth', 'scam_smooth', 'mgcv.smooth')""","Unknown type of smooth",NA,2.16890726791933,1.07244968461373e-09,"ℹ In index: 1.
+Caused by error in `gratia::tidy_basis()` at gratia/R/basis-funs.R:263:3:
+! identical(sum(p_ident), length(coefs)) is not TRUE","Don't know how to calculate partial derivatives for <scam>","no applicable method for 'overview' applied to an object of class ""c('scam', 'glm', 'lm')""",NA,NA,NA,NA,NA
+"tescx",2,"","Non-finite exponentiated coefficients at iteration 3 | Step size truncated due to divergence | Non-finite exponentiated coefficients at iteration 4","tescx.smooth",TRUE,"GCV","","","","ℹ In index: 1.
+Caused by error in `UseMethod()`:
+! no applicable method for 'smooth_values' applied to an object of class ""c('tescx.smooth', 'single_mono_tensor_scam_smooth', 'tensor_scam_smooth', 'scam_smooth', 'single_mono_tensor_scam_smooth', 'tensor_scam_smooth', 'scam_smooth', 'mgcv.smooth')""","Unknown type of smooth",NA,2.56912580019506,1.06782627184998e-09,"ℹ In index: 1.
+Caused by error in `gratia::tidy_basis()` at gratia/R/basis-funs.R:263:3:
+! identical(sum(p_ident), length(coefs)) is not TRUE","Don't know how to calculate partial derivatives for <scam>","no applicable method for 'overview' applied to an object of class ""c('scam', 'glm', 'lm')""",NA,NA,NA,NA,NA
+"tesmd1",2,"","","tesmd1.smooth",TRUE,"GCV","","","","$ operator is invalid for atomic vectors","Unknown type of smooth",NA,1.89398537851909e-05,1.05518788151571e-11,"ℹ In index: 1.
+Caused by error in `gratia::tidy_basis()` at gratia/R/basis-funs.R:263:3:
+! identical(sum(p_ident), length(coefs)) is not TRUE","Don't know how to calculate partial derivatives for <scam>","no applicable method for 'overview' applied to an object of class ""c('scam', 'glm', 'lm')""",NA,NA,NA,NA,NA
+"tesmd2",2,"","","tesmd2.smooth",TRUE,"GCV","","","","$ operator is invalid for atomic vectors","Unknown type of smooth",NA,0.19254050307979,3.06690228768502e-10,"ℹ In index: 1.
+Caused by error in `gratia::tidy_basis()` at gratia/R/basis-funs.R:263:3:
+! identical(sum(p_ident), length(coefs)) is not TRUE","Don't know how to calculate partial derivatives for <scam>","no applicable method for 'overview' applied to an object of class ""c('scam', 'glm', 'lm')""",NA,NA,NA,NA,NA
+"tesmi1",2,"","","tesmi1.smooth",TRUE,"GCV","","","","$ operator is invalid for atomic vectors","Unknown type of smooth",NA,1.29135088765637,2.38165043242589e-11,"ℹ In index: 1.
+Caused by error in `gratia::tidy_basis()` at gratia/R/basis-funs.R:263:3:
+! identical(sum(p_ident), length(coefs)) is not TRUE","Don't know how to calculate partial derivatives for <scam>","no applicable method for 'overview' applied to an object of class ""c('scam', 'glm', 'lm')""",NA,NA,NA,NA,NA
+"tesmi2",2,"","","tesmi2.smooth",TRUE,"GCV","","","","$ operator is invalid for atomic vectors","Unknown type of smooth",NA,0.228248820562284,3.16303316871824e-10,"ℹ In index: 1.
+Caused by error in `gratia::tidy_basis()` at gratia/R/basis-funs.R:263:3:
+! identical(sum(p_ident), length(coefs)) is not TRUE","Don't know how to calculate partial derivatives for <scam>","no applicable method for 'overview' applied to an object of class ""c('scam', 'glm', 'lm')""",NA,NA,NA,NA,NA
+"tismd",2,"","","tismd.smooth",TRUE,"GCV","","","non-conformable arguments","$ operator is invalid for atomic vectors","Unknown type of smooth",NA,NA,NA,"ℹ In index: 1.
+Caused by error in `gratia::tidy_basis()` at gratia/R/basis-funs.R:263:3:
+! identical(NCOL(tbl), length(coefs)) is not TRUE","Don't know how to calculate partial derivatives for <scam>","no applicable method for 'overview' applied to an object of class ""c('scam', 'glm', 'lm')""",NA,NA,NA,NA,NA
+"tismi",2,"","","tismi.smooth",TRUE,"GCV","","","non-conformable arguments","$ operator is invalid for atomic vectors","Unknown type of smooth",NA,NA,NA,"ℹ In index: 1.
+Caused by error in `gratia::tidy_basis()` at gratia/R/basis-funs.R:263:3:
+! identical(sum(p_ident), length(coefs)) is not TRUE","Don't know how to calculate partial derivatives for <scam>","no applicable method for 'overview' applied to an object of class ""c('scam', 'glm', 'lm')""",NA,NA,NA,NA,NA
+"cr",1,"","","cr.smooth",TRUE,"GCV","","","","","",1,0,0,"","Don't know how to calculate derivatives for <scam>","no applicable method for 'overview' applied to an object of class ""c('scam', 'glm', 'lm')""",0,0,0,0,0
+"tp",1,"","","tprs.smooth",TRUE,"GCV","","","","","",1,0,0,"","Don't know how to calculate derivatives for <scam>","no applicable method for 'overview' applied to an object of class ""c('scam', 'glm', 'lm')""",0,0,0,0,0
+"ps",1,"","","pspline.smooth",TRUE,"GCV","","","","","",1,0,0,"","Don't know how to calculate derivatives for <scam>","no applicable method for 'overview' applied to an object of class ""c('scam', 'glm', 'lm')""",0,0,0,0,0

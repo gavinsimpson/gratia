@@ -66,6 +66,9 @@
 #'
 #'   Currently does not affect the y-axis scale of plots of the parametric
 #'   terms.
+#' @param frequentist logical; use frequentist covariance for smooth-component
+#'   intervals? The default uses approximate Bayesian covariance. Parametric
+#'   effect intervals retain their existing Bayesian covariance calculation.
 #' @param constant numeric; a constant to add to the estimated values of the
 #'   smooth. `constant`, if supplied, will be added to the estimated value
 #'   before the confidence band is computed.
@@ -103,8 +106,8 @@
 #'   approximate Bayesian credible interpretation of default-covariance bands.
 #'   Parametric panels retain pointwise intervals and are labelled accordingly
 #'   when simultaneous smooth bands are requested. Bands appear where the
-#'   renderer displays interval bounds; surface and random-effect QQ plots
-#'   retain their existing estimate or standard-error display.
+#'   renderer displays interval bounds, including 3D effect surfaces when
+#'   `ci_3d = TRUE`. Random-effect QQ plots retain their usual display.
 #' @inheritParams smooth_estimates
 #' @param n_sim,n_cores positive integers; coefficient draws and simulation cores
 #'   for simultaneous bands. Parallel simulation requires OpenMP support.
@@ -132,13 +135,18 @@
 #' @param grouped_by logical; should factor by smooths be drawn as one panel
 #'   per level of the factor (`FALSE`, the default), or should the individual
 #'   smooths be combined into a single panel containing all levels (`TRUE`)?
-#' @param ci_alpha numeric; alpha transparency for confidence or simultaneous
+#' @param ci_alpha Deprecated; use [gratia_theme_get()] theme
+#'   settings instead. Numeric; alpha transparency for confidence or simultaneous
 #'   interval.
-#' @param ci_col colour specification for the confidence/credible intervals
+#' @param ci_col Deprecated; use [gratia_theme_get()] theme
+#'   settings instead. Colour specification for the confidence/credible intervals
 #'   band. Affects the fill of the interval.
-#' @param smooth_col colour specification for the smooth line.
-#' @param resid_col colour specification for the partial residuals.
-#' @param contour_col colour specification for contour lines.
+#' @param smooth_col Deprecated; use [gratia_theme_get()] theme
+#'   settings instead. Colour specification for the smooth line.
+#' @param resid_col Deprecated; use [gratia_theme_get()] theme
+#'   settings instead. Colour specification for the partial residuals.
+#' @param contour_col Deprecated; use [gratia_theme_get()] theme
+#'   settings instead. Colour specification for contour lines.
 #' @param n_contour numeric; the number of contour bins. Will result in
 #'   `n_contour - 1` contour lines being drawn. See [ggplot2::geom_contour()].
 #' @param partial_match logical; should smooths be selected by partial matches
@@ -159,6 +167,17 @@
 #'   spherical smooths retain their geographic rendering.
 #'   Covariate scale changes that produce irregular spacing use rectangles
 #'   bounded by adjacent coordinate midpoints for flat surfaces.
+#' @param ci_3d logical; add lower and upper interval surfaces to numeric
+#'   smooth and parametric effect panels when `surface = "3d"`? Defaults to
+#'   `FALSE`. Applies across supported model classes and conditioning facets.
+#'   Other panel types, including standard errors, retain their usual display.
+#'   Smooth bounds follow `interval`; parametric bounds remain pointwise.
+#' @param ci_3d_alpha Deprecated; use [gratia_theme_get()] theme
+#'   settings instead. Numeric between 0 and 1; opacity of both interval
+#'   surfaces, independent of `ci_alpha`. Defaults to `0.15`.
+#' @param ci_3d_col Deprecated; use [gratia_theme_get()] theme
+#'   settings instead. One R colour; fill of both interval surfaces, independent
+#'   of `ci_col` and the estimate's continuous fill scale. Defaults to `"grey60"`.
 #' @param surface_3d named list of view options passed to [ggcube::coord_3d()],
 #'   for example `list(yaw = 45, persp = FALSE)`. The default `list()` uses the
 #'   default view with `ggcube::light(backface_scale = 1)`, preserving equal
@@ -240,7 +259,7 @@
 #' Three-dimensional faces retain the current diverging RdBu fill scale and
 #' effect-range rules, shared across conditioning facets. `continuous_fill`
 #' overrides the fill scale. Faces have no outlines; `contour_col` controls
-#' contour lines. Surface faces are fully opaque. Faces, contours, and floor
+#' contour lines. Estimate faces are fully opaque. Faces, contours, and floor
 #' observations are depth-sorted together, so nearer faces hide the parts behind
 #' them. The existing theme and facet styling are retained.
 #'
@@ -248,7 +267,11 @@
 #' (or standard error when requested) forms the vertical axis. Additional
 #' covariates retain their existing conditioning facets: `n_2d` controls surface
 #' resolution, while `n_3d` and `n_4d` control covariate slices. Fixed effect
-#' ranges are also used for the vertical axis. Confidence surfaces are not added.
+#' ranges are also used for the vertical axis. With `ci_3d = TRUE`, translucent
+#' lower and upper interval surfaces use the same mesh and masking as the
+#' estimate. Their heights expand the vertical range, while the continuous
+#' fill scale retains its existing range rules. `ci_3d_alpha` and `ci_3d_col`
+#' style these surfaces separately from univariate interval ribbons.
 #'
 #' Contours follow the displayed mesh, and available observations are projected
 #' onto its floor. Observations are not assigned to conditioning slices. Soap
@@ -302,6 +325,8 @@
 #' if (requireNamespace("ggcube", quietly = TRUE)) {
 #'   draw(m2, surface = "3d", n_2d = 20,
 #'     surface_3d = list(yaw = 45, persp = FALSE))
+#'   draw(m2, surface = "3d", ci_3d = TRUE, n_2d = 20) &
+#'     ggplot2::theme(gratia.alpha.surface.interval = 0.12)
 #'   panels <- assemble(m2, surface = "3d", n_2d = 20)
 #'   # Replace coordinates to customize a single term; retain the current theme.
 #'   panels[[1]] <- panels[[1]] +
@@ -359,12 +384,16 @@
   envir = NULL,
   surface = c("raster", "tile", "3d"),
   surface_3d = list(),
+  ci_3d = FALSE,
+  ci_3d_alpha = 0.15, ci_3d_col = "grey60",
   back_transform = FALSE,
   re_levels = NULL,
   mrf_plot = c("effects", "qq"),
   interval = c("confidence", "simultaneous"),
   n_sim = 10000, n_cores = 1, seed = NULL,
-  interval_method = c("auto", "gaussian", "bootstrap"),
+  interval_method = c("auto", "gaussian", "bootstrap", "shape"),
+  frequentist = FALSE,
+  shape_source = c("gaussian", "bootstrap"),
   ...
 ) {
   .call <- match.call()
@@ -417,16 +446,21 @@ draw_gam_impl <- function(
   envir = NULL,
   surface = c("raster", "tile", "3d"),
   surface_3d = list(),
+  ci_3d = FALSE,
+  ci_3d_alpha = 0.15, ci_3d_col = "grey60",
   back_transform = FALSE,
   re_levels = NULL,
   mrf_plot = c("effects", "qq"),
   interval = c("confidence", "simultaneous"),
   n_sim = 10000, n_cores = 1, seed = NULL,
-  interval_method = c("auto", "gaussian", "bootstrap"),
+  interval_method = c("auto", "gaussian", "bootstrap", "shape"),
+  frequentist = FALSE,
+  shape_source = c("gaussian", "bootstrap"),
   ...
 ) {
   surface <- match.arg(surface)
   validate_surface_3d(surface_3d)
+  validate_ci_3d(ci_3d, ci_3d_alpha, ci_3d_col)
   check_surface_dots(match.call(expand.dots = FALSE))
 
 
@@ -473,9 +507,17 @@ draw_gam_impl <- function(
 }
 
 #' @export
-`draw.scam` <- function(object, ..., overall_uncertainty = FALSE) {
-  class(object) <- append(class(object), "gam", after = 1)
-  draw.gam(object, overall_uncertainty = overall_uncertainty, ...)
+#' @rdname draw.gam
+#' @param centre character; for SCAM models, `"model"` retains each fitted
+#'   smooth contribution. `"plot"` subtracts the evaluation-grid mean from
+#'   each bivariate smooth to match [scam::plot.scam()]. The same linear
+#'   transformation is applied to its covariance. Univariate curves and
+#'   [smooth_estimates()] retain the fitted centring for either setting.
+`draw.scam` <- function(object, ..., overall_uncertainty = FALSE,
+  centre = c("model", "plot")) {
+  object <- scam_gam_adapter(object)
+  draw.gam(object, overall_uncertainty = overall_uncertainty,
+    centre = match.arg(centre), ...)
 }
 
 # TODO: Remove after dplyr 1.1.0 is released and use `multiple = "all"` instead

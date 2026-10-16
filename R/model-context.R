@@ -238,7 +238,7 @@ evaluated_model_frame <- function(model, data, envir = NULL) {
 
 # Native GAM prediction accepts a prepared model frame. This avoids evaluating
 # local calls again inside mgcv, after their environment has been discarded.
-predict_model <- function(object, newdata, ..., envir = NULL) {
+predict_model.default <- function(object, newdata, ..., envir = NULL) {
   if (missing(newdata)) return(stats::predict(object, ...))
   object <- with_model_envir(object, envir)
   # Native BAM code relies on base data-frame subsetting, including for an

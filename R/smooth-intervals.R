@@ -25,6 +25,13 @@ validate_smooth_interval <- function(interval, level, n_sim, n_cores, seed) {
   }
 }
 
+validate_shape_flag <- function(value, name) {
+  if (!is.logical(value) || length(value) != 1L || is.na(value)) {
+    cli::cli_abort("{.arg {name}} must be a single TRUE or FALSE for shape intervals.")
+  }
+  invisible(NULL)
+}
+
 # Use precisely the design that supplies component-wise smooth uncertainty.
 # Keep the fitted effect centre separate: overall mean uncertainty need not
 # change the centre. Returning active columns preserves existing SE arithmetic.
@@ -32,6 +39,16 @@ smooth_uncertainty_design <- function(smooth, X, model, V,
                                       overall_uncertainty = TRUE) {
   cols <- smooth$first.para:smooth$last.para
   if (nrow(X) == 0L) return(list(X = X, cols = cols))
+  if (inherits(model, "scam") && is_scam_smooth(smooth)) {
+    if (isTRUE(overall_uncertainty)) {
+      full <- matrix(0, nrow(X), ncol(V))
+      full[, cols] <- X
+      intercept <- which(names(stats::coef(model)) == "(Intercept)")
+      if (length(intercept)) full[, intercept] <- 1
+      return(list(X = full, cols = seq_len(ncol(V))))
+    }
+    return(list(X = X, cols = cols))
+  }
   n_cons <- attr(smooth, "nCons")
   if (isTRUE(overall_uncertainty) && !is.null(n_cons) && n_cons > 0L) {
     column_means <- model$cmX
@@ -53,12 +70,10 @@ smooth_uncertainty_design <- function(smooth, X, model, V,
 # and higher-dimensional slices are identical to the eventual plotting grids.
 add_smooth_intervals <- function(estimates, smooths, model, interval, ci_level,
                                  unconditional, frequentist, overall_uncertainty,
-                                 n_sim, n_cores, seed, interval_method = "gaussian") {
+                                 n_sim, n_cores, seed, interval_method = "gaussian",
+                                 shape_specs = NULL) {
   interval <- normalize_smooth_interval(interval)
   validate_smooth_interval(interval, ci_level, n_sim, n_cores, seed)
-  if (interval == "simultaneous" && inherits(model, "scam")) {
-    cli::cli_abort("Simultaneous smooth intervals are not supported for SCAM models.")
-  }
   calculate <- function() {
     V <- deviations <- NULL
     if (interval == "simultaneous") {
@@ -105,6 +120,10 @@ add_smooth_intervals <- function(estimates, smooths, model, interval, ci_level,
       d$.crit <- rep(unname(critical), nrow(d))
       d$.lower_ci <- lower
       d$.upper_ci <- upper
+      if (!is.null(shape_specs)) {
+        d <- scasm_enforce_smooth_band(d, smooths[[i]], shape_specs[[i]],
+          interval, ci_level)
+      }
       start <- 0L
       for (j in seq_along(pieces)) {
         estimates[[i]]$data[[j]] <- d[start + seq_len(sizes[j]), , drop = FALSE]

@@ -12,7 +12,7 @@ curve_data <- function(n = 3L) {
 }
 
 curve_geoms <- function(p) {
-  unname(vapply(p$layers, function(l) class(l$geom)[1L], character(1L)))
+  unname(vapply(p$layers, function(l) class(l$geom)[!grepl("^GeomGratia", class(l$geom))][1L], character(1L)))
 }
 
 test_that("ordinary curves preserve transformations, layers and styling", {

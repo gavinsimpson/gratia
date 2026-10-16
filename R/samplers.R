@@ -53,9 +53,10 @@
 #'   uncertainty corrected covariance matrix is used, *if available* for
 #'   `model`. See `mgcv::vcov.gam()`.
 #'   SCAM models do not support this correction; use `unconditional = FALSE`.
-#' @param parametrized logical; use parametrized coefficients and covariance
-#'   matrix, which respect the linear inequality constraints of the model. Only
-#'   for `scam::scam()` model fits.
+#' @param parametrized logical; for SCAM fits, transform Gaussian draws from
+#'   the unrestricted fitting coefficients using the fitted positivity transform.
+#'   This preserves the smooth's constraints. With `FALSE`, return Gaussian draws
+#'   in the unrestricted fitting coordinates. Only for `scam::scam()` fits.
 #' @param mvn_method character; one of `"mvnfast"` or `"mgcv"`. The default is
 #'   uses `mvnfast::rmvn()`, which can be considerably faster at generate large
 #'   numbers of MVN random values than `mgcv::rmvn()`, but which might not work
@@ -71,6 +72,19 @@
 #' Sampling controls must be named. Removed arguments produce migration errors;
 #' see `vignette("sampling-migration")`. Explicit controls that the selected
 #' method cannot use are rejected.
+#'
+#' For SCAM models, Gaussian draws approximate the distribution of the unrestricted
+#' fitting coefficients using `Vp` (or `Ve` with `frequentist = TRUE`), then apply
+#' scam's fitted exponential or `notExp` transformation. This is an approximation
+#' in fitting coordinates, rather than an exact constrained posterior. Supplied
+#' draws must already use the transformed coordinates in `coef(model)` order.
+#' Numerically singular covariance matrices are sampled by eigen decomposition;
+#' negative eigenvalues within `100 * .Machine$double.eps * ncol(V)` times the
+#' largest absolute eigenvalue are treated as zero. Larger negatives are errors.
+#' For weakly identified exponential coefficients, a very large fitting-coordinate
+#' variance can yield non-finite transformed draws. Sampling then reports an
+#' error because this Gaussian approximation cannot provide usable draws; supply
+#' finite transformed draws from a suitable alternative sampler.
 #'
 #' For multiple chains, `n_draws` is the total retained count and must be divisible
 #' by `chains`. Coefficient matrices carry a chain mapping; use
@@ -479,26 +493,44 @@
   chains <- layout$chains
   n_threads <- sampling_count(n_threads, "n_threads")
 
+  flags <- list(parametrized = parametrized, frequentist = frequentist)
+  for (name in names(flags)) {
+    value <- flags[[name]]
+    if (!is.logical(value) || length(value) != 1L || is.na(value)) stop(
+      "`", name, "` must be a single non-missing logical value.", call. = FALSE)
+  }
+
   check_scam_unconditional(model, unconditional)
   if (!is.null(seed)) {
     withr::local_seed(seed)
   }
   mvn_method <- match.arg(mvn_method, c("mvnfast", "mgcv"))
-  mu <- coef(model, parametrized = parametrized)
-  sigma <- vcov(model, freq = frequentist, parametrized = parametrized)
+  mu <- coef.scam(model, parametrized = FALSE)
+  # scam registers its own vcov.scam with a different parameterisation argument.
+  # Read fitting-coordinate covariances directly so package load order cannot
+  # silently select the transformed covariance.
+  sigma <- if (isTRUE(frequentist)) model$Ve else model$Vp
+  dimnames(sigma) <- list(names(mu), names(mu))
+  constrained <- stats::setNames(model$p.ident, names(mu))
   if (!is.null(index)) {
     mu <- mu[index]
     sigma <- sigma[index, index, drop = FALSE]
   }
-  betas <- if (isTRUE(identical(mvn_method, "mvnfast"))) {
-    mvnfast::rmvn(n = n_draws, mu = mu, sigma = sigma, ncores = n_threads)
-  } else {
-    mgcv::rmvn(n = n_draws, mu = mu, V = sigma)
+  if (!is.null(index)) constrained <- constrained[index]
+  betas <- scam_gaussian_matrix(n_draws, mu, sigma, mvn_method, n_threads)
+  if (isTRUE(parametrized) && any(constrained)) {
+    transform <- if (isTRUE(model$not.exp)) {
+      function(x) getFromNamespace("notExp", "scam")(x,
+        b = model$control$b.notexp %||% 1,
+        threshold = model$control$threshold.notexp %||% 20)
+    } else exp
+    betas[, constrained] <- transform(betas[, constrained, drop = FALSE])
+    if (any(!is.finite(betas))) stop(
+      "SCAM coefficient transformation overflowed; the Gaussian approximation produces non-finite draws.",
+      call. = FALSE)
   }
-  # if we ask for n=1 samples, we need to get back a matrix
-  if (!is.matrix(betas)) {
-    betas <- matrix(betas, nrow = n_draws, byrow = TRUE)
-  }
+  attr(betas, "scam_parameterization") <- if (isTRUE(parametrized))
+    "transformed" else "unrestricted"
   sampling_finish(
     betas,
     sampling_layout(n_draws, chains),
@@ -829,9 +861,11 @@ sampling_mh_worker <- function(
   draws
 }
 
-#' @details User-supplied coefficient draws are not currently supported for
-#'   SCAM models. Scalable posterior predictive plots need this sampling path;
-#'   use `scalable = FALSE` for an ordinary SCAM posterior predictive plot.
+#' @details For SCAM models, supplied draws must contain finite transformed
+#'   coefficients in the order returned by `coef(model)`. If column names are
+#'   supplied they must match exactly. Entries identified by `model$p.ident`
+#'   must be nonnegative. Draws returned with `parametrized = FALSE` cannot be
+#'   supplied directly for prediction; transform them first.
 #' @export
 #' @rdname user_draws
 user_draws.scam <- function(
@@ -843,10 +877,63 @@ user_draws.scam <- function(
   index = NULL
 ) {
   sampling_check_names(substitute(list(...)))
-  stop(
-    "Scalable posterior predictive plots are not currently available for SCAM models. Use scalable = FALSE.",
-    call. = FALSE
-  )
+  if (identical(attr(draws, "scam_parameterization"), "unrestricted")) stop(
+    "SCAM user draws must use transformed coefficients; these draws use unrestricted fitting coordinates.",
+    call. = FALSE)
+  if (!is.matrix(draws) || !is.numeric(draws) || any(!is.finite(draws))) stop(
+    "SCAM user draws must be a finite numeric matrix of transformed coefficients.",
+    call. = FALSE)
+  if (!is.null(colnames(draws)) &&
+      !identical(colnames(draws), names(coef(model)))) stop(
+    "SCAM user draw columns must match coef(model) names and order.", call. = FALSE)
+  if (ncol(draws) == length(coef(model)) &&
+      any(draws[, model$p.ident, drop = FALSE] < 0)) stop(
+    "SCAM user draws contain negative coefficients constrained to be nonnegative.",
+    call. = FALSE)
+  user_draws.gam(model, ..., draws = draws, n_draws = n_draws,
+    chains = chains, index = index)
+}
+
+#' @export
+#' @rdname post_draws
+#' @method generate_draws scam
+generate_draws.scam <- post_draws
+
+#' @export
+#' @rdname mh_draws
+mh_draws.scam <- function(model, ...) {
+  stop("Metropolis Hastings sampling is not implemented for SCAM models; use method = 'gaussian' or transformed user draws.",
+    call. = FALSE)
+}
+
+# Check the covariance before selecting a backend. Singular positive semidefinite
+# matrices need an eigen factor because the Cholesky backend requires full rank.
+scam_gaussian_matrix <- function(n, mu, V, method, n_threads) {
+  p <- length(mu)
+  if (!is.matrix(V) || !identical(dim(V), c(p, p)) ||
+      any(!is.finite(V)) || any(!is.finite(mu))) stop(
+    "SCAM Gaussian sampling requires finite coefficients and a matching covariance matrix.",
+    call. = FALSE)
+  scale <- max(abs(V))
+  tolerance <- 100 * .Machine$double.eps * max(1L, p)
+  if (max(abs(V - t(V))) > tolerance * scale) stop(
+    "SCAM coefficient covariance is not symmetric.", call. = FALSE)
+  V <- (V + t(V)) / 2
+  decomposition <- eigen(V, symmetric = TRUE)
+  eigen_scale <- max(abs(decomposition$values))
+  cutoff <- tolerance * eigen_scale
+  if (any(decomposition$values < -cutoff)) stop(
+    "SCAM coefficient covariance has materially negative eigenvalues.", call. = FALSE)
+  if (all(decomposition$values > cutoff)) {
+    draws <- if (method == "mvnfast") {
+      mvnfast::rmvn(n, mu, V, ncores = n_threads)
+    } else mgcv::rmvn(n, mu, V)
+    return(matrix(draws, nrow = n, ncol = p))
+  }
+  values <- pmax(decomposition$values, 0)
+  factor <- sweep(decomposition$vectors, 2L, sqrt(values), `*`)
+  z <- matrix(stats::rnorm(n * p), nrow = n, ncol = p)
+  sweep(z %*% t(factor), 2L, mu, `+`)
 }
 
 # Detect inequalities on the fitted coefficients, rather than a model class: one

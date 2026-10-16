@@ -21,7 +21,8 @@
 
 \item{ref_line}{logical; draw a horizontal reference line at zero?}
 
-\item{alpha}{numeric; opacity of the interval ribbon.}
+\item{alpha}{Deprecated; use \code{\link[=gratia_theme_get]{gratia_theme_get()}} theme
+settings instead. Numeric; opacity of the interval ribbon.}
 
 \item{xlab, ylab}{optional axis labels. Defaults identify the focal covariate
 and selected parameter. The computation scale appears in the caption.

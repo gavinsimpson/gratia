@@ -6,10 +6,11 @@
 #' implementation of `evaluate_smooth()`, and replaces that function, which has
 #' been removed from the package.
 #'
-#' @param object an object of class `"gam"` or `"gamm"`.
-#' @param select character; select which smooth's posterior to draw from.
-#'   The default (`NULL`) means the posteriors of all smooths in `model`
-#'   will be sampled from. If supplied, a character vector of requested terms.
+#' @param object a fitted model, including objects of class `"gam"`, `"gamm"`
+#'   or models fitted by [GJRM::gamlss()].
+#' @param select character, numeric or logical; smooths to evaluate, using labels
+#'   from [smooths()] or indices in fitted smooth order. The default (`NULL`)
+#'   evaluates all smooths.
 #' @param smooth `r lifecycle::badge("deprecated")` Use `select` instead.
 #' @param n numeric; the number of points over the range of the covariate at
 #'   which to evaluate a univariate smooth.
@@ -54,6 +55,12 @@
 #'   for pointwise intervals when available, and Gaussian intervals otherwise.
 #'   Use "gaussian" to request covariance-based limits or "bootstrap" to
 #'   require stored draws. Simultaneous bootstrap bands are not supported.
+#'   `"shape"` applies [shape_intervals()] to supported scasm smooth components,
+#'   using the initial limits chosen by `shape_source`.
+#' @param shape_source character; initial uncertainty for `interval_method =
+#'   "shape"`: `"gaussian"` (the default) or stored `"bootstrap"` pointwise
+#'   limits. Bootstrap sources require `frequentist = FALSE` and
+#'   `unconditional = FALSE` because the stored draws hold smoothing fixed.
 #' @param n_sim,n_cores positive integers; coefficient draws and simulation cores
 #'   for simultaneous bands. Parallel simulation requires OpenMP support.
 #' @param seed integer or `NULL`; an explicit simulation seed preserves the
@@ -79,6 +86,17 @@
 #' @return A data frame (tibble), which is of class `"smooth_estimates"`.
 #'
 #' @details
+#' For [GJRM::gamlss()] models, smooths are evaluated in equation and smooth
+#' order using the final fitted GJRM coefficients and covariance matrices.
+#' Selection uses the model-wide labels returned by [smooths()], including
+#' suffixes such as `s.1(x)` for repeated labels. Equations without smooths
+#' are skipped; a model without any smooths gives an error. All grid, data,
+#' environment, coordinate transformation and interval controls are passed to
+#' the GAM method for each selected equation. `frequentist = TRUE` uses the
+#' final GJRM frequentist covariance. A smoothing-parameter uncertainty
+#' correction is unavailable: `unconditional = TRUE` warns and uses the
+#' uncorrected final covariance, as for GAMs without that correction.
+#'
 #' For distributional and glmmTMB models with multiple linear predictors,
 #' an optional `.model` column identifies the model part or parameter
 #' associated with each smooth. This display metadata is retained in nested
@@ -96,7 +114,6 @@
 #' not claim joint coverage across selected smooths or the full fitted model.
 #' Increasing grid resolution improves the approximation to whole-curve coverage.
 #' `overall_uncertainty` and covariance options apply to both interval types.
-#' Simultaneous intervals for SCAM models are unsupported.
 #' SCAM smooth estimates retain the fitted centring and coefficient
 #' transformation when evaluation points are changed. Pointwise intervals use
 #' the covariance of the constrained coefficients. With
@@ -121,6 +138,50 @@
 #' plotmath arrows for increasing and decreasing constraints while `.type`
 #' and [smooth_type()] keep their existing basis names. Unsupported tensor
 #' requests produce a warning and are labelled as not retained.
+#'
+#' SCAM captions describe the basis and its constraints separately from the
+#' compact `.type` values. Increasing and decreasing constraints use plotmath
+#' arrows. Tensor captions name each covariate and its constraint; local
+#' constraints include the fitted change point. The `scam_smooth_info`
+#' attribute preserves these descriptions when plotting saved estimates.
+#'
+#' Shape enforcement is explicit and leaves the existing interval defaults
+#' unchanged. It preserves containment of a shape-restricted target whenever
+#' the entire initial band contains that target on the evaluation grid. This
+#' does not establish nominal coverage of the initial band, or preserve
+#' marginal coverage of transformed pointwise limits. The default Gaussian
+#' source uses approximate Bayesian covariance and does not construct a
+#' constrained posterior. Standard errors describe the initial calculation;
+#' `.crit` is `NA` after shape enforcement. Metadata records the initial source,
+#' correction, named shapes, model coordinates and whole-grid guarantee.
+#'
+#' Every selected term must have retained named scasm restrictions. Supported
+#' combinations are positivity, monotonicity in any directions and curvature
+#' in at most one direction. Tensor smooths require `te(..., np = FALSE)` with
+#' univariate B-spline margins (`"sc"` or `"bs"`). Normal reparameterisation
+#' and other complementary bases can invalidate the named surface shape even
+#' when coefficient inequalities were retained. Curvature additionally
+#' requires equally spaced fitted knots to rounding precision and degree at
+#' least two. Irregular evaluation
+#' coordinates are supported. Complete product grids, finite endpoints and
+#' evaluation inside the fitted B-spline domains are required; use `dist = 0`
+#' for tensors. Numeric `by` variables are unsupported; factor-by components
+#' and separate linear predictors are treated separately.
+#' Function-valued bases are required; derivative bases are unsupported.
+#' General `pc` inequalities can replace the named coefficient restrictions
+#' while leaving their original `xt` request in the fitted object. These
+#' replacements are labelled as general constraints and rejected for automatic
+#' shape intervals. Point equalities that retain the named inequalities are
+#' supported.
+#'
+#' Shape intervals use component-only uncertainty: explicit
+#' `overall_uncertainty = TRUE`, effect shifts and effect transformations are
+#' rejected. Coordinate transformations used in the model remain supported;
+#' their named shapes concern model coordinates. The transformed endpoints
+#' need not belong to the fitted spline space or obey centring equalities.
+#' See [shape_confidence_set()] for explicit coefficient restrictions and the
+#' [shape-constrained intervals article](https://gavinsimpson.github.io/gratia/articles/shape-constrained-intervals.html)
+#' for examples.
 #'
 #' Smoothing-parameter uncertainty is not currently supported for SCAM models;
 #' use `unconditional = FALSE`.
@@ -174,6 +235,16 @@
 #' ## or selected smooths
 #' smooth_estimates(m1, select = c("s(x0)", "s(x1)"))
 #'
+#' # Direct evaluation of a GJRM distributional model
+#' if (requireNamespace("GJRM", quietly = TRUE)) {
+#'   set.seed(82)
+#'   d <- data.frame(x = runif(100), z = runif(100))
+#'   d$y <- sin(6 * d$x) + rnorm(100, sd = exp(0.3 * d$z))
+#'   m <- GJRM::gamlss(list(y ~ s(x, k = 4), ~ s(z, k = 4)), data = d)
+#'   estimates <- smooth_estimates(m, n = 50)
+#'   draw(estimates)
+#' }
+#'
 #' # parallel processing of smooths
 #' if (requireNamespace("mirai") && requireNamespace("carrier")) {
 #'   library("mirai")
@@ -213,7 +284,8 @@
     back_transform = FALSE,
     interval = NULL, ci_level = 0.95,
     n_sim = 10000, n_cores = 1, seed = NULL,
-    interval_method = c("auto", "gaussian", "bootstrap"),
+    interval_method = c("auto", "gaussian", "bootstrap", "shape"),
+    shape_source = c("gaussian", "bootstrap"),
     ...) {
   overall_supplied <- !missing(overall_uncertainty)
   check_scam_unconditional(object, unconditional)
@@ -221,9 +293,6 @@
   interval <- normalize_smooth_interval(interval, allow_null = TRUE)
   if (!is.null(interval)) {
     validate_smooth_interval(interval, ci_level, n_sim, n_cores, seed)
-    if (interval == "simultaneous" && inherits(object, "scam")) {
-      cli::cli_abort("Simultaneous smooth intervals are not supported for SCAM models.")
-    }
   }
   model_name <- expr_label(substitute(object))
   object <- with_model_envir(object, envir)
@@ -246,10 +315,35 @@
 
   ## extract the mgcv.smooth objects
   smooths <- get_smooths_by_id(object, smooth_ids)
+  interval_method <- match.arg(interval_method)
+  shape_source <- match.arg(shape_source)
+  enforce_shape <- interval_method == "shape"
+  if (enforce_shape) {
+    validate_shape_flag(overall_uncertainty, "overall_uncertainty")
+    validate_shape_flag(frequentist, "frequentist")
+    validate_shape_flag(unconditional, "unconditional")
+  }
+  if (enforce_shape && is.null(interval)) {
+    cli::cli_abort("Request an interval when using interval_method = 'shape'.")
+  }
+  if (enforce_shape && overall_supplied && isTRUE(overall_uncertainty)) {
+    cli::cli_abort("Shape intervals use component-only uncertainty; set overall_uncertainty = FALSE.")
+  }
+  if (enforce_shape && shape_source == "bootstrap" &&
+      (isTRUE(frequentist) || isTRUE(unconditional))) {
+    cli::cli_abort("Stored bootstrap shape intervals require frequentist = FALSE and unconditional = FALSE.")
+  }
   overall_uncertainty <- scasm_overall_uncertainty(object,
     overall_uncertainty, overall_supplied, smooths)
   shape_constraints <- smooth_shape_constraints(object, smooths, smooth_ids)
-  resolved_method <- scasm_interval_method(object, interval_method,
+  shape_specs <- if (enforce_shape) Map(function(sm, id) {
+    scasm_shape_spec(object, sm, shape_constraints[[as.character(id)]])
+  }, smooths, smooth_ids) else NULL
+  if (enforce_shape && interval == "confidence") {
+    cli::cli_warn("Shape enforcement preserves whole-grid containment; transformed pointwise limits have no guaranteed pointwise calibration.")
+  }
+  resolved_method <- scasm_interval_method(object,
+    if (enforce_shape) shape_source else interval_method,
     interval = interval %||% "confidence")
 
   ## loop over the smooths and evaluate them
@@ -327,7 +421,7 @@
   if (!is.null(interval)) {
     sm_list <- add_smooth_intervals(sm_list, smooths, object, interval, ci_level,
       unconditional, frequentist, overall_uncertainty, n_sim, n_cores, seed,
-      interval_method = resolved_method)
+      interval_method = resolved_method, shape_specs = shape_specs)
   }
 
   # Tensor products of the two soap components can share both label and type.
@@ -364,10 +458,17 @@
   attr(sm_list, "surface_support") <- surface_support
   attr(sm_list, "tensor_plot_info") <- tensor_plot_info(object, smooths)
   if (length(shape_constraints)) attr(sm_list, "shape_constraints") <- shape_constraints
+  scam_info <- scam_smooth_info(object, smooths, smooth_ids)
+  if (length(scam_info)) attr(sm_list, "scam_smooth_info") <- scam_info
 
   if (!is.null(interval)) {
     attr(sm_list, "interval_info") <- scasm_interval_info(object,
       resolved_method, interval, ci_level)
+    if (enforce_shape) {
+      names(shape_specs) <- as.character(smooth_ids)
+      attr(sm_list, "interval_info") <- scasm_shape_interval_info(
+        attr(sm_list, "interval_info"), shape_specs, object, frequentist, unconditional)
+    }
     attr(sm_list, "interval_info")$scope <- "smooth"
     attr(sm_list, "interval_info")$overall_uncertainty <- overall_uncertainty &&
       all(vapply(smooths, function(sm) isTRUE(attr(sm, "nCons") > 0L), logical(1)))
@@ -378,6 +479,61 @@
 
   ## return
   sm_list
+}
+
+#' @rdname smooth_estimates
+#' @export
+smooth_estimates.gamlss <- function(object, select = NULL, smooth = deprecated(),
+    ..., partial_match = FALSE) {
+  if (lifecycle::is_present(smooth)) {
+    lifecycle::deprecate_warn("0.8.9.9", "smooth_estimates(smooth)",
+      "smooth_estimates(select)")
+    select <- smooth
+  }
+  components <- gjrm_gamlss_components(object)
+  labels <- gjrm_gamlss_smooth_labels(components)
+  if (!length(labels)) stop("No smooths in GJRM model.", call. = FALSE)
+  if (anyNA(select) || (is.numeric(select) &&
+      any(!is.finite(select) | select < 1 | select != floor(select)))) {
+    stop("Smooth indices in 'select' must be positive integers without missing values.")
+  }
+  selected <- check_user_select_smooths(labels, select,
+    partial_match = partial_match)
+  if (!any(selected)) stop("No smooths selected.", call. = FALSE)
+
+  results <- list()
+  start <- 0L
+  for (m in components) {
+    count <- length(m$smooth)
+    index <- start + seq_len(count)
+    if (any(selected[index])) {
+      # Use model-wide labels before evaluation so saved plotting metadata and
+      # repeated terms have the same identities as smooths(object).
+      for (i in seq_len(count)) m$smooth[[i]]$label <- labels[index[i]]
+      results[[length(results) + 1L]] <- smooth_estimates.gam(m,
+        select = selected[index], ..., partial_match = FALSE)
+    }
+    start <- start + count
+  }
+
+  out <- bind_rows(results)
+  for (attribute in c("tensor_term_order", "surface_support", "tensor_plot_info")) {
+    attr(out, attribute) <- do.call(c, lapply(results, attr, attribute))
+  }
+  coordinates <- lapply(results, attr, "coordinate_info")
+  info <- do.call(c, coordinates)
+  info <- info[!duplicated(names(info))]
+  attr(info, "smooth_variables") <- do.call(c,
+    lapply(coordinates, attr, "smooth_variables"))
+  attr(out, "coordinate_info") <- info
+  interval_info <- attr(out, "interval_info")
+  if (!is.null(interval_info)) {
+    interval_info$overall_uncertainty <- all(vapply(results, function(x) {
+      isTRUE(attr(x, "interval_info")$overall_uncertainty)
+    }, logical(1)))
+    attr(out, "interval_info") <- interval_info
+  }
+  out
 }
 
 #' @export
@@ -502,7 +658,17 @@
       env = environment(smooth$form)
     )
   }
-  predict_mat_rows(smooth, data)
+  X <- predict_mat_rows(smooth, data)
+  if (inherits(model, "scam") && is_scam_smooth(smooth)) {
+    X <- scam_smooth_matrix(smooth, X)
+    if (smooth_dim(smooth) == 2L &&
+        identical(attr(model, "gratia.scam.centre"), "plot")) {
+      offset <- attr(X, "offset")
+      X <- sweep(X, 2L, colMeans(X, na.rm = TRUE), FUN = "-")
+      if (!is.null(offset)) attr(X, "offset") <- offset - mean(offset, na.rm = TRUE)
+    }
+  }
+  X
 }
 
 #' Evaluate a spline at provided covariate values
@@ -529,6 +695,12 @@
     overall_uncertainty = TRUE,
     frequentist = FALSE, envir = NULL) {
   check_scam_unconditional(model, unconditional)
+  if (inherits(model, "scam") &&
+      inherits(reclass_scam_smooth(smooth), "scam_smooth")) {
+    return(spline_values_scam(smooth, data, model,
+      overall_uncertainty = overall_uncertainty, frequentist = frequentist,
+      envir = envir))
+  }
   model <- with_model_envir(model, envir)
   data <- prepare_smooth_data(model, smooth, data)
   is_soap <- is_soap_film(smooth)
@@ -611,37 +783,19 @@
 }
 
 #' @export
-`smooth_values.univariate_scam_smooth` <- function(
+`smooth_values.scam_smooth` <- function(
     smooth, data, model, V, overall_uncertainty = TRUE,
     ...) {
-  X <- predict_mat_rows(smooth, data) # prediction matrix
+  X <- smooth_predict_matrix(smooth, data, model)
   off <- attr(X, "offset") %||% 0
-  X <- scam_smooth_matrix(smooth, X)
   idx <- smooth_coef_indices(smooth)
   fit <- drop(X %*% coef(model)[idx]) + off
-  G <- X
-  intercept <- which(names(coef(model)) == "(Intercept)")
-  if (isTRUE(overall_uncertainty) && length(intercept)) {
-    G <- cbind(1, G)
-    idx <- c(intercept, idx)
-  }
+  design <- smooth_uncertainty_design(smooth, X, model, V,
+    overall_uncertainty = overall_uncertainty)
+  G <- design$X
+  idx <- design$cols
   se_fit <- sqrt(pmax(0, rowSums((G %*% V[idx, idx, drop = FALSE]) * G)))
   list(fit = fit, se = se_fit)
-}
-
-# Match SCAM's fitted constrained coefficient order. Some bases retain columns
-# whose coefficients were fixed to zero when the model was fitted.
-scam_smooth_matrix <- function(smooth, X) {
-  if (inherits(smooth, "po.smooth")) {
-    X <- X[, -1L, drop = FALSE]
-  } else if (inherits(smooth, "zero_point_scam_smooth")) {
-    X <- X[, -smooth$n.zero, drop = FALSE]
-  }
-  if (ncol(X) != length(smooth_coef_indices(smooth))) {
-    stop("Cannot align the SCAM smooth basis with its fitted coefficients.",
-      call. = FALSE)
-  }
-  X
 }
 
 `spline_values_scam` <- function(
@@ -1297,11 +1451,13 @@ scam_smooth_matrix <- function(smooth, X) {
 
 #' Plot the result of a call to `smooth_estimates()`
 #'
-#' @param decrease_col,increase_col colour specifications to use for
+#' @param decrease_col,increase_col Deprecated; use [gratia_theme_get()] theme
+#'   settings instead. Colour specifications to use for
 #'   indicating periods of change. `col_change` is used when
 #'   `change_type = "change"`, while `col_decrease` and `col_increase` are used
 #'   when `change_type = "sizer"``.
-#' @param change_lwd numeric; the value to set the `linewidth` to in
+#' @param change_lwd Deprecated; use [gratia_theme_get()] theme
+#'   settings instead. Numeric; the value to set the `linewidth` to in
 #'   [ggplot2::geom_line()], used to represent the periods of change.
 #' @param ylim numeric; vector of y axis limits to use all *all* panels drawn.
 #'
@@ -1310,6 +1466,9 @@ scam_smooth_matrix <- function(smooth, X) {
 #'   unchanged, adding pointwise bounds if absent. An explicit choice validates
 #'   stored interval metadata; `"credible"` aliases `"confidence"`. Simultaneous
 #'   bands must first be computed from the fitted model by [smooth_estimates()].
+#'   Method and uncertainty controls such as `interval_method`, `shape_source`,
+#'   `frequentist`, and `unconditional` also require the fitted model; they
+#'   cannot change intervals when drawing saved estimates.
 #'
 #' @export
 #' @importFrom patchwork wrap_plots
@@ -1331,7 +1490,10 @@ scam_smooth_matrix <- function(smooth, X) {
 #' draw(sm)
 #'
 #' # customising some plot elements
-#' draw(sm, ci_col = "steelblue", smooth_col = "forestgreen", ci_alpha = 0.3)
+#' draw(sm) & ggplot2::theme(
+#'   geom.gratia.interval = ggplot2::element_geom(fill = "steelblue"),
+#'   geom.gratia.smooth = ggplot2::element_geom(colour = "forestgreen"),
+#'   gratia.alpha.interval = 0.3)
 #'
 #' # Add a constant to the plotted smooth
 #' draw(sm, constant = coef(m)[1])
@@ -1373,20 +1535,33 @@ scam_smooth_matrix <- function(smooth, X) {
                                     caption = TRUE,
                                     surface = c("raster", "tile", "3d"),
                                     surface_3d = list(),
+                                    ci_3d = FALSE,
+                                    ci_3d_alpha = 0.15, ci_3d_col = "grey60",
                                     back_transform = FALSE,
                                     re_levels = NULL,
                                     mrf_plot = c("effects", "qq"),
                                     interval = NULL,
                                     ...) {
+  gratia_plot_arguments(c("contour_col", "ci_alpha", "ci_col", "smooth_col", "resid_col", "decrease_col", "increase_col", "change_lwd", "ci_3d_alpha", "ci_3d_col"), environment())
+  dots <- names(match.call(expand.dots = FALSE)$...)
+  controls <- intersect(dots, c("interval_method", "shape_source", "frequentist",
+    "unconditional", "overall_uncertainty", "ci_level", "n_sim", "n_cores", "seed"))
+  if (length(controls)) {
+    cli::cli_abort(c("Interval computation controls require the fitted model: {paste(controls, collapse = ', ')}.",
+      "i" = "Compute intervals with smooth_estimates(model, ...) before drawing saved estimates."))
+  }
   check_back_transform(back_transform)
   mrf_plot <- match.arg(mrf_plot)
   surface <- match.arg(surface)
   validate_surface_3d(surface_3d)
+  validate_ci_3d(ci_3d, ci_3d_alpha, ci_3d_col)
   check_surface_dots(match.call(expand.dots = FALSE))
   validate_tensor_plot_controls(re_levels)
   validate_estimate_re_levels(object, re_levels)
   interval_info <- validate_saved_smooth_interval(object, interval)
+  check_shape_effect_transform(interval_info, constant, fun)
   shape_constraints <- attr(object, "shape_constraints")
+  scam_info <- attr(object, "scam_smooth_info")
   plot_info <- attr(object, "tensor_plot_info")
   surface_support <- attr(object, "surface_support")
   if ("data" %in% names(object) && !".estimate" %in% names(object)) {
@@ -1440,6 +1615,7 @@ scam_smooth_matrix <- function(smooth, X) {
     mrf_plot = mrf_plot,
     tensor_plot_info = plot_info,
     surface = surface, surface_3d = surface_3d,
+    ci_3d = ci_3d, ci_3d_alpha = ci_3d_alpha, ci_3d_col = ci_3d_col,
     surface_support = surface_support,
     constant = constant,
     fun = fun,
@@ -1466,6 +1642,7 @@ scam_smooth_matrix <- function(smooth, X) {
     coordinate_info = attr(object, "coordinate_info"),
     interval_info = interval_info,
     shape_constraints = shape_constraints,
+    scam_smooth_info = scam_info,
     back_transform = back_transform,
     caption = caption,
     grouped_by = grouped_by,
@@ -1511,14 +1688,19 @@ scam_smooth_matrix <- function(smooth, X) {
                                     grouped_by = FALSE,
                                     surface = c("raster", "tile", "3d"),
                                     surface_3d = list(),
+                                    ci_3d = FALSE,
+                                    ci_3d_alpha = 0.15, ci_3d_col = "grey60",
                                     back_transform = FALSE,
                                     coordinate_info = NULL,
                                     surface_support = NULL,
                                     interval_info = NULL,
                                     shape_constraints = NULL,
+                                    scam_smooth_info = NULL,
                                     ...) {
+  check_shape_effect_transform(interval_info, constant, fun)
   surface <- match.arg(surface)
   validate_surface_3d(surface_3d)
+  validate_ci_3d(ci_3d, ci_3d_alpha, ci_3d_col)
   check_surface_dots(match.call(expand.dots = FALSE))
 
   plot_info <- tensor_plot_info[[unique(object$.smooth)[1L]]]
@@ -1572,16 +1754,28 @@ scam_smooth_matrix <- function(smooth, X) {
       "TPRS", "TPRS (shrink)", "CRS", "CRS (shrink)",
       "Cyclic CRS", "Cyclic P spline", "P spline", "B spline", "Duchon spline",
       "GP",
-      "Mono inc P spline",
-      "Mono dec P spline",
-      "Convex P spline",
-      "Concave P spline",
-      "Mono dec conv P spline",
-      "Mono dec conc P spline",
-      "Mono inc conv P spline",
-      "Mono inc conc P spline",
-      "Mono inc 0 start P spline",
-      "Mono inc 0 start P spline"
+      "P spline (inc)",
+      "P spline (dec)",
+      "P spline (convex)",
+      "P spline (concave)",
+      "P spline (dec, convex)",
+      "P spline (dec, concave)",
+      "P spline (inc, convex)",
+      "P spline (inc, concave)",
+      "P spline (inc, left=0)",
+      "P spline (inc, right=0)",
+      "P spline (pos)", "P spline (pos, inc)",
+      "P spline (pos, dec)", "Cyclic P spline (pos)",
+      "P spline (local inc)", "P spline (inc then flat)",
+      # Retain rendering for estimates saved before the compact type labels.
+      "Mono inc P spline", "Mono dec P spline",
+      "Convex P spline", "Concave P spline",
+      "Mono dec conv P spline", "Mono dec conc P spline",
+      "Mono inc conv P spline", "Mono inc conc P spline",
+      "Mono inc 0 start P spline", "Mono inc 0 end P spline",
+      "Positive P spline", "Positive increasing P spline",
+      "Positive decreasing P spline", "Positive cyclic P spline",
+      "Locally increasing P spline", "Increasing then level P spline"
     )) {
     class(object) <- append(class(object), "mgcv_smooth", after = 0L)
   } else if (grepl("1d Tensor product", sm_type, fixed = TRUE)) {
@@ -1714,10 +1908,12 @@ scam_smooth_matrix <- function(smooth, X) {
 
   attr(object, "interval_info") <- interval_info
   attr(object, "shape_constraints") <- shape_constraints
+  attr(object, "scam_smooth_info") <- scam_smooth_info
   plot_smooth(
     object,
     mrf_plot = mrf_plot,
     surface = surface, surface_3d = surface_3d,
+    ci_3d = ci_3d, ci_3d_alpha = ci_3d_alpha, ci_3d_col = ci_3d_col,
     surface_support = support,
     variables = sm_vars,
     rug = rug_data,

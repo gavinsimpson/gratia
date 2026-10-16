@@ -254,6 +254,7 @@
 #' @importFrom dplyr mutate across
 #' @importFrom tidyselect any_of
 `add_constant.smooth_estimates` <- function(object, constant = NULL, ...) {
+  check_shape_effect_transform(attr(object, "interval_info"), constant)
   ## If constant supplied, add it to `est`
   if (!is.null(constant)) {
     if (!is.numeric(constant)) {
@@ -423,7 +424,7 @@
 #' @details For smooth estimates, this function computes Gaussian pointwise
 #'   intervals from the saved estimates and standard errors. It replaces any
 #'   existing limits and updates their interval metadata. To retain stored
-#'   bootstrap or simultaneous limits, draw the estimates directly with
+#'   bootstrap, shape-enforced or simultaneous limits, draw the estimates directly with
 #'   [draw()] without calling `add_confint()`.
 #'
 #' @export
@@ -463,6 +464,9 @@
     info$level <- coverage
     info$method <- "gaussian"
     info$correction <- "none"
+    info[c("source", "shape", "operator", "domain", "coordinate_scale",
+      "coverage", "pointwise_calibration", "interpretation", "unconditional",
+      "unconditional_requested")] <- NULL
     attr(object, "interval_info") <- info
   }
 

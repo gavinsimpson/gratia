@@ -420,6 +420,7 @@ test_that("draw() works with a ziplss models; issue #45", {
 })
 
 test_that("draw works for sample_smooths objects", {
+  withr::local_options(lifecycle_verbosity = "quiet")
   skip_on_cran()
   # skip_on_ci() # testing without as moved to mac os x # minor statistical differences
 
@@ -446,6 +447,7 @@ test_that("draw works for sample_smooths objects", {
 })
 
 test_that("draw works for sample_smooths objects rotated labels", {
+  withr::local_options(lifecycle_verbosity = "quiet")
   skip_on_cran()
   # skip_on_ci() # testing without as moved to mac os x # minor statistical differences
 
@@ -484,6 +486,7 @@ test_that("draw works for sample_smooths objects rotated labels", {
 })
 
 test_that("draw works for smooth_samples objects", {
+  withr::local_options(lifecycle_verbosity = "quiet")
   skip_on_os("win")
   sm2 <- smooth_samples(su_m_bivar, n_draws = 2, seed = 23478, n_grid = 50)
   plt <- draw(sm2, alpha = 0.7, contour = TRUE)
@@ -493,6 +496,7 @@ test_that("draw works for smooth_samples objects", {
 })
 
 test_that("draw works for sample_smooths objects with n_samples", {
+  withr::local_options(lifecycle_verbosity = "quiet")
   skip_on_cran()
   # skip_on_ci() # testing without as moved to mac os x # minor statistical differences
 
@@ -512,6 +516,7 @@ test_that("draw works for sample_smooths objects with n_samples", {
 })
 
 test_that("draw works for sample_smooths objects with user specified smooth", {
+  withr::local_options(lifecycle_verbosity = "quiet")
   skip_on_cran()
   # skip_on_ci() # testing without as moved to mac os x # minor statistical differences
 

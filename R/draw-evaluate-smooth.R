@@ -72,16 +72,16 @@
   ## If fun supplied, use it to transform est and the upper and lower interval
   object <- transform_fun(object, fun = fun)
 
-  plt <- ggplot(object, aes(x = .data$value, y = .data$partial))
+  plt <- gratia_plot(object, aes(x = .data$value, y = .data$partial))
 
   if (is_fac) {
-    plt <- plt + geom_pointrange(aes(
+    plt <- plt + geom_gratia_effect_pointrange(aes(
       ymin = .data$lower,
       ymax = .data$upper
     ))
   } else {
     if (isTRUE(rug)) {
-      plt <- plt + geom_rug(sides = "b", position = position, alpha = 0.5)
+      plt <- plt + geom_gratia_rug(sides = "b", position = position, alpha = 0.5)
     }
     plt <- add_curve_interval(plt, lower_var = "lower", upper_var = "upper",
       ribbon_alpha = 0.3)
