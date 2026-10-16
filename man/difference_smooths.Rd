@@ -122,6 +122,37 @@ a new batch of coefficient draws, and the caller's random number state is
 restored on exit. With \code{seed = NULL}, the current random number state is
 used and advanced.
 }
+\section{Parallel calculation}{
+
+With mirai and carrier installed, configure workers with
+\code{mirai::daemons()} to distribute calculations across selected smooths.
+\code{\link[=difference_smooths]{difference_smooths()}} distributes factor-level comparisons instead.
+Without configured workers, or with only one calculation, evaluation is
+serial. These functions leave the caller's worker pool running.
+
+Model selection, evaluation of model expressions and random draws are
+prepared in the caller. Workers receive the coordinates and coefficient
+columns needed for their calculation. Custom prediction methods are evaluated
+in the caller, including custom tensor margins and factor-smooth bases;
+workers receive their prediction matrices. Simultaneous intervals use successive
+draws in selection order, so \code{set.seed()} gives the same results with or
+without workers, independently of their number or completion order.
+\code{derivatives()} uses \code{set.seed()}; the other functions also accept \code{seed},
+which restores the caller's random number state on exit.
+
+\code{\link[=smooth_samples]{smooth_samples()}} draws coefficients jointly once, then reuses those draws
+for every smooth, preserving dependence and chain identities. Sampling
+finishes before smooth calculations start, so MH chains and smooth workers
+are not nested. Sampling thread controls keep their existing meanings.
+Workers use their configured BLAS thread settings; when using a threaded
+BLAS, limit its threads before starting daemons to avoid competing threads.
+
+Parallel work is most useful for expensive bases or interval calculations.
+Small grids can be slower because of transfer and scheduling costs. Large
+grids and many draws also require memory for worker inputs and returned
+results, in addition to the final output.
+}
+
 \examples{
 
 load_mgcv()

@@ -114,6 +114,13 @@
   The calculation follows Liu and Zhang (2018), requires no additional package,
   and preserves accuracy in extreme tails (#359).
 
+* `derivatives()`, `partial_derivatives()`, `smooth_samples()` and
+  `difference_smooths()` now use workers configured by `mirai::daemons()`
+  for independent smooth or comparison calculations (#348). Serial execution
+  remains available without workers. Joint posterior draws, seeded simulation
+  results and result order are preserved across worker counts. Custom smooth
+  prediction methods are evaluated in the caller so workers use the same bases.
+
 * Plots now support native ggplot2 theme settings for smooths, intervals,
   residuals, diagnostics and other components, including completed patchwork
   figures. `gratia_theme_get()`, `gratia_theme_set()` and

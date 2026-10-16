@@ -50,40 +50,109 @@ smooth_derivative_data <- function(model, smooth, n, focal, wrt, order, type, ep
   out
 }
 
-# Evaluate the selected smooth at each finite-difference point. This keeps
-# formula offsets and unrelated smooths out of the calculation, and recomputes
-# calls after raw covariates change. A smooth's fixed boundary contribution is
-# differentiated alongside its basis, using exactly the same points.
-smooth_finite_difference <- function(model, smooth, data, focal, wrt, type, order, h) {
+# Resolve transformations before sending coordinates to a fresh R session.
+# Coefficient draws retain the existing full-model simulation order, but only
+# the selected columns cross the process boundary.
+prepare_derivative_task <- function(model, sm, data, focal, wrt, type, order,
+                                    h, betas, V, interval, interval_method,
+                                    level, n_sim, ncores) {
   if (!is.numeric(data[[focal]]) || is.matrix(data[[focal]])) {
     cli::cli_abort("The differentiation coordinate must be a numeric vector.")
   }
-  has_offset <- FALSE
-  at <- function(delta) {
+  stencil <- smooth_derivative_stencil(model, sm, data, focal, wrt, type, order, h)
+  idx <- smooth_coef_indices(sm)
+  X <- if (smooth_task_predict_in_caller(sm, model)) {
+    smooth_derivative_matrix(sm, stencil, model, h, order,
+      rownames(data), names(betas)[idx])
+  } else NULL
+  if (interval == "simultaneous" || interval_method == "bootstrap") {
+    validate_smooth_interval(interval, level, n_sim, ncores, NULL)
+  }
+  bootstrap <- if (interval_method == "bootstrap") {
+    bs <- model$bs[idx, , drop = FALSE]
+    Ve <- if (!is.null(attr(model$bs, "svar.only")) && !is.null(model$Ve)) {
+      model$Ve[idx, idx, drop = FALSE]
+    } else NULL
+    list(bs = bs, Ve = Ve)
+  } else NULL
+  list(sm = smooth_task_smooth(sm),
+    data = smooth_task_data(data[, unique(c(terms_in_smooth(sm), focal)), drop = FALSE]),
+    stencil = if (is.null(X)) stencil else NULL,
+    model = smooth_matrix_model(model), X = X,
+    betas = betas[idx], V = V[idx, idx, drop = FALSE],
+    h = h, order = order, focal = focal, interval = interval,
+    level = level, bootstrap = bootstrap)
+}
+
+calculate_smooth_derivative <- function(sm, data, stencil, model, betas, V,
+                                        h, order, focal, interval, level,
+                                        bootstrap, X = NULL) {
+  if (is.null(X)) {
+    X <- smooth_derivative_matrix(sm, stencil, model, h, order,
+      rownames(data), names(betas))
+  }
+  d <- compute_derivative(sm, X, betas, V, data, focal)
+  if (!is.null(bootstrap)) {
+    band <- scasm_bootstrap_limits(X, d$deriv$.derivative, d$deriv$.se,
+      betas, bootstrap$bs, bootstrap$Ve, level)
+    return(tibble::add_column(d$deriv, .crit = rep(NA_real_, nrow(d$deriv)),
+      .lower_ci = band$lower, .upper_ci = band$upper))
+  }
+  if (interval == "confidence") {
+    return(derivative_pointwise_int(d$deriv, level, "normal"))
+  }
+  list(data = d$deriv, X = d$Xi, V = V)
+}
+
+smooth_derivative_stencil <- function(model, sm, data, focal, wrt, type, order, h) {
+  deltas <- if (order == 1L) {
+    switch(type, forward = c(h, 0), backward = c(0, -h),
+      central = c(h / 2, -h / 2))
+  } else {
+    switch(type, forward = c(2 * h, h, 0), backward = c(0, -h, -2 * h),
+      central = c(h, 0, -h))
+  }
+  lapply(deltas, function(delta) {
     d <- data
     d[[focal]] <- d[[focal]] + delta
     attr(d, "gratia.evaluated") <- identical(wrt, "smooth")
     attr(d, "terms") <- NULL
-    d <- prepare_smooth_data(model, smooth, d)
-    X <- smooth_predict_matrix(smooth, d, model)
-    offset <- attr(X, "offset", exact = TRUE)
-    if (!is.null(offset)) has_offset <<- TRUE
-    cbind(X, if (is.null(offset)) rep(0, nrow(X)) else offset)
-  }
-  # Use the same forward, backward, and central stencils as existing methods.
-  if (order == 1L) {
-    ans <- switch(type, forward = (at(h) - at(0)) / h,
-      backward = (at(0) - at(-h)) / h,
-      central = (at(h / 2) - at(-h / 2)) / h)
+    smooth_task_data(prepare_smooth_data(model, sm, d)[, terms_in_smooth(sm), drop = FALSE])
+  })
+}
+
+smooth_derivative_matrix <- function(sm, stencil, model, h, order, row_names, coef_names) {
+  has_offset <- FALSE
+  matrices <- lapply(stencil, function(d) {
+    X <- smooth_predict_matrix(sm, d, model)
+    off <- attr(X, "offset", exact = TRUE)
+    if (!is.null(off)) has_offset <<- TRUE
+    cbind(X, if (is.null(off)) rep(0, nrow(X)) else off)
+  })
+  X <- if (order == 1L) {
+    (matrices[[1L]] - matrices[[2L]]) / h
   } else {
-    ans <- switch(type, forward = (at(2 * h) - 2 * at(h) + at(0)) / h^2,
-      backward = (at(0) - 2 * at(-h) + at(-2 * h)) / h^2,
-      central = (at(h) - 2 * at(0) + at(-h)) / h^2)
+    (matrices[[1L]] - 2 * matrices[[2L]] + matrices[[3L]]) / h^2
   }
-  # Existing interval routines consume a matrix in full coefficient order.
-  out <- matrix(0, nrow(ans), length(coef(model)),
-    dimnames = list(rownames(data), names(coef(model))))
-  out[, smooth_coef_indices(smooth)] <- ans[, -ncol(ans), drop = FALSE]
-  if (has_offset) attr(out, "offset") <- ans[, ncol(ans)]
+  offset <- X[, ncol(X)]
+  X <- X[, -ncol(X), drop = FALSE]
+  dimnames(X) <- list(row_names, coef_names)
+  if (has_offset) attr(X, "offset") <- offset
+  X
+}
+
+# Retain full coefficient order for callers of the finite-difference helper.
+smooth_finite_difference <- function(model, smooth, data, focal, wrt, type, order, h) {
+  if (!is.numeric(data[[focal]]) || is.matrix(data[[focal]])) {
+    cli::cli_abort("The differentiation coordinate must be a numeric vector.")
+  }
+  stencil <- smooth_derivative_stencil(model, smooth, data, focal, wrt, type, order, h)
+  idx <- smooth_coef_indices(smooth)
+  X <- smooth_derivative_matrix(smooth, stencil, model, h, order,
+    rownames(data), names(stats::coef(model))[idx])
+  out <- matrix(0, nrow(X), length(stats::coef(model)),
+    dimnames = list(rownames(data), names(stats::coef(model))))
+  out[, idx] <- X
+  if (!is.null(attr(X, "offset"))) attr(out, "offset") <- attr(X, "offset")
   out
 }

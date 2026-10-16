@@ -643,6 +643,8 @@ smooth_estimates.gamlss <- function(object, select = NULL, smooth = deprecated()
 
 # Construct a smooth's prediction matrix in the fitted coefficient order.
 `smooth_predict_matrix` <- function(smooth, data, model) {
+  # Optional smooth constructors register prediction methods when loaded.
+  if (inherits(model, "scam")) loadNamespace("scam")
   if (!is.null(model$dinfo) &&
     inherits(smooth, "random.effect") &&
     inherits(smooth, "tensor.smooth")) {

@@ -68,19 +68,28 @@ scasm_bootstrap_intervals <- function(model, X, estimate, se, level = 0.95,
       length(se) != length(estimate) || ncol(X) != length(cols)) {
     cli::cli_abort("Incompatible bootstrap estimates, standard errors and prediction matrix.")
   }
+  scasm_bootstrap_limits(X, estimate, se, stats::coef(model)[cols],
+    model$bs[cols, , drop = FALSE],
+    if (is.null(attr(model$bs, "svar.only")) || is.null(model$Ve)) NULL else
+      model$Ve[cols, cols, drop = FALSE], level)
+}
+
+# Inputs have already been validated against the fitted model. Keeping only
+# the required columns avoids copying all bootstrap coefficients to workers.
+scasm_bootstrap_limits <- function(X, estimate, se, coefficients, bs, Ve, level) {
   lower <- upper <- rep(NA_real_, length(estimate))
   names(lower) <- names(upper) <- names(estimate)
   valid <- is.finite(estimate) & is.finite(se) & rowSums(!is.finite(X)) == 0L
   if (any(valid)) {
     XX <- X[valid, , drop = FALSE]
-    ff <- XX %*% model$bs[cols, , drop = FALSE]
-    offset <- as.numeric(estimate[valid]) - drop(XX %*% stats::coef(model)[cols])
+    ff <- XX %*% bs
+    offset <- as.numeric(estimate[valid]) - drop(XX %*% coefficients)
     ff <- ff + offset
-    delta <- if (is.null(attr(model$bs, "svar.only")) || is.null(model$Ve)) {
+    delta <- if (is.null(Ve)) {
       0
     } else {
       mean(se[valid] - sqrt(pmax(0,
-        rowSums((XX %*% model$Ve[cols, cols, drop = FALSE]) * XX))))
+        rowSums((XX %*% Ve) * XX))))
     }
     alpha <- (1 - level) / 2
     adjustment <- delta * stats::qnorm(1 - alpha)
