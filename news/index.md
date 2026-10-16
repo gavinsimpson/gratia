@@ -157,7 +157,9 @@
   manage the optional `gratia.plot.theme` override.
   [`gratia_palette()`](https://gavinsimpson.github.io/gratia/reference/gratia_palette.md)
   provides optional Paul Tol palettes. Current default appearances are
-  retained ([\#215](https://github.com/gavinsimpson/gratia/issues/215)).
+  retained, including group legends without symbols for fixed-colour
+  partial residuals
+  ([\#215](https://github.com/gavinsimpson/gratia/issues/215)).
 
 - All 41 smooth constructors in scam 1.2-22 are supported for smooth
   estimates, bases, sampling and plots, including bivariate smooths,
