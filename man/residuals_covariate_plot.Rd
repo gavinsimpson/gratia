@@ -89,7 +89,8 @@ fitting call only when needed and verifying them in the same way.}
 \item{by}{optional name of a categorical covariate defining separate facets.}
 
 \item{type}{character or \code{NULL}; residual type: \code{"deviance"}, \code{"pearson"},
-\code{"response"}, \code{"pit"}, \code{"quantile"}, or \code{"dharma"}. Grouped models automatically use
+\code{"response"}, \code{"pit"}, \code{"quantile"}, \code{"dharma"}, or \code{"surrogate"} (for
+\code{ocat()} models). Grouped models automatically use
 quantile residuals when all active components are supported, otherwise all
 use deviance residuals with a message. Ordinary models retain deviance
 residuals by default. See \code{\link[=appraise]{appraise()}} for distributional support.}
@@ -109,7 +110,8 @@ blank. Counts for occupied cells are retained in the plotting data.}
 \item{statistic}{joint-map summary: \code{"mean"} or sample standard deviation,
 \code{"sd"}. Cells containing one observation have undefined standard deviation.}
 
-\item{seed}{integer; random seed to use for PIT, quantile or DHARMa-style residuals.}
+\item{seed}{integer; random seed to use for PIT, quantile, surrogate or
+DHARMa-style residuals.}
 
 \item{conditioning}{character or \code{NULL}; \code{"conditional"} holds fitted random
 effects fixed, \code{"marginal"} averages over new effects, and \code{"gam_component"}

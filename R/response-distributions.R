@@ -269,7 +269,8 @@ distribution_bounds <- function(y, family, wt = 1) {
 
 distribution_quantile_residuals <- function(distribution, y,
                                            type = c("pit", "quantile"),
-                                           seed = NULL) {
+                                           seed = NULL,
+                                           quantile_function = stats::qnorm) {
   type <- match.arg(type)
   if (!is.function(distribution$cdf))
     stop("Quantile residuals are unavailable: no response CDF.", call. = FALSE)
@@ -282,7 +283,8 @@ distribution_quantile_residuals <- function(distribution, y,
     if (isTRUE(native)) {
       adapter <- function(q, mu, wt, scale, log_p = FALSE, lower_tail = TRUE)
         cdf(q, log_p = log_p, lower_tail = lower_tail)
-      return(log_tail_residuals(bounds, NULL, NULL, NULL, adapter, type))
+      return(log_tail_residuals(bounds, NULL, NULL, NULL, adapter, type,
+        quantile_function = quantile_function))
     }
     r <- if (is.function(bounds$cdf_upper)) bounds$cdf_upper() else cdf(bounds$upper)
     random <- which(bounds$lower != bounds$upper | (bounds$left_limit %||% FALSE))
@@ -290,7 +292,7 @@ distribution_quantile_residuals <- function(distribution, y,
       lower <- if (is.function(bounds$cdf_lower)) bounds$cdf_lower() else cdf(bounds$lower)
       r[random] <- stats::runif(length(random), lower[random], r[random])
     }
-    if (type == "quantile") stats::qnorm(r) else r
+    if (type == "quantile") quantile_function(r) else r
   }
   unname(if (is.null(seed)) compute() else withr::with_seed(seed, compute()))
 }

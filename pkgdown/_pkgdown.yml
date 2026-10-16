@@ -150,6 +150,7 @@ reference:
       - residuals_covariate_plot
       - scalable_residuals_covariate_plot
       - quantile_residuals
+      - surrogate_residuals
       - dharma_residuals
       - residual_correlation
       - add_residuals

@@ -64,6 +64,8 @@ bands or significance tests.
 \details{
 Use \code{type = "dharma"} and \code{n_dharma} for simulation-based PIT residuals
 on the uniform scale; see \code{\link[=dharma_residuals]{dharma_residuals()}}.
+Use \code{type = "surrogate"} for \code{ocat()} models to calculate correlations of
+residuals on the latent logistic scale; see \code{\link[=surrogate_residuals]{surrogate_residuals()}}.
 
 BAM's generalized estimating equations (GEE) AR1 correction acts on the
 weighted working response used for fitting. Whitening

@@ -132,7 +132,8 @@ and \code{method = "uniform"}, and for randomised quantile residuals and
 posterior predictive draws.}
 
 \item{type}{character or \code{NULL}; residual type: \code{"deviance"}, \code{"response"},
-\code{"pearson"}, \code{"pit"}, \code{"quantile"}, or \code{"dharma"}. \code{NULL} uses the model-specific default:
+\code{"pearson"}, \code{"pit"}, \code{"quantile"}, \code{"dharma"}, or \code{"surrogate"} (for
+\code{ocat()} models). \code{NULL} uses the model-specific default:
 deviance for ordinary lm/glm/GAM fits, and quantile for supported grouped
 families, GJRM, sdmTMB and full mixed-model checks. glmmTMB uses Pearson
 residuals conditionally and response residuals marginally. Extracted GAM
@@ -243,6 +244,12 @@ QQ and worm plots require \code{method = NULL} and use uniform reference
 quantiles, with approximate pointwise bands for independent responses.
 Bands are omitted for dependent responses. Censored and multivariate
 outcomes are unsupported. See \code{\link[=dharma_residuals]{dharma_residuals()}} for the calculation.
+
+Use \code{type = "surrogate"} for \code{\link[mgcv:ocat]{mgcv::ocat()}} models. These residuals are
+continuous draws on the latent logistic scale, centred at the fitted latent
+mean. QQ and worm plots require \code{method = NULL} and compare to a logistic
+distribution with location zero and scale one. Each appraisal shares one
+residual vector across panels. See \code{\link[=surrogate_residuals]{surrogate_residuals()}}.
 
 With \code{type = NULL}, ordinary lm/glm/GAM fits use deviance residuals.
 Models fitted with \code{\link[mgcv:gfam]{mgcv::gfam()}} use randomised quantile (Dunn--Smyth)

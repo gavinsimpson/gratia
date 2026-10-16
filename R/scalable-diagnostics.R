@@ -88,7 +88,7 @@ diagnostic_data.gam <- function(model, type = NULL, seed = NULL, conditioning = 
   rows <- which(!is.na(model_row_map(model)))
   model <- model_used_rows(model)
   r <- diagnostic_residuals(model, type = type, seed = seed, n_dharma = n_dharma)
-  if (type %in% c("pit", "quantile", "dharma")) {
+  if (type %in% c("pit", "quantile", "dharma", "surrogate")) {
     attr(model, "gratia.diagnostics") <- list(type = type, residuals = r, seed = seed, n_dharma = if (type == "dharma") dharma_simulation_count(model, n_dharma) else NULL)
   }
   y <- model$y
@@ -225,13 +225,17 @@ diagnostic_qq_data.default <- function(
     if (!is.null(method)) stop("DHARMa-style residuals require method = NULL.", call. = FALSE)
     return(dharma_qq_reference(diagnostics, level, by_family))
   }
-  if (type %in% c("pit", "quantile")) {
+  if (type %in% c("pit", "quantile", "surrogate")) {
+    if (type == "surrogate" && !is.null(method)) stop(
+      "Surrogate residuals use a fixed logistic reference; use method = NULL.",
+      call. = FALSE)
     if (!is.null(method) && !(type == "quantile" && method == "normal"))
       stop("Calibrated residuals use a fixed reference distribution.", call. = FALSE)
     df <- calibrated_residual_reference(diagnostics$data[c("residuals",
       intersect(".family", names(diagnostics$data)))], type, level, FALSE, by_family,
       distribution = response_distribution(model), n_simulate = n_simulate)
-    return(list(data = df, method = if (type == "pit") "uniform reference" else "normal",
+    return(list(data = df, method = switch(type, pit = "uniform reference",
+      surrogate = "logistic", "normal"),
       intercept = 0, slope = 1, center = df$theoretical, by_family = by_family,
       subtitle = calibrated_reference_subtitle(type),
       caption = diagnostic_qq_caption(model, df),
@@ -511,8 +515,7 @@ render_diagnostic_qq <- function(
   plt <- plt +
     ggplot2::labs(
       x = if (is.null(xlab)) {
-        if (type == "pit") "Uniform quantiles" else
-          if (type == "quantile") "Std. normal quantiles" else "Theoretical quantiles"
+        calibrated_reference_axis(type)
       } else xlab,
       y = if (is.null(ylab)) {
         paste0(diagnostic_residual_label(type), if (worm) " (Deviation)" else "")
@@ -558,7 +561,9 @@ render_diagnostic_qq <- function(
 #'   Used only for `density_method = "kde"` and conditional density.
 #' @param type Residual type; `NULL` follows the model-specific defaults in
 #'   [appraise()]. PIT and quantile residuals are available for supported response
-#'   distributions; see [diagnostic_support].
+#'   distributions. `"surrogate"` is available for `ocat()` models and uses
+#'   logistic QQ references with `method = NULL`; see [surrogate_residuals()]
+#'   and [diagnostic_support].
 #' @inheritParams qq_plot
 #' @inheritParams appraise
 #' @param level Coverage of pointwise QQ reference intervals, strictly between

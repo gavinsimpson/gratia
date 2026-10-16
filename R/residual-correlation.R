@@ -26,6 +26,8 @@
 #' @details
 #' Use `type = "dharma"` and `n_dharma` for simulation-based PIT residuals
 #' on the uniform scale; see [dharma_residuals()].
+#' Use `type = "surrogate"` for `ocat()` models to calculate correlations of
+#' residuals on the latent logistic scale; see [surrogate_residuals()].
 #'
 #' BAM's generalized estimating equations (GEE) AR1 correction acts on the
 #' weighted working response used for fitting. Whitening

@@ -44,7 +44,8 @@
 #'   facets. Standalone `observed_fitted_plot()` facets by default and permits
 #'   explicit pooling. Ignored for ordinary models.
 #' @param type character or `NULL`; residual type: `"deviance"`, `"response"`,
-#'   `"pearson"`, `"pit"`, `"quantile"`, or `"dharma"`. `NULL` uses the model-specific default:
+#'   `"pearson"`, `"pit"`, `"quantile"`, `"dharma"`, or `"surrogate"` (for
+#'   `ocat()` models). `NULL` uses the model-specific default:
 #'   deviance for ordinary lm/glm/GAM fits, and quantile for supported grouped
 #'   families, GJRM, sdmTMB and full mixed-model checks. glmmTMB uses Pearson
 #'   residuals conditionally and response residuals marginally. Extracted GAM
@@ -93,6 +94,13 @@
 #'   Bands condition on fitted parameters and exclude fitting uncertainty; they
 #'   do not provide simultaneous coverage. Traditional residuals use the fitted
 #'   response distributions or a normal approximation.
+#'
+#'   For [mgcv::ocat()] fits, `type = "surrogate"` uses logistic reference
+#'   quantiles with location zero and scale one. Set `method = NULL`. Independent
+#'   observations have approximate pointwise bands obtained by applying
+#'   `qlogis()` to beta order-statistic limits. Worm plots subtract the same
+#'   logistic reference quantiles from residuals and bands. These references
+#'   treat fitted parameters as fixed. See [surrogate_residuals()].
 #'
 #'   Subtitles name the method. Captions identify conditioning and field choices,
 #'   joint simulation bands or omitted bands. Routine pointwise bands are unlabelled.
@@ -221,7 +229,7 @@ qq_plot.default <- function(model, ...) {
   # figure out method stuff
   type <- diagnostic_type(model, type)
   by_family <- diagnostic_by_family(model, type, by_family)
-  if (type %in% c("pit", "quantile")) {
+  if (type %in% c("pit", "quantile", "surrogate")) {
     return(calibrated_qq_plot(model, method, level, FALSE, by_family,
       ylab, xlab, title, subtitle, caption, ci_col, ci_alpha,
       point_col, point_alpha, line_col, type = type, n_simulate = n_simulate))
@@ -509,7 +517,8 @@ qq_uniform <- function(model, n = 10,
 #' @param model a fitted model supported by [diagnostic_support].
 #' @inheritParams appraise
 #' @param type character or `NULL`; residual type: `"deviance"`, `"pearson"`,
-#'   `"response"`, `"pit"`, `"quantile"`, or `"dharma"`. Grouped models automatically use
+#'   `"response"`, `"pit"`, `"quantile"`, `"dharma"`, or `"surrogate"` (for
+#'   `ocat()` models). Grouped models automatically use
 #'   quantile residuals when all active components are supported, otherwise all
 #'   use deviance residuals with a message. Ordinary models retain deviance
 #'   residuals by default. See [appraise()] for distributional support.
@@ -538,7 +547,8 @@ qq_uniform <- function(model, n = 10,
 #'   plots and retains original predictors in facets. `TRUE` or `FALSE` overrides
 #'   this independently of the residual type and layout. Only finite observations
 #'   included in each component determine its ranks; average ties are used.
-#' @param seed integer; random seed to use for PIT, quantile or DHARMa-style residuals.
+#' @param seed integer; random seed to use for PIT, quantile, surrogate or
+#'   DHARMa-style residuals.
 #' @param ... optional arguments passed to model preparation, such as the
 #'   sdmTMB `field_method`.
 #'
@@ -574,10 +584,11 @@ qq_uniform <- function(model, n = 10,
   type <- diagnostic_type(model, type, allow_pit = TRUE)
   by_family <- diagnostic_by_family(model, type, by_family)
   y_intercept <- 0
-  if (type %in% c("pit", "quantile", "dharma")) {
+  if (type %in% c("pit", "quantile", "dharma", "surrogate")) {
     r <- diagnostic_residuals(model, type = type, seed = seed)
     if (type %in% c("pit", "dharma")) y_intercept <- 0.5
-    if (is.null(ylab) && type == "dharma") ylab <- diagnostic_residual_label(type)
+    if (is.null(ylab) && type %in% c("dharma", "surrogate"))
+      ylab <- diagnostic_residual_label(type)
     if (is.null(ylab) && type == "pit") {
       ylab <- "PIT residuals"
       y_intercept <- 0.5
@@ -766,7 +777,7 @@ qq_uniform <- function(model, n = 10,
   type <- diagnostic_type(model, type, allow_pit = TRUE)
   by_family <- diagnostic_by_family(model, type, by_family)
 
-  if (type %in% c("pit", "quantile", "dharma")) {
+  if (type %in% c("pit", "quantile", "dharma", "surrogate")) {
     r <- diagnostic_residuals(model, type = type, seed = seed)
   } else {
     r <- diagnostic_residuals(model, type = type)
@@ -950,7 +961,7 @@ worm_plot.default <- function(model, ...) {
 
   type <- diagnostic_type(model, type)
   by_family <- diagnostic_by_family(model, type, by_family)
-  if (type %in% c("pit", "quantile")) {
+  if (type %in% c("pit", "quantile", "surrogate")) {
     return(calibrated_qq_plot(model, method, level, TRUE, by_family,
       ylab, xlab, title, subtitle, caption, ci_col, ci_alpha,
       point_col, point_alpha, line_col, type = type, n_simulate = n_simulate))

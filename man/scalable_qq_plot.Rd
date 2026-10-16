@@ -121,7 +121,9 @@ error; a normal approximation must be requested explicitly.}
 
 \item{type}{Residual type; \code{NULL} follows the model-specific defaults in
 \code{\link[=appraise]{appraise()}}. PIT and quantile residuals are available for supported response
-distributions; see \link{diagnostic_support}.}
+distributions. \code{"surrogate"} is available for \code{ocat()} models and uses
+logistic QQ references with \code{method = NULL}; see \code{\link[=surrogate_residuals]{surrogate_residuals()}}
+and \link{diagnostic_support}.}
 
 \item{n_uniform}{numeric; number of inverse-CDF draws to average when
 \code{method = "uniform"}.}

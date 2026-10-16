@@ -110,6 +110,9 @@ diagnostic_residuals <- function(model, type, seed = NULL, n_dharma = NULL) {
   if (!is.null(cached) && identical(cached$type, type)) {
     return(restore_model_rows(cached$residuals, model))
   }
+  if (identical(type, "surrogate")) {
+    return(surrogate_residuals(model, seed = seed))
+  }
   if (type %in% c("pit", "quantile")) {
     return(quantile_residuals(model, type = type, seed = seed))
   }
@@ -200,9 +203,11 @@ diagnostic_type <- function(model, type = NULL, allow_pit = TRUE) {
       "grouped component ", paste(unsupported, collapse = ", "), ".")
     return("deviance")
   }
-  choices <- if (allow_pit) c("deviance", "response", "pearson", "pit", "quantile", "dharma")
-    else c("deviance", "response", "pearson", "quantile", "dharma")
-  match.arg(type, choices)
+  choices <- if (allow_pit) c("deviance", "response", "pearson", "pit", "quantile", "dharma", "surrogate")
+    else c("deviance", "response", "pearson", "quantile", "dharma", "surrogate")
+  type <- match.arg(type, choices)
+  if (type == "surrogate") check_surrogate_model(model)
+  type
 }
 
 diagnostic_by_family <- function(model, type, by_family = NULL) {
@@ -309,6 +314,9 @@ calibrated_qq_plot <- function(model, method, level, detrend, by_family,
                                ylab, xlab, title, subtitle, caption, ci_col,
                                ci_alpha, point_col, point_alpha, line_col, type = "quantile", n_simulate = 50L) {
   if (!is.null(method) && !(type == "quantile" && identical(method, "normal"))) {
+    if (type == "surrogate") stop(
+      "Surrogate residuals use a fixed logistic reference; use method = NULL.",
+      call. = FALSE)
     stop("Calibrated residuals use a fixed standard-normal reference; use ",
       "'type = \"deviance\"' for uniform or simulated response references.", call. = FALSE)
   }
@@ -325,8 +333,8 @@ calibrated_qq_plot <- function(model, method, level, detrend, by_family,
       ggokabeito::scale_colour_okabe_ito(limits = gfam_diagnostic_labels(model),
         drop = FALSE)
   } else plt <- plt + ggplot2::geom_point(colour = point_col, alpha = point_alpha)
-  plt <- plt + ggplot2::labs(x = xlab %||% if (type == "pit") "Uniform quantiles" else "Std. normal quantiles",
-    y = ylab %||% paste0(if (type == "pit") "PIT" else "Quantile", " residuals",
+  plt <- plt + ggplot2::labs(x = xlab %||% calibrated_reference_axis(type),
+    y = ylab %||% paste0(diagnostic_residual_label(type),
       if (detrend) " (Deviation)" else ""),
     title = title %||% if (detrend) "Worm plot of residuals" else "QQ plot of residuals",
     subtitle = subtitle %||% calibrated_reference_subtitle(type),

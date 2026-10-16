@@ -408,7 +408,7 @@ calibrated_residual_reference <- function(data, type, level, detrend = FALSE,
   if (!nrow(data)) stop("No finite calibrated residuals are available.", call. = FALSE)
   parts <- if (by_family && ".family" %in% names(data))
     split(data, data$.family, drop = TRUE) else list(data)
-  transform <- if (type == "pit") identity else stats::qnorm
+  transform <- calibrated_reference_quantile(type)
   independent <- is.null(distribution) || (isTRUE(distribution$independent) &&
     !identical(distribution$calibration, "simulation ranks"))
   joint <- !independent && isTRUE(distribution$joint_available) && is.function(distribution$rd)
@@ -423,7 +423,9 @@ calibrated_residual_reference <- function(data, type, level, detrend = FALSE,
       reference <- qq_reference_draws(part$residuals,
         draw = function(p) distribution$rd(),
         residual = function(y) as.vector(distribution_quantile_residuals(
-          distribution, observe_diagnostic_response(distribution, y), type))[part$.row],
+          distribution, observe_diagnostic_response(distribution, y),
+          if (type == "surrogate") "quantile" else type,
+          quantile_function = transform))[part$.row],
         n = n_simulate, method = "simulate", level = level)
       part$lower <- reference$lower
       part$upper <- reference$upper
@@ -486,7 +488,20 @@ prepare_diagnostic_data <- function(model, type = NULL, seed = NULL,
 
 
 calibrated_reference_subtitle <- function(type) {
+  if (type == "surrogate") return(diagnostic_qq_subtitle("logistic"))
   diagnostic_qq_subtitle(if (type %in% c("pit", "dharma")) "uniform" else "normal")
+}
+
+calibrated_reference_quantile <- function(type) {
+  switch(type, pit = identity, dharma = identity, quantile = stats::qnorm,
+    surrogate = stats::qlogis,
+    stop("Unsupported residual reference distribution.", call. = FALSE))
+}
+
+calibrated_reference_axis <- function(type) {
+  switch(type, pit = "Uniform quantiles",
+    quantile = "Std. normal quantiles", surrogate = "Logistic quantiles",
+    "Theoretical quantiles")
 }
 
 diagnostic_posterior_source <- function(model) UseMethod("diagnostic_posterior_source")

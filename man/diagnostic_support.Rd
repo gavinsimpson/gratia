@@ -20,6 +20,11 @@ PIT means probability integral transform: the fitted cumulative distribution
 function (CDF) maps each observation to a probability. At discrete values,
 that probability is randomised over the corresponding probability mass.
 Quantile residuals transform PIT values to standard-normal scores.
+Surrogate residuals for \code{\link[mgcv:ocat]{mgcv::ocat()}} models transform the same randomised
+probabilities to logistic scores. Their reference has location zero and
+scale one, and fitting weights do not rescale it. They hold fitted random
+effects fixed and use the same observation alignment and seed conventions.
+Select them explicitly with \code{type = "surrogate"}; see \code{\link[=surrogate_residuals]{surrogate_residuals()}}.
 A posterior predictive check (PPC) compares observed responses with simulated
 data sets that also include approximate uncertainty in fitted parameters.
 

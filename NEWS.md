@@ -98,6 +98,12 @@
 
 ## New features
 
+* Surrogate residuals are available for `mgcv::ocat()` models through
+  `surrogate_residuals()` and `type = "surrogate"` in residual diagnostic plots
+  and `add_residuals()`. QQ and worm plots use logistic reference quantiles.
+  The calculation follows Liu and Zhang (2018), requires no additional package,
+  and preserves accuracy in extreme tails (#359).
+
 * `interval_method` selects native scasm bootstrap or Gaussian pointwise
   intervals for smooths, fitted values, smooth derivatives and `confint()`.
   Shifting or transforming smooth confidence intervals retains asymmetric limits.

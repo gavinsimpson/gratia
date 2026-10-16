@@ -263,9 +263,10 @@ quantile_residuals.glm <- function(model, type = c("pit", "quantile"),
   r
 }
 
-# Compute both tails directly, retaining tiny probabilities through the normal
+# Compute both tails directly, retaining tiny probabilities through the chosen
 # quantile transformation. The same uniform draw must be used for both tails.
-log_tail_residuals <- function(bounds, mu, wt, scale, cdf, type) {
+log_tail_residuals <- function(bounds, mu, wt, scale, cdf, type,
+                               quantile_function = stats::qnorm) {
   log_u <- if (is.function(bounds$cdf_upper))
     bounds$cdf_upper(log_p = TRUE, lower_tail = TRUE) else
     cdf(bounds$upper, mu, wt, scale, log_p = TRUE, lower_tail = TRUE)
@@ -300,9 +301,9 @@ log_tail_residuals <- function(bounds, mu, wt, scale, cdf, type) {
     r <- log_u
     r[] <- NA_real_
     idx <- which(lower)
-    r[idx] <- qnorm(log_u[idx], log.p = TRUE)
+    r[idx] <- quantile_function(log_u[idx], log.p = TRUE)
     upper <- which(!lower)
-    r[upper] <- qnorm(log_s[upper], lower.tail = FALSE, log.p = TRUE)
+    r[upper] <- quantile_function(log_s[upper], lower.tail = FALSE, log.p = TRUE)
   } else {
     r <- exp(log_u)
     upper <- which(!lower)

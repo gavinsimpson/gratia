@@ -41,6 +41,12 @@
 #'   Bands are omitted for dependent responses. Censored and multivariate
 #'   outcomes are unsupported. See [dharma_residuals()] for the calculation.
 #'
+#'   Use `type = "surrogate"` for [mgcv::ocat()] models. These residuals are
+#'   continuous draws on the latent logistic scale, centred at the fitted latent
+#'   mean. QQ and worm plots require `method = NULL` and compare to a logistic
+#'   distribution with location zero and scale one. Each appraisal shares one
+#'   residual vector across panels. See [surrogate_residuals()].
+#'
 #'   With `type = NULL`, ordinary lm/glm/GAM fits use deviance residuals.
 #'   Models fitted with [mgcv::gfam()] use randomised quantile (Dunn--Smyth)
 #'   residuals when every active component supplies a supported CDF and
@@ -110,7 +116,8 @@
 #'   and `method = "uniform"`, and for randomised quantile residuals and
 #'   posterior predictive draws.
 #' @param type character or `NULL`; residual type: `"deviance"`, `"response"`,
-#'   `"pearson"`, `"pit"`, `"quantile"`, or `"dharma"`. `NULL` uses the model-specific default:
+#'   `"pearson"`, `"pit"`, `"quantile"`, `"dharma"`, or `"surrogate"` (for
+#'   `ocat()` models). `NULL` uses the model-specific default:
 #'   deviance for ordinary lm/glm/GAM fits, and quantile for supported grouped
 #'   families, GJRM, sdmTMB and full mixed-model checks. glmmTMB uses Pearson
 #'   residuals conditionally and response residuals marginally. Extracted GAM
@@ -307,7 +314,7 @@
     check_gfam_appraise(model)
     type <- diagnostic_type(model, type)
     by_family <- diagnostic_by_family(model, type, by_family)
-    if (type %in% c("pit", "quantile")) {
+    if (type %in% c("pit", "quantile", "surrogate")) {
       model <- cache_diagnostic_residuals(model, type, seed)
     }
     n_obs <- NROW(stats::model.frame(model))

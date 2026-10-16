@@ -115,8 +115,10 @@
 #' Add residuals from a GAM to a data frame
 #'
 #' @param type character; the type of residuals to return. See
-#'   [mgcv::residuals.gam()] for options.
-#' @param ... additional arguments passed to [mgcv::residuals.gam()].
+#'   [mgcv::residuals.gam()] for options, or use `"surrogate"` for models fitted
+#'   with [mgcv::ocat()].
+#' @param ... additional arguments passed to [mgcv::residuals.gam()] or, for
+#'   `type = "surrogate"`, to [surrogate_residuals()], including `seed`.
 #'
 #' @return A data frame (tibble) formed from `data` and residuals from `model`.
 #'
@@ -149,7 +151,9 @@
   data <- as_tibble(data)
 
   ## predict using the predict method
-  resid_vals <- residuals(model_used_rows(model), type = type, ...)
+  used <- model_used_rows(model)
+  resid_vals <- if (identical(type, "surrogate")) surrogate_residuals(used, ...) else
+    residuals(used, type = type, ...)
   resid_vals <- residual_rows(resid_vals, model, data)
 
   data <- add_column(data, !!value := drop(resid_vals), .after = ncol(data))

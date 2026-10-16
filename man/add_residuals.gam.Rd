@@ -17,9 +17,11 @@ available. S3 method dispatch is performed on the \code{model} argument.}
 will be stored.}
 
 \item{type}{character; the type of residuals to return. See
-\code{\link[mgcv:residuals.gam]{mgcv::residuals.gam()}} for options.}
+\code{\link[mgcv:residuals.gam]{mgcv::residuals.gam()}} for options, or use \code{"surrogate"} for models fitted
+with \code{\link[mgcv:ocat]{mgcv::ocat()}}.}
 
-\item{...}{additional arguments passed to \code{\link[mgcv:residuals.gam]{mgcv::residuals.gam()}}.}
+\item{...}{additional arguments passed to \code{\link[mgcv:residuals.gam]{mgcv::residuals.gam()}} or, for
+\code{type = "surrogate"}, to \code{\link[=surrogate_residuals]{surrogate_residuals()}}, including \code{seed}.}
 }
 \value{
 A data frame (tibble) formed from \code{data} and residuals from \code{model}.
