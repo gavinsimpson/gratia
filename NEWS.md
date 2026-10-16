@@ -95,8 +95,9 @@
 ## New features
 
 * Posterior sampling supports multiple chains, including parallel MH chains
-  using mirai. `n_draws = 1000, chains = 4` retains 250 draws per chain after
-  separate burn-in. Chain identities are preserved through fitted, response,
+  using mirai. Workers started for sampling exit cleanly so coverage data can
+  be written completely. `n_draws = 1000, chains = 4` retains 250 draws per chain
+  after separate burn-in. Chain identities are preserved through fitted, response,
   smooth, and derivative samples. `as_mcmc_draws()` converts draws for posterior,
   coda, and bayesplot; `diagnostics = TRUE` and `sampling_diagnostics()` provide
   coefficient convergence summaries and acceptance rates (#281).

@@ -161,7 +161,7 @@ test_that("family errors clean up workers without stopping the caller's pool", {
   expect_error(post_draws(model, n_draws = 12, chains = 2, n_cores = 2,
     method = "mh", mh_backend = "family", burnin = 2, seed = 9), "chain.*failed")
   expect_false(mirai::daemons_set())
-  mirai::daemons(2L)
+  mirai::daemons(2L, autoexit = NA)
   on.exit(mirai::daemons(0L), add = TRUE)
   expect_error(post_draws(model, n_draws = 12, chains = 2, n_cores = 2,
     method = "mh", mh_backend = "family", burnin = 2, seed = 9), "chain.*failed")

@@ -247,7 +247,8 @@ sampling_parallel <- function(tasks, args, workers) {
   profile <- NULL
   if (!isTRUE(mirai::daemons_set())) {
     profile <- paste0("gratia-sampling-", Sys.getpid(), "-", basename(tempfile()))
-    mirai::daemons(workers, .compute = profile)
+    # Allow exit finalizers, including coverage writes, to finish.
+    mirai::daemons(workers, autoexit = NA, .compute = profile)
     on.exit(mirai::daemons(0L, .compute = profile), add = TRUE)
   }
   pending <- list()

@@ -54,7 +54,7 @@ test_that("mirai and serial chains have the same draws and preserve caller state
     expect_identical(RNGkind(), kind)
   }
   expect_false(mirai::daemons_set())
-  mirai::daemons(2L)
+  mirai::daemons(2L, autoexit = NA)
   on.exit(mirai::daemons(0L), add = TRUE)
   expect_silent(post_draws(m, n_draws = 12, chains = 2, n_cores = 2,
     method = "mh", burnin = 5, seed = 7))
