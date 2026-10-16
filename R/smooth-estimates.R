@@ -484,7 +484,7 @@
 #' @importFrom dplyr pull
 #' @importFrom tidyselect all_of
 #' @importFrom tidyr nest unnest
-#' @importFrom mgcv PredictMat inSide
+#' @importFrom mgcv PredictMat
 #' @export
 `spline_values` <- function(
     smooth,
@@ -753,12 +753,6 @@ scam_smooth_matrix <- function(smooth, X) {
     by_var <- NA_character_
   }
 
-  # Deal with data if supplied
-  # As a special case, if no `data`, then we should generate some data here for
-  # soap film from the boundary
-  #if (is.null(data)) {
-  #  data <- soap_film_data(smooth, n = n, n_2d = n_2d, n_3d = n_3d, n_4d = n_4d)
-  #}
   data <- process_user_data_for_eval(
     data = data, model = model, back_transform = back_transform,
     n = n, n_2d = n_2d, n_3d = n_3d, n_4d = n_4d,
@@ -769,21 +763,17 @@ scam_smooth_matrix <- function(smooth, X) {
   )
 
   # handle soap film smooths
-  # can use this if Simon accepts the proposed changes to inSide()
   is_soap <- is_soap_film(smooth)
   if (is_soap) {
-    bnd <- boundary(smooth) # smooth$xt$bnd
-    # in_side <- inSide(bnd, x = data[[smooth$vn[[1]]]],
-    #  y = data[[smooth$vn[[1]]]],
-    # xname = "v", yname = "w") # needs fixed inSide
-    # use in_side to filter the data before we evaluate the spline
-    # any point outside the domain is NA anyway
+    bnd <- boundary(smooth)
     if (isTRUE(clip)) {
-      is_inside <- inside(
-        data,
-        bnd,
-        x_var = smooth_variable(smooth)[[1]],
-        y_var = smooth_variable(smooth)[[2]]
+      vars <- smooth_variable(smooth)
+      is_inside <- mgcv::inSide(
+        bnd = bnd,
+        x = data[[vars[[1L]]]],
+        y = data[[vars[[2L]]]],
+        xname = vars[[1L]],
+        yname = vars[[2L]]
       )
 
       data <- filter(data, is_inside)

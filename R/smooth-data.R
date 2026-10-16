@@ -287,34 +287,6 @@
   newdata # return
 }
 
-# This is just stupid - what was I even thinking, doesn't work if there are
-# multiple boundaries for example, and I don't even think it is necessary...
-`soap_film_data` <- function(smooth,
-    n = 100,
-    n_2d = NULL,
-    n_3d = NULL,
-    n_4d = NULL,
-    offset = NULL,
-    include_all = FALSE,
-    var_order = NULL) {
-  bnd <- boundary(smooth)
-
-  sub_bnd_data <- function(bnd, n = 100) {
-    l <- lapply(bnd, \(x) evenly(x, n = n))
-    d <- expand.grid(l) |>
-      as_tibble()
-    d
-  }
-
-  bnd_data <- lapply(bnd, FUN = sub_bnd_data, n = n) |>
-    bind_rows()
-
-  # are points inside boundary?
-  # Will deal with this in eval_smooth.soap.film because mgcv::inSide has a bad
-  # design
-  bnd_data
-}
-
 `sos_data` <- function(
   data,
   n = 100,

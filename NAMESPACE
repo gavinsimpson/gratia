@@ -820,7 +820,6 @@ importFrom(mgcv,
   fix.family.rd,
   gam.mh,
   gam.vcomp,
-  inSide,
   rTweedie,
   smoothCon
 )
