@@ -126,6 +126,7 @@
     title <- unique(object[[".smooth"]])
   }
   default_caption <- scasm_shape_plot_caption(object, default_caption)
+  default_caption <- scam_shape_plot_caption(object, default_caption)
   interval_info <- attr(object, "interval_info")
   if (!identical(interval_info$method, "shape") &&
       !is.null(interval_info) && interval_info$interval == "simultaneous") {

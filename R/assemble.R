@@ -207,6 +207,7 @@
 
     interval_info <- attr(sm_eval, "interval_info")
     shape_constraints <- attr(sm_eval, "shape_constraints")
+    scam_info <- attr(sm_eval, "scam_smooth_info")
 
     # Take the range of the smooths & their confidence intervals now
     # before we put rug and residuals on
@@ -393,6 +394,7 @@
       coordinate_info = coordinate_info, back_transform = back_transform,
       interval_info = interval_info,
       shape_constraints = shape_constraints,
+      scam_smooth_info = scam_info,
       caption = caption,
       grouped_by = grouped_by,
       ... # FIXME: temporary fix to allow captions to be suppressed-ish

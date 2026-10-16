@@ -121,6 +121,9 @@
   retains the fitted function. SCAM `smooth_type()` labels use compact
   descriptions such as `P spline (inc)` and `Tensor (inc, free)`.
   Saved estimates with earlier type labels remain drawable.
+  Plot captions describe the basis and constraints separately, using arrows
+  for monotonicity, covariate names for tensor constraints and fitted change
+  points for local constraints. Saved smooth estimates retain these captions.
 
 * SCAM models gain conditional simultaneous smooth bands, derivatives,
   contrasts, conditional predictions, parametric effects, residual helpers,

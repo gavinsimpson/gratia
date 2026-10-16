@@ -140,6 +140,10 @@ scasm_shape_plot_caption <- function(object, default_caption, plotmath = TRUE) {
   info <- info[!duplicated(plain)]
   captions <- lapply(info, scasm_shape_caption, plotmath = plotmath)
   caption <- Reduce(scasm_caption_append, captions)
+  replace_smooth_basis_caption(object, default_caption, caption)
+}
+
+replace_smooth_basis_caption <- function(object, default_caption, caption) {
   default_caption <- unique(default_caption)[1L]
   at <- regexpr("Basis: ", default_caption, fixed = TRUE)[1L]
   prefix <- if (at > 0L) substr(default_caption, 1L, at - 1L) else ""

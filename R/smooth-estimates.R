@@ -127,6 +127,12 @@
 #' and [smooth_type()] keep their existing basis names. Unsupported tensor
 #' requests produce a warning and are labelled as not retained.
 #'
+#' SCAM captions describe the basis and its constraints separately from the
+#' compact `.type` values. Increasing and decreasing constraints use plotmath
+#' arrows. Tensor captions name each covariate and its constraint; local
+#' constraints include the fitted change point. The `scam_smooth_info`
+#' attribute preserves these descriptions when plotting saved estimates.
+#'
 #' Shape enforcement is explicit and leaves the existing interval defaults
 #' unchanged. It preserves containment of a shape-restricted target whenever
 #' the entire initial band contains that target on the evaluation grid. This
@@ -430,6 +436,8 @@
   attr(sm_list, "surface_support") <- surface_support
   attr(sm_list, "tensor_plot_info") <- tensor_plot_info(object, smooths)
   if (length(shape_constraints)) attr(sm_list, "shape_constraints") <- shape_constraints
+  scam_info <- scam_smooth_info(object, smooths, smooth_ids)
+  if (length(scam_info)) attr(sm_list, "scam_smooth_info") <- scam_info
 
   if (!is.null(interval)) {
     attr(sm_list, "interval_info") <- scasm_interval_info(object,
@@ -1476,6 +1484,7 @@
   interval_info <- validate_saved_smooth_interval(object, interval)
   check_shape_effect_transform(interval_info, constant, fun)
   shape_constraints <- attr(object, "shape_constraints")
+  scam_info <- attr(object, "scam_smooth_info")
   plot_info <- attr(object, "tensor_plot_info")
   surface_support <- attr(object, "surface_support")
   if ("data" %in% names(object) && !".estimate" %in% names(object)) {
@@ -1556,6 +1565,7 @@
     coordinate_info = attr(object, "coordinate_info"),
     interval_info = interval_info,
     shape_constraints = shape_constraints,
+    scam_smooth_info = scam_info,
     back_transform = back_transform,
     caption = caption,
     grouped_by = grouped_by,
@@ -1608,6 +1618,7 @@
                                     surface_support = NULL,
                                     interval_info = NULL,
                                     shape_constraints = NULL,
+                                    scam_smooth_info = NULL,
                                     ...) {
   check_shape_effect_transform(interval_info, constant, fun)
   surface <- match.arg(surface)
@@ -1820,6 +1831,7 @@
 
   attr(object, "interval_info") <- interval_info
   attr(object, "shape_constraints") <- shape_constraints
+  attr(object, "scam_smooth_info") <- scam_smooth_info
   plot_smooth(
     object,
     mrf_plot = mrf_plot,

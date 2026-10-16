@@ -40,6 +40,7 @@
 #' @importFrom rlang has_name
 `[.smooth_estimates` <- function(x, i, j, drop = FALSE) {
   shape_constraints <- attr(x, "shape_constraints")
+  scam_info <- attr(x, "scam_smooth_info")
   interval_info <- attr(x, "interval_info")
   plot_info <- attr(x, "tensor_plot_info")
   support <- attr(x, "surface_support")
@@ -75,6 +76,10 @@
   attr(x, "shape_constraints") <- if (!is.null(shape_constraints) &&
     ".smooth" %in% names(x)) {
     scasm_shape_subset(shape_constraints, x)
+  } else NULL
+  attr(x, "scam_smooth_info") <- if (!is.null(scam_info) &&
+    ".smooth" %in% names(x)) {
+    scasm_shape_subset(scam_info, x)
   } else NULL
   x
 }

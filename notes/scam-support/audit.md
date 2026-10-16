@@ -16,8 +16,9 @@ classes and GAM operations are unavailable, one recognised smooth disappears
 from plots, and response simulation loses scam's AR1 correlation. GCV does
 not explain most of these gaps.
 
-This report records the audit before implementation. The numerical evidence
-refers to the baseline above.
+The original audit added reproducible R calculations without changing
+package behaviour. Subsequent fixes and additions are described in the
+[implementation report](implementation.md).
 
 ## Which smooths work
 

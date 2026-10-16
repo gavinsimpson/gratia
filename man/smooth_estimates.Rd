@@ -192,6 +192,12 @@ plotmath arrows for increasing and decreasing constraints while \code{.type}
 and \code{\link[=smooth_type]{smooth_type()}} keep their existing basis names. Unsupported tensor
 requests produce a warning and are labelled as not retained.
 
+SCAM captions describe the basis and its constraints separately from the
+compact \code{.type} values. Increasing and decreasing constraints use plotmath
+arrows. Tensor captions name each covariate and its constraint; local
+constraints include the fitted change point. The \code{scam_smooth_info}
+attribute preserves these descriptions when plotting saved estimates.
+
 Shape enforcement is explicit and leaves the existing interval defaults
 unchanged. It preserves containment of a shape-restricted target whenever
 the entire initial band contains that target on the evaluation grid. This

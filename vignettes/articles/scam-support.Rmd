@@ -37,6 +37,13 @@ draw(m)
 
 ## Fitted functions and native plots
 
+Plot captions describe basis and shape separately. Increasing and decreasing
+constraints use arrows; tensor captions name the covariate for each constraint.
+Local constraints show their fitted change point. These captions are also
+available when drawing saved `smooth_estimates()`. The `.type` column and
+`smooth_type()` retain compact ASCII labels such as `P spline (inc)` and
+`Tensor (inc, free)`.
+
 By default, `draw()` retains the fitted function's centring. Evaluating a
 smooth on a different grid therefore evaluates the same function. This agrees
 with scam's univariate plots. Its bivariate plots instead subtract the mean
