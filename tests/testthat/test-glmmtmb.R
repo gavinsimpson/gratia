@@ -31,6 +31,8 @@ test_that("smooth coefficients reconstruct mixed model predictors in formula ord
     }
     expect_equal(unname(value + re), unname(predict(m)), tolerance = 1e-7)
     expect_identical(smooths(m), c("s(x)", "s(z)"))
+    expect_identical(n_smooths(m), 2L)
+    expect_identical(n_smooths(m), length(smooths(m)))
     expect_length(get_smooths_by_id(m, 1), 1)
     # Deliberately corrupt the known-bad legacy indices.
     m$modelInfo$reTrms$cond$smooth_info[[which(lengths(m$modelInfo$reTrms$cond$smooth_info)>0)[1]]]$re$b_ind <- 1:1000
@@ -42,6 +44,8 @@ test_that("joint covariance matches native ML and REML prediction intervals", {
   d <- tmb_data()
   for (reml in c(FALSE, TRUE)) {
     m <- glmmTMB::glmmTMB(y ~ s(x, k = 6), d, REML = reml)
+    expect_identical(n_smooths(m), 1L)
+    expect_identical(n_smooths(m), length(smooths(m)))
     a <- glmmtmb_smooth_model(m, "cond")
     X <- cbind(1, mgcv::PredictMat(a$smooth[[1]], d))
     se <- sqrt(rowSums((X %*% a$Vp) * X))
@@ -71,8 +75,22 @@ test_that("smooth plotting supports transformed, bivariate and numeric by smooth
   expect_s3_class(draw(m, parametric = TRUE), "patchwork")
   plain <- glmmTMB::glmmTMB(y ~ x, d)
   expect_length(smooths(plain), 0)
+  expect_identical(n_smooths(plain), 0L)
   expect_length(draw(plain, wrap = FALSE), 1)
   expect_error(smooth_estimates(plain), "No smooths")
+})
+
+test_that("smooth counts exclude native random effects and parametric terms", {
+  d <- tmb_data()
+  for (f in list(y ~ 1, y ~ (1 | g), y ~ x + (1 | g))) {
+    m <- glmmTMB::glmmTMB(f, data = d, REML = TRUE)
+    expect_identical(n_smooths(m), 0L)
+    expect_identical(n_smooths(m), length(smooths(m)))
+  }
+  m <- glmmTMB::glmmTMB(y ~ s(x, k = 6) + s(z, k = 5), data = d,
+    REML = TRUE)
+  expect_identical(n_smooths(m), 2L)
+  expect_identical(n_smooths(m), length(smooths(m)))
 })
 
 test_that("all linear predictors share mgcv-style smooth selection and labels", {
@@ -82,6 +100,8 @@ test_that("all linear predictors share mgcv-style smooth selection and labels", 
   m <- glmmTMB::glmmTMB(y ~ s(x, k = 5), ziformula = ~s(x, k = 4),
     family = poisson, data = d)
   expect_identical(smooths(m), c("s(x)", "s.1(x)"))
+  expect_identical(n_smooths(m), 2L)
+  expect_identical(n_smooths(m), length(smooths(m)))
   expect_identical(unique(smooth_estimates(m)$.smooth), smooths(m))
   expect_identical(unique(smooth_estimates(m, select = 2)$.smooth), "s.1(x)")
   expect_identical(unique(smooth_estimates(m, select = c(FALSE, TRUE))$.smooth), "s.1(x)")
@@ -100,9 +120,16 @@ test_that("all linear predictors share mgcv-style smooth selection and labels", 
   expect_equal(unname(drop(X %*% coef(a))), unname(pr$fit), tolerance = 1e-7)
   expect_equal(unname(sqrt(rowSums(X * (X %*% a$Vp)))),
     unname(pr$se.fit), tolerance = 1e-7)
+  zi_only <- glmmTMB::glmmTMB(y ~ 1, ziformula = ~s(x, k = 4),
+    family = poisson, data = d)
+  expect_identical(smooths(zi_only), "s.1(x)")
+  expect_identical(n_smooths(zi_only), 1L)
+  expect_identical(n_smooths(zi_only), length(smooths(zi_only)))
   d$y <- sin(6*d$x) + rnorm(nrow(d), sd = exp(d$x))
   m <- glmmTMB::glmmTMB(y ~ s(x, k = 5), dispformula = ~s(x, k = 4), data = d)
   expect_identical(smooths(m), c("s(x)", "s.1(x)"))
+  expect_identical(n_smooths(m), 2L)
+  expect_identical(n_smooths(m), length(smooths(m)))
   expect_identical(unique(smooth_estimates(m)$.smooth), smooths(m))
   expect_length(draw(m, wrap = FALSE), 2)
   e <- smooth_estimates(m, select = "s.1(x)", data = d)
@@ -120,12 +147,16 @@ test_that("all linear predictors share mgcv-style smooth selection and labels", 
   # Predictors without smooths still determine mgcv-style numbering.
   m <- glmmTMB::glmmTMB(y ~ 1, dispformula = ~s(x, k = 4), data = d)
   expect_identical(smooths(m), "s.1(x)")
+  expect_identical(n_smooths(m), 1L)
+  expect_identical(n_smooths(m), length(smooths(m)))
   expect_length(draw(m, wrap = FALSE), 1)
 })
 
 test_that("native residuals are preserved for observed and replaced responses", {
   d <- tmb_data()
   m <- glmmTMB::glmmTMB(y ~ s(x, k = 6) + (1 | g), d, REML = TRUE)
+  expect_identical(n_smooths(m), 1L)
+  expect_identical(n_smooths(m), length(smooths(m)))
   for (type in c("response", "pearson", "deviance")) {
     expect_equal(glmmtmb_residuals(m, type, d$y), unname(residuals(m, type)))
   }
@@ -286,6 +317,8 @@ test_that("draw includes all three predictors in one model-wide layout", {
     control = glmmTMB::glmmTMBControl(optimizer = optim,
       optArgs = list(method = "BFGS")))
   expect_identical(smooths(m), c("s(x)", "s.1(x)", "s.2(x)"))
+  expect_identical(n_smooths(m), 3L)
+  expect_identical(n_smooths(m), length(smooths(m)))
   expect_identical(unique(smooth_estimates(m, n = 5)$.smooth), smooths(m))
   expect_length(draw(m, wrap = FALSE), 3)
   expect_length(draw(m, select = c(1, 3), wrap = FALSE), 2)

@@ -54,6 +54,17 @@ smooths.glmmTMB <- function(object, ...) {
   vapply(glmmtmb_smooths(object), `[[`, character(1), "label")
 }
 
+#' @rdname n_smooths
+#' @details
+#' For `glmmTMB` models, `n_smooths()` counts smooth terms across the
+#' conditional, zero-inflation and dispersion predictors. Each fitted smooth
+#' is counted once; native random effects are excluded. Models without smooths
+#' return integer zero.
+#' @export
+n_smooths.glmmTMB <- function(object) {
+  length(glmmtmb_smooths(object))
+}
+
 #' @rdname glmmTMB-methods
 #' @export
 get_smooths_by_id.glmmTMB <- function(object, id, ...) {
@@ -249,6 +260,7 @@ glmmtmb_smooth_model <- function(object, component = NULL, covariance = TRUE) {
 #'   d <- data.frame(x = runif(150))
 #'   d$y <- sin(6 * d$x) + rnorm(150, sd = 0.2)
 #'   m <- glmmTMB::glmmTMB(y ~ s(x, k = 8), data = d, REML = TRUE)
+#'   n_smooths(m) # one smooth term
 #'   draw(m)
 #'   appraise(m, seed = 42)
 #'
