@@ -36,6 +36,8 @@
 #' model classes are not supported. Use `type = "surrogate"` in [appraise()],
 #' [qq_plot()], [worm_plot()] and other residual diagnostic plots. QQ and worm
 #' plots require `method = NULL` and use logistic reference quantiles.
+#' For `ocat()`, the linear predictor is the fitted latent mean, so
+#' [residuals_linpred_plot()] plots residuals against these fitted values.
 #'
 #' Each call draws one residual per observation. Set `seed` for reproducibility;
 #' repeating plots with different seeds helps assess whether a pattern persists

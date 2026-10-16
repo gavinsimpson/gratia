@@ -28,6 +28,12 @@ test_that("surrogate residuals follow the truncated logistic construction", {
     r <- surrogate_residuals(m, seed = 12)
     expect_type(r, "double")
     expect_equal(r, surrogate_oracle(m, 12), tolerance = 1e-12)
+    probabilities <- stats::predict(m, type = "response")
+    cumulative <- cbind(0, t(apply(probabilities, 1L, cumsum)))
+    rows <- seq_along(m$y)
+    expected <- withr::with_seed(12, qlogis(runif(length(rows),
+      cumulative[cbind(rows, m$y)], cumulative[cbind(rows, m$y + 1L)])))
+    expect_equal(r, expected, tolerance = 1e-12)
     expect_equal(r, qlogis(quantile_residuals(m, "pit", seed = 12)),
       tolerance = 1e-12)
     expect_equal(quantile_residuals(m, "quantile", seed = 12),
@@ -155,6 +161,7 @@ test_that("QQ, worm and ordinary panels share logistic residuals and references"
   }
   p <- residuals_linpred_plot(m, type = "surrogate", seed = 21)
   expect_equal(p$data$residuals, r)
+  expect_equal(p$data$eta, unname(stats::fitted(m)))
   expect_equal(p$layers[[1]]$data$yintercept, 0)
   expect_identical(p$labels$y, "Surrogate residuals")
   h <- residuals_hist_plot(m, type = "surrogate", seed = 21)
@@ -173,16 +180,74 @@ test_that("QQ, worm and ordinary panels share logistic residuals and references"
 
 test_that("appraisal shares one unseeded draw across panels", {
   m <- surrogate_test_fit()
+  withr::local_preserve_seed()
   for (scalable in c(FALSE, TRUE)) {
-    withr::local_seed(5)
+    set.seed(5)
+    expected <- surrogate_residuals(m)
+    expected_state <- .Random.seed
+    set.seed(5)
     a <- appraise(m, type = "surrogate", scalable = scalable,
       density_method = "histogram")
-    expected <- surrogate_residuals(m, seed = 5)
+    expect_identical(.Random.seed, expected_state)
     expect_equal(a[[1]]$data$residuals, sort(expected))
-    if (!scalable) expect_equal(a[[2]]$data$residuals, expected)
+    if (!scalable) {
+      expect_equal(a[[2]]$data$residuals, expected)
+      expect_equal(a[[3]]$data$residuals, expected)
+    }
   }
   d <- prepare_diagnostic_data(m, "surrogate", seed = 3)
   expect_equal(qq_plot(d)$data$residuals, sort(d$data$residuals))
+})
+
+test_that("surrogate plots preserve missing-row alignment", {
+  dat <- surrogate_test_data()
+  dat$y[c(8, 20)] <- NA
+  m <- mgcv::gam(y ~ s(x, k = 6) + offset(off), data = dat,
+    family = mgcv::ocat(R = 4), weights = w, na.action = na.exclude,
+    method = "REML")
+  r <- surrogate_residuals(m, seed = 21)
+  retained <- which(!is.na(r))
+  for (fun in list(residuals_linpred_plot, residuals_hist_plot)) {
+    p <- fun(m, type = "surrogate", seed = 21)
+    expect_equal(p$data$residuals, r)
+  }
+  for (fun in list(qq_plot, scalable_qq_plot)) {
+    p <- fun(m, type = "surrogate", seed = 21)
+    expect_equal(p$data$residuals, sort(r[retained]))
+  }
+  d <- prepare_diagnostic_data(m, "surrogate", seed = 21)
+  expect_identical(d$data$.row, retained)
+  expect_equal(d$data$residuals, r[retained])
+  p <- residuals_covariate_plot(m, covariates = "x", type = "surrogate",
+    seed = 21, smooth = FALSE)
+  expect_equal(p$data$residuals, r[retained])
+  expect_equal(p$data$x, dat$x[retained])
+  for (scalable in c(FALSE, TRUE)) {
+    a <- appraise(m, type = "surrogate", seed = 21, scalable = scalable,
+      density_method = "histogram")
+    expect_equal(a[[1]]$data$residuals, sort(r[retained]))
+    if (!scalable) expect_equal(a[[2]]$data$residuals, r)
+    expect_plot_render(a)
+  }
+})
+
+test_that("surrogate references retain native diagnostic theme settings", {
+  m <- surrogate_test_fit()
+  settings <- ggplot2::theme(
+    geom.gratia.diagnostic.point = ggplot2::element_geom(colour = "purple"),
+    geom.gratia.diagnostic.reference = ggplot2::element_geom(colour = "green"),
+    geom.gratia.diagnostic.interval = ggplot2::element_geom(fill = "orange"),
+    gratia.alpha.diagnostic.interval = .35)
+  for (fun in list(qq_plot, worm_plot, scalable_qq_plot, scalable_worm_plot)) {
+    p <- fun(m, type = "surrogate", seed = 21) + settings
+    layers <- ggplot2::ggplot_build(p)$data
+    has_value <- function(field, value) any(vapply(layers, function(layer)
+      field %in% names(layer) && all(layer[[field]] == value), logical(1)))
+    expect_true(has_value("colour", "purple"))
+    expect_true(has_value("colour", "green"))
+    expect_true(has_value("fill", "orange"))
+    expect_true(has_value("alpha", .35))
+  }
 })
 
 test_that("unsupported models and reference methods fail explicitly", {

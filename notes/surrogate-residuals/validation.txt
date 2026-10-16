@@ -1,0 +1,36 @@
+Validation for gratia issue #359
+
+Targeted tests passed with NOT_CRAN=true:
+  testthat::test_local(
+    filter = "surrogate-residuals|residual-tails|quantile-residuals|plot-themes",
+    reporter = "summary", stop_on_failure = TRUE)
+
+The full suite passed with make test-full. This includes visual snapshots and
+the HGAM paper integration tests.
+
+R CMD build completed with the package vignettes.
+R CMD check --no-tests returned Status: OK, with no errors, warnings or notes.
+The --no-tests option skipped the duplicate test run inside R CMD check;
+the full test suite ran separately. Examples, their stored output comparison,
+vignettes, vignette rebuilding and the PDF manual were checked.
+
+pkgdown::check_pkgdown(".") reported no problems with the reference index.
+git diff --check passed.
+
+notes/surrogate-residuals/example.R generated the three PNG files in this
+directory. All three were visually inspected. The figures retain the established
+method and family subtitles, labels and caption format. The combined QQ, worm,
+predictor and covariate figure was widened to keep subtitles apart.
+
+The linked sure adapter uses a latent logistic draw restricted to the observed
+category, centred by subtracting the fitted latent mean. The implementation in
+gratia reuses its ordinal probabilities and logarithmic calculations in both
+tails; no sure dependency or source code was added.
+
+Additional tests on current main's plot infrastructure verify category
+probabilities obtained independently from mgcv::predict.gam(), exact random-number
+consumption for one residual draw per appraisal, latent fitted values on the
+predictor axis, na.exclude plot alignment, and native diagnostic theme roles.
+
+The issue comment is a local draft. Its adjacent appraisal PNG is ready to attach
+when posting the comment.
