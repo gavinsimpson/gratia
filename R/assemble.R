@@ -42,7 +42,7 @@
 #' @importFrom ggplot2 scale_colour_discrete scale_colour_continuous
 #'   scale_fill_distiller
 #' @importFrom dplyr mutate rowwise ungroup left_join group_split summarise
-#' @importFrom purrr pluck map_lgl in_parallel map map_chr
+#' @importFrom purrr pluck map_lgl map map_chr
 #' @importFrom rlang expr_label
 #' @importFrom utils packageVersion getFromNamespace
 #' @importFrom stringr str_split_fixed
@@ -363,6 +363,8 @@
       )
       split_smooth_components(sm_eval)
     }
+    # Keep ggplot object creation serial: trials with mirai workers did not
+    # improve performance.
     sm_plts <- map(sm_l,
       draw_smooth_estimates,
       surface = surface, surface_3d = surface_3d,
@@ -399,39 +401,6 @@
       grouped_by = grouped_by,
       ... # FIXME: temporary fix to allow captions to be suppressed-ish
     )
-
-    # Parallel version; currently not working for some weird ggproto thing
-    # that needs some debugging
-    # sm_plts2 <- map(
-    #   sm_l,
-    #   in_parallel(
-    #     \(sm, ...) draw_smooth_estimates(
-    #       sm,
-    #       constant = constant, fun = fun, contour = contour,
-    #       contour_col = contour_col, n_contour = n_contour,
-    #       ci_alpha = ci_alpha, ci_col = ci_col, smooth_col = smooth_col,
-    #       resid_col = resid_col, partial_match = partial_match,
-    #       discrete_colour = discrete_colour,
-    #       discrete_fill = discrete_fill,
-    #       continuous_colour = continuous_colour,
-    #       continuous_fill = continuous_fill,
-    #       angle = angle, ylim = ylims, crs = crs, default_crs = default_crs,
-    #       lims_method = lims_method, tensor_term_order = tensor_term_order,
-    #       caption = caption, ...
-    #     ),
-    #     constant = constant, fun = fun, contour = contour,
-    #     contour_col = contour_col, n_contour = n_contour,
-    #     ci_alpha = ci_alpha, ci_col = ci_col, smooth_col = smooth_col,
-    #     resid_col = resid_col, partial_match = partial_match,
-    #     discrete_colour = discrete_colour, discrete_fill = discrete_fill,
-    #     continuous_colour = continuous_colour,
-    #     continuous_fill = continuous_fill,
-    #     angle = angle, ylims = ylims, crs = crs, default_crs = default_crs,
-    #     lims_method = lims_method, tensor_term_order = tensor_term_order,
-    #     caption = caption,
-    #     draw_smooth_estimates = draw_smooth_estimates, ...
-    #   )
-    # )
 
     # filter out NULLs as those are types of smooths we can't plot (yet)
     no_plot <- map_lgl(sm_plts, is.null)
