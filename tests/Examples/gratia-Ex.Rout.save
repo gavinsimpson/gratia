@@ -3514,7 +3514,7 @@ detaching ‘package:mgcv’
 > 
 > ### Name: smooth_estimates
 > ### Title: Evaluate smooths at covariate values
-> ### Aliases: smooth_estimates smooth_estimates.gam
+> ### Aliases: smooth_estimates smooth_estimates.gam smooth_estimates.gamlss
 > 
 > ### ** Examples
 > 
@@ -3559,6 +3559,16 @@ detaching ‘package:mgcv’
 10 s(x0)   TPRS  <NA>  -0.594641 0.194685 0.0971693     NA
 # i 190 more rows
 > 
+> # Direct evaluation of a GJRM distributional model
+> if (requireNamespace("GJRM", quietly = TRUE)) {
++   set.seed(82)
++   d <- data.frame(x = runif(100), z = runif(100))
++   d$y <- sin(6 * d$x) + rnorm(100, sd = exp(0.3 * d$z))
++   m <- GJRM::gamlss(list(y ~ s(x, k = 4), ~ s(z, k = 4)), data = d)
++   estimates <- smooth_estimates(m, n = 50)
++   draw(estimates)
++ }
+>
 > # parallel processing of smooths
 > if (requireNamespace("mirai") && requireNamespace("carrier")) {
 +   library("mirai")

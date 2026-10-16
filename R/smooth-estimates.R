@@ -6,10 +6,11 @@
 #' implementation of `evaluate_smooth()`, and replaces that function, which has
 #' been removed from the package.
 #'
-#' @param object an object of class `"gam"` or `"gamm"`.
-#' @param select character; select which smooth's posterior to draw from.
-#'   The default (`NULL`) means the posteriors of all smooths in `model`
-#'   will be sampled from. If supplied, a character vector of requested terms.
+#' @param object a fitted model, including objects of class `"gam"`, `"gamm"`
+#'   or models fitted by [GJRM::gamlss()].
+#' @param select character, numeric or logical; smooths to evaluate, using labels
+#'   from [smooths()] or indices in fitted smooth order. The default (`NULL`)
+#'   evaluates all smooths.
 #' @param smooth `r lifecycle::badge("deprecated")` Use `select` instead.
 #' @param n numeric; the number of points over the range of the covariate at
 #'   which to evaluate a univariate smooth.
@@ -85,6 +86,17 @@
 #' @return A data frame (tibble), which is of class `"smooth_estimates"`.
 #'
 #' @details
+#' For [GJRM::gamlss()] models, smooths are evaluated in equation and smooth
+#' order using the final fitted GJRM coefficients and covariance matrices.
+#' Selection uses the model-wide labels returned by [smooths()], including
+#' suffixes such as `s.1(x)` for repeated labels. Equations without smooths
+#' are skipped; a model without any smooths gives an error. All grid, data,
+#' environment, coordinate transformation and interval controls are passed to
+#' the GAM method for each selected equation. `frequentist = TRUE` uses the
+#' final GJRM frequentist covariance. A smoothing-parameter uncertainty
+#' correction is unavailable: `unconditional = TRUE` warns and uses the
+#' uncorrected final covariance, as for GAMs without that correction.
+#'
 #' For distributional and glmmTMB models with multiple linear predictors,
 #' an optional `.model` column identifies the model part or parameter
 #' associated with each smooth. This display metadata is retained in nested
@@ -222,6 +234,16 @@
 #'
 #' ## or selected smooths
 #' smooth_estimates(m1, select = c("s(x0)", "s(x1)"))
+#'
+#' # Direct evaluation of a GJRM distributional model
+#' if (requireNamespace("GJRM", quietly = TRUE)) {
+#'   set.seed(82)
+#'   d <- data.frame(x = runif(100), z = runif(100))
+#'   d$y <- sin(6 * d$x) + rnorm(100, sd = exp(0.3 * d$z))
+#'   m <- GJRM::gamlss(list(y ~ s(x, k = 4), ~ s(z, k = 4)), data = d)
+#'   estimates <- smooth_estimates(m, n = 50)
+#'   draw(estimates)
+#' }
 #'
 #' # parallel processing of smooths
 #' if (requireNamespace("mirai") && requireNamespace("carrier")) {
@@ -457,6 +479,61 @@
 
   ## return
   sm_list
+}
+
+#' @rdname smooth_estimates
+#' @export
+smooth_estimates.gamlss <- function(object, select = NULL, smooth = deprecated(),
+    ..., partial_match = FALSE) {
+  if (lifecycle::is_present(smooth)) {
+    lifecycle::deprecate_warn("0.8.9.9", "smooth_estimates(smooth)",
+      "smooth_estimates(select)")
+    select <- smooth
+  }
+  components <- gjrm_gamlss_components(object)
+  labels <- gjrm_gamlss_smooth_labels(components)
+  if (!length(labels)) stop("No smooths in GJRM model.", call. = FALSE)
+  if (anyNA(select) || (is.numeric(select) &&
+      any(!is.finite(select) | select < 1 | select != floor(select)))) {
+    stop("Smooth indices in 'select' must be positive integers without missing values.")
+  }
+  selected <- check_user_select_smooths(labels, select,
+    partial_match = partial_match)
+  if (!any(selected)) stop("No smooths selected.", call. = FALSE)
+
+  results <- list()
+  start <- 0L
+  for (m in components) {
+    count <- length(m$smooth)
+    index <- start + seq_len(count)
+    if (any(selected[index])) {
+      # Use model-wide labels before evaluation so saved plotting metadata and
+      # repeated terms have the same identities as smooths(object).
+      for (i in seq_len(count)) m$smooth[[i]]$label <- labels[index[i]]
+      results[[length(results) + 1L]] <- smooth_estimates.gam(m,
+        select = selected[index], ..., partial_match = FALSE)
+    }
+    start <- start + count
+  }
+
+  out <- bind_rows(results)
+  for (attribute in c("tensor_term_order", "surface_support", "tensor_plot_info")) {
+    attr(out, attribute) <- do.call(c, lapply(results, attr, attribute))
+  }
+  coordinates <- lapply(results, attr, "coordinate_info")
+  info <- do.call(c, coordinates)
+  info <- info[!duplicated(names(info))]
+  attr(info, "smooth_variables") <- do.call(c,
+    lapply(coordinates, attr, "smooth_variables"))
+  attr(out, "coordinate_info") <- info
+  interval_info <- attr(out, "interval_info")
+  if (!is.null(interval_info)) {
+    interval_info$overall_uncertainty <- all(vapply(results, function(x) {
+      isTRUE(attr(x, "interval_info")$overall_uncertainty)
+    }, logical(1)))
+    attr(out, "interval_info") <- interval_info
+  }
+  out
 }
 
 #' @export

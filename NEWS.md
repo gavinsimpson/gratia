@@ -564,6 +564,13 @@
 
 ## Bug fixes
 
+* Direct calls to `smooth_estimates()` now work for `GJRM::gamlss()` models
+  (#352). Estimates use the final fitted coefficients and covariance, with
+  smooth selection across equations and parameter labels retained for drawing
+  saved estimates. Frequentist covariance also comes from the final fit;
+  unavailable smoothing-parameter corrections warn and use its Bayesian
+  covariance.
+
 * B-spline evaluation handles empty data and factor-by calls whose evaluation
   data omit fitted levels, including constrained tensor products.
 

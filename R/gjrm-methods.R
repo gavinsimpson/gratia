@@ -169,7 +169,8 @@ gjrm_gamlss_smooth_labels <- function(components) {
 #' @rdname smooths
 #' @details For GJRM GAMLSS models, labels follow equation and smooth order.
 #'   Labels repeated in later equations receive suffixes such as `s.1(x)`.
-#'   These labels can be supplied to [draw()] to select smooths across equations.
+#'   These labels can be supplied to [draw()] or [smooth_estimates()] to select
+#'   smooths across equations.
 smooths.gamlss <- function(object, ...) {
   gjrm_gamlss_smooth_labels(gjrm_gamlss_components(object))
 }
@@ -227,8 +228,12 @@ smooths.gamlss <- function(object, ...) {
 
   # modify the GAM
   gam_obj$coefficients <- object$coefficients[i]
-  gam_obj$Vp <- object$Vb[i, i]
-  gam_obj$Vp.t <- object$Vb.t[i, i]
+  gam_obj$Vp <- object$Vb[i, i, drop = FALSE]
+  gam_obj$Vp.t <- object$Vb.t[i, i, drop = FALSE]
+  gam_obj$Ve <- object$Ve[i, i, drop = FALSE]
+  # The working GAM's smoothing-parameter correction does not describe the
+  # final GJRM fit. Use the ordinary unavailable-correction warning and fallback.
+  gam_obj$Vc <- NULL
   gam_obj$sig2 <- 1
   gam_obj$edf <- diag(object$F)[i]
   gam_obj$scale.estimated <- FALSE

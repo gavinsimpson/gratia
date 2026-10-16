@@ -30,5 +30,6 @@ Names of smooths in a GAM
 \details{
 For GJRM GAMLSS models, labels follow equation and smooth order.
 Labels repeated in later equations receive suffixes such as \code{s.1(x)}.
-These labels can be supplied to \code{\link[=draw]{draw()}} to select smooths across equations.
+These labels can be supplied to \code{\link[=draw]{draw()}} or \code{\link[=smooth_estimates]{smooth_estimates()}} to select
+smooths across equations.
 }

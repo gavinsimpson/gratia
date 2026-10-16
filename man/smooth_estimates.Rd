@@ -3,6 +3,7 @@
 \name{smooth_estimates}
 \alias{smooth_estimates}
 \alias{smooth_estimates.gam}
+\alias{smooth_estimates.gamlss}
 \title{Evaluate smooths at covariate values}
 \usage{
 smooth_estimates(object, ...)
@@ -34,15 +35,24 @@ smooth_estimates(object, ...)
   shape_source = c("gaussian", "bootstrap"),
   ...
 )
+
+\method{smooth_estimates}{gamlss}(
+  object,
+  select = NULL,
+  smooth = deprecated(),
+  ...,
+  partial_match = FALSE
+)
 }
 \arguments{
-\item{object}{an object of class \code{"gam"} or \code{"gamm"}.}
+\item{object}{a fitted model, including objects of class \code{"gam"}, \code{"gamm"}
+or models fitted by \code{\link[GJRM:gamlss]{GJRM::gamlss()}}.}
 
 \item{...}{arguments passed to other methods.}
 
-\item{select}{character; select which smooth's posterior to draw from.
-The default (\code{NULL}) means the posteriors of all smooths in \code{model}
-will be sampled from. If supplied, a character vector of requested terms.}
+\item{select}{character, numeric or logical; smooths to evaluate, using labels
+from \code{\link[=smooths]{smooths()}} or indices in fitted smooth order. The default (\code{NULL})
+evaluates all smooths.}
 
 \item{smooth}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{select} instead.}
 
@@ -150,6 +160,17 @@ implementation of \code{evaluate_smooth()}, and replaces that function, which ha
 been removed from the package.
 }
 \details{
+For \code{\link[GJRM:gamlss]{GJRM::gamlss()}} models, smooths are evaluated in equation and smooth
+order using the final fitted GJRM coefficients and covariance matrices.
+Selection uses the model-wide labels returned by \code{\link[=smooths]{smooths()}}, including
+suffixes such as \code{s.1(x)} for repeated labels. Equations without smooths
+are skipped; a model without any smooths gives an error. All grid, data,
+environment, coordinate transformation and interval controls are passed to
+the GAM method for each selected equation. \code{frequentist = TRUE} uses the
+final GJRM frequentist covariance. A smoothing-parameter uncertainty
+correction is unavailable: \code{unconditional = TRUE} warns and uses the
+uncorrected final covariance, as for GAMs without that correction.
+
 For distributional and glmmTMB models with multiple linear predictors,
 an optional \code{.model} column identifies the model part or parameter
 associated with each smooth. This display metadata is retained in nested
@@ -280,6 +301,16 @@ smooth_estimates(m1)
 
 ## or selected smooths
 smooth_estimates(m1, select = c("s(x0)", "s(x1)"))
+
+# Direct evaluation of a GJRM distributional model
+if (requireNamespace("GJRM", quietly = TRUE)) {
+  set.seed(82)
+  d <- data.frame(x = runif(100), z = runif(100))
+  d$y <- sin(6 * d$x) + rnorm(100, sd = exp(0.3 * d$z))
+  m <- GJRM::gamlss(list(y ~ s(x, k = 4), ~ s(z, k = 4)), data = d)
+  estimates <- smooth_estimates(m, n = 50)
+  draw(estimates)
+}
 
 # parallel processing of smooths
 if (requireNamespace("mirai") && requireNamespace("carrier")) {
