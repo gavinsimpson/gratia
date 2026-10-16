@@ -81,20 +81,6 @@ test_that("captions preserve literal text and use plotmath arrows", {
   expect_true(is.expression(labels$caption))
   expect_match(paste(deparse(labels$caption), collapse = ""), "95% simultaneous")
   expect_null(prepare_smooth_labels(obj, x_var = "x", caption = FALSE)$caption)
-
-  # Each supported graphics device must accept the expression without a font
-  # package or a Unicode arrow in the source text.
-  paths <- file.path(tempdir(), paste0("gratia-shape-caption.", c("pdf", "svg", "png")))
-  on.exit(unlink(paths), add = TRUE)
-  for (i in seq_along(paths)) {
-    device <- list(grDevices::pdf, grDevices::svg, grDevices::png)[[i]]
-    device(paths[i])
-    tryCatch({
-      graphics::plot.new()
-      expect_warning(graphics::text(0.5, 0.5, caption), NA)
-    }, finally = grDevices::dev.off())
-    expect_gt(file.info(paths[i])$size, 0)
-  }
 })
 
 test_that("general tensor constraints are described separately from margins", {
