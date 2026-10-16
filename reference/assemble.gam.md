@@ -68,7 +68,8 @@ assemble(
   interval_method = c("auto", "gaussian", "bootstrap", "shape"),
   frequentist = FALSE,
   shape_source = c("gaussian", "bootstrap"),
-  ...
+  ...,
+  variables = NULL
 )
 
 # S3 method for class 'scam'
@@ -514,6 +515,21 @@ assemble(object, ..., overall_uncertainty = FALSE, centre = c("model", "plot"))
 
   Additional smooth plotting arguments, including `title`, `subtitle`,
   `xlab` and `ylab`.
+
+- variables:
+
+  Character vector giving every covariate of the selected smooths
+  exactly once, in plotting order: x, y, then the conditioning covariate
+  for 3D smooths, or facet rows and columns for 4D smooths. When
+  supplied, selected smooths must use the same covariates. Use fitted
+  coordinate names, such as `"log(x)"` for a transformed covariate. The
+  default, `NULL`, favours a two-variable tensor margin for x and y,
+  otherwise retaining fitted order. Grid resolution follows this order.
+  Supplied `data` are evaluated unchanged. Drawing saved estimates can
+  change the order but uses only points already evaluated; evaluate
+  again to change grid resolution or conditioning values. Continuous
+  covariates must precede factors. Spherical smooths retain their
+  latitude/longitude convention and do not support reordering.
 
 - centre:
 

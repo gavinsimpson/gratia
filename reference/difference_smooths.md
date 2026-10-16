@@ -28,7 +28,10 @@ difference_smooths(
   interval = c("confidence", "simultaneous"),
   n_sim = 10000,
   n_cores = 1,
-  seed = NULL
+  seed = NULL,
+  variables = NULL,
+  n_3d = 16,
+  n_4d = 4
 )
 
 # S3 method for class 'scam'
@@ -140,6 +143,27 @@ difference_smooths(model, ..., unconditional = FALSE)
   explicit seed preserves the caller's random number state. With `NULL`,
   the current random number state is used and advanced.
 
+- variables:
+
+  Character vector giving every covariate of the selected smooths
+  exactly once, in plotting order: x, y, then the conditioning covariate
+  for 3D smooths, or facet rows and columns for 4D smooths. When
+  supplied, selected smooths must use the same covariates. Use fitted
+  coordinate names, such as `"log(x)"` for a transformed covariate. The
+  default, `NULL`, favours a two-variable tensor margin for x and y,
+  otherwise retaining fitted order. Grid resolution follows this order.
+  Supplied `data` are evaluated unchanged. Drawing saved estimates can
+  change the order but uses only points already evaluated; evaluate
+  again to change grid resolution or conditioning values. Continuous
+  covariates must precede factors. Spherical smooths retain their
+  latitude/longitude convention and do not support reordering.
+
+- n_3d, n_4d:
+
+  numeric; the number of conditioning values for smooths of three or
+  four covariates. The defaults are 16 and 4, respectively. If `NULL`,
+  use `n`. Ignored when evaluation `data` are supplied.
+
 ## Details
 
 Simultaneous intervals jointly cover the underlying smooth differences
@@ -147,9 +171,17 @@ at the evaluated covariate combinations for each pair of factor levels,
 with approximate posterior probability `ci_level` when using the
 Bayesian covariance. They do not provide joint coverage across all
 pairs, outside the evaluation set, or between its points. With
-`data = NULL`, the evaluation set is generated using `n`. Differences
-and interval limits are on the linear predictor scale, including group
-means when requested.
+`data = NULL`, the evaluation set is generated using `n`, `n_2d`,
+`n_3d`, and `n_4d`. Differences and interval limits are on the linear
+predictor scale, including group means when requested.
+
+`variables` determines the order used to generate and display the
+evaluation grid. The first two covariates are the x and y axes. The
+third covariate defines facets for three-dimensional smooths, or facet
+rows for four-dimensional smooths; the fourth defines facet columns. Use
+`data` to choose particular conditioning values. The resolved order is
+saved with the estimates for use by
+[`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md).
 
 The intervals use the joint coefficient covariance selected by
 `unconditional` and `frequentist`, retaining covariance between the two
@@ -160,6 +192,43 @@ ignored for pointwise intervals. An explicit seed scopes the entire
 call: each pair uses a new batch of coefficient draws, and the caller's
 random number state is restored on exit. With `seed = NULL`, the current
 random number state is used and advanced.
+
+## Parallel calculation
+
+With mirai and carrier installed, configure workers with
+[`mirai::daemons()`](https://mirai.r-lib.org/reference/daemons.html) to
+distribute calculations across selected smooths. `difference_smooths()`
+distributes factor-level comparisons instead. Without configured
+workers, or with only one calculation, evaluation is serial. These
+functions leave the caller's worker pool running.
+
+Model selection, evaluation of model expressions and random draws are
+prepared in the caller. Workers receive the coordinates and coefficient
+columns needed for their calculation. Custom prediction methods are
+evaluated in the caller, including custom tensor margins and
+factor-smooth bases; workers receive their prediction matrices.
+Simultaneous intervals use successive draws in selection order, so
+[`set.seed()`](https://rdrr.io/r/base/Random.html) gives the same
+results with or without workers, independently of their number or
+completion order.
+[`derivatives()`](https://gavinsimpson.github.io/gratia/reference/derivatives.md)
+uses [`set.seed()`](https://rdrr.io/r/base/Random.html); the other
+functions also accept `seed`, which restores the caller's random number
+state on exit.
+
+[`smooth_samples()`](https://gavinsimpson.github.io/gratia/reference/smooth_samples.md)
+draws coefficients jointly once, then reuses those draws for every
+smooth, preserving dependence and chain identities. Sampling finishes
+before smooth calculations start, so MH chains and smooth workers are
+not nested. Sampling thread controls keep their existing meanings.
+Workers use their configured BLAS thread settings; when using a threaded
+BLAS, limit its threads before starting daemons to avoid competing
+threads.
+
+Parallel work is most useful for expensive bases or interval
+calculations. Small grids can be slower because of transfer and
+scheduling costs. Large grids and many draws also require memory for
+worker inputs and returned results, in addition to the final output.
 
 ## Examples
 
@@ -204,4 +273,22 @@ draw(sm_sim)
 sm_dif3 <- difference_smooths(m,
   select = c("s(x2):fac1", "s(x2):fac2"), partial_match = FALSE
 )
+
+# Choose two axes and condition on the third covariate
+m3 <- gam(y ~ fac + te(x0, x1, x2, by = fac, k = c(3, 3, 3)),
+  data = df, method = "REML")
+sm_dif_3d <- difference_smooths(m3, select = "te(x0,x1,x2)",
+  variables = c("x1", "x2", "x0"), n_2d = 20, n_3d = 3)
+draw(sm_dif_3d)
+
+# Redraw the evaluated points with the axes exchanged
+draw(sm_dif_3d, variables = c("x2", "x1", "x0"))
+
+
+# Supply particular conditioning values using a prediction grid
+grid <- data_slice(m3, x1 = evenly(x1, n = 20),
+  x2 = evenly(x2, n = 20), x0 = c(0.2, 0.8), fac = levels(fac))
+sm_dif_at <- difference_smooths(m3, select = "te(x0,x1,x2)",
+  data = grid, variables = c("x1", "x2", "x0"))
+draw(sm_dif_at)
 ```

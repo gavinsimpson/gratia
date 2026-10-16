@@ -34,7 +34,10 @@ add_residuals(data, model, value = ".residual", type = "deviance", ...)
   character; the type of residuals to return. See
   [`mgcv::residuals.gam()`](https://rdrr.io/pkg/mgcv/man/residuals.gam.html)
   for options, or use `"surrogate"` for models fitted with
-  [`mgcv::ocat()`](https://rdrr.io/pkg/mgcv/man/ocat.html).
+  [`mgcv::ocat()`](https://rdrr.io/pkg/mgcv/man/ocat.html) or
+  [`mgcv::multinom()`](https://rdrr.io/pkg/mgcv/man/multinom.html).
+  Nominal surrogate residuals form a matrix column retaining all
+  category labels, including category 0.
 
 - ...:
 

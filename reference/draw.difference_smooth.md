@@ -28,7 +28,8 @@ draw(
   subtitle = NULL,
   caption = NULL,
   angle = NULL,
-  ...
+  ...,
+  variables = NULL
 )
 ```
 
@@ -136,6 +137,14 @@ draw(
 
   additional arguments passed to
   [`patchwork::wrap_plots()`](https://patchwork.data-imaginist.com/reference/wrap_plots.html).
+
+- variables:
+
+  character vector; every covariate of the selected smooth, in plotting
+  order. The first two are the x and y axes; the third defines facets
+  for three covariates, or facet rows for four covariates; the fourth
+  defines facet columns. `NULL` uses the order saved with the estimates.
+  Drawing rearranges evaluated points without generating a new grid.
 
 ## Examples
 

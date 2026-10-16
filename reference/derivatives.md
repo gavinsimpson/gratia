@@ -205,6 +205,43 @@ A tibble, currently with the following variables:
 `derivatives()` will ignore any random effect smooths it encounters in
 `object`.
 
+## Parallel calculation
+
+With mirai and carrier installed, configure workers with
+[`mirai::daemons()`](https://mirai.r-lib.org/reference/daemons.html) to
+distribute calculations across selected smooths.
+[`difference_smooths()`](https://gavinsimpson.github.io/gratia/reference/difference_smooths.md)
+distributes factor-level comparisons instead. Without configured
+workers, or with only one calculation, evaluation is serial. These
+functions leave the caller's worker pool running.
+
+Model selection, evaluation of model expressions and random draws are
+prepared in the caller. Workers receive the coordinates and coefficient
+columns needed for their calculation. Custom prediction methods are
+evaluated in the caller, including custom tensor margins and
+factor-smooth bases; workers receive their prediction matrices.
+Simultaneous intervals use successive draws in selection order, so
+[`set.seed()`](https://rdrr.io/r/base/Random.html) gives the same
+results with or without workers, independently of their number or
+completion order. `derivatives()` uses
+[`set.seed()`](https://rdrr.io/r/base/Random.html); the other functions
+also accept `seed`, which restores the caller's random number state on
+exit.
+
+[`smooth_samples()`](https://gavinsimpson.github.io/gratia/reference/smooth_samples.md)
+draws coefficients jointly once, then reuses those draws for every
+smooth, preserving dependence and chain identities. Sampling finishes
+before smooth calculations start, so MH chains and smooth workers are
+not nested. Sampling thread controls keep their existing meanings.
+Workers use their configured BLAS thread settings; when using a threaded
+BLAS, limit its threads before starting daemons to avoid competing
+threads.
+
+Parallel work is most useful for expensive bases or interval
+calculations. Small grids can be slower because of transfer and
+scheduling costs. Large grids and many draws also require memory for
+worker inputs and returned results, in addition to the final output.
+
 ## See also
 
 [gamm4_support](https://gavinsimpson.github.io/gratia/reference/gamm4_support.md)
@@ -238,6 +275,34 @@ derivatives(mod, type = "central")
 #> 10 s(x0)   NA    NA           6.87  2.47  1.96     2.03       11.7 9.08e-2    NA
 #> # i 390 more rows
 #> # i 2 more variables: x2 <dbl>, x3 <dbl>
+
+# \donttest{
+if (requireNamespace("mirai", quietly = TRUE) &&
+    requireNamespace("carrier", quietly = TRUE)) {
+  library("mirai")
+  library("gratia")
+  local({
+    mirai::daemons(2)
+    on.exit(mirai::daemons(0))
+    derivatives(mod, type = "central")
+  })
+}
+#> # A tibble: 400 x 12
+#>    .smooth .by   .fs   .derivative   .se .crit .lower_ci .upper_ci      x0    x1
+#>    <chr>   <chr> <chr>       <dbl> <dbl> <dbl>     <dbl>     <dbl>   <dbl> <dbl>
+#>  1 s(x0)   NA    NA           7.41  3.33  1.96     0.874      13.9 2.42e-4    NA
+#>  2 s(x0)   NA    NA           7.40  3.33  1.96     0.884      13.9 1.03e-2    NA
+#>  3 s(x0)   NA    NA           7.39  3.30  1.96     0.929      13.8 2.04e-2    NA
+#>  4 s(x0)   NA    NA           7.36  3.24  1.96     1.01       13.7 3.04e-2    NA
+#>  5 s(x0)   NA    NA           7.32  3.15  1.96     1.14       13.5 4.05e-2    NA
+#>  6 s(x0)   NA    NA           7.26  3.04  1.96     1.30       13.2 5.06e-2    NA
+#>  7 s(x0)   NA    NA           7.18  2.90  1.96     1.49       12.9 6.06e-2    NA
+#>  8 s(x0)   NA    NA           7.09  2.76  1.96     1.69       12.5 7.07e-2    NA
+#>  9 s(x0)   NA    NA           6.99  2.61  1.96     1.87       12.1 8.08e-2    NA
+#> 10 s(x0)   NA    NA           6.87  2.47  1.96     2.03       11.7 9.08e-2    NA
+#> # i 390 more rows
+#> # i 2 more variables: x2 <dbl>, x3 <dbl>
+# }
 
 ## derivatives for a selected smooth
 derivatives(mod, type = "central", select = "s(x1)")

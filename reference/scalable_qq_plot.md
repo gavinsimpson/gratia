@@ -144,8 +144,15 @@ scalable_residuals_hist_plot(
   [`appraise()`](https://gavinsimpson.github.io/gratia/reference/appraise.md).
   PIT and quantile residuals are available for supported response
   distributions. `"surrogate"` is available for
-  [`ocat()`](https://rdrr.io/pkg/mgcv/man/ocat.html) models and uses
-  logistic QQ references with `method = NULL`; see
+  [`ocat()`](https://rdrr.io/pkg/mgcv/man/ocat.html) and
+  [`multinom()`](https://rdrr.io/pkg/mgcv/man/multinom.html) GAMs with
+  `method = NULL`: logistic references for ordinal residuals and centred
+  Gumbel references for each nominal category utility. Nominal
+  components always have separate panels. Their residuals are drawn once
+  per observation and shared with ordinary diagnostics. Components are
+  summarised one at a time; QQ bin limits apply to each category.
+  Residuals use category probabilities on the predictor axis, including
+  category 0. See
   [`surrogate_residuals()`](https://gavinsimpson.github.io/gratia/reference/surrogate_residuals.md)
   and
   [diagnostic_support](https://gavinsimpson.github.io/gratia/reference/diagnostic_support.md).

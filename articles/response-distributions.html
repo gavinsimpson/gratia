@@ -376,9 +376,82 @@ custom thresholds can use gratia’s data simulator:</p>
 <p><img src="response-distributions_files/figure-html/ordinal-1.png" class="r-plt" alt="" width="700"></p>
 <p>The thresholds define a simulated rating process; they must be finite
 and strictly increasing. These checks randomise within ordered category
-mass. Nominal multinomial categories have no intrinsic ordering, so
-gratia retains traditional residual checks and posterior predictive
-checks, but does not assign them PIT scores by inventing an order.</p>
+mass. For nominal categories, <code>mgcv::multinom(K)</code> models one
+outcome coded <code>0, ..., K</code>. gratia accumulates probabilities
+in that existing coding order:</p>
+<p><span class="math display">
+F(q) = \sum_{j=0}^{\lfloor q \rfloor} p_j, \qquad
+Q(u) = \min\{j : F(j) \ge u\}, \quad 0 &lt; u &lt; 1.
+</span></p>
+<p>The CDF is zero below category 0 and one at or above category K.
+Quantiles at lower-tail probabilities zero and one are 0 and K,
+respectively; upper-tail probabilities reverse these endpoints. Both
+functions accept log probabilities and upper tails. Internally, their
+<code>mu</code> argument contains K logits relative to category 0, as in
+mgcv’s native random generator, rather than the K+1 probabilities
+returned by <code>predict(type = "response")</code>.</p>
+<p>A PIT for an observed category <code>j</code> is
+<code>F(j - 1) + V * p_j</code>, with <code>V</code> uniform on
+<code>(0, 1)</code>. Thus randomization spans the entire mass of that
+category. This is the ordinary randomized probability transform
+described by <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC2211730/" class="external-link">Brockwell
+(2007)</a>. Each fixed enumeration gives a uniform transform under the
+true model. Changing the enumeration can change individual residuals and
+diagnostic sensitivity: the probabilities before a given category
+change. The coding does not turn the multinomial likelihood into an
+ordinal model.</p>
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">417</span><span class="op">)</span></span>
+<span><span class="va">category_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">300</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">category_data</span><span class="op">$</span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fl">0</span><span class="op">:</span><span class="fl">2</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">category_data</span><span class="op">)</span>, replace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="va">category_fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, <span class="op">~</span><span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">category_data</span>,</span>
+<span>  family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/multinom.html" class="external-link">multinom</a></span><span class="op">(</span>K <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/qq_plot.html">qq_plot</a></span><span class="op">(</span><span class="va">category_fit</span>, type <span class="op">=</span> <span class="st">"quantile"</span>, seed <span class="op">=</span> <span class="fl">418</span><span class="op">)</span></span></code></pre></div>
+<p><img src="response-distributions_files/figure-html/multinomial-1.png" class="r-plt" alt="" width="700"></p>
+<p>These residuals transform cumulative category probabilities; they are
+distinct from the latent-utility surrogate residuals for nominal models
+studied by <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC8018589/" class="external-link">Cheng, Wang and
+Zhang (2021)</a>.</p>
+<p>Use <code><a href="../reference/surrogate_residuals.html">surrogate_residuals()</a></code> or
+<code>appraise(fit, type = "surrogate", seed = 417)</code> for a GAM
+fitted with <code><a href="https://rdrr.io/pkg/mgcv/man/multinom.html" class="external-link">multinom()</a></code>. These residuals draw continuous
+utilities conditional on the observed choice, then subtract each fitted
+location and the Gumbel mean. The result is a matrix with columns
+labelled <code>0</code>, …, <code>K</code>, including the reference
+category. Every component has a centred Gumbel reference, with mean zero
+and variance <code>pi^2 / 6</code>. Even binary
+<code>multinom(K = 1)</code> fits retain two utility components; the
+difference between them has a logistic reference. This construction uses
+the whole utility vector and does not assign an order to the nominal
+outcomes.</p>
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">417</span><span class="op">)</span></span>
+<span><span class="va">nominal_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">400</span>, <span class="op">-</span><span class="fl">2</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">locations</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">nominal_data</span><span class="op">$</span><span class="va">x</span>, <span class="op">-</span><span class="fl">.5</span> <span class="op">-</span> <span class="va">nominal_data</span><span class="op">$</span><span class="va">x</span><span class="op">)</span></span>
+<span><span class="va">utilities</span> <span class="op">&lt;-</span> <span class="va">locations</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">1200</span><span class="op">)</span>, nrow <span class="op">=</span> <span class="fl">400</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">nominal_data</span><span class="op">$</span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/maxCol.html" class="external-link">max.col</a></span><span class="op">(</span><span class="va">utilities</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1L</span></span>
+<span><span class="va">nominal_fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x</span>, k <span class="op">=</span> <span class="fl">6</span><span class="op">)</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x</span>, k <span class="op">=</span> <span class="fl">6</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  data <span class="op">=</span> <span class="va">nominal_data</span>, family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/multinom.html" class="external-link">multinom</a></span><span class="op">(</span>K <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="../reference/surrogate_residuals.html">surrogate_residuals</a></span><span class="op">(</span><span class="va">nominal_fit</span>, seed <span class="op">=</span> <span class="fl">418</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;               0          1          2</span></span>
+<span><span class="co">#&gt; [1,]  0.2642662 -0.7456620 -0.4193910</span></span>
+<span><span class="co">#&gt; [2,] -1.2404136  3.2844008 -1.0975267</span></span>
+<span><span class="co">#&gt; [3,] -2.1688542 -2.1006100 -0.6264208</span></span>
+<span><span class="co">#&gt; [4,]  2.4842765 -1.5569361  0.5762615</span></span>
+<span><span class="co">#&gt; [5,] -1.1996106  1.4861575 -0.2546800</span></span>
+<span><span class="co">#&gt; [6,] -1.3084249  0.1337424  0.4076122</span></span>
+<span><span class="fu"><a href="../reference/appraise.html">appraise</a></span><span class="op">(</span><span class="va">nominal_fit</span>, type <span class="op">=</span> <span class="st">"surrogate"</span>, seed <span class="op">=</span> <span class="fl">418</span><span class="op">)</span></span></code></pre></div>
+<p><img src="response-distributions_files/figure-html/nominal-surrogate-1.png" class="r-plt" alt="" width="700"></p>
+<p>QQ and worm plots show each category separately against centred
+Gumbel quantiles. Their pointwise bands treat fitted parameters as fixed
+and apply separately to each component. Residual-versus-fitted panels
+use each category’s fitted probability, including category 0.
+Observed-versus-fitted panels compare category indicators with those
+probabilities. All panels share a single draw. For larger data,
+<code>scalable = TRUE</code> summarises each category separately while
+retaining the same underlying draws for the same seed. Automatic
+dispatch counts observations. See <code><a href="../reference/surrogate_residuals.html">surrogate_residuals()</a></code> for
+the sampling identity and reference distributions.</p>
 </div>
 <div class="section level2">
 <h2 id="other-distributions-and-limits-to-interpretation">Other distributions and limits to interpretation<a class="anchor" aria-label="anchor" href="#other-distributions-and-limits-to-interpretation"></a>
@@ -454,7 +527,7 @@ appropriate parameter. For multivariate normal and multinomial families,
 explicit <code>which_eta</code> selects and validates the predictor.
 Unsupported parameters are errors; a single-link user family can use its
 own functions without a family-name whitelist.</p>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/link.html">inv_link</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/twlss.html" class="external-link">twlss</a></span><span class="op">(</span><span class="op">)</span>, parameter <span class="op">=</span> <span class="st">"power"</span><span class="op">)</span><span class="op">(</span><span class="fl">0</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 0</span></span>
 <span><span class="fu"><a href="../reference/link.html">inv_link</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/twlss.html" class="external-link">twlss</a></span><span class="op">(</span><span class="op">)</span>, parameter <span class="op">=</span> <span class="st">"phi"</span><span class="op">)</span><span class="op">(</span><span class="fl">0</span><span class="op">)</span></span>

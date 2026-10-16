@@ -24,8 +24,15 @@ standard-normal scores. Surrogate residuals for
 transform the same randomised probabilities to logistic scores. Their
 reference has location zero and scale one, and fitting weights do not
 rescale it. They hold fitted random effects fixed and use the same
-observation alignment and seed conventions. Select them explicitly with
-`type = "surrogate"`; see
+observation alignment and seed conventions. For
+[`mgcv::multinom()`](https://rdrr.io/pkg/mgcv/man/multinom.html) GAMs,
+surrogate residuals are vectors of centred Gumbel utility errors, one
+for every category including 0, following Cheng, Wang and Zhang (2021).
+Conditional utility draws preserve category identity and are shared
+across ordinary and scalable panels. Each component has its own QQ/worm
+reference and pointwise bands; residual panels use that category's
+fitted probability, and covariate panels separate categories. Select
+them explicitly with `type = "surrogate"`; see
 [`surrogate_residuals()`](https://gavinsimpson.github.io/gratia/reference/surrogate_residuals.md).
 A posterior predictive check (PPC) compares observed responses with
 simulated data sets that also include approximate uncertainty in fitted
@@ -52,9 +59,12 @@ This table applies to the supported response families described below.
 - `gam`/`bam`: ordinary, distributional and grouped families, including
   weighted Gamma, inverse Gaussian, `twlss`, ordinal and `ziP`
   distributions. Multivariate-normal PITs check each response
-  separately; simulations retain covariance between responses. Nominal
-  multinomial models retain traditional residual checks and PPCs. PITs
-  would require an ordering of their categories.
+  separately; simulations retain covariance between responses.
+  Multinomial PIT/quantile residuals accumulate category probabilities
+  in mgcv's numeric coding order, `0, ..., K`. Nominal multinomial GAMs
+  also support utility surrogate residuals in ordinary and scalable
+  plots. Utility residuals need no ordering of categories. Traditional
+  residual checks and PPCs remain available.
 
 - SCAM models support ordinary posterior predictive plots. Scalable
   posterior predictive plots are not currently available; use

@@ -374,7 +374,7 @@ individual diagnostic plots, residuals, and measures of concurvity.
 - [`quantile_residuals()`](https://gavinsimpson.github.io/gratia/reference/quantile_residuals.md)
   : PIT and randomised quantile residuals
 - [`surrogate_residuals()`](https://gavinsimpson.github.io/gratia/reference/surrogate_residuals.md)
-  : Surrogate residuals for ordered categorical GAMs
+  : Surrogate residuals for categorical GAMs
 - [`dharma_residuals()`](https://gavinsimpson.github.io/gratia/reference/dharma_residuals.md)
   : Simulation-based PIT residuals
 - [`residual_correlation()`](https://gavinsimpson.github.io/gratia/reference/residual_correlation.md)

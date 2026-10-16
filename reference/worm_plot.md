@@ -121,12 +121,13 @@ worm_plot(
 
   character or `NULL`; residual type: `"deviance"`, `"response"`,
   `"pearson"`, `"pit"`, `"quantile"`, `"dharma"`, or `"surrogate"` (for
-  [`ocat()`](https://rdrr.io/pkg/mgcv/man/ocat.html) models). `NULL`
-  uses the model-specific default: deviance for ordinary lm/glm/GAM
-  fits, and quantile for supported grouped families, GJRM, sdmTMB and
-  full mixed-model checks. glmmTMB uses Pearson residuals conditionally
-  and response residuals marginally. Extracted GAM components follow the
-  ordinary GAM defaults. See
+  [`ocat()`](https://rdrr.io/pkg/mgcv/man/ocat.html) or
+  [`multinom()`](https://rdrr.io/pkg/mgcv/man/multinom.html) GAMs).
+  `NULL` uses the model-specific default: deviance for ordinary
+  lm/glm/GAM fits, and quantile for supported grouped families, GJRM,
+  sdmTMB and full mixed-model checks. glmmTMB uses Pearson residuals
+  conditionally and response residuals marginally. Extracted GAM
+  components follow the ordinary GAM defaults. See
   [diagnostic_support](https://gavinsimpson.github.io/gratia/reference/diagnostic_support.md).
 
 - n_uniform:
@@ -277,7 +278,15 @@ approximate pointwise bands obtained by applying
 [`qlogis()`](https://rdrr.io/r/stats/Logistic.html) to beta
 order-statistic limits. Worm plots subtract the same logistic reference
 quantiles from residuals and bands. These references treat fitted
-parameters as fixed. See
+parameters as fixed. For
+[`mgcv::multinom()`](https://rdrr.io/pkg/mgcv/man/multinom.html) GAMs,
+surrogate residuals retain a utility component for every category,
+including 0. Components have separate facets and centred Gumbel
+reference quantiles, including when `by_family = FALSE`. The same
+reference is subtracted in worm plots, and pointwise beta
+order-statistic bands use the centred Gumbel quantile function
+separately for each component. Ordinary and scalable displays share
+their draw. See
 [`surrogate_residuals()`](https://gavinsimpson.github.io/gratia/reference/surrogate_residuals.md).
 
 Subtitles name the method. Captions identify conditioning and field

@@ -395,9 +395,94 @@ qq_plot(ordinal_fit, type = "quantile", seed = 416)
 
 The thresholds define a simulated rating process; they must be finite
 and strictly increasing. These checks randomise within ordered category
-mass. Nominal multinomial categories have no intrinsic ordering, so
-gratia retains traditional residual checks and posterior predictive
-checks, but does not assign them PIT scores by inventing an order.
+mass. For nominal categories, `mgcv::multinom(K)` models one outcome
+coded `0, ..., K`. gratia accumulates probabilities in that existing
+coding order:
+
+F(q) = \sum\_{j=0}^{\lfloor q \rfloor} p_j, \qquad Q(u) = \min\\j : F(j)
+\ge u\\, \quad 0 \< u \< 1.
+
+The CDF is zero below category 0 and one at or above category K.
+Quantiles at lower-tail probabilities zero and one are 0 and K,
+respectively; upper-tail probabilities reverse these endpoints. Both
+functions accept log probabilities and upper tails. Internally, their
+`mu` argument contains K logits relative to category 0, as in mgcv’s
+native random generator, rather than the K+1 probabilities returned by
+`predict(type = "response")`.
+
+A PIT for an observed category `j` is `F(j - 1) + V * p_j`, with `V`
+uniform on `(0, 1)`. Thus randomization spans the entire mass of that
+category. This is the ordinary randomized probability transform
+described by [Brockwell
+(2007)](https://pmc.ncbi.nlm.nih.gov/articles/PMC2211730/). Each fixed
+enumeration gives a uniform transform under the true model. Changing the
+enumeration can change individual residuals and diagnostic sensitivity:
+the probabilities before a given category change. The coding does not
+turn the multinomial likelihood into an ordinal model.
+
+``` r
+
+set.seed(417)
+category_data <- data.frame(x = runif(300))
+category_data$y <- sample(0:2, nrow(category_data), replace = TRUE)
+category_fit <- gam(list(y ~ s(x), ~s(x)), data = category_data,
+  family = multinom(K = 2), method = "REML")
+qq_plot(category_fit, type = "quantile", seed = 418)
+```
+
+![](response-distributions_files/figure-html/multinomial-1.png)
+
+These residuals transform cumulative category probabilities; they are
+distinct from the latent-utility surrogate residuals for nominal models
+studied by [Cheng, Wang and Zhang
+(2021)](https://pmc.ncbi.nlm.nih.gov/articles/PMC8018589/).
+
+Use
+[`surrogate_residuals()`](https://gavinsimpson.github.io/gratia/reference/surrogate_residuals.md)
+or `appraise(fit, type = "surrogate", seed = 417)` for a GAM fitted with
+[`multinom()`](https://rdrr.io/pkg/mgcv/man/multinom.html). These
+residuals draw continuous utilities conditional on the observed choice,
+then subtract each fitted location and the Gumbel mean. The result is a
+matrix with columns labelled `0`, …, `K`, including the reference
+category. Every component has a centred Gumbel reference, with mean zero
+and variance `pi^2 / 6`. Even binary `multinom(K = 1)` fits retain two
+utility components; the difference between them has a logistic
+reference. This construction uses the whole utility vector and does not
+assign an order to the nominal outcomes.
+
+``` r
+
+set.seed(417)
+nominal_data <- data.frame(x = runif(400, -2, 2))
+locations <- cbind(0, nominal_data$x, -.5 - nominal_data$x)
+utilities <- locations - log(-log(matrix(runif(1200), nrow = 400)))
+nominal_data$y <- max.col(utilities) - 1L
+nominal_fit <- gam(list(y ~ s(x, k = 6), ~ s(x, k = 6)),
+  data = nominal_data, family = multinom(K = 2), method = "REML")
+head(surrogate_residuals(nominal_fit, seed = 418))
+#>               0          1          2
+#> [1,]  0.2642662 -0.7456620 -0.4193910
+#> [2,] -1.2404136  3.2844008 -1.0975267
+#> [3,] -2.1688542 -2.1006100 -0.6264208
+#> [4,]  2.4842765 -1.5569361  0.5762615
+#> [5,] -1.1996106  1.4861575 -0.2546800
+#> [6,] -1.3084249  0.1337424  0.4076122
+appraise(nominal_fit, type = "surrogate", seed = 418)
+```
+
+![](response-distributions_files/figure-html/nominal-surrogate-1.png)
+
+QQ and worm plots show each category separately against centred Gumbel
+quantiles. Their pointwise bands treat fitted parameters as fixed and
+apply separately to each component. Residual-versus-fitted panels use
+each category’s fitted probability, including category 0.
+Observed-versus-fitted panels compare category indicators with those
+probabilities. All panels share a single draw. For larger data,
+`scalable = TRUE` summarises each category separately while retaining
+the same underlying draws for the same seed. Automatic dispatch counts
+observations. See
+[`surrogate_residuals()`](https://gavinsimpson.github.io/gratia/reference/surrogate_residuals.md)
+for the sampling identity and reference distributions.
 
 ## Other distributions and limits to interpretation
 

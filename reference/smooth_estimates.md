@@ -38,7 +38,8 @@ smooth_estimates(
   seed = NULL,
   interval_method = c("auto", "gaussian", "bootstrap", "shape"),
   shape_source = c("gaussian", "bootstrap"),
-  ...
+  ...,
+  variables = NULL
 )
 
 # S3 method for class 'gamlss'
@@ -210,9 +211,26 @@ smooth_estimates(
   Bootstrap sources require `frequentist = FALSE` and
   `unconditional = FALSE` because the stored draws hold smoothing fixed.
 
+- variables:
+
+  Character vector giving every covariate of the selected smooths
+  exactly once, in plotting order: x, y, then the conditioning covariate
+  for 3D smooths, or facet rows and columns for 4D smooths. When
+  supplied, selected smooths must use the same covariates. Use fitted
+  coordinate names, such as `"log(x)"` for a transformed covariate. The
+  default, `NULL`, favours a two-variable tensor margin for x and y,
+  otherwise retaining fitted order. Grid resolution follows this order.
+  Supplied `data` are evaluated unchanged. Drawing saved estimates can
+  change the order but uses only points already evaluated; evaluate
+  again to change grid resolution or conditioning values. Continuous
+  covariates must precede factors. Spherical smooths retain their
+  latitude/longitude convention and do not support reordering.
+
 ## Value
 
-A data frame (tibble), which is of class `"smooth_estimates"`.
+A data frame (tibble), which is of class `"smooth_estimates"`. Its
+`plot_variables` attribute is a list of resolved covariate orders, named
+by smooth label, used when drawing the saved estimates.
 
 ## Details
 
@@ -419,7 +437,6 @@ if (requireNamespace("mirai") && requireNamespace("carrier")) {
   daemons(2)                          # only low for CRAN requirements
   smooth_estimates(m1)
 }
-#> Loading required namespace: carrier
 #> # A tibble: 400 x 9
 #>    .smooth .type .by   .estimate      .se         x0    x1    x2    x3
 #>    <chr>   <chr> <chr>     <dbl>    <dbl>      <dbl> <dbl> <dbl> <dbl>

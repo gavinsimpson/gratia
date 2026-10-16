@@ -33,10 +33,11 @@ residuals_hist_plot(
 
   character or `NULL`; residual type: `"deviance"`, `"pearson"`,
   `"response"`, `"pit"`, `"quantile"`, `"dharma"`, or `"surrogate"` (for
-  [`ocat()`](https://rdrr.io/pkg/mgcv/man/ocat.html) models). Grouped
-  models automatically use quantile residuals when all active components
-  are supported, otherwise all use deviance residuals with a message.
-  Ordinary models retain deviance residuals by default. See
+  [`ocat()`](https://rdrr.io/pkg/mgcv/man/ocat.html) or
+  [`multinom()`](https://rdrr.io/pkg/mgcv/man/multinom.html) GAMs).
+  Grouped models automatically use quantile residuals when all active
+  components are supported, otherwise all use deviance residuals with a
+  message. Ordinary models retain deviance residuals by default. See
   [`appraise()`](https://gavinsimpson.github.io/gratia/reference/appraise.md)
   for distributional support.
 

@@ -147,16 +147,48 @@
 
 ### New features
 
+- Smooth estimation and drawing, including
+  [`difference_smooths()`](https://gavinsimpson.github.io/gratia/reference/difference_smooths.md),
+  now accept `variables` to choose x and y axes and the order of
+  conditioning facets. Differences between 3D and 4D smooths can now be
+  drawn as faceted surfaces
+  ([\#256](https://github.com/gavinsimpson/gratia/issues/256),
+  [\#257](https://github.com/gavinsimpson/gratia/issues/257)). Their
+  automatic grids use `n_3d = 16` and `n_4d = 4`, matching individual
+  smooths; use `NULL` to use `n` for those dimensions. Resolved
+  covariate orders are retained when drawing saved estimates. Supply
+  `data` to choose explicit conditioning values.
+
 - Surrogate residuals are available for
-  [`mgcv::ocat()`](https://rdrr.io/pkg/mgcv/man/ocat.html) models
+  [`mgcv::ocat()`](https://rdrr.io/pkg/mgcv/man/ocat.html) and
+  [`mgcv::multinom()`](https://rdrr.io/pkg/mgcv/man/multinom.html) GAMs
   through
-  [`surrogate_residuals()`](https://gavinsimpson.github.io/gratia/reference/surrogate_residuals.md)
-  and `type = "surrogate"` in residual diagnostic plots and
+  [`surrogate_residuals()`](https://gavinsimpson.github.io/gratia/reference/surrogate_residuals.md),
+  `type = "surrogate"` in ordinary and scalable residual diagnostic
+  plots, and
   [`add_residuals()`](https://gavinsimpson.github.io/gratia/reference/add_residuals.md).
-  QQ and worm plots use logistic reference quantiles. The calculation
-  follows Liu and Zhang (2018), requires no additional package, and
-  preserves accuracy in extreme tails
-  ([\#359](https://github.com/gavinsimpson/gratia/issues/359)).
+  Ordinal residuals follow Liu and Zhang (2018), with logistic
+  references
+  ([\#359](https://github.com/gavinsimpson/gratia/issues/359)). Nominal
+  residuals follow Cheng, Wang and Zhang (2021), retaining a centred
+  Gumbel utility component for every category, including category 0. All
+  appraisal panels share one draw, and categories have separate panels.
+  Both methods require no additional package and preserve accuracy in
+  extreme tails.
+
+- [`derivatives()`](https://gavinsimpson.github.io/gratia/reference/derivatives.md),
+  [`partial_derivatives()`](https://gavinsimpson.github.io/gratia/reference/partial_derivatives.md),
+  [`smooth_samples()`](https://gavinsimpson.github.io/gratia/reference/smooth_samples.md)
+  and
+  [`difference_smooths()`](https://gavinsimpson.github.io/gratia/reference/difference_smooths.md)
+  now use workers configured by
+  [`mirai::daemons()`](https://mirai.r-lib.org/reference/daemons.html)
+  for independent smooth or comparison calculations
+  ([\#348](https://github.com/gavinsimpson/gratia/issues/348)). Serial
+  execution remains available without workers. Joint posterior draws,
+  seeded simulation results and result order are preserved across worker
+  counts. Custom smooth prediction methods are evaluated in the caller
+  so workers use the same bases.
 
 - Plots now support native ggplot2 theme settings for smooths,
   intervals, residuals, diagnostics and other components, including
@@ -466,21 +498,33 @@
   [`gaulss()`](https://rdrr.io/pkg/mgcv/man/gaulss.html),
   [`gevlss()`](https://rdrr.io/pkg/mgcv/man/gevlss.html),
   [`gumbls()`](https://rdrr.io/pkg/mgcv/man/gumbls.html),
-  [`gammals()`](https://rdrr.io/pkg/mgcv/man/gammals.html) and
-  [`ziplss()`](https://rdrr.io/pkg/mgcv/man/ziplss.html).
-  `fix_family_cdf()` adds cumulative distribution functions for
+  [`gammals()`](https://rdrr.io/pkg/mgcv/man/gammals.html),
+  [`ziplss()`](https://rdrr.io/pkg/mgcv/man/ziplss.html) and
+  [`mvn()`](https://rdrr.io/pkg/mgcv/man/mvn.html). `fix_family_cdf()`
+  adds cumulative distribution functions for
   [`gaulss()`](https://rdrr.io/pkg/mgcv/man/gaulss.html),
   [`gevlss()`](https://rdrr.io/pkg/mgcv/man/gevlss.html),
   [`gumbls()`](https://rdrr.io/pkg/mgcv/man/gumbls.html),
-  [`gammals()`](https://rdrr.io/pkg/mgcv/man/gammals.html) and
-  [`ziplss()`](https://rdrr.io/pkg/mgcv/man/ziplss.html), making
-  quantile residuals available. These helpers and `fix_family_rd()`
-  preserve distribution functions supplied by callers.
-  [`ziplss()`](https://rdrr.io/pkg/mgcv/man/ziplss.html) quantile
-  residuals randomise over the probability mass of each observed count
-  (GRA-007). Quantile helpers retain log probabilities where supported;
-  conversions that cannot represent an extreme probability give an
-  explanatory error rather than a false infinite quantile.
+  [`gammals()`](https://rdrr.io/pkg/mgcv/man/gammals.html),
+  [`ziplss()`](https://rdrr.io/pkg/mgcv/man/ziplss.html) and
+  [`mvn()`](https://rdrr.io/pkg/mgcv/man/mvn.html), making quantile
+  residuals available. For
+  [`mvn()`](https://rdrr.io/pkg/mgcv/man/mvn.html), both helpers use
+  each response’s marginal Gaussian distribution with its fitted
+  variance ([\#183](https://github.com/gavinsimpson/gratia/issues/183)).
+  Categorical CDFs and quantiles for
+  [`multinom()`](https://rdrr.io/pkg/mgcv/man/multinom.html) use mgcv’s
+  category codes `0, ..., K` as the accumulation order, enabling
+  randomised PIT/quantile residuals and inverse-CDF diagnostic
+  references
+  ([\#183](https://github.com/gavinsimpson/gratia/issues/183)). These
+  helpers and `fix_family_rd()` preserve distribution functions supplied
+  by callers. [`ziplss()`](https://rdrr.io/pkg/mgcv/man/ziplss.html)
+  quantile residuals randomise over the probability mass of each
+  observed count (GRA-007). Quantile helpers retain log probabilities
+  where supported; conversions that cannot represent an extreme
+  probability give an explanatory error rather than a false infinite
+  quantile.
 
 - New Tweedie quantile helpers support uniform QQ diagnostics
   ([\#410](https://github.com/gavinsimpson/gratia/issues/410)). They use
@@ -812,6 +856,10 @@
   needing a recognised family name.
 
 ### Bug fixes
+
+- [`draw.difference_smooth()`](https://gavinsimpson.github.io/gratia/reference/draw.difference_smooth.md)
+  now uses supplied `xlab` and `caption` values when drawing differences
+  between curves.
 
 - [`n_smooths()`](https://gavinsimpson.github.io/gratia/reference/n_smooths.md)
   now counts smooth terms in glmmTMB models across the conditional,

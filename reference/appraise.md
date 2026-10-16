@@ -161,12 +161,13 @@ appraise(
 
   character or `NULL`; residual type: `"deviance"`, `"response"`,
   `"pearson"`, `"pit"`, `"quantile"`, `"dharma"`, or `"surrogate"` (for
-  [`ocat()`](https://rdrr.io/pkg/mgcv/man/ocat.html) models). `NULL`
-  uses the model-specific default: deviance for ordinary lm/glm/GAM
-  fits, and quantile for supported grouped families, GJRM, sdmTMB and
-  full mixed-model checks. glmmTMB uses Pearson residuals conditionally
-  and response residuals marginally. Extracted GAM components follow the
-  ordinary GAM defaults. See
+  [`ocat()`](https://rdrr.io/pkg/mgcv/man/ocat.html) or
+  [`multinom()`](https://rdrr.io/pkg/mgcv/man/multinom.html) GAMs).
+  `NULL` uses the model-specific default: deviance for ordinary
+  lm/glm/GAM fits, and quantile for supported grouped families, GJRM,
+  sdmTMB and full mixed-model checks. glmmTMB uses Pearson residuals
+  conditionally and response residuals marginally. Extracted GAM
+  components follow the ordinary GAM defaults. See
   [diagnostic_support](https://gavinsimpson.github.io/gratia/reference/diagnostic_support.md).
 
 - n_bins:
@@ -339,11 +340,16 @@ outcomes are unsupported. See
 for the calculation.
 
 Use `type = "surrogate"` for
-[`mgcv::ocat()`](https://rdrr.io/pkg/mgcv/man/ocat.html) models. These
-residuals are continuous draws on the latent logistic scale, centred at
-the fitted latent mean. QQ and worm plots require `method = NULL` and
-compare to a logistic distribution with location zero and scale one.
-Each appraisal shares one residual vector across panels. See
+[`mgcv::ocat()`](https://rdrr.io/pkg/mgcv/man/ocat.html) and
+[`mgcv::multinom()`](https://rdrr.io/pkg/mgcv/man/multinom.html) GAMs.
+The former uses a scalar latent logistic residual; the latter retains
+all category utilities, including category 0, as separate panels with
+centred Gumbel references. QQ and worm plots require `method = NULL`.
+Each appraisal shares one residual draw across panels, with the same
+draw in ordinary and scalable displays. Multinomial residuals are
+plotted against their own category probabilities; observed-versus-fitted
+panels compare category indicators with those probabilities. Pointwise
+bands are calculated separately for each utility. See
 [`surrogate_residuals()`](https://gavinsimpson.github.io/gratia/reference/surrogate_residuals.md).
 
 With `type = NULL`, ordinary lm/glm/GAM fits use deviance residuals.

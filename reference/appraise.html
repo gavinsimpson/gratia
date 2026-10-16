@@ -207,7 +207,7 @@ posterior predictive draws.</p></dd>
 <dt id="arg-type">type<a class="anchor" aria-label="anchor" href="#arg-type"></a></dt>
 <dd><p>character or <code>NULL</code>; residual type: <code>"deviance"</code>, <code>"response"</code>,
 <code>"pearson"</code>, <code>"pit"</code>, <code>"quantile"</code>, <code>"dharma"</code>, or <code>"surrogate"</code> (for
-<code><a href="https://rdrr.io/pkg/mgcv/man/ocat.html" class="external-link">ocat()</a></code> models). <code>NULL</code> uses the model-specific default:
+<code><a href="https://rdrr.io/pkg/mgcv/man/ocat.html" class="external-link">ocat()</a></code> or <code><a href="https://rdrr.io/pkg/mgcv/man/multinom.html" class="external-link">multinom()</a></code> GAMs). <code>NULL</code> uses the model-specific default:
 deviance for ordinary lm/glm/GAM fits, and quantile for supported grouped
 families, GJRM, sdmTMB and full mixed-model checks. glmmTMB uses Pearson
 residuals conditionally and response residuals marginally. Extracted GAM
@@ -364,11 +364,15 @@ QQ and worm plots require <code>method = NULL</code> and use uniform reference
 quantiles, with approximate pointwise bands for independent responses.
 Bands are omitted for dependent responses. Censored and multivariate
 outcomes are unsupported. See <code><a href="dharma_residuals.html">dharma_residuals()</a></code> for the calculation.</p>
-<p>Use <code>type = "surrogate"</code> for <code><a href="https://rdrr.io/pkg/mgcv/man/ocat.html" class="external-link">mgcv::ocat()</a></code> models. These residuals are
-continuous draws on the latent logistic scale, centred at the fitted latent
-mean. QQ and worm plots require <code>method = NULL</code> and compare to a logistic
-distribution with location zero and scale one. Each appraisal shares one
-residual vector across panels. See <code><a href="surrogate_residuals.html">surrogate_residuals()</a></code>.</p>
+<p>Use <code>type = "surrogate"</code> for <code><a href="https://rdrr.io/pkg/mgcv/man/ocat.html" class="external-link">mgcv::ocat()</a></code> and <code><a href="https://rdrr.io/pkg/mgcv/man/multinom.html" class="external-link">mgcv::multinom()</a></code> GAMs.
+The former uses a scalar latent logistic residual; the latter retains
+all category utilities, including category 0, as separate panels with
+centred Gumbel references. QQ and worm plots require <code>method = NULL</code>.
+Each appraisal shares one residual draw across panels, with the same
+draw in ordinary and scalable displays. Multinomial residuals are plotted
+against their own category probabilities; observed-versus-fitted panels
+compare category indicators with those probabilities. Pointwise bands
+are calculated separately for each utility. See <code><a href="surrogate_residuals.html">surrogate_residuals()</a></code>.</p>
 <p>With <code>type = NULL</code>, ordinary lm/glm/GAM fits use deviance residuals.
 Models fitted with <code><a href="https://rdrr.io/pkg/mgcv/man/gfam.html" class="external-link">mgcv::gfam()</a></code> use randomised quantile (Dunn–Smyth)
 residuals when every active component supplies a supported CDF and

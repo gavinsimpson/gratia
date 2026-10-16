@@ -273,6 +273,14 @@ PITs are returned as ordinary probabilities and may still round to zero or
 one in extreme tails. Applying <code><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">qnorm()</a></code> to returned PITs can therefore be
 less accurate than requesting quantile residuals directly. CDFs without log
 probabilities retain ordinary-probability calculations.</p>
+<p>For <code><a href="https://rdrr.io/pkg/mgcv/man/multinom.html" class="external-link">mgcv::multinom()</a></code> models, probabilities accumulate in the existing
+category coding order <code>0, ..., K</code>. If category <code>j</code> has probability <code>p_j</code>,
+its PIT is <code>F(j - 1) + V * p_j</code>, where <code>V</code> is uniform on <code>(0, 1)</code>.
+This uses one categorical response, rather than a vector of trial counts.
+The coding does not change the multinomial likelihood into an ordinal model.
+Each fixed enumeration gives a uniform randomized transform under the true
+model, but changing the enumeration can change individual residuals and
+which departures from the model are easiest to detect.</p>
 <p>Marginal checks may calculate residuals from ranks in joint response
 simulations when no analytic marginal CDF is available. See
 <a href="diagnostic_support.html">diagnostic_support</a> for the rank definition, conditioning choices and

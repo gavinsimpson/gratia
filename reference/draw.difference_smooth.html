@@ -87,7 +87,8 @@
 <span>  subtitle <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  caption <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  angle <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  <span class="va">...</span></span>
+<span>  <span class="va">...</span>,</span>
+<span>  variables <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -184,6 +185,14 @@ drawn passed to the <code>angle</code> argument of <code><a href="https://ggplot
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>additional arguments passed to <code><a href="https://patchwork.data-imaginist.com/reference/wrap_plots.html" class="external-link">patchwork::wrap_plots()</a></code>.</p></dd>
+
+
+<dt id="arg-variables">variables<a class="anchor" aria-label="anchor" href="#arg-variables"></a></dt>
+<dd><p>character vector; every covariate of the selected smooth,
+in plotting order. The first two are the x and y axes; the third defines
+facets for three covariates, or facet rows for four covariates; the fourth
+defines facet columns. <code>NULL</code> uses the order saved with the estimates.
+Drawing rearranges evaluated points without generating a new grid.</p></dd>
 
 </dl></div>
 
