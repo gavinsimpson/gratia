@@ -1,0 +1,380 @@
+Intervals for shape-constrained functions: literature and use with scasm()
+2026-10-16
+
+Scope
+
+This note records the literature search requested after the implementation of
+shape-enforced scasm intervals. It includes the four previously identified
+references: Chernozhukov et al. (2009), Chen et al. (2021), Dümbgen (2003), and
+Hazelton and Turlach (2011). Full references and primary-source links appear
+at the end. The search is focused on alternatives relevant to monotone or
+convex regression functions; it is not an exhaustive systematic review.
+
+The discussion separates results established in the papers from the work
+proposed here for scasm(). Adaptation requirements are our assessment, not
+claims that the cited authors established inference for mgcv's scasm models.
+The implementation status was checked against the gratia sources on this date.
+
+Calibration and shape enforcement are separate decisions
+
+Some methods change an existing uncertainty region; others construct one from
+the likelihood, local averages, or a posterior model. Endpoint rearrangement
+and the more general operators are one family, not two independent methods
+of calibrating uncertainty. Neither needs a bootstrap input: an appropriate
+Gaussian band can be supplied instead.
+
+For a simultaneous band, the event is L(x) <= f(x) <= U(x) for every x in
+the stated domain. A pointwise interval controls coverage at one fixed x.
+Repeating pointwise intervals across a grid does not give a simultaneous band.
+A Bayesian credible region instead controls posterior probability under its
+specified model. These distinctions determine which guarantees transfer.
+
+Comparison for scasm()
+
+Approach                       Existing fit usable?     Current gratia status
+-----------------------------  -----------------------  -----------------------
+1. Transform band endpoints     Yes, eligible shapes     Implemented on a grid
+2. Intersect and optimize       Yes, given valid region  Set stored; no optimizer
+3. Constrained posterior        Basis reusable; refit    No constrained sampler
+4. Multiscale bands             Separate construction    Not implemented
+5. Likelihood-ratio inversion   Profiling engine needed  Not implemented
+6. Adaptive local intervals     Separate construction    Not implemented
+7. Normalized estimator error   Different estimator      Not implemented
+
+The following sections compare the statistical requirements as well as the
+software work. Reusing a fitted basis or likelihood is not sufficient to
+transfer a coverage theorem to a penalized additive model.
+
+1. Transform the endpoints of an existing simultaneous band
+
+References: [1], [2].
+
+Construction and evidence. Apply an operator T to the estimate and the two
+endpoint functions. Rearrangement imposes monotonicity; convex minorants and
+related operators impose curvature and certain combinations of restrictions.
+If T preserves order and fixes functions in the target class, then
+
+    L <= f <= U  implies  T(L) <= T(f) = f <= T(U).
+
+The whole-function coverage event is therefore preserved. The papers also
+give contraction results in specified distances. Such a result does not mean
+that the width decreases at every location. Transforming marginal pointwise
+limits does not generally preserve their marginal coverage probabilities.
+
+Use with scasm(). This is implemented through shape_intervals() and the
+interval_method = "shape" integration. The Gaussian source provides an
+alternative to stored bootstrap limits. The current transformation handles
+nonnegativity, monotonicity in several coordinates, and curvature in at most
+one coordinate, on a complete Cartesian evaluation grid. It does not implement
+all the operators or multivariate convexity results in [2].
+
+Remaining work. Stronger nominal coverage requires a better justified initial
+band, including its treatment of smoothing bias and smoothing parameters.
+Extending the guarantee between evaluation points requires a continuum band
+or a bound on interpolation error. Additional shape operators need proofs
+that their combinations preserve the required properties, then numerical
+validation. The transformed values need not belong to the fitted spline space.
+
+2. Intersect a confidence region with restrictions, then optimize bounds
+
+Reference: [3] gives a concrete application to an inverse problem.
+
+Construction and evidence. Let C be an initially calibrated confidence set
+and S the known admissible class. For a truth in S,
+
+    f in C intersect S  if and only if  f in C.
+
+Minimizing and maximizing a functional over C intersect S gives bounds that
+cover it whenever the set contains the truth. Joint coverage follows for all
+such bounds from the same event. Kuusela and Stark combine calibrated data-fit
+restrictions with positivity, monotonicity and convexity, and obtain conservative
+finite-sample simultaneous intervals in their particle-spectrum model. That
+model-specific calibration is distinct from the general intersection argument.
+
+Use with scasm(). The current shape_confidence_set() represents
+
+    {beta: L <= X beta <= U, Ain beta >= bin, C beta = d}.
+
+in_shape_set() checks membership. Construction does not check feasibility,
+optimize bounds, sample the set, or extract restrictions from a fitted model.
+
+Remaining work. Extract the effective coefficient restrictions, equalities,
+and prediction matrix in the same parameterization. Add feasibility checks
+and reliable optimization of a' beta. A band box with linear restrictions
+gives linear programs; an ellipsoidal initial region requires a different
+region representation and convex optimization. Handle singular covariance in
+estimable coordinates, unbounded objectives, scaling, and solver tolerances.
+Report numerical certificates or residuals with each computed bound.
+
+Statistical requirement. Establish calibration of the initial region for the
+target coefficients or function. An ellipsoid made from the same approximate
+Gaussian covariance does not itself resolve smoothing bias or behavior when
+constraints bind. Separate pointwise limits do not establish joint calibration.
+
+Unlike endpoint transformations, extrema over the intersected band box cannot
+extend beyond the original limits at those evaluation points. The two extremal
+curves need not themselves satisfy coupled restrictions or integral equalities;
+they summarize a set of admissible whole functions.
+
+3. Specify and sample a constrained Bayesian spline posterior
+
+Reference: [4].
+
+Construction and evidence. Hazelton and Turlach use the mixed-model
+representation of penalized splines, restrict prior support through truncation,
+and fit using MCMC with truncated multivariate normal proposals. Posterior
+draws give uncertainty under a model in which the functions satisfy the shape
+restrictions. Pointwise quantiles give credible intervals; a simultaneous
+credible band requires joint posterior calibration. Frequentist coverage is
+a separate property to investigate.
+
+Use with scasm(). The spline basis, penalties, family likelihood, and effective
+linear restrictions are useful inputs. A fitted scasm object would provide a
+model specification and starting values, rather than the required posterior.
+
+Remaining work. Specify priors for all coefficients, smoothing parameters and
+any dispersion or random-effect parameters. Implement a sampler respecting
+inequalities and identifiability equalities, including the dependence of a
+truncated prior's normalizing constant on its hyperparameters where relevant.
+Parameterizing equalities explicitly can reduce the sampling dimension.
+Validate posterior calculations, mixing, effective sample sizes, and interval
+construction. Extend beyond the linear mixed-model setting only with a suitable
+likelihood and sampler. Choose whether inference conditions on smoothing or
+integrates over it, and document that choice.
+
+Simply truncating Gaussian draws centered at the constrained estimate does
+not establish that they sample this posterior. Likewise, the current Gaussian
+source followed by endpoint transformation does not fit a constrained posterior.
+
+4. Construct simultaneous bands using multiscale inequalities
+
+References: [5], [6]; the surface extension is [11].
+
+Construction and evidence. Local averages at multiple locations and scales
+give one-sided information under the shape restriction. Joint noise bounds
+turn those inequalities into simultaneous bands. Dümbgen establishes calibrated
+bands for monotone and convex functions in Gaussian white noise. Yang and
+Barber give a different construction using isotonic least squares and local
+averages, with finite-sample bands for independent sub-Gaussian errors at the
+specified noise bound. Estimating that bound requires its own justification.
+
+Datta, Mukherjee and Sen extend multiscale bands to multidimensional white
+noise, including coordinatewise monotonicity and convexity. Their guarantees
+are in that observation model, not automatically in tensor-product GAMs.
+
+Use with scasm(). Start with a univariate Gaussian regression problem and a
+specified noise model. These methods construct a separate uncertainty region;
+they do not take the existing smooth standard errors as their calibration.
+
+Remaining work. Implement the local statistics and critical values for the
+chosen observation model and design. For additive models, account for error
+in estimating the intercept and other smooths; treating fitted partial
+residuals as independent observations would require justification. Non-Gaussian
+families need likelihood-appropriate inequalities. Specify whether the target
+is a link-scale component or a response-scale mean. Surface support also needs
+multidimensional local averaging and critical-value calculations, and a clear
+distinction between directional and joint convexity. Validate the claimed
+coverage in the discrete model actually used by the software.
+
+5. Invert shape-restricted likelihood-ratio tests
+
+References: [7], [8].
+
+Construction and evidence. For each candidate theta at x0, compare the best
+shape-constrained likelihood with the best likelihood additionally satisfying
+f(x0) = theta. Invert the test to obtain an interval. Banerjee and Wellner
+develop this for current-status data; Banerjee treats a broader class of
+monotone response models, including Gaussian, binary and Poisson examples.
+The pointwise likelihood-ratio limit is nonstandard, not the usual chi-squared
+law. Its regularity conditions matter, including the local behavior of the
+monotone function at the interior target point.
+
+Use with scasm(). Prediction rows supply the candidate-value equality and
+the fitted constraints supply part of the optimization problem. However,
+the cited theory concerns the shape-restricted nonparametric likelihood,
+not a generic penalized scasm likelihood.
+
+Remaining work. Implement repeated constrained profiling with nuisance terms,
+candidate-value equalities, and stable interval-endpoint searches. Decide
+whether the criterion is the likelihood or penalized likelihood and how
+smoothing parameters are selected during profiling. Derive or otherwise
+justify critical values for that exact construction, especially at flat
+regions or binding restrictions. Convex regression needs its own theory;
+the monotone likelihood-ratio theorem is not a general curvature result.
+Simultaneous bands would require joint calibration beyond these pointwise tests.
+
+6. Construct adaptive pointwise intervals using shape-controlled bias
+
+Reference: [9].
+
+Construction and evidence. Cai, Low and Xia use local estimates whose biases
+have known signs under monotonicity or convexity, then select a scale using
+the data. They establish coverage over the assumed shape class and expected
+lengths that adapt to the particular function. Their settings include white
+noise and equally spaced Gaussian regression with known noise level. These
+are intervals for a fixed function value, not simultaneous bands.
+
+Use with scasm(). The method is best introduced first as a separate univariate
+interval procedure. It does not need the fitted spline covariance and may
+produce intervals that are not centered at the scasm estimate.
+
+Remaining work. Implement the one-sided local estimates and the prescribed
+scale selection. Establish how to handle the intended design, unknown variance,
+and nuisance additive components. A residual-based substitution needs analysis
+of the nuisance estimation error and dependence it introduces. For other
+families or surfaces, derive suitable local estimates and coverage results.
+Providing a plotted grid of intervals must retain the pointwise interpretation
+unless a separate simultaneous construction is supplied.
+
+7. Normalize the errors of a shape-constrained estimator by its local geometry
+
+Reference: [10].
+
+Construction and evidence. Deng, Han and Sen use the lengths of local linear
+pieces of the convex least-squares estimator to normalize estimation errors.
+The resulting limiting distributions give asymptotically exact intervals for
+function values and derivatives at an interior point under their assumptions.
+The canonical curvature case has positive second derivative there; the
+paper also treats specified higher-order local behavior. A locally affine
+truth is not covered merely by invoking the positive-curvature result.
+
+Use with scasm(). The natural convex least-squares estimator is piecewise
+linear and differs from a penalized spline. Its local segment lengths and
+critical values cannot simply be attached to a scasm estimate.
+
+Remaining work. Either implement that separate estimator and its interval
+procedure, or establish a corresponding limit theorem for the penalized
+spline estimator, including its basis dimension and smoothing regime.
+The separate implementation needs segment detection, noise estimation and
+the relevant critical values. Extending it to additive nuisance terms,
+non-Gaussian responses, or surfaces requires further statistical development.
+The cited intervals remain pointwise unless joint calibration is added.
+
+Requirements shared by proposed scasm integrations
+
+Define the inferential target first: a smooth component, the complete linear
+predictor, a response-scale mean, a derivative, or an integral. Monotonicity
+can transfer through an increasing inverse link, but convexity generally
+does not. Component restrictions do not automatically restrict a sum of
+components or a surface after arbitrary shifts and transformations.
+
+Use the constraints that the model actually fitted. Translate them through
+centering, coefficient reparameterization, tensor transformations and factor-by
+construction. Check that they imply the named function shape: raw second
+differences with irregular knots, for example, need not ensure convexity.
+Some tensor reparameterizations can also invalidate an inference from
+marginal coefficient restrictions to the named surface shape. The concrete
+counterexamples and present eligibility rules are in shape-method-review.txt.
+
+Separate uncertainty for coefficients within a chosen spline space from
+coverage for an underlying regression function. Spline approximation error,
+smoothing bias, smoothing-parameter selection, and binding constraints need
+to be treated by the proposed calibration rather than assumed away by
+reusing a covariance matrix.
+
+Validation should include flat and linear truths, nearly binding constraints,
+interior and boundary evaluation points, irregular designs and knots, nuisance
+smooths, and supported tensor constructions. Assess pointwise and simultaneous
+coverage separately and report Monte Carlo uncertainty. Include fitting or
+solver failures in the accounting. Numerical checks should cover feasibility,
+ordering, constraint residuals, conditioning, and optimization or sampling
+accuracy as appropriate to the method.
+
+Recommended order of development
+
+The nearest software extension is optimization over the existing intersected
+set, initially using a supplied simultaneous band box and linear constraints.
+Its coverage claim remains conditional on that supplied band's calibration.
+An ellipsoidal region is a useful subsequent representation, with a separate
+assessment of how it is calibrated for scasm.
+
+A constrained Bayesian posterior is the most direct route that retains the
+penalized-spline model while incorporating the restrictions into uncertainty
+from the outset. It is a model-fitting project as well as an interval feature.
+
+For a direct frequentist construction, investigate multiscale bands first in
+univariate Gaussian regression, where the observation model can be matched
+explicitly. The likelihood-ratio, adaptive local and normalized-error methods
+are valuable alternatives for pointwise inference, but each needs more than
+an interface to the existing smooth covariance.
+
+Full references
+
+[1] Chernozhukov, V., Fernández-Val, I., and Galichon, A. (2009).
+    Improving point and interval estimators of monotone functions by
+    rearrangement. Biometrika, 96(3), 559-575.
+    https://doi.org/10.1093/biomet/asp030
+    Author manuscript: https://arxiv.org/abs/0806.4730
+
+[2] Chen, X., Chernozhukov, V., Fernández-Val, I., Kostyshak, S., and
+    Luo, Y. (2021). Shape-Enforcing Operators for Generic Point and Interval
+    Estimators of Functions. Journal of Machine Learning Research,
+    22(220), 1-42.
+    https://www.jmlr.org/papers/v22/20-513.html
+    Paper: https://www.jmlr.org/papers/volume22/20-513/20-513.pdf
+    Especially Corollary 32 for whole-function coverage-event inclusion.
+
+[3] Kuusela, M., and Stark, P. B. (2017). Shape-constrained uncertainty
+    quantification in unfolding steeply falling elementary particle spectra.
+    The Annals of Applied Statistics, 11(3), 1671-1710.
+    https://doi.org/10.1214/17-AOAS1053
+    Author manuscript: https://arxiv.org/abs/1512.00905
+
+[4] Hazelton, M. L., and Turlach, B. A. (2011). Semiparametric regression
+    with shape-constrained penalized splines. Computational Statistics &
+    Data Analysis, 55(10), 2871-2879.
+    https://doi.org/10.1016/j.csda.2011.04.018
+    Publisher: https://www.sciencedirect.com/science/article/pii/S0167947311001472
+
+[5] Dümbgen, L. (2003). Optimal confidence bands for shape-restricted curves.
+    Bernoulli, 9(3), 423-449.
+    https://doi.org/10.3150/bj/1065444812
+    Corrected author manuscript: https://arxiv.org/abs/1312.6466
+    The arXiv posting is from 2013; the journal article is from 2003.
+
+[6] Yang, F., and Barber, R. F. (2019). Contraction and uniform convergence
+    of isotonic regression. Electronic Journal of Statistics, 13(1), 646-677.
+    https://doi.org/10.1214/18-EJS1520
+    Author manuscript: https://arxiv.org/abs/1706.01852
+    Especially Section 4.2 for the data-adaptive simultaneous bands.
+
+[7] Banerjee, M., and Wellner, J. A. (2001). Likelihood ratio tests for
+    monotone functions. The Annals of Statistics, 29(6), 1699-1731.
+    https://doi.org/10.1214/aos/1015345959
+    Author-hosted paper:
+    https://sites.stat.washington.edu/people/jaw/JAW-papers/jaw-banerjee-01AS.pdf
+
+[8] Banerjee, M. (2007). Likelihood based inference for monotone response
+    models. The Annals of Statistics, 35(3), 931-956.
+    https://doi.org/10.1214/009053606000001578
+    Author manuscript: https://arxiv.org/abs/0708.2177
+
+[9] Cai, T. T., Low, M. G., and Xia, Y. (2013). Adaptive confidence
+    intervals for regression functions under shape constraints.
+    The Annals of Statistics, 41(2), 722-750.
+    https://doi.org/10.1214/12-AOS1068
+    Author manuscript: https://arxiv.org/abs/1305.5673
+    Especially Section 4 for the Gaussian regression construction.
+
+[10] Deng, H., Han, Q., and Sen, B. (2023). Inference for Local Parameters
+     in Convexity Constrained Models. Journal of the American Statistical
+     Association, 118(544), 2721-2735.
+     https://doi.org/10.1080/01621459.2022.2071721
+     Earlier author manuscript: https://arxiv.org/abs/2006.10264
+
+[11] Datta, Ashley (Pratyay), Mukherjee, S., and Sen, B. (2024).
+     Optimal Confidence Bands for Shape-restricted Regression in
+     Multidimensions. Author manuscript, arXiv:2401.12753, version 1.
+     https://doi.org/10.48550/arXiv.2401.12753
+     https://arxiv.org/abs/2401.12753
+
+Related project notes and sources
+
+    notes/scasm/shape-method-review.txt
+    notes/scasm/shape-review.txt
+    notes/scasm/shape-coverage-validation.txt
+    notes/scasm/shape-coverage-boundary-validation.txt
+    vignettes/articles/shape-constrained-intervals.Rmd
+    R/shape-intervals.R
+    R/shape-confidence-set.R
+    R/scasm-intervals.R
