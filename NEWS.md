@@ -235,6 +235,10 @@
   `mgcv::gam()` and `mgcv::bam()` fits, with link and response scales,
   distribution parameters, and pointwise or simultaneous intervals.
   `draw()` plots saved results with parameter labels and a scale caption.
+  Prediction blocks can use workers configured by `mirai::daemons()`. Block
+  accumulation order, shared interval draws and caller RNG handling are
+  preserved. Custom prediction methods and expressions that require the
+  caller retain serial prediction.
 
 * `data_sim()` now accepts family objects, explicit predictors and generating
   parameters for scalar, location-scale, categorical, multivariate and Cox

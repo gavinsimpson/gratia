@@ -31,8 +31,9 @@
 #' @param n_sim,n_cores positive integers; simulation count and number of cores
 #'   for simultaneous intervals. Ignored for pointwise intervals.
 #' @param seed optional integer seed for simultaneous intervals. An explicit
-#'   seed preserves the caller's random-number state.
-#' @param block_size positive integer; maximum reference rows processed at once.
+#'   seed preserves the caller's random-number state around interval simulation.
+#' @param block_size positive integer; maximum reference rows in each prediction
+#'   block. Blocks can run in parallel when workers are configured; see Details.
 #' @param exclude character; model terms to exclude, as in [mgcv::predict.gam()].
 #' @param envir optional environment for functions and constants in model
 #'   expressions; see [smooth_estimates()].
@@ -87,6 +88,24 @@
 #' supplied only through the fitting function's `offset` argument are omitted,
 #' following explicit-newdata prediction semantics. BAM predictions use
 #' `discrete = FALSE`, including for models fitted with `discrete = TRUE`.
+#'
+#' Prediction blocks use an existing pool of workers configured with
+#' [mirai::daemons()], when mirai and carrier are installed. Set `block_size`
+#' small enough to give each worker a block; serial and parallel calculations
+#' retain the same block boundaries and accumulation order. Worker startup and
+#' model transfer can outweigh the benefit for small models or reference data.
+#' The caller owns the pool; `ale()` does not start or stop workers.
+#' `n_cores` controls coefficient simulation for simultaneous intervals, not the
+#' number of prediction workers. Workers use their configured BLAS thread limits.
+#'
+#' Data recovery and validation, centring, covariance calculations and interval
+#' simulation remain in the caller. Simultaneous bands use one shared set of
+#' coefficient deviations for all boundaries, preserving results and the
+#' caller's random-number state across worker counts. Models requiring custom
+#' prediction methods, family callbacks, contrasts or formula functions that
+#' workers cannot safely evaluate retain serial prediction. Standard arithmetic
+#' and common base and stats transformations can run on workers; local helpers,
+#' stochastic expressions and other package functions retain serial prediction.
 #'
 #' This implementation is written independently from the published ALE
 #' definition, without using code from mgcViz or ALEPlot.
@@ -219,36 +238,18 @@ ale.gam <- function(
   gradients <- matrix(0, nb, p)
   # Use a compact local model so native prediction cannot restore training NAs.
   object <- model_used_rows(object)
-  predict_at <- function(nd, type) {
-    do.call(
-      predict_model,
-      c(
-        list(
-          object = object,
-          newdata = nd,
-          type = type,
-          exclude = exclude,
-          na.action = stats::na.pass
-        ),
-        dots
-      )
-    )
-  }
-  for (start in seq.int(1L, nrow(reference), by = block_size)) {
-    rows <- seq.int(start, min(nrow(reference), start + block_size - 1))
-    b <- grid$bin[rows]
-    lower <- upper <- as.data.frame(reference[rows, , drop = FALSE])
-    lower[[focal]] <- grid$breaks[b]
-    upper[[focal]] <- grid$breaks[b + 1L]
-    # Raw modified coordinates must be evaluated afresh, even if the reference
-    # originated in a model frame containing stored expression values.
-    attr(lower, "terms") <- attr(upper, "terms") <- NULL
-    attr(lower, "gratia.evaluated") <- attr(upper, "gratia.evaluated") <- NULL
-    lo <- ale_endpoint(lower, target, p, predict_at)
-    hi <- ale_endpoint(upper, target, p, predict_at)
-    delta <- hi$value - lo$value
-    D <- hi$gradient - lo$gradient
-    group <- rowsum(cbind(delta, D), b, reorder = FALSE)
+  starts <- seq.int(1L, nrow(reference), by = block_size)
+  groups <- if (ale_parallel_available() && length(starts) > 1L &&
+      !ale_predict_in_caller(object, reference, target, dots)) {
+    ale_reference_summaries(object, reference, focal, grid, target, p,
+      exclude, dots, block_size)
+  } else NULL
+  for (i in seq_along(starts)) {
+    group <- if (is.null(groups)) {
+      rows <- seq.int(starts[i], min(nrow(reference), starts[i] + block_size - 1))
+      ale_block_summary(object, reference[rows, , drop = FALSE], focal,
+        grid$breaks, grid$bin[rows], target, p, exclude, dots)
+    } else groups[[i]]
     ids <- as.integer(rownames(group))
     sums[ids] <- sums[ids] + group[, 1L]
     gradients[ids, ] <- gradients[ids, , drop = FALSE] +
