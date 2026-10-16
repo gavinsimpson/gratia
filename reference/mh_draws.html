@@ -23,6 +23,7 @@
     <li><a class="dropdown-item" href="../articles/model-checking.html">Model diagnostics: distributions, uncertainty and dependence</a></li>
     <li><a class="dropdown-item" href="../articles/bayesplot-loo.html">Posterior predictive checks and approximate leave-one-out comparisons</a></li>
     <li><a class="dropdown-item" href="../articles/gfam-support.html">Combining surveys with different response distributions</a></li>
+    <li><a class="dropdown-item" href="../articles/scam-support.html">Working with shape-constrained additive models</a></li>
     <li><a class="dropdown-item" href="../articles/glmmTMB-support.html">Smooth trends and repeated measurements with glmmTMB</a></li>
     <li><a class="dropdown-item" href="../articles/sdmTMB-support.html">Depth effects and spatial variation in a trawl survey</a></li>
     <li><hr class="dropdown-divider"></li>
@@ -85,7 +86,10 @@
 <span>  dense_limit <span class="op">=</span> <span class="fl">5e+06</span>,</span>
 <span>  index <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  seed <span class="op">=</span> <span class="cn">NULL</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for class 'scam'</span></span>
+<span><span class="fu">mh_draws</span><span class="op">(</span><span class="va">model</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -180,6 +184,18 @@ An explicit seed restores the caller's random-number state on exit.</p></dd>
     <p>Sampling controls must be named. Removed arguments produce migration errors;
 see <code><a href="../articles/sampling-migration.html">vignette("sampling-migration")</a></code>. Explicit controls that the selected
 method cannot use are rejected.</p>
+<p>For SCAM models, Gaussian draws approximate the distribution of the unrestricted
+fitting coefficients using <code>Vp</code> (or <code>Ve</code> with <code>frequentist = TRUE</code>), then apply
+scam's fitted exponential or <code>notExp</code> transformation. This is an approximation
+in fitting coordinates, rather than an exact constrained posterior. Supplied
+draws must already use the transformed coordinates in <code>coef(model)</code> order.
+Numerically singular covariance matrices are sampled by eigen decomposition;
+negative eigenvalues within <code>100 * .Machine$double.eps * ncol(V)</code> times the
+largest absolute eigenvalue are treated as zero. Larger negatives are errors.
+For weakly identified exponential coefficients, a very large fitting-coordinate
+variance can yield non-finite transformed draws. Sampling then reports an
+error because this Gaussian approximation cannot provide usable draws; supply
+finite transformed draws from a suitable alternative sampler.</p>
 <p>For multiple chains, <code>n_draws</code> is the total retained count and must be divisible
 by <code>chains</code>. Coefficient matrices carry a chain mapping; use
 <code><a href="as_mcmc_draws.html">as_mcmc_draws()</a></code> before ordinary matrix operations remove that mapping.

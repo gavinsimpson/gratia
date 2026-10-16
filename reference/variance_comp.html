@@ -25,6 +25,7 @@ expressed as variance components."><meta property="og:image" content="https://ga
     <li><a class="dropdown-item" href="../articles/model-checking.html">Model diagnostics: distributions, uncertainty and dependence</a></li>
     <li><a class="dropdown-item" href="../articles/bayesplot-loo.html">Posterior predictive checks and approximate leave-one-out comparisons</a></li>
     <li><a class="dropdown-item" href="../articles/gfam-support.html">Combining surveys with different response distributions</a></li>
+    <li><a class="dropdown-item" href="../articles/scam-support.html">Working with shape-constrained additive models</a></li>
     <li><a class="dropdown-item" href="../articles/glmmTMB-support.html">Smooth trends and repeated measurements with glmmTMB</a></li>
     <li><a class="dropdown-item" href="../articles/sdmTMB-support.html">Depth effects and spatial variation in a trawl survey</a></li>
     <li><hr class="dropdown-divider"></li>
@@ -55,7 +56,7 @@ expressed as variance components."><meta property="og:image" content="https://ga
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Variance components of smooths from smoothness estimates</h1>
-      <small class="dont-index">Source: <a href="https://github.com/gavinsimpson/gratia/blob/main/R/gamm4-methods.R" class="external-link"><code>R/gamm4-methods.R</code></a>, <a href="https://github.com/gavinsimpson/gratia/blob/main/R/variance-components.R" class="external-link"><code>R/variance-components.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/gavinsimpson/gratia/blob/main/R/gamm4-methods.R" class="external-link"><code>R/gamm4-methods.R</code></a>, <a href="https://github.com/gavinsimpson/gratia/blob/main/R/scam-methods.R" class="external-link"><code>R/scam-methods.R</code></a>, <a href="https://github.com/gavinsimpson/gratia/blob/main/R/variance-components.R" class="external-link"><code>R/variance-components.R</code></a></small>
       <div class="d-none name"><code>variance_comp.Rd</code></div>
     </div>
 
@@ -67,6 +68,9 @@ expressed as variance components.</p>
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S3 method for class 'gamm4'</span></span>
+<span><span class="fu">variance_comp</span><span class="op">(</span><span class="va">object</span>, rescale <span class="op">=</span> <span class="cn">TRUE</span>, coverage <span class="op">=</span> <span class="fl">0.95</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for class 'scam'</span></span>
 <span><span class="fu">variance_comp</span><span class="op">(</span><span class="va">object</span>, rescale <span class="op">=</span> <span class="cn">TRUE</span>, coverage <span class="op">=</span> <span class="fl">0.95</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">variance_comp</span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span><span class="op">)</span></span>
@@ -103,7 +107,13 @@ coverage of the confidence interval that is returned.</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>This function is a wrapper to <code><a href="https://rdrr.io/pkg/mgcv/man/gam.vcomp.html" class="external-link">mgcv::gam.vcomp()</a></code> which performs
+    <p>For SCAM fits, <code>.variance</code> is the fitted response scale divided by
+the smoothing parameter, optionally undoing penalty rescaling. This ratio
+describes the Gaussian penalty on unrestricted fitting parameters; it is
+not a Gaussian variance for the transformed smooth coefficients. SCAM's
+GCV and UBRE fits do not supply the likelihood-based smoothing-parameter
+covariance needed for confidence limits, so both limit columns are <code>NA</code>.</p>
+<p>This function is a wrapper to <code><a href="https://rdrr.io/pkg/mgcv/man/gam.vcomp.html" class="external-link">mgcv::gam.vcomp()</a></code> which performs
 three additional services</p><ul><li><p>it suppresses the annoying text output that <code><a href="https://rdrr.io/pkg/mgcv/man/gam.vcomp.html" class="external-link">mgcv::gam.vcomp()</a></code> prints to
 the terminal,</p></li>
 <li><p>returns the variance of each smooth as well as the standard deviation, and</p></li>

@@ -42,8 +42,8 @@ tidy_basis(
 
 - p_ident:
 
-  logical vector; only used for handling
-  [`scam::scam()`](https://rdrr.io/pkg/scam/man/scam.html) smooths.
+  retained for compatibility. Fitted SCAM smooths use their stored
+  coefficient constraints to match basis columns to coefficients.
 
 - envir:
 

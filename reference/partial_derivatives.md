@@ -43,6 +43,9 @@ partial_derivatives(
 
 # S3 method for class 'gamm4'
 partial_derivatives(object, ...)
+
+# S3 method for class 'scam'
+partial_derivatives(object, ..., unconditional = FALSE)
 ```
 
 ## Arguments

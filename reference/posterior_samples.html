@@ -23,6 +23,7 @@
     <li><a class="dropdown-item" href="../articles/model-checking.html">Model diagnostics: distributions, uncertainty and dependence</a></li>
     <li><a class="dropdown-item" href="../articles/bayesplot-loo.html">Posterior predictive checks and approximate leave-one-out comparisons</a></li>
     <li><a class="dropdown-item" href="../articles/gfam-support.html">Combining surveys with different response distributions</a></li>
+    <li><a class="dropdown-item" href="../articles/scam-support.html">Working with shape-constrained additive models</a></li>
     <li><a class="dropdown-item" href="../articles/glmmTMB-support.html">Smooth trends and repeated measurements with glmmTMB</a></li>
     <li><a class="dropdown-item" href="../articles/sdmTMB-support.html">Depth effects and spatial variation in a trawl survey</a></li>
     <li><hr class="dropdown-divider"></li>
@@ -327,7 +328,7 @@ any <code>subset</code>. With explicit <code>data</code>, <code>.row</code> inde
 responses do not prevent prediction, and missing required predictors give
 <code>NA</code> draws. An explicit prediction <code>na.action</code> in <code>...</code> is honoured without
 renumbering retained rows. Restoration does not consume random numbers.</p>
-<p>For Gaussian identity-link <code>bam</code> fits, first-order autoregressive (AR1) errors
+<p>For Gaussian identity-link <code>bam</code> and <code>scam</code> fits, first-order autoregressive (AR1) errors
 make consecutive responses correlated. Responses are drawn together to retain
 this fitted correlation, restarting at each <code>AR.start</code> segment. These draws
 currently use the fitting observations only. For other families or links,

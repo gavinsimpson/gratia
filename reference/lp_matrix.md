@@ -14,6 +14,12 @@ lp_matrix(model, ...)
 
 # S3 method for class 'gam'
 lp_matrix(model, data = NULL, ...)
+
+# S3 method for class 'scam'
+lp_matrix(model, data = NULL, ...)
+
+# S3 method for class 'scam'
+model.matrix(object, ...)
 ```
 
 ## Arguments
@@ -33,6 +39,11 @@ lp_matrix(model, data = NULL, ...)
 
   a data frame of values at which to return the linear prediction
   matrix.
+
+- object:
+
+  a fitted SCAM model, for the
+  [`model.matrix()`](https://rdrr.io/r/stats/model.matrix.html) method.
 
 ## Value
 

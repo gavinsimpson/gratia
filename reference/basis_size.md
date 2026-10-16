@@ -18,6 +18,9 @@ basis_size(object, ...)
 
 # S3 method for class 'gamm4'
 basis_size(object, ...)
+
+# S3 method for class 'scam'
+basis_size(object, ...)
 ```
 
 ## Arguments

@@ -116,9 +116,11 @@ gaussian_draws(
 
 - parametrized:
 
-  logical; use parametrized coefficients and covariance matrix, which
-  respect the linear inequality constraints of the model. Only for
-  [`scam::scam()`](https://rdrr.io/pkg/scam/man/scam.html) model fits.
+  logical; for SCAM fits, transform Gaussian draws from the unrestricted
+  fitting coefficients using the fitted positivity transform. This
+  preserves the smooth's constraints. With `FALSE`, return Gaussian
+  draws in the unrestricted fitting coordinates. Only for
+  [`scam::scam()`](https://rdrr.io/pkg/scam/man/scam.html) fits.
 
 ## Details
 
@@ -126,6 +128,21 @@ Sampling controls must be named. Removed arguments produce migration
 errors; see
 [`vignette("sampling-migration")`](https://gavinsimpson.github.io/gratia/articles/sampling-migration.md).
 Explicit controls that the selected method cannot use are rejected.
+
+For SCAM models, Gaussian draws approximate the distribution of the
+unrestricted fitting coefficients using `Vp` (or `Ve` with
+`frequentist = TRUE`), then apply scam's fitted exponential or `notExp`
+transformation. This is an approximation in fitting coordinates, rather
+than an exact constrained posterior. Supplied draws must already use the
+transformed coordinates in `coef(model)` order. Numerically singular
+covariance matrices are sampled by eigen decomposition; negative
+eigenvalues within `100 * .Machine$double.eps * ncol(V)` times the
+largest absolute eigenvalue are treated as zero. Larger negatives are
+errors. For weakly identified exponential coefficients, a very large
+fitting-coordinate variance can yield non-finite transformed draws.
+Sampling then reports an error because this Gaussian approximation
+cannot provide usable draws; supply finite transformed draws from a
+suitable alternative sampler.
 
 For multiple chains, `n_draws` is the total retained count and must be
 divisible by `chains`. Coefficient matrices carry a chain mapping; use

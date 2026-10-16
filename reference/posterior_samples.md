@@ -291,13 +291,14 @@ predictors give `NA` draws. An explicit prediction `na.action` in `...`
 is honoured without renumbering retained rows. Restoration does not
 consume random numbers.
 
-For Gaussian identity-link `bam` fits, first-order autoregressive (AR1)
-errors make consecutive responses correlated. Responses are drawn
-together to retain this fitted correlation, restarting at each
-`AR.start` segment. These draws currently use the fitting observations
-only. For other families or links, the AR1 correction applies to working
-residuals used during fitting. It does not specify a joint distribution
-of actual responses, so sampling produces an error.
+For Gaussian identity-link `bam` and `scam` fits, first-order
+autoregressive (AR1) errors make consecutive responses correlated.
+Responses are drawn together to retain this fitted correlation,
+restarting at each `AR.start` segment. These draws currently use the
+fitting observations only. For other families or links, the AR1
+correction applies to working residuals used during fitting. It does not
+specify a joint distribution of actual responses, so sampling produces
+an error.
 
 Location-scale-shape families
 [`mgcv::gaulss()`](https://rdrr.io/pkg/mgcv/man/gaulss.html),

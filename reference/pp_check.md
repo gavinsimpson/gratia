@@ -63,6 +63,8 @@ pp_check.gamm4(
   conditioning = NULL,
   sampling_args = list()
 )
+
+pp_check.scam(object, ...)
 ```
 
 ## Arguments

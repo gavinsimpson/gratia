@@ -9,6 +9,9 @@ add_fitted(data, model, value = ".value", ...)
 
 # S3 method for class 'gamm4'
 add_fitted(data, model, ...)
+
+# S3 method for class 'scam'
+add_fitted(data, model, ...)
 ```
 
 ## Arguments

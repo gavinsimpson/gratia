@@ -19,6 +19,9 @@ model_constant(model, ...)
 
 # S3 method for class 'glm'
 model_constant(model, ...)
+
+# S3 method for class 'scam'
+model_constant(model, lp = NULL, ...)
 ```
 
 ## Arguments

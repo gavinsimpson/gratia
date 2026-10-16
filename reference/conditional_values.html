@@ -35,6 +35,7 @@ marginaleffects::plot_predictions()."><meta property="og:image" content="https:/
     <li><a class="dropdown-item" href="../articles/model-checking.html">Model diagnostics: distributions, uncertainty and dependence</a></li>
     <li><a class="dropdown-item" href="../articles/bayesplot-loo.html">Posterior predictive checks and approximate leave-one-out comparisons</a></li>
     <li><a class="dropdown-item" href="../articles/gfam-support.html">Combining surveys with different response distributions</a></li>
+    <li><a class="dropdown-item" href="../articles/scam-support.html">Working with shape-constrained additive models</a></li>
     <li><a class="dropdown-item" href="../articles/glmmTMB-support.html">Smooth trends and repeated measurements with glmmTMB</a></li>
     <li><a class="dropdown-item" href="../articles/sdmTMB-support.html">Depth effects and spatial variation in a trawl survey</a></li>
     <li><hr class="dropdown-divider"></li>
@@ -65,7 +66,7 @@ marginaleffects::plot_predictions()."><meta property="og:image" content="https:/
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Conditional predictions from a GAM</h1>
-      <small class="dont-index">Source: <a href="https://github.com/gavinsimpson/gratia/blob/main/R/conditional-values.R" class="external-link"><code>R/conditional-values.R</code></a>, <a href="https://github.com/gavinsimpson/gratia/blob/main/R/gamm4-methods.R" class="external-link"><code>R/gamm4-methods.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/gavinsimpson/gratia/blob/main/R/conditional-values.R" class="external-link"><code>R/conditional-values.R</code></a>, <a href="https://github.com/gavinsimpson/gratia/blob/main/R/gamm4-methods.R" class="external-link"><code>R/gamm4-methods.R</code></a>, <a href="https://github.com/gavinsimpson/gratia/blob/main/R/scam-methods.R" class="external-link"><code>R/scam-methods.R</code></a></small>
       <div class="d-none name"><code>conditional_values.Rd</code></div>
     </div>
 
@@ -102,7 +103,10 @@ more complex model predictions, you are strongly encouraged to use
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'gamm4'</span></span>
-<span><span class="fu">conditional_values</span><span class="op">(</span><span class="va">model</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">conditional_values</span><span class="op">(</span><span class="va">model</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for class 'scam'</span></span>
+<span><span class="fu">conditional_values</span><span class="op">(</span><span class="va">model</span>, <span class="va">...</span>, unconditional <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -157,6 +161,12 @@ Numeric conditions are not filtered, and variables absent from <code>condition</
 remain at their typical values. Supplied <code>data</code> does not change which
 combinations count as observed. An error is raised if no combinations
 remain.</p></dd>
+
+
+<dt id="arg-unconditional">unconditional<a class="anchor" aria-label="anchor" href="#arg-unconditional"></a></dt>
+<dd><p>logical; include smoothing parameter uncertainty in
+the Bayesian covariance matrix, if available. Otherwise a warning is
+issued and the uncorrected covariance is used.</p></dd>
 
 </dl></div>
     <div class="section level2">

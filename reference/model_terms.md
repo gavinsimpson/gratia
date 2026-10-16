@@ -25,6 +25,9 @@ model_terms(object, ...)
 
 # S3 method for class 'lm'
 model_terms(object, ...)
+
+# S3 method for class 'scam'
+model_terms(object, ...)
 ```
 
 ## Arguments

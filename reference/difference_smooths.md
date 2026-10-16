@@ -30,6 +30,9 @@ difference_smooths(
   n_cores = 1,
   seed = NULL
 )
+
+# S3 method for class 'scam'
+difference_smooths(model, ..., unconditional = FALSE)
 ```
 
 ## Arguments

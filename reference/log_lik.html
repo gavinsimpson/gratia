@@ -25,6 +25,7 @@ This leaves the scalar stats::logLik() method supplied by mgcv unchanged."><meta
     <li><a class="dropdown-item" href="../articles/model-checking.html">Model diagnostics: distributions, uncertainty and dependence</a></li>
     <li><a class="dropdown-item" href="../articles/bayesplot-loo.html">Posterior predictive checks and approximate leave-one-out comparisons</a></li>
     <li><a class="dropdown-item" href="../articles/gfam-support.html">Combining surveys with different response distributions</a></li>
+    <li><a class="dropdown-item" href="../articles/scam-support.html">Working with shape-constrained additive models</a></li>
     <li><a class="dropdown-item" href="../articles/glmmTMB-support.html">Smooth trends and repeated measurements with glmmTMB</a></li>
     <li><a class="dropdown-item" href="../articles/sdmTMB-support.html">Depth effects and spatial variation in a trawl survey</a></li>
     <li><hr class="dropdown-divider"></li>
@@ -55,7 +56,7 @@ This leaves the scalar stats::logLik() method supplied by mgcv unchanged."><meta
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Posterior draws of pointwise log likelihoods</h1>
-      <small class="dont-index">Source: <a href="https://github.com/gavinsimpson/gratia/blob/main/R/log-lik.R" class="external-link"><code>R/log-lik.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/gavinsimpson/gratia/blob/main/R/log-lik.R" class="external-link"><code>R/log-lik.R</code></a>, <a href="https://github.com/gavinsimpson/gratia/blob/main/R/scam-methods.R" class="external-link"><code>R/scam-methods.R</code></a></small>
       <div class="d-none name"><code>log_lik.Rd</code></div>
     </div>
 
@@ -92,7 +93,10 @@ This leaves the scalar <code><a href="https://rdrr.io/r/stats/logLik.html" class
 <span>  method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"gaussian"</span>, <span class="st">"mh"</span>, <span class="st">"user"</span><span class="op">)</span>,</span>
 <span>  draws <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  unconditional <span class="op">=</span> <span class="cn">FALSE</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for class 'scam'</span></span>
+<span><span class="fu">log_lik</span><span class="op">(</span><span class="va">model</span>, <span class="va">...</span>, unconditional <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -100,7 +104,7 @@ This leaves the scalar <code><a href="https://rdrr.io/r/stats/logLik.html" class
 
 
 <dl><dt id="arg-model">model<a class="anchor" aria-label="anchor" href="#arg-model"></a></dt>
-<dd><p>A fitted independent-response <code>gam</code> or <code>bam</code> model.</p></dd>
+<dd><p>A fitted independent-response <code>gam</code>, <code>bam</code>, or <code>scam</code> model.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
@@ -174,6 +178,10 @@ values. Even with <code>unconditional = TRUE</code>, those additional parameters
 not jointly sampled. Ordinary PSIS-LOO uses these draws without correcting
 their Gaussian approximation. Pareto diagnostics assess reweighting, not the
 accuracy of the Gaussian approximation. See <a href="loo.gam.html">loo.gam</a> for optional loo methods.</p>
+<p>Independent-response SCAM fits are supported using the coefficient
+approximation selected by <code><a href="post_draws.html">post_draws()</a></code>. The prediction matrix multiplies
+transformed coefficients. Smoothing parameters and response scale remain at
+their fitted values; smoothing-parameter uncertainty is unavailable.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>

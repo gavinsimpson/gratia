@@ -34,6 +34,9 @@ conditional_values(
 
 # S3 method for class 'gamm4'
 conditional_values(model, ...)
+
+# S3 method for class 'scam'
+conditional_values(model, ..., unconditional = FALSE)
 ```
 
 ## Arguments
@@ -90,6 +93,12 @@ conditional_values(model, ...)
   absent from `condition` remain at their typical values. Supplied
   `data` does not change which combinations count as observed. An error
   is raised if no combinations remain.
+
+- unconditional:
+
+  logical; include smoothing parameter uncertainty in the Bayesian
+  covariance matrix, if available. Otherwise a warning is issued and the
+  uncorrected covariance is used.
 
 ## Value
 

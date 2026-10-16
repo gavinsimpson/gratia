@@ -12,6 +12,8 @@ complete workflow for grouped surveys, mixed models or spatial surveys.
   comparisons](https://gavinsimpson.github.io/gratia/articles/bayesplot-loo.md):
 - [Combining surveys with different response
   distributions](https://gavinsimpson.github.io/gratia/articles/gfam-support.md):
+- [Working with shape-constrained additive
+  models](https://gavinsimpson.github.io/gratia/articles/scam-support.md):
 - [Smooth trends and repeated measurements with
   glmmTMB](https://gavinsimpson.github.io/gratia/articles/glmmTMB-support.md):
 - [Depth effects and spatial variation in a trawl

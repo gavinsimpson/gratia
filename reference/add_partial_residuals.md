@@ -12,6 +12,9 @@ add_partial_residuals(data, model, select = NULL, partial_match = FALSE, ...)
 
 # S3 method for class 'gamm4'
 add_partial_residuals(data, model, ...)
+
+# S3 method for class 'scam'
+add_partial_residuals(data, model, ...)
 ```
 
 ## Arguments

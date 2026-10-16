@@ -29,6 +29,9 @@ parametric_effects(
   back_transform = FALSE,
   ...
 )
+
+# S3 method for class 'scam'
+parametric_effects(object, ..., unconditional = FALSE)
 ```
 
 ## Arguments

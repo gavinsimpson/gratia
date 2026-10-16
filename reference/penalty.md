@@ -44,6 +44,9 @@ penalty(object, margins = FALSE, rescale = FALSE, ...)
 
 # S3 method for class 're.smooth.spec'
 penalty(object, data, rescale = FALSE, margins = FALSE, ...)
+
+# S3 method for class 'scam'
+penalty(object, ...)
 ```
 
 ## Arguments
@@ -139,6 +142,12 @@ with the following components:
 
 - `.value` - double; the value of the penalty matrix for the combination
   of `row` and `col`,
+
+## Details
+
+For SCAM fits, the returned penalties act on the unrestricted fitting
+parameters, before scam transforms selected coefficients to impose
+positivity. The `parameterisation` attribute records this distinction.
 
 ## Note
 

@@ -29,6 +29,7 @@ rather than differences of selected smooth functions."><meta property="og:image"
     <li><a class="dropdown-item" href="../articles/model-checking.html">Model diagnostics: distributions, uncertainty and dependence</a></li>
     <li><a class="dropdown-item" href="../articles/bayesplot-loo.html">Posterior predictive checks and approximate leave-one-out comparisons</a></li>
     <li><a class="dropdown-item" href="../articles/gfam-support.html">Combining surveys with different response distributions</a></li>
+    <li><a class="dropdown-item" href="../articles/scam-support.html">Working with shape-constrained additive models</a></li>
     <li><a class="dropdown-item" href="../articles/glmmTMB-support.html">Smooth trends and repeated measurements with glmmTMB</a></li>
     <li><a class="dropdown-item" href="../articles/sdmTMB-support.html">Depth effects and spatial variation in a trawl survey</a></li>
     <li><hr class="dropdown-divider"></li>
@@ -59,7 +60,7 @@ rather than differences of selected smooth functions."><meta property="og:image"
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Conditional differences of fitted values from a GAM</h1>
-      <small class="dont-index">Source: <a href="https://github.com/gavinsimpson/gratia/blob/main/R/conditional-differences.R" class="external-link"><code>R/conditional-differences.R</code></a>, <a href="https://github.com/gavinsimpson/gratia/blob/main/R/gamm4-methods.R" class="external-link"><code>R/gamm4-methods.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/gavinsimpson/gratia/blob/main/R/conditional-differences.R" class="external-link"><code>R/conditional-differences.R</code></a>, <a href="https://github.com/gavinsimpson/gratia/blob/main/R/gamm4-methods.R" class="external-link"><code>R/gamm4-methods.R</code></a>, <a href="https://github.com/gavinsimpson/gratia/blob/main/R/scam-methods.R" class="external-link"><code>R/scam-methods.R</code></a></small>
       <div class="d-none name"><code>conditional_differences.Rd</code></div>
     </div>
 
@@ -110,7 +111,10 @@ rather than differences of selected smooth functions.</p>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'gamm4'</span></span>
-<span><span class="fu">conditional_differences</span><span class="op">(</span><span class="va">model</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">conditional_differences</span><span class="op">(</span><span class="va">model</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for class 'scam'</span></span>
+<span><span class="fu">conditional_differences</span><span class="op">(</span><span class="va">model</span>, <span class="va">...</span>, unconditional <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">

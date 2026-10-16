@@ -8,6 +8,9 @@
 # S3 method for class 'gamm4'
 dispersion(model, ...)
 
+# S3 method for class 'scam'
+dispersion(model, ...)
+
 dispersion(model, ...)
 
 # S3 method for class 'gam'

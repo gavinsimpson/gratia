@@ -21,6 +21,9 @@ rootogram(object, ...)
 
 # S3 method for class 'gam'
 rootogram(object, max_count = NULL, breaks = "Sturges", ...)
+
+# S3 method for class 'scam'
+rootogram(object, ...)
 ```
 
 ## Arguments

@@ -45,6 +45,7 @@
     <li><a class="dropdown-item" href="../articles/model-checking.html">Model diagnostics: distributions, uncertainty and dependence</a></li>
     <li><a class="dropdown-item" href="../articles/bayesplot-loo.html">Posterior predictive checks and approximate leave-one-out comparisons</a></li>
     <li><a class="dropdown-item" href="../articles/gfam-support.html">Combining surveys with different response distributions</a></li>
+    <li><a class="dropdown-item" href="../articles/scam-support.html">Working with shape-constrained additive models</a></li>
     <li><a class="dropdown-item" href="../articles/glmmTMB-support.html">Smooth trends and repeated measurements with glmmTMB</a></li>
     <li><a class="dropdown-item" href="../articles/sdmTMB-support.html">Depth effects and spatial variation in a trawl survey</a></li>
     <li><hr class="dropdown-divider"></li>
@@ -615,8 +616,8 @@ frequency and a positive-tail summary:</p>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> New fields              density_95th    180.    149.    241.     157.   </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> New fields              proportion_zero   0.494   0.412   0.614    0.538</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> Uncertain fitted fields density_95th    157.    141.    176.     157.   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> Uncertain fitted fields proportion_zero   0.542   0.527   0.556    0.538</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> Uncertain fitted fields density_95th    158.    140.    181.     157.   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> Uncertain fitted fields proportion_zero   0.538   0.526   0.551    0.538</span></span></code></pre></div>
 <p>The conditional comparison asks whether new responses around the
 inferred survey fields reproduce these summaries. The marginal
 comparison asks whether new field realisations at the survey locations

@@ -37,6 +37,9 @@ ale(
 
 # S3 method for class 'bam'
 ale(object, ...)
+
+# S3 method for class 'scam'
+ale(object, ..., unconditional = FALSE)
 ```
 
 ## Arguments

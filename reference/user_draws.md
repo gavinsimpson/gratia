@@ -74,9 +74,11 @@ posterior draws for the entire model (say from
 wish to use those draws for an individual smooth, via
 [`smooth_samples()`](https://gavinsimpson.github.io/gratia/reference/smooth_samples.md).
 
-User-supplied coefficient draws are not currently supported for SCAM
-models. Scalable posterior predictive plots need this sampling path; use
-`scalable = FALSE` for an ordinary SCAM posterior predictive plot.
+For SCAM models, supplied draws must contain finite transformed
+coefficients in the order returned by `coef(model)`. If column names are
+supplied they must match exactly. Entries identified by `model$p.ident`
+must be nonnegative. Draws returned with `parametrized = FALSE` cannot
+be supplied directly for prediction; transform them first.
 
 ## See also
 

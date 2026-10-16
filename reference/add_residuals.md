@@ -9,6 +9,9 @@ add_residuals(data, model, value = ".residual", ...)
 
 # S3 method for class 'gamm4'
 add_residuals(data, model, ...)
+
+# S3 method for class 'scam'
+add_residuals(data, model, ...)
 ```
 
 ## Arguments

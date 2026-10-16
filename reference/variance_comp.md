@@ -10,6 +10,9 @@ returns the smoothing parameters expressed as variance components.
 # S3 method for class 'gamm4'
 variance_comp(object, rescale = TRUE, coverage = 0.95, ...)
 
+# S3 method for class 'scam'
+variance_comp(object, rescale = TRUE, coverage = 0.95, ...)
+
 variance_comp(object, ...)
 
 # S3 method for class 'gam'
@@ -46,6 +49,13 @@ variance_comp(object, rescale = TRUE, coverage = 0.95, ...)
   arguments passed to other methods
 
 ## Details
+
+For SCAM fits, `.variance` is the fitted response scale divided by the
+smoothing parameter, optionally undoing penalty rescaling. This ratio
+describes the Gaussian penalty on unrestricted fitting parameters; it is
+not a Gaussian variance for the transformed smooth coefficients. SCAM's
+GCV and UBRE fits do not supply the likelihood-based smoothing-parameter
+covariance needed for confidence limits, so both limit columns are `NA`.
 
 This function is a wrapper to
 [`mgcv::gam.vcomp()`](https://rdrr.io/pkg/mgcv/man/gam.vcomp.html) which

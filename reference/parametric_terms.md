@@ -8,6 +8,9 @@ Names of any parametric terms in a GAM
 # S3 method for class 'gamm4'
 parametric_terms(model, ...)
 
+# S3 method for class 'scam'
+parametric_terms(model, ...)
+
 parametric_terms(model, ...)
 
 # Default S3 method

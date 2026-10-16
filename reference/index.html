@@ -23,6 +23,7 @@
     <li><a class="dropdown-item" href="../articles/model-checking.html">Model diagnostics: distributions, uncertainty and dependence</a></li>
     <li><a class="dropdown-item" href="../articles/bayesplot-loo.html">Posterior predictive checks and approximate leave-one-out comparisons</a></li>
     <li><a class="dropdown-item" href="../articles/gfam-support.html">Combining surveys with different response distributions</a></li>
+    <li><a class="dropdown-item" href="../articles/scam-support.html">Working with shape-constrained additive models</a></li>
     <li><a class="dropdown-item" href="../articles/glmmTMB-support.html">Smooth trends and repeated measurements with glmmTMB</a></li>
     <li><a class="dropdown-item" href="../articles/sdmTMB-support.html">Depth effects and spatial variation in a trawl survey</a></li>
     <li><hr class="dropdown-divider"></li>
@@ -74,7 +75,7 @@
 
         <dt>
 
-          <code><a href="draw.gam.html">draw(<i>&lt;gam&gt;</i>)</a></code> <code><a href="draw.gam.html">draw(<i>&lt;scasm&gt;</i>)</a></code>
+          <code><a href="draw.gam.html">draw(<i>&lt;gam&gt;</i>)</a></code> <code><a href="draw.gam.html">draw(<i>&lt;scam&gt;</i>)</a></code> <code><a href="draw.gam.html">draw(<i>&lt;scasm&gt;</i>)</a></code>
 
         </dt>
         <dd>Plot smooth and parametric terms from a fitted GAM</dd>
@@ -109,7 +110,7 @@
 
         <dt>
 
-          <code><a href="assemble.gam.html">assemble(<i>&lt;gam&gt;</i>)</a></code>
+          <code><a href="assemble.gam.html">assemble(<i>&lt;gam&gt;</i>)</a></code> <code><a href="assemble.gam.html">assemble(<i>&lt;scam&gt;</i>)</a></code>
 
         </dt>
         <dd>Plot smooth and parametric terms from a fitted GAM</dd>
@@ -195,7 +196,7 @@
 
         <dt>
 
-          <code><a href="confint.gam.html">confint(<i>&lt;gam&gt;</i>)</a></code> <code><a href="confint.gam.html">confint(<i>&lt;gamm&gt;</i>)</a></code> <code><a href="confint.gam.html">confint(<i>&lt;gamm4&gt;</i>)</a></code>
+          <code><a href="confint.gam.html">confint(<i>&lt;gam&gt;</i>)</a></code> <code><a href="confint.gam.html">confint(<i>&lt;gamm&gt;</i>)</a></code> <code><a href="confint.gam.html">confint(<i>&lt;gamm4&gt;</i>)</a></code> <code><a href="confint.gam.html">confint(<i>&lt;scam&gt;</i>)</a></code>
 
         </dt>
         <dd>Point-wise and simultaneous confidence intervals for smooths</dd>
@@ -455,7 +456,7 @@
 
         <dt>
 
-          <code><a href="pp_check.html">pp_check.gam()</a></code> <code><a href="pp_check.html">pp_check.bam()</a></code> <code><a href="pp_check.html">pp_check.gamm()</a></code> <code><a href="pp_check.html">pp_check.gamm4()</a></code>
+          <code><a href="pp_check.html">pp_check.gam()</a></code> <code><a href="pp_check.html">pp_check.bam()</a></code> <code><a href="pp_check.html">pp_check.gamm()</a></code> <code><a href="pp_check.html">pp_check.gamm4()</a></code> <code><a href="pp_check.html">pp_check.scam()</a></code>
 
         </dt>
         <dd>Posterior checks with bayesplot</dd>
@@ -469,7 +470,7 @@
 
         <dt>
 
-          <code><a href="loo.gam.html">loo.gam()</a></code> <code><a href="loo.gam.html">loo.bam()</a></code> <code><a href="loo.gam.html">waic.gam()</a></code> <code><a href="loo.gam.html">waic.bam()</a></code>
+          <code><a href="loo.gam.html">loo.gam()</a></code> <code><a href="loo.gam.html">loo.bam()</a></code> <code><a href="loo.gam.html">waic.gam()</a></code> <code><a href="loo.gam.html">waic.bam()</a></code> <code><a href="loo.gam.html">loo.scam()</a></code> <code><a href="loo.gam.html">waic.scam()</a></code>
 
         </dt>
         <dd>Leave-one-out validation and WAIC for GAMs</dd>
@@ -928,7 +929,7 @@
           <code><a href="smooth_type.html">smooth_type()</a></code>
 
         </dt>
-        <dd>Determine the type of smooth and return it n a human readable form</dd>
+        <dd>Determine the type of smooth and return it in a human readable form</dd>
 
         <dt>
 
@@ -1162,7 +1163,7 @@
 
       <dl><dt>
 
-          <code><a href="lp_matrix.html">lp_matrix()</a></code>
+          <code><a href="lp_matrix.html">lp_matrix()</a></code> <code><a href="lp_matrix.html">model.matrix(<i>&lt;scam&gt;</i>)</a></code>
 
         </dt>
         <dd>Return the linear prediction matrix of a fitted GAM</dd>

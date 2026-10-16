@@ -14,6 +14,7 @@ plots](https://gavinsimpson.github.io/gratia/articles/custom-plotting.md).
   Generic plotting via `ggplot2`
 
 - [`draw(`*`<gam>`*`)`](https://gavinsimpson.github.io/gratia/reference/draw.gam.md)
+  [`draw(`*`<scam>`*`)`](https://gavinsimpson.github.io/gratia/reference/draw.gam.md)
   [`draw(`*`<scasm>`*`)`](https://gavinsimpson.github.io/gratia/reference/draw.gam.md)
   : Plot smooth and parametric terms from a fitted GAM
 
@@ -51,6 +52,7 @@ plots](https://gavinsimpson.github.io/gratia/articles/custom-plotting.md).
   Prepare plots via `ggplot2` and assembles them as a list
 
 - [`assemble(`*`<gam>`*`)`](https://gavinsimpson.github.io/gratia/reference/assemble.gam.md)
+  [`assemble(`*`<scam>`*`)`](https://gavinsimpson.github.io/gratia/reference/assemble.gam.md)
   : Plot smooth and parametric terms from a fitted GAM
 
 - [`scale_fill_partial_effect()`](https://gavinsimpson.github.io/gratia/reference/scale_fill_partial_effect.md)
@@ -96,6 +98,7 @@ residuals, and transform effects for interpretation.
 - [`confint(`*`<gam>`*`)`](https://gavinsimpson.github.io/gratia/reference/confint.gam.md)
   [`confint(`*`<gamm>`*`)`](https://gavinsimpson.github.io/gratia/reference/confint.gam.md)
   [`confint(`*`<gamm4>`*`)`](https://gavinsimpson.github.io/gratia/reference/confint.gam.md)
+  [`confint(`*`<scam>`*`)`](https://gavinsimpson.github.io/gratia/reference/confint.gam.md)
   : Point-wise and simultaneous confidence intervals for smooths
 
 - [`shape_intervals()`](https://gavinsimpson.github.io/gratia/reference/shape_intervals.md)
@@ -205,6 +208,7 @@ individual diagnostic plots, residuals, and measures of concurvity.
   [`pp_check.bam()`](https://gavinsimpson.github.io/gratia/reference/pp_check.md)
   [`pp_check.gamm()`](https://gavinsimpson.github.io/gratia/reference/pp_check.md)
   [`pp_check.gamm4()`](https://gavinsimpson.github.io/gratia/reference/pp_check.md)
+  [`pp_check.scam()`](https://gavinsimpson.github.io/gratia/reference/pp_check.md)
   : Posterior checks with bayesplot
 - [`log_lik()`](https://gavinsimpson.github.io/gratia/reference/log_lik.md)
   : Posterior draws of pointwise log likelihoods
@@ -212,6 +216,8 @@ individual diagnostic plots, residuals, and measures of concurvity.
   [`loo.bam()`](https://gavinsimpson.github.io/gratia/reference/loo.gam.md)
   [`waic.gam()`](https://gavinsimpson.github.io/gratia/reference/loo.gam.md)
   [`waic.bam()`](https://gavinsimpson.github.io/gratia/reference/loo.gam.md)
+  [`loo.scam()`](https://gavinsimpson.github.io/gratia/reference/loo.gam.md)
+  [`waic.scam()`](https://gavinsimpson.github.io/gratia/reference/loo.gam.md)
   : Leave-one-out validation and WAIC for GAMs
 - [`scalable_qq_plot()`](https://gavinsimpson.github.io/gratia/reference/scalable_qq_plot.md)
   [`scalable_worm_plot()`](https://gavinsimpson.github.io/gratia/reference/scalable_qq_plot.md)
@@ -425,7 +431,7 @@ Extract smooth objects and inspect their structure and coefficients.
 - [`smooth_label()`](https://gavinsimpson.github.io/gratia/reference/smooth_label.md)
   : Extract the label for a smooth used by 'mgcv'
 - [`smooth_type()`](https://gavinsimpson.github.io/gratia/reference/smooth_type.md)
-  : Determine the type of smooth and return it n a human readable form
+  : Determine the type of smooth and return it in a human readable form
 - [`smooth_terms()`](https://gavinsimpson.github.io/gratia/reference/smooth_terms.md)
   **\[experimental\]** : List the variables involved in smooths
 - [`smooth_coefs()`](https://gavinsimpson.github.io/gratia/reference/smooth_coefs.md)
@@ -527,6 +533,7 @@ validation tools.
 ### Model evaluation and posterior sampling
 
 - [`lp_matrix()`](https://gavinsimpson.github.io/gratia/reference/lp_matrix.md)
+  [`model.matrix(`*`<scam>`*`)`](https://gavinsimpson.github.io/gratia/reference/lp_matrix.md)
   : Return the linear prediction matrix of a fitted GAM
 - [`eval_smooth()`](https://gavinsimpson.github.io/gratia/reference/eval_smooth.md)
   : S3 methods to evaluate individual smooths

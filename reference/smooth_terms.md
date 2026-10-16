@@ -8,6 +8,9 @@
 # S3 method for class 'gamm4'
 smooth_terms(object, ...)
 
+# S3 method for class 'scam'
+smooth_terms(object, ...)
+
 smooth_terms(object, ...)
 ```
 

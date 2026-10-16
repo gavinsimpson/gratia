@@ -49,6 +49,9 @@ conditional_differences(
 
 # S3 method for class 'gamm4'
 conditional_differences(model, ...)
+
+# S3 method for class 'scam'
+conditional_differences(model, ..., unconditional = FALSE)
 ```
 
 ## Arguments

@@ -36,13 +36,18 @@ loo.bam(
 waic.gam(x, ..., n_draws = NULL, seed = NULL, sampling_args = list())
 
 waic.bam(x, ..., n_draws = NULL, seed = NULL, sampling_args = list())
+
+loo.scam(x, ...)
+
+waic.scam(x, ...)
 ```
 
 ## Arguments
 
 - x:
 
-  a GAM or BAM fitted by mgcv.
+  a GAM or BAM fitted by mgcv, or an independent-response SCAM fitted by
+  scam.
 
 - ...:
 

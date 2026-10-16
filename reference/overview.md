@@ -22,6 +22,9 @@ overview(
   stars = FALSE,
   ...
 )
+
+# S3 method for class 'scam'
+overview(model, ...)
 ```
 
 ## Arguments

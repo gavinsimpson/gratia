@@ -223,15 +223,14 @@ smooths remain separate coverage sets when grouped in one plot. This
 finite-grid band does not claim joint coverage across selected smooths
 or the full fitted model. Increasing grid resolution improves the
 approximation to whole-curve coverage. `overall_uncertainty` and
-covariance options apply to both interval types. Simultaneous intervals
-for SCAM models are unsupported. SCAM smooth estimates retain the fitted
-centring and coefficient transformation when evaluation points are
-changed. Pointwise intervals use the covariance of the constrained
-coefficients. With `overall_uncertainty = TRUE`, their standard errors
-also include intercept uncertainty and its covariance with the smooth;
-estimates remain centred. Models without an intercept use smooth-only
-uncertainty for either setting. Native scasm fits use component-only
-uncertainty by default. Explicitly requesting
+covariance options apply to both interval types. SCAM smooth estimates
+retain the fitted centring and coefficient transformation when
+evaluation points are changed. Pointwise intervals use the covariance of
+the constrained coefficients. With `overall_uncertainty = TRUE`, their
+standard errors also include intercept uncertainty and its covariance
+with the smooth; estimates remain centred. Models without an intercept
+use smooth-only uncertainty for either setting. Native scasm fits use
+component-only uncertainty by default. Explicitly requesting
 `overall_uncertainty = TRUE` warns once if selected smooths lack the
 centring information needed to add mean uncertainty. Ordinary GAM
 defaults are unchanged.
@@ -251,6 +250,13 @@ use plotmath arrows for increasing and decreasing constraints while
 [`smooth_type()`](https://gavinsimpson.github.io/gratia/reference/smooth_type.md)
 keep their existing basis names. Unsupported tensor requests produce a
 warning and are labelled as not retained.
+
+SCAM captions describe the basis and its constraints separately from the
+compact `.type` values. Increasing and decreasing constraints use
+plotmath arrows. Tensor captions name each covariate and its constraint;
+local constraints include the fitted change point. The
+`scam_smooth_info` attribute preserves these descriptions when plotting
+saved estimates.
 
 Shape enforcement is explicit and leaves the existing interval defaults
 unchanged. It preserves containment of a shape-restricted target

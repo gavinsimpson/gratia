@@ -31,6 +31,15 @@ confint(object, ...)
 
 # S3 method for class 'gamm4'
 confint(object, ...)
+
+# S3 method for class 'scam'
+confint(
+  object,
+  parm = smooths(object),
+  ...,
+  unconditional = FALSE,
+  overall_uncertainty = FALSE
+)
 ```
 
 ## Arguments
@@ -156,6 +165,15 @@ a tibble with components:
 9.  `.lower_ci`; lower limit of the confidence or simultaneous interval,
 
 10. `.upper_ci`; upper limit of the confidence or simultaneous interval,
+
+## Details
+
+For SCAM fits, [`confint()`](https://rdrr.io/r/stats/confint.html)
+returns intervals for smooth functions, with `parm` selecting smooth
+labels. It uses transformed-coefficient Gaussian uncertainty conditional
+on the fitted smoothing parameters. By default, intercept uncertainty is
+excluded. These intervals do not enforce shape constraints on their
+limits.
 
 ## Note
 

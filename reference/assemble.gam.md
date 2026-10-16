@@ -70,6 +70,9 @@ assemble(
   shape_source = c("gaussian", "bootstrap"),
   ...
 )
+
+# S3 method for class 'scam'
+assemble(object, ..., overall_uncertainty = FALSE, centre = c("model", "plot"))
 ```
 
 ## Arguments
@@ -511,6 +514,17 @@ assemble(
 
   Additional smooth plotting arguments, including `title`, `subtitle`,
   `xlab` and `ylab`.
+
+- centre:
+
+  character; for SCAM models, `"model"` retains each fitted smooth
+  contribution. `"plot"` subtracts the evaluation-grid mean from each
+  bivariate smooth to match
+  [`scam::plot.scam()`](https://rdrr.io/pkg/scam/man/plot.scam.html).
+  The same linear transformation is applied to its covariance.
+  Univariate curves and
+  [`smooth_estimates()`](https://gavinsimpson.github.io/gratia/reference/smooth_estimates.md)
+  retain the fitted centring for either setting.
 
 ## Value
 

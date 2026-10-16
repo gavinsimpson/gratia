@@ -25,6 +25,7 @@ of bayesplot. Call bayesplot::pp_check() after loading gratia."><meta property="
     <li><a class="dropdown-item" href="../articles/model-checking.html">Model diagnostics: distributions, uncertainty and dependence</a></li>
     <li><a class="dropdown-item" href="../articles/bayesplot-loo.html">Posterior predictive checks and approximate leave-one-out comparisons</a></li>
     <li><a class="dropdown-item" href="../articles/gfam-support.html">Combining surveys with different response distributions</a></li>
+    <li><a class="dropdown-item" href="../articles/scam-support.html">Working with shape-constrained additive models</a></li>
     <li><a class="dropdown-item" href="../articles/glmmTMB-support.html">Smooth trends and repeated measurements with glmmTMB</a></li>
     <li><a class="dropdown-item" href="../articles/sdmTMB-support.html">Depth effects and spatial variation in a trawl survey</a></li>
     <li><hr class="dropdown-divider"></li>
@@ -55,7 +56,7 @@ of bayesplot. Call bayesplot::pp_check() after loading gratia."><meta property="
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Posterior checks with bayesplot</h1>
-      <small class="dont-index">Source: <a href="https://github.com/gavinsimpson/gratia/blob/main/R/bayesplot.R" class="external-link"><code>R/bayesplot.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/gavinsimpson/gratia/blob/main/R/bayesplot.R" class="external-link"><code>R/bayesplot.R</code></a>, <a href="https://github.com/gavinsimpson/gratia/blob/main/R/scam-methods.R" class="external-link"><code>R/scam-methods.R</code></a></small>
       <div class="d-none name"><code>pp_check.Rd</code></div>
     </div>
 
@@ -120,7 +121,9 @@ of bayesplot. Call <code><a href="https://mc-stan.org/bayesplot/reference/pp_che
 <span>  response <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  conditioning <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  sampling_args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">pp_check.scam</span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">

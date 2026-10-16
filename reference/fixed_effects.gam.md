@@ -24,6 +24,9 @@ fixed_effects(object, ...)
 
 # Default S3 method
 fixed_effects(object, ...)
+
+# S3 method for class 'scam'
+fixed_effects(object, ...)
 ```
 
 ## Arguments

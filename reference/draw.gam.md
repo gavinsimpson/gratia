@@ -71,6 +71,9 @@ draw(
   ...
 )
 
+# S3 method for class 'scam'
+draw(object, ..., overall_uncertainty = FALSE, centre = c("model", "plot"))
+
 # S3 method for class 'scasm'
 draw(
   object,
@@ -517,6 +520,17 @@ draw(
 
   additional arguments passed to
   [`patchwork::wrap_plots()`](https://patchwork.data-imaginist.com/reference/wrap_plots.html).
+
+- centre:
+
+  character; for SCAM models, `"model"` retains each fitted smooth
+  contribution. `"plot"` subtracts the evaluation-grid mean from each
+  bivariate smooth to match
+  [`scam::plot.scam()`](https://rdrr.io/pkg/scam/man/plot.scam.html).
+  The same linear transformation is applied to its covariance.
+  Univariate curves and
+  [`smooth_estimates()`](https://gavinsimpson.github.io/gratia/reference/smooth_estimates.md)
+  retain the fitted centring for either setting.
 
 ## Value
 

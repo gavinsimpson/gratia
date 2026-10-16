@@ -23,6 +23,7 @@
     <li><a class="dropdown-item" href="../articles/model-checking.html">Model diagnostics: distributions, uncertainty and dependence</a></li>
     <li><a class="dropdown-item" href="../articles/bayesplot-loo.html">Posterior predictive checks and approximate leave-one-out comparisons</a></li>
     <li><a class="dropdown-item" href="../articles/gfam-support.html">Combining surveys with different response distributions</a></li>
+    <li><a class="dropdown-item" href="../articles/scam-support.html">Working with shape-constrained additive models</a></li>
     <li><a class="dropdown-item" href="../articles/glmmTMB-support.html">Smooth trends and repeated measurements with glmmTMB</a></li>
     <li><a class="dropdown-item" href="../articles/sdmTMB-support.html">Depth effects and spatial variation in a trawl survey</a></li>
     <li><hr class="dropdown-divider"></li>
@@ -168,9 +169,10 @@ sizes, and Monte Carlo standard errors using the optional posterior package.</p>
 
 
 <dt id="arg-parametrized">parametrized<a class="anchor" aria-label="anchor" href="#arg-parametrized"></a></dt>
-<dd><p>logical; use parametrized coefficients and covariance
-matrix, which respect the linear inequality constraints of the model. Only
-for <code><a href="https://rdrr.io/pkg/scam/man/scam.html" class="external-link">scam::scam()</a></code> model fits.</p></dd>
+<dd><p>logical; for SCAM fits, transform Gaussian draws from
+the unrestricted fitting coefficients using the fitted positivity transform.
+This preserves the smooth's constraints. With <code>FALSE</code>, return Gaussian draws
+in the unrestricted fitting coordinates. Only for <code><a href="https://rdrr.io/pkg/scam/man/scam.html" class="external-link">scam::scam()</a></code> fits.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -178,6 +180,18 @@ for <code><a href="https://rdrr.io/pkg/scam/man/scam.html" class="external-link"
     <p>Sampling controls must be named. Removed arguments produce migration errors;
 see <code><a href="../articles/sampling-migration.html">vignette("sampling-migration")</a></code>. Explicit controls that the selected
 method cannot use are rejected.</p>
+<p>For SCAM models, Gaussian draws approximate the distribution of the unrestricted
+fitting coefficients using <code>Vp</code> (or <code>Ve</code> with <code>frequentist = TRUE</code>), then apply
+scam's fitted exponential or <code>notExp</code> transformation. This is an approximation
+in fitting coordinates, rather than an exact constrained posterior. Supplied
+draws must already use the transformed coordinates in <code>coef(model)</code> order.
+Numerically singular covariance matrices are sampled by eigen decomposition;
+negative eigenvalues within <code>100 * .Machine$double.eps * ncol(V)</code> times the
+largest absolute eigenvalue are treated as zero. Larger negatives are errors.
+For weakly identified exponential coefficients, a very large fitting-coordinate
+variance can yield non-finite transformed draws. Sampling then reports an
+error because this Gaussian approximation cannot provide usable draws; supply
+finite transformed draws from a suitable alternative sampler.</p>
 <p>For multiple chains, <code>n_draws</code> is the total retained count and must be divisible
 by <code>chains</code>. Coefficient matrices carry a chain mapping; use
 <code><a href="as_mcmc_draws.html">as_mcmc_draws()</a></code> before ordinary matrix operations remove that mapping.

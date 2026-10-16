@@ -9,6 +9,9 @@ the variables involved in the term.
 # S3 method for class 'gamm4'
 term_variables(object, ...)
 
+# S3 method for class 'scam'
+term_variables(object, term, ...)
+
 term_variables(object, term, ...)
 
 # S3 method for class 'terms'

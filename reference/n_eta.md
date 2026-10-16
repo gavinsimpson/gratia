@@ -9,6 +9,9 @@ fitted model.
 # S3 method for class 'gamm4'
 n_eta(model, ...)
 
+# S3 method for class 'scam'
+n_eta(model, ...)
+
 n_eta(model, ...)
 
 # S3 method for class 'gam'

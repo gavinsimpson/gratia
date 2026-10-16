@@ -35,13 +35,16 @@ log_lik(
   draws = NULL,
   unconditional = FALSE
 )
+
+# S3 method for class 'scam'
+log_lik(model, ..., unconditional = FALSE)
 ```
 
 ## Arguments
 
 - model:
 
-  A fitted independent-response `gam` or `bam` model.
+  A fitted independent-response `gam`, `bam`, or `scam` model.
 
 - ...:
 
@@ -130,6 +133,13 @@ diagnostics assess reweighting, not the accuracy of the Gaussian
 approximation. See
 [loo.gam](https://gavinsimpson.github.io/gratia/reference/loo.gam.md)
 for optional loo methods.
+
+Independent-response SCAM fits are supported using the coefficient
+approximation selected by
+[`post_draws()`](https://gavinsimpson.github.io/gratia/reference/post_draws.md).
+The prediction matrix multiplies transformed coefficients. Smoothing
+parameters and response scale remain at their fitted values;
+smoothing-parameter uncertainty is unavailable.
 
 ## See also
 

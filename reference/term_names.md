@@ -8,6 +8,9 @@ Extract names of all variables needed to fit a GAM or a smooth
 # S3 method for class 'gamm4'
 term_names(object, ...)
 
+# S3 method for class 'scam'
+term_names(object, ...)
+
 term_names(object, ...)
 
 # S3 method for class 'gam'

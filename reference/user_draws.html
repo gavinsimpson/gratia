@@ -23,6 +23,7 @@
     <li><a class="dropdown-item" href="../articles/model-checking.html">Model diagnostics: distributions, uncertainty and dependence</a></li>
     <li><a class="dropdown-item" href="../articles/bayesplot-loo.html">Posterior predictive checks and approximate leave-one-out comparisons</a></li>
     <li><a class="dropdown-item" href="../articles/gfam-support.html">Combining surveys with different response distributions</a></li>
+    <li><a class="dropdown-item" href="../articles/scam-support.html">Working with shape-constrained additive models</a></li>
     <li><a class="dropdown-item" href="../articles/glmmTMB-support.html">Smooth trends and repeated measurements with glmmTMB</a></li>
     <li><a class="dropdown-item" href="../articles/sdmTMB-support.html">Depth effects and spatial variation in a trawl survey</a></li>
     <li><hr class="dropdown-divider"></li>
@@ -126,9 +127,11 @@ argument <code>index</code>, which can be used to subset (select) coefficients
 columns of a matrix. <code>index</code> is useful if you have a set of posterior draws
 for the entire model (say from <code><a href="https://rdrr.io/pkg/mgcv/man/gam.mh.html" class="external-link">mgcv::gam.mh()</a></code>) and you wish to use those
 draws for an individual smooth, via <code><a href="smooth_samples.html">smooth_samples()</a></code>.</p>
-<p>User-supplied coefficient draws are not currently supported for
-SCAM models. Scalable posterior predictive plots need this sampling path;
-use <code>scalable = FALSE</code> for an ordinary SCAM posterior predictive plot.</p>
+<p>For SCAM models, supplied draws must contain finite transformed
+coefficients in the order returned by <code>coef(model)</code>. If column names are
+supplied they must match exactly. Entries identified by <code>model$p.ident</code>
+must be nonnegative. Draws returned with <code>parametrized = FALSE</code> cannot be
+supplied directly for prediction; transform them first.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>

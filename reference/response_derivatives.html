@@ -23,6 +23,7 @@
     <li><a class="dropdown-item" href="../articles/model-checking.html">Model diagnostics: distributions, uncertainty and dependence</a></li>
     <li><a class="dropdown-item" href="../articles/bayesplot-loo.html">Posterior predictive checks and approximate leave-one-out comparisons</a></li>
     <li><a class="dropdown-item" href="../articles/gfam-support.html">Combining surveys with different response distributions</a></li>
+    <li><a class="dropdown-item" href="../articles/scam-support.html">Working with shape-constrained additive models</a></li>
     <li><a class="dropdown-item" href="../articles/glmmTMB-support.html">Smooth trends and repeated measurements with glmmTMB</a></li>
     <li><a class="dropdown-item" href="../articles/sdmTMB-support.html">Depth effects and spatial variation in a trawl survey</a></li>
     <li><hr class="dropdown-divider"></li>
@@ -254,8 +255,9 @@ methods' point estimates can also differ.</p>
 <p>Delta uncertainty supports single-linear-predictor <code>gam</code> and <code>bam</code> models
 with an ordinary scalar inverse-link mean (including negative binomial,
 Tweedie, beta regression, and scaled t families), and <code>gamm</code> via its GAM
-component. It is not supported for <code>scam</code> or general multi-predictor families;
-their existing simulation support is unchanged.
+component. SCAM models use transformed-coefficient covariance conditional on
+the fitted smoothing parameters. General multi-predictor families do not
+support delta uncertainty; their existing simulation support is unchanged.
 The <code>uncertainty</code> attribute records the selected method.</p>
     </div>
     <div class="section level2">

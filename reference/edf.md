@@ -22,6 +22,9 @@ model_edf(object, ..., type = c("default", "unconditional", "alternative"))
 
 # S3 method for class 'gamm4'
 edf(object, ...)
+
+# S3 method for class 'scam'
+edf(object, ..., type = c("default", "unconditional", "alternative"))
 ```
 
 ## Arguments

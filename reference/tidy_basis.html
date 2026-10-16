@@ -25,6 +25,7 @@ of the basis."><meta property="og:image" content="https://gavinsimpson.github.io
     <li><a class="dropdown-item" href="../articles/model-checking.html">Model diagnostics: distributions, uncertainty and dependence</a></li>
     <li><a class="dropdown-item" href="../articles/bayesplot-loo.html">Posterior predictive checks and approximate leave-one-out comparisons</a></li>
     <li><a class="dropdown-item" href="../articles/gfam-support.html">Combining surveys with different response distributions</a></li>
+    <li><a class="dropdown-item" href="../articles/scam-support.html">Working with shape-constrained additive models</a></li>
     <li><a class="dropdown-item" href="../articles/glmmTMB-support.html">Smooth trends and repeated measurements with glmmTMB</a></li>
     <li><a class="dropdown-item" href="../articles/sdmTMB-support.html">Depth effects and spatial variation in a trawl survey</a></li>
     <li><hr class="dropdown-divider"></li>
@@ -101,7 +102,8 @@ the basis should be evaluated.</p></dd>
 
 
 <dt id="arg-p-ident">p_ident<a class="anchor" aria-label="anchor" href="#arg-p-ident"></a></dt>
-<dd><p>logical vector; only used for handling <code><a href="https://rdrr.io/pkg/scam/man/scam.html" class="external-link">scam::scam()</a></code> smooths.</p></dd>
+<dd><p>retained for compatibility. Fitted SCAM smooths use their
+stored coefficient constraints to match basis columns to coefficients.</p></dd>
 
 
 <dt id="arg-envir">envir<a class="anchor" aria-label="anchor" href="#arg-envir"></a></dt>

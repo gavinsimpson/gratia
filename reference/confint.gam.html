@@ -25,6 +25,7 @@ terms of a fitted GAM."><meta property="og:image" content="https://gavinsimpson.
     <li><a class="dropdown-item" href="../articles/model-checking.html">Model diagnostics: distributions, uncertainty and dependence</a></li>
     <li><a class="dropdown-item" href="../articles/bayesplot-loo.html">Posterior predictive checks and approximate leave-one-out comparisons</a></li>
     <li><a class="dropdown-item" href="../articles/gfam-support.html">Combining surveys with different response distributions</a></li>
+    <li><a class="dropdown-item" href="../articles/scam-support.html">Working with shape-constrained additive models</a></li>
     <li><a class="dropdown-item" href="../articles/glmmTMB-support.html">Smooth trends and repeated measurements with glmmTMB</a></li>
     <li><a class="dropdown-item" href="../articles/sdmTMB-support.html">Depth effects and spatial variation in a trawl survey</a></li>
     <li><hr class="dropdown-divider"></li>
@@ -55,7 +56,7 @@ terms of a fitted GAM."><meta property="og:image" content="https://gavinsimpson.
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Point-wise and simultaneous confidence intervals for smooths</h1>
-      <small class="dont-index">Source: <a href="https://github.com/gavinsimpson/gratia/blob/main/R/confint-methods.R" class="external-link"><code>R/confint-methods.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/gavinsimpson/gratia/blob/main/R/confint-methods.R" class="external-link"><code>R/confint-methods.R</code></a>, <a href="https://github.com/gavinsimpson/gratia/blob/main/R/scam-methods.R" class="external-link"><code>R/scam-methods.R</code></a></small>
       <div class="d-none name"><code>confint.gam.Rd</code></div>
     </div>
 
@@ -90,7 +91,16 @@ terms of a fitted GAM.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/confint.html" class="external-link">confint</a></span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'gamm4'</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/stats/confint.html" class="external-link">confint</a></span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/confint.html" class="external-link">confint</a></span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for class 'scam'</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/confint.html" class="external-link">confint</a></span><span class="op">(</span></span>
+<span>  <span class="va">object</span>,</span>
+<span>  parm <span class="op">=</span> <span class="fu"><a href="smooths.html">smooths</a></span><span class="op">(</span><span class="va">object</span><span class="op">)</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  unconditional <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  overall_uncertainty <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -205,6 +215,14 @@ per the variables in the smooth,</p></li>
 <li><p><code>.lower_ci</code>; lower limit of the confidence or simultaneous interval,</p></li>
 <li><p><code>.upper_ci</code>; upper limit of the confidence or simultaneous interval,</p></li>
 </ol></div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>For SCAM fits, <code><a href="https://rdrr.io/r/stats/confint.html" class="external-link">confint()</a></code> returns intervals for smooth functions,
+with <code>parm</code> selecting smooth labels. It uses transformed-coefficient
+Gaussian uncertainty conditional on the fitted smoothing parameters.
+By default, intercept uncertainty is excluded. These intervals do not
+enforce shape constraints on their limits.</p>
+    </div>
     <div class="section level2">
     <h2 id="note">Note<a class="anchor" aria-label="anchor" href="#note"></a></h2>
     <p><code>overall_uncertainty</code> applies to both pointwise and simultaneous

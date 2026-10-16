@@ -26,6 +26,9 @@ concrvity(
 
 # S3 method for class 'gamm4'
 model_concurvity(model, ...)
+
+# S3 method for class 'scam'
+model_concurvity(model, ...)
 ```
 
 ## Arguments

@@ -8,6 +8,9 @@ Identify a smooth term by its label
 # S3 method for class 'gamm4'
 which_smooths(object, ...)
 
+# S3 method for class 'scam'
+which_smooths(object, terms, ...)
+
 which_smooths(object, ...)
 
 # Default S3 method

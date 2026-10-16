@@ -41,6 +41,9 @@ derivatives(
 
 # S3 method for class 'gamm4'
 derivatives(object, ...)
+
+# S3 method for class 'scam'
+derivatives(object, ..., unconditional = FALSE)
 ```
 
 ## Arguments

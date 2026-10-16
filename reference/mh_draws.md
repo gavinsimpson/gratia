@@ -28,6 +28,9 @@ mh_draws(
   index = NULL,
   seed = NULL
 )
+
+# S3 method for class 'scam'
+mh_draws(model, ...)
 ```
 
 ## Arguments
@@ -128,6 +131,21 @@ Sampling controls must be named. Removed arguments produce migration
 errors; see
 [`vignette("sampling-migration")`](https://gavinsimpson.github.io/gratia/articles/sampling-migration.md).
 Explicit controls that the selected method cannot use are rejected.
+
+For SCAM models, Gaussian draws approximate the distribution of the
+unrestricted fitting coefficients using `Vp` (or `Ve` with
+`frequentist = TRUE`), then apply scam's fitted exponential or `notExp`
+transformation. This is an approximation in fitting coordinates, rather
+than an exact constrained posterior. Supplied draws must already use the
+transformed coordinates in `coef(model)` order. Numerically singular
+covariance matrices are sampled by eigen decomposition; negative
+eigenvalues within `100 * .Machine$double.eps * ncol(V)` times the
+largest absolute eigenvalue are treated as zero. Larger negatives are
+errors. For weakly identified exponential coefficients, a very large
+fitting-coordinate variance can yield non-finite transformed draws.
+Sampling then reports an error because this Gaussian approximation
+cannot provide usable draws; supply finite transformed draws from a
+suitable alternative sampler.
 
 For multiple chains, `n_draws` is the total retained count and must be
 divisible by `chains`. Coefficient matrices carry a chain mapping; use

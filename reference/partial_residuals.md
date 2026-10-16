@@ -9,6 +9,9 @@ partial_residuals(object, ...)
 
 # S3 method for class 'gam'
 partial_residuals(object, select = NULL, partial_match = FALSE, ...)
+
+# S3 method for class 'scam'
+partial_residuals(object, ...)
 ```
 
 ## Arguments
