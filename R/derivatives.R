@@ -114,6 +114,33 @@
 #'   when a smooth depends on multiple raw inputs. A single name can be used
 #'   for all selected univariate smooths.
 #'
+#' @section Parallel calculation:
+#' With mirai and carrier installed, configure workers with
+#' `mirai::daemons()` to distribute calculations across selected smooths.
+#' [difference_smooths()] distributes factor-level comparisons instead.
+#' Without configured workers, or with only one calculation, evaluation is
+#' serial. These functions leave the caller's worker pool running.
+#'
+#' Model selection, evaluation of model expressions and random draws are
+#' prepared in the caller. Workers receive the coordinates and coefficient
+#' columns needed for their calculation. Simultaneous intervals use successive
+#' draws in selection order, so `set.seed()` gives the same results with or
+#' without workers, independently of their number or completion order.
+#' `derivatives()` uses `set.seed()`; the other functions also accept `seed`,
+#' which restores the caller's random number state on exit.
+#'
+#' [smooth_samples()] draws coefficients jointly once, then reuses those draws
+#' for every smooth, preserving dependence and chain identities. Sampling
+#' finishes before smooth calculations start, so MH chains and smooth workers
+#' are not nested. Sampling thread controls keep their existing meanings.
+#' Workers use their configured BLAS thread settings; when using a threaded
+#' BLAS, limit its threads before starting daemons to avoid competing threads.
+#'
+#' Parallel work is most useful for expensive bases or interval calculations.
+#' Small grids can be slower because of transfer and scheduling costs. Large
+#' grids and many draws also require memory for worker inputs and returned
+#' results, in addition to the final output.
+#'
 #' @examples
 #'
 #' load_mgcv()
@@ -125,6 +152,19 @@
 #'
 #' ## first derivatives of all smooths using central finite differences
 #' derivatives(mod, type = "central")
+#'
+#' \donttest{
+#' if (requireNamespace("mirai", quietly = TRUE) &&
+#'     requireNamespace("carrier", quietly = TRUE)) {
+#'   library("mirai")
+#'   library("gratia")
+#'   local({
+#'     mirai::daemons(2)
+#'     on.exit(mirai::daemons(0))
+#'     derivatives(mod, type = "central")
+#'   })
+#' }
+#' }
 #'
 #' ## derivatives for a selected smooth
 #' derivatives(mod, type = "central", select = "s(x1)")
@@ -257,9 +297,9 @@
 
   ## how many smooths need working on
   ns <- length(smooth_ids)
-  result <- vector(mode = "list", length = ns)
+  tasks <- vector(mode = "list", length = ns)
 
-  ## loop over the smooths and compute derivatives from finite differences
+  ## Prepare coordinates and random draws in term order before dispatch.
   for (i in seq_along(smooth_ids)) {
     sm <- get_smooths_by_id(object, id = smooth_ids[[i]])[[1]]
     focal_i <- derivative_focal(object, sm,
@@ -273,33 +313,14 @@
     if (is_factor_by_smooth(sm)) {
       newd <- vec_slice(newd, is.na(newd[[sm$by]]) | newd[[sm$by]] == by_level(sm))
     }
-    X <- smooth_finite_difference(object, sm, newd, focal_i, wrt, type, order, h)
-
-    ## compute derivatives
-    d <- compute_derivative(smooth_ids[[i]],
-      lpmatrix = X, betas = betas,
-      Vb = Vb, model = object, data = newd, focal = focal_i
-    )
-
-    ## compute intervals
-    if (interval_method == "bootstrap") {
-      band <- scasm_bootstrap_intervals(object, d[["Xi"]],
-        d[["deriv"]]$.derivative, d[["deriv"]]$.se, level = level)
-      result[[i]] <- add_column(d[["deriv"]],
-        .crit = rep(NA_real_, nrow(d[["deriv"]])),
-        .lower_ci = band$lower, .upper_ci = band$upper)
-    } else if (identical(interval, "confidence")) {
-      result[[i]] <- derivative_pointwise_int(d[["deriv"]],
-        level = level,
-        distrib = "normal"
-      )
-    } else {
-      result[[i]] <- derivative_simultaneous_int(d[["deriv"]], d[["Xi"]],
-        level = level, Vb = Vb,
-        n_sim = n_sim,
-        ncores = ncores
-      )
-    }
+    tasks[[i]] <- prepare_derivative_task(object, sm, newd, focal_i,
+      wrt, type, order, h, betas, Vb, interval, interval_method, level,
+      n_sim, ncores)
+  }
+  result <- smooth_task_map(tasks, "calculate_smooth_derivative")
+  if (interval == "simultaneous") {
+    result <- smooth_interval_map(result, lapply(tasks, function(x) smooth_coef_indices(x$sm)),
+      Vb, level, n_sim, ncores, estimate = ".derivative", critical = TRUE)
   }
 
   ## results in a list of tibbles that we need to bind row-wise
@@ -379,9 +400,8 @@
 #' @importFrom rlang eval_tidy parse_expr
 #' @importFrom tibble tibble
 `compute_derivative` <- function(
-    id, lpmatrix, betas, Vb, model, data,
+    sm, lpmatrix, betas, Vb, data,
     focal = NULL) {
-  sm <- get_smooths_by_id(model, id)[[1L]]
   sm_var <- smooth_variable(sm)
   if (!is.null(focal)) {
     # fix the focal variable
@@ -831,6 +851,7 @@
 #' * `.upper_ci`: the upper bound of the confidence or simultaneous interval.
 #'
 #' @inheritParams derivatives
+#' @inheritSection derivatives Parallel calculation
 #'
 #' @examples
 #'
@@ -907,16 +928,12 @@
     select <- term
   }
   ## handle seed
-  if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
-    runif(1)
-  }
   if (is.null(seed)) {
+    if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) runif(1)
     RNGstate <- get(".Random.seed", envir = .GlobalEnv)
   } else {
-    R.seed <- get(".Random.seed", envir = .GlobalEnv)
-    set.seed(seed)
+    withr::local_seed(seed)
     RNGstate <- structure(seed, kind = as.list(RNGkind()))
-    on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
   }
 
   ## handle term
@@ -1047,9 +1064,9 @@
 
   ## how many smooths need working on
   ns <- length(smooth_ids)
-  result <- vector(mode = "list", length = ns)
+  tasks <- vector(mode = "list", length = ns)
 
-  ## loop over the smooths and compute derivatives from finite differences
+  ## Prepare coordinates and random draws in term order before dispatch.
   for (i in seq_along(smooth_ids)) {
     focal_i <- focal[[i]]
     sm <- get_smooths_by_id(object, id = smooth_ids[[i]])[[1L]]
@@ -1073,35 +1090,17 @@
     if (is_factor_by_smooth(sm)) {
       newd <- vec_slice(newd, is.na(newd[[sm$by]]) | newd[[sm$by]] == by_level(sm))
     }
-    X <- smooth_finite_difference(object, sm, newd, focal_i, wrt, type, order, h)
-
-    ## compute derivatives
-    d <- compute_derivative(smooth_ids[[i]],
-      lpmatrix = X, betas = betas,
-      Vb = Vb, model = object, data = newd, focal = focal_i
-    )
-
-    ## compute intervals
-    if (interval_method == "bootstrap") {
-      band <- scasm_bootstrap_intervals(object, d[["Xi"]],
-        d[["deriv"]]$.derivative, d[["deriv"]]$.se, level = level)
-      result[[i]] <- add_column(d[["deriv"]],
-        .crit = rep(NA_real_, nrow(d[["deriv"]])),
-        .lower_ci = band$lower, .upper_ci = band$upper)
-    } else if (identical(interval, "confidence")) {
-      result[[i]] <- derivative_pointwise_int(d[["deriv"]],
-        level = level,
-        distrib = "normal"
-      )
-    } else {
-      result[[i]] <- derivative_simultaneous_int(d[["deriv"]], d[["Xi"]],
-        level = level, Vb = Vb,
-        n_sim = n_sim,
-        ncores = ncores
-      )
-    }
-    result[[i]] <- add_column(result[[i]], .focal = focal_i, .after = 1L)
+    tasks[[i]] <- prepare_derivative_task(object, sm, newd, focal_i,
+      wrt, type, order, h, betas, Vb, interval, interval_method, level,
+      n_sim, ncores)
   }
+  result <- smooth_task_map(tasks, "calculate_smooth_derivative")
+  if (interval == "simultaneous") {
+    result <- smooth_interval_map(result, lapply(tasks, function(x) smooth_coef_indices(x$sm)),
+      Vb, level, n_sim, ncores, estimate = ".derivative", critical = TRUE)
+  }
+  result <- Map(function(x, focal_i) add_column(x, .focal = focal_i, .after = 1L),
+    result, focal)
 
   ## results in a list of tibbles that we need to bind row-wise
   result <- bind_rows(result)

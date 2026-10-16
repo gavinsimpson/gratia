@@ -3,24 +3,9 @@ skip_if_not_installed("carrier")
 
 # set up daemons
 # ensures only 1 additional process on CRAN
-mirai::daemons(1, dispatcher = FALSE, autoexit = NA)
 on.exit(mirai::daemons(0), add = TRUE)
 
-# Namespaced functions sent to workers resolve against the worker's package
-# library. Match the parent instead of silently using an older installed build
-# when the parent is testing a development checkout with load_all().
-worker_setup <- mirai::everywhere({
-  .libPaths(gratia_test_libraries)
-  if (gratia_test_development) {
-    pkgload::load_all(gratia_test_path, quiet = TRUE, helpers = FALSE)
-  } else {
-    loadNamespace("gratia", lib.loc = dirname(gratia_test_path))
-  }
-  invisible(NULL)
-}, gratia_test_libraries = .libPaths(),
-  gratia_test_development = pkgload::is_dev_package("gratia"),
-  gratia_test_path = getNamespaceInfo(asNamespace("gratia"), "path"))
-invisible(mirai::collect_mirai(worker_setup, options = ".stop"))
+gratia_test_workers(1L)
 
 test_that("parallel workers use the package under test", {
   path <- mirai::mirai(getNamespaceInfo(asNamespace("gratia"), "path"))[]

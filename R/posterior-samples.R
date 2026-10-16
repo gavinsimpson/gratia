@@ -1430,6 +1430,8 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
 #' Useful, for example, for visualising the uncertainty in individual estimated
 #' functions.
 #'
+#' @inheritSection derivatives Parallel calculation
+#'
 #' @details
 #' For LSS models, each smooth is a contribution to its own linear predictor.
 #' Select its full smooth label to distinguish predictors, for example `s(x)`
@@ -1592,16 +1594,12 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
   model_name <- deparse(substitute(model))
   model <- with_model_envir(model, envir)
   # smooth_samples begins
-  if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
-    runif(1)
-  }
   if (is.null(seed)) {
+    if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) runif(1)
     RNGstate <- get(".Random.seed", envir = .GlobalEnv)
   } else {
-    R.seed <- get(".Random.seed", envir = .GlobalEnv)
-    set.seed(seed)
+    withr::local_seed(seed)
     RNGstate <- structure(seed, kind = as.list(RNGkind()))
-    on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
   }
 
   sms <- smooths(model) # vector of smooth labels - "s(x)"
@@ -1677,7 +1675,7 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
     )
   )
 
-  sims <- data_names <- vector("list", length = length(sms))
+  tasks <- vector("list", length = length(sms))
   for (i in seq_along(sms)) {
     if (need_data) {
       # FIXME: should offset be NULL?
@@ -1689,55 +1687,12 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
     idx <- smooth_coef_indices(sm)
     # Resolve calls before matrix construction and output-column selection.
     data <- prepare_smooth_data(model, sm, data)
-    Xp <- smooth_predict_matrix(sm, data, model)
-    simu <- Xp %*% t(betas[, idx, drop = FALSE])
-    # A prescribed boundary contributes a fixed value to every coefficient draw.
-    off <- attr(Xp, "offset", exact = TRUE)
-    if (!is.null(off)) simu <- simu + off
-    colnames(simu) <- paste0("..V", seq_len(NCOL(simu)))
-    simu <- as_tibble(simu)
-    nr_simu <- nrow(simu)
-    simu <- add_by_data(
-      simu,
-      by_name = by_variable(sm),
-      by_data = data,
-      before = 1L
-    )
-    # add on spline type info
-    sm_type <- smooth_type(sm)
-    simu <- add_column(
-      simu,
-      .smooth = rep(
-        unlist(lapply(strsplit(sms[[i]], ":"), `[`, 1L)),
-        nr_simu
-      ),
-      .term = rep(sms[[i]], each = nr_simu),
-      .type = rep(sm_type, nr_simu),
-      .row = seq_len(nr_simu),
-      .after = 0L
-    )
-    simu <- bind_cols(simu, data[smooth_variable(sm)])
-    simu <- pivot_longer(
-      simu,
-      cols = dplyr::starts_with("..V"),
-      names_to = ".draw",
-      values_to = ".value",
-      names_transform = \(x) as.integer(sub("\\.\\.V", "", x))
-    )
-    simu <- relocate(simu, any_of(names(data)), .after = last_col()) |>
-      relocate(".by", .after = 3L)
-    ## nest all columns with varying data
-    simu <- nest(
-      simu,
-      data = all_of(c(
-        ".row",
-        ".draw",
-        ".value",
-        vars_in_smooth(sm)
-      ))
-    )
-    sims[[i]] <- simu
+    tasks[[i]] <- list(sm = smooth_task_smooth(sm),
+      data = smooth_task_data(data[, intersect(names(data), terms_in_smooth(sm)), drop = FALSE]),
+      model = smooth_matrix_model(model), betas = betas[, idx, drop = FALSE],
+      label = sms[[i]])
   }
+  sims <- smooth_task_map(tasks, "calculate_smooth_samples")
 
   sims <- bind_rows(sims)
   sims <- unnest(sims, all_of("data"))
@@ -1745,6 +1700,58 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
   ## add classes
   class(sims) <- c("smooth_samples", class(sims))
   attach_sampling(sims, betas, draw_index = TRUE)
+}
+
+# All terms use columns of the same joint posterior draws.
+calculate_smooth_samples <- function(sm, data, model, betas, label) {
+  Xp <- smooth_predict_matrix(sm, data, model)
+  simu <- Xp %*% t(betas)
+  # A prescribed boundary contributes a fixed value to every coefficient draw.
+  off <- attr(Xp, "offset", exact = TRUE)
+  if (!is.null(off)) simu <- simu + off
+  colnames(simu) <- paste0("..V", seq_len(NCOL(simu)))
+  simu <- as_tibble(simu)
+  nr_simu <- nrow(simu)
+  simu <- add_by_data(
+    simu,
+    by_name = by_variable(sm),
+    by_data = data,
+    before = 1L
+  )
+  # add on spline type info
+  sm_type <- smooth_type(sm)
+  simu <- add_column(
+    simu,
+    .smooth = rep(
+      unlist(lapply(strsplit(label, ":"), `[`, 1L)),
+      nr_simu
+    ),
+    .term = rep(label, each = nr_simu),
+    .type = rep(sm_type, nr_simu),
+    .row = seq_len(nr_simu),
+    .after = 0L
+  )
+  simu <- bind_cols(simu, data[smooth_variable(sm)])
+  simu <- pivot_longer(
+    simu,
+    cols = dplyr::starts_with("..V"),
+    names_to = ".draw",
+    values_to = ".value",
+    names_transform = \(x) as.integer(sub("\\.\\.V", "", x))
+  )
+  simu <- relocate(simu, any_of(names(data)), .after = last_col()) |>
+    relocate(".by", .after = 3L)
+  ## nest all columns with varying data
+  simu <- nest(
+    simu,
+    data = all_of(c(
+      ".row",
+      ".draw",
+      ".value",
+      vars_in_smooth(sm)
+    ))
+  )
+  simu
 }
 
 #' @export
@@ -1806,16 +1813,12 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
   model_name <- deparse(substitute(model))
   model <- with_model_envir(model, envir)
   # smooth_samples begins
-  if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
-    runif(1)
-  }
   if (is.null(seed)) {
+    if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) runif(1)
     RNGstate <- get(".Random.seed", envir = .GlobalEnv)
   } else {
-    R.seed <- get(".Random.seed", envir = .GlobalEnv)
-    set.seed(seed)
+    withr::local_seed(seed)
     RNGstate <- structure(seed, kind = as.list(RNGkind()))
-    on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
   }
   sms <- smooths(model) # vector of smooth labels - "s(x)"
   take <- seq_along(sms) # in default case 1,2,3,..,n smooths
@@ -1886,7 +1889,7 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
     )
   )
 
-  sims <- data_names <- vector("list", length = length(sms))
+  tasks <- vector("list", length = length(sms))
   for (i in seq_along(sms)) {
     if (need_data) {
       # FIXME: should offset be NULL?
@@ -1898,52 +1901,12 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
     idx <- smooth_coef_indices(sm)
     # Resolve calls before matrix construction and output-column selection.
     data <- prepare_smooth_data(model, sm, data)
-    Xp <- smooth_predict_matrix(sm, data, model)
-    simu <- Xp %*% t(betas[, idx, drop = FALSE])
-    colnames(simu) <- paste0("..V", seq_len(NCOL(simu)))
-    simu <- as_tibble(simu)
-    nr_simu <- nrow(simu)
-    simu <- add_by_data(
-      simu,
-      by_name = by_variable(sm),
-      by_data = data,
-      before = 1L
-    )
-    # add on spline type info
-    sm_type <- smooth_type(sm)
-    simu <- add_column(
-      simu,
-      .smooth = rep(
-        unlist(lapply(strsplit(sms[[i]], ":"), `[`, 1L)),
-        nr_simu
-      ),
-      .term = rep(sms[[i]], each = nr_simu),
-      .type = rep(sm_type, nr_simu),
-      .row = seq_len(nr_simu),
-      .after = 0L
-    )
-    simu <- bind_cols(simu, data[smooth_variable(sm)])
-    simu <- pivot_longer(
-      simu,
-      cols = dplyr::starts_with("..V"),
-      names_to = ".draw",
-      values_to = ".value",
-      names_transform = \(x) as.integer(sub("\\.\\.V", "", x))
-    )
-    simu <- relocate(simu, any_of(names(data)), .after = last_col()) |>
-      relocate(".by", .after = 3L)
-    ## nest all columns with varying data
-    simu <- nest(
-      simu,
-      data = all_of(c(
-        ".row",
-        ".draw",
-        ".value",
-        vars_in_smooth(sm)
-      ))
-    )
-    sims[[i]] <- simu
+    tasks[[i]] <- list(sm = smooth_task_smooth(sm),
+      data = smooth_task_data(data[, intersect(names(data), terms_in_smooth(sm)), drop = FALSE]),
+      model = smooth_matrix_model(model), betas = betas[, idx, drop = FALSE],
+      label = sms[[i]])
   }
+  sims <- smooth_task_map(tasks, "calculate_smooth_samples")
 
   sims <- bind_rows(sims)
   sims <- unnest(sims, all_of("data"))

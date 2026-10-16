@@ -108,6 +108,12 @@
 
 ## New features
 
+* `derivatives()`, `partial_derivatives()`, `smooth_samples()` and
+  `difference_smooths()` now use workers configured by `mirai::daemons()`
+  for independent smooth or comparison calculations (#348). Serial execution
+  remains available without workers. Joint posterior draws, seeded simulation
+  results and result order are preserved across worker counts.
+
 * Plots now support native ggplot2 theme settings for smooths, intervals,
   residuals, diagnostics and other components, including completed patchwork
   figures. `gratia_theme_get()`, `gratia_theme_set()` and

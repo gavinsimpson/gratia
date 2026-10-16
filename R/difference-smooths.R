@@ -48,6 +48,8 @@
 #'
 #' @inheritParams smooth_estimates
 #'
+#' @inheritSection derivatives Parallel calculation
+#'
 #' @details
 #' Simultaneous intervals jointly cover the underlying smooth differences at
 #' the evaluated covariate combinations for each pair of factor levels, with
@@ -132,6 +134,9 @@
   seed = NULL
 ) {
   interval <- match.arg(interval)
+  if (interval == "simultaneous") {
+    validate_smooth_interval(interval, ci_level, n_sim, n_cores, seed)
+  }
   if (identical(interval, "simultaneous") && !is.null(seed) &&
       (!is.numeric(seed) || length(seed) != 1L || !is.finite(seed) ||
        abs(seed) > .Machine$integer.max || seed != trunc(seed))) {
@@ -218,12 +223,18 @@
   coefs <- coef(model)
 
   calculate <- function() {
-    pmap(pairs, calc_difference,
+    tasks <- pmap(pairs, prepare_difference,
       select = select, by_var = by_var,
       smooth_var = smooth_var, data = data, Xp = Xp, V = V,
       coefs = coefs, group_means = group_means,
-      interval = interval, ci_level = ci_level, n_sim = n_sim, n_cores = n_cores
-    ) |> bind_rows()
+      interval = interval, ci_level = ci_level, n_sim = n_sim, n_cores = n_cores)
+    result <- smooth_task_map(tasks, "calculate_difference")
+    if (interval == "simultaneous") {
+      columns <- lapply(tasks, function(x) match(names(x$coefs), names(coefs)))
+      result <- smooth_interval_map(result, columns, V, ci_level, n_sim, n_cores,
+        estimate = ".diff", critical = FALSE)
+    }
+    bind_rows(result)
   }
   # Scope the seed once: do not restart the same draw sequence for every pair.
   if (identical(interval, "simultaneous") && !is.null(seed)) {
@@ -251,8 +262,7 @@
 #' @importFrom tibble new_tibble
 #' @importFrom dplyr bind_cols
 #' @importFrom stringr str_extract
-#' @importsFrom vctrs vec_match
-`calc_difference` <- function(f1, f2, select, by_var, smooth_var, data, Xp, V,
+`prepare_difference` <- function(f1, f2, select, by_var, smooth_var, data, Xp, V,
                               coefs, group_means = FALSE,
                               interval = "confidence", ci_level = 0.95,
                               n_sim = 10000, n_cores = 1) {
@@ -317,12 +327,17 @@
   }
   r2 <- r2[matched]
 
-  ## Keep matrix dimensions for comparisons at a single covariate location.
-  X <- Xp[r1, , drop = FALSE] - Xp[r2, , drop = FALSE]
+  # Send only matched rows and active coefficient columns for this pair.
+  list(first = Xp[r1, keep, drop = FALSE], second = Xp[r2, keep, drop = FALSE],
+    V = V[keep, keep, drop = FALSE], coefs = coefs[keep],
+    data = smooth_task_data(data[r1, smooth_var, drop = FALSE]),
+    select = select, by_var = by_var, f1 = f1, f2 = f2,
+    interval = interval, ci_level = ci_level)
+}
 
-  ## zero the cols related to other splines and covariates
-  X[, !keep] <- 0
-
+calculate_difference <- function(first, second, V, coefs, data, select,
+                                 by_var, f1, f2, interval, ci_level) {
+  X <- first - second
   ## compute difference
   sm_diff <- drop(X %*% coefs)
   se <- sqrt(rowSums((X %*% V) * X))
@@ -341,15 +356,10 @@
   )
   out <- new_tibble(out, nrow = NROW(X), class = "difference_smooth")
   ## Only need rows associated with one of the levels
-  out <- bind_cols(out, data[r1, smooth_var, drop = FALSE])
+  out <- bind_cols(out, data)
 
   if (identical(interval, "simultaneous")) {
-    bounds <- simultaneous_intervals(
-      estimate = sm_diff, se = se, X = X, V = V,
-      level = ci_level, n_sim = n_sim, n_cores = n_cores
-    )
-    lower <- bounds$lower
-    upper <- bounds$upper
+    return(list(data = out, X = X, V = V))
   } else {
     crit <- coverage_normal(ci_level)
     lower <- sm_diff - crit * se
