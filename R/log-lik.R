@@ -4,8 +4,10 @@
 #' This leaves the scalar [stats::logLik()] method supplied by mgcv unchanged.
 #'
 #' @param model A fitted independent-response `gam` or `bam` model.
-#' @param n Positive integer; number of coefficient draws. Ignored for
-#'   `method = "user"`, which uses every row of `draws`.
+#' @param n_draws Positive integer; total coefficient draws across chains.
+#'   Defaults to 4000 when generating draws. Supplied draws determine their own
+#'   count; an explicit count must agree.
+#' @inheritParams post_draws
 #' @param seed Optional random seed. The caller's random-number state is retained.
 #' @param method One of `"gaussian"`, `"mh"` or `"user"`; see [post_draws()].
 #' @param draws A numeric matrix with one row per draw and one column per
@@ -41,6 +43,8 @@
 #' @return A numeric matrix with draws in rows and retained fitting observations
 #'   in columns. Attribute `observation` gives their original fitting-row indices
 #'   after any fitting subset; `gratia` describes the sampling assumptions.
+#'   The `sampling` attribute retains chain identities and requested coefficient
+#'   diagnostics; [as_mcmc_draws()] converts the likelihood matrix by chain.
 #'   Impossible observations may have log likelihood `-Inf`; invalid numerical
 #'   calculations produce an error. LOO and WAIC require finite log likelihoods.
 #' @seealso [posterior_samples()], [family_diagnostics]
@@ -48,12 +52,15 @@
 #' @examples
 #' library("mgcv")
 #' m <- gam(mpg ~ s(wt, k = 5), data = mtcars, method = "REML")
-#' ll <- log_lik(m, n = 500, seed = 42)
+#' ll <- log_lik(m, n_draws = 500, seed = 42)
 #' dim(ll)
 #' if (requireNamespace("loo", quietly = TRUE)) {
 #'   loo::loo(ll, r_eff = 1)
 #' }
-log_lik <- function(model, ...) UseMethod("log_lik")
+log_lik <- function(model, ...) {
+  sampling_check_names(substitute(list(...)))
+  UseMethod("log_lik")
+}
 
 #' @export
 log_lik.default <- function(model, ...) {
@@ -63,12 +70,18 @@ log_lik.default <- function(model, ...) {
 
 #' @rdname log_lik
 #' @export
-log_lik.gam <- function(model, n = 4000, seed = NULL,
+log_lik.gam <- function(model, ..., n_draws = NULL, chains = NULL,
+                        diagnostics = FALSE, seed = NULL,
                         method = c("gaussian", "mh", "user"), draws = NULL,
-                        unconditional = FALSE, ...) {
-  args <- c(list(method = match.arg(method), draws = draws,
-    unconditional = unconditional), list(...))
-  prep <- posterior_likelihood_prepare(model, n, seed, args)
+                        unconditional = FALSE) {
+  sampling_check_names(substitute(list(...)))
+  args <- c(list(method = match.arg(method)), list(...))
+  if (!missing(draws)) args$draws <- draws
+  if (!missing(unconditional)) args$unconditional <- unconditional
+  if (!missing(chains)) args$chains <- chains
+  if (!missing(diagnostics)) args$diagnostics <- diagnostics
+  prep <- posterior_likelihood_prepare(model, n = n_draws, seed = seed,
+    sampling_args = args)
   posterior_likelihood_matrix(prep)
 }
 
@@ -76,7 +89,7 @@ log_lik.gam <- function(model, n = 4000, seed = NULL,
 #' @export
 log_lik.bam <- log_lik.gam
 
-posterior_likelihood_prepare <- function(model, n = 4000, seed = NULL,
+posterior_likelihood_prepare <- function(model, n = NULL, seed = NULL,
                                          sampling_args = list()) {
   if (!inherits(model, "gam") || inherits(model, c("scam", "gamm", "gamm4")) ||
       isTRUE(attr(model, "gratia.gamm4"))) {
@@ -84,20 +97,11 @@ posterior_likelihood_prepare <- function(model, n = 4000, seed = NULL,
   }
   if (!is.null(model$AR1.rho) && model$AR1.rho != 0) stop(
     "Pointwise likelihoods do not support residual-correlated BAM fits.", call. = FALSE)
-  diagnostic_posterior_count(n)
-  if (!is.list(sampling_args) || (length(sampling_args) &&
-      (is.null(names(sampling_args)) || anyNA(names(sampling_args)) || any(!nzchar(names(sampling_args))) ||
-       anyDuplicated(names(sampling_args))))) stop(
-    "'sampling_args' must be a list with distinct argument names.", call. = FALSE)
-  allowed <- c("method", "draws", "unconditional", "burnin", "thin", "t_df",
-    "rw_scale", "n_cores", "mvn_method")
-  if (length(setdiff(names(sampling_args), allowed))) stop(
-    "Unsupported posterior likelihood sampling argument(s): ",
-    paste(setdiff(names(sampling_args), allowed), collapse = ", "), ".", call. = FALSE)
-  method <- match.arg(sampling_args$method %||% "gaussian", c("gaussian", "mh", "user"))
-  if (!is.null(sampling_args$draws) && method != "user") stop(
-    "Supply coefficient draws with method = 'user'.", call. = FALSE)
-  sampling_args$method <- method
+  sampling_args <- posterior_adapter_sampling_args(sampling_args, likelihood = TRUE)
+  method <- sampling_args$method
+  layout <- sampling_resolve(n %||% if (method != "user") 4000L,
+    sampling_args$chains, sampling_args$draws, method)
+  n <- layout$n_draws
   rows <- which(!is.na(model_row_map(model)))
   used <- model_used_rows(model)
   f <- stats::family(used)
@@ -116,12 +120,14 @@ posterior_likelihood_prepare <- function(model, n = 4000, seed = NULL,
   base <- vapply(idx, function(j) drop(X[, j, drop = FALSE] %*%
     stats::coef(used)[j]), numeric(nrow(X)))
   offsets <- eta - base
-  betas <- do.call(post_draws, c(list(model = used, n = n, seed = seed), sampling_args))
+  betas <- do.call(post_draws, c(list(model = used, n_draws = n, seed = seed), sampling_args))
   if (!is.numeric(betas) || !is.matrix(betas) || !nrow(betas) ||
       ncol(betas) != length(stats::coef(used)) || any(!is.finite(betas))) stop(
     "Coefficient draws must be a finite numeric matrix with one column per fitted coefficient.",
     call. = FALSE)
-  metadata <- list(method = method,
+  ids <- attr(betas, "sampling")$draw_ids %||% sampling_layout(nrow(betas), 1L)
+  metadata <- list(method = method, n_draws = nrow(betas),
+    chains = length(unique(ids$.chain)),
     approximation = if (method == "gaussian") "Gaussian coefficient posterior approximation" else
       if (method == "mh") "Metropolis-Hastings coefficient posterior" else "User-supplied coefficient draws",
     fixed_parameters = "Smoothing parameters and family parameters outside the coefficient vector remain at fitted values.",
@@ -130,7 +136,7 @@ posterior_likelihood_prepare <- function(model, n = 4000, seed = NULL,
   context <- if (is_gfam_family(f)) gfam_diagnostic_context(used) else NULL
   list(model = used, betas = betas, rows = rows, method = method,
     metadata = metadata, X = X, index = idx, offsets = offsets, context = context,
-    trials = trials)
+    trials = trials, draw_ids = ids)
 }
 
 posterior_likelihood_check_family <- function(family) {
@@ -159,7 +165,35 @@ posterior_likelihood_matrix <- function(prep) {
   colnames(out) <- rownames(prep$model$model)
   attr(out, "observation") <- prep$rows
   attr(out, "gratia") <- prep$metadata
+  out <- attach_sampling(out, prep$betas)
+  metadata <- attr(out, "sampling")
+  if (!is.null(metadata)) {
+    metadata$quantity <- "log_lik"
+    attr(out, "sampling") <- metadata
+  }
   out
+}
+
+# Shared validation for adapters that accept a sampling_args list.
+posterior_adapter_sampling_args <- function(args, likelihood = FALSE) {
+  if (!is.list(args) || (length(args) &&
+      (is.null(names(args)) || anyNA(names(args)) || any(!nzchar(names(args))) ||
+       anyDuplicated(names(args))))) stop(
+    "'sampling_args' must be a named list with distinct argument names.", call. = FALSE)
+  sampling_check_names(as.call(c(list(quote(list)), args)))
+  allowed <- unique(c("method", "chains", "diagnostics", "draws",
+    sampling_method_controls("gaussian"), sampling_method_controls("mh")))
+  if (likelihood) allowed <- setdiff(allowed, c("frequentist", "parametrized"))
+  bad <- setdiff(names(args), allowed)
+  if (length(bad)) stop("Unsupported posterior sampling argument(s): ",
+    paste(bad, collapse = ", "), ". Supply n_draws at the top level.", call. = FALSE)
+  method <- match.arg(args$method %||% "gaussian", c("gaussian", "mh", "user"))
+  if (!is.null(args$draws) && method != "user") stop(
+    "Supply coefficient draws with method = 'user'.", call. = FALSE)
+  sampling_check_options(method, names(args),
+    mh_backend = args$mh_backend %||% "mgcv", mvn_method = args$mvn_method %||% "mvnfast")
+  args$method <- method
+  args
 }
 
 # Keep this boundary deterministic: both loo's observation callback and the

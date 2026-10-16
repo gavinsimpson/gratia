@@ -2,12 +2,25 @@
 
 ## User visible changes
 
-* `fitted_samples()` now rejects response-scale requests for general families
-  whose first predictor is not a supported response mean. Use
-  `scale = "linear_predictor"` for the first predictor; `gaulss()` means,
-  multivariate normal means and multinomial probabilities remain supported.
-  Previously these unsupported requests could return a distribution parameter
-  as though it were an expected response.
+* **Breaking change:** Sampling functions now use `n_draws` for the total
+  retained draw count and `n_grid` for automatically constructed evaluation
+  grids. Sampling controls must be named. Obsolete names, including `n`,
+  `n_sim`, `n_vals`, `freq`, `newdata`, and `ncores`, produce migration errors.
+  `derivative_samples()` takes `model` rather than `object`; `add_*()` sampling
+  helpers take `data` rather than `object`. Coefficient and `*_samples()`
+  functions require an explicit `n_draws` when generating draws; supplied
+  coefficient draws determine their own count and chains. Likelihood, LOO,
+  WAIC and bayesplot wrappers use `n_draws` with their documented defaults.
+  Derivative sampling now defaults to a grid resolution of 200, matching smooth
+  sampling; supply `n_grid = 100` for the previous derivative resolution.
+  Gaussian threads use `n_threads`, while `n_cores` limits concurrent MH chains.
+  Explicit controls that do not apply to the selected sampler are rejected.
+  See `vignette("sampling-migration")`.
+
+* `fitted_samples()` rejects response-scale requests for general families
+  without an expected-response adapter. Use `scale = "linear_predictor"`
+  for the first predictor. Supported LSS families use their full expected
+  response instead of treating location as the mean.
 
 * Gaussian coefficient sampling for `mgcv::scasm()` fits with linear inequality
   constraints now warns that the draws need not satisfy the fitted shapes.
@@ -81,6 +94,37 @@
 
 ## New features
 
+* Posterior sampling supports multiple chains, including parallel MH chains
+  using mirai. `n_draws = 1000, chains = 4` retains 250 draws per chain after
+  separate burn-in. Chain identities are preserved through fitted, response,
+  smooth, and derivative samples. `as_mcmc_draws()` converts draws for posterior,
+  coda, and bayesplot; `diagnostics = TRUE` and `sampling_diagnostics()` provide
+  coefficient convergence summaries and acceptance rates (#281).
+  `draw(sampling_diagnostics(x))` plots native coefficient traces or pooled-rank
+  histogram outlines by chain. Sampling with `diagnostics = TRUE` retains the
+  coefficient draws for these plots through fitted, response, smooth and
+  derivative sampling. LSS sampling
+  supports fitting rows, subsets and new covariates without observed responses.
+  All distribution parameters use the same coefficient draw. Fitted response
+  samples and their derivatives evaluate the expected response, including
+  means that depend on scale, shape or hurdle probabilities. Fixed-coefficient
+  response sampling uses the same parameter transformations. Missing predictors
+  or explicit sampling weights produce `NA` response draws consistently.
+  LSS response generation now reuses model-matrix blocks and constructs
+  the output table once, preserving seeded responses and chain identities.
+
+* `mh_backend = "gratia"` adds a compiled MH evaluator for common response
+  families in ordinary gam and bam fits with independent observations. Large
+  designs can be evaluated in blocks. `mh_backend = "family"` uses the compiled
+  MH loop with the fitted family's likelihood functions, including compatible
+  extended, grouped, and multiple-predictor families. It prepares and reuses a
+  full design matrix, smoothing penalty, and proposal factorisation across
+  chains. Smoothing parameters and parameters outside the coefficient vector
+  remain fixed; LSS scale and shape coefficients vary jointly with location.
+  The default backend remains `mgcv::gam.mh()`.
+  The new backends reject BAM fits with nonzero prescribed smooth contributions,
+  where native fitting and prediction use different offsets.
+
 * `data_sim()` accepts descriptive aliases for the original example models,
   including `"additive"`, `"bivariate_surface"`, `"gu_wahba_f2"` and
   `"luo_wahba_f6"`. All existing names remain supported and produce identical
@@ -113,10 +157,17 @@
 
 * Optional `bayesplot::pp_check()` methods provide posterior predictive checks
   for supported GAMs and mixed models (#278, reported by @nicholasjclark).
+  Sampling controls, including chains, are supplied through `sampling_args`.
+  Response draws remain aligned with likelihood draws for leave-one-out plots,
+  including supplied matrices with stored chain and draw identities.
 
 * `log_lik()` and optional `loo::loo()` and `loo::waic()` methods support
   approximate predictive comparisons for independent GAM/BAM fits
   (#278, reported by @nicholasjclark).
+  They retain coefficient diagnostics and chain identities. LOO uses stored
+  iteration order for relative effective sample sizes without changing the
+  likelihood draw order; unlabelled supplied draws need explicit efficiency
+  or chain information.
 
 * Diagnostic plots now support native inlaws families through their supplied
   `gratia_diagnostics` functions, including grouped-family fits and models
@@ -290,8 +341,12 @@
 * Grouped-family models fitted with `mgcv::gfam()` now support response-scale
   `fitted_samples()` with component-specific mean transforms (#269), and
   `simulate()` with component-specific distributions and parameters (#272).
-  Both accept `family_index` for prediction data; ordinal response-scale
-  fitted draws remain unsupported.
+  These functions and `posterior_samples()` accept supplied data and
+  `family_index` for component membership without observed responses. Posterior
+  responses preserve joint coefficient draws, component labels, offsets and
+  sampling weights; ordinal response-scale fitted draws remain unsupported.
+  Derivative sampling retains family membership when shifting supplied
+  covariates.
 
 * Support for classed gamm4 models now covers smooths, parametric effects,
   predictions, derivatives, simulations, posterior draws and variance
@@ -426,6 +481,8 @@
   recognised family name.
 
 ## Bug fixes
+
+* MH acceptance rates are extracted from the correct mgcv return components.
 
 * `data_sim()` now transforms the `eg6` predictor once and returns the
   predictor used for sampling. Grouped-family simulations respect seeds,

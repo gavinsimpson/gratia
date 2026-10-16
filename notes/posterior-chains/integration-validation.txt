@@ -1,0 +1,97 @@
+Posterior sampling integration, response performance and statistical extensions
+15 October 2026; gls/posterior-chains
+
+Integrated main through b8c9fafa2 in merge commits c8c123508 and 7aab22669.
+The existing posterior worktree was reused; the primary checkout was not edited.
+New-main tests were migrated to n_draws and joint smooth draws. Multinomial
+scale handling, fitting offsets, expression environments, discrete row restoration
+and inequality warnings/errors were retained alongside the LSS expectation adapters.
+
+Implementation:
+- LSS response generation caches design blocks, retains the original matrix-vector
+  products and one family RNG call per draw, fills responses directly and builds
+  one output table. Streaming diagnostic sampling shares the numeric generator.
+- Grouped posterior responses now accept supplied data with recoverable or explicit
+  family_index membership. They retain component links, nuisance parameters, offsets,
+  weights, missing rows, chain/iteration/global draw IDs and coefficient diagnostics.
+  Grouped derivatives retain membership variables while constructing shifted data.
+- Both prediction contexts share prediction_offsets(), including prescribed smooth
+  values. Actual fitting offsets are retained exactly; ignored general-family call
+  offsets are not invented from a model-frame column.
+- Real soap-film fits revealed a native BAM fitting/prediction inconsistency for
+  nonzero fixed contributions. MH and the smoothing prototype reject affected fits
+  precisely. Gaussian approximation and supplied-draw prediction retain native
+  conventions. Blockwise targets use a bounded probe, without a full dense design.
+- The separate internal Gaussian smoothing prototype caches weighted crossproducts
+  and recomputes conditional means/covariances. It verifies linked/fixed smoothing
+  mappings and fitted coefficient coordinates, and keeps dispersion fixed.
+  It is a mixture over an approximate distribution of fitted log-smoothing estimates,
+  without specified hyperpriors or a joint posterior MCMC method. It remains internal.
+
+Review fixes:
+- Validate family RNG output before missing-row slicing, preventing malformed
+  generators from silently truncating or padding response draws.
+- Preserve all three MH inequality guards, including direct private target setup.
+- Restore unrelated roxygen rewrites and historical release-note spacing.
+- Amend existing unreleased feature entries; added capabilities remain under New features.
+
+Benchmarks:
+- Final paired study: 7 LSS families, 3 seeds, 5 repetitions, 1000 draws/four chains
+  at 200 new rows. All 210 timed outputs match the earlier calculation exactly.
+  Median paired speedups range from 2.32 to 5.93. gaulss R allocation traffic falls
+  from 66.23 MB to 52.32 MB (about 21%); output size is unchanged. This measures
+  allocation traffic, not peak resident memory. See response-report.md.
+- Refreshed all 21 LSS prediction cases, six grouped cases and six gaulss MH cases.
+  Failures/warnings remain visible in raw results; every refreshed transformation passed.
+- Longer study: 45 successful runs, three targets/five samplers/three seeds, 16000
+  retained draws/four chains, 4000 burn-in per chain. All diagnostic screens pass.
+  Worst coefficient/derived R-hat: 1.005415/1.004367; minimum tail ESS: 403/455.
+  MALA improves tail throughput on two targets but loses bulk throughput; alternatives
+  remain internal. These timings compare current R prototypes with compiled MH loops.
+- The longer study uses frozen c8c12350. A separate old/final installation comparison
+  verifies three fitted targets and nine MH results exactly, including coefficients,
+  draw identities and acceptance information. No sampler numerical changes occurred
+  for those targets. See difficult-report.md and difficult-validation.txt.
+- Smoothing study: seven supported fits, 20000 draws each; independent fixed-sp refits,
+  numerical integration and total-variance calculations verify the implementation.
+  See smoothing-report.md and smoothing-fixed-contributions.md for restrictions.
+
+Validation (all R tests/builds/checks run outside the sandbox):
+- Targeted suite: 1856 passed; zero failures, warnings, errors or skips.
+- Full suite: 17640 passed; zero failures or warnings; 197 visual expectations skipped
+  because VDIFFR_RUN_TESTS=false. CI was unset, so tests marked skip_on_ci did run.
+  All Suggests were required with _R_CHECK_FORCE_SUGGESTS_=true; none were missing.
+- The first --as-cran --no-manual check ran the full suite and all examples/vignettes.
+  It reported one NOTE: main's saved example record omitted family_diagnostics().
+  The example executed successfully; its verified 34-line output was inserted.
+- The corrected archive was rebuilt and checked with --as-cran --no-manual --no-tests.
+  Final status: OK; no errors, warnings or notes. --no-tests omitted a duplicate full
+  suite run. Checksums prove all implementation, help, vignette and test files match
+  the full-suite archive except that single saved example record.
+  Final formatting removed one terminal blank line from sampling-grouped.R and
+  its test file. Their parsed R expressions were verified identical before/after;
+  all other implementation/test/help/vignette checksums remain unchanged.
+  Generated research-session output was trimmed; it is excluded from source builds.
+- --no-manual omitted PDF reference-manual compilation. Vignettes were built and rebuilt;
+  standard and --run-donttest examples, compiled-code checks and help checks passed.
+  _R_CHECK_CRAN_INCOMING_REMOTE_=false omitted remote CRAN incoming checks; local
+  CRAN feasibility checks still ran. These options caused omitted validation, not
+  package errors or warnings. The stale example NOTE was a separate corrected problem.
+- Native inlaws integration tests remain in their separate workflow; no inlaws-specific
+  tests were added here, as requested.
+
+Pkgdown:
+- check_pkgdown and full reference/index build passed: 148 public topics, 201 unique
+  index labels; every public topic and local reference link resolves.
+- Sampling aliases resolve to canonical pages; the migration article builds.
+- Reference examples were disabled with examples=FALSE because R CMD check ran them.
+  Installed rendering tools emitted deprecated --katex/--mathjax switch notices.
+  These are Pandoc invocation notices, not missing topics or broken links.
+
+Checked implementation/test/help/vignette files: 835
+Full-suite archive/check: /private/tmp/gratia-posterior-integration-check-871818820622
+Corrected archive/check: /private/tmp/gratia-posterior-integration-final-910278c35080
+Targeted log: /private/tmp/gratia-integration-targeted.log
+Final check log: /private/tmp/gratia-integration-package-check-final.log
+Reference output: /private/tmp/gratia-posterior-integration-reference
+Reference log: /private/tmp/gratia-integration-reference.log

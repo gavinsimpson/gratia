@@ -44,11 +44,8 @@ test_that("fitted and smooth draws retain fixed boundaries once", {
       a <- add_fitted_samples(nd, m, method = "user", draws = B, scale = scale)
       expect_equal(a$.fitted[order(a$.draw, a$.row)], as.numeric(expected))
     }
-    for (per_smooth in c(FALSE, TRUE)) {
-      a <- smooth_samples(m, data = nd, method = "user", draws = B,
-        rng_per_smooth = per_smooth)
-      expect_equal(a$.value[order(a$.draw, a$.row)], as.numeric(term))
-    }
+    a <- smooth_samples(m, data = nd, method = "user", draws = B)
+    expect_equal(a$.value[order(a$.draw, a$.row)], as.numeric(term))
     a <- fitted_samples(m, data = nd, method = "user", draws = B,
       scale = "linear_predictor", exclude = sm$label)
     expect_equal(a$.fitted, as.numeric(outer(.2 * nd$x, B[, 1], "+")))

@@ -118,7 +118,7 @@ to singular.}
 \item{burnin}{numeric; the length of any initial burn in period to discard.
 See \code{mgcv::gam.mh()}.}
 
-\item{thin}{numeric; retain only \code{thin} samples. See \code{mgcv::gam.mh()}.}
+\item{thin}{positive integer; retain every \code{thin} iterations after burn-in.}
 
 \item{t_df}{numeric; degrees of freedom for static multivariate \emph{t} proposal.
 See \code{mgcv::gam.mh()}.}

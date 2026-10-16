@@ -92,8 +92,8 @@ test_that("local functions, basis values, sampling, and direct spline calls agre
   attr(raw, "coordinate_info") <- attr(stored, "coordinate_info") <- NULL
   expect_equal(raw[, names(stored)], stored)
   expect_equal(basis(m, data = nd, envir = env), basis(m, data = evaluated))
-  expect_equal(smooth_samples(m, data = nd, envir = env, seed = 4, n = 3),
-    smooth_samples(m, data = evaluated, seed = 4, n = 3))
+  expect_equal(smooth_samples(m, data = nd, envir = env, seed = 4, n_draws = 3),
+    smooth_samples(m, data = evaluated, seed = 4, n_draws = 3))
   sm <- m$smooth[[1]]
   a <- spline_values2(sm, nd, m, FALSE, overall_uncertainty = FALSE, envir = env)$data[[1L]]
   b <- spline_values(sm, evaluated, m, FALSE, overall_uncertainty = FALSE)$data[[1L]]

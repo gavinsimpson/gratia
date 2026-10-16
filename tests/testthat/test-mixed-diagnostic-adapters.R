@@ -113,7 +113,7 @@ test_that("explicit gamm4 posterior modes share the PPC sampler and rows", {
   m <- gamm4::gamm4(y ~ s(x, k = 5), random = ~(1 | g), data = d,
     na.action = na.exclude)
   for (conditioning in c("conditional", "marginal")) {
-    raw <- posterior_samples(m, n = 3L, seed = 42,
+    raw <- posterior_samples(m, n_draws = 3L, seed = 42,
       conditioning = conditioning)
     expect_equal(raw, diagnostic_posterior_samples.default(m, n = 3L,
       seed = 42, conditioning = conditioning))
@@ -122,7 +122,7 @@ test_that("explicit gamm4 posterior modes share the PPC sampler and rows", {
       conditioning = conditioning)
     plotted <- plot$data[plot$data$.draw > 0L, names(raw)]
     expect_equal(plotted, raw)
-    expect_error(posterior_samples(m, n = 2L, seed = 42,
+    expect_error(posterior_samples(m, n_draws = 2L, seed = 42,
       conditioning = conditioning, method = "mh"), "method = 'gaussian'")
   }
 })

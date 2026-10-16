@@ -8,10 +8,10 @@ test_that("AR1 posterior response draws retain correlation and segment resets", 
   # A fixed coefficient vector gives an independent oracle for the joint
   # response generator, including its exact RNG order.
   fixed <- matrix(coef(m), nrow = 1L)
-  samples <- posterior_samples(m, n = 1, method = "user", draws = fixed, seed = 11)
+  samples <- posterior_samples(m, n_draws = 1, method = "user", draws = fixed, seed = 11)
   expected <- withr::with_seed(11, response_distribution(m)$rd())
   expect_equal(samples$.response, unname(expected))
-  samples <- posterior_samples(m, n = 1200, method = "user",
+  samples <- posterior_samples(m, n_draws = 1200, method = "user",
     draws = matrix(rep(coef(m), 1200), nrow = 1200, byrow = TRUE), seed = 11)
   values <- matrix(samples$.response, nrow = nrow(d))
   errors <- sweep(values, 1L, fitted(m), `-`) / sqrt(m$sig2 / m$prior.weights)
@@ -36,9 +36,9 @@ test_that("raw and streamed AR1 posterior checks agree across batches", {
     expect_equal(lapply(raw$layers, `[[`, "data"), lapply(streamed$layers, `[[`, "data"))
   }
   before <- .Random.seed
-  posterior_samples(m, n = 2, seed = 8)
+  posterior_samples(m, n_draws = 2, seed = 8)
   expect_identical(.Random.seed, before)
-  expect_error(posterior_samples(m, data = d, n = 2), "require fitting observations")
+  expect_error(posterior_samples(m, data = d, n_draws = 2), "require fitting observations")
 })
 
 test_that("working AR1 corrections do not silently produce independent PPC", {
@@ -46,7 +46,7 @@ test_that("working AR1 corrections do not silently produce independent PPC", {
   d <- data.frame(x = runif(80), y = rpois(80, 2))
   m <- mgcv::bam(y ~ s(x, k = 5), data = d, family = poisson(),
     rho = 0.5, discrete = TRUE)
-  expect_error(posterior_samples(m, n = 2, seed = 2), "working AR1 correction")
+  expect_error(posterior_samples(m, n_draws = 2, seed = 2), "working AR1 correction")
   for (scalable in c(FALSE, TRUE)) {
     expect_error(posterior_predictive_plot(m, n = 2, seed = 2, scalable = scalable),
       "working AR1 correction")

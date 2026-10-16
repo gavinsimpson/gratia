@@ -7,33 +7,61 @@
 \alias{add_smooth_samples}
 \title{Add posterior draws from a model to a data object}
 \usage{
-add_fitted_samples(object, model, n = 1, seed = NULL, ...)
+add_fitted_samples(
+  data,
+  model,
+  ...,
+  n_draws = NULL,
+  seed = NULL,
+  chains = NULL
+)
 
-add_predicted_samples(object, model, n = 1, seed = NULL, ...)
+add_predicted_samples(data, model, ..., n_draws = NULL, seed = NULL)
 
-add_posterior_samples(object, model, n = 1, seed = NULL, ...)
+add_posterior_samples(
+  data,
+  model,
+  ...,
+  n_draws = NULL,
+  seed = NULL,
+  chains = NULL
+)
 
-add_smooth_samples(object, model, n = 1, seed = NULL, select = NULL, ...)
+add_smooth_samples(
+  data,
+  model,
+  ...,
+  n_draws = NULL,
+  seed = NULL,
+  select = NULL,
+  chains = NULL
+)
 }
 \arguments{
-\item{object}{a data frame or tibble to which the posterior draws will be
+\item{data}{a data frame or tibble to which the posterior draws will be
 added.}
 
 \item{model}{a fitted GAM (or GAM-like) object for which a posterior draw
 method exists.}
 
-\item{n}{integer; the number of posterior draws to add.}
-
-\item{seed}{numeric; a value to seed the random number generator.}
-
 \item{...}{arguments are passed to the posterior draw function, currently one
-of \code{\link[=fitted_samples]{fitted_samples()}}, \code{\link[=predicted_samples]{predicted_samples()}}, or \code{\link[=posterior_samples]{posterior_samples()}}. \code{n}
+of \code{\link[=fitted_samples]{fitted_samples()}}, \code{\link[=predicted_samples]{predicted_samples()}}, or \code{\link[=posterior_samples]{posterior_samples()}}. \code{n_draws}
 and \code{seed} are already specified here as arguments and are also passed on
 to the posterior sampling function.}
 
+\item{n_draws}{positive integer; total retained draws across all chains.
+Required when generating draws. With \code{method = "user"}, the supplied
+matrix determines the count; an explicit count must agree with its rows.}
+
+\item{seed}{numeric; a value to seed the random number generator.}
+
+\item{chains}{positive integer or \code{NULL}; number of chains. \code{NULL} uses one
+chain, or the chain mapping in supplied draws. \code{n_draws} must be divisible by
+\code{chains}. Burn-in is applied separately to each MH chain.}
+
 \item{select}{character; select which smooth's posterior to draw from. The
 default, \code{NULL}, means the posteriors of all smooths in model will be
-sampled from individually. If supplied, a character vector of requested
+returned using the same joint coefficient draws. If supplied, a vector of
 smooth terms.}
 }
 \description{
@@ -52,13 +80,13 @@ df <- data_sim("eg1", n = 400, seed = 42)
 m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = "REML")
 
 # add fitted samples (posterior draws of the expected value of the response)
-# note that there are 800 rows in the output: 400 data by `n = 2` samples.
+# note that there are 800 rows in the output: 400 data by `n_draws = 2` samples.
 df |>
-  add_fitted_samples(m, n = 2, seed = 84)
+  add_fitted_samples(m, n_draws = 2, seed = 84)
 
 # add posterior draws from smooth s(x2)
 df |>
-  add_smooth_samples(m, n = 2, seed = 2, select= "s(x2)")
+  add_smooth_samples(m, n_draws = 2, seed = 2, select= "s(x2)")
 \dontshow{
   options(op)
 }

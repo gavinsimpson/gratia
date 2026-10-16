@@ -1371,12 +1371,12 @@
   }
   method <- match.arg(method)
   mvn_method <- match.arg(mvn_method)
-  yd <- derivative_samples(object,
+  yd <- sampling_call(derivative_samples, list(object,
     focal = focal, data = data, order = order,
-    type = type, scale = scale, method = method, n = n, eps = eps,
-    n_sim = n_sim, seed = seed, mvn_method = mvn_method,
+    type = type, scale = scale, method = method, n_grid = n, eps = eps,
+    n_draws = if (method == "user") NULL else n_sim, seed = seed, mvn_method = mvn_method,
     unconditional = unconditional, ...
-  )
+  ))
 
   qq <- (1 - level) / 2
 

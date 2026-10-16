@@ -66,10 +66,10 @@ validate_optional_bayesplot_loo <- function(path = ".") {
     d$y <- sin(d$x) + 0.3 * cos(seq_len(nrow(d)))
     s <- mgcv::s
     fit <- mgcv::gam(y ~ s(x, k = 5), data = d, method = "REML")
-    ll <- gratia::log_lik(fit, n = 20, seed = 278)
+    ll <- gratia::log_lik(fit, n_draws = 20, seed = 278)
     stopifnot(identical(dim(ll), c(20L, 24L)), all(is.finite(ll)))
     # The pre-existing sampler also remains usable without either package.
-    samples <- gratia::posterior_samples(fit, n = 2, seed = 278)
+    samples <- gratia::posterior_samples(fit, n_draws = 2, seed = 278)
     stopifnot(nrow(samples) == 48L)
     message_contains <- function(expr, pattern) {
       message <- tryCatch({ force(expr); NA_character_ },
@@ -77,9 +77,9 @@ validate_optional_bayesplot_loo <- function(path = ".") {
       stopifnot(!is.na(message), grepl(pattern, message, fixed = TRUE))
     }
     if ("loo" %in% available) {
-      result <- suppressWarnings(loo::loo(fit, n = 100, seed = 278, cores = 1))
+      result <- suppressWarnings(loo::loo(fit, n_draws = 100, seed = 278, cores = 1))
       stopifnot(inherits(result, "loo"), nrow(result$pointwise) == 24L)
-      result <- suppressWarnings(loo::waic(fit, n = 100, seed = 278))
+      result <- suppressWarnings(loo::waic(fit, n_draws = 100, seed = 278))
       stopifnot(inherits(result, "waic"), nrow(result$pointwise) == 24L)
     } else {
       message_contains(getFromNamespace("loo.gam", "gratia")(fit),
@@ -88,10 +88,10 @@ validate_optional_bayesplot_loo <- function(path = ".") {
         "Package 'loo' is required")
     }
     if ("bayesplot" %in% available) {
-      plot <- suppressMessages(bayesplot::pp_check(fit, n = 10, seed = 278))
+      plot <- suppressMessages(bayesplot::pp_check(fit, n_draws = 10, seed = 278))
       stopifnot(inherits(plot, "ggplot"))
       render <- function(type) suppressWarnings(suppressMessages(
-        bayesplot::pp_check(fit, type = type, n = 200, seed = 278)))
+        bayesplot::pp_check(fit, type = type, n_draws = 200, seed = 278)))
       if ("rstantools" %in% available) {
         stopifnot(inherits(render("error_binned"), "ggplot"))
       } else {

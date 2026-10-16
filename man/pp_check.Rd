@@ -10,62 +10,64 @@
 \usage{
 pp_check.gam(
   object,
+  ...,
   type = "dens_overlay",
   prefix = c("ppc", "ppd"),
-  n = NULL,
+  n_draws = NULL,
   seed = NULL,
   group = NULL,
   x = NULL,
   response = NULL,
   conditioning = NULL,
-  sampling_args = list(),
-  ...
+  sampling_args = list()
 )
 
 pp_check.bam(
   object,
+  ...,
   type = "dens_overlay",
   prefix = c("ppc", "ppd"),
-  n = NULL,
+  n_draws = NULL,
   seed = NULL,
   group = NULL,
   x = NULL,
   response = NULL,
   conditioning = NULL,
-  sampling_args = list(),
-  ...
+  sampling_args = list()
 )
 
 pp_check.gamm(
   object,
+  ...,
   type = "dens_overlay",
   prefix = c("ppc", "ppd"),
-  n = NULL,
+  n_draws = NULL,
   seed = NULL,
   group = NULL,
   x = NULL,
   response = NULL,
   conditioning = NULL,
-  sampling_args = list(),
-  ...
+  sampling_args = list()
 )
 
 pp_check.gamm4(
   object,
+  ...,
   type = "dens_overlay",
   prefix = c("ppc", "ppd"),
-  n = NULL,
+  n_draws = NULL,
   seed = NULL,
   group = NULL,
   x = NULL,
   response = NULL,
   conditioning = NULL,
-  sampling_args = list(),
-  ...
+  sampling_args = list()
 )
 }
 \arguments{
 \item{object}{a fitted GAM, BAM, gamm, or gamm4 model.}
+
+\item{...}{arguments passed only to the selected bayesplot plotting function.}
 
 \item{type}{character; the bayesplot plot name without its \code{ppc_} or \code{ppd_}
 prefix. Available names come from the installed version of bayesplot.}
@@ -73,7 +75,7 @@ prefix. Available names come from the installed version of bayesplot.}
 \item{prefix}{character; \code{"ppc"} compares responses with observations;
 \code{"ppd"} shows replicated responses alone.}
 
-\item{n}{positive integer; number of coefficient and response draws. Defaults
+\item{n_draws}{positive integer; total coefficient and response draws. Defaults
 to 50 for ordinary plots and 4000 for leave-one-out plots. With supplied
 coefficient draws, defaults to their number of rows.}
 
@@ -92,10 +94,9 @@ posterior predictive sampler. See \code{\link[=posterior_predictive_plot]{poster
 \item{sampling_args}{named list; arguments for the posterior sampler, including
 \code{method}, \code{draws}, \code{unconditional}, and \code{mvn_method}. Prediction at new data
 is not supported. Fitted binomial trials must be retained.
-For leave-one-out plots, supply \code{r_eff} or \code{chain_id} here when using
-coefficient draws supplied by the user.}
-
-\item{...}{arguments passed only to the selected bayesplot plotting function.}
+Use \code{chains} for multiple coefficient chains and \code{diagnostics = TRUE} for
+coefficient diagnostics. Leave-one-out plots use stored chain identities;
+for unlabelled supplied draws, include \code{r_eff} or \code{chain_id} here.}
 }
 \value{
 The object returned by the selected bayesplot function, usually a
@@ -134,7 +135,7 @@ if (requireNamespace("bayesplot", quietly = TRUE)) {
   load_mgcv()
   dat <- data_sim("eg1", n = 100, seed = 2)
   fit <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat)
-  bayesplot::pp_check(fit, n = 10, seed = 42)
+  bayesplot::pp_check(fit, n_draws = 10, seed = 42)
 }
 }
 \seealso{

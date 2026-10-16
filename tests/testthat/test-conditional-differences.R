@@ -40,7 +40,7 @@ test_that("response contrasts transform endpoints and use the joint gradient", {
 test_that("simulation pairs shared draws before summarising on either scale", {
   f <- conditional_difference_fixture(poisson())
   m <- f$model
-  betas <- generate_draws(m, n = 101, seed = 7, mvn_method = "mgcv")
+  betas <- generate_draws(m, n_draws = 101, seed = 7, mvn_method = "mgcv")
   for (scale in c("link", "response")) {
     cd <- conditional_differences(m, "a", list(x = c(0.2, 0.8), exposure = 2),
       scale = scale, uncertainty = "simulation", method = "user", draws = betas,
@@ -122,7 +122,7 @@ test_that("exclusions are honoured by both uncertainty methods", {
   f <- conditional_difference_fixture(poisson())
   m <- f$model
   excluded <- "s(x):B"
-  betas <- generate_draws(m, n = 20, seed = 3)
+  betas <- generate_draws(m, n_draws = 20, seed = 3)
   cd <- conditional_differences(m, "a", list(x = 0.4), exclude = excluded,
     uncertainty = "simulation", method = "user", draws = betas)
   ep <- conditional_difference_endpoints(cd, m)

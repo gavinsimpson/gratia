@@ -8,7 +8,7 @@
 #'   prefix. Available names come from the installed version of bayesplot.
 #' @param prefix character; `"ppc"` compares responses with observations;
 #'   `"ppd"` shows replicated responses alone.
-#' @param n positive integer; number of coefficient and response draws. Defaults
+#' @param n_draws positive integer; total coefficient and response draws. Defaults
 #'   to 50 for ordinary plots and 4000 for leave-one-out plots. With supplied
 #'   coefficient draws, defaults to their number of rows.
 #' @param seed integer or `NULL`; seed for reproducible sampling.
@@ -22,8 +22,9 @@
 #' @param sampling_args named list; arguments for the posterior sampler, including
 #'   `method`, `draws`, `unconditional`, and `mvn_method`. Prediction at new data
 #'   is not supported. Fitted binomial trials must be retained.
-#'   For leave-one-out plots, supply `r_eff` or `chain_id` here when using
-#'   coefficient draws supplied by the user.
+#'   Use `chains` for multiple coefficient chains and `diagnostics = TRUE` for
+#'   coefficient diagnostics. Leave-one-out plots use stored chain identities;
+#'   for unlabelled supplied draws, include `r_eff` or `chain_id` here.
 #' @param ... arguments passed only to the selected bayesplot plotting function.
 #'
 #' @details
@@ -59,18 +60,20 @@
 #'   load_mgcv()
 #'   dat <- data_sim("eg1", n = 100, seed = 2)
 #'   fit <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat)
-#'   bayesplot::pp_check(fit, n = 10, seed = 42)
+#'   bayesplot::pp_check(fit, n_draws = 10, seed = 42)
 #' }
 NULL
 
 #' @rdname pp_check
 #' @exportS3Method bayesplot::pp_check gam
-pp_check.gam <- function(object, type = "dens_overlay", prefix = c("ppc", "ppd"),
-    n = NULL, seed = NULL, group = NULL, x = NULL, response = NULL,
-    conditioning = NULL, sampling_args = list(), ...) {
-  prepared <- bayesplot_prepare(object, type, prefix, n, seed, group, x,
+pp_check.gam <- function(object, ..., type = "dens_overlay", prefix = c("ppc", "ppd"),
+    n_draws = NULL, seed = NULL, group = NULL, x = NULL, response = NULL,
+    conditioning = NULL, sampling_args = list()) {
+  sampling_check_names(substitute(list(...)))
+  prepared <- bayesplot_prepare(object, type, prefix, n_draws, seed, group, x,
     response, conditioning, sampling_args, list(...))
-  diagnostic_seed(seed, do.call(prepared$fun, prepared$args))
+  result <- diagnostic_seed(seed, do.call(prepared$fun, prepared$args))
+  attach_sampling(result, prepared$sampling)
 }
 
 #' @rdname pp_check
@@ -103,18 +106,20 @@ bayesplot_prepare <- function(object, type, prefix, n, seed, group, x,
       (is.null(names(sampling_args)) || anyNA(names(sampling_args)) ||
        any(!nzchar(names(sampling_args))) || anyDuplicated(names(sampling_args)))))
     stop("'sampling_args' must be a named list with unique names.", call. = FALSE)
-  n <- n %||% if (identical(sampling_args$method, "user") &&
-      !is.null(sampling_args$draws)) NROW(sampling_args$draws) else
-    if (needs_loo) 4000L else 50L
-  diagnostic_posterior_count(n)
-  if (identical(sampling_args$method, "user") &&
-      !is.null(sampling_args$draws) && n != NROW(sampling_args$draws)) stop(
-    "'n' must equal the number of rows in supplied coefficient draws.", call. = FALSE)
-  forbidden <- intersect(names(sampling_args), c("model", "n", "seed", "data",
+  forbidden <- intersect(names(sampling_args), c("model", "seed", "data",
     "newdata", "conditioning", "weights", ".response_weights"))
   if (length(forbidden)) stop("Do not supply ", paste(forbidden, collapse = ", "),
     " in 'sampling_args': bayesplot checks use fitting observations and trial counts.",
     call. = FALSE)
+  loo_controls <- intersect(names(sampling_args), c("r_eff", "chain_id"))
+  if (!needs_loo && length(loo_controls)) stop(
+    "'r_eff' and 'chain_id' require a leave-one-out bayesplot type.", call. = FALSE)
+  sampling <- posterior_adapter_sampling_args(sampling_args[setdiff(names(sampling_args), loo_controls)])
+  sampling_args <- c(sampling, sampling_args[loo_controls])
+  default_count <- if (needs_loo) 4000L else 50L
+  layout <- sampling_resolve(n %||% if (sampling$method != "user") default_count,
+    sampling$chains, sampling$draws, sampling$method)
+  n <- layout$n_draws
   reserved <- intersect(names(dots), c("y", "yrep", "ypred", "lw", "psis_object"))
   if (length(reserved)) stop("Arguments ", paste(reserved, collapse = ", "),
     " are prepared from the fitted model and cannot be supplied in '...'.", call. = FALSE)
@@ -151,8 +156,7 @@ bayesplot_prepare <- function(object, type, prefix, n, seed, group, x,
       coefficient_seed <- seed %||% sample.int(.Machine$integer.max, 1L)
       prep <- posterior_likelihood_prepare(object, n, coefficient_seed, sampling)
       response_seed <- sample.int(.Machine$integer.max, 1L)
-      sampling$method <- "user"
-      sampling$draws <- prep$betas
+      sampling <- list(method = "user", draws = prep$betas)
     }
     response_sampling <- sampling
     raw_trials <- bayesplot_fitted_trials(object)
@@ -176,10 +180,12 @@ bayesplot_prepare <- function(object, type, prefix, n, seed, group, x,
       do.call(diagnostic_posterior_samples, c(list(model = object, n = n,
         seed = response_seed, conditioning = conditioning), response_sampling))
     }
+    meta <- attr(sims, "sampling") %||% attr(sampling$draws, "sampling")
+    draw_ids <- meta$draw_ids %||% sampling_layout(n, 1L)
     if (!".parameter" %in% names(sims)) sims$.parameter <- "response"
     sims <- sims[sims$.parameter == selected, , drop = FALSE]
-    sims <- posterior_predictive_validate(sims, observed, seq_len(n))
-    ordered <- order(sims$.draw, match(sims$.row, observed$.row))
+    sims <- posterior_predictive_validate(sims, observed, draw_ids$.draw)
+    ordered <- order(match(sims$.draw, draw_ids$.draw), match(sims$.row, observed$.row))
     replicated <- matrix(sims$.response[ordered], nrow = n, byrow = TRUE)
     trials <- bayesplot_trials(object, selected, selected_positions)
     y <- observed$.response * trials
@@ -197,7 +203,8 @@ bayesplot_prepare <- function(object, type, prefix, n, seed, group, x,
       if ("lw" %in% formal_names) args$lw <- stats::weights(result$psis_object,
         log = TRUE) else args$psis_object <- result$psis_object
     }
-    list(fun = fun, args = c(args, dots), rows = observed$.row)
+    list(fun = fun, args = c(args, dots), rows = observed$.row,
+      draw_ids = draw_ids, sampling = meta)
   })
 }
 
@@ -293,19 +300,6 @@ bayesplot_expected_samples <- function(object, n, seed, conditioning, sampling_a
   rows <- which(!is.na(model_row_map(object)))
   model <- model_used_rows(object)
   f <- stats::family(model)
-  if (family_type(f) == "gumbls" && native_mgcv_hook(f$ll, mgcv::gumbls()$ll) &&
-      (is.null(f$gratia_diagnostics) || is.function(f$gratia_diagnostics))) {
-    factory <- f$gratia_diagnostics
-    f$gratia_diagnostics <- function(mu, wt, scale, y, eta) {
-      extra <- if (is.function(factory))
-        factory(mu = mu, wt = wt, scale = scale, y = y, eta = eta) else list()
-      # Gumbel's location differs from its expectation. Retain an explicit
-      # family mean, including NULL, when its diagnostic hook supplies one.
-      if (is.list(extra) && !"mean" %in% names(extra))
-        extra$mean <- mu[, 1L] - digamma(1) * exp(mu[, 2L])
-      extra
-    }
-  }
   grouped <- is_gfam_family(f)
   if (family_type(f) == "multinom" ||
       grepl("^ordered_categorical", family_type(f))) stop(
@@ -316,12 +310,8 @@ bayesplot_expected_samples <- function(object, n, seed, conditioning, sampling_a
   base <- vapply(index, function(j) drop(X[, j, drop = FALSE] %*%
     stats::coef(model)[j]), numeric(nrow(X)))
   offsets <- matrix(model$linear.predictors, nrow = nrow(X)) - base
-  args <- sampling_args
-  if (!is.null(args$freq)) {
-    args$frequentist <- args$freq
-    args$freq <- NULL
-  }
-  betas <- do.call(post_draws, c(list(model = model, n = n, seed = seed), args))
+  args <- posterior_adapter_sampling_args(sampling_args)
+  betas <- do.call(post_draws, c(list(model = model, n_draws = n, seed = seed), args))
   context <- if (grouped) gfam_diagnostic_context(model) else NULL
   components <- if (grouped && !is.null(response))
     as.integer(sub("^component", "", response)) else if (grouped)
@@ -329,7 +319,7 @@ bayesplot_expected_samples <- function(object, n, seed, conditioning, sampling_a
   if (grouped && any(vapply(context$families[components], function(family)
       grepl("^ordered_categorical", family_type(family)), logical(1)))) stop(
     "The 'error_binned' plot is unavailable for categorical responses.", call. = FALSE)
-  dplyr::bind_rows(lapply(seq_len(n), function(i) {
+  out <- dplyr::bind_rows(lapply(seq_len(n), function(i) {
     eta <- vapply(index, function(j) drop(X[, j, drop = FALSE] %*%
       betas[i, j]), numeric(nrow(X))) + offsets
     if (grouped) {
@@ -358,6 +348,7 @@ bayesplot_expected_samples <- function(object, n, seed, conditioning, sampling_a
     }
     diagnostic_response_table(mean, i, parameter, rows)
   }))
+  attach_sampling(out, betas, draw_index = TRUE)
 }
 
 bayesplot_distribution_mean <- function(distribution) {
@@ -373,14 +364,16 @@ bayesplot_distribution_mean <- function(distribution) {
 # LOO weights and response draws must use the same drawn precision matrix.
 bayesplot_mvn_samples <- function(prep, n) {
   d <- n_eta(prep$model)
-  fits <- fitted_samples(prep$model, n = n, method = "user", draws = prep$betas)
-  dplyr::bind_rows(lapply(seq_len(n), function(i) {
+  fits <- fitted_samples(prep$model, method = "user", draws = prep$betas)
+  ids <- attr(prep$betas, "sampling")$draw_ids$.draw %||% seq_len(n)
+  out <- dplyr::bind_rows(lapply(seq_len(n), function(i) {
     mu <- vapply(paste0("response", seq_len(d)), function(parameter)
-      fits$.fitted[fits$.draw == i & fits$.parameter == parameter],
+      fits$.fitted[fits$.draw == ids[i] & fits$.parameter == parameter],
       numeric(length(prep$rows)))
     R <- posterior_likelihood_mvn_R(prep$betas[i, ], d)
     values <- matrix(stats::rnorm(length(mu)), nrow = nrow(mu)) %*%
       t(solve(R)) + mu
     diagnostic_response_table(values, i, rows = prep$rows)
   }))
+  attach_sampling(out, prep$betas, draw_index = TRUE)
 }

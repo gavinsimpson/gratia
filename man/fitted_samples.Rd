@@ -13,43 +13,53 @@ fitted_samples(model, ...)
 
 \method{fitted_samples}{gam}(
   model,
-  n = 1,
-  data = newdata,
+  ...,
+  data = NULL,
+  n_draws = NULL,
+  chains = NULL,
   seed = NULL,
-  scale = c("response", "linear_predictor"),
   method = c("gaussian", "mh", "inla", "user"),
-  n_cores = 1,
+  n_cores = 1L,
+  n_threads = 1L,
   burnin = 1000,
-  thin = 1,
+  thin = 1L,
   t_df = 40,
   rw_scale = 0.25,
-  freq = FALSE,
+  frequentist = FALSE,
   unconditional = FALSE,
   draws = NULL,
+  diagnostics = FALSE,
+  mh_backend = c("mgcv", "gratia", "family"),
   mvn_method = c("mvnfast", "mgcv"),
-  family_index = NULL,
-  ...,
-  newdata = NULL,
-  ncores = NULL
+  block_size = 10000L,
+  dense_limit = 5e+06,
+  scale = c("response", "linear_predictor"),
+  family_index = NULL
 )
 
 \method{fitted_samples}{scam}(
   model,
-  n = 1,
+  ...,
   data = NULL,
+  n_draws = NULL,
+  chains = NULL,
   seed = NULL,
-  scale = c("response", "linear_predictor"),
   method = c("gaussian", "mh", "inla", "user"),
-  n_cores = 1,
+  n_cores = 1L,
+  n_threads = 1L,
   burnin = 1000,
-  thin = 1,
+  thin = 1L,
   t_df = 40,
   rw_scale = 0.25,
-  freq = FALSE,
+  frequentist = FALSE,
   unconditional = FALSE,
   draws = NULL,
+  diagnostics = FALSE,
+  mh_backend = c("mgcv", "gratia", "family"),
   mvn_method = c("mvnfast", "mgcv"),
-  ...
+  block_size = 10000L,
+  dense_limit = 5e+06,
+  scale = c("response", "linear_predictor")
 )
 }
 \arguments{
@@ -60,21 +70,19 @@ are passed on to \code{\link[mgcv:predict.gam]{mgcv::predict.gam()}}. For \code{
 passed on to \code{fitted_samples()}. For \code{predicted_samples()} these are
 passed on to the relevant \code{simulate()} method.}
 
-\item{n}{numeric; the number of posterior samples to return.}
-
 \item{data}{data frame; new observations at which the posterior draws
 from the model should be evaluated. If not supplied, the data used to fit
 the model will be used for \code{data}, if available in \code{model}.}
 
-\item{seed}{numeric; a random seed for the simulations.}
+\item{n_draws}{positive integer; total retained draws across all chains.
+Required when generating draws. With \code{method = "user"}, the supplied
+matrix determines the count; an explicit count must agree with its rows.}
 
-\item{scale}{character; either \code{"response"} for expectations of the response
-or \code{"linear_predictor"} for values before the inverse link transformation.
-For multinomial models both scales return all categories, labelled
-\code{response1}, \code{response2}, and so on. On the linear predictor scale,
-\code{response1} is the reference category with predictor zero; the other
-values are log odds relative to it. On the response scale, the values
-are category probabilities.}
+\item{chains}{positive integer or \code{NULL}; number of chains. \code{NULL} uses one
+chain, or the chain mapping in supplied draws. \code{n_draws} must be divisible by
+\code{chains}. Burn-in is applied separately to each MH chain.}
+
+\item{seed}{numeric; a random seed for the simulations.}
 
 \item{method}{character; which method should be used to draw samples from
 the posterior distribution. \code{"gaussian"} uses a Gaussian (Laplace)
@@ -83,19 +91,19 @@ that alternates t proposals with proposals based on a shrunken version of
 the posterior covariance matrix. \code{"inla"} uses a variant of Integrated
 Nested Laplace Approximation due to Wood (2019), (currently not
 implemented). \code{"user"} allows for user-supplied posterior draws
-(currently not implemented).}
+as a coefficient matrix.}
 
-\item{n_cores}{number of cores for generating random variables from a
-multivariate normal distribution. Passed to \code{\link[mvnfast:rmvn]{mvnfast::rmvn()}}.
-Parallelization will take place only if OpenMP is supported (but appears
-to work on Windows with current \code{R}).}
+\item{n_cores}{positive integer; maximum concurrent MH chains using mirai,
+capped at \code{chains}. Existing workers are reused; otherwise temporary workers
+are created and cleaned up. Only used by \code{method = "mh"}.}
+
+\item{n_threads}{positive integer; threads within Gaussian sampling using
+mvnfast. Defaults to one. This is separate from concurrent MH chains.}
 
 \item{burnin}{numeric; number of samples to discard as the burnin draws.
 Only used with \code{method = "mh"}.}
 
-\item{thin}{numeric; the number of samples to skip when taking \code{n} draws.
-Results in \code{thin * n} draws from the posterior being taken. Only used with
-\code{method = "mh"}.}
+\item{thin}{positive integer; retain every \code{thin} iterations after burn-in.}
 
 \item{t_df}{numeric; degrees of freedom for t distribution proposals. Only
 used with \code{method = "mh"}.}
@@ -104,16 +112,28 @@ used with \code{method = "mh"}.}
 matrix when generating random walk proposals. Negative or non finite to
 skip the random walk step. Only used with \code{method = "mh"}.}
 
-\item{freq}{logical; \code{TRUE} to use the frequentist covariance matrix of
+\item{frequentist}{logical; \code{TRUE} to use the frequentist covariance matrix of
 the parameter estimators, \code{FALSE} to use the Bayesian posterior
 covariance matrix of the parameters.}
 
-\item{unconditional}{logical; if \code{TRUE} (and \code{freq == FALSE}) then the
+\item{unconditional}{logical; if \code{TRUE} (and \code{frequentist == FALSE}) then the
 Bayesian smoothing parameter uncertainty corrected covariance matrix is
 used, if available.}
 
 \item{draws}{matrix; user supplied posterior draws to be used when
 \code{method = "user"}.}
+
+\item{diagnostics}{logical; calculate coefficient R-hat, effective sample
+sizes, and Monte Carlo standard errors using the optional posterior package.}
+
+\item{mh_backend}{character; \code{"mgcv"} preserves \code{\link[mgcv:gam.mh]{mgcv::gam.mh()}}.
+\code{"gratia"} uses compiled common-family likelihoods. \code{"family"} uses a
+compiled MH loop with callbacks to the fitted family object. Both support
+independent-observation bam fits. Smoothing parameters and parameters
+outside the fitted coefficient vector remain fixed. LSS scale and shape
+coefficients are sampled jointly with location. The family backend caches
+a full design matrix,
+smoothing penalty, and proposal factorisation once for all chains.}
 
 \item{mvn_method}{character; one of \code{"mvnfast"} or \code{"mgcv"}. The default is
 uses \code{mvnfast::rmvn()}, which can be considerably faster at generate large
@@ -121,29 +141,37 @@ numbers of MVN random values than \code{mgcv::rmvn()}, but which might not work
 for some marginal fits, such as those where the covariance matrix is close
 to singular.}
 
+\item{block_size}{positive integer; maximum observation rows per block in the
+gratia MH evaluator. Large designs are evaluated without storing a full matrix.}
+
+\item{dense_limit}{numeric; maximum number of design-matrix elements to cache
+for the gratia MH backend. Use zero to force blockwise evaluation.}
+
+\item{scale}{character; \code{"response"} returns the expected response;
+\code{"linear_predictor"} returns the first linear predictor. For LSS models,
+this is the predictor for location, which need not be the expected response.
+For multinomial models both scales return every category, labelled
+\code{response1}, \code{response2}, and so on. On the linear predictor scale,
+\code{response1} is the reference category with predictor zero; other values
+are log odds relative to it. Response-scale values are probabilities.}
+
 \item{family_index}{numeric; optional family-list positions for grouped
 family (\code{\link[mgcv:gfam]{mgcv::gfam()}}) response predictions, with one integer per requested
 row. By default membership is recovered from the response/index expression
 in \code{data}, or the fitted membership when \code{data} is omitted. This is useful
 when predicting without responses or with a complex response expression.
 An explicit index must agree with membership recoverable from \code{data}.}
-
-\item{newdata}{Deprecated: use \code{data} instead.}
-
-\item{ncores}{Deprecated; use \code{n_cores} instead. The number of cores for
-generating random variables from a multivariate normal distribution.
-Passed to \code{\link[mvnfast:rmvn]{mvnfast::rmvn()}}. Parallelization will take place only if
-OpenMP is supported (but appears to work on Windows with current \code{R}).}
 }
 \value{
-A tibble (data frame) with 3 columns containing the posterior
-predicted values in long format. The columns are
+A tibble (data frame) in long format, with columns:
 \itemize{
-\item \code{row} (integer) the row of \code{data} that each posterior draw relates to,
-\item \code{draw} (integer) an index, in range \code{1:n}, indicating which draw each row
-relates to,
-\item \code{response} (numeric) the predicted response for the indicated row of
-\code{data}.
+\item \code{.row}: row of the evaluation data;
+\item \code{.draw}: globally unique draw identifier;
+\item \code{.parameter}: \code{"location"} for scalar fitted values, or a response/category
+label for multivariate or multinomial models;
+\item \code{.fitted}: expected response or linear predictor, as selected by \code{scale}.
+Multiple-chain output also includes \code{.chain} and \code{.iteration}. Attached
+coefficient diagnostics are available through \code{\link[=sampling_diagnostics]{sampling_diagnostics()}}.
 }
 }
 \description{
@@ -152,14 +180,16 @@ distribution of fitted model using a Gaussian approximation to the
 posterior or a simple Metropolis Hastings sampler.
 }
 \details{
-For general families with several distributional parameters, response-scale
-draws currently support \code{\link[mgcv:gaulss]{mgcv::gaulss()}} means, \code{\link[mgcv:mvn]{mgcv::mvn()}} response means,
-and \code{\link[mgcv:multinom]{mgcv::multinom()}} category probabilities. Other general families,
-including \code{\link[mgcv:ziplss]{mgcv::ziplss()}}, produce an error on the response scale because
-their first parameter is not necessarily the expected response. On the
-linear predictor scale, these other families return the first predictor
-under the existing \code{location} label, including its offsets. The same label
-identifies the mean predictor for \code{gaulss()}; scale predictors are omitted.
+For LSS models, \code{scale = "response"} returns the expected response, using
+all parameters on which it depends. This includes the mean correction for
+Gumbel, GEV and sinh-arcsinh distributions and the hurdle probability for
+\code{ziplss()}. The Gamma LSS mean is the exponential of its first predictor.
+\code{scale = "linear_predictor"} returns only the first predictor (location);
+it is not a transformation of the expectation for these multi-parameter
+distributions. The existing \code{.parameter = "location"} label is retained on
+both scales. A GEV expectation does not exist at shape >= 1: response-scale
+fitted and derivative sampling then fail explicitly, while response draws
+and location-predictor draws remain available.
 
 For grouped families, coefficient draws preserve the joint model covariance;
 each row is then transformed using its own fitted component family. Explicit
@@ -201,13 +231,13 @@ op <- options(pillar.sigfig = 3, cli.unicode = FALSE)
 dat <- data_sim("eg1", n = 1000, dist = "normal", scale = 2, seed = 2)
 m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 
-fs <- fitted_samples(m1, n = 5, seed = 42)
+fs <- fitted_samples(m1, n_draws = 5, seed = 42)
 \donttest{
 fs
 }
 
 # can generate own set of draws and use them
-drws <- generate_draws(m1, n = 2, seed = 24)
+drws <- generate_draws(m1, n_draws = 2, seed = 24)
 fs2 <- fitted_samples(m1, method = "user", draws = drws)
 \donttest{
 fs2

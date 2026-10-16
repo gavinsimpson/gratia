@@ -24,7 +24,7 @@ validate_loo_refits <- function(n = 60L, draws = 8000L, seed = 278L) {
       d$y <- responses[[name]]
       family <- families[[name]]
       fit <- gam(y ~ s(x, k = 5), data = d, family = family, method = "REML")
-      ll <- log_lik(fit, n = draws, seed = seed)
+      ll <- log_lik(fit, n_draws = draws, seed = seed)
       psis <- loo::loo(ll, r_eff = 1)
       refit_lpd <- matrix(NA_real_, n, 2,
         dimnames = list(NULL, c("fixed", "reestimated")))
@@ -38,7 +38,7 @@ validate_loo_refits <- function(n = 60L, draws = 8000L, seed = 278L) {
             scale = if (fixed) fit$sig2 else 0)
           # Use the public sampler without using log_lik() for held-out densities.
           expected <- gratia::fitted_samples(refit, data = d[i, , drop = FALSE],
-            n = draws, seed = seed + i)
+            n_draws = draws, seed = seed + i)
           mu <- expected$.fitted
           density <- switch(name,
             gaussian = dnorm(d$y[i], mu, sqrt(refit$sig2), log = TRUE),

@@ -14,15 +14,15 @@ test_that("ordinary GAM sampling does not report inequality constraints", {
   d$y <- sin(d$x * 6) + d$x / 10
   m <- mgcv::gam(y ~ s(x, k = 5), data = d)
   expect_false(has_inequality_constraints(m))
-  expect_silent(post_draws(m, n = 3, seed = 2, mvn_method = "mgcv"))
-  expect_silent(post_draws(m, n = 3, method = "mh", burnin = 5, seed = 2))
+  expect_silent(post_draws(m, n_draws = 3, seed = 2, mvn_method = "mgcv"))
+  expect_silent(post_draws(m, n_draws = 3, method = "mh", burnin = 5, seed = 2))
 
   # Empty inequality storage is not evidence of constrained coefficients.
   m$Ain <- matrix(numeric(), nrow = 0, ncol = length(coef(m)))
   m$bin <- numeric()
   expect_false(has_inequality_constraints(m))
-  expect_silent(generate_draws(m, n = 3, seed = 2, mvn_method = "mgcv"))
-  expect_silent(generate_draws(m, n = 3, method = "mh", burnin = 5,
+  expect_silent(generate_draws(m, n_draws = 3, seed = 2, mvn_method = "mgcv"))
+  expect_silent(generate_draws(m, n_draws = 3, method = "mh", burnin = 5,
     seed = 2))
 
   # A single field and all-zero, nonrestrictive inequalities are not sufficient.
@@ -43,7 +43,7 @@ test_that("Gaussian sampling warns once about actual GAM inequalities", {
   for (sampler in samplers) {
     warnings <- character()
     draws <- withCallingHandlers(
-      withr::with_seed(42, sampler(m, n = 200, seed = 42,
+      withr::with_seed(42, sampler(m, n_draws = 200, seed = 42,
         mvn_method = "mgcv")),
       warning = function(w) {
         warnings <<- c(warnings, conditionMessage(w))
@@ -58,27 +58,29 @@ test_that("Gaussian sampling warns once about actual GAM inequalities", {
   }
 })
 
-test_that("MH sampling rejects GAM inequalities before using mgcv", {
+test_that("all MH backends reject GAM inequalities before sampling", {
   m <- scasm_sampling_fixture()
-  expect_error(mh_draws(m, n = 2, burnin = 0),
-    "not supported.*linear inequality constraints")
-  expect_error(post_draws(m, n = 2, method = "mh", burnin = 0),
-    "not supported.*linear inequality constraints")
-  expect_error(generate_draws(m, n = 2, method = "mh", burnin = 0),
-    "not supported.*linear inequality constraints")
-  # Selecting unconstrained coefficients still uses a full-model MH chain.
-  expect_error(post_draws(m, n = 2, method = "mh", index = 1),
-    "not supported.*linear inequality constraints")
+  for (backend in c("mgcv", "gratia", "family")) {
+    expect_error(mh_draws(m, n_draws = 2, burnin = 0, mh_backend = backend),
+      "not supported.*linear inequality constraints")
+    expect_error(post_draws(m, n_draws = 2, method = "mh", burnin = 0,
+      mh_backend = backend), "not supported.*linear inequality constraints")
+    expect_error(generate_draws(m, n_draws = 2, method = "mh", burnin = 0,
+      mh_backend = backend), "not supported.*linear inequality constraints")
+    # Selecting unconstrained coefficients still uses a full-model MH chain.
+    expect_error(post_draws(m, n_draws = 2, method = "mh", index = 1,
+      mh_backend = backend), "not supported.*linear inequality constraints")
+  }
 })
 
 test_that("native constrained bootstrap draws can be supplied explicitly", {
   m <- scasm_sampling_fixture()
   draws <- t(m$bs)
   expect_true(all(colSums(m$Ain %*% t(draws) - m$bin < -1e-7) == 0))
-  expect_silent(actual <- post_draws(m, n = nrow(draws), method = "user",
+  expect_silent(actual <- post_draws(m, n_draws = nrow(draws), method = "user",
     draws = draws))
   expect_identical(actual, draws)
-  expect_silent(selected <- post_draws(m, n = nrow(draws), method = "user",
+  expect_silent(selected <- post_draws(m, n_draws = nrow(draws), method = "user",
     draws = draws, index = 2:3))
   expect_identical(selected, draws[, 2:3, drop = FALSE])
 })

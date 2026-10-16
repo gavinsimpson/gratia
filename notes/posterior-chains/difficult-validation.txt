@@ -1,0 +1,24 @@
+45 completed runs; zero failed runs.
+720000 retained coefficient draws; 1440000 iterations including burn-in.
+90 run/group rows; 1980 variable summaries; 180 per-chain information rows.
+All output counts, four-chain layouts and derived transformations checked in each process.
+All 30 method/model/group summaries pass all three seeds.
+         group min_ess_bulk min_ess_tail
+1 coefficients     915.0923     403.0361
+2   quantities     997.9376     455.3575
+         group max_rhat max_mcse_over_sd
+1 coefficients 1.005415       0.04071126
+2   quantities 1.004367       0.02299674
+      method difference_over_combined_mcse
+1 elliptical                      3.757103
+2     family                      0.000000
+3       mala                      3.100789
+4       mgcv                      2.446610
+           case process_peak_mb
+1  rare_poisson        625.3281
+2        sparse        659.7673
+3 sparse_high_p        656.3922
+            case events coefficients
+1         sparse    656           30
+31  rare_poisson     34           25
+61 sparse_high_p    529           50

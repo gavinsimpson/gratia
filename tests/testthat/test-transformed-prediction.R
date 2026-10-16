@@ -26,7 +26,7 @@ test_that("prediction and sampling preserve transformed missing observations", {
   a <- fitted_values(m, data = nd)
   expect_true(is.na(a$.fitted[2]))
   expect_true(is.finite(a$.fitted[3]))
-  b <- fitted_samples(m, data = nd, n = 3, seed = 4)
+  b <- fitted_samples(m, data = nd, n_draws = 3, seed = 4)
   expect_equal(nrow(b), 15L)
   expect_true(all(is.na(b$.fitted[b$.row == 2])))
   d$x[3] <- NA

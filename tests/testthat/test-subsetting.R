@@ -1,7 +1,7 @@
 ## Test subsetting methods `[`
 
 test_that("subsetting works for smooth_samples", {
-  sm <- smooth_samples(m_gam, seed = 42)
+  sm <- smooth_samples(m_gam, seed = 42, n_draws = 1L)
   hsm <- head(sm)
   expect_identical(NROW(hsm), 6L)
   expect_true(!is.null(attr(hsm, "seed")))

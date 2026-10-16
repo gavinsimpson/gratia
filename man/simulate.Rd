@@ -77,6 +77,8 @@ the model will be used for \code{newdata}, if available in \code{object}.}
 overrides the fitting weights; a single value applies to every observation.
 With \code{data = NULL}, the default is the fitted prior weights, except
 factor-valued binomial responses retain one Bernoulli trial per observation.
+Native \code{gaulss()} ignores fitting weights in its likelihood, so its default
+response weights are ones; explicit sampling weights still override this.
 With prediction data, the default is a vector of ones. For ordinary Gaussian
 and Gamma responses, larger weights reduce response variance (precision
 weights). For binomial responses, weights give integer trial counts. Include

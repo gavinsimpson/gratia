@@ -16,15 +16,21 @@ predicted_samples(model, ...)
 
 \method{predicted_samples}{gam}(
   model,
-  n = 1,
-  data = newdata,
-  seed = NULL,
-  weights = NULL,
   ...,
-  newdata = NULL
+  data = NULL,
+  n_draws = NULL,
+  seed = NULL,
+  weights = NULL
 )
 
-\method{predicted_samples}{scam}(model, n = 1, data = NULL, seed = NULL, weights = NULL, ...)
+\method{predicted_samples}{scam}(
+  model,
+  ...,
+  data = NULL,
+  n_draws = NULL,
+  seed = NULL,
+  weights = NULL
+)
 }
 \arguments{
 \item{model}{a fitted model of the supported types; see \link{diagnostic_support}.}
@@ -34,11 +40,12 @@ are passed on to \code{\link[mgcv:predict.gam]{mgcv::predict.gam()}}. For \code{
 passed on to \code{fitted_samples()}. For \code{predicted_samples()} these are
 passed on to the relevant \code{simulate()} method.}
 
-\item{n}{numeric; the number of posterior samples to return.}
-
 \item{data}{data frame; new observations at which the posterior draws
 from the model should be evaluated. If not supplied, the data used to fit
 the model will be used for \code{data}, if available in \code{model}.}
+
+\item{n_draws}{positive integer; number of response replicates to generate
+at the fitted parameters. Required; coefficient chains are not used.}
 
 \item{seed}{numeric; a random seed for the simulations.}
 
@@ -46,22 +53,23 @@ the model will be used for \code{data}, if available in \code{model}.}
 explicit vector overrides the fitting weights; a single value applies to
 every observation. With \code{data = NULL}, the default is the fitted prior
 weights, except factor-valued binomial responses retain one Bernoulli trial
-per observation. With prediction data, the default is a vector of ones.
+per observation. Native \code{gaulss()} ignores fitting weights in its likelihood,
+so its default response weights are also ones; explicitly supplied sampling
+weights still override this default. With prediction data, weights default
+to a vector of ones.
 For ordinary Gaussian and Gamma responses, larger weights reduce response
 variance (precision weights). For binomial responses, weights give integer
 trial counts. They do not alter the fitted coefficient covariance. Include
 positions restored by \code{na.exclude} when supplying weights for fitting rows.}
-
-\item{newdata}{Deprecated: use \code{data} instead.}
 }
 \value{
 A tibble (data frame) with 3 columns containing the posterior
 predicted values in long format. The columns are
 \itemize{
-\item \code{row} (integer) the row of \code{data} that each posterior draw relates to,
-\item \code{draw} (integer) an index, in range \code{1:n}, indicating which draw each row
+\item \code{.row} (integer) the row of \code{data} that each posterior draw relates to,
+\item \code{.draw} (integer) an index, in range \code{1:n_draws}, indicating which draw each row
 relates to,
-\item \code{response} (numeric) the predicted response for the indicated row of
+\item \code{.response} (numeric) the predicted response for the indicated row of
 \code{data}.
 }
 }
@@ -72,6 +80,12 @@ in a tidy, long, format. These predicted values do not include the
 uncertainty in the estimated model; they are simply draws from the
 conditional distribution of the response.
 }
+\details{
+LSS response simulation uses all fitted distribution parameters at the
+requested data, with the same parameter transformations and offset rules as
+\code{\link[=posterior_samples]{posterior_samples()}}. It holds coefficients fixed, so it has no coefficient
+chains or attached coefficient diagnostics.
+}
 \examples{
 load_mgcv()
 \dontshow{
@@ -80,7 +94,7 @@ op <- options(pillar.sigfig = 3, cli.unicode = FALSE)
 dat <- data_sim("eg1", n = 1000, dist = "normal", scale = 2, seed = 2)
 m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 
-predicted_samples(m, n = 5, seed = 42)
+predicted_samples(m, n_draws = 5, seed = 42)
 
 ## Can pass arguments to predict.gam()
 \dontshow{
@@ -92,16 +106,16 @@ newd <- data.frame(
 )
 
 ## Exclude s(x2)
-predicted_samples(m, n = 5, newd, exclude = "s(x2)", seed = 25)
+predicted_samples(m, n_draws = 5, data = newd, exclude = "s(x2)", seed = 25)
 
 ## Exclude s(x1)
-predicted_samples(m, n = 5, newd, exclude = "s(x1)", seed = 25)
+predicted_samples(m, n_draws = 5, data = newd, exclude = "s(x1)", seed = 25)
 
 ## Select which terms --- result should be the same as previous
 ## but note that we have to include any parametric terms, including the
 ## constant term
 predicted_samples(m,
-  n = 5, newd, seed = 25,
+  n_draws = 5, data = newd, seed = 25,
   terms = c("Intercept", "s(x0)", "s(x2)", "s(x3)")
 )
 \dontshow{

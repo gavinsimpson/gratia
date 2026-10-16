@@ -28,7 +28,7 @@ test_that("fitting-argument offsets survive ordinary bam storage and row restora
     expect_equal(a$.fitted, restore(unname(coef(m)[1]) + known))
     expect_equal(response_distribution(m)$mean, exp(eta), ignore_attr = TRUE)
     expected <- withr::with_seed(13, rpois(length(eta), exp(eta)))
-    a <- posterior_samples(m, n = 1, method = "user", draws = B, seed = 13)
+    a <- posterior_samples(m, n_draws = 1, method = "user", draws = B, seed = 13)
     expect_equal(a$.response, restore(expected))
     a <- simulate(m, nsim = 1, seed = 13)
     expect_equal(a[[1]], restore(expected))

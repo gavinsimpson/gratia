@@ -1,0 +1,71 @@
+Review of internal MH covariance adjustment, 15 October 2026.
+Branch: gls/posterior-chains. Reviewed implementation based on 053628a41.
+All fitting, tests, comparisons and package checks ran outside the sandbox.
+
+Findings and corrections:
+- Finite source draws can have an overflowing empirical covariance. This now produces a clear error.
+- Very small target variation around a large coefficient mean can disappear in floating-point arithmetic.
+  Nonfinite transformations and achieved covariance errors above 1e-7 relative to the largest target entry are rejected.
+- Comparison CSV rows previously carried source-MH acceptance and mean-shift fields without identifying their source.
+  Six renamed columns now distinguish source_mh fields and adjustment fields from the sampler's own diagnostics.
+- Missing CSV columns can produce empty logical comparisons in R. Required schemas are now checked explicitly;
+  an intentionally removed diagnostic field was rejected by the negative validation check.
+- Trailing blank lines were removed. No public function, signature, sampling target, export or documentation topic changed.
+
+Regression checks:
+59 focused assertions passed, with no failures, warnings or skips.
+On 12 representative fitted targets, old and reviewed helpers returned exactly identical coefficient draws, audit and diagnostics.
+These targets include GAM/BAM, strong/weak/absent Gaussian smooths, rare-binary datasets 1 and 4, and the low-tail-ESS dataset 73.
+Coverage, paired differences, availability, resolution and follow-up CSVs remain byte-identical.
+The diagnostic CSV has identical values and row order; only the six source/adjustment column names changed.
+The main study independently validated 281424 intervals and 1599 matching original smoothing estimates over 1600 attempted fits.
+The separate resolution study validated 7040 intervals over 40 fits.
+Primary cohorts, native fitting exclusions and low-ESS follow-up decisions are unchanged.
+No Monte Carlo outcomes were replaced. Existing coverage conclusions and numerical error bounds remain unchanged.
+
+Source provenance:
+The original execution sources were frozen and verified against protocol hashes before review edits.
+Analysis validates against those snapshots when current sources differ. Sampling resumption still requires an exact generation-source match.
+The reviewed package source and tests match the successful check snapshot except for one terminal blank line removed from the helper.
+Its parsed R expressions are identical to the checked source; every other package-source/test hash matches.
+No additional full-suite run was needed for that whitespace-only cleanup.
+
+Package checks:
+R CMD build completed, including vignette creation.
+R CMD check --as-cran --no-manual completed with Status: OK; no errors, warnings or notes.
+Its full suite reported FAIL 0, WARN 0, SKIP 197, PASS 18627.
+NOT_CRAN=true exercised the functional tests normally gated on CRAN.
+VDIFFR_RUN_TESTS=false skipped 197 visual comparisons; installed test-copy snapshot cleanup did not alter source snapshots.
+Ordinary examples, donttest examples, vignette checks and vignette rebuilding passed.
+--no-manual omitted the PDF reference manual.
+_R_CHECK_CRAN_INCOMING_REMOTE_=false disabled remote incoming checks; local incoming checks ran.
+The earlier example-timing NOTE recorded in mh-adjustment-validation.txt did not recur in this check.
+
+Pkgdown:
+Built all reference pages, the reference index and the sampling-migration article.
+Validated 148 public topics and 201 index labels, including sampling aliases, canonical pages and local links.
+No missing topics, duplicate labels or broken local links were found.
+Reference examples were disabled with examples=FALSE because the package check ran ordinary and donttest examples.
+Pandoc emitted deprecation warnings for --katex and --mathjax supplied by the installed pkgdown workflow.
+These did not prevent the builds or index/link checks and are separate from the warning-free package check.
+No reference-index source edit was needed for this unexported helper.
+
+Commit scope:
+Only the MH helper, its tests, mh-adjustment research files and the MH section of the shared README are included.
+The earlier smoothing-reference investigation and its README/coverage-report edits remain unchanged and uncommitted.
+The committed documentation does not depend on those uncommitted files.
+Staged diff checks and source parsing passed.
+
+Reproducible scripts:
+notes/posterior-chains/mh-adjustment-review-checks.R
+notes/posterior-chains/mh-adjustment-validate.R
+notes/posterior-chains/validate-reference-index.R
+
+Logs:
+/private/tmp/gratia-mh-adjustment-review-tests.log
+/private/tmp/gratia-mh-adjustment-review-parity.log
+/private/tmp/gratia-mh-adjustment-review-study-validation.log
+/private/tmp/gratia-mh-adjustment-review-resolution-validation.log
+/private/tmp/gratia-mh-adjustment-review-schema-negative.log
+/private/tmp/gratia-mh-adjustment-review-package-check.log
+/private/tmp/gratia-mh-adjustment-review-reference.log

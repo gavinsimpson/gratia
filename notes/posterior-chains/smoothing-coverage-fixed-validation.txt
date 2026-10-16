@@ -1,0 +1,110 @@
+Partly fixed Gaussian bam fREML dispersion correction: validation, 15 October 2026.
+Branch gls/posterior-chains; prototype remains internal. All fits, tests and package checks ran outside the sandbox.
+Targeted smoothing suite: 1,020 assertions passed; no failures, warnings or skips.
+Standalone coverage analysis tests: 99 assertions passed.
+Full installed-package local suite: passed with NOT_CRAN=true; no failures or warnings; 197 visual comparisons skipped by VDIFFR_RUN_TESTS=false.
+Snapshot cleanup was confined to installed test copies; source snapshots were not changed.
+R CMD build: successful, including vignettes.
+R CMD check --as-cran --no-manual --run-donttest: no errors or warnings; Status: 1 NOTE.
+The sole NOTE is expected from --run-donttest: five extra printed donttest example blocks are absent from tests/Examples/gratia-Ex.Rout.save. The differences contain no changes to ordinary example output.
+--run-donttest ran the optional examples; ordinary examples and vignette rebuilding also passed.
+--no-manual omitted the PDF reference manual. _R_CHECK_CRAN_INCOMING_REMOTE_=false disabled remote incoming checks; local incoming checks ran.
+The CRAN-style check used NOT_CRAN=false: 17,662 assertions passed and 198 CRAN-gated tests were skipped. The separate full local run exercised the additional functional assertions with NOT_CRAN=true.
+Pkgdown reference index built successfully into /private/tmp/gratia-fixed-freml-reference; no public topics or exports added.
+Pandoc emitted deprecation warnings for --katex supplied by pkgdown. These did not prevent the index build and are separate from the warning-free package check.
+Changed implementation and regression-test hashes match the source archive used in R CMD check.
+Corrected main and resolution protocol hashes match the final evaluator and runner.
+Original study checkpoints and their compact summaries are preserved; corrected-case summaries are separate.
+
+Coverage follow-up validation:
+200 datasets: all four unaffected configurations identical, excluding elapsed times.
+bam fREML: native conditional/unconditional intervals and smoothing estimates unchanged; all 200 mixtures now returned.
+Ten unaffected fits: cached setups and 100 seeded draws identical to baseline 739b44eddf197502c8561240ae9671c63089f5c1 excluding added audit fields.
+ reported_REML_dispersion coefficient_Pearson_dispersion Pearson_over_REML
+ Min.   :0.1764           Min.   :0.1820                 Min.   :1.031
+ 1st Qu.:0.2254           1st Qu.:0.2326                 1st Qu.:1.032
+ Median :0.2419           Median :0.2496                 Median :1.032
+ Mean   :0.2406           Mean   :0.2482                 Mean   :1.032
+ 3rd Qu.:0.2559           3rd Qu.:0.2641                 3rd Qu.:1.032
+ Max.   :0.3065           Max.   :0.3162                 Max.   :1.032
+   mean_error        covariance_error
+ Min.   :1.137e-15   Min.   :5.266e-16
+ 1st Qu.:2.541e-15   1st Qu.:1.275e-15
+ Median :3.359e-15   Median :2.062e-15
+ Mean   :3.482e-15   Mean   :2.335e-15
+ 3rd Qu.:4.173e-15   3rd Qu.:2.976e-15
+ Max.   :7.574e-15   Max.   :7.725e-15
+Six actual-draw checks passed. Largest absolute CDF discrepancy: 0.0146
+256/1024-component resolution: all 20 datasets returned in each of five configurations.
+Largest absolute interior coverage change: 0
+Largest group-specific 95th percentile endpoint change / interval width: 0.0003994646
+
+Independent Gaussian dispersion calculation:
+                                          quantity        value
+                 relative_coefficient_disagreement 1.743496e-15
+                  relative_covariance_disagreement 3.089211e-02
+                 maximum_native_penalised_gradient 1.065814e-13
+            maximum_direct_vs_gam_prediction_error 2.553513e-15
+ maximum_direct_vs_gam_prediction_covariance_error 7.632783e-17
+               maximum_bam_vs_gam_prediction_error 1.110223e-15
+                               reported_dispersion 2.207051e-01
+              native_covariance_implied_dispersion 2.277405e-01
+               native_over_direct_covariance_scale 1.031877e+00
+                           profile_REML_dispersion 2.207051e-01
+                                Pearson_dispersion 2.277405e-01
+          fixed_smoothing_gam_estimated_dispersion 2.277405e-01
+           known_dispersion_setup_covariance_error 2.361424e-15
+                        corrected_setup_dispersion 2.277405e-01
+                  corrected_setup_covariance_error 1.966286e-15
+Native Vp/direct covariance diagonal ratio range: 1.031877 1.031877
+sig2, scale, reml.scale: 0.2207051 TRUE
+Maximum departure from common covariance scaling: 1.110223e-16
+Fitted full smoothing multipliers:
+    s(x)     s(z)
+0.100000 7.915605
+
+Changed source hashes:
+                  R/sampling-smoothing.R
+      "befdf2088b030f04ef7255eca022a8d2"
+tests/testthat/test-sampling-smoothing.R
+      "ccd34a4cf32e0b0f37f85d9bb5ac3ae7"
+
+Logs: /private/tmp/gratia-fixed-freml-targeted.log, /private/tmp/gratia-fixed-freml-full-local-tests.log, /private/tmp/gratia-fixed-freml-check.log, /private/tmp/gratia-fixed-freml-reference.log.
+
+Pre-commit review:
+No package-code regressions or unrelated changes found. Public interfaces, exports, chain handling and nuisance-parameter scope are unchanged.
+The research comparison now pins its original baseline commit from protocol.rds; draw-check archives reject overwriting. Only research scripts changed during this review.
+Original and corrected summary CSVs were independently reconstructed and match exactly. The original raw archive was not modified.
+Fresh draw-check results match the preceding six checks exactly. All research R files parse and local report links resolve.
+Standalone research tests rerun: 99 assertions passed, without failures or warnings.
+Existing draw-check archive rejected; every file hash remains unchanged.
+main : summary, paired comparisons, availability and failures reproduce the saved CSVs exactly.
+fixed-corrected : summary, paired comparisons, availability and failures reproduce the saved CSVs exactly.
+Package implementation and regression tests match the previously checked source archive.
+Additional independent native fits in the original coefficient coordinates:
+tensor fitted covariance relative error: 3.491684e-15 changed smoothing coefficient error: 1.332268e-14 covariance error: 4.440892e-16
+shared fitted covariance relative error: 7.160156e-12 changed smoothing coefficient error: 9.547918e-15 covariance error: 6.661338e-16
+call_sp fitted covariance relative error: 1.764479e-11 changed smoothing coefficient error: 2.309264e-14 covariance error: 4.440892e-16
+Fresh pkgdown full-reference and migration build: 148 public topics and 201 index labels validated; all topic links and sampling aliases resolve.
+Pandoc reports deprecation warnings for --katex and --mathjax supplied by pkgdown; the build and validation succeed.
+Prior full-suite and R CMD check results retained because the reviewed package implementation and tests match the checked archive by hash. Visual comparisons, PDF manual and remote incoming checks remain omitted as described above.
+Final research source hashes:
+           notes/posterior-chains/smoothing-coverage-draws.R
+                          "e051e2c56d963088ea814d443a31922d"
+         notes/posterior-chains/smoothing-coverage-figures.R
+                          "e2c39485a7c243a77d3832b31282d788"
+     notes/posterior-chains/smoothing-coverage-fixed-check.R
+                          "fc79dc20d082b42cbf38fee7e911f4bf"
+notes/posterior-chains/smoothing-coverage-fixed-validation.R
+                          "33d45a43d8fea5e7f77d10746b47c3d3"
+       notes/posterior-chains/smoothing-coverage-functions.R
+                          "7d9fb52631b4303564016c3fcab1173e"
+      notes/posterior-chains/smoothing-coverage-resolution.R
+                          "6b844495a9143e1b0f9b8e49401d4ea3"
+             notes/posterior-chains/smoothing-coverage-run.R
+                          "fe892fff58543a2ff85a860b37ab5b82"
+         notes/posterior-chains/smoothing-coverage-summary.R
+                          "fe43df52381ae77b9364d1245439b0da"
+           notes/posterior-chains/smoothing-coverage-tests.R
+                          "b13971fb55e79cbe5787f0b987054c41"
+Review logs: /private/tmp/gratia-fixed-freml-review-reference.log, /private/tmp/gratia-fixed-freml-review-integrity.log, /private/tmp/gratia-fixed-freml-review-tests.log, /private/tmp/gratia-fixed-freml-review-coverage.log.

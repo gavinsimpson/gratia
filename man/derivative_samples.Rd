@@ -9,64 +9,163 @@
 \alias{derivative_samples.scam}
 \title{Posterior expectations of derivatives from an estimated model}
 \usage{
-\method{derivative_samples}{gamm4}(object, ...)
+\method{derivative_samples}{gamm4}(model, ...)
 
-derivative_samples(object, ...)
+derivative_samples(model, ...)
 
-\method{derivative_samples}{default}(object, ...)
+\method{derivative_samples}{default}(model, ...)
 
-\method{derivative_samples}{gamm}(object, ...)
+\method{derivative_samples}{gamm}(model, ...)
 
 \method{derivative_samples}{gam}(
-  object,
-  focal = NULL,
+  model,
+  ...,
   data = NULL,
+  n_draws = NULL,
+  chains = NULL,
+  seed = NULL,
+  method = c("gaussian", "mh", "inla", "user"),
+  n_cores = 1L,
+  n_threads = 1L,
+  burnin = 1000,
+  thin = 1L,
+  t_df = 40,
+  rw_scale = 0.25,
+  frequentist = FALSE,
+  unconditional = FALSE,
+  draws = NULL,
+  diagnostics = FALSE,
+  mh_backend = c("mgcv", "gratia", "family"),
+  mvn_method = c("mvnfast", "mgcv"),
+  block_size = 10000L,
+  dense_limit = 5e+06,
+  focal = NULL,
   order = 1L,
   type = c("forward", "backward", "central"),
   scale = c("response", "linear_predictor"),
-  method = c("gaussian", "mh", "inla", "user"),
-  n = 100,
+  n_grid = 200L,
   eps = NULL,
-  n_sim = 10000,
-  level = lifecycle::deprecated(),
-  seed = NULL,
-  envir = environment(formula(object)),
-  draws = NULL,
-  mvn_method = c("mvnfast", "mgcv"),
-  ...
+  envir = environment(formula(model))
 )
 
 \method{derivative_samples}{scam}(
-  object,
-  focal = NULL,
+  model,
+  ...,
   data = NULL,
+  n_draws = NULL,
+  chains = NULL,
+  seed = NULL,
+  method = c("gaussian", "mh", "inla", "user"),
+  n_cores = 1L,
+  n_threads = 1L,
+  burnin = 1000,
+  thin = 1L,
+  t_df = 40,
+  rw_scale = 0.25,
+  frequentist = FALSE,
+  unconditional = FALSE,
+  draws = NULL,
+  diagnostics = FALSE,
+  mh_backend = c("mgcv", "gratia", "family"),
+  mvn_method = c("mvnfast", "mgcv"),
+  block_size = 10000L,
+  dense_limit = 5e+06,
+  focal = NULL,
   order = 1L,
   type = c("forward", "backward", "central"),
   scale = c("response", "linear_predictor"),
-  method = c("gaussian", "mh", "inla", "user"),
-  n = 100,
+  n_grid = 200L,
   eps = NULL,
-  n_sim = 10000,
-  seed = NULL,
-  envir = environment(formula(object)),
-  draws = NULL,
-  mvn_method = c("mvnfast", "mgcv"),
-  ...
+  envir = environment(formula(model))
 )
 }
 \arguments{
-\item{object}{an R object to compute derivatives for}
+\item{model}{a fitted model to compute derivative samples for}
 
 \item{...}{arguments passed to other methods and on to \code{fitted_samples()}}
+
+\item{data}{a data frame containing the values of the model covariates
+at which to evaluate derivatives of fitted values. If supplied,
+all but one variable must be held at a constant value.}
+
+\item{n_draws}{positive integer; total retained draws across all chains.
+Required when generating draws. With \code{method = "user"}, the supplied
+matrix determines the count; an explicit count must agree with its rows.}
+
+\item{chains}{positive integer or \code{NULL}; number of chains. \code{NULL} uses one
+chain, or the chain mapping in supplied draws. \code{n_draws} must be divisible by
+\code{chains}. Burn-in is applied separately to each MH chain.}
+
+\item{seed}{numeric or \code{NULL}; seed for the complete sampling operation.
+An explicit seed restores the caller's random-number state on exit.}
+
+\item{method}{character; which algorithm to use to sample from the posterior.
+Currently implemented methods are: \code{"gaussian"} and \code{"mh"}. \code{"gaussian"}
+calls \code{gaussian_draws()} which uses a Gaussian approximation to the
+posterior distribution. \code{"mh"} uses a simple Metropolis Hastings sampler
+which alternates static proposals based on a Gaussian approximation to the
+posterior, with random walk proposals. Note, setting \code{t_df} to a low value
+will result in heavier-tailed statistic proposals. See \code{mgcv::gam.mh()}
+for more details.}
+
+\item{n_cores}{positive integer; maximum concurrent MH chains using mirai,
+capped at \code{chains}. Existing workers are reused; otherwise temporary workers
+are created and cleaned up. Only used by \code{method = "mh"}.}
+
+\item{n_threads}{positive integer; threads within Gaussian sampling using
+mvnfast. Defaults to one. This is separate from concurrent MH chains.}
+
+\item{burnin}{numeric; the length of any initial burn in period to discard.
+See \code{mgcv::gam.mh()}.}
+
+\item{thin}{positive integer; retain every \code{thin} iterations after burn-in.}
+
+\item{t_df}{numeric; degrees of freedom for static multivariate \emph{t} proposal.
+See \code{mgcv::gam.mh()}.}
+
+\item{rw_scale}{numeric; factor by which to scale posterior covariance
+matrix when generating random walk proposals. See \code{mgcv::gam.mh()}.}
+
+\item{frequentist}{logical; if \code{TRUE}, the frequentist covariance matrix of
+the parameter estimates is used. If \code{FALSE}, the Bayesian posterior
+covariance matrix of the parameters is used. See \code{mgcv::vcov.gam()}.}
+
+\item{unconditional}{logical; if \code{TRUE}  the Bayesian smoothing parameter
+uncertainty corrected covariance matrix is used, \emph{if available} for
+\code{model}. See \code{mgcv::vcov.gam()}.
+SCAM models do not support this correction; use \code{unconditional = FALSE}.}
+
+\item{draws}{matrix; user supplied posterior draws to be used when
+\code{method = "user"}.}
+
+\item{diagnostics}{logical; calculate coefficient R-hat, effective sample
+sizes, and Monte Carlo standard errors using the optional posterior package.}
+
+\item{mh_backend}{character; \code{"mgcv"} preserves \code{\link[mgcv:gam.mh]{mgcv::gam.mh()}}.
+\code{"gratia"} uses compiled common-family likelihoods. \code{"family"} uses a
+compiled MH loop with callbacks to the fitted family object. Both support
+independent-observation bam fits. Smoothing parameters and parameters
+outside the fitted coefficient vector remain fixed. LSS scale and shape
+coefficients are sampled jointly with location. The family backend caches
+a full design matrix,
+smoothing penalty, and proposal factorisation once for all chains.}
+
+\item{mvn_method}{character; one of \code{"mvnfast"} or \code{"mgcv"}. The default is
+uses \code{mvnfast::rmvn()}, which can be considerably faster at generate large
+numbers of MVN random values than \code{mgcv::rmvn()}, but which might not work
+for some marginal fits, such as those where the covariance matrix is close
+to singular.}
+
+\item{block_size}{positive integer; maximum observation rows per block in the
+gratia MH evaluator. Large designs are evaluated without storing a full matrix.}
+
+\item{dense_limit}{numeric; maximum number of design-matrix elements to cache
+for the gratia MH backend. Use zero to force blockwise evaluation.}
 
 \item{focal}{character; name of the focal variable. The response derivative
 of the response with respect to this variable will be returned.
 All other variables involved in the model will be held at constant values.
 This must be supplied.}
-
-\item{data}{a data frame containing the values of the model covariates
-at which to evaluate derivatives of fitted values. If supplied,
-all but one variable must be held at a constant value.}
 
 \item{order}{numeric; the order of derivative.}
 
@@ -77,17 +176,8 @@ all but one variable must be held at a constant value.}
 or the linear predictor (link) scale? One of \code{"response"} (the default),
 or \code{"linear_predictor"}.}
 
-\item{method}{character; which method should be used to draw samples from
-the posterior distribution. \code{"gaussian"} uses a Gaussian (Laplace)
-approximation to the posterior. \code{"mh"} uses a Metropolis Hastings sample
-that alternates t proposals with proposals based on a shrunken version of
-the posterior covariance matrix. \code{"inla"} uses a variant of Integrated
-Nested Laplace Approximation due to Wood (2019), (currently not
-implemented). \code{"user"} allows for user-supplied posterior draws
-via \code{draws} in \code{...}.}
-
-\item{n}{numeric; the number of points to evaluate the derivative at (if
-\code{data} is not supplied).}
+\item{n_grid}{positive integer; resolution for constructing evaluation data if
+\code{data} not supplied}
 
 \item{eps}{a positive finite number giving the absolute finite-difference
 step, or \code{NULL} (the default) to choose it automatically. The automatic
@@ -103,24 +193,8 @@ unusual function scales or domain boundaries may require explicit \code{eps}.
 For first central differences the two points are separated by \code{eps};
 for second central differences they are each \code{eps} from the target.}
 
-\item{n_sim}{integer; number of posterior draws. Ignored when using
-user-supplied draws.}
-
-\item{level}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}}
-
-\item{seed}{numeric; a random seed for the simulations.}
-
 \item{envir}{the environment within which to recreate the data used to fit
-\code{object}.}
-
-\item{draws}{matrix; user supplied posterior draws to be used when
-\code{method = "user"}.}
-
-\item{mvn_method}{character; one of \code{"mvnfast"} or \code{"mgcv"}. The default is
-uses \code{mvnfast::rmvn()}, which can be considerably faster at generate large
-numbers of MVN random values than \code{mgcv::rmvn()}, but which might not work
-for some marginal fits, such as those where the covariance matrix is close
-to singular.}
+\code{model}.}
 }
 \value{
 A tibble, currently with the following variables:
@@ -132,6 +206,13 @@ was evaluated.
 }
 \description{
 Posterior expectations of derivatives from an estimated model
+}
+\details{
+For LSS models, response-scale derivatives differentiate the expected response
+returned by \code{\link[=fitted_samples]{fitted_samples()}}, retaining the joint uncertainty in every
+parameter that affects that expectation. Predictor-scale derivatives refer
+to the first linear predictor. Smooth-component derivatives and derivatives
+of the response expectation are different quantities.
 }
 \examples{
 
@@ -149,7 +230,7 @@ ds <- data_slice(m, x2 = evenly(x2, n = 200))
 # samples from posterior of derivatives
 fd_samp <- derivative_samples(m,
   data = ds, type = "central",
-  focal = "x2", eps = 0.01, seed = 21, n_sim = 100
+  focal = "x2", eps = 0.01, seed = 21, n_draws = 100
 )
 
 # plot the first 20 posterior draws

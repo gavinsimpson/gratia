@@ -24,7 +24,7 @@ test_that("native blocked covariance uses its fitted predictor column order", {
   empirical <- cov(t(as.matrix(joint$perturbation[seq_len(k), ])))
   expect_equal(unname(empirical), unname(vcov(m)), tolerance = .05)
   for (conditioning in c("conditional", "marginal")) {
-    raw <- posterior_samples(m, n = 2L, seed = 17, conditioning = conditioning)
+    raw <- posterior_samples(m, n_draws = 2L, seed = 17, conditioning = conditioning)
     expect_equal(nrow(raw), 400L)
     expect_true(all(is.finite(raw$.response)))
     expect_s3_class(posterior_predictive_plot(m, n = 2L, seed = 17,
@@ -68,7 +68,7 @@ test_that("native subset and omissions preserve fitted rows", {
     expect_equal(unname(proxy$y), fitted_data$y)
     expect_equal(proxy$fitted.values, as.vector(m$fitted[,
       if (conditioning == "conditional") 2L else 1L]))
-    raw <- posterior_samples(m, n = 2L, seed = 17, conditioning = conditioning)
+    raw <- posterior_samples(m, n_draws = 2L, seed = 17, conditioning = conditioning)
     expect_equal(nrow(raw), 2L * nrow(fitted_data))
     expect_true(all(is.finite(raw$.response)))
     expect_s3_class(posterior_predictive_plot(m, n = 2L, seed = 17,
@@ -95,7 +95,7 @@ test_that("native subset restores the fitted factor levels", {
       z %*% (nlme::pdMatrix(m$modelStruct$reStruct[[1L]]) * sigma(m)^2) %*% t(z)
     expect_equal(unname(proxy$distribution$variance[seq_len(8L)]),
       unname(diag(covariance)))
-    raw <- posterior_samples(m, n = 2L, seed = 17, conditioning = conditioning)
+    raw <- posterior_samples(m, n_draws = 2L, seed = 17, conditioning = conditioning)
     expect_equal(nrow(raw), 320L)
     expect_true(all(is.finite(raw$.response)))
   }
@@ -121,7 +121,7 @@ test_that("factor-binomial mixed laws retain one trial despite frequency weights
   }
   withr::local_options(gratia.diagnostics.marginal_draws = 29L)
   for (conditioning in c("conditional", "marginal")) {
-    raw <- posterior_samples(pql, n = 3L, seed = 42, conditioning = conditioning)
+    raw <- posterior_samples(pql, n_draws = 3L, seed = 42, conditioning = conditioning)
     expect_true(all(raw$.response %in% c(0, 1)))
   }
 })

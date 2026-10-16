@@ -21,13 +21,13 @@ test_that("bayesplot receives fitting responses and complete replicated datasets
   expect_equal(p$args$y, m_tiny_eg1$y, ignore_attr = TRUE)
   expect_equal(p$args$yrep, matrix(sims$.response[order(sims$.draw, sims$.row)],
     nrow = 3, byrow = TRUE))
-  expect_s3_class(pp_check.gam(m_tiny_eg1, n = 3, seed = 42), "ggplot")
-  expect_s3_class(pp_check.bam(b_pois, type = "bars", n = 3, seed = 42), "ggplot")
+  expect_s3_class(pp_check.gam(m_tiny_eg1, n_draws = 3, seed = 42), "ggplot")
+  expect_s3_class(pp_check.bam(b_pois, type = "bars", n_draws = 3, seed = 42), "ggplot")
   pred <- bayesplot_test_prepare(m_tiny_eg1, prefix = "ppd")
   expect_false("y" %in% names(pred$args))
   expect_equal(pred$args$ypred, p$args$yrep)
-  expect_s3_class(pp_check.gam(m_tiny_eg1, prefix = "ppd", n = 3, seed = 42), "ggplot")
-  stat <- pp_check.gam(m_tiny_eg1, type = "stat", n = 3, seed = 42, stat = "mean")
+  expect_s3_class(pp_check.gam(m_tiny_eg1, prefix = "ppd", n_draws = 3, seed = 42), "ggplot")
+  stat <- pp_check.gam(m_tiny_eg1, type = "stat", n_draws = 3, seed = 42, stat = "mean")
   expect_s3_class(stat, "ggplot")
 })
 
@@ -70,7 +70,7 @@ test_that("bayesplot removes excluded rows from all inputs together", {
   expect_identical(ncol(p$args$yrep), length(p$args$y))
   error <- bayesplot_test_prepare(fit, type = "error_binned", x = "x")
   expect_equal(error$args$x, dat$x[setdiff(1:28, c(3, 27))])
-  expected <- fitted_samples(fit, n = 3, seed = 42)
+  expected <- fitted_samples(fit, n_draws = 3, seed = 42)
   expected <- expected[is.finite(expected$.fitted), ]
   expect_equal(error$args$yrep,
     matrix(expected$.fitted[order(expected$.draw, expected$.row)], 3, byrow = TRUE))
@@ -127,9 +127,9 @@ test_that("posterior check arguments fail clearly instead of changing the sample
   expect_error(bayesplot_test_prepare(m_tiny_eg1, sampling_args = list(weights = 2)), "trial counts")
   expect_error(bayesplot_test_prepare(m_tiny_eg1, dots = list(yrep = matrix(1))), "prepared from")
   expect_error(bayesplot_test_prepare(m_tiny_eg1, response = "response2"), "Unknown 'response'")
-  draws <- post_draws(m_tiny_eg1, n = 2, seed = 1)
+  draws <- post_draws(m_tiny_eg1, n_draws = 2, seed = 1)
   expect_error(bayesplot_test_prepare(m_tiny_eg1,
-    sampling_args = list(method = "user", draws = draws)), "'n' must equal")
+    sampling_args = list(method = "user", draws = draws)), "n_draws.*agree")
   inferred <- bayesplot_test_prepare(m_tiny_eg1, n = NULL,
     sampling_args = list(method = "user", draws = draws))
   expect_equal(nrow(inferred$args$yrep), 2L)
@@ -203,7 +203,7 @@ test_that("bayesplot renders hurdle Poisson binned errors with rstantools", {
   skip_if_not_installed("bayesplot")
   skip_if_not_installed("rstantools")
   fit <- bayesplot_test_zip_fit()
-  expect_s3_class(bayesplot::pp_check(fit, type = "error_binned", n = 2, seed = 42),
+  expect_s3_class(bayesplot::pp_check(fit, type = "error_binned", n_draws = 2, seed = 42),
     "ggplot")
 })
 
@@ -214,14 +214,14 @@ test_that("posterior check seeds are reproducible without changing RNG state", {
   p <- bayesplot_test_prepare(m_tiny_eg1)
   expect_identical(.Random.seed, before)
   expect_equal(bayesplot_test_prepare(m_tiny_eg1)$args, p$args)
-  pp_check.gam(m_tiny_eg1, n = 3, seed = 42)
+  pp_check.gam(m_tiny_eg1, n_draws = 3, seed = 42)
   expect_identical(.Random.seed, before)
 })
 
 test_that("leave-one-out checks share coefficient draws with likelihood weights", {
   skip_if_not_installed("bayesplot")
   skip_if_not_installed("loo")
-  draws <- post_draws(m_tiny_eg1, n = 100, seed = 11, method = "gaussian")
+  draws <- post_draws(m_tiny_eg1, n_draws = 100, seed = 11, method = "gaussian")
   options <- list(method = "user", draws = draws, r_eff = 1)
   # Efficiency is a likelihood option; the user draws themselves are unchanged.
   prep <- posterior_likelihood_prepare(m_tiny_eg1, n = 100, seed = 42,
@@ -243,7 +243,7 @@ test_that("bayesplot renders LOO-PIT checks with rstantools", {
   skip_if_not_installed("loo")
   skip_if_not_installed("rstantools")
   expect_s3_class(suppressWarnings(pp_check.gam(m_tiny_eg1, type = "loo_pit_overlay",
-    n = 100, seed = 42)), "ggplot")
+    n_draws = 100, seed = 42)), "ggplot")
 })
 
 test_that("grouped leave-one-out plots receive only their selected PSIS columns", {
@@ -269,7 +269,7 @@ test_that("multivariate LOO response draws retain drawn covariance parameters", 
   at <- ncol(prep$betas) - d * (d + 1L) / 2L + 1L
   prep$betas[, at] <- prep$betas[, at] + log(2)
   draws <- withr::with_seed(100, bayesplot_mvn_samples(prep, 2))
-  fits <- fitted_samples(prep$model, n = 2, method = "user", draws = prep$betas)
+  fits <- fitted_samples(prep$model, n_draws = 2, method = "user", draws = prep$betas)
   expected <- withr::with_seed(100, lapply(1:2, function(i) {
     mu <- vapply(paste0("response", seq_len(d)), function(parameter)
       fits$.fitted[fits$.draw == i & fits$.parameter == parameter],

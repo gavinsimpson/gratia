@@ -4,7 +4,7 @@
 \alias{mh_draws}
 \alias{mh_draws.gamm4}
 \alias{mh_draws.gam}
-\title{Posterior samples using a simple Metropolis Hastings sampler}
+\title{Posterior samples using Metropolis Hastings}
 \usage{
 \method{mh_draws}{gamm4}(model, ...)
 
@@ -12,13 +12,20 @@ mh_draws(model, ...)
 
 \method{mh_draws}{gam}(
   model,
-  n,
+  ...,
+  n_draws = NULL,
+  chains = NULL,
+  n_cores = 1L,
   burnin = 1000,
-  thin = 1,
+  thin = 1L,
   t_df = 40,
   rw_scale = 0.25,
+  diagnostics = FALSE,
+  mh_backend = c("mgcv", "gratia", "family"),
+  block_size = 10000L,
+  dense_limit = 5e+06,
   index = NULL,
-  ...
+  seed = NULL
 )
 }
 \arguments{
@@ -28,12 +35,22 @@ classes. See \link{gamm4_support} for sampling from gamm4 fits.}
 
 \item{...}{arguments passed to methods.}
 
-\item{n}{numeric; the number of posterior draws to take.}
+\item{n_draws}{positive integer; total retained draws across all chains.
+Required when generating draws. With \code{method = "user"}, the supplied
+matrix determines the count; an explicit count must agree with its rows.}
+
+\item{chains}{positive integer or \code{NULL}; number of chains. \code{NULL} uses one
+chain, or the chain mapping in supplied draws. \code{n_draws} must be divisible by
+\code{chains}. Burn-in is applied separately to each MH chain.}
+
+\item{n_cores}{positive integer; maximum concurrent MH chains using mirai,
+capped at \code{chains}. Existing workers are reused; otherwise temporary workers
+are created and cleaned up. Only used by \code{method = "mh"}.}
 
 \item{burnin}{numeric; the length of any initial burn in period to discard.
 See \code{mgcv::gam.mh()}.}
 
-\item{thin}{numeric; retain only \code{thin} samples. See \code{mgcv::gam.mh()}.}
+\item{thin}{positive integer; retain every \code{thin} iterations after burn-in.}
 
 \item{t_df}{numeric; degrees of freedom for static multivariate \emph{t} proposal.
 See \code{mgcv::gam.mh()}.}
@@ -41,21 +58,80 @@ See \code{mgcv::gam.mh()}.}
 \item{rw_scale}{numeric; factor by which to scale posterior covariance
 matrix when generating random walk proposals. See \code{mgcv::gam.mh()}.}
 
+\item{diagnostics}{logical; calculate coefficient R-hat, effective sample
+sizes, and Monte Carlo standard errors using the optional posterior package.}
+
+\item{mh_backend}{character; \code{"mgcv"} preserves \code{\link[mgcv:gam.mh]{mgcv::gam.mh()}}.
+\code{"gratia"} uses compiled common-family likelihoods. \code{"family"} uses a
+compiled MH loop with callbacks to the fitted family object. Both support
+independent-observation bam fits. Smoothing parameters and parameters
+outside the fitted coefficient vector remain fixed. LSS scale and shape
+coefficients are sampled jointly with location. The family backend caches
+a full design matrix,
+smoothing penalty, and proposal factorisation once for all chains.}
+
+\item{block_size}{positive integer; maximum observation rows per block in the
+gratia MH evaluator. Large designs are evaluated without storing a full matrix.}
+
+\item{dense_limit}{numeric; maximum number of design-matrix elements to cache
+for the gratia MH backend. Use zero to force blockwise evaluation.}
+
 \item{index}{numeric; vector of indices of coefficients to use. Can be used
 to subset the mean vector and covariance matrix extracted from \code{model}.}
+
+\item{seed}{numeric or \code{NULL}; seed for the complete sampling operation.
+An explicit seed restores the caller's random-number state on exit.}
 }
 \description{
-Posterior samples using a simple Metropolis Hastings sampler
+Posterior samples using Metropolis Hastings
 }
 \details{
+Sampling controls must be named. Removed arguments produce migration errors;
+see \code{vignette("sampling-migration")}. Explicit controls that the selected
+method cannot use are rejected.
+
+For multiple chains, \code{n_draws} is the total retained count and must be divisible
+by \code{chains}. Coefficient matrices carry a chain mapping; use
+\code{\link[=as_mcmc_draws]{as_mcmc_draws()}} before ordinary matrix operations remove that mapping.
+Higher-level sampling tables include \code{.chain} and \code{.iteration} for multiple
+chains, with \code{.draw} unique across chains. Default single-chain table columns
+are unchanged. Use \code{\link[=sampling_diagnostics]{sampling_diagnostics()}} to extract coefficient diagnostics
+before response simulation adds further noise.
+
+The gratia MH backend supports Gaussian identity, Poisson log, binomial
+logit, Gamma log, and negative binomial log fits. It evaluates the fitted
+bases at original covariates, including for discrete bam fits. GAMM components, AR1 dependence,
+\code{paraPen}, \code{H}, and fits made from pre-fit \code{G} objects are unsupported.
+
+The family MH backend calls the fitted family's \code{dev.resids()} and \code{linkinv()}
+functions, or \code{ll()} for families with multiple linear predictors. This
+retains response encodings and attributes such as censoring indicators and
+the mappings between coefficients and predictors. It supports compatible
+standard, extended, and general mgcv families, including multinomial, Gaussian
+location-scale, and grouped families. Quasi families, Cox proportional hazards
+models, GAMM components, AR1 dependence, \code{paraPen}, \code{H}, and pre-fit \code{G} objects
+are unsupported. The fitted coefficient covariance must be nonsingular.
+It always caches the full design matrix; \code{block_size} and \code{dense_limit} apply
+only to the gratia backend and are rejected for the family backend.
+The new MH backends reject \code{bam} fits with nonzero prescribed smooth
+contributions: mgcv fitting and prediction can use different offsets for
+those fits. Supplied coefficient draws can still be evaluated with the
+native prediction conventions.
+
+All MH backends sample the conditional coefficient posterior with fitted
+smoothing, dispersion, and additional family parameters fixed. Parameters
+represented in the fitted coefficient vector are sampled, including scale
+or covariance coefficients in general families. \code{unconditional} applies
+to Gaussian draws only.
+
 GAM-class fits with linear inequality constraints, including
 \code{mgcv::scasm()} fits, store these as \code{Ain \%*\% coefficients >= bin}.
 Gaussian sampling uses the fitted covariance matrix without enforcing
 these inequalities and issues a warning. Sampled smooths can therefore
 violate the fitted shape constraints. Pointwise intervals computed from
 the same Gaussian covariance approximation also need not preserve those
-shapes. Metropolis-Hastings sampling is unavailable for these fits because
-\code{\link[mgcv:gam.mh]{mgcv::gam.mh()}} does not enforce their inequalities.
+shapes. All MH backends are unavailable for these fits because
+the samplers do not enforce their inequalities.
 
 If \code{mgcv::scasm()} was fitted with \code{bs > 0}, its \code{bs} component stores
 coefficient draws from the native constrained bootstrap in columns. These

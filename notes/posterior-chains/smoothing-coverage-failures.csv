@@ -1,0 +1,23 @@
+"case","engine","method","sampler","status","count"
+"binomial_rare","bam","fREML","conditional","Fit failed: Native fit did not converge: full convergence; algorithm did not converge",1
+"binomial_rare","bam","ML","conditional","Fit failed: Native fit did not converge: full convergence; algorithm did not converge",2
+"binomial_rare","bam","REML","conditional","Fit failed: Native fit did not converge: full convergence; algorithm did not converge",1
+"binomial_rare","bam","fREML","mixture","Fit failed: Native fit did not converge: full convergence; algorithm did not converge",1
+"binomial_rare","bam","ML","mixture","Fit failed: Native fit did not converge: full convergence; algorithm did not converge",2
+"binomial_rare","bam","REML","mixture","Fit failed: Native fit did not converge: full convergence; algorithm did not converge",1
+"binomial_rare","bam","fREML","unconditional","Fit failed: Native fit did not converge: full convergence; algorithm did not converge",1
+"binomial_rare","bam","ML","unconditional","Fit failed: Native fit did not converge: full convergence; algorithm did not converge",2
+"binomial_rare","bam","REML","unconditional","Fit failed: Native fit did not converge: full convergence; algorithm did not converge",1
+"beta","bam","REML","conditional","Fit failed: Native fit did not converge: full convergence; Fitting terminated with step failure - check results carefully",1
+"beta","bam","REML","mixture","Fit failed: Native fit did not converge: full convergence; Fitting terminated with step failure - check results carefully",1
+"beta","bam","REML","unconditional","Fit failed: Native fit did not converge: full convergence; Fitting terminated with step failure - check results carefully",1
+"normal_fixed","bam","fREML","mixture","Setup failed: The reconstructed Gaussian conditional distribution does not agree with the fitted coefficients and covariance; this fitting configuration is unsupported.",200
+"binomial_rare","bam","fREML","mixture","Smoothing component failed: A sampled smoothing parameter is outside the numerically supported range.",29
+"normal_null","bam","fREML","mixture","Smoothing component failed: A sampled smoothing parameter is outside the numerically supported range.",122
+"normal_weak","bam","fREML","mixture","Smoothing component failed: A sampled smoothing parameter is outside the numerically supported range.",90
+"binomial_rare","bam","fREML","mixture","Smoothing component failed: BLAS/LAPACK routine 'DSYEVR' gave error code -6",26
+"poisson_sparse","bam","fREML","mixture","Smoothing component failed: BLAS/LAPACK routine 'DSYEVR' gave error code -6",1
+"binomial_rare","bam","fREML","mixture","Smoothing component failed: The fixed-parameter native conditional did not converge with a finite positive definite covariance.",15
+"poisson_sparse","bam","fREML","mixture","Smoothing component failed: The fixed-parameter native conditional did not converge with a finite positive definite covariance.",3
+"normal_null","bam","fREML","mixture","Smoothing component failed: The Gaussian conditional precision is not positive definite.",16
+"normal_weak","bam","fREML","mixture","Smoothing component failed: The Gaussian conditional precision is not positive definite.",5

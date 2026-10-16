@@ -1,0 +1,16 @@
+"quantity","value"
+"relative_coefficient_disagreement",1.7434956992083e-15
+"relative_covariance_disagreement",0.0308921124249233
+"maximum_native_penalised_gradient",1.06581410364015e-13
+"maximum_direct_vs_gam_prediction_error",2.55351295663786e-15
+"maximum_direct_vs_gam_prediction_covariance_error",7.63278329429795e-17
+"maximum_bam_vs_gam_prediction_error",1.11022302462516e-15
+"reported_dispersion",0.220705070621315
+"native_covariance_implied_dispersion",0.227740454340504
+"native_over_direct_covariance_scale",1.03187685583926
+"profile_REML_dispersion",0.220705071354204
+"Pearson_dispersion",0.227740454340504
+"fixed_smoothing_gam_estimated_dispersion",0.227740454340504
+"known_dispersion_setup_covariance_error",2.361424030889e-15
+"corrected_setup_dispersion",0.227740454340504
+"corrected_setup_covariance_error",1.96628607873836e-15

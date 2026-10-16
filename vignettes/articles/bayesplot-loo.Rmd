@@ -40,8 +40,8 @@ response at every fitting observation. The variation between these replicated
 data sets includes coefficient uncertainty and response variation.
 
 ```{r predictive-checks}
-bayesplot::pp_check(smooth, type = "dens_overlay", n = 20, seed = 42)
-bayesplot::pp_check(smooth, type = "stat", stat = "sd", n = 500, seed = 42)
+bayesplot::pp_check(smooth, type = "dens_overlay", n_draws = 20, seed = 42)
+bayesplot::pp_check(smooth, type = "stat", stat = "sd", n_draws = 500, seed = 42)
 ```
 
 The first plot compares the observed response distribution with replicated
@@ -54,7 +54,7 @@ Grouped plots accept a fitting-frame variable name or a vector in fitting-row
 order. A vector is useful when the grouping variable was not used in the model.
 
 ```{r grouped-check}
-bayesplot::pp_check(smooth, type = "stat_grouped", stat = "mean", n = 500,
+bayesplot::pp_check(smooth, type = "stat_grouped", stat = "mean", n_draws = 500,
   group = factor(dat$x > 0, labels = c("negative x", "positive x")), seed = 42)
 ```
 
@@ -73,7 +73,7 @@ draws and columns are retained fitting observations. For example, a Poisson
 entry is `dpois(y[i], lambda = mu[s, i], log = TRUE)`.
 
 ```{r log-likelihood}
-ll <- gratia::log_lik(smooth, n = 2000, seed = 42)
+ll <- gratia::log_lik(smooth, n_draws = 2000, seed = 42)
 dim(ll)
 head(attr(ll, "observation"))
 attr(ll, "gratia")
@@ -93,8 +93,8 @@ density: larger values indicate better predictions on the same response scale
 and the same observations.
 
 ```{r loo-comparison}
-loo_linear <- loo::loo(linear, n = 2000, seed = 42)
-loo_smooth <- loo::loo(smooth, n = 2000, seed = 42)
+loo_linear <- loo::loo(linear, n_draws = 2000, seed = 42)
+loo_smooth <- loo::loo(smooth, n_draws = 2000, seed = 42)
 loo::loo_compare(loo_linear, loo_smooth)
 loo::pareto_k_table(loo_smooth)
 ```
@@ -102,7 +102,7 @@ loo::pareto_k_table(loo_smooth)
 The methods return ordinary loo objects, so loo's plotting, model-comparison
 and weighting tools are available. For an already extracted matrix of
 independent Gaussian coefficient draws, the equivalent calculation is
-`loo::loo(ll, r_eff = 1)`. `loo::waic(smooth, n = 2000, seed = 42)` also works.
+`loo::loo(ll, r_eff = 1)`. `loo::waic(smooth, n_draws = 2000, seed = 42)` also works.
 Model methods evaluate likelihoods one observation at a time, avoiding a full
 draws-by-observations matrix unless saved PSIS weights are requested.
 
@@ -116,7 +116,7 @@ LOO predictive plots use response simulations and importance weights from the
 same coefficient draws:
 
 ```{r loo-plot, eval=requireNamespace("bayesplot", quietly = TRUE) && requireNamespace("loo", quietly = TRUE) && requireNamespace("rstantools", quietly = TRUE)}
-bayesplot::pp_check(smooth, type = "loo_pit_overlay", n = 2000, seed = 42)
+bayesplot::pp_check(smooth, type = "loo_pit_overlay", n_draws = 2000, seed = 42)
 ```
 
 ## Understand the posterior approximation
@@ -135,21 +135,32 @@ approximation, and small Pareto-k values do not establish its accuracy.
 
 ```{r sampling-options, eval=FALSE}
 # Extra sampler arguments are kept separate from loo and plotting arguments.
-loo::loo(smooth, n = 2000, seed = 42,
+loo::loo(smooth, n_draws = 2000, seed = 42,
   sampling_args = list(unconditional = TRUE))
-bayesplot::pp_check(smooth, n = 50, seed = 42,
+bayesplot::pp_check(smooth, n_draws = 50, seed = 42,
   sampling_args = list(unconditional = TRUE))
 
-# A single supported Metropolis-Hastings chain retains its draw order.
-loo::loo(smooth, n = 2000, seed = 42,
-  sampling_args = list(method = "mh", burnin = 1000))
+# Four chains share the total retained count, with separate burn-in.
+loo::loo(smooth, n_draws = 2000, seed = 42,
+  sampling_args = list(method = "mh", chains = 4, burnin = 1000))
 ```
 
 For supplied coefficient draws, use `method = "user", draws = B` in
 `log_lik()`, or place those arguments in `sampling_args` for loo and bayesplot.
-Loo additionally needs `chain_id` or an explicit `r_eff`; gratia cannot infer
-autocorrelation from the origin of an arbitrary matrix. Bootstrap coefficient
+LOO uses the chain and iteration mapping stored by gratia's samplers. For an
+unlabelled matrix, supply `chain_id` or an explicit `r_eff`; gratia cannot infer
+chain boundaries from its dimensions. A supplied `chain_id` must agree with
+stored metadata. Bootstrap coefficient
 samples do not become posterior draws by passing them to this interface.
+
+`n_draws` is the total retained count, so 2,000 draws over four chains retains
+500 draws per chain. Likelihood and LOO/WAIC wrappers default to 4,000 draws;
+bayesplot uses 50 for ordinary checks and 4,000 for leave-one-out plots.
+Supplied matrices determine their own count and chains. These wrappers reject
+the obsolete `n` argument, and inactive sampler controls produce errors.
+Use `diagnostics = TRUE` directly in `log_lik()`, or in `sampling_args` for LOO
+and bayesplot, to retain coefficient diagnostics. The likelihood matrix also
+supports `as_mcmc_draws()` for diagnostics of its observation-wise log densities.
 
 Likelihood and LOO methods initially cover independent GAM/BAM responses. They
 exclude residual-correlated BAMs, full gamm/gamm4 fits, quasi families, Cox

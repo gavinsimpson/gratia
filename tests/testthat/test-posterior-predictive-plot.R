@@ -1,6 +1,6 @@
 test_that("posterior predictive curves retain the posterior draws", {
   p <- posterior_predictive_plot(m_tiny_eg1, n = 3, seed = 42)
-  sims <- posterior_samples(m_tiny_eg1, n = 3, seed = 42)
+  sims <- posterior_samples(m_tiny_eg1, n_draws = 3, seed = 42)
   expect_s3_class(p, "ggplot")
   replicated <- p$data[p$data$.draw > 0L, ]
   expect_equal(
@@ -26,7 +26,7 @@ test_that("posterior predictive curves retain the posterior draws", {
     unconditional = TRUE, mvn_method = "mgcv"
   )
   sims <- posterior_samples(m_tiny_eg1,
-    n = 2, seed = 5,
+    n_draws = 2, seed = 5,
     unconditional = TRUE, mvn_method = "mgcv"
   )
   expect_equal(p$data$.response[p$data$.draw > 0L], sims$.response)
@@ -78,9 +78,9 @@ test_that("discrete intervals honor coverage and handle a single draw", {
 
   m <- b_pois
   m$y[] <- 0
-  testthat::local_mocked_bindings(posterior_samples = function(model, n, ...) {
-    tibble::tibble(.row = rep(seq_along(model$y), n),
-      .draw = rep(seq_len(n), each = length(model$y)), .response = 0)
+  testthat::local_mocked_bindings(posterior_samples = function(model, n_draws, ...) {
+    tibble::tibble(.row = rep(seq_along(model$y), n_draws),
+      .draw = rep(seq_len(n_draws), each = length(model$y)), .response = 0)
   })
   p <- posterior_predictive_plot(m, n = 2)
   expect_equal(p$layers[[1L]]$data$.density, 1)
@@ -104,7 +104,7 @@ test_that("binomial responses match the sampling scale", {
   for (m in list(counts, proportions)) {
     p <- posterior_predictive_plot(m, n = 3, seed = 2)
     expect_equal(p$data$.response[p$data$.draw == 0L], d$success / d$trials)
-    sims <- posterior_samples(m, n = 3, seed = 2)
+    sims <- posterior_samples(m, n_draws = 3, seed = 2)
     expect_equal(p$data$.response[p$data$.draw > 0L], sims$.response)
     expect_true(all(p$data$.response >= 0 & p$data$.response <= 1))
     built <- ggplot2::ggplot_build(p)
@@ -138,7 +138,7 @@ test_that("missing fitting rows, subsets and offsets stay aligned", {
     rows <- !is.na(model_row_map(m))
     expect_equal(p$data$.row[p$data$.draw == 0L], which(rows))
     expect_equal(p$data$.response[p$data$.draw == 0L], m$y)
-    sims <- posterior_samples(m, n = 3, seed = 10)
+    sims <- posterior_samples(m, n_draws = 3, seed = 10)
     sims <- sims[is.finite(sims$.response), ]
     expect_equal(p$data$.response[p$data$.draw > 0L], sims$.response)
     expect_equal(p$data$.row[p$data$.draw > 0L], sims$.row)
@@ -147,7 +147,7 @@ test_that("missing fitting rows, subsets and offsets stay aligned", {
 
 test_that("multivariate responses have correctly aligned facets", {
   p <- posterior_predictive_plot(m_mvn, n = 2, seed = 18)
-  sims <- posterior_samples(m_mvn, n = 2, seed = 18)
+  sims <- posterior_samples(m_mvn, n_draws = 2, seed = 18)
   expect_equal(p$data[p$data$.draw > 0L, names(sims)], tibble::as_tibble(sims))
   for (i in seq_len(ncol(m_mvn$y))) {
     observed <- p$data[p$data$.draw == 0L &
@@ -163,7 +163,7 @@ test_that("posterior predictive plots support compatible model wrappers", {
   for (m in list(m_bam, m_scam, gamm4_gaussian)) {
     p <- posterior_predictive_plot(m, n = 2, seed = 4)
     expect_s3_class(p, "ggplot")
-    sims <- posterior_samples(m, n = 2, seed = 4)
+    sims <- posterior_samples(m, n_draws = 2, seed = 4)
     expect_equal(p$data$.response[p$data$.draw > 0L], sims$.response)
     expect_silent(ggplot2::ggplot_build(p))
   }

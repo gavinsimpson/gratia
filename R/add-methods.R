@@ -646,18 +646,19 @@
 #' using one of [fitted_samples()], [predicted_samples()], or
 #' [posterior_samples()].
 #'
-#' @param object a data frame or tibble to which the posterior draws will be
+#' @param data a data frame or tibble to which the posterior draws will be
 #'   added.
 #' @param model a fitted GAM (or GAM-like) object for which a posterior draw
 #'   method exists.
-#' @param n integer; the number of posterior draws to add.
+#' @inheritParams post_draws n_draws
+#' @inheritParams post_draws chains
 #' @param seed numeric; a value to seed the random number generator.
 #' @param select character; select which smooth's posterior to draw from. The
 #'   default, `NULL`, means the posteriors of all smooths in model will be
-#'   sampled from individually. If supplied, a character vector of requested
+#'   returned using the same joint coefficient draws. If supplied, a vector of
 #'   smooth terms.
 #' @param ... arguments are passed to the posterior draw function, currently one
-#'   of [fitted_samples()], [predicted_samples()], or [posterior_samples()]. `n`
+#'   of [fitted_samples()], [predicted_samples()], or [posterior_samples()]. `n_draws`
 #'   and `seed` are already specified here as arguments and are also passed on
 #'   to the posterior sampling function.
 #'
@@ -675,50 +676,123 @@
 #' m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = "REML")
 #'
 #' # add fitted samples (posterior draws of the expected value of the response)
-#' # note that there are 800 rows in the output: 400 data by `n = 2` samples.
+#' # note that there are 800 rows in the output: 400 data by `n_draws = 2` samples.
 #' df |>
-#'   add_fitted_samples(m, n = 2, seed = 84)
+#'   add_fitted_samples(m, n_draws = 2, seed = 84)
 #'
 #' # add posterior draws from smooth s(x2)
 #' df |>
-#'   add_smooth_samples(m, n = 2, seed = 2, select= "s(x2)")
+#'   add_smooth_samples(m, n_draws = 2, seed = 2, select= "s(x2)")
 #' \dontshow{
 #'   options(op)
 #' }
-`add_fitted_samples` <- function(object, model, n = 1, seed = NULL, ...) {
+`add_fitted_samples` <- function(
+  data,
+  model,
+  ...,
+  n_draws = NULL,
+  seed = NULL,
+  chains = NULL
+) {
+  sampling_check_names(substitute(list(...)), derivative = FALSE)
+  if (!is.null(data) && !is.data.frame(data)) {
+    stop(
+      "'data' must be a data frame; name the draw count with n_draws = ... .",
+      call. = FALSE
+    )
+  }
+
   # compute fitted samples
-  fs <- fitted_samples(model, data = object, n = n, seed = seed, ...)
-  # need to have .row in object so we can join with the fitted samples
-  object <- object |>
+  fs <- fitted_samples(
+    model,
+    data = data,
+    n_draws = n_draws,
+    seed = seed,
+    chains = chains,
+    ...
+  )
+  # need to have .row in data so we can join with the fitted samples
+  data <- data |>
     mutate(.row = row_number())
-  object |>
-    left_join(fs, by = join_by(".row" == ".row"))
+  attach_sampling(
+    data |>
+      left_join(fs, by = join_by(".row" == ".row")),
+    fs
+  )
 }
 
 #' @export
 #' @importFrom dplyr mutate row_number left_join join_by
 #' @rdname add_fitted_samples
-`add_predicted_samples` <- function(object, model, n = 1, seed = NULL, ...) {
+`add_predicted_samples` <- function(
+  data,
+  model,
+  ...,
+  n_draws = NULL,
+  seed = NULL
+) {
+  sampling_check_names(substitute(list(...)), derivative = FALSE)
+  if (!is.null(data) && !is.data.frame(data)) {
+    stop(
+      "'data' must be a data frame; name the draw count with n_draws = ... .",
+      call. = FALSE
+    )
+  }
+
   # compute predicted samples
-  ps <- predicted_samples(model, data = object, n = n, seed = seed, ...)
-  # need to have .row in object so we can join with the fitted samples
-  object <- object |>
+  ps <- predicted_samples(
+    model,
+    data = data,
+    n_draws = n_draws,
+    seed = seed,
+    ...
+  )
+  # need to have .row in data so we can join with the fitted samples
+  data <- data |>
     mutate(.row = row_number())
-  object |>
-    left_join(ps, by = join_by(".row" == ".row"))
+  attach_sampling(
+    data |>
+      left_join(ps, by = join_by(".row" == ".row")),
+    ps
+  )
 }
 
 #' @export
 #' @importFrom dplyr mutate row_number left_join join_by
 #' @rdname add_fitted_samples
-`add_posterior_samples` <- function(object, model, n = 1, seed = NULL, ...) {
+`add_posterior_samples` <- function(
+  data,
+  model,
+  ...,
+  n_draws = NULL,
+  seed = NULL,
+  chains = NULL
+) {
+  sampling_check_names(substitute(list(...)), derivative = FALSE)
+  if (!is.null(data) && !is.data.frame(data)) {
+    stop(
+      "'data' must be a data frame; name the draw count with n_draws = ... .",
+      call. = FALSE
+    )
+  }
+
   # compute posterior samples
-  ps <- posterior_samples(model, data = object, n = n, seed = seed, ...)
-  # need to have .row in object so we can join with the fitted samples
-  object <- object |>
+  ps <- posterior_samples(
+    model,
+    data = data,
+    n_draws = n_draws,
+    seed = seed,
+    chains = chains,
+    ...
+  )
+  # need to have .row in data so we can join with the fitted samples
+  data <- data |>
     mutate(.row = row_number())
-  object |>
-    left_join(ps, by = join_by(".row" == ".row"))
+  attach_sampling(
+    data |>
+      left_join(ps, by = join_by(".row" == ".row")),
+    ps
+  )
 }
 
 
@@ -726,21 +800,44 @@
 #' @importFrom dplyr mutate row_number left_join join_by
 #' @rdname add_fitted_samples
 `add_smooth_samples` <- function(
-  object,
+  data,
   model,
-  n = 1,
+  ...,
+  n_draws = NULL,
   seed = NULL,
   select = NULL,
-  ...
+  chains = NULL
 ) {
+  sampling_check_names(substitute(list(...)), derivative = FALSE)
+  if (!is.null(data) && !is.data.frame(data)) {
+    stop(
+      "'data' must be a data frame; name the draw count with n_draws = ... .",
+      call. = FALSE
+    )
+  }
+
   # compute posterior samples
   ss <- smooth_samples(
-    model, data = object, n = n, seed = seed, select = select, ...
+    model,
+    data = data,
+    n_draws = n_draws,
+    seed = seed,
+    select = select,
+    chains = chains,
+    ...
   )
-  ss <- ss[c(".smooth", ".term", ".row", ".draw", ".value")]
-  # need to have .row in object so we can join with the fitted samples
-  object <- object |>
+  sampling <- attr(ss, "sampling")
+  ss <- ss[intersect(
+    c(".smooth", ".term", ".row", ".draw", ".value", ".chain", ".iteration"),
+    names(ss)
+  )]
+  attr(ss, "sampling") <- sampling
+  # need to have .row in data so we can join with the fitted samples
+  data <- data |>
     mutate(.row = row_number())
-  object |>
-    left_join(ss, by = join_by(".row" == ".row"))
+  attach_sampling(
+    data |>
+      left_join(ss, by = join_by(".row" == ".row")),
+    ss
+  )
 }

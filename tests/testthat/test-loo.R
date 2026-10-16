@@ -4,10 +4,10 @@ test_that("LOO and WAIC match direct calls with the same coefficient draws", {
   dat <- data.frame(x = seq(-1, 1, length.out = 45))
   dat$y <- sin(dat$x) + rnorm(nrow(dat), sd = 0.5)
   fit <- mgcv::gam(y ~ s(x, k = 5), data = dat, method = "REML")
-  ll <- log_lik(fit, n = 400, seed = 41)
+  ll <- log_lik(fit, n_draws = 400, seed = 41)
   direct <- suppressWarnings(loo::loo(ll, r_eff = 1, save_psis = TRUE,
     cores = 1))
-  result <- suppressWarnings(loo::loo(fit, n = 400, seed = 41,
+  result <- suppressWarnings(loo::loo(fit, n_draws = 400, seed = 41,
     save_psis = TRUE, cores = 1))
   expect_s3_class(result, "loo")
   expect_equal(result$estimates, direct$estimates)
@@ -17,7 +17,7 @@ test_that("LOO and WAIC match direct calls with the same coefficient draws", {
     stats::weights(direct$psis_object))
   expect_equal(attr(result, "observation"), attr(ll, "observation"))
   expect_equal(attr(result, "gratia"), attr(ll, "gratia"))
-  expect_equal(suppressWarnings(loo::waic(fit, n = 400, seed = 41))$estimates,
+  expect_equal(suppressWarnings(loo::waic(fit, n_draws = 400, seed = 41))$estimates,
     suppressWarnings(loo::waic(ll))$estimates)
   expect_identical(getS3method("logLik", "gam"),
     getFromNamespace("logLik.gam", "mgcv"))
@@ -120,12 +120,12 @@ test_that("likelihoods reject dependent custom response distributions", {
         result
       }
     })
-    expect_error(log_lik(fit, n = 2, seed = 1),
+    expect_error(log_lik(fit, n_draws = 2, seed = 1),
       "independent|dependen|residual errors")
     if (requireNamespace("loo", quietly = TRUE)) {
-      expect_error(loo::loo(fit, n = 2, seed = 1),
+      expect_error(loo::loo(fit, n_draws = 2, seed = 1),
         "independent|dependen|residual errors")
-      expect_error(loo::waic(fit, n = 2, seed = 1),
+      expect_error(loo::waic(fit, n_draws = 2, seed = 1),
         "independent|dependen|residual errors")
     }
   }
@@ -137,7 +137,7 @@ test_that("likelihoods reject dependent custom response distributions", {
   families[[2L]]$gratia_diagnostics <- function(mu, wt, scale, y, eta)
     list(independent = FALSE, dependence_reason = "Shared component errors")
   grouped$family$getfl <- function() families
-  expect_error(log_lik(grouped, n = 2, seed = 1),
+  expect_error(log_lik(grouped, n_draws = 2, seed = 1),
     "independent|dependen|component errors")
 })
 

@@ -115,8 +115,8 @@ test_that("seeded Gaussian and MH paths preserve joint draws and caller RNG", {
   withr::with_seed(269, {
     before <- .Random.seed
     for (method in c("gaussian", "mh")) {
-      args <- list(model = gfam_model, n = 3, seed = 42, method = method,
-        burnin = 20, mvn_method = "mgcv")
+      args <- c(list(model = gfam_model, n_draws = 3, seed = 42, method = method),
+        if (method == "mh") list(burnin = 20) else list(mvn_method = "mgcv"))
       response <- do.call(fitted_samples, args)
       link <- do.call(fitted_samples, c(args, list(scale = "linear_predictor")))
       expect_equal(gfam_test_matrix(response),
@@ -125,9 +125,9 @@ test_that("seeded Gaussian and MH paths preserve joint draws and caller RNG", {
       expect_identical(.Random.seed, before)
     }
     for (freq in c(FALSE, TRUE)) {
-      samples <- fitted_samples(gfam_model, n = 3, seed = 13, freq = freq,
+      samples <- fitted_samples(gfam_model, n_draws = 3, seed = 13, frequentist = freq,
         mvn_method = "mgcv")
-      draws <- generate_draws(gfam_model, n = 3, seed = 13, frequentist = freq,
+      draws <- generate_draws(gfam_model, n_draws = 3, seed = 13, frequentist = freq,
         mvn_method = "mgcv")
       expect_equal(gfam_test_matrix(samples), gfam_test_means(
         gfam_test_eta(gfam_model, gfam_data, draws), gfam_data$family_id),
@@ -189,7 +189,7 @@ test_that("prediction never mutates fitted family parameter or index state", {
 })
 
 test_that("family_index has a clear model-specific boundary", {
-  expect_error(fitted_samples(m_tiny_eg1, family_index = rep(1, 100)),
+  expect_error(fitted_samples(m_tiny_eg1, family_index = rep(1, 100), n_draws = 1L),
     "only supported for grouped-family")
 })
 
@@ -220,18 +220,18 @@ test_that("prediction arguments and corrected covariance are preserved", {
   expect_equal(gfam_test_matrix(result), expected, ignore_attr = TRUE)
   if (!is.null(gfam_model$Vc)) {
     for (backend in c("mgcv", "mvnfast")) {
-      result <- fitted_samples(gfam_model, n = 3, seed = 6, unconditional = TRUE,
+      result <- fitted_samples(gfam_model, n_draws = 3, seed = 6, unconditional = TRUE,
         mvn_method = backend)
-      draws <- generate_draws(gfam_model, n = 3, seed = 6, unconditional = TRUE,
+      draws <- generate_draws(gfam_model, n_draws = 3, seed = 6, unconditional = TRUE,
         mvn_method = backend)
       expect_equal(gfam_test_matrix(result), gfam_test_means(
         gfam_test_eta(gfam_model, gfam_data, draws), gfam_data$family_id),
         ignore_attr = TRUE)
     }
   }
-  expect_error(fitted_samples(gfam_model, data = data, family_index = c(0, 2, 3)),
+  expect_error(fitted_samples(gfam_model, data = data, family_index = c(0, 2, 3), n_draws = 1L),
     "one integer family-list position")
-  expect_error(fitted_samples(gfam_model, data = data, family_index = c(1, 1, 1)),
+  expect_error(fitted_samples(gfam_model, data = data, family_index = c(1, 1, 1), n_draws = 1L),
     "conflicts")
 })
 

@@ -9,56 +9,61 @@
 \usage{
 loo.gam(
   x,
-  n = 4000,
+  ...,
+  n_draws = NULL,
   seed = NULL,
   sampling_args = list(),
   r_eff = NULL,
   chain_id = NULL,
   save_psis = FALSE,
-  cores = 1,
-  ...
+  cores = 1
 )
 
 loo.bam(
   x,
-  n = 4000,
+  ...,
+  n_draws = NULL,
   seed = NULL,
   sampling_args = list(),
   r_eff = NULL,
   chain_id = NULL,
   save_psis = FALSE,
-  cores = 1,
-  ...
+  cores = 1
 )
 
-waic.gam(x, n = 4000, seed = NULL, sampling_args = list(), ...)
+waic.gam(x, ..., n_draws = NULL, seed = NULL, sampling_args = list())
 
-waic.bam(x, n = 4000, seed = NULL, sampling_args = list(), ...)
+waic.bam(x, ..., n_draws = NULL, seed = NULL, sampling_args = list())
 }
 \arguments{
 \item{x}{a GAM or BAM fitted by \pkg{mgcv}.}
 
-\item{n}{number of posterior coefficient draws.}
+\item{...}{additional arguments passed to \code{\link[loo:loo]{loo::loo()}} or \code{\link[loo:waic]{loo::waic()}}.}
+
+\item{n_draws}{total posterior coefficient draws across all chains. Defaults
+to 4000 when generating draws; supplied draws determine their own count.}
 
 \item{seed}{random seed for posterior sampling.}
 
 \item{sampling_args}{named list of arguments passed to the coefficient
-sampler; see \code{\link[=log_lik]{log_lik()}}.}
+sampler, including \code{chains}, \code{diagnostics}, \code{method}, \code{mh_backend} and
+method-specific controls; see \code{\link[=log_lik]{log_lik()}}.}
 
 \item{r_eff}{optional relative effective sample sizes, either one value or
 one per observation. Independent Gaussian draws use \code{1} by default.
 For Metropolis--Hastings draws this is estimated from the likelihoods.
-Supplied draws require \code{r_eff} or \code{chain_id}.}
+Supplied draws use their stored chain mapping when available; otherwise
+supply \code{r_eff} or \code{chain_id}.}
 
 \item{chain_id}{integer chain identifier for each coefficient draw, in
 draw order. Identifiers must be consecutive starting at one, and chains
-must contain equal numbers of draws. MH sampling defaults to one chain.}
+must contain equal numbers of draws. A supplied mapping must agree with
+the coefficient draws' stored mapping. Stored iterations determine temporal
+order for relative efficiency without reordering response or likelihood rows.}
 
 \item{save_psis}{retain the PSIS object in the returned LOO result.}
 
 \item{cores}{number of cores used by \pkg{loo}.}
-
-\item{...}{additional arguments passed to \code{\link[loo:loo]{loo::loo()}} or \code{\link[loo:waic]{loo::waic()}}.}
 }
 \value{
 A native \code{loo} or \code{waic} object, with attributes \code{gratia} describing
@@ -84,6 +89,6 @@ proportional to the number of observations times the number of draws.
 if (requireNamespace("loo", quietly = TRUE)) {
   library("mgcv")
   m <- gam(mpg ~ s(wt, k = 5), data = mtcars, method = "REML")
-  loo::loo(m, n = 500, seed = 42)
+  loo::loo(m, n_draws = 500, seed = 42)
 }
 }

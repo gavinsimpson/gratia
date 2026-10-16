@@ -50,3 +50,4 @@
 
 # A worktree has a .git pointer file rather than a directory.
 ^\.git$
+^tests/testthat/Rplots\.pdf$

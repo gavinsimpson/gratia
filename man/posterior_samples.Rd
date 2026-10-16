@@ -16,77 +16,91 @@
 \alias{posterior_samples.scam}
 \title{Draw samples from the posterior distribution of an estimated model}
 \usage{
-\method{posterior_samples}{lm}(model, n = 1L, seed = NULL, ...)
+\method{posterior_samples}{lm}(model, ..., n_draws = NULL, seed = NULL)
 
-\method{posterior_samples}{glm}(model, n = 1L, seed = NULL, ...)
+\method{posterior_samples}{glm}(model, ..., n_draws = NULL, seed = NULL)
 
-\method{posterior_samples}{glmmTMB}(model, n = 1L, seed = NULL, conditioning = NULL, ...)
+\method{posterior_samples}{glmmTMB}(model, ..., n_draws = NULL, seed = NULL, conditioning = NULL)
 
-\method{posterior_samples}{sdmTMB}(model, n = 1L, seed = NULL, conditioning = NULL, ...)
+\method{posterior_samples}{sdmTMB}(model, ..., n_draws = NULL, seed = NULL, conditioning = NULL)
 
-\method{posterior_samples}{gamlss}(model, n = 1L, seed = NULL, ...)
+\method{posterior_samples}{gamlss}(model, ..., n_draws = NULL, seed = NULL)
 
-\method{posterior_samples}{gamm}(model, n = 1L, seed = NULL, conditioning = NULL, ...)
+\method{posterior_samples}{gamm}(model, ..., n_draws = NULL, seed = NULL, conditioning = NULL)
 
-\method{posterior_samples}{lme}(model, n = 1L, seed = NULL, conditioning = NULL, ...)
+\method{posterior_samples}{lme}(model, ..., n_draws = NULL, seed = NULL, conditioning = NULL)
 
-\method{posterior_samples}{merMod}(model, n = 1L, seed = NULL, conditioning = NULL, ...)
+\method{posterior_samples}{merMod}(model, ..., n_draws = NULL, seed = NULL, conditioning = NULL)
 
-\method{posterior_samples}{gamm4}(model, n = 1L, seed = NULL, ..., conditioning = NULL)
+\method{posterior_samples}{gamm4}(model, ..., n_draws = NULL, seed = NULL, conditioning = NULL)
 
 posterior_samples(model, ...)
 
 \method{posterior_samples}{gam}(
   model,
-  n = 1,
-  data = newdata,
+  ...,
+  data = NULL,
+  n_draws = NULL,
+  chains = NULL,
   seed = NULL,
   method = c("gaussian", "mh", "inla", "user"),
-  n_cores = 1,
+  n_cores = 1L,
+  n_threads = 1L,
   burnin = 1000,
-  thin = 1,
+  thin = 1L,
   t_df = 40,
   rw_scale = 0.25,
-  freq = FALSE,
+  frequentist = FALSE,
   unconditional = FALSE,
-  weights = NULL,
   draws = NULL,
+  diagnostics = FALSE,
+  mh_backend = c("mgcv", "gratia", "family"),
   mvn_method = c("mvnfast", "mgcv"),
-  ...,
-  newdata = NULL,
-  ncores = NULL
+  block_size = 10000L,
+  dense_limit = 5e+06,
+  weights = NULL,
+  family_index = NULL
 )
 
 \method{posterior_samples}{scam}(
   model,
-  n = 1,
+  ...,
   data = NULL,
+  n_draws = NULL,
+  chains = NULL,
   seed = NULL,
   method = c("gaussian", "mh", "inla", "user"),
-  n_cores = 1,
+  n_cores = 1L,
+  n_threads = 1L,
   burnin = 1000,
-  thin = 1,
+  thin = 1L,
   t_df = 40,
   rw_scale = 0.25,
-  freq = FALSE,
+  frequentist = FALSE,
   unconditional = FALSE,
-  weights = NULL,
   draws = NULL,
+  diagnostics = FALSE,
+  mh_backend = c("mgcv", "gratia", "family"),
   mvn_method = c("mvnfast", "mgcv"),
-  ...
+  block_size = 10000L,
+  dense_limit = 5e+06,
+  weights = NULL,
+  family_index = NULL
 )
 }
 \arguments{
 \item{model}{a fitted model of the supported types; see \link{diagnostic_support}.}
 
-\item{n}{numeric; the number of posterior samples to return.}
-
-\item{seed}{numeric; a random seed for the simulations.}
-
 \item{...}{arguments passed to other methods. For \code{fitted_samples()}, these
 are passed on to \code{\link[mgcv:predict.gam]{mgcv::predict.gam()}}. For \code{posterior_samples()} these are
 passed on to \code{fitted_samples()}. For \code{predicted_samples()} these are
 passed on to the relevant \code{simulate()} method.}
+
+\item{n_draws}{positive integer; total retained draws across all chains.
+Required when generating draws. With \code{method = "user"}, the supplied
+matrix determines the count; an explicit count must agree with its rows.}
+
+\item{seed}{numeric; a random seed for the simulations.}
 
 \item{conditioning}{character or \code{NULL}; mixed-model conditioning mode;
 see \link{diagnostic_support}.}
@@ -95,6 +109,10 @@ see \link{diagnostic_support}.}
 from the model should be evaluated. If not supplied, the data used to fit
 the model will be used for \code{data}, if available in \code{model}.}
 
+\item{chains}{positive integer or \code{NULL}; number of chains. \code{NULL} uses one
+chain, or the chain mapping in supplied draws. \code{n_draws} must be divisible by
+\code{chains}. Burn-in is applied separately to each MH chain.}
+
 \item{method}{character; which method should be used to draw samples from
 the posterior distribution. \code{"gaussian"} uses a Gaussian (Laplace)
 approximation to the posterior. \code{"mh"} uses a Metropolis Hastings sampler
@@ -102,19 +120,19 @@ that alternates t proposals with proposals based on a shrunken version of
 the posterior covariance matrix. \code{"inla"} uses a variant of Integrated
 Nested Laplace Approximation due to Wood (2019), (currently not
 implemented). \code{"user"} allows for user-supplied posterior draws
-(currently not implemented).}
+as a coefficient matrix.}
 
-\item{n_cores}{number of cores for generating random variables from a
-multivariate normal distribution. Passed to \code{\link[mvnfast:rmvn]{mvnfast::rmvn()}}.
-Parallelization will take place only if OpenMP is supported (but appears
-to work on Windows with current \code{R}).}
+\item{n_cores}{positive integer; maximum concurrent MH chains using mirai,
+capped at \code{chains}. Existing workers are reused; otherwise temporary workers
+are created and cleaned up. Only used by \code{method = "mh"}.}
+
+\item{n_threads}{positive integer; threads within Gaussian sampling using
+mvnfast. Defaults to one. This is separate from concurrent MH chains.}
 
 \item{burnin}{numeric; number of samples to discard as the burnin draws.
 Only used with \code{method = "mh"}.}
 
-\item{thin}{numeric; the number of samples to skip when taking \code{n} draws.
-Results in \code{thin * n} draws from the posterior being taken. Only used with
-\code{method = "mh"}.}
+\item{thin}{positive integer; retain every \code{thin} iterations after burn-in.}
 
 \item{t_df}{numeric; degrees of freedom for t distribution proposals. Only
 used with \code{method = "mh"}.}
@@ -123,26 +141,28 @@ used with \code{method = "mh"}.}
 matrix when generating random walk proposals. Negative or non finite to
 skip the random walk step. Only used with \code{method = "mh"}.}
 
-\item{freq}{logical; \code{TRUE} to use the frequentist covariance matrix of
+\item{frequentist}{logical; \code{TRUE} to use the frequentist covariance matrix of
 the parameter estimators, \code{FALSE} to use the Bayesian posterior
 covariance matrix of the parameters.}
 
-\item{unconditional}{logical; if \code{TRUE} (and \code{freq == FALSE}) then the
+\item{unconditional}{logical; if \code{TRUE} (and \code{frequentist == FALSE}) then the
 Bayesian smoothing parameter uncertainty corrected covariance matrix is
 used, if available.}
 
-\item{weights}{numeric; response sampling weights for GAM methods. An
-explicit vector overrides the fitting weights; a single value applies to
-every observation. With \code{data = NULL}, the default is the fitted prior
-weights, except factor-valued binomial responses retain one Bernoulli trial
-per observation. With prediction data, the default is a vector of ones.
-For ordinary Gaussian and Gamma responses, larger weights reduce response
-variance (precision weights). For binomial responses, weights give integer
-trial counts. They do not alter the fitted coefficient covariance. Include
-positions restored by \code{na.exclude} when supplying weights for fitting rows.}
-
 \item{draws}{matrix; user supplied posterior draws to be used when
 \code{method = "user"}.}
+
+\item{diagnostics}{logical; calculate coefficient R-hat, effective sample
+sizes, and Monte Carlo standard errors using the optional posterior package.}
+
+\item{mh_backend}{character; \code{"mgcv"} preserves \code{\link[mgcv:gam.mh]{mgcv::gam.mh()}}.
+\code{"gratia"} uses compiled common-family likelihoods. \code{"family"} uses a
+compiled MH loop with callbacks to the fitted family object. Both support
+independent-observation bam fits. Smoothing parameters and parameters
+outside the fitted coefficient vector remain fixed. LSS scale and shape
+coefficients are sampled jointly with location. The family backend caches
+a full design matrix,
+smoothing penalty, and proposal factorisation once for all chains.}
 
 \item{mvn_method}{character; one of \code{"mvnfast"} or \code{"mgcv"}. The default is
 uses \code{mvnfast::rmvn()}, which can be considerably faster at generate large
@@ -150,22 +170,39 @@ numbers of MVN random values than \code{mgcv::rmvn()}, but which might not work
 for some marginal fits, such as those where the covariance matrix is close
 to singular.}
 
-\item{newdata}{Deprecated: use \code{data} instead.}
+\item{block_size}{positive integer; maximum observation rows per block in the
+gratia MH evaluator. Large designs are evaluated without storing a full matrix.}
 
-\item{ncores}{Deprecated; use \code{n_cores} instead. The number of cores for
-generating random variables from a multivariate normal distribution.
-Passed to \code{\link[mvnfast:rmvn]{mvnfast::rmvn()}}. Parallelization will take place only if
-OpenMP is supported (but appears to work on Windows with current \code{R}).}
+\item{dense_limit}{numeric; maximum number of design-matrix elements to cache
+for the gratia MH backend. Use zero to force blockwise evaluation.}
+
+\item{weights}{numeric; response sampling weights for GAM methods. An
+explicit vector overrides the fitting weights; a single value applies to
+every observation. With \code{data = NULL}, the default is the fitted prior
+weights, except factor-valued binomial responses retain one Bernoulli trial
+per observation. Native \code{gaulss()} ignores fitting weights in its likelihood,
+so its default response weights are also ones; explicitly supplied sampling
+weights still override this default. With prediction data, weights default
+to a vector of ones.
+For ordinary Gaussian and Gamma responses, larger weights reduce response
+variance (precision weights). For binomial responses, weights give integer
+trial counts. They do not alter the fitted coefficient covariance. Include
+positions restored by \code{na.exclude} when supplying weights for fitting rows.}
+
+\item{family_index}{numeric; optional family-list positions for grouped
+family (\code{\link[mgcv:gfam]{mgcv::gfam()}}) response draws, one integer per evaluation row.
+Membership can instead be recovered from the response-index expression
+in \code{data}; observed response values are not required.}
 }
 \value{
-A tibble (data frame) with 3 columns containing the posterior
-predicted values in long format. The columns are
+A tibble (data frame) in long format, with columns:
 \itemize{
-\item \code{row} (integer) the row of \code{data} that each posterior draw relates to,
-\item \code{draw} (integer) an index, in range \code{1:n}, indicating which draw each row
-relates to,
-\item \code{response} (numeric) the predicted response for the indicated row of
-\code{data}.
+\item \code{.row}: row of the evaluation data;
+\item \code{.draw}: globally unique draw identifier;
+\item \code{.response}: simulated response.
+Where needed, \code{.parameter} identifies the response or grouped component.
+Multiple-chain output also includes \code{.chain} and \code{.iteration}. Attached
+coefficient diagnostics are available through \code{\link[=sampling_diagnostics]{sampling_diagnostics()}}.
 }
 }
 \description{
@@ -193,6 +230,28 @@ currently use the fitting observations only. For other families or links,
 the AR1 correction applies to working residuals used during fitting. It does
 not specify a joint distribution of actual responses, so sampling produces
 an error.
+
+Location-scale-shape families \code{\link[mgcv:gaulss]{mgcv::gaulss()}}, \code{\link[mgcv:gammals]{mgcv::gammals()}},
+\code{\link[mgcv:gumbls]{mgcv::gumbls()}}, \code{\link[mgcv:gevlss]{mgcv::gevlss()}}, \code{\link[mgcv:shash]{mgcv::shash()}}, \code{\link[mgcv:twlss]{mgcv::twlss()}} and
+\code{\link[mgcv:ziplss]{mgcv::ziplss()}} support fitting observations, subsets and new covariates.
+Every distribution parameter is computed from the same joint coefficient
+draw. Formula offsets and prescribed smooth contributions are retained.
+Evaluation data need predictors and formula-offset variables, but no
+observed response. In \code{gaulss()}, the second response parameter is inverse
+standard deviation: sampling uses its reciprocal, divided by the square
+root of the sampling weight. Other LSS generators currently ignore sampling
+weights, following their mgcv implementations. Parameters represented by
+coefficients vary jointly; other family parameters remain fixed.
+
+Cox survival models require evaluation times and an observation process and
+do not have a response generator for this interface. Censored-family draws
+are latent, uncensored responses; reproducing observed censoring requires
+an observation process and remains unsupported in posterior predictive checks.
+Grouped-family posterior response draws support fitting observations and
+supplied data with known family membership. Component nuisance parameters
+remain fixed. \code{.parameter} identifies the component used for each row.
+Censored grouped components require an observation process; use \code{simulate()}
+for their latent, uncensored responses.
 }
 \section{Note}{
 With \code{data = NULL}, fitting offsets are retained, including offsets

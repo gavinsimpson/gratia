@@ -1,0 +1,5 @@
+R 4.6.1 ; mgcv 1.9.4
+Uncensored cpois bam versus independent fixed-sp ordinary Poisson gam, unit weights:
+native bam converged: TRUE
+objective at bam: 357.197 at reference: 315.4142
+max absolute objective gradient at bam: 192.8008 at reference: 6.82121e-08

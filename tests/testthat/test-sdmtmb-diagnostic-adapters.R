@@ -56,7 +56,7 @@ test_that("sdmTMB binomial counts use trial-sized probability bounds", {
   b <- p$distribution$bounds(p$y)
   expect_equal(p$distribution$cdf(b$lower),
     pbinom(d$y - 1, d$n, p$fitted.values))
-  raw <- posterior_samples(m, n = 2L, seed = 10)
+  raw <- posterior_samples(m, n_draws = 2L, seed = 10)
   expect_true(all(raw$.response >= 0 & raw$.response <= 1))
   ordinary <- posterior_predictive_plot(m, n = 2L, seed = 10)
   scalable <- posterior_predictive_plot(m, n = 2L, seed = 10,

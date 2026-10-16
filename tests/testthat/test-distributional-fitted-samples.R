@@ -94,25 +94,41 @@ test_that("Gaussian location-scale fitted draws retain their mean interpretation
   }
 })
 
-test_that("unsupported general-family response means fail explicitly", {
+test_that("zero-inflated Poisson fitted draws use both predictors for the mean", {
   d <- distributional_samples_data()
   d$y <- withr::with_seed(431, rpois(nrow(d), exp(.8 + d$x)))
   m <- mgcv::gam(list(y ~ x + offset(off), ~ z + offset(off2)),
     data = d, family = mgcv::ziplss())
   B <- rbind(coef(m), coef(m) + c(.2, -.1, .4, -.2))
-  for (input in list(NULL, d[c(8, 35, 71), ])) {
-    expect_error(fitted_samples(m, data = input, method = "user", draws = B),
-      "Response-scale fitted samples are not supported for general family")
+  nd <- d[c(8, 35, 71), ]
+  nd$off2 <- nd$off2 + .4
+  for (input in list(NULL, nd)) {
+    rows <- if (is.null(input)) d else input
+    eta1 <- outer(rows$off, rep(1, nrow(B))) +
+      outer(rep(1, nrow(rows)), B[, 1]) + outer(rows$x, B[, 2])
+    eta2 <- outer(rows$off2, rep(1, nrow(B))) +
+      outer(rep(1, nrow(rows)), B[, 3]) + outer(rows$z, B[, 4])
+    # ziplss models a positive-count probability and a truncated Poisson.
+    lambda <- exp(eta1)
+    expected <- (-expm1(-exp(eta2))) * lambda / (-expm1(-lambda))
     expect_silent(a <- fitted_samples(m, data = input, method = "user",
-      draws = B, scale = "linear_predictor"))
-    nd <- if (is.null(input)) d else input
-    expected <- outer(nd$off, rep(1, nrow(B))) +
-      outer(rep(1, nrow(nd)), B[, 1]) + outer(nd$x, B[, 2])
+      draws = B, scale = "response"))
     expect_identical(unique(a$.parameter), "location")
     expect_equal(a$.fitted, as.numeric(expected))
+    expect_silent(a <- fitted_samples(m, data = input, method = "user",
+      draws = B, scale = "linear_predictor"))
+    expect_identical(unique(a$.parameter), "location")
+    expect_equal(a$.fitted, as.numeric(eta1))
+    expect_silent(a <- posterior_samples(m, data = input, n_draws = nrow(B),
+      method = "user", draws = B, seed = 14))
+    expect_identical(nrow(a), nrow(rows) * nrow(B))
+    expect_true(all(a$.response >= 0))
   }
-  # Response sampling uses all distributional parameters through its own route.
-  expect_silent(a <- posterior_samples(m, n = nrow(B), method = "user", draws = B, seed = 14))
-  expect_identical(nrow(a), nrow(d) * nrow(B))
-  expect_true(all(a$.response >= 0))
+  # Supporting known LSS families does not supply a mean for unknown ones.
+  unknown <- m
+  unknown$family$family <- "unknown_lss"
+  for (input in list(NULL, nd)) {
+    expect_error(fitted_samples(unknown, data = input, method = "user", draws = B),
+      "Response-scale fitted samples are not supported for general family")
+  }
 })

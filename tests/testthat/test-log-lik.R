@@ -338,9 +338,9 @@ test_that("seeded likelihood extraction restores RNG and preserves scalar logLik
   before_loglik <- stats::logLik(m)
   withr::local_seed(58)
   before <- .Random.seed
-  a <- log_lik(m, n = 4, seed = 42)
+  a <- log_lik(m, n_draws = 4, seed = 42)
   expect_identical(.Random.seed, before)
-  expect_identical(log_lik(m, n = 4, seed = 42), a)
+  expect_identical(log_lik(m, n_draws = 4, seed = 42), a)
   expect_identical(stats::logLik(m), before_loglik)
   expect_equal(dim(a), c(4L, length(m$y)))
 })
@@ -349,10 +349,10 @@ test_that("unsupported observation likelihoods and invalid draws fail clearly", 
   d <- log_lik_test_data()
   d$y <- abs(round(d$y))
   q <- mgcv::gam(y ~ x, data = d, family = quasipoisson())
-  expect_error(log_lik(q, n = 2), "[Qq]uasi|[Ll]ikelihood")
+  expect_error(log_lik(q, n_draws = 2), "[Qq]uasi|[Ll]ikelihood")
   ar <- mgcv::bam(y ~ s(x, k = 5), data = d, rho = .3)
-  expect_error(log_lik(ar, n = 2), "correlat|independent|AR")
-  expect_error(log_lik(m_gamm, n = 2), "gamm|[Ll]ikelihood|supported")
+  expect_error(log_lik(ar, n_draws = 2), "correlat|independent|AR")
+  expect_error(log_lik(m_gamm, n_draws = 2), "gamm|[Ll]ikelihood|supported")
   for (B in list(matrix(0, 2, 1), matrix(NA_real_, 2, length(coef(m_tiny_eg1))),
       matrix(Inf, 2, length(coef(m_tiny_eg1))))) {
     expect_error(log_lik(m_tiny_eg1, method = "user", draws = B))

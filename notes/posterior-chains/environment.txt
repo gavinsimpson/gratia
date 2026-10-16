@@ -1,0 +1,4 @@
+Feature package: /private/tmp/gratia-sampling-library/gratia
+Platform: aarch64-apple-darwin23
+Optional diagnostic packages: 1.7.0 0.19.4.1
+Mirai: 2.7.3

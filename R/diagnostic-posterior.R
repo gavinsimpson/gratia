@@ -6,30 +6,53 @@ diagnostic_posterior_samples <- function(model, n, seed = NULL,
 }
 
 #' @export
-diagnostic_posterior_samples.default <- function(model, n, seed = NULL,
-                                                conditioning = NULL, ...) {
+diagnostic_posterior_samples.default <- function(
+  model,
+  n,
+  seed = NULL,
+  conditioning = NULL,
+  ...
+) {
   diagnostic_posterior_count(n)
   dots <- list(...)
-  if (!is.null(dots$data) || !is.null(dots$newdata)) stop(
-    "Posterior diagnostic sampling uses fitting observations; new data are not supported.",
-    call. = FALSE)
+  if (!is.null(dots$data) || !is.null(dots$newdata)) {
+    stop(
+      "Posterior diagnostic sampling uses fitting observations; new data are not supported.",
+      call. = FALSE
+    )
+  }
   diagnostic_seed(seed, {
-    sampler <- diagnostic_posterior_sampler(model, n = n, seed = seed,
-      conditioning = conditioning, ...)
-    dplyr::bind_rows(lapply(seq_len(n), sampler))
+    sampler <- diagnostic_posterior_sampler(
+      model,
+      n = n,
+      seed = seed,
+      conditioning = conditioning,
+      ...
+    )
+    attach_sampling(dplyr::bind_rows(lapply(seq_len(n), sampler)), sampler, draw_index = TRUE)
   })
 }
 
 #' @export
-diagnostic_posterior_samples.gam <- function(model, n, seed = NULL,
-                                            conditioning = NULL, ...) {
+diagnostic_posterior_samples.gam <- function(
+  model,
+  n,
+  seed = NULL,
+  conditioning = NULL,
+  ...
+) {
   check_distribution_conditioning(conditioning)
   fam <- stats::family(model)
   ft <- family_type(fam)
-  if (!is_gfam_family(fam) && (!inherits(fam, "general.family") ||
-      ft %in% c("multivariate_normal", "multinom"))) {
-    return(diagnostic_seed(seed, posterior_samples(model, n = n,
-      seed = seed, ...)))
+  if (
+    !is_gfam_family(fam) &&
+      (!inherits(fam, "general.family") ||
+        ft %in% c("multivariate_normal", "multinom"))
+  ) {
+    return(diagnostic_seed(
+      seed,
+      posterior_samples(model, n_draws = n, seed = seed, ...)
+    ))
   }
   diagnostic_posterior_samples.default(model, n, seed, conditioning, ...)
 }
@@ -53,8 +76,13 @@ diagnostic_posterior_sampler.default <- function(model, n, seed = NULL,
 # For p coefficients, n draws and N observations, memory is O(p*n + N*p);
 # no N-by-n response matrix is stored. Batch size does not change draw order.
 #' @export
-diagnostic_posterior_sampler.gam <- function(model, n, seed = NULL,
-                                            conditioning = NULL, ...) {
+diagnostic_posterior_sampler.gam <- function(
+  model,
+  n,
+  seed = NULL,
+  conditioning = NULL,
+  ...
+) {
   check_distribution_conditioning(conditioning)
   row_map <- model_row_map(model)
   rows <- which(!is.na(row_map))
@@ -62,78 +90,179 @@ diagnostic_posterior_sampler.gam <- function(model, n, seed = NULL,
   fam <- stats::family(model)
   ft <- family_type(fam)
   if (ft %in% c("cnorm", "clog", "cpois")) {
-    stop("Posterior predictive checks are not available for family <",
-      family_name(fam), "> without a censoring observation process.", call. = FALSE)
+    stop(
+      "Posterior predictive checks are not available for family <",
+      family_name(fam),
+      "> without a censoring observation process.",
+      call. = FALSE
+    )
   }
-  if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) stats::runif(1L)
+  if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
+    stats::runif(1L)
+  }
+  sampling_check_names(substitute(list(...)))
   dots <- list(...)
   if (!is.null(dots$weights)) {
-    if (length(dots$weights) == 1L) dots$weights <- rep(dots$weights, length(row_map))
-    if (length(dots$weights) != length(row_map)) stop(
-      "Weights must have one value per fitting observation.", call. = FALSE)
+    if (length(dots$weights) == 1L) {
+      dots$weights <- rep(dots$weights, length(row_map))
+    }
+    if (length(dots$weights) != length(row_map)) {
+      stop(
+        "Weights must have one value per fitting observation.",
+        call. = FALSE
+      )
+    }
     dots$weights <- dots$weights[rows]
   }
-  sampling_names <- c("method", "n_cores", "burnin", "thin", "t_df",
-    "rw_scale", "unconditional", "draws", "mvn_method")
+  sampling_names <- c(
+    "method",
+    "n_threads",
+    "n_cores",
+    "burnin",
+    "thin",
+    "t_df",
+    "rw_scale",
+    "unconditional",
+    "draws",
+    "mvn_method",
+    "chains",
+    "diagnostics",
+    "mh_backend",
+    "block_size",
+    "dense_limit"
+  )
   args <- dots[intersect(names(dots), sampling_names)]
-  if (!is.null(dots$freq)) args$frequentist <- dots$freq
-  coefficient_seed <- if (identical(args$method, "user")) NULL else
+  if (!is.null(dots$frequentist)) {
+    args$frequentist <- dots$frequentist
+  }
+  coefficient_seed <- if (identical(args$method, "user")) {
+    NULL
+  } else {
     sample.int(.Machine$integer.max, 1L)
-  betas <- do.call(post_draws, c(list(model = model, n = n,
-    seed = coefficient_seed), args))
+  }
+  betas <- sampling_call(
+    post_draws,
+    c(list(model = model, n_draws = n, seed = coefficient_seed), args)
+  )
+  if (is_lss_family(fam)) {
+    context <- lss_prediction_context(model)
+    sampler <- lss_response_sampler(context, betas, dots$weights)
+    out <- function(i) {
+      value <- sampler(i)
+      value$.row <- rows[value$.row]
+      value
+    }
+    attr(out, "sampling") <- attr(betas, "sampling")
+    return(out)
+  }
   grouped <- is_gfam_family(fam)
-  advanced <- grouped || (inherits(fam, "general.family") &&
-    !ft %in% c("multivariate_normal", "multinom"))
+  advanced <- grouped ||
+    (inherits(fam, "general.family") &&
+      !ft %in% c("multivariate_normal", "multinom"))
   if (identical(ft, "multivariate_normal")) {
     return(diagnostic_mvn_posterior_sampler(model, betas, rows))
   }
   if (!advanced) {
-    response_args <- dots[setdiff(names(dots), c(sampling_names, "freq"))]
+    response_args <- dots[setdiff(
+      names(dots),
+      c(sampling_names, "frequentist")
+    )]
     return(function(i) {
-      out <- do.call(posterior_samples, c(list(model = model, n = 1L,
-        method = "user", draws = betas[i, , drop = FALSE]), response_args))
+      out <- sampling_call(
+        posterior_samples,
+        c(
+          list(
+            model = model,
+            n_draws = 1L,
+            method = "user",
+            draws = betas[i, , drop = FALSE]
+          ),
+          response_args
+        )
+      )
       out$.draw <- i
       out$.row <- rows[out$.row]
-      if (!".parameter" %in% names(out)) out$.parameter <- "response"
+      if (!".parameter" %in% names(out)) {
+        out$.parameter <- "response"
+      }
       out
     })
   }
-  X <- if (grouped) gfam_predict_eta(model, model$model, type = "lpmatrix") else
+  X <- if (grouped) {
+    gfam_predict_eta(model, model$model, type = "lpmatrix")
+  } else {
     predict_model(model, newdata = model$model, type = "lpmatrix")
+  }
   idx <- attr(X, "lpi") %||% lss_eta_index(model)
   # Compare fitted linear predictors with X times the fitted coefficients to
   # recover offsets, including those supplied through fitting arguments.
-  eta0 <- model$linear.predictors %||% if (grouped)
-    gfam_predict_eta(model, model$model, type = "link") else stats::predict(model, type = "link")
+  eta0 <- model$linear.predictors %||%
+    if (grouped) {
+      gfam_predict_eta(model, model$model, type = "link")
+    } else {
+      stats::predict(model, type = "link")
+    }
   eta0 <- matrix(eta0, nrow = nrow(X))
-  base_eta <- vapply(idx, function(j) drop(X[, j, drop = FALSE] %*%
-    stats::coef(model)[j]), numeric(nrow(X)))
+  base_eta <- vapply(
+    idx,
+    function(j) {
+      drop(
+        X[, j, drop = FALSE] %*%
+          stats::coef(model)[j]
+      )
+    },
+    numeric(nrow(X))
+  )
   offsets <- eta0 - base_eta
-  wt <- dots$weights %||% binomial_sampling_weights(model,
-    model$prior.weights %||% rep(1, nrow(X)))
+  wt <- dots$weights %||%
+    binomial_sampling_weights(model, model$prior.weights %||% rep(1, nrow(X)))
   scale <- model$sig2 %||% summary(model)$dispersion %||% 1
   if (grouped) {
     context <- gfam_prediction_context(model)
     generators <- lapply(context$components, function(component) {
       if (family_type(component$family) %in% c("cnorm", "clog", "cpois")) {
-        stop("Posterior predictive checks are not available for censored ",
-          "grouped components without an observation process.", call. = FALSE)
+        stop(
+          "Posterior predictive checks are not available for censored ",
+          "grouped components without an observation process.",
+          call. = FALSE
+        )
       }
       rd <- fix_family_rd(component$family)$rd
-      if (!is.function(rd)) stop("No response generator for grouped component <",
-        component$family$family, ">.", call. = FALSE)
+      if (!is.function(rd)) {
+        stop(
+          "No response generator for grouped component <",
+          component$family$family,
+          ">.",
+          call. = FALSE
+        )
+      }
       rd
     })
     parameter <- paste0("component", context$index)
   } else {
     rd <- fix_family_rd(fam)$rd
-    if (!is.function(rd)) stop("Posterior predictive checks are not available for family <",
-      family_name(fam), ">: no response generator.", call. = FALSE)
+    if (!is.function(rd)) {
+      stop(
+        "Posterior predictive checks are not available for family <",
+        family_name(fam),
+        ">: no response generator.",
+        call. = FALSE
+      )
+    }
     parameter <- "response"
   }
-  function(i) {
-    eta <- vapply(idx, function(j) drop(X[, j, drop = FALSE] %*%
-      betas[i, j]), numeric(nrow(X))) + offsets
+  out <- function(i) {
+    eta <- vapply(
+      idx,
+      function(j) {
+        drop(
+          X[, j, drop = FALSE] %*%
+            betas[i, j]
+        )
+      },
+      numeric(nrow(X))
+    ) +
+      offsets
     if (grouped) {
       response <- gfam_response_draw(as.numeric(eta), wt, context, generators)
     } else {
@@ -143,9 +272,10 @@ diagnostic_posterior_sampler.gam <- function(model, n, seed = NULL,
       mu <- family_prediction_parameters(fam, eta)
       response <- rd(mu = mu, wt = wt, scale = scale)
     }
-    diagnostic_response_table(response, i, parameter = parameter,
-      rows = rows)
+    diagnostic_response_table(response, i, parameter = parameter, rows = rows)
   }
+  attr(out, "sampling") <- attr(betas, "sampling")
+  out
 }
 
 #' @export
@@ -265,8 +395,17 @@ diagnostic_posterior_observed.glm <- diagnostic_posterior_observed.gam
 #' coefficients together using Gaussian approximations. See
 #' [posterior_predictive_plot()] for which additional distribution parameters
 #' remain fixed and how random effects are treated for each fitter.
-posterior_samples.lm <- function(model, n = 1L, seed = NULL, ...) {
-  diagnostic_posterior_samples.default(model, n, seed, ...)
+posterior_samples.lm <- function(
+  model,
+  ...,
+  n_draws = NULL,
+  seed = NULL
+) {
+  sampling_check_names(substitute(list(...)), derivative = FALSE)
+  layout <- sampling_resolve(n_draws, NULL, NULL, method = "gaussian")
+  n_draws <- layout$n_draws
+
+  diagnostic_posterior_samples.default(model, n_draws, seed, ...)
 }
 #' @export
 #' @rdname posterior_samples
@@ -361,9 +500,18 @@ diagnostic_posterior_sampler.glmmTMB <- function(model, n, seed = NULL,
 
 #' @export
 #' @rdname posterior_samples
-posterior_samples.glmmTMB <- function(model, n = 1L, seed = NULL,
-                                      conditioning = NULL, ...) {
-  diagnostic_posterior_samples.default(model, n, seed, conditioning, ...)
+posterior_samples.glmmTMB <- function(
+  model,
+  ...,
+  n_draws = NULL,
+  seed = NULL,
+  conditioning = NULL
+) {
+  sampling_check_names(substitute(list(...)), derivative = FALSE)
+  layout <- sampling_resolve(n_draws, NULL, NULL, method = "gaussian")
+  n_draws <- layout$n_draws
+
+  diagnostic_posterior_samples.default(model, n_draws, seed, conditioning, ...)
 }
 
 # Extract fitting observations without requiring an analytic response CDF.
@@ -457,9 +605,18 @@ diagnostic_posterior_sampler.sdmTMB <- function(model, n, seed = NULL,
 
 #' @export
 #' @rdname posterior_samples
-posterior_samples.sdmTMB <- function(model, n = 1L, seed = NULL,
-                                     conditioning = NULL, ...) {
-  diagnostic_posterior_samples.default(model, n, seed, conditioning, ...)
+posterior_samples.sdmTMB <- function(
+  model,
+  ...,
+  n_draws = NULL,
+  seed = NULL,
+  conditioning = NULL
+) {
+  sampling_check_names(substitute(list(...)), derivative = FALSE)
+  layout <- sampling_resolve(n_draws, NULL, NULL, method = "gaussian")
+  n_draws <- layout$n_draws
+
+  diagnostic_posterior_samples.default(model, n_draws, seed, conditioning, ...)
 }
 
 #' @export
@@ -589,8 +746,17 @@ diagnostic_posterior_sampler.gamlss <- function(model, n, seed = NULL,
 
 #' @export
 #' @rdname posterior_samples
-posterior_samples.gamlss <- function(model, n = 1L, seed = NULL, ...) {
-  diagnostic_posterior_samples.default(model, n, seed, ...)
+posterior_samples.gamlss <- function(
+  model,
+  ...,
+  n_draws = NULL,
+  seed = NULL
+) {
+  sampling_check_names(substitute(list(...)), derivative = FALSE)
+  layout <- sampling_resolve(n_draws, NULL, NULL, method = "gaussian")
+  n_draws <- layout$n_draws
+
+  diagnostic_posterior_samples.default(model, n_draws, seed, ...)
 }
 
 #' @export
@@ -668,16 +834,31 @@ diagnostic_mvn_posterior_sampler <- function(model, betas, rows) {
     }
   }
   function(i) {
-    fits <- fitted_samples(model, n = 1L, method = "user",
-      draws = betas[i, , drop = FALSE])
-    mu <- vapply(paste0("response", seq_len(p)), function(parameter)
-      fits$.fitted[fits$.parameter == parameter], numeric(n_obs))
-    z <- vapply(seq_len(p), function(j) withr::with_preserve_seed({
-      assign(".Random.seed", states[[j]], envir = .GlobalEnv)
-      value <- stats::rnorm(n_obs)
-      states[[j]] <<- get(".Random.seed", envir = .GlobalEnv)
-      value
-    }), numeric(n_obs))
+    fits <- fitted_samples(
+      model,
+      n_draws = 1L,
+      method = "user",
+      draws = betas[i, , drop = FALSE]
+    )
+    mu <- vapply(
+      paste0("response", seq_len(p)),
+      function(parameter) {
+        fits$.fitted[fits$.parameter == parameter]
+      },
+      numeric(n_obs)
+    )
+    z <- vapply(
+      seq_len(p),
+      function(j) {
+        withr::with_preserve_seed({
+          assign(".Random.seed", states[[j]], envir = .GlobalEnv)
+          value <- stats::rnorm(n_obs)
+          states[[j]] <<- get(".Random.seed", envir = .GlobalEnv)
+          value
+        })
+      },
+      numeric(n_obs)
+    )
     diagnostic_response_table(z %*% t(root) + mu, i, rows = rows)
   }
 }
@@ -685,9 +866,21 @@ diagnostic_mvn_posterior_sampler <- function(model, betas, rows) {
 
 #' @export
 #' @rdname posterior_samples
-posterior_samples.gamm <- function(model, n = 1L, seed = NULL,
-                                   conditioning = NULL, ...) {
-  diagnostic_posterior_samples.default(model, n, seed, conditioning, ...)
+posterior_samples.gamm <- function(
+  model,
+  ...,
+  n_draws = NULL,
+  seed = NULL,
+  conditioning = NULL
+) {
+  sampling_check_names(substitute(list(...)), derivative = FALSE)
+  conditioning <- mixed_conditioning(model, conditioning)
+  if (conditioning == "gam_component") return(posterior_samples(
+    model$gam, n_draws = n_draws, seed = seed, ...))
+  layout <- sampling_resolve(n_draws, NULL, NULL, method = "gaussian")
+  n_draws <- layout$n_draws
+
+  diagnostic_posterior_samples.default(model, n_draws, seed, conditioning, ...)
 }
 
 
@@ -728,18 +921,59 @@ diagnostic_posterior_observed.gamm <- function(model, conditioning = NULL, ...) 
 # These fitters support Gaussian approximations only. Reject requests for user
 # draws or other sampling algorithms instead of ignoring them.
 diagnostic_gaussian_posterior_options <- function(dots, label) {
+  sampling_check_names(as.call(c(list(quote(list)), dots)))
+  unsupported <- intersect(
+    names(dots),
+    c("chains", "diagnostics", "n_threads", sampling_method_controls("mh"))
+  )
+  if (length(unsupported)) {
+    stop(
+      "Argument '",
+      unsupported[1L],
+      "' is not supported by the ",
+      label,
+      " posterior diagnostic sampler.",
+      call. = FALSE
+    )
+  }
+
   if (!is.null(dots$method)) {
     method <- match.arg(dots$method, c("gaussian", "mh", "inla", "user"))
-    if (method != "gaussian") stop(label,
-      " posterior diagnostic sampling supports only method = 'gaussian'.", call. = FALSE)
+    if (method != "gaussian") {
+      stop(
+        label,
+        " posterior diagnostic sampling supports only method = 'gaussian'.",
+        call. = FALSE
+      )
+    }
   }
-  if (!is.null(dots$draws)) stop("User coefficient draws are not supported by the ",
-    label, " posterior diagnostic sampler.", call. = FALSE)
-  if (!is.null(dots$weights)) stop("Custom response weights are not supported by the ",
-    label, " posterior diagnostic sampler; fitted weights are used.", call. = FALSE)
-  if (isTRUE(dots$unconditional) || isTRUE(dots$freq)) stop(
-    "Alternative covariance corrections are not supported by the ", label,
-    " posterior diagnostic sampler.", call. = FALSE)
+  if (!is.null(dots$draws)) {
+    stop(
+      "User coefficient draws are not supported by the ",
+      label,
+      " posterior diagnostic sampler.",
+      call. = FALSE
+    )
+  }
+  if (!is.null(dots$weights)) {
+    stop(
+      "Custom response weights are not supported by the ",
+      label,
+      " posterior diagnostic sampler; fitted weights are used.",
+      call. = FALSE
+    )
+  }
+  if (isTRUE(dots$unconditional) || isTRUE(dots$frequentist)) {
+    stop(
+      "Alternative covariance corrections are not supported by the ",
+      label,
+      " posterior diagnostic sampler.",
+      call. = FALSE
+    )
+  }
+  unused <- intersect(names(dots), c("n_grid", "mvn_method", "parametrized", "frequentist", "unconditional"))
+  if (length(unused)) stop("Argument '", unused[1L],
+    "' is not supported by the ", label, " posterior diagnostic sampler.", call. = FALSE)
   invisible(NULL)
 }
 
@@ -773,10 +1007,24 @@ diagnostic_posterior_observed.lme <- function(model, conditioning = NULL, ...) {
 }
 #' @export
 #' @rdname posterior_samples
-posterior_samples.lme <- function(model, n = 1L, seed = NULL,
-    conditioning = NULL, ...) {
-  diagnostic_posterior_samples.default(model, n, seed,
-    conditioning = native_mixed_posterior_conditioning(conditioning), ...)
+posterior_samples.lme <- function(
+  model,
+  ...,
+  n_draws = NULL,
+  seed = NULL,
+  conditioning = NULL
+) {
+  sampling_check_names(substitute(list(...)), derivative = FALSE)
+  layout <- sampling_resolve(n_draws, NULL, NULL, method = "gaussian")
+  n_draws <- layout$n_draws
+
+  diagnostic_posterior_samples.default(
+    model,
+    n_draws,
+    seed,
+    conditioning = native_mixed_posterior_conditioning(conditioning),
+    ...
+  )
 }
 
 #' @export
@@ -795,10 +1043,24 @@ diagnostic_posterior_observed.merMod <- function(model, conditioning = NULL, ...
 }
 #' @export
 #' @rdname posterior_samples
-posterior_samples.merMod <- function(model, n = 1L, seed = NULL,
-    conditioning = NULL, ...) {
-  diagnostic_posterior_samples.default(model, n, seed,
-    conditioning = native_mixed_posterior_conditioning(conditioning), ...)
+posterior_samples.merMod <- function(
+  model,
+  ...,
+  n_draws = NULL,
+  seed = NULL,
+  conditioning = NULL
+) {
+  sampling_check_names(substitute(list(...)), derivative = FALSE)
+  layout <- sampling_resolve(n_draws, NULL, NULL, method = "gaussian")
+  n_draws <- layout$n_draws
+
+  diagnostic_posterior_samples.default(
+    model,
+    n_draws,
+    seed,
+    conditioning = native_mixed_posterior_conditioning(conditioning),
+    ...
+  )
 }
 
 

@@ -5,17 +5,22 @@
 #' Neither method changes [stats::logLik()] for fitted GAMs.
 #'
 #' @param x a GAM or BAM fitted by \pkg{mgcv}.
-#' @param n number of posterior coefficient draws.
+#' @param n_draws total posterior coefficient draws across all chains. Defaults
+#'   to 4000 when generating draws; supplied draws determine their own count.
 #' @param seed random seed for posterior sampling.
 #' @param sampling_args named list of arguments passed to the coefficient
-#'   sampler; see [log_lik()].
+#'   sampler, including `chains`, `diagnostics`, `method`, `mh_backend` and
+#'   method-specific controls; see [log_lik()].
 #' @param r_eff optional relative effective sample sizes, either one value or
 #'   one per observation. Independent Gaussian draws use `1` by default.
 #'   For Metropolis--Hastings draws this is estimated from the likelihoods.
-#'   Supplied draws require `r_eff` or `chain_id`.
+#'   Supplied draws use their stored chain mapping when available; otherwise
+#'   supply `r_eff` or `chain_id`.
 #' @param chain_id integer chain identifier for each coefficient draw, in
 #'   draw order. Identifiers must be consecutive starting at one, and chains
-#'   must contain equal numbers of draws. MH sampling defaults to one chain.
+#'   must contain equal numbers of draws. A supplied mapping must agree with
+#'   the coefficient draws' stored mapping. Stored iterations determine temporal
+#'   order for relative efficiency without reordering response or likelihood rows.
 #' @param save_psis retain the PSIS object in the returned LOO result.
 #' @param cores number of cores used by \pkg{loo}.
 #' @param ... additional arguments passed to [loo::loo()] or [loo::waic()].
@@ -37,18 +42,19 @@
 #' if (requireNamespace("loo", quietly = TRUE)) {
 #'   library("mgcv")
 #'   m <- gam(mpg ~ s(wt, k = 5), data = mtcars, method = "REML")
-#'   loo::loo(m, n = 500, seed = 42)
+#'   loo::loo(m, n_draws = 500, seed = 42)
 #' }
 #' @name loo.gam
 NULL
 
 #' @rdname loo.gam
 #' @exportS3Method loo::loo gam
-loo.gam <- function(x, n = 4000, seed = NULL, sampling_args = list(),
+loo.gam <- function(x, ..., n_draws = NULL, seed = NULL, sampling_args = list(),
                     r_eff = NULL, chain_id = NULL, save_psis = FALSE,
-                    cores = 1, ...) {
+                    cores = 1) {
+  sampling_check_names(substitute(list(...)))
   posterior_likelihood_require_loo()
-  prep <- posterior_likelihood_prepare(x, n = n, seed = seed,
+  prep <- posterior_likelihood_prepare(x, n = n_draws, seed = seed,
     sampling_args = sampling_args)
   posterior_likelihood_loo(prep, r_eff = r_eff, chain_id = chain_id,
     save_psis = save_psis, cores = cores, ...)
@@ -60,9 +66,10 @@ loo.bam <- loo.gam
 
 #' @rdname loo.gam
 #' @exportS3Method loo::waic gam
-waic.gam <- function(x, n = 4000, seed = NULL, sampling_args = list(), ...) {
+waic.gam <- function(x, ..., n_draws = NULL, seed = NULL, sampling_args = list()) {
+  sampling_check_names(substitute(list(...)))
   posterior_likelihood_require_loo()
-  prep <- posterior_likelihood_prepare(x, n = n, seed = seed,
+  prep <- posterior_likelihood_prepare(x, n = n_draws, seed = seed,
     sampling_args = sampling_args)
   if (nrow(prep$betas) < 2L) {
     stop("WAIC requires at least two posterior draws.", call. = FALSE)
@@ -97,6 +104,7 @@ posterior_likelihood_loo_loglik <- function(data_i, draws) {
 
 posterior_likelihood_loo_likelihood <- function(data_i, draws) {
   ll <- posterior_likelihood_loo_loglik(data_i, draws)
+  if (!is.null(draws$efficiency_order)) ll <- ll[draws$efficiency_order]
   # A common scale factor leaves relative efficiency unchanged and avoids
   # underflow when the observation has a very small likelihood.
   exp(ll - max(ll))
@@ -110,7 +118,7 @@ posterior_likelihood_loo_attributes <- function(result, prep,
   labels <- rownames(prep$X) %||% as.character(prep$rows)
   rownames(result$pointwise) <- if (is.null(observations)) labels else
     labels[observations]
-  result
+  attach_sampling(result, prep$betas)
 }
 
 posterior_likelihood_loo <- function(prep, save_psis = FALSE, r_eff = NULL,
@@ -132,12 +140,20 @@ posterior_likelihood_loo <- function(prep, save_psis = FALSE, r_eff = NULL,
   if (n_draws < 2L) {
     stop("LOO requires at least two posterior draws.", call. = FALSE)
   }
+  ids <- attr(prep$betas, "sampling")$draw_ids
+  if (!is.null(chain_id)) {
+    posterior_likelihood_validate_chains(chain_id, n_draws)
+    if (!is.null(ids) && !identical(as.integer(chain_id), as.integer(ids$.chain)))
+      stop("'chain_id' conflicts with the stored coefficient chain mapping.", call. = FALSE)
+  }
   if (is.null(r_eff)) {
     if (identical(prep$method, "gaussian")) {
       r_eff <- 1
     } else {
       if (is.null(chain_id)) {
-        if (identical(prep$method, "mh")) {
+        if (!is.null(ids)) {
+          chain_id <- ids$.chain
+        } else if (identical(prep$method, "mh")) {
           chain_id <- rep.int(1L, n_draws)
         } else {
           stop("Supply 'chain_id' or 'r_eff' for user-supplied draws.",
@@ -145,8 +161,13 @@ posterior_likelihood_loo <- function(prep, save_psis = FALSE, r_eff = NULL,
         }
       }
       posterior_likelihood_validate_chains(chain_id, n_draws)
+      efficiency_prep <- prep
+      if (!is.null(ids)) {
+        efficiency_prep$efficiency_order <- order(ids$.chain, ids$.iteration)
+        chain_id <- chain_id[efficiency_prep$efficiency_order]
+      }
       r_eff <- loo::relative_eff(posterior_likelihood_loo_likelihood,
-        chain_id = chain_id, data = data, draws = prep, cores = cores)
+        chain_id = chain_id, data = data, draws = efficiency_prep, cores = cores)
     }
   }
   if (!is.numeric(r_eff) || !length(r_eff) %in% c(1L, n_obs) ||

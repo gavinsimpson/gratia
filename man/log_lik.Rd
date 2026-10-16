@@ -10,22 +10,26 @@ log_lik(model, ...)
 
 \method{log_lik}{gam}(
   model,
-  n = 4000,
+  ...,
+  n_draws = NULL,
+  chains = NULL,
+  diagnostics = FALSE,
   seed = NULL,
   method = c("gaussian", "mh", "user"),
   draws = NULL,
-  unconditional = FALSE,
-  ...
+  unconditional = FALSE
 )
 
 \method{log_lik}{bam}(
   model,
-  n = 4000,
+  ...,
+  n_draws = NULL,
+  chains = NULL,
+  diagnostics = FALSE,
   seed = NULL,
   method = c("gaussian", "mh", "user"),
   draws = NULL,
-  unconditional = FALSE,
-  ...
+  unconditional = FALSE
 )
 }
 \arguments{
@@ -35,8 +39,16 @@ log_lik(model, ...)
 or \code{mvn_method}. Prediction at new observations and frequentist covariance
 matrices are not supported.}
 
-\item{n}{Positive integer; number of coefficient draws. Ignored for
-\code{method = "user"}, which uses every row of \code{draws}.}
+\item{n_draws}{Positive integer; total coefficient draws across chains.
+Defaults to 4000 when generating draws. Supplied draws determine their own
+count; an explicit count must agree.}
+
+\item{chains}{positive integer or \code{NULL}; number of chains. \code{NULL} uses one
+chain, or the chain mapping in supplied draws. \code{n_draws} must be divisible by
+\code{chains}. Burn-in is applied separately to each MH chain.}
+
+\item{diagnostics}{logical; calculate coefficient R-hat, effective sample
+sizes, and Monte Carlo standard errors using the optional posterior package.}
 
 \item{seed}{Optional random seed. The caller's random-number state is retained.}
 
@@ -52,6 +64,8 @@ when available, using \code{\link[mgcv:vcov.gam]{mgcv::vcov.gam()}}. Defaults to
 A numeric matrix with draws in rows and retained fitting observations
 in columns. Attribute \code{observation} gives their original fitting-row indices
 after any fitting subset; \code{gratia} describes the sampling assumptions.
+The \code{sampling} attribute retains chain identities and requested coefficient
+diagnostics; \code{\link[=as_mcmc_draws]{as_mcmc_draws()}} converts the likelihood matrix by chain.
 Impossible observations may have log likelihood \code{-Inf}; invalid numerical
 calculations produce an error. LOO and WAIC require finite log likelihoods.
 }
@@ -84,7 +98,7 @@ accuracy of the Gaussian approximation. See \link{loo.gam} for optional loo meth
 \examples{
 library("mgcv")
 m <- gam(mpg ~ s(wt, k = 5), data = mtcars, method = "REML")
-ll <- log_lik(m, n = 500, seed = 42)
+ll <- log_lik(m, n_draws = 500, seed = 42)
 dim(ll)
 if (requireNamespace("loo", quietly = TRUE)) {
   loo::loo(ll, r_eff = 1)

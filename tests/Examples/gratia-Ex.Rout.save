@@ -109,9 +109,9 @@ detaching ‘package:mgcv’
 > m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = "REML")
 > 
 > # add fitted samples (posterior draws of the expected value of the response)
-> # note that there are 800 rows in the output: 400 data by `n = 2` samples.
+> # note that there are 800 rows in the output: 400 data by `n_draws = 2` samples.
 > df |>
-+   add_fitted_samples(m, n = 2, seed = 84)
++   add_fitted_samples(m, n_draws = 2, seed = 84)
 # A tibble: 800 × 14
        y    x0     x1    x2    x3     f    f0    f1     f2    f3  .row .draw
    <dbl> <dbl>  <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>  <dbl> <dbl> <int> <int>
@@ -130,7 +130,7 @@ detaching ‘package:mgcv’
 > 
 > # add posterior draws from smooth s(x2)
 > df |>
-+   add_smooth_samples(m, n = 2, seed = 2, select= "s(x2)")
++   add_smooth_samples(m, n_draws = 2, seed = 2, select= "s(x2)")
 # A tibble: 800 × 15
        y    x0     x1    x2    x3     f    f0    f1     f2    f3  .row .smooth
    <dbl> <dbl>  <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>  <dbl> <dbl> <int> <chr>  
@@ -1011,7 +1011,7 @@ detaching ‘package:mgcv’
 > # samples from posterior of derivatives
 > fd_samp <- derivative_samples(m,
 +   data = ds, type = "central",
-+   focal = "x2", eps = 0.01, seed = 21, n_sim = 100
++   focal = "x2", eps = 0.01, seed = 21, n_draws = 100
 + )
 > 
 > # plot the first 20 posterior draws
@@ -1499,6 +1499,32 @@ detaching ‘package:mgcv’
 
 detaching ‘package:mgcv’
 
+> nameEx("draw.sampling_diagnostics")
+> ### * draw.sampling_diagnostics
+>
+> flush(stderr()); flush(stdout())
+>
+> ### Name: draw.sampling_diagnostics
+> ### Title: Plot coefficient-chain diagnostics
+> ### Aliases: draw.sampling_diagnostics
+>
+> ### ** Examples
+>
+> load_mgcv()
+> dat <- data_sim("eg1", n = 100, seed = 42)
+> model <- gam(y ~ s(x0, k = 5), data = dat, method = "REML")
+> b <- post_draws(model, n_draws = 400, chains = 4, method = "mh",
++   burnin = 100, seed = 281)
+> diagnostics <- sampling_diagnostics(b)
+> draw(diagnostics, select = 1:2)
+> draw(diagnostics, type = "rank", select = 1:2, n_bins = 10)
+>
+>
+>
+> cleanEx()
+
+detaching ‘package:mgcv’
+
 > nameEx("draw.smooth_estimates")
 > ### * draw.smooth_estimates
 > 
@@ -1564,7 +1590,7 @@ detaching ‘package:mgcv’
 > ## a single smooth GAM
 > m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat1, method = "REML")
 > ## posterior smooths from m1
-> sm1 <- smooth_samples(m1, n = 15, seed = 23478)
+> sm1 <- smooth_samples(m1, n_draws = 15, seed = 23478)
 > ## plot
 > draw(sm1, alpha = 0.7)
 > ## plot only 5 randomly smapled draws
@@ -1575,7 +1601,7 @@ detaching ‘package:mgcv’
 > ## a multi-smooth GAM with a factor-by smooth
 > m2 <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = dat2, method = "REML")
 > ## posterior smooths from m1
-> sm2 <- smooth_samples(m2, n = 15, seed = 23478)
+> sm2 <- smooth_samples(m2, n_draws = 15, seed = 23478)
 > ## plot, this time selecting only the factor-by smooth
 > draw(sm2, select = "s(x2)", partial_match = TRUE, alpha = 0.7)
 > 
@@ -1695,15 +1721,15 @@ detaching ‘package:mgcv’
 > cleanEx()
 > nameEx("family_diagnostics")
 > ### * family_diagnostics
-> 
+>
 > flush(stderr()); flush(stdout())
-> 
+>
 > ### Name: family_diagnostics
 > ### Title: Extend diagnostics for an mgcv-compatible family
 > ### Aliases: family_diagnostics
-> 
+>
 > ### ** Examples
-> 
+>
 > load_mgcv()
 > f <- poisson()
 > f$gratia_diagnostics <- function(mu, wt, scale, y, eta) {
@@ -1720,9 +1746,9 @@ detaching ‘package:mgcv’
 > f$cdf <- function(q, mu, wt, scale) ppois(q, mu)
 > fit <- gam(y ~ x, data = dat, family = f, method = "REML")
 > qq_plot(fit, type = "quantile", seed = 1)
-> 
-> 
-> 
+>
+>
+>
 > cleanEx()
 
 detaching ‘package:mgcv’
@@ -1795,10 +1821,10 @@ detaching ‘package:mgcv’
 > dat <- data_sim("eg1", n = 1000, dist = "normal", scale = 2, seed = 2)
 > m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 > 
-> fs <- fitted_samples(m1, n = 5, seed = 42)
+> fs <- fitted_samples(m1, n_draws = 5, seed = 42)
 > 
 > # can generate own set of draws and use them
-> drws <- generate_draws(m1, n = 2, seed = 24)
+> drws <- generate_draws(m1, n_draws = 2, seed = 24)
 > fs2 <- fitted_samples(m1, method = "user", draws = drws)
 > ## Don't show: 
 > options(op)
@@ -2135,7 +2161,7 @@ detaching ‘package:mgcv’
 Loading required package: nlme
 This is mgcv 1.9-4. For overview type '?mgcv'.
 > m <- gam(mpg ~ s(wt, k = 5), data = mtcars, method = "REML")
-> ll <- log_lik(m, n = 500, seed = 42)
+> ll <- log_lik(m, n_draws = 500, seed = 42)
 > dim(ll)
 [1] 500  32
 > if (requireNamespace("loo", quietly = TRUE)) {
@@ -2175,7 +2201,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > if (requireNamespace("loo", quietly = TRUE)) {
 +   library("mgcv")
 +   m <- gam(mpg ~ s(wt, k = 5), data = mtcars, method = "REML")
-+   loo::loo(m, n = 500, seed = 42)
++   loo::loo(m, n_draws = 500, seed = 42)
 + }
 Loading required package: nlme
 This is mgcv 1.9-4. For overview type '?mgcv'.
@@ -2793,7 +2819,7 @@ detaching ‘package:mgcv’
 +   load_mgcv()
 +   dat <- data_sim("eg1", n = 100, seed = 2)
 +   fit <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat)
-+   bayesplot::pp_check(fit, n = 10, seed = 42)
++   bayesplot::pp_check(fit, n_draws = 10, seed = 42)
 + }
 > 
 > 
@@ -2823,7 +2849,7 @@ detaching ‘package:mgcv’
 > dat <- data_sim("eg1", n = 1000, dist = "normal", scale = 2, seed = 2)
 > m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 > 
-> predicted_samples(m, n = 5, seed = 42)
+> predicted_samples(m, n_draws = 5, seed = 42)
 # A tibble: 5,000 x 3
     .row .draw .response
    <int> <int>     <dbl>
@@ -2849,7 +2875,7 @@ detaching ‘package:mgcv’
 + )
 > 
 > ## Exclude s(x2)
-> predicted_samples(m, n = 5, newd, exclude = "s(x2)", seed = 25)
+> predicted_samples(m, n_draws = 5, data = newd, exclude = "s(x2)", seed = 25)
 # A tibble: 50 x 3
     .row .draw .response
    <int> <int>     <dbl>
@@ -2866,7 +2892,7 @@ detaching ‘package:mgcv’
 # i 40 more rows
 > 
 > ## Exclude s(x1)
-> predicted_samples(m, n = 5, newd, exclude = "s(x1)", seed = 25)
+> predicted_samples(m, n_draws = 5, data = newd, exclude = "s(x1)", seed = 25)
 # A tibble: 50 x 3
     .row .draw .response
    <int> <int>     <dbl>
@@ -2886,7 +2912,7 @@ detaching ‘package:mgcv’
 > ## but note that we have to include any parametric terms, including the
 > ## constant term
 > predicted_samples(m,
-+   n = 5, newd, seed = 25,
++   n_draws = 5, data = newd, seed = 25,
 +   terms = c("Intercept", "s(x0)", "s(x2)", "s(x3)")
 + )
 # A tibble: 50 x 3
@@ -3492,14 +3518,14 @@ detaching ‘package:mgcv’
 > dat <- data_sim("eg1", n = 400, seed = 2)
 > m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 > 
-> sms <- smooth_samples(m1, select = "s(x0)", n = 5, seed = 42)
+> sms <- smooth_samples(m1, select = "s(x0)", n_draws = 5, seed = 42)
 > 
 > ## A factor by example (with a spurious covariate x0)
 > dat <- data_sim("eg4", n = 1000, seed = 2)
 > 
 > ## fit model...
 > m2 <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = dat)
-> sms <- smooth_samples(m2, n = 5, seed = 42)
+> sms <- smooth_samples(m2, n_draws = 5, seed = 42)
 > draw(sms)
 > ## Don't show: 
 > options(op)
