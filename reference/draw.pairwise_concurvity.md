@@ -76,8 +76,12 @@ draw(
 
 - bar_col:
 
-  colour specification for the bar colour.
+  Deprecated; use
+  [`gratia_theme_get()`](https://gavinsimpson.github.io/gratia/reference/gratia_theme_get.md)
+  theme settings instead. Colour specification for the bar colour.
 
 - bar_fill:
 
-  colour specification for the bar fill
+  Deprecated; use
+  [`gratia_theme_get()`](https://gavinsimpson.github.io/gratia/reference/gratia_theme_get.md)
+  theme settings instead. Colour specification for the bar fill

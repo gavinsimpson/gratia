@@ -9,7 +9,7 @@ ggplot2::ggplot()."><meta property="og:image" content="https://gavinsimpson.gith
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-52</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-53</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -292,25 +292,30 @@ smooths be combined into a single panel containing all levels (<code>TRUE</code>
 
 
 <dt id="arg-ci-alpha">ci_alpha<a class="anchor" aria-label="anchor" href="#arg-ci-alpha"></a></dt>
-<dd><p>numeric; alpha transparency for confidence or simultaneous
+<dd><p>Deprecated; use <code><a href="gratia_theme_get.html">gratia_theme_get()</a></code> theme
+settings instead. Numeric; alpha transparency for confidence or simultaneous
 interval.</p></dd>
 
 
 <dt id="arg-ci-col">ci_col<a class="anchor" aria-label="anchor" href="#arg-ci-col"></a></dt>
-<dd><p>colour specification for the confidence/credible intervals
+<dd><p>Deprecated; use <code><a href="gratia_theme_get.html">gratia_theme_get()</a></code> theme
+settings instead. Colour specification for the confidence/credible intervals
 band. Affects the fill of the interval.</p></dd>
 
 
 <dt id="arg-smooth-col">smooth_col<a class="anchor" aria-label="anchor" href="#arg-smooth-col"></a></dt>
-<dd><p>colour specification for the smooth line.</p></dd>
+<dd><p>Deprecated; use <code><a href="gratia_theme_get.html">gratia_theme_get()</a></code> theme
+settings instead. Colour specification for the smooth line.</p></dd>
 
 
 <dt id="arg-resid-col">resid_col<a class="anchor" aria-label="anchor" href="#arg-resid-col"></a></dt>
-<dd><p>colour specification for the partial residuals.</p></dd>
+<dd><p>Deprecated; use <code><a href="gratia_theme_get.html">gratia_theme_get()</a></code> theme
+settings instead. Colour specification for the partial residuals.</p></dd>
 
 
 <dt id="arg-contour-col">contour_col<a class="anchor" aria-label="anchor" href="#arg-contour-col"></a></dt>
-<dd><p>colour specification for contour lines.</p></dd>
+<dd><p>Deprecated; use <code><a href="gratia_theme_get.html">gratia_theme_get()</a></code> theme
+settings instead. Colour specification for contour lines.</p></dd>
 
 
 <dt id="arg-n-contour">n_contour<a class="anchor" aria-label="anchor" href="#arg-n-contour"></a></dt>
@@ -447,12 +452,14 @@ Smooth bounds follow <code>interval</code>; parametric bounds remain pointwise.<
 
 
 <dt id="arg-ci-d-alpha">ci_3d_alpha<a class="anchor" aria-label="anchor" href="#arg-ci-d-alpha"></a></dt>
-<dd><p>numeric between 0 and 1; opacity of both interval
+<dd><p>Deprecated; use <code><a href="gratia_theme_get.html">gratia_theme_get()</a></code> theme
+settings instead. Numeric between 0 and 1; opacity of both interval
 surfaces, independent of <code>ci_alpha</code>. Defaults to <code>0.15</code>.</p></dd>
 
 
 <dt id="arg-ci-d-col">ci_3d_col<a class="anchor" aria-label="anchor" href="#arg-ci-d-col"></a></dt>
-<dd><p>one R colour; fill of both interval surfaces, independent
+<dd><p>Deprecated; use <code><a href="gratia_theme_get.html">gratia_theme_get()</a></code> theme
+settings instead. One R colour; fill of both interval surfaces, independent
 of <code>ci_col</code> and the estimate's continuous fill scale. Defaults to <code>"grey60"</code>.</p></dd>
 
 
@@ -637,8 +644,8 @@ see the examples.</p>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"ggcube"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="va">m2</span>, surface <span class="op">=</span> <span class="st">"3d"</span>, n_2d <span class="op">=</span> <span class="fl">20</span>,</span></span>
 <span class="r-in"><span>    surface_3d <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>yaw <span class="op">=</span> <span class="fl">45</span>, persp <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="va">m2</span>, surface <span class="op">=</span> <span class="st">"3d"</span>, ci_3d <span class="op">=</span> <span class="cn">TRUE</span>, ci_3d_alpha <span class="op">=</span> <span class="fl">0.12</span>,</span></span>
-<span class="r-in"><span>    n_2d <span class="op">=</span> <span class="fl">20</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="va">m2</span>, surface <span class="op">=</span> <span class="st">"3d"</span>, ci_3d <span class="op">=</span> <span class="cn">TRUE</span>, n_2d <span class="op">=</span> <span class="fl">20</span><span class="op">)</span> <span class="op">&amp;</span></span></span>
+<span class="r-in"><span>    <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>gratia.alpha.surface.interval <span class="op">=</span> <span class="fl">0.12</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="va">panels</span> <span class="op">&lt;-</span> <span class="fu"><a href="assemble.html">assemble</a></span><span class="op">(</span><span class="va">m2</span>, surface <span class="op">=</span> <span class="st">"3d"</span>, n_2d <span class="op">=</span> <span class="fl">20</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="co"># Replace coordinates to customize a single term; retain the current theme.</span></span></span>
 <span class="r-in"><span>  <span class="va">panels</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">panels</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span> <span class="op">+</span></span></span>

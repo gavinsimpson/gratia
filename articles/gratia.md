@@ -99,11 +99,24 @@ to zero. For partial derivatives (what *marginaleffects* would call a
 marginal effect or slope), gratia provides
 [`derivatives()`](https://gavinsimpson.github.io/gratia/reference/derivatives.md).
 
-The resulting plot is intended as reasonable overview of the estimated
-model, but it offers limited option to modify the resulting plot. If you
-want full control, you can obtain the data used to create the plot above
-with
+Use a ggplot2 theme to change the appearance of the plots. The `&`
+operator applies the settings to every panel:
+
+``` r
+
+library("ggplot2")
+draw(m) & theme(
+  geom.gratia.smooth = element_geom(colour = "forestgreen", linewidth = 1.5),
+  geom.gratia.interval = element_geom(fill = "forestgreen")
+)
+```
+
+![](gratia_files/figure-html/theme-smooths-1.png)
+
+To choose different layers or map other variables to plot aesthetics,
+obtain the estimates with
 [`smooth_estimates()`](https://gavinsimpson.github.io/gratia/reference/smooth_estimates.md)
+and build a plot yourself.
 
 ``` r
 
@@ -127,7 +140,7 @@ sm
 
 which will evaluate all smooths at values that are evenly spaced over
 the range of the covariate(s). If you want to evaluate only selected
-smooths, you can specify which via the `smooth` argument. This takes the
+smooths, you can specify which via the `select` argument. This takes the
 *smooth labels* which are the names of the smooths as they are known to
 mgcv. To list the labels for the smooths in use
 
@@ -141,13 +154,7 @@ To evaluate only f(x_2) use
 
 ``` r
 
-sm <- smooth_estimates(m, smooth = "s(x2)")
-#> Warning: The `smooth` argument of `smooth_estimates()` is deprecated as of gratia
-#> 0.8.9.9.
-#> ℹ Please use the `select` argument instead.
-#> This warning is displayed once per session.
-#> Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
-#> generated.
+sm <- smooth_estimates(m, select = "s(x2)")
 sm
 #> # A tibble: 100 × 6
 #>    .smooth .type .by   .estimate   .se      x2

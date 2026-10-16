@@ -34,7 +34,9 @@ draw(
 
 - alpha:
 
-  numeric; opacity of the interval ribbon.
+  Deprecated; use
+  [`gratia_theme_get()`](https://gavinsimpson.github.io/gratia/reference/gratia_theme_get.md)
+  theme settings instead. Numeric; opacity of the interval ribbon.
 
 - xlab, ylab:
 

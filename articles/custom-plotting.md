@@ -3,36 +3,15 @@
 ## Background
 
 The [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)
-function in {gratia} was envisaged as a `ggplot`-based alternative to
-`mgcv:::plot.gam()`. As such, it was never intended to allow the sorts
-of customization that is possible with
-[`ggplot()`](https://ggplot2.tidyverse.org/reference/ggplot.html) or
-some other packages that use
-[`ggplot()`](https://ggplot2.tidyverse.org/reference/ggplot.html) as the
-plotting layer. This is largely due to the decision to produce multiple
-separate
-[`ggplot()`](https://ggplot2.tidyverse.org/reference/ggplot.html) plots
-for GAMs with multiple smooths, which would subsequently be combined
-into a single *figure* on the device, initially using {cowplot} and more
-recently {patchwork}. Why I did things this way is evident when you
-consider how we might represent smooths of 3 or 4 variables (which are
-more common than you might think; consider space-time models via
-`te(x, y, time, d = c(2,1))` or space-depth-time models \[think ocean or
-atmospheric data over space and at depth (height), observed over time\]
-via `te(x, y, depth, time, d = c(2, 1, 1))`), and which require facets
-top produce small multiples, which means we can’t use facets to plot
-separate smooths. Additional complications arise when we consider more
-complex smooth types, such as splines on the sphere, for which we might
-want to us different coordinate systems or geoms to best represent the
-underlying smooth.
+function combines plots of model terms into a single figure using
+{patchwork}. Some terms need their own facets or coordinate systems, so
+separate plots allow {gratia} to display them together.
 
-Having gone down the root of combining multiple `ggplot` objects into a
-single figure, the problem of customizing these plots quickly rears its
-head. This vignette presents some solutions to the problem of modifying
-or adding to the plots produced by
-[`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)
-culminating in an example illustrating how to use {gratia}’s utility
-functions to produce your own plots from lower-lever components.
+Use ggplot2 themes to change the appearance of these plots. The `&`
+operator applies a theme to every plot in the figure. This article shows
+how to style {gratia} components and how to build plots from the
+underlying estimates when you need different layers or mappings from
+variables to aesthetics.
 
 ## Adding layers to plots with the `&` operator
 
@@ -101,6 +80,108 @@ p & theme_bw()
 
 ![](custom-plotting_files/figure-html/draw-eg1-right-theme-1.png)
 
+## Styling gratia components
+
+Gratia uses ggplot2 themes for its plot components. Defaults retain the
+existing appearance. Change an existing figure with `&` so every panel
+receives the settings:
+
+``` r
+
+p & theme(
+  geom.gratia.smooth = element_geom(colour = "navy", linewidth = 0.8),
+  geom.gratia.interval = element_geom(fill = "navy"),
+  gratia.alpha.interval = 0.15
+)
+```
+
+![](custom-plotting_files/figure-html/native-component-theme-1.png)
+
+Use `geom.gratia.partial.residual` for partial residuals,
+`geom.gratia.diagnostic.point` for diagnostic points, and
+`geom.gratia.reference` for reference lines. Opacity uses numeric
+settings such as `gratia.alpha.interval` and
+`gratia.alpha.diagnostic.point`. More specific settings, such as
+`geom.gratia.smooth.interval`, override the general interval setting.
+See
+[`?gratia_theme_get`](https://gavinsimpson.github.io/gratia/reference/gratia_theme_get.md)
+for the component list.
+
+Set a package override for subsequent plots without changing other
+ggplot2 plots. The override is attached when the plot is created:
+
+``` r
+
+old_theme <- gratia_theme_set(theme(gratia.alpha.interval = 0.1))
+draw(m)
+```
+
+![](custom-plotting_files/figure-html/native-package-theme-1.png)
+
+``` r
+
+gratia_theme_set(old_theme)
+```
+
+For temporary settings, use
+[`withr::with_options()`](https://withr.r-lib.org/reference/with_options.html)
+with the option `gratia.plot.theme`. Settings added to an existing plot
+follow normal ggplot2 theme merging. Explicit deprecated aesthetic
+arguments remain fixed overrides, even when they equal the old defaults.
+For example, replace `draw(m, smooth_col = "navy", ci_alpha = 0.15)`
+with the component theme above.
+
+Common replacements for deprecated arguments are:
+
+| Previous argument | Theme setting |
+|:---|:---|
+| `smooth_col` | `geom.gratia.smooth = element_geom(colour = ...)` |
+| `ci_col`, `ci_alpha` | `geom.gratia.interval = element_geom(fill = ...)`, `gratia.alpha.interval` |
+| `resid_col` | `geom.gratia.partial.residual = element_geom(colour = ...)` |
+| `contour_col` | `geom.gratia.contour = element_geom(colour = ...)` |
+| `point_col`, `point_alpha` in diagnostics | `geom.gratia.diagnostic.point = element_geom(colour = ...)`, `gratia.alpha.diagnostic.point` |
+| `line_col` in diagnostics | `geom.gratia.diagnostic.reference = element_geom(colour = ...)` |
+| `colour`, `alpha` in smooth samples | `geom.gratia.sample = element_geom(colour = ...)`, `gratia.alpha.sample` |
+| `ci_3d_col`, `ci_3d_alpha` | `geom.gratia.surface.interval = element_geom(fill = ...)`, `gratia.alpha.surface.interval` |
+| `alpha`, `linewidth` in chain diagnostics | `gratia.alpha.chain`, `geom.gratia.chain = element_geom(linewidth = ...)` |
+
+For parametric curves use `geom.gratia.effect`; for derivatives use
+`geom.gratia.derivative`. Rootograms have separate `rootogram.bar`,
+`rootogram.fitted`, `rootogram.reference` and `rootogram.warning`
+elements. MRF interval lines use `geom.gratia.smooth.interval`,
+independently of the points controlled by `geom.gratia.smooth`.
+Diagnostic boxplots use `geom.gratia.diagnostic.boxplot`.
+
+## Optional discrete palettes
+
+Grouped curves and ribbons retain the current Okabe–Ito palette and hue
+fallback unless another palette is requested. Use the same function for
+colour and fill to keep groups paired:
+
+``` r
+
+tol <- gratia_palette("tol_banded_16")
+theme(palette.colour.discrete = tol, palette.fill.discrete = tol)
+#> <theme> List of 2
+#>  $ palette.colour.discrete:function (n)  
+#>  $ palette.fill.discrete  :function (n)  
+#>  @ complete: logi FALSE
+#>  @ validate: logi TRUE
+```
+
+Paul Tol choices include bright and vibrant (7 colours), muted (9), dark
+(11), and banded schemes (12, 16 or 20). Dark favours visibility against
+white; colours within larger banded schemes are less distinct. Finite
+palettes error when their capacity is exceeded and do not interpolate or
+recycle colours. See
+[`?gratia_palette`](https://gavinsimpson.github.io/gratia/reference/gratia_palette.md)
+for attribution and available names.
+
+Continuous palettes can also be changed through
+`palette.fill.continuous` and `palette.colour.continuous`. Existing
+scale arguments still accept complete scales when custom
+transformations, breaks or guides are needed.
+
 ## Combining individual plots produced by `draw()`
 
 [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)
@@ -154,7 +235,9 @@ Numeric smooth and parametric surfaces can be displayed with
 `surface = "3d"`. The default remains `surface = "raster"`;
 `surface = "tile"` draws vector rectangles. The 3D display retains the
 current diverging RdBu palette, fill ranges, theme, and facet styling.
-Use `continuous_fill` to choose another palette.
+Use `palette.fill.continuous` in
+[`theme()`](https://ggplot2.tidyverse.org/reference/theme.html) to
+choose another palette.
 
 ``` r
 
@@ -225,12 +308,10 @@ Spherical smooths retain their geographic display.
 
 ## Building your own plot by hand
 
-{gratia} provides high-level functions like
-[`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md) to
-get you a good graphical overview of a fitted model, but with little
-option for customisation — it isn’t possible or desirable to allow all
-possible customisation options and features of {ggplot2} through a
-single function. Think about how many arguments that would require!
+Themes control the appearance of plots returned by
+[`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md). To
+choose different layers or map additional variables to aesthetics, build
+a plot from the estimates returned by {gratia}.
 
 Instead, {gratia} also exports the lower-level functions used
 [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md) so
@@ -317,9 +398,9 @@ p_sx2 <- sm |>
     alpha = 0.2
   ) +
   geom_point(aes(x = x2, y = `s(x2)`),
-    data = eg1, cex = 1.5, colour = "steelblue3"
+    data = eg1, size = 1.5, colour = "steelblue3"
   ) +
-  geom_line(aes(x = x2, y = .estimate), lwd = 1.2) +
+  geom_line(aes(x = x2, y = .estimate), linewidth = 1.2) +
   labs(y = "Partial effect", title = "s(x2)")
 p_sx2
 ```
@@ -368,7 +449,7 @@ plt <- sm |>
   geom_ribbon(aes(ymin = .lower_ci, ymax = .upper_ci, x = x2),
     alpha = 0.2
   ) +
-  geom_line(aes(x = x2, y = .estimate), lwd = 1.2) +
+  geom_line(aes(x = x2, y = .estimate), linewidth = 1.2) +
   labs(y = "Partial effect", title = "s(x2)")
 
 plt +
@@ -377,7 +458,7 @@ plt +
       x = x2, y = `s(x2)`,
       colour = fac
     ), # <-- map fac to colour aesthetic
-    data = eg1, cex = 1.5
+    data = eg1, size = 1.5
   )
 ```
 
@@ -387,7 +468,7 @@ We can also do some simple model checking by plotting the smooth with
 partial residuals coloured according to one of the other covariates (we
 could also do this by plotting the actual residuals against covariates).
 In the code chunk below, we map the covariate `x1` to both the *colour*
-and *size* aesthetics (note we deleted `cex = 1.5` to allow the mapping
+and *size* aesthetics (note we deleted `size = 1.5` to allow the mapping
 to *size*)
 
 ``` r

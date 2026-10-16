@@ -4,6 +4,21 @@
 
 ### User visible changes
 
+- Plot aesthetic arguments for colours, opacity and line widths are
+  deprecated in favour of ggplot2 component themes
+  ([\#215](https://github.com/gavinsimpson/gratia/issues/215)). Existing
+  default appearances are unchanged, and explicitly supplied arguments
+  remain fixed overrides during migration. Apply
+  [`theme()`](https://ggplot2.tidyverse.org/reference/theme.html) with
+  `&` to every panel in a patchwork, or with `+` to a single plot. For
+  example, replace `smooth_col` with
+  `geom.gratia.smooth = element_geom(colour = ...)` and `ci_alpha` with
+  `gratia.alpha.interval` inside
+  [`theme()`](https://ggplot2.tidyverse.org/reference/theme.html). See
+  [`gratia_theme_get()`](https://gavinsimpson.github.io/gratia/reference/gratia_theme_get.md)
+  and the Customizing plots article for migration examples. gratia now
+  requires ggplot2 \>= 4.0.3 and patchwork \>= 1.3.2.
+
 - Native [`mgcv::scasm()`](https://rdrr.io/pkg/mgcv/man/scasm.html)
   smooth estimation, drawing and
   [`confint()`](https://rdrr.io/r/stats/confint.html) now default to
@@ -131,6 +146,18 @@
   so the development version of glmmTMB is no longer needed.
 
 ### New features
+
+- Plots now support native ggplot2 theme settings for smooths,
+  intervals, residuals, diagnostics and other components, including
+  completed patchwork figures.
+  [`gratia_theme_get()`](https://gavinsimpson.github.io/gratia/reference/gratia_theme_get.md),
+  [`gratia_theme_set()`](https://gavinsimpson.github.io/gratia/reference/gratia_theme_get.md)
+  and
+  [`gratia_theme_update()`](https://gavinsimpson.github.io/gratia/reference/gratia_theme_get.md)
+  manage the optional `gratia.plot.theme` override.
+  [`gratia_palette()`](https://gavinsimpson.github.io/gratia/reference/gratia_palette.md)
+  provides optional Paul Tol palettes. Current default appearances are
+  retained ([\#215](https://github.com/gavinsimpson/gratia/issues/215)).
 
 - [`shape_intervals()`](https://gavinsimpson.github.io/gratia/reference/shape_intervals.md)
   applies monotone rearrangement and convex or concave envelopes to

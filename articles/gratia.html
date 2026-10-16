@@ -27,7 +27,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-52</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-53</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -173,11 +173,19 @@ the contribution of all other model terms to the predicted value to
 zero. For partial derivatives (what <em>marginaleffects</em> would call
 a marginal effect or slope), gratia provides
 <code><a href="../reference/derivatives.html">derivatives()</a></code>.</p>
-<p>The resulting plot is intended as reasonable overview of the
-estimated model, but it offers limited option to modify the resulting
-plot. If you want full control, you can obtain the data used to create
-the plot above with <code><a href="../reference/smooth_estimates.html">smooth_estimates()</a></code></p>
+<p>Use a ggplot2 theme to change the appearance of the plots. The
+<code>&amp;</code> operator applies the settings to every panel:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://ggplot2.tidyverse.org" class="external-link">"ggplot2"</a></span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span> <span class="op">&amp;</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span></span>
+<span>  geom.gratia.smooth <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_geom</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="st">"forestgreen"</span>, linewidth <span class="op">=</span> <span class="fl">1.5</span><span class="op">)</span>,</span>
+<span>  geom.gratia.interval <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_geom</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="st">"forestgreen"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p><img src="gratia_files/figure-html/theme-smooths-1.png" class="r-plt" alt="" width="700"></p>
+<p>To choose different layers or map other variables to plot aesthetics,
+obtain the estimates with <code><a href="../reference/smooth_estimates.html">smooth_estimates()</a></code> and build a
+plot yourself.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/smooth_estimates.html">smooth_estimates</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span></span>
 <span><span class="va">sm</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 400 × 9</span></span></span>
@@ -196,21 +204,15 @@ the plot above with <code><a href="../reference/smooth_estimates.html">smooth_es
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 390 more rows</span></span></span></code></pre></div>
 <p>which will evaluate all smooths at values that are evenly spaced over
 the range of the covariate(s). If you want to evaluate only selected
-smooths, you can specify which via the <code>smooth</code> argument.
+smooths, you can specify which via the <code>select</code> argument.
 This takes the <em>smooth labels</em> which are the names of the smooths
 as they are known to mgcv. To list the labels for the smooths in use</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/smooths.html">smooths</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "s(x0)" "s(x1)" "s(x2)" "s(x3)"</span></span></code></pre></div>
 <p>To evaluate only <span class="math inline">f(x_2)</span> use</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">sm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/smooth_estimates.html">smooth_estimates</a></span><span class="op">(</span><span class="va">m</span>, smooth <span class="op">=</span> <span class="st">"s(x2)"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: The `smooth` argument of `smooth_estimates()` is deprecated as of gratia</span></span>
-<span><span class="co">#&gt; 0.8.9.9.</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Please use the `select` argument instead.</span></span>
-<span><span class="co">#&gt; <span style="color: #555555;">This warning is displayed once per session.</span></span></span>
-<span><span class="co">#&gt; <span style="color: #555555;">Call `lifecycle::last_lifecycle_warnings()` to see where this warning was</span></span></span>
-<span><span class="co">#&gt; <span style="color: #555555;">generated.</span></span></span>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">sm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/smooth_estimates.html">smooth_estimates</a></span><span class="op">(</span><span class="va">m</span>, select <span class="op">=</span> <span class="st">"s(x2)"</span><span class="op">)</span></span>
 <span><span class="va">sm</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 100 × 6</span></span></span>
 <span><span class="co">#&gt;    .smooth .type .by   .estimate   .se      x2</span></span>
@@ -228,7 +230,7 @@ as they are known to mgcv. To list the labels for the smooths in use</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 90 more rows</span></span></span></code></pre></div>
 <p>Then you can generate your own plot using the ggplot2 package, for
 example</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://ggplot2.tidyverse.org" class="external-link">"ggplot2"</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://dplyr.tidyverse.org" class="external-link">"dplyr"</a></span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -261,7 +263,7 @@ example</p>
 </h3>
 <p>The <code><a href="../reference/appraise.html">appraise()</a></code> function provides standard diagnostic
 plots for GAMs</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/appraise.html">appraise</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span></span></code></pre></div>
 <p><img src="gratia_files/figure-html/appraise-1.png" class="r-plt" alt="" width="700"></p>
 <p>The plots produced are (from left-to-right, top-to-bottom),</p>
@@ -275,7 +277,7 @@ predictor,</li>
 <p>Adding partial residuals to the partial effect plots produced by
 <code><a href="../reference/draw.html">draw()</a></code> can also help diagnose problems with the model, such
 as oversmoothing</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">m</span>, residuals <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="gratia_files/figure-html/draw-partial-residuals-1.png" class="r-plt" alt="" width="700"></p>
 </div>

@@ -174,25 +174,36 @@ worm_plot(
 
 - ci_col:
 
-  fill colour for reference intervals, including bands for quantile
-  residuals.
+  Deprecated; use
+  [`gratia_theme_get()`](https://gavinsimpson.github.io/gratia/reference/gratia_theme_get.md)
+  theme settings instead. Fill colour for reference intervals, including
+  bands for quantile residuals.
 
 - ci_alpha:
 
-  alpha transparency for reference intervals.
+  Deprecated; use
+  [`gratia_theme_get()`](https://gavinsimpson.github.io/gratia/reference/gratia_theme_get.md)
+  theme settings instead. Alpha transparency for reference intervals.
 
 - point_col:
 
-  constant point colour when family components are not mapped to colour.
-  Pooled grouped diagnostics instead colour points by component.
+  Deprecated; use
+  [`gratia_theme_get()`](https://gavinsimpson.github.io/gratia/reference/gratia_theme_get.md)
+  theme settings instead. Constant point colour when family components
+  are not mapped to colour. Pooled grouped diagnostics instead colour
+  points by component.
 
 - point_alpha:
 
-  alpha transparency of points on the QQ plot.
+  Deprecated; use
+  [`gratia_theme_get()`](https://gavinsimpson.github.io/gratia/reference/gratia_theme_get.md)
+  theme settings instead. Alpha transparency of points on the QQ plot.
 
 - line_col:
 
-  colour used to draw the reference line.
+  Deprecated; use
+  [`gratia_theme_get()`](https://gavinsimpson.github.io/gratia/reference/gratia_theme_get.md)
+  theme settings instead. Colour used to draw the reference line.
 
 - seed:
 

@@ -45,17 +45,22 @@ posterior_predictive_plot(
 
 - observed_col, replicated_col:
 
-  colours for the observed and replicated distributions, respectively.
-  Standalone plots default to orange-red (`"#D55E00"`) and blue
-  (`"#0072B2"`). When called by
+  Deprecated; use
+  [`gratia_theme_get()`](https://gavinsimpson.github.io/gratia/reference/gratia_theme_get.md)
+  theme settings instead. Colours for the observed and replicated
+  distributions, respectively. Standalone plots default to orange-red
+  (`"#D55E00"`) and blue (`"#0072B2"`). When called by
   [`appraise()`](https://gavinsimpson.github.io/gratia/reference/appraise.md),
   the check uses that function's `line_col` and `ci_col` instead.
 
 - replicated_alpha:
 
-  numeric or `NULL`; opacity of replicated distributions. The default,
-  `NULL`, uses `0.8` for discrete posterior median points and interval
-  bars, and `0.2` for continuous density curves.
+  Deprecated; use
+  [`gratia_theme_get()`](https://gavinsimpson.github.io/gratia/reference/gratia_theme_get.md)
+  theme settings instead. Numeric or `NULL`; opacity of replicated
+  distributions. The default, `NULL`, uses `0.8` for discrete posterior
+  median points and interval bars, and `0.2` for continuous density
+  curves.
 
 - xlab:
 

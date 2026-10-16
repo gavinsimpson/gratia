@@ -80,18 +80,26 @@ draw(
 
 - alpha:
 
-  numeric; alpha transparency for confidence or simultaneous interval.
+  Deprecated; use
+  [`gratia_theme_get()`](https://gavinsimpson.github.io/gratia/reference/gratia_theme_get.md)
+  theme settings instead. Numeric; alpha transparency for confidence or
+  simultaneous interval.
 
 - change_col, decrease_col, increase_col:
 
-  colour specifications to use for indicating periods of change.
-  `col_change` is used when `change_type = "change"`, while
-  `col_decrease` and `col_increase` are used when \`change_type =
+  Deprecated; use
+  [`gratia_theme_get()`](https://gavinsimpson.github.io/gratia/reference/gratia_theme_get.md)
+  theme settings instead. Colour specifications to use for indicating
+  periods of change. `col_change` is used when `change_type = "change"`,
+  while `col_decrease` and `col_increase` are used when \`change_type =
   "sizer"“.
 
 - lwd_change:
 
-  numeric; the `linewidth` to use for the change indicators.
+  Deprecated; use
+  [`gratia_theme_get()`](https://gavinsimpson.github.io/gratia/reference/gratia_theme_get.md)
+  theme settings instead. Numeric; the `linewidth` to use for the change
+  indicators.
 
 - ncol, nrow:
 

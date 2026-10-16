@@ -223,8 +223,7 @@ method available for them
 
 ``` r
 
-sm_samp |>
-  draw(alpha = 0.3)
+draw(sm_samp) & theme(gratia.alpha.sample = 0.3)
 ```
 
 ![](posterior-simulation_files/figure-html/draw-smooth-samples-x0-1.png)
@@ -479,12 +478,7 @@ distribution GAM, and then plot it
 
 ``` r
 
-plt_gaulss <- plt_gau %+% sim_gaulss
-#> Warning: <ggplot> %+% x was deprecated in ggplot2 4.0.0.
-#> ℹ Please use <ggplot> + x instead.
-#> This warning is displayed once per session.
-#> Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
-#> generated.
+plt_gaulss <- plt_gau + sim_gaulss
 
 plt_gau + plt_gaulss +
   plot_annotation(tag_levels = "a") +

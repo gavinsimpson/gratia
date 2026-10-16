@@ -85,11 +85,17 @@ draw(
 
 - alpha:
 
-  numeric; alpha transparency for confidence or simultaneous interval.
+  Deprecated; use
+  [`gratia_theme_get()`](https://gavinsimpson.github.io/gratia/reference/gratia_theme_get.md)
+  theme settings instead. Numeric; alpha transparency for confidence or
+  simultaneous interval.
 
 - colour:
 
-  The colour to use to draw the posterior smooths. Passed to
+  Deprecated; use
+  [`gratia_theme_get()`](https://gavinsimpson.github.io/gratia/reference/gratia_theme_get.md)
+  theme settings instead. The colour to use to draw the posterior
+  smooths. Passed to
   [`ggplot2::geom_line()`](https://ggplot2.tidyverse.org/reference/geom_path.html)
   as argument `colour`.
 
@@ -99,7 +105,9 @@ draw(
 
 - contour_col:
 
-  colour specification for contour lines.
+  Deprecated; use
+  [`gratia_theme_get()`](https://gavinsimpson.github.io/gratia/reference/gratia_theme_get.md)
+  theme settings instead. Colour specification for contour lines.
 
 - n_contour:
 
@@ -163,10 +171,10 @@ m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat1, method = "REML")
 ## posterior smooths from m1
 sm1 <- smooth_samples(m1, n_draws = 15, seed = 23478)
 ## plot
-draw(sm1, alpha = 0.7)
+draw(sm1) & ggplot2::theme(gratia.alpha.sample = 0.7)
 
 ## plot only 5 randomly smapled draws
-draw(sm1, n_samples = 5, alpha = 0.7)
+draw(sm1, n_samples = 5) & ggplot2::theme(gratia.alpha.sample = 0.7)
 
 
 ## A factor-by smooth example
@@ -176,7 +184,8 @@ m2 <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = dat2, method = "REML")
 ## posterior smooths from m1
 sm2 <- smooth_samples(m2, n_draws = 15, seed = 23478)
 ## plot, this time selecting only the factor-by smooth
-draw(sm2, select = "s(x2)", partial_match = TRUE, alpha = 0.7)
+draw(sm2, select = "s(x2)", partial_match = TRUE) &
+  ggplot2::theme(gratia.alpha.sample = 0.7)
 
 
 # \donttest{

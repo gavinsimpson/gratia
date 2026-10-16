@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-52</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-53</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -138,7 +138,8 @@ smooths be combined into a single panel containing all levels (<code>TRUE</code>
 
 
 <dt id="arg-contour-col">contour_col<a class="anchor" aria-label="anchor" href="#arg-contour-col"></a></dt>
-<dd><p>colour specification for contour lines.</p></dd>
+<dd><p>Deprecated; use <code><a href="gratia_theme_get.html">gratia_theme_get()</a></code> theme
+settings instead. Colour specification for contour lines.</p></dd>
 
 
 <dt id="arg-n-contour">n_contour<a class="anchor" aria-label="anchor" href="#arg-n-contour"></a></dt>
@@ -147,32 +148,38 @@ smooths be combined into a single panel containing all levels (<code>TRUE</code>
 
 
 <dt id="arg-ci-alpha">ci_alpha<a class="anchor" aria-label="anchor" href="#arg-ci-alpha"></a></dt>
-<dd><p>numeric; alpha transparency for confidence or simultaneous
+<dd><p>Deprecated; use <code><a href="gratia_theme_get.html">gratia_theme_get()</a></code> theme
+settings instead. Numeric; alpha transparency for confidence or simultaneous
 interval.</p></dd>
 
 
 <dt id="arg-ci-col">ci_col<a class="anchor" aria-label="anchor" href="#arg-ci-col"></a></dt>
-<dd><p>colour specification for the confidence/credible intervals
+<dd><p>Deprecated; use <code><a href="gratia_theme_get.html">gratia_theme_get()</a></code> theme
+settings instead. Colour specification for the confidence/credible intervals
 band. Affects the fill of the interval.</p></dd>
 
 
 <dt id="arg-smooth-col">smooth_col<a class="anchor" aria-label="anchor" href="#arg-smooth-col"></a></dt>
-<dd><p>colour specification for the smooth line.</p></dd>
+<dd><p>Deprecated; use <code><a href="gratia_theme_get.html">gratia_theme_get()</a></code> theme
+settings instead. Colour specification for the smooth line.</p></dd>
 
 
 <dt id="arg-resid-col">resid_col<a class="anchor" aria-label="anchor" href="#arg-resid-col"></a></dt>
-<dd><p>colour specification for the partial residuals.</p></dd>
+<dd><p>Deprecated; use <code><a href="gratia_theme_get.html">gratia_theme_get()</a></code> theme
+settings instead. Colour specification for the partial residuals.</p></dd>
 
 
 <dt id="arg-decrease-col-increase-col">decrease_col, increase_col<a class="anchor" aria-label="anchor" href="#arg-decrease-col-increase-col"></a></dt>
-<dd><p>colour specifications to use for
+<dd><p>Deprecated; use <code><a href="gratia_theme_get.html">gratia_theme_get()</a></code> theme
+settings instead. Colour specifications to use for
 indicating periods of change. <code>col_change</code> is used when
 <code>change_type = "change"</code>, while <code>col_decrease</code> and <code>col_increase</code> are used
 when `change_type = "sizer"“.</p></dd>
 
 
 <dt id="arg-change-lwd">change_lwd<a class="anchor" aria-label="anchor" href="#arg-change-lwd"></a></dt>
-<dd><p>numeric; the value to set the <code>linewidth</code> to in
+<dd><p>Deprecated; use <code><a href="gratia_theme_get.html">gratia_theme_get()</a></code> theme
+settings instead. Numeric; the value to set the <code>linewidth</code> to in
 <code><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">ggplot2::geom_line()</a></code>, used to represent the periods of change.</p></dd>
 
 
@@ -276,12 +283,14 @@ Smooth bounds follow <code>interval</code>; parametric bounds remain pointwise.<
 
 
 <dt id="arg-ci-d-alpha">ci_3d_alpha<a class="anchor" aria-label="anchor" href="#arg-ci-d-alpha"></a></dt>
-<dd><p>numeric between 0 and 1; opacity of both interval
+<dd><p>Deprecated; use <code><a href="gratia_theme_get.html">gratia_theme_get()</a></code> theme
+settings instead. Numeric between 0 and 1; opacity of both interval
 surfaces, independent of <code>ci_alpha</code>. Defaults to <code>0.15</code>.</p></dd>
 
 
 <dt id="arg-ci-d-col">ci_3d_col<a class="anchor" aria-label="anchor" href="#arg-ci-d-col"></a></dt>
-<dd><p>one R colour; fill of both interval surfaces, independent
+<dd><p>Deprecated; use <code><a href="gratia_theme_get.html">gratia_theme_get()</a></code> theme
+settings instead. One R colour; fill of both interval surfaces, independent
 of <code>ci_col</code> and the estimate's continuous fill scale. Defaults to <code>"grey60"</code>.</p></dd>
 
 
@@ -367,7 +376,10 @@ cannot change intervals when drawing saved estimates.</p></dd>
 <span class="r-plt img"><img src="draw.smooth_estimates-2.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># customising some plot elements</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="va">sm</span>, ci_col <span class="op">=</span> <span class="st">"steelblue"</span>, smooth_col <span class="op">=</span> <span class="st">"forestgreen"</span>, ci_alpha <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="va">sm</span><span class="op">)</span> <span class="op">&amp;</span> <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  geom.gratia.interval <span class="op">=</span> <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_geom</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="st">"steelblue"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  geom.gratia.smooth <span class="op">=</span> <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_geom</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="st">"forestgreen"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  gratia.alpha.interval <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="draw.smooth_estimates-3.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Add a constant to the plotted smooth</span></span></span>

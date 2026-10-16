@@ -54,12 +54,18 @@ observed_fitted_plot(
 
 - point_col:
 
-  constant point colour when components are not mapped to colour. Pooled
-  grouped diagnostics instead colour points by component.
+  Deprecated; use
+  [`gratia_theme_get()`](https://gavinsimpson.github.io/gratia/reference/gratia_theme_get.md)
+  theme settings instead. Constant point colour when components are not
+  mapped to colour. Pooled grouped diagnostics instead colour points by
+  component.
 
 - point_alpha:
 
-  numeric; alpha transparency for points in plots.
+  Deprecated; use
+  [`gratia_theme_get()`](https://gavinsimpson.github.io/gratia/reference/gratia_theme_get.md)
+  theme settings instead. Numeric; alpha transparency for points in
+  plots.
 
 - by_family:
 

@@ -238,24 +238,36 @@ draw(
 
 - ci_alpha:
 
-  numeric; alpha transparency for confidence or simultaneous interval.
+  Deprecated; use
+  [`gratia_theme_get()`](https://gavinsimpson.github.io/gratia/reference/gratia_theme_get.md)
+  theme settings instead. Numeric; alpha transparency for confidence or
+  simultaneous interval.
 
 - ci_col:
 
-  colour specification for the confidence/credible intervals band.
-  Affects the fill of the interval.
+  Deprecated; use
+  [`gratia_theme_get()`](https://gavinsimpson.github.io/gratia/reference/gratia_theme_get.md)
+  theme settings instead. Colour specification for the
+  confidence/credible intervals band. Affects the fill of the interval.
 
 - smooth_col:
 
-  colour specification for the smooth line.
+  Deprecated; use
+  [`gratia_theme_get()`](https://gavinsimpson.github.io/gratia/reference/gratia_theme_get.md)
+  theme settings instead. Colour specification for the smooth line.
 
 - resid_col:
 
-  colour specification for the partial residuals.
+  Deprecated; use
+  [`gratia_theme_get()`](https://gavinsimpson.github.io/gratia/reference/gratia_theme_get.md)
+  theme settings instead. Colour specification for the partial
+  residuals.
 
 - contour_col:
 
-  colour specification for contour lines.
+  Deprecated; use
+  [`gratia_theme_get()`](https://gavinsimpson.github.io/gratia/reference/gratia_theme_get.md)
+  theme settings instead. Colour specification for contour lines.
 
 - n_contour:
 
@@ -399,13 +411,18 @@ draw(
 
 - ci_3d_alpha:
 
-  numeric between 0 and 1; opacity of both interval surfaces,
-  independent of `ci_alpha`. Defaults to `0.15`.
+  Deprecated; use
+  [`gratia_theme_get()`](https://gavinsimpson.github.io/gratia/reference/gratia_theme_get.md)
+  theme settings instead. Numeric between 0 and 1; opacity of both
+  interval surfaces, independent of `ci_alpha`. Defaults to `0.15`.
 
 - ci_3d_col:
 
-  one R colour; fill of both interval surfaces, independent of `ci_col`
-  and the estimate's continuous fill scale. Defaults to `"grey60"`.
+  Deprecated; use
+  [`gratia_theme_get()`](https://gavinsimpson.github.io/gratia/reference/gratia_theme_get.md)
+  theme settings instead. One R colour; fill of both interval surfaces,
+  independent of `ci_col` and the estimate's continuous fill scale.
+  Defaults to `"grey60"`.
 
 - back_transform:
 
@@ -615,8 +632,8 @@ draw(m2, surface = "tile", n_2d = 30)
 if (requireNamespace("ggcube", quietly = TRUE)) {
   draw(m2, surface = "3d", n_2d = 20,
     surface_3d = list(yaw = 45, persp = FALSE))
-  draw(m2, surface = "3d", ci_3d = TRUE, ci_3d_alpha = 0.12,
-    n_2d = 20)
+  draw(m2, surface = "3d", ci_3d = TRUE, n_2d = 20) &
+    ggplot2::theme(gratia.alpha.surface.interval = 0.12)
   panels <- assemble(m2, surface = "3d", n_2d = 20)
   # Replace coordinates to customize a single term; retain the current theme.
   panels[[1]] <- panels[[1]] +

@@ -9,7 +9,7 @@ from the approximate posterior predictive distribution of a fitted model."><meta
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-52</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-53</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -105,14 +105,16 @@ caller's random-number state is preserved.</p></dd>
 
 
 <dt id="arg-observed-col-replicated-col">observed_col, replicated_col<a class="anchor" aria-label="anchor" href="#arg-observed-col-replicated-col"></a></dt>
-<dd><p>colours for the observed and replicated
+<dd><p>Deprecated; use <code><a href="gratia_theme_get.html">gratia_theme_get()</a></code> theme
+settings instead. Colours for the observed and replicated
 distributions, respectively. Standalone plots default to orange-red
 (<code>"#D55E00"</code>) and blue (<code>"#0072B2"</code>). When called by <code><a href="appraise.html">appraise()</a></code>, the check
 uses that function's <code>line_col</code> and <code>ci_col</code> instead.</p></dd>
 
 
 <dt id="arg-replicated-alpha">replicated_alpha<a class="anchor" aria-label="anchor" href="#arg-replicated-alpha"></a></dt>
-<dd><p>numeric or <code>NULL</code>; opacity of replicated
+<dd><p>Deprecated; use <code><a href="gratia_theme_get.html">gratia_theme_get()</a></code> theme
+settings instead. Numeric or <code>NULL</code>; opacity of replicated
 distributions. The default, <code>NULL</code>, uses <code>0.8</code> for discrete posterior
 median points and interval bars, and <code>0.2</code> for continuous density curves.</p></dd>
 

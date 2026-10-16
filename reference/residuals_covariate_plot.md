@@ -161,15 +161,24 @@ scalable_residuals_covariate_plot(
 
 - point_col:
 
-  colour for individual residual points or observation locations.
+  Deprecated; use
+  [`gratia_theme_get()`](https://gavinsimpson.github.io/gratia/reference/gratia_theme_get.md)
+  theme settings instead. Colour for individual residual points or
+  observation locations.
 
 - point_alpha:
 
-  numeric; alpha transparency for points in plots.
+  Deprecated; use
+  [`gratia_theme_get()`](https://gavinsimpson.github.io/gratia/reference/gratia_theme_get.md)
+  theme settings instead. Numeric; alpha transparency for points in
+  plots.
 
 - line_col:
 
-  colour for reference lines and categorical group means.
+  Deprecated; use
+  [`gratia_theme_get()`](https://gavinsimpson.github.io/gratia/reference/gratia_theme_get.md)
+  theme settings instead. Colour for reference lines and categorical
+  group means.
 
 - xlab:
 

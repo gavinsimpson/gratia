@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-52</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-53</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -235,12 +235,14 @@ posterior predictive intervals for discrete responses with <code>ppcheck = TRUE<
 
 
 <dt id="arg-ci-alpha-ci-col">ci_alpha, ci_col<a class="anchor" aria-label="anchor" href="#arg-ci-alpha-ci-col"></a></dt>
-<dd><p>colour and transparency of QQ reference intervals,
+<dd><p>Deprecated; use <code><a href="gratia_theme_get.html">gratia_theme_get()</a></code> theme
+settings instead. Colour and transparency of QQ reference intervals,
 including bands for quantile residuals.</p></dd>
 
 
 <dt id="arg-point-col-point-alpha">point_col, point_alpha<a class="anchor" aria-label="anchor" href="#arg-point-col-point-alpha"></a></dt>
-<dd><p>colour and transparency used to draw points in
+<dd><p>Deprecated; use <code><a href="gratia_theme_get.html">gratia_theme_get()</a></code> theme
+settings instead. Colour and transparency used to draw points in
 the plots. See <code><a href="https://rdrr.io/r/graphics/par.html" class="external-link">graphics::par()</a></code> section <strong>Color Specification</strong>. This is
 passed to the individual plotting functions, and therefore affects the
 points of all plots. Pooled grouped residual panels map component identity
@@ -248,7 +250,8 @@ to colour instead of using the constant <code>point_col</code>.</p></dd>
 
 
 <dt id="arg-line-col">line_col<a class="anchor" aria-label="anchor" href="#arg-line-col"></a></dt>
-<dd><p>colour specification for the 1:1 line in the QQ plot and the
+<dd><p>Deprecated; use <code><a href="gratia_theme_get.html">gratia_theme_get()</a></code> theme
+settings instead. Colour specification for the 1:1 line in the QQ plot and the
 reference line in the residuals vs linear predictor plot. Also used for
 the observed distribution when <code>ppcheck = TRUE</code>.</p></dd>
 
@@ -437,7 +440,9 @@ simulated residuals method (<code>method = "simulated"</code>). To avoid confusi
 <span class="r-in"><span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="data_sim.html">data_sim</a></span><span class="op">(</span><span class="st">"eg1"</span>, n <span class="op">=</span> <span class="fl">400</span>, dist <span class="op">=</span> <span class="st">"normal"</span>, scale <span class="op">=</span> <span class="fl">2</span>, seed <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">mod</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x0</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x1</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x2</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x3</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">dat</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co">## run some basic model checks</span></span></span>
-<span class="r-in"><span><span class="fu">appraise</span><span class="op">(</span><span class="va">mod</span>, point_col <span class="op">=</span> <span class="st">"steelblue"</span>, point_alpha <span class="op">=</span> <span class="fl">0.4</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">appraise</span><span class="op">(</span><span class="va">mod</span><span class="op">)</span> <span class="op">&amp;</span> <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  geom.gratia.diagnostic.point <span class="op">=</span> <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_geom</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="st">"steelblue"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  gratia.alpha.diagnostic.point <span class="op">=</span> <span class="fl">0.4</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="appraise-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="co">## replace the residual histogram with a posterior predictive check</span></span></span>
 <span class="r-in"><span><span class="fu">appraise</span><span class="op">(</span><span class="va">mod</span>, ppcheck <span class="op">=</span> <span class="cn">TRUE</span>, n_ppc <span class="op">=</span> <span class="fl">20</span>, seed <span class="op">=</span> <span class="fl">42</span><span class="op">)</span></span></span>
@@ -446,15 +451,8 @@ simulated residuals method (<code>method = "simulated"</code>). To avoid confusi
 <span class="r-in"><span><span class="co">## To change the theme for all panels use the &amp; operator, for example to</span></span></span>
 <span class="r-in"><span><span class="co">## change the ggplot theme for all panels</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://ggplot2.tidyverse.org" class="external-link">"ggplot2"</a></span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/packageDescription.html" class="external-link">packageVersion</a></span><span class="op">(</span><span class="st">"ggplot2"</span><span class="op">)</span> <span class="op">&lt;=</span> <span class="st">"3.5.2"</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span>  <span class="co"># Throws warning with ggplot rc 4.0.0 and patchwork 1.3.1 - will be fixed</span></span></span>
-<span class="r-in"><span>  <span class="co"># in patchwork 1.3.2 - so temporarily skipping during ggplot release</span></span></span>
-<span class="r-in"><span>  <span class="co"># process</span></span></span>
-<span class="r-in"><span>  <span class="fu">appraise</span><span class="op">(</span><span class="va">mod</span>, seed <span class="op">=</span> <span class="fl">42</span>,</span></span>
-<span class="r-in"><span>    point_col <span class="op">=</span> <span class="st">"steelblue"</span>, point_alpha <span class="op">=</span> <span class="fl">0.4</span>,</span></span>
-<span class="r-in"><span>    line_col <span class="op">=</span> <span class="st">"black"</span></span></span>
-<span class="r-in"><span>  <span class="op">)</span> <span class="op">&amp;</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span><span class="fu">appraise</span><span class="op">(</span><span class="va">mod</span>, seed <span class="op">=</span> <span class="fl">42</span><span class="op">)</span> <span class="op">&amp;</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="appraise-3.png" alt="" width="700" height="433"></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

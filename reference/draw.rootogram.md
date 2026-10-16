@@ -57,7 +57,10 @@ draw(
 - fitted_colour, bar_colour, bar_fill, ref_line_colour,
   warn_line_colour:
 
-  colours used to draw the respective element of the rootogram.
+  Deprecated; use
+  [`gratia_theme_get()`](https://gavinsimpson.github.io/gratia/reference/gratia_theme_get.md)
+  theme settings instead. Colours used to draw the respective element of
+  the rootogram.
 
 - xlab, ylab:
 

@@ -81,7 +81,9 @@ draw(
 
 - contour_col:
 
-  colour specification for contour lines.
+  Deprecated; use
+  [`gratia_theme_get()`](https://gavinsimpson.github.io/gratia/reference/gratia_theme_get.md)
+  theme settings instead. Colour specification for contour lines.
 
 - n_contour:
 
@@ -91,31 +93,46 @@ draw(
 
 - ci_alpha:
 
-  numeric; alpha transparency for confidence or simultaneous interval.
+  Deprecated; use
+  [`gratia_theme_get()`](https://gavinsimpson.github.io/gratia/reference/gratia_theme_get.md)
+  theme settings instead. Numeric; alpha transparency for confidence or
+  simultaneous interval.
 
 - ci_col:
 
-  colour specification for the confidence/credible intervals band.
-  Affects the fill of the interval.
+  Deprecated; use
+  [`gratia_theme_get()`](https://gavinsimpson.github.io/gratia/reference/gratia_theme_get.md)
+  theme settings instead. Colour specification for the
+  confidence/credible intervals band. Affects the fill of the interval.
 
 - smooth_col:
 
-  colour specification for the smooth line.
+  Deprecated; use
+  [`gratia_theme_get()`](https://gavinsimpson.github.io/gratia/reference/gratia_theme_get.md)
+  theme settings instead. Colour specification for the smooth line.
 
 - resid_col:
 
-  colour specification for the partial residuals.
+  Deprecated; use
+  [`gratia_theme_get()`](https://gavinsimpson.github.io/gratia/reference/gratia_theme_get.md)
+  theme settings instead. Colour specification for the partial
+  residuals.
 
 - decrease_col, increase_col:
 
-  colour specifications to use for indicating periods of change.
-  `col_change` is used when `change_type = "change"`, while
-  `col_decrease` and `col_increase` are used when \`change_type =
+  Deprecated; use
+  [`gratia_theme_get()`](https://gavinsimpson.github.io/gratia/reference/gratia_theme_get.md)
+  theme settings instead. Colour specifications to use for indicating
+  periods of change. `col_change` is used when `change_type = "change"`,
+  while `col_decrease` and `col_increase` are used when \`change_type =
   "sizer"“.
 
 - change_lwd:
 
-  numeric; the value to set the `linewidth` to in
+  Deprecated; use
+  [`gratia_theme_get()`](https://gavinsimpson.github.io/gratia/reference/gratia_theme_get.md)
+  theme settings instead. Numeric; the value to set the `linewidth` to
+  in
   [`ggplot2::geom_line()`](https://ggplot2.tidyverse.org/reference/geom_path.html),
   used to represent the periods of change.
 
@@ -225,13 +242,18 @@ draw(
 
 - ci_3d_alpha:
 
-  numeric between 0 and 1; opacity of both interval surfaces,
-  independent of `ci_alpha`. Defaults to `0.15`.
+  Deprecated; use
+  [`gratia_theme_get()`](https://gavinsimpson.github.io/gratia/reference/gratia_theme_get.md)
+  theme settings instead. Numeric between 0 and 1; opacity of both
+  interval surfaces, independent of `ci_alpha`. Defaults to `0.15`.
 
 - ci_3d_col:
 
-  one R colour; fill of both interval surfaces, independent of `ci_col`
-  and the estimate's continuous fill scale. Defaults to `"grey60"`.
+  Deprecated; use
+  [`gratia_theme_get()`](https://gavinsimpson.github.io/gratia/reference/gratia_theme_get.md)
+  theme settings instead. One R colour; fill of both interval surfaces,
+  independent of `ci_col` and the estimate's continuous fill scale.
+  Defaults to `"grey60"`.
 
 - back_transform:
 
@@ -322,7 +344,10 @@ draw(sm)
 
 
 # customising some plot elements
-draw(sm, ci_col = "steelblue", smooth_col = "forestgreen", ci_alpha = 0.3)
+draw(sm) & ggplot2::theme(
+  geom.gratia.interval = ggplot2::element_geom(fill = "steelblue"),
+  geom.gratia.smooth = ggplot2::element_geom(colour = "forestgreen"),
+  gratia.alpha.interval = 0.3)
 
 
 # Add a constant to the plotted smooth

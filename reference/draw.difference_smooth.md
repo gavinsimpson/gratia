@@ -63,7 +63,9 @@ draw(
 
 - contour_col:
 
-  colour specification for contour lines.
+  Deprecated; use
+  [`gratia_theme_get()`](https://gavinsimpson.github.io/gratia/reference/gratia_theme_get.md)
+  theme settings instead. Colour specification for contour lines.
 
 - n_contour:
 
@@ -73,20 +75,31 @@ draw(
 
 - ci_alpha:
 
-  numeric; alpha transparency for confidence or simultaneous interval.
+  Deprecated; use
+  [`gratia_theme_get()`](https://gavinsimpson.github.io/gratia/reference/gratia_theme_get.md)
+  theme settings instead. Numeric; alpha transparency for confidence or
+  simultaneous interval.
 
 - ci_col:
 
-  colour specification for the confidence/credible intervals band.
-  Affects the fill of the interval.
+  Deprecated; use
+  [`gratia_theme_get()`](https://gavinsimpson.github.io/gratia/reference/gratia_theme_get.md)
+  theme settings instead. Colour specification for the
+  confidence/credible intervals band. Affects the fill of the interval.
 
 - smooth_col:
 
-  colour specification for the the smooth or difference line.
+  Deprecated; use
+  [`gratia_theme_get()`](https://gavinsimpson.github.io/gratia/reference/gratia_theme_get.md)
+  theme settings instead. Colour specification for the the smooth or
+  difference line.
 
 - line_col:
 
-  colour specification for drawing reference lines
+  Deprecated; use
+  [`gratia_theme_get()`](https://gavinsimpson.github.io/gratia/reference/gratia_theme_get.md)
+  theme settings instead. Colour specification for drawing reference
+  lines
 
 - scales:
 

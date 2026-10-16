@@ -56,6 +56,14 @@ plots](https://gavinsimpson.github.io/gratia/articles/custom-plotting.md).
 - [`scale_fill_partial_effect()`](https://gavinsimpson.github.io/gratia/reference/scale_fill_partial_effect.md)
   : Default diverging red-blue colour palette for partial effects
 
+- [`gratia_theme_get()`](https://gavinsimpson.github.io/gratia/reference/gratia_theme_get.md)
+  [`gratia_theme_set()`](https://gavinsimpson.github.io/gratia/reference/gratia_theme_get.md)
+  [`gratia_theme_update()`](https://gavinsimpson.github.io/gratia/reference/gratia_theme_get.md)
+  : Native themes for gratia plots
+
+- [`gratia_palette()`](https://gavinsimpson.github.io/gratia/reference/gratia_palette.md)
+  : Discrete palettes for gratia plots
+
 ## Estimate smooths and parametric effects
 
 Estimate individual model terms, add confidence intervals and partial

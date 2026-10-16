@@ -91,7 +91,9 @@ draw(
 
 - contour_col:
 
-  colour specification for contour lines.
+  Deprecated; use
+  [`gratia_theme_get()`](https://gavinsimpson.github.io/gratia/reference/gratia_theme_get.md)
+  theme settings instead. Colour specification for contour lines.
 
 - ...:
 

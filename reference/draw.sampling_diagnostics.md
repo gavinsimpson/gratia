@@ -61,11 +61,15 @@ draw(
 
 - alpha:
 
-  Transparency of the chain lines.
+  Deprecated; use
+  [`gratia_theme_get()`](https://gavinsimpson.github.io/gratia/reference/gratia_theme_get.md)
+  theme settings instead. Transparency of the chain lines.
 
 - linewidth:
 
-  Width of the chain lines.
+  Deprecated; use
+  [`gratia_theme_get()`](https://gavinsimpson.github.io/gratia/reference/gratia_theme_get.md)
+  theme settings instead. Width of the chain lines.
 
 - discrete_colour:
 
