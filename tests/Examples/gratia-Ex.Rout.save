@@ -1351,6 +1351,8 @@ detaching ‘package:mgcv’
 > if (requireNamespace("ggcube", quietly = TRUE)) {
 +   draw(m2, surface = "3d", n_2d = 20,
 +     surface_3d = list(yaw = 45, persp = FALSE))
++   draw(m2, surface = "3d", ci_3d = TRUE, ci_3d_alpha = 0.12,
++     n_2d = 20)
 +   panels <- assemble(m2, surface = "3d", n_2d = 20)
 +   # Replace coordinates to customize a single term; retain the current theme.
 +   panels[[1]] <- panels[[1]] +
@@ -1402,6 +1404,11 @@ detaching ‘package:mgcv’
 +   m <- gamlss(fl, data = dataSim)
 + 
 +   draw(m)
++   if (requireNamespace("ggcube", quietly = TRUE)) {
++     surface <- GJRM::gamlss(list(y1 ~ s(x2, x3, k = 10), ~ s(x3, k = 6)),
++       data = dataSim)
++     draw(surface, surface = "3d", ci_3d = TRUE, n_2d = 15)
++   }
 + }
 > 
 > 
@@ -1996,6 +2003,10 @@ detaching ‘package:lme4’, ‘package:Matrix’, ‘package:mgcv’
 +     data = d, REML = TRUE)
 +   draw(mixed) # separate QQ panels for intercepts and slopes
 +   draw(mixed, ranef_lines = TRUE) # random contributions only
++   if (requireNamespace("ggcube", quietly = TRUE)) {
++     interaction <- glmmTMB::glmmTMB(y ~ x:z, data = d)
++     draw(interaction, surface = "3d", ci_3d = TRUE, n_2d = 15)
++   }
 + }
 Loading required package: nlme
 This is mgcv 1.9-4. For overview type '?mgcv'.
@@ -3230,6 +3241,10 @@ detaching ‘package:mgcv’, ‘package:nlme’
 +   draw(m)
 +   smooth_estimates(m, select = "s(x)")
 +   assemble(m)
++   if (requireNamespace("ggcube", quietly = TRUE)) {
++     surface <- sdmTMB::sdmTMB(y ~ s(x, z, k = 8), data = d, spatial = "off")
++     draw(surface, surface = "3d", ci_3d = TRUE, n_2d = 15)
++   }
 + 
 +   d$y <- ifelse(runif(150) < 0.3, 0, exp(d$y))
 +   delta <- sdmTMB::sdmTMB(y ~ z + s(x, k = 6),

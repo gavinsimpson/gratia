@@ -458,6 +458,11 @@
   ggcube's theme. Lighting defaults to `backface_scale = 1`; supply a custom
   `light` through `surface_3d` to override it. Opaque faces, contours and
   floor observations share depth ordering so hidden features are occluded.
+  Set `ci_3d = TRUE` to add translucent lower and upper interval surfaces to
+  smooths and numeric parametric interactions across supported model classes.
+  `ci_3d_alpha` and `ci_3d_col` style the bounds independently of curve ribbons.
+  Interval surfaces retain the estimate's mesh and masking; their heights
+  expand the vertical range without training the continuous fill scale.
 
 * `draw()` and `assemble()` now accept `surface = "tile"` to draw flat smooth
   surfaces with vector rectangles; the default remains `surface = "raster"`

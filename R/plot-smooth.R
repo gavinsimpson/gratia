@@ -408,6 +408,7 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
 #'   Changed covariate scales with irregular spacing use rectangles bounded by
 #'   adjacent coordinate midpoints for flat surfaces.
 #' @param surface_3d Named options for the 3D coordinate system.
+#' @param ci_3d,ci_3d_alpha,ci_3d_col Enable and style 3D interval surfaces.
 #' @param facet_vars Column names that identify separate mesh panels.
 #' @param surface_support Recorded support and normalization for masking.
 #' @param isotropic Preserve equal horizontal units by default.
@@ -444,7 +445,9 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
 `prepare_surface_plot` <- function(
   object, x_var, y_var, fill_var, fill_limits = NULL, fill_title = NULL,
   labels = labs(), surface = c("raster", "tile", "3d"),
-  surface_3d = list(), continuous_fill = NULL,
+  surface_3d = list(),
+  ci_3d = FALSE,
+  ci_3d_alpha = 0.15, ci_3d_col = "grey60", continuous_fill = NULL,
   contour = TRUE, contour_col = "black", n_contour = NULL, angle = NULL,
   facet = NULL, coord = NULL, rug = NULL, boundary = NULL, boundary_group = NULL,
   mapping = NULL, contour_mapping = NULL, contour_na_rm = TRUE,
@@ -457,12 +460,18 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
 ) {
   surface <- match.arg(surface)
   validate_surface_3d(surface_3d)
+  validate_ci_3d(ci_3d, ci_3d_alpha, ci_3d_col)
   if (surface == "3d") {
     if (is.numeric(object[[x_var]]) && is.numeric(object[[y_var]])) {
+      ci_3d <- ci_3d && fill_var %in% c(".estimate", ".partial")
+      if (ci_3d && !all(c(".lower_ci", ".upper_ci") %in% names(object))) {
+        stop("3D interval surfaces require both interval-bound columns.", call. = FALSE)
+      }
       return(prepare_surface_3d(object, x_var, y_var, fill_var, fill_limits,
         fill_title, labels, continuous_fill, contour, contour_col, n_contour,
         facet, facet_vars, rug, boundary, boundary_group, surface_3d,
-        isotropic || inherits(coord, "CoordFixed"), surface_support, z_limits))
+        isotropic || inherits(coord, "CoordFixed"), surface_support, z_limits,
+        ci_3d, ci_3d_alpha, ci_3d_col))
     }
     message("3D surfaces require two numeric axes; retaining the flat display.")
     surface <- "raster"
@@ -572,11 +581,14 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
   angle = NULL,
   surface = c("raster", "tile", "3d"),
   surface_3d = list(),
+  ci_3d = FALSE,
+  ci_3d_alpha = 0.15, ci_3d_col = "grey60",
   surface_support = NULL,
   ...
 ) {
   surface <- match.arg(surface)
   validate_surface_3d(surface_3d)
+  validate_ci_3d(ci_3d, ci_3d_alpha, ci_3d_col)
   if (is.null(variables)) {
     variables <- vars_from_label(unique(object[[".smooth"]]))
   }
@@ -590,6 +602,7 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
   )
   prepare_surface_plot(object,
     x_var = variables[1], y_var = variables[2], surface = surface, surface_3d = surface_3d,
+    ci_3d = ci_3d, ci_3d_alpha = ci_3d_alpha, ci_3d_col = ci_3d_col,
     fill_var = prepared$fill_var, fill_limits = prepared$fill_limits,
     fill_title = prepared$fill_title, labels = labels,
     continuous_fill = continuous_fill, contour = contour,
@@ -623,11 +636,14 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
   angle = NULL,
   surface = c("raster", "tile", "3d"),
   surface_3d = list(),
+  ci_3d = FALSE,
+  ci_3d_alpha = 0.15, ci_3d_col = "grey60",
   surface_support = NULL,
   ...
 ) {
   surface <- match.arg(surface)
   validate_surface_3d(surface_3d)
+  validate_ci_3d(ci_3d, ci_3d_alpha, ci_3d_col)
   if (is.null(variables)) {
     variables <- attr(object, "tensor_term_order")
     if (is.null(variables)) {
@@ -647,6 +663,7 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
   coord <- if (inherits(object, "isotropic_smooth")) coord_equal() else NULL
   prepare_surface_plot(object,
     x_var = variables[1], y_var = variables[2], surface = surface, surface_3d = surface_3d,
+    ci_3d = ci_3d, ci_3d_alpha = ci_3d_alpha, ci_3d_col = ci_3d_col,
     fill_var = prepared$fill_var, fill_limits = prepared$fill_limits,
     fill_title = prepared$fill_title, labels = labels,
     continuous_fill = continuous_fill, contour = contour,
@@ -682,11 +699,14 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
   angle = NULL,
   surface = c("raster", "tile", "3d"),
   surface_3d = list(),
+  ci_3d = FALSE,
+  ci_3d_alpha = 0.15, ci_3d_col = "grey60",
   surface_support = NULL,
   ...
 ) {
   surface <- match.arg(surface)
   validate_surface_3d(surface_3d)
+  validate_ci_3d(ci_3d, ci_3d_alpha, ci_3d_col)
   if (is.null(variables)) {
     variables <- vars_from_label(unique(object[[".smooth"]]))
   }
@@ -704,6 +724,7 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
   coord <- if (inherits(object, "isotropic_smooth")) coord_equal() else NULL
   prepare_surface_plot(object,
     x_var = variables[1], y_var = variables[2], surface = surface, surface_3d = surface_3d,
+    ci_3d = ci_3d, ci_3d_alpha = ci_3d_alpha, ci_3d_col = ci_3d_col,
     fill_var = prepared$fill_var, fill_limits = prepared$fill_limits,
     fill_title = prepared$fill_title, labels = labels,
     continuous_fill = continuous_fill, contour = contour,
@@ -720,16 +741,21 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
   object,
   surface = c("raster", "tile", "3d"),
   surface_3d = list(),
+  ci_3d = FALSE,
+  ci_3d_alpha = 0.15, ci_3d_col = "grey60",
   surface_support = NULL,
   ...
 ) {
   surface <- match.arg(surface)
   validate_surface_3d(surface_3d)
+  validate_ci_3d(ci_3d, ci_3d_alpha, ci_3d_col)
   # Preserve equal horizontal units even when this method is called directly.
   class(object) <- unique(c("isotropic_smooth", class(object)))
   # plot as per a bivariate smooth
   plt <- plot_smooth.bivariate_smooth(object, surface = surface,
-    surface_3d = surface_3d, surface_support = surface_support, ...)
+    surface_3d = surface_3d,
+    ci_3d = ci_3d, ci_3d_alpha = ci_3d_alpha, ci_3d_col = ci_3d_col,
+    surface_support = surface_support, ...)
 
   # but set the x/y coordinates to have aspect ratio = 1
   if (surface != "3d") plt <- plt + coord_equal(ratio = 1)
@@ -1104,6 +1130,8 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
   lims_method = "geometry_bbox",
   angle = NULL,
   surface = "raster", surface_3d = list(),
+  ci_3d = FALSE,
+  ci_3d_alpha = 0.15, ci_3d_col = "grey60",
   grouped_by = FALSE,
   ...
 ) {
@@ -1267,11 +1295,14 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
   angle = NULL,
   surface = c("raster", "tile", "3d"),
   surface_3d = list(),
+  ci_3d = FALSE,
+  ci_3d_alpha = 0.15, ci_3d_col = "grey60",
   surface_support = NULL,
   ...
 ) {
   surface <- match.arg(surface)
   validate_surface_3d(surface_3d)
+  validate_ci_3d(ci_3d, ci_3d_alpha, ci_3d_col)
   if (is.null(variables)) {
     variables <- vars_from_label(unique(object[[".smooth"]]))
   }
@@ -1287,6 +1318,7 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
   )
   prepare_surface_plot(object,
     x_var = variables[1], y_var = variables[2], surface = surface, surface_3d = surface_3d,
+    ci_3d = ci_3d, ci_3d_alpha = ci_3d_alpha, ci_3d_col = ci_3d_col,
     fill_var = prepared$fill_var, fill_limits = prepared$fill_limits,
     fill_title = prepared$fill_title, labels = labels,
     continuous_fill = continuous_fill, contour = contour,
