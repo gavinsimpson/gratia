@@ -564,6 +564,10 @@
 
 ## Bug fixes
 
+* `n_smooths()` now counts smooth terms in glmmTMB models across the
+  conditional, zero-inflation and dispersion predictors, excluding native
+  random effects. Models without smooths return zero (#240).
+
 * Direct calls to `smooth_estimates()` now work for `GJRM::gamlss()` models
   (#352). Estimates use the final fitted coefficients and covariance, with
   smooth selection across equations and parameter labels retained for drawing
