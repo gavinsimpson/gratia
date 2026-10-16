@@ -172,6 +172,15 @@
 #' less accurate than requesting quantile residuals directly. CDFs without log
 #' probabilities retain ordinary-probability calculations.
 #'
+#' For [mgcv::multinom()] models, probabilities accumulate in the existing
+#' category coding order `0, ..., K`. If category `j` has probability `p_j`,
+#' its PIT is `F(j - 1) + V * p_j`, where `V` is uniform on `(0, 1)`.
+#' This uses one categorical response, rather than a vector of trial counts.
+#' The coding does not change the multinomial likelihood into an ordinal model.
+#' Each fixed enumeration gives a uniform randomized transform under the true
+#' model, but changing the enumeration can change individual residuals and
+#' which departures from the model are easiest to detect.
+#'
 #' Marginal checks may calculate residuals from ranks in joint response
 #' simulations when no analytic marginal CDF is available. See
 #' [diagnostic_support] for the rank definition, conditioning choices and
@@ -231,7 +240,7 @@ quantile_residuals.glm <- function(model, type = c("pit", "quantile"),
     bounds <- censored_response_bounds(y, discrete = ft == "cpois")
   } else {
     lower <- y
-    if (ft %in% c("poisson", "negative_binomial", "ziplss")) {
+    if (ft %in% c("poisson", "negative_binomial", "ziplss", "multinom")) {
       lower <- y - 1
     } else if (ft == "tweedie") {
       # Compound Poisson Tweedie responses have a probability atom at zero.

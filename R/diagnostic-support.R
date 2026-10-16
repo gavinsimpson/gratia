@@ -44,8 +44,9 @@
 #' * `gam`/`bam`: ordinary, distributional and grouped families, including
 #'   weighted Gamma, inverse Gaussian, `twlss`, ordinal and `ziP` distributions.
 #'   Multivariate-normal PITs check each response separately; simulations retain
-#'   covariance between responses. Nominal multinomial models retain traditional
-#'   residual checks and PPCs. PITs would require an ordering of their categories.
+#'   covariance between responses. Multinomial PIT/quantile residuals accumulate
+#'   category probabilities in mgcv's numeric coding order, `0, ..., K`.
+#'   Traditional residual checks and PPCs remain available.
 #' * SCAM models support ordinary posterior predictive plots. Scalable posterior
 #'   predictive plots are not currently available; use `scalable = FALSE`.
 #'   Smoothing-parameter uncertainty is not currently supported for SCAM models;

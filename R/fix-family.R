@@ -157,6 +157,7 @@ make_rd_clog <- function(sigma) {
     "gumbls"   = cdf_gumbls,
     "gammals"  = cdf_gammals,
     "binomial" = cdf_binomial,
+    "multinom" = make_cdf_multinom(family$nlp),
     "gamma"    = cdf_gamma,
     "ziplss"   = cdf_ziplss,
     "twlss"    = make_cdf_twlss(family),
@@ -421,6 +422,7 @@ extreme_value_probability <- function(log_hazard, log_p = FALSE,
     "gumbls"   = qf_gumbls,
     "gammals"  = qf_gammals,
     "ziplss"   = qf_ziplss,
+    "multinom" = make_qf_multinom(family$nlp),
     "twlss"    = make_qf_twlss(family),
     NULL # if don't handle family, return NULL as qfun so family unchanged
   )
@@ -726,4 +728,82 @@ check_legacy_quantile_tail <- function(value, original, converted,
   if (any(lost, na.rm = TRUE)) stop("Extreme-tail quantiles are unsupported by this legacy ",
     "inverse-CDF hook; provide native log-probability and tail support.", call. = FALSE)
   invisible(value)
+}
+
+# multinom() uses K logits relative to category 0, including when K = 1.
+# A vector denotes one observation for K > 1 and multiple observations for K = 1.
+multinom_arguments <- function(x, mu, K) {
+  if (is.null(dim(mu))) {
+    if (K > 1L && length(mu) != K)
+      stop("mu must contain K logits relative to category 0.", call. = FALSE)
+    mu <- matrix(mu, ncol = K, byrow = TRUE)
+  }
+  if (!is.numeric(mu) || !is.matrix(mu) || ncol(mu) != K)
+    stop("mu must contain K logits relative to category 0.", call. = FALSE)
+  n <- max(length(x), nrow(mu))
+  if (!length(x) || !nrow(mu)) return(list(x = numeric(), eta = matrix(0, 0, K + 1L)))
+  if (!length(x) %in% c(1L, n) || !nrow(mu) %in% c(1L, n))
+    stop("Supply one argument per observation, or a single value to repeat.", call. = FALSE)
+  list(x = rep_len(x, n), eta = cbind(0, mu[rep_len(seq_len(nrow(mu)), n), , drop = FALSE]))
+}
+
+# Compute each tail from its own categories. Taking a complement of a rounded
+# probability would lose small masses; log-sum-exp also avoids overflowing logits.
+multinom_log_tail <- function(eta, q, lower_tail) {
+  vapply(seq_len(nrow(eta)), function(i) {
+    z <- eta[i, ]
+    if (anyNA(z) || is.na(q[i])) return(NA_real_)
+    if (any(!is.finite(z))) return(NaN)
+    z <- z - max(z)
+    include <- seq_along(z) - 1L <= floor(q[i])
+    if (!lower_tail) include <- !include
+    if (!any(include)) return(-Inf)
+    if (all(include)) return(0)
+    log_sum <- function(z) {
+      m <- max(z)
+      if (m == -Inf) return(-Inf)
+      m + log(sum(exp(z - m)))
+    }
+    difference <- log_sum(z[!include]) - log_sum(z[include])
+    -(max(difference, 0) + log1p(exp(-abs(difference))))
+  }, numeric(1))
+}
+
+make_cdf_multinom <- function(K) {
+  force(K)
+  function(q, mu, wt, scale, log_p = FALSE, lower_tail = TRUE) {
+    a <- multinom_arguments(q, mu, K)
+    value <- multinom_log_tail(a$eta, a$x, lower_tail)
+    if (log_p) value else exp(value)
+  }
+}
+
+make_qf_multinom <- function(K) {
+  force(K)
+  function(p, mu, wt, scale, log_p = FALSE, lower_tail = TRUE) {
+    a <- multinom_arguments(quantile_log_probability(p, log_p), mu, K)
+    p <- a$x
+    out <- rep(NA_real_, length(p))
+    # Use the smaller probability to distinguish jumps close to either endpoint.
+    small_lower <- if (lower_tail) p <= -log(2) else p > -log(2)
+    target <- p
+    complement <- which(if (lower_tail) !small_lower else small_lower)
+    target[complement] <- log1mexp(p[complement])
+    for (j in 0:K) {
+      lower <- multinom_log_tail(a$eta, rep(j, length(p)), TRUE)
+      upper <- multinom_log_tail(a$eta, rep(j, length(p)), FALSE)
+      # Allow a few rounding units at a jump, as R's discrete quantiles do.
+      tolerance <- 4 * .Machine$double.eps * pmax(1, abs(target))
+      reached <- ifelse(small_lower, lower >= target - tolerance,
+        upper <= target + tolerance)
+      rows <- which(is.na(out) & reached)
+      out[rows] <- j
+    }
+    # Endpoints refer to the finite categorical support, even if a probability
+    # has rounded to zero or one at the supplied logits.
+    valid <- rowSums(!is.finite(a$eta)) == 0L
+    out[which(valid & p == -Inf)] <- if (lower_tail) 0 else K
+    out[which(valid & p == 0)] <- if (lower_tail) K else 0
+    out
+  }
 }

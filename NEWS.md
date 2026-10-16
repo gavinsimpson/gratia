@@ -333,7 +333,10 @@
   for `scat()`, `tw()`, `Tweedie()`, `gaulss()`, `gevlss()`, `gumbls()`,
   `gammals()` and `ziplss()`. `fix_family_cdf()` adds cumulative distribution
   functions for `gaulss()`, `gevlss()`, `gumbls()`, `gammals()` and
-  `ziplss()`, making quantile residuals available. These helpers and
+  `ziplss()`, making quantile residuals available. Categorical CDFs and
+  quantiles for `multinom()` use mgcv's category codes `0, ..., K` as the
+  accumulation order, enabling randomized PIT/quantile residuals and inverse-CDF
+  diagnostic references (#183). These helpers and
   `fix_family_rd()` preserve distribution functions supplied by callers.
   `ziplss()` quantile residuals randomise over the probability mass of each
   observed count (GRA-007). Quantile helpers retain log probabilities where

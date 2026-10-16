@@ -294,9 +294,42 @@ qq_plot(ordinal_fit, type = "quantile", seed = 416)
 
 The thresholds define a simulated rating process; they must be finite and
 strictly increasing. These checks randomise within ordered category mass.
-Nominal multinomial categories have no intrinsic ordering, so gratia retains
-traditional residual checks and posterior predictive checks, but does not
-assign them PIT scores by inventing an order.
+For nominal categories, `mgcv::multinom(K)` models one outcome coded
+`0, ..., K`. gratia accumulates probabilities in that existing coding order:
+
+$$
+F(q) = \sum_{j=0}^{\lfloor q \rfloor} p_j, \qquad
+Q(u) = \min\{j : F(j) \ge u\}, \quad 0 < u < 1.
+$$
+
+The CDF is zero below category 0 and one at or above category K. Quantiles
+at lower-tail probabilities zero and one are 0 and K, respectively;
+upper-tail probabilities reverse these endpoints. Both functions accept
+log probabilities and upper tails. Internally, their `mu` argument contains
+K logits relative to category 0, as in mgcv's native random generator, rather
+than the K+1 probabilities returned by `predict(type = "response")`.
+
+A PIT for an observed category `j` is `F(j - 1) + V * p_j`, with `V` uniform
+on `(0, 1)`. Thus randomization spans the entire mass of that category.
+This is the ordinary randomized probability transform described by
+[Brockwell (2007)](https://pmc.ncbi.nlm.nih.gov/articles/PMC2211730/).
+Each fixed enumeration gives a uniform transform under the true model.
+Changing the enumeration can change individual residuals and diagnostic
+sensitivity: the probabilities before a given category change. The coding
+does not turn the multinomial likelihood into an ordinal model.
+
+```{r multinomial}
+set.seed(417)
+category_data <- data.frame(x = runif(300))
+category_data$y <- sample(0:2, nrow(category_data), replace = TRUE)
+category_fit <- gam(list(y ~ s(x), ~s(x)), data = category_data,
+  family = multinom(K = 2), method = "REML")
+qq_plot(category_fit, type = "quantile", seed = 418)
+```
+
+These residuals transform cumulative category probabilities; they are distinct
+from the latent-utility surrogate residuals for nominal models studied by
+[Cheng, Wang and Zhang (2021)](https://pmc.ncbi.nlm.nih.gov/articles/PMC8018589/).
 
 ## Other distributions and limits to interpretation
 

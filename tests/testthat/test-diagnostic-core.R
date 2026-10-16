@@ -96,7 +96,7 @@ test_that("multinomial native residual layouts match simulated references", {
   expect_equal(nrow(p$data), nrow(dat))
   expect_equal(p$data$residuals, sort(as.vector(residuals(m, type = "deviance"))))
   expect_s3_class(appraise(m, method = "simulate", n_simulate = 3), "patchwork")
-  expect_error(quantile_residuals(m), "CDF")
+  expect_length(quantile_residuals(m), nrow(dat))
 })
 
 test_that("dependent calibrated references use joint rank simulations", {

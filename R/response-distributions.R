@@ -89,10 +89,11 @@ response_distribution.gam <- function(model, conditioning = NULL, ...) {
       combine_response_distributions(components, context$index), stats::family(model)))
   }
   f <- stats::family(model)
-  # ziP and ordinal family functions expect the latent linear predictor.
+  # ziP, ordinal and multinom family functions expect linear predictors.
   # Their expected responses are calculated separately.
   ft <- family_type(f)
-  latent <- grepl("^ordered_categorical|^zero_inflated_poisson", ft)
+  latent <- ft == "multinom" ||
+    grepl("^ordered_categorical|^zero_inflated_poisson", ft)
   mu <- if (latent) model$linear.predictors else model$fitted.values
   d <- distribution_from_family(f, mu, binomial_sampling_weights(model, model$prior.weights),
     model$sig2, y = model$y, eta = model$linear.predictors)
@@ -224,7 +225,7 @@ distribution_from_family <- function(family, mu, wt, scale, y = NULL, eta = NULL
   }
   cdf_left <- if (is.function(cdf)) function(q, log_p = FALSE, lower_tail = TRUE) {
     at <- q
-    if (ft %in% c("poisson", "negative_binomial", "ziplss", "cpois") ||
+    if (ft %in% c("poisson", "negative_binomial", "ziplss", "cpois", "multinom") ||
         grepl("^ordered_categorical|^zero_inflated_poisson", ft)) at <- ceiling(q) - 1
     if (ft == "binomial") {
       q <- rep_len(q, max(length(q), length(wt)))
@@ -267,7 +268,7 @@ distribution_bounds <- function(y, family, wt = 1) {
   if (ft %in% c("cnorm", "clog", "cpois"))
     return(censored_response_bounds(y, discrete = ft == "cpois"))
   lower <- y
-  count <- ft %in% c("poisson", "negative_binomial", "ziplss", "ocat", "zip") ||
+  count <- ft %in% c("poisson", "negative_binomial", "ziplss", "ocat", "zip", "multinom") ||
     grepl("^ordered_categorical|^zero_inflated_poisson", ft)
   if (count) lower <- y - 1
   if (ft == "binomial") lower <- y - 1 / pmax(wt, 1)
@@ -438,6 +439,7 @@ family_response_mean <- function(family, mu) {
     return(-expm1(-exp(th[1L] + th[2L] * mu)) *
       lambda / (-expm1(-lambda)))
   }
+  if (ft == "multinom" && is.null(dim(mu))) mu <- matrix(mu, ncol = family$nlp)
   if (is.matrix(mu) && ft != "multivariate_normal") {
     if (ft == "multinom") {
       eta <- cbind(0, mu)
