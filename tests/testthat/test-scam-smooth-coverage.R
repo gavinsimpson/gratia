@@ -18,11 +18,12 @@ scam_constructor_models <- local({
     bases <- sub(".smooth.spec$", "", sub("^smooth.construct.", "", constructors))
     models <- lapply(bases, function(bs) {
       dd <- d
-      decreasing <- grepl("^(mpd|mdc|dpo|tedm|tedec|tesmd|tismd)", bs)
+      decreasing <- grepl("^(mpd|mdc|dpo|tedm|tedec|tesmd|tismd)", bs) || bs == "tedi"
       concave <- grepl("^(cv|micv|mdcv|tecvcv|temicv|tedecv)", bs)
       fx <- if (concave) sqrt(dd$x) else exp(dd$x)
       if (decreasing) fx <- -fx
-      dd$y <- 2 + fx + 0.3 * exp(dd$z) + dd$error
+      fz <- if (bs == "teid") -exp(dd$z) else exp(dd$z)
+      dd$y <- 2 + fx + 0.3 * fz + dd$error
       bivar <- startsWith(bs, "te") || startsWith(bs, "ti")
       form <- if (bivar) {
         y ~ s(x, z, bs = bs, k = c(5, 5))
@@ -44,7 +45,9 @@ scam_constructor_models <- local({
 
 test_that("every SCAM constructor has a type and evaluates the fitted function", {
   fixtures <- scam_constructor_models()
-  expect_length(fixtures$models, 41L)
+  constructors <- ls(asNamespace("scam"), pattern =
+    "^smooth.construct.*smooth.spec$")
+  expect_length(fixtures$models, length(constructors))
   for (name in names(fixtures$models)) {
     m <- fixtures$models[[name]]
     sm <- m$smooth[[1L]]
@@ -117,7 +120,9 @@ test_that("SCAM plots reproduce native functions with an explicit surface centre
 
 test_that("endpoint curves and constrained surfaces reach ggplot's renderer", {
   fixtures <- scam_constructor_models()
-  for (name in c("mifo", "ipo", "lipl", "mpiBy", "tedmi", "tesmi1", "tismi")) {
+  bases <- intersect(c("mifo", "ipo", "lipl", "mpiBy", "tedmi", "tedi",
+    "teid", "tesmi1", "tismi"), names(fixtures$models))
+  for (name in bases) {
     plots <- draw(fixtures$models[[name]], n = 20, n_2d = 10,
       rug = FALSE, parametric = FALSE, wrap = FALSE, dist = 0)
     expect_length(plots, 1L)

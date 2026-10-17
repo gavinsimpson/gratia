@@ -10,6 +10,7 @@ scam_smooth_info <- function(model, smooths = model$smooth,
     po = "+", ipo = c("m+", "+"), dpo = c("m-", "+"),
     cpopspline = "+", lmpi = "m+", lipl = "m+")
   tensor <- list(tedmi = c("m+", "m+"), tedmd = c("m-", "m-"),
+    tedi = c("m-", "m+"), teid = c("m+", "m-"),
     temicx = c("m+", "c+"), temicv = c("m+", "c-"),
     tedecx = c("m-", "c+"), tedecv = c("m-", "c-"),
     tecxcx = c("c+", "c+"), tecvcv = c("c-", "c-"),

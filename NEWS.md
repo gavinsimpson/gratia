@@ -158,9 +158,11 @@
   `gratia_palette()` provides optional Paul Tol palettes. Current default
   appearances are retained, including group legends without symbols for
   fixed-colour partial residuals (#215).
-* All 41 smooth constructors in scam 1.2-22 are supported for smooth estimates,
+* All 43 smooth constructors in scam 1.2-23 are supported for smooth estimates,
   bases, sampling and plots, including bivariate smooths, cyclic margins,
-  interactions and explicit `By` classes. `draw()` and `assemble()` accept
+  interactions and explicit `By` classes. This includes `tedi` and `teid`
+  surfaces that increase along one covariate and decrease along the other.
+  `draw()` and `assemble()` accept
   `centre = "plot"` to match scam's centring of bivariate displays; the default
   retains the fitted function. SCAM `smooth_type()` labels use compact
   descriptions such as `P spline (inc)` and `Tensor (inc, free)`.
@@ -173,8 +175,10 @@
   contrasts, conditional predictions, parametric effects, residual helpers,
   model summaries, concurvity, penalties and variance-component ratios.
   Independent-response likelihoods, LOO/WAIC, supplied coefficient draws and
-  scalable posterior predictive plots are also supported. See the SCAM
-  support article for supported combinations and uncertainty calculations.
+  scalable posterior predictive plots are also supported. Concurvity excludes
+  basis columns whose coefficients are fixed to zero, restoring the correct
+  calculation for curves that become flat. See the SCAM support article for
+  supported combinations and uncertainty calculations.
 
 * `shape_intervals()` applies monotone rearrangement and convex or concave
   envelopes to existing interval endpoints on a finite grid. Supported scasm
@@ -346,6 +350,10 @@
   (`conditioning = "marginal"`). Plot labels identify the choice. Posterior
   predictive checks separately include approximate parameter uncertainty. See
   `?diagnostic_support` for what these checks assess and their limitations.
+  Delta-model diagnostics accept the dispersion parameter layouts in sdmTMB
+  1.1.0 and 1.2.0, including the TMB and RTMB backends. Fits with a dispersion
+  formula give an explicit error because observation-specific dispersion is
+  not yet supported by these diagnostics.
 
 * Diagnostic plots now support uncensored univariate `GJRM::gamlss()` models
   with N, LN, GA, GAi, P, NBI and NBII families. They use randomised quantile

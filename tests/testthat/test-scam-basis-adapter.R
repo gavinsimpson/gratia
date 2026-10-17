@@ -8,8 +8,13 @@ scam_basis_cases <- local({
     x$y <- exp(x$x) + x$z + rnorm(100, sd = 0.08)
     x
   })
-  models <- lapply(c("po", "dpo", "miso", "mifo", "lmpi", "lipl", "mpiBy", "tesmi1", "tismi"), function(bs) {
-    form <- if (bs %in% c("tesmi1", "tismi")) {
+  bases <- c("po", "dpo", "miso", "mifo", "lmpi", "lipl", "mpiBy", "tesmi1", "tismi")
+  mixed <- c("tedi", "teid")
+  mixed <- mixed[vapply(paste0("smooth.construct.", mixed, ".smooth.spec"),
+    exists, logical(1), envir = asNamespace("scam"), inherits = FALSE)]
+  bases <- c(bases, mixed)
+  models <- lapply(bases, function(bs) {
+    form <- if (bs %in% c("tesmi1", "tismi", "tedi", "teid")) {
       stats::as.formula(sprintf("y ~ s(x, z, bs = '%s', k = c(4, 4))", bs))
     } else if (bs %in% c("lmpi", "lipl")) {
       stats::as.formula(sprintf("y ~ s(x, bs = '%s', k = 10, xt = list(xc = 0.5))", bs))
@@ -17,8 +22,34 @@ scam_basis_cases <- local({
       stats::as.formula(sprintf("y ~ s(x, bs = '%s', k = 6)", bs))
     suppressWarnings(scam::scam(form, data = d, not.exp = TRUE))
   })
-  names(models) <- c("po", "dpo", "miso", "mifo", "lmpi", "lipl", "mpiBy", "tesmi1", "tismi")
+  names(models) <- bases
   list(models = models, data = d)
+})
+
+test_that("SCAM tensors with one decreasing direction retain their fitted columns", {
+  s <- mgcv::s
+  d <- scam_basis_cases$data
+  bases <- intersect(c("tedi", "teid"), names(scam_basis_cases$models))
+  if (!length(bases)) skip("The tedi and teid tensor bases require SCAM 1.2-23")
+  for (bs in bases) {
+    spec <- s(x, z, bs = bs, k = c(5, 5))
+    sm <- mgcv::smoothCon(spec, data = d)[[1L]]
+    # These bases fix the first coefficient at zero. The remaining native
+    # prediction columns already include the tensor and centring transforms.
+    expected <- mgcv::PredictMat(sm, d)[, -1L, drop = FALSE]
+    expect_equal(scam_smooth_matrix(sm, mgcv::PredictMat(sm, d)), sm$X,
+      tolerance = 1e-10, info = bs)
+    b <- basis(spec, data = d, at = d)
+    expect_equal(matrix(b$.value, nrow = nrow(d), byrow = TRUE),
+      unname(expected), tolerance = 1e-10, info = bs)
+    m <- scam_basis_cases$models[[bs]]
+    idx <- smooth_coef_indices(m$smooth[[1L]])
+    nd <- d[c(1L, 4L, 8L), ]
+    native <- predict(m, newdata = nd, type = "lpmatrix")[, idx, drop = FALSE]
+    actual <- scam_smooth_matrix(m$smooth[[1L]],
+      mgcv::PredictMat(m$smooth[[1L]], nd))
+    expect_equal(unname(actual), unname(native), tolerance = 1e-10, info = bs)
+  }
 })
 
 test_that("SCAM basis contributions sum to the fitted function", {
@@ -65,7 +96,10 @@ test_that("SCAM smooth registry covers the installed constructors", {
   constructors <- grep("^smooth.construct.*[.]smooth.spec$", ls(ns), value = TRUE)
   expected <- sub("[.]smooth.spec$", ".smooth", sub("^smooth.construct[.]", "", constructors))
   expected[expected == "cpop.smooth"] <- "cpopspline.smooth"
-  expect_setequal(scam_smooth_classes(), expected)
+  # Earlier SCAM releases lack the tedi and teid tensor bases.
+  expect_true(all(expected %in% scam_smooth_classes()))
+  expect_true(all(setdiff(scam_smooth_classes(), expected) %in%
+    c("tedi.smooth", "teid.smooth")))
   for (model in scam_basis_cases$models) {
     sm <- model$smooth[[1L]]
     expect_identical(smooth_shape_constraints(model), list())

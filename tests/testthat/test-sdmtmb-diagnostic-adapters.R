@@ -29,10 +29,19 @@ test_that("sdmTMB delta diagnostics calibrate the entire response mixture", {
   expect_equal(p$distribution$cdf_left(b$lower)[p$y == 0],
     rep(0, sum(p$y == 0)))
   u <- distribution_quantile_residuals(p$distribution, p$y, "pit", seed = 17)
+  expect_true(all(is.finite(u)))
   expect_true(all(u[d$y == 0] >= 0 & u[d$y == 0] <= 1 - native$est1[d$y == 0]))
   positive <- sdmtmb_diagnostic_model(m, component = "positive", field_method = "mle-eb")
   r <- distribution_quantile_residuals(positive$distribution, positive$y,
     "quantile", seed = 12)
+  expect_true(all(is.finite(r)))
+  shape <- tail(as.numeric(sigma(m)), 1L)^-2
+  expected_cdf <- pgamma(positive$y, shape = shape,
+    scale = positive$fitted.values / shape)
+  expect_equal(positive$distribution$cdf(positive$y), expected_cdf)
+  positive_rows <- d$y > 0
+  expect_equal(p$distribution$cdf(d$y)[positive_rows],
+    1 - native$est1[positive_rows] + native$est1[positive_rows] * expected_cdf)
   expect_equal(r, as.vector(residuals(m, type = "mle-eb", model = 2))[d$y > 0],
     tolerance = 1e-8)
   expect_equal(model_row_map(positive),
@@ -40,6 +49,16 @@ test_that("sdmTMB delta diagnostics calibrate the entire response mixture", {
   expect_s3_class(posterior_predictive_plot(m, n = 2L, seed = 12), "ggplot")
   expect_s3_class(posterior_predictive_plot(m, n = 2L, seed = 12,
     conditioning = "marginal"), "ggplot")
+})
+
+test_that("sdmTMB diagnostics identify unsupported dispersion formulas", {
+  skip_if_not_installed("sdmTMB", minimum_version = "1.2.0")
+  withr::local_seed(346)
+  d <- data.frame(x = seq(-1, 1, length.out = 80))
+  d$y <- 1 + d$x + rnorm(80, sd = exp(0.5 * d$x))
+  m <- sdmTMB::sdmTMB(y ~ x, data = d, spatial = "off", dispformula = ~ x)
+  expect_error(quantile_residuals(m), "do not yet support.*dispformula")
+  expect_error(response_distribution(m), "do not yet support.*dispformula")
 })
 
 test_that("sdmTMB binomial counts use trial-sized probability bounds", {
@@ -98,4 +117,14 @@ test_that("sdmTMB spatial calibration retains the fitted field", {
   expect_equal(qnorm(p$distribution$cdf(p$y)),
     as.vector(residuals(m, type = "mle-eb")), tolerance = 1e-8)
   expect_s3_class(posterior_predictive_plot(m, n = 2L, seed = 13), "ggplot")
+})
+
+test_that("sdmTMB dispersion selection supports family and predictor indices", {
+  legacy <- list()
+  current <- list(family_spec = list(param_slot = list(ln_phi = 1L)))
+  expect_equal(sdmtmb_dispersion(legacy, list(ln_phi = log(c(1, 3))), 2L), 3)
+  expect_equal(sdmtmb_dispersion(legacy, list(ln_phi = log(3)), 2L), 3)
+  expect_equal(sdmtmb_dispersion(current, list(ln_phi = log(3)), 2L), 3)
+  current$family_spec$param_slot$ln_phi <- NA_integer_
+  expect_equal(sdmtmb_dispersion(current, list(ln_phi = numeric()), 1L), 1)
 })

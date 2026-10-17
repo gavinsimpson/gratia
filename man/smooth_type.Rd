@@ -41,6 +41,8 @@
 \alias{smooth_type.lipl.smooth}
 \alias{smooth_type.tedmi.smooth}
 \alias{smooth_type.tedmd.smooth}
+\alias{smooth_type.tedi.smooth}
+\alias{smooth_type.teid.smooth}
 \alias{smooth_type.temicx.smooth}
 \alias{smooth_type.temicv.smooth}
 \alias{smooth_type.tedecx.smooth}
@@ -145,6 +147,10 @@ smooth_type(smooth)
 \method{smooth_type}{tedmi.smooth}(smooth)
 
 \method{smooth_type}{tedmd.smooth}(smooth)
+
+\method{smooth_type}{tedi.smooth}(smooth)
+
+\method{smooth_type}{teid.smooth}(smooth)
 
 \method{smooth_type}{temicx.smooth}(smooth)
 

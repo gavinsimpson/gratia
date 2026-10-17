@@ -5,6 +5,17 @@ sdmtmb_has_random <- function(model) {
   length(model$tmb_obj$env$random) > 0L || length(model$tmb_random) > 0L
 }
 
+# Since sdmTMB 1.2.0, dispersion parameters are indexed by response family,
+# rather than by linear predictor. A delta model has two predictors but only
+# one positive-response dispersion parameter.
+sdmtmb_dispersion <- function(model, pars, which_model) {
+  slots <- model$family_spec$param_slot$ln_phi
+  index <- if (!is.null(slots)) slots[1L] else
+    if (length(pars$ln_phi) == 1L) 1L else which_model
+  if (is.na(index)) return(1)
+  exp(pars$ln_phi[index])
+}
+
 # Check which fitted effects are shared between observations. A model fitted
 # with a spatial package need not have dependent responses.
 sdmtmb_random_tags <- function(model) {
@@ -66,6 +77,9 @@ sdmtmb_diagnostic_model <- function(model, conditioning = NULL,
   conditioning <- match.arg(conditioning %||% "conditional", c("conditional", "marginal"))
   field_method <- match.arg(field_method)
   component <- match.arg(component, c("response", "binomial", "positive"))
+  if (isTRUE(model$has_dispformula)) stop(
+    "sdmTMB response diagnostics do not yet support models fitted with `dispformula`.",
+    call. = FALSE)
   delta <- isTRUE(model$family$delta)
   if (!delta && component != "response") stop(
     "Component diagnostics require a delta sdmTMB model.", call. = FALSE)
@@ -110,7 +124,7 @@ sdmtmb_diagnostic_model <- function(model, conditioning = NULL,
   if (delta && component == "response")
     y <- ifelse(response[, 1L] == 0, 0, response[, 2L])
   keep <- which(!is.na(y))
-  phi <- exp(pars$ln_phi[which_model])
+  phi <- sdmtmb_dispersion(model, pars, which_model)
   trials <- if (identical(fam$family, "binomial")) unname(model$tmb_data$size) else 1
   trials <- rep_len(trials, NROW(response))
   binomial <- identical(fam$family, "binomial")
