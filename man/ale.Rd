@@ -85,9 +85,10 @@ available. Otherwise \code{\link[=get_vcov]{get_vcov()}} warns and uses the unco
 for simultaneous intervals. Ignored for pointwise intervals.}
 
 \item{seed}{optional integer seed for simultaneous intervals. An explicit
-seed preserves the caller's random-number state.}
+seed preserves the caller's random-number state around interval simulation.}
 
-\item{block_size}{positive integer; maximum reference rows processed at once.}
+\item{block_size}{positive integer; maximum reference rows in each prediction
+block. Blocks can run in parallel when workers are configured; see Details.}
 
 \item{exclude}{character; model terms to exclude, as in \code{\link[mgcv:predict.gam]{mgcv::predict.gam()}}.}
 
@@ -157,6 +158,26 @@ Formula offsets are included and reevaluated at interval boundaries. Offsets
 supplied only through the fitting function's \code{offset} argument are omitted,
 following explicit-newdata prediction semantics. BAM predictions use
 \code{discrete = FALSE}, including for models fitted with \code{discrete = TRUE}.
+
+Prediction blocks use an existing pool of workers configured with
+\code{\link[mirai:daemons]{mirai::daemons()}}, when mirai and carrier are installed. Set \code{block_size}
+small enough to give each worker a block; serial and parallel calculations
+retain the same block boundaries and accumulation order. Worker startup and
+model transfer can outweigh the benefit for small models or reference data.
+The caller owns the pool; \code{ale()} does not start or stop workers.
+\code{n_cores} controls coefficient simulation for simultaneous intervals, not the
+number of prediction workers. Workers use their configured BLAS thread limits.
+
+Data recovery and validation, centring, covariance calculations and interval
+simulation remain in the caller. Simultaneous bands use one shared set of
+coefficient deviations for all boundaries, preserving results and the
+caller's random-number state across worker counts. Models requiring custom
+prediction methods, family callbacks, contrasts or formula functions that
+workers cannot safely evaluate retain serial prediction. Standard arithmetic
+and common base and stats transformations can run on workers; local helpers,
+stochastic expressions, custom S3 transformation methods and other package
+functions retain serial prediction. Method checks do not invoke active or
+lazy caller bindings.
 
 This implementation is written independently from the published ALE
 definition, without using code from mgcViz or ALEPlot.
