@@ -16,6 +16,8 @@ scam_caption_expectations <- c(
   lipl = "P spline (increasing for age <= 0.5; then flat)",
   tedmi = "Tensor product; age: increasing; dose: increasing",
   tedmd = "Tensor product; age: decreasing; dose: decreasing",
+  tedi = "Tensor product; age: decreasing; dose: increasing",
+  teid = "Tensor product; age: increasing; dose: decreasing",
   temicx = "Tensor product; age: increasing; dose: convex",
   temicv = "Tensor product; age: increasing; dose: concave",
   tedecx = "Tensor product; age: decreasing; dose: convex",
@@ -54,7 +56,7 @@ test_that("SCAM captions describe every constructor without changing smooth type
   model <- structure(list(smooth = smooths), class = "scam")
   info <- scam_smooth_info(model, ids = ids)
   expect_setequal(paste0(bases, ".smooth"), scam_smooth_classes())
-  expect_length(info, 41L)
+  expect_length(info, length(bases))
   expect_identical(names(info), as.character(ids))
   actual <- vapply(info, scam_shape_caption, character(1), plotmath = FALSE)
   expect_identical(unname(actual), unname(scam_caption_expectations))

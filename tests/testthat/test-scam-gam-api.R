@@ -193,6 +193,53 @@ test_that("SCAM model matrices and concurvity omit plateau coefficients fixed to
     sum(projection^2) / sum(term^2), tolerance = 1e-8)
 })
 
+test_that("SCAM concurvity does not depend on model-matrix registration", {
+  s <- mgcv::s
+  d <- scam_api_fixture$data
+  m <- scam::scam(y ~ s(z, bs = "mpi", k = 6) +
+    s(x, bs = "lipl", k = 12, xt = list(xc = .5)), data = d)
+  original <- m
+  sm <- m$smooth[[2L]]
+  idx <- smooth_coef_indices(sm)
+  raw <- mgcv::PredictMat(sm, d)
+  X <- cbind(model.matrix(m$pterms, d), mgcv::PredictMat(m$smooth[[1L]], d),
+    raw[, seq_along(idx) + 1L, drop = FALSE])
+  groups <- c(list(para = seq_len(m$nsdf)), lapply(m$smooth, smooth_coef_indices))
+  names(groups)[-1L] <- smooths(m)
+  observed <- vapply(groups, function(j) {
+    term <- drop(X[, j, drop = FALSE] %*% coef(m)[j])
+    projection <- qr.fitted(qr(X[, -j, drop = FALSE]), term)
+    sum(projection^2) / sum(term^2)
+  }, numeric(1))
+  registered <- getS3method("model.matrix", "scam")
+  withr::defer(registerS3method("model.matrix", "scam", registered,
+    envir = asNamespace("stats")))
+  methods <- list(gratia = model.matrix.scam)
+  if (exists("model.matrix.scam", envir = asNamespace("scam"), inherits = FALSE)) {
+    methods$scam <- getFromNamespace("model.matrix.scam", "scam")
+  }
+  reference <- NULL
+  for (method in methods) {
+    registerS3method("model.matrix", "scam", method, envir = asNamespace("stats"))
+    overall <- model_concurvity(m)
+    pairwise <- model_concurvity(m, pairwise = TRUE)
+    for (label in names(groups)) {
+      expect_equal(overall$.concurvity[overall$.type == "observed" &
+        overall$.term == label], unname(observed[label]), tolerance = 1e-8)
+      term <- drop(X[, groups[[label]], drop = FALSE] %*% coef(m)[groups[[label]]])
+      for (other in setdiff(names(groups), label)) {
+        projection <- qr.fitted(qr(X[, groups[[other]], drop = FALSE]), term)
+        expect_equal(pairwise$.concurvity[pairwise$.type == "observed" &
+          pairwise$.with == label & pairwise$.term == other],
+          sum(projection^2) / sum(term^2), tolerance = 1e-8)
+      }
+    }
+    actual <- list(overall = overall, pairwise = pairwise)
+    if (is.null(reference)) reference <- actual else expect_equal(actual, reference)
+  }
+  expect_identical(m, original)
+})
+
 test_that("SCAM matrix extraction retains training offsets and excluded rows", {
   withr::local_options(na.action = "na.exclude")
   s <- mgcv::s

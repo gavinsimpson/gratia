@@ -308,6 +308,18 @@
 
 #' @export
 #' @rdname smooth_type
+`smooth_type.tedi.smooth` <- function(smooth) {
+  "Tensor (dec, inc)"
+}
+
+#' @export
+#' @rdname smooth_type
+`smooth_type.teid.smooth` <- function(smooth) {
+  "Tensor (inc, dec)"
+}
+
+#' @export
+#' @rdname smooth_type
 `smooth_type.temicx.smooth` <- function(smooth) {
   "Tensor (inc, convex)"
 }

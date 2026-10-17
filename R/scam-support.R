@@ -20,7 +20,8 @@ scam_smooth_classes <- function() {
     "cpopspline.smooth", "lmpi.smooth", "lipl.smooth",
     "mpiBy.smooth", "mpdBy.smooth", "cxBy.smooth", "cvBy.smooth",
     "micxBy.smooth", "micvBy.smooth", "mdcxBy.smooth", "mdcvBy.smooth",
-    "tedmi.smooth", "tedmd.smooth", "temicx.smooth", "temicv.smooth",
+    "tedmi.smooth", "tedmd.smooth", "tedi.smooth", "teid.smooth",
+    "temicx.smooth", "temicv.smooth",
     "tedecx.smooth", "tedecv.smooth", "tecxcx.smooth", "tecvcv.smooth",
     "tecxcv.smooth", "tesmi1.smooth", "tesmi2.smooth", "tesmd1.smooth",
     "tesmd2.smooth", "tescx.smooth", "tescv.smooth", "tismi.smooth", "tismd.smooth")
@@ -44,7 +45,8 @@ scam_smooth_matrix <- function(smooth, X) {
     return(X)
   }
   if (inherits(smooth, c("po.smooth", "ipo.smooth", "cpopspline.smooth",
-      "tedmi.smooth", "tedmd.smooth", "temicx.smooth", "temicv.smooth",
+      "tedmi.smooth", "tedmd.smooth", "tedi.smooth", "teid.smooth",
+      "temicx.smooth", "temicv.smooth",
       "tedecx.smooth", "tedecv.smooth", "tecxcx.smooth", "tecvcv.smooth",
       "tecxcv.smooth"))) {
     X <- X[, -1L, drop = FALSE]

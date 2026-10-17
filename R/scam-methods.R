@@ -251,11 +251,18 @@ variance_comp.scam <- function(object, rescale = TRUE, coverage = 0.95, ...) {
 #' @export
 model_concurvity.scam <- function(model, ...) {
   model <- scam_gam_adapter(model)
-  # mgcv::concurvity obtains the fitted design via model.matrix() and native
-  # prediction. Its observed measure reads $coef, so supply an exact field
-  # in the same transformed coordinates as that design.
+  # Both packages register model.matrix.scam. Give this copy its own matrix
+  # method so mgcv always uses the basis aligned with transformed coefficients,
+  # regardless of which package registered its SCAM method most recently.
+  model[["X"]] <- predict_model(model, type = "lpmatrix")
   model[["coef"]] <- stats::coef(model)
+  class(model) <- c("gratia_concurvity", class(model))
   model_concurvity.gam(model, ...)
+}
+
+#' @export
+model.matrix.gratia_concurvity <- function(object, ...) {
+  object[["X"]]
 }
 
 #' @rdname log_lik

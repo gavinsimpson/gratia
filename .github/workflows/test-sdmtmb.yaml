@@ -11,17 +11,16 @@ permissions:
   contents: read
 
 jobs:
-  effects:
+  compatibility:
     runs-on: ubuntu-latest
     name: sdmTMB (${{ matrix.config.name }})
     strategy:
       fail-fast: false
       matrix:
         config:
-          - {name: release, package: 'any::sdmTMB', backend: ''}
-          # Development version 1.1.0.9032, validated with both backends.
-          - {name: development-TMB, package: 'sdmTMB=github::sdmTMB/sdmTMB@fbe516e4486b3096d175bab880bf93d6d24eca11', backend: tmb}
-          - {name: development-RTMB, package: 'sdmTMB=github::sdmTMB/sdmTMB@fbe516e4486b3096d175bab880bf93d6d24eca11', backend: rtmb}
+          - {name: legacy-1.1.0, package: 'sdmTMB@1.1.0', backend: ''}
+          - {name: release-TMB, package: 'any::sdmTMB', backend: tmb}
+          - {name: release-RTMB, package: 'any::sdmTMB', backend: rtmb}
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       NOT_CRAN: 'true'
@@ -39,11 +38,15 @@ jobs:
             any::glmmTMB
             ${{ matrix.config.package }}
           needs: check
-      - name: Check formula effects against native predictions
+      - name: Check formula effects and response diagnostics
         run: |
+          backend <- Sys.getenv("GRATIA_SDMTMB_BACKEND")
+          if (nzchar(backend)) options(sdmTMB.backend = backend)
           pkgload::load_all()
           print(packageVersion("sdmTMB"))
           source("tests/testthat/helper-vdiffr.R")
-          testthat::test_file("tests/testthat/test-sdmtmb.R",
+          files <- list.files("tests/testthat", pattern = "^test-sdmtmb.*\\.R$",
+            full.names = TRUE)
+          for (file in files) testthat::test_file(file,
             reporter = "summary", stop_on_failure = TRUE)
         shell: Rscript {0}
