@@ -1,0 +1,97 @@
+* using log directory ‘/private/tmp/gratia-tube-verified/gratia.Rcheck’
+* using R version 4.6.1 (2026-06-24)
+* using platform: aarch64-apple-darwin23
+* R was compiled by
+    Apple clang version 17.0.0 (clang-1700.3.19.1)
+    GNU Fortran (GCC) 14.2.0
+* running under: macOS Tahoe 26.6.1
+* using session charset: UTF-8
+* current time: 2026-10-17 09:25:27 UTC
+* checking for file ‘gratia/DESCRIPTION’ ... OK
+* this is package ‘gratia’ version ‘0.11.2-53’
+* package encoding: UTF-8
+* checking package namespace information ... OK
+* checking package dependencies ... OK
+* checking if this is a source package ... OK
+* checking if there is a namespace ... OK
+* checking for executable files ... OK
+* checking for hidden files and directories ... OK
+* checking for portable file names ... OK
+* checking for sufficient/correct file permissions ... OK
+* checking whether package ‘gratia’ can be installed ... OK
+* used C++ compiler: ‘Apple clang version 17.0.0 (clang-1700.6.4.2)’
+* used SDK: ‘MacOSX26.2.sdk’
+* checking installed package size ... INFO
+  installed size is  6.3Mb
+  sub-directories of 1Mb or more:
+    help   1.6Mb
+    R      3.1Mb
+* checking package directory ... OK
+* checking ‘build’ directory ... OK
+* checking DESCRIPTION meta-information ... OK
+* checking top-level files ... OK
+* checking for left-over files ... OK
+* checking index information ... OK
+* checking package subdirectories ... OK
+* checking code files for non-ASCII characters ... OK
+* checking R files for syntax errors ... OK
+* checking whether the package can be loaded ... OK
+* checking whether the package can be loaded with stated dependencies ... OK
+* checking whether the package can be unloaded cleanly ... OK
+* checking whether the namespace can be loaded with stated dependencies ... OK
+* checking whether the namespace can be unloaded cleanly ... OK
+* checking whether startup messages can be suppressed ... OK
+* checking dependencies in R code ... OK
+* checking S3 generic/method consistency ... OK
+* checking replacement functions ... OK
+* checking foreign function calls ... OK
+* checking R code for possible problems ... OK
+* checking Rd files ... OK
+* checking Rd metadata ... OK
+* checking Rd cross-references ... OK
+* checking for missing documentation entries ... OK
+* checking for code/documentation mismatches ... OK
+* checking Rd \usage sections ... OK
+* checking Rd contents ... OK
+* checking for unstated dependencies in examples ... OK
+* checking contents of ‘data’ directory ... OK
+* checking data for non-ASCII characters ... OK
+* checking LazyData ... OK
+* checking data for ASCII and uncompressed saves ... OK
+* checking line endings in C/C++/Fortran sources/headers ... OK
+* checking line endings in Makefiles ... OK
+* checking compilation flags in Makevars ... OK
+* checking for GNU extensions in Makefiles ... OK
+* checking for portable use of $(BLAS_LIBS) and $(LAPACK_LIBS) ... OK
+* checking use of PKG_*FLAGS in Makefiles ... OK
+* checking compiled code ... OK
+* checking installed files from ‘inst/doc’ ... OK
+* checking files in ‘vignettes’ ... OK
+* checking examples ... OK
+* checking for differences from example reference output ... OK
+* checking for unstated dependencies in ‘tests’ ... OK
+* checking tests ... ERROR
+  Running ‘test-all.R’
+Running the tests in ‘tests/test-all.R’ failed.
+Last 13 lines of output:
+  'basis/draw-basis-works-with-a-gam-multiple-smooths.svg',
+  'basis/draw-basis-works-with-a-gam-single-smooth.svg',
+  'by-variables/continuous-by-variable-smmoth-fixed-scales.svg',
+  'by-variables/continuous-by-variable-smmoth.svg',
+  'by-variables/draw-gam-user-select-and-parametric-true.svg',
+  'compare-smooths/compare-smooths-all-smooths.svg',
+  'compare-smooths/compare-smooths-bottom-legend.svg',
+  'compare-smooths/compare-smooths-set-nrow-ncol.svg',
+  'concurvity/draw-concurvity-overall.svg',
+  'concurvity/draw-concurvity-pairwise.svg', …,
+  'worm-plot/worm-plot-uniform-randomisation-response-residuals.svg', and
+  'worm-plot/worm-plot-uniform-randomisation.svg'
+  Error:
+  ! Test failures.
+  Execution halted
+* checking for unstated dependencies in vignettes ... OK
+* checking package vignettes ... OK
+* checking re-building of vignette outputs ... OK
+* checking PDF version of manual ... OK
+* DONE
+Status: 1 ERROR

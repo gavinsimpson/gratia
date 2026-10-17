@@ -1,0 +1,281 @@
+Volume-of-tube simultaneous bands: implementation and validation
+2026-10-17
+
+Implementation
+
+The feature branch gls/tube-simultaneous-bands was created explicitly from main
+at d8bac59d8, in a separate managed worktree. The original checkout was not
+switched, stashed, reset, or edited. Its unrelated work remains with that chat.
+
+The implementation commit after rebase is 155fa1ec5; validation evidence is separate.
+
+The branch was rebased onto main at 77cea657e on 2026-10-17, incorporating
+the response-moments work and development version 0.11.2-54. The only conflict
+was in NEWS.md; both new-feature entries were retained. The tube R code and
+tests were unchanged by the rebase. Its two commits contain only the tube
+feature and validation evidence.
+
+The full-package checks and simulation experiments below were run before
+the rebase on version 0.11.2-53. The focused tests and reference-index check
+were repeated after the rebase; see Validation after rebase at the end.
+
+The implementation adds simultaneous_method = "tube" to smooth_estimates(),
+derivatives(), and difference_smooths(). draw(), assemble(), and confint()
+forward the controls. Simulation remains the default. The existing interval
+source (Gaussian, bootstrap, or shape intervals) is a separate choice.
+
+The work was completed in these stages:
+
+1. Implement Gaussian process geometry, a positive-semidefinite covariance
+   factor, numerical integration of spherical curve length, and a critical
+   value from the two-sided threshold-crossing bound.
+2. Recover the fitted prediction basis for ordinary cubic cr, cs, ps, tp, and
+   ts smooths, preserving mgcv's fitted constraints and column transformations.
+   Use analytic basis derivatives through order three. Thin plate knot
+   subsampling does not truncate the fitted covariate domain.
+3. Add smooth, first/second derivative, and factor-by difference adapters.
+   Preserve the selected coefficient covariance, overall smooth uncertainty,
+   the joint contrast covariance, and constant group contributions. Evaluate
+   finite differences by exact integration on each cubic piece to avoid
+   subtracting nearly equal predictions. Preserve the requested mathematical
+   finite-difference operator, stencil, and step.
+4. Add domain and quadrature controls, per-curve metadata, public documentation,
+   the pkgdown reference entry, release notes under New features, and plotting
+   integration. Saved estimates retain their computed interval limits.
+5. Validate analytic geometry, fitted matrices, adapters, edge cases, conditional
+   coverage, repeated fits, performance, package examples, and rendered plots.
+
+Calibration and assumptions
+
+For uncertainty design d(x), covariance V = L L', and
+u(x) = L'd(x) / sqrt(d(x)' V d(x)), integrate kappa = integral ||u'(x)|| dx.
+For K regular components, solve
+
+  2 K Pr(N(0,1) > c) + kappa exp(-c^2/2) / pi = 1 - level.
+
+This counts endpoints and threshold crossings and bounds the two-sided
+exceedance probability. It remains conservative when the standardized curve
+retraces itself. Polynomial knots split integration without adding endpoint
+contributions. Exact zero variance and rank-one processes are treated
+separately. Integration error estimates are added to the computed length for
+a numerical margin; they are not rigorous numerical error certificates.
+
+The probability statement concerns the selected Gaussian coefficient
+approximation. Bayesian covariance gives approximate posterior probability;
+frequentist covariance calibrates centered Gaussian sampling errors. Neither
+choice removes smoothing bias. The unconditional correction uses mgcv's
+corrected covariance, rather than integrating a smoothing-parameter posterior.
+
+Coverage is separate for each fitted smooth or factor-level pair. The domain
+is a continuous interval, including gaps in the output coordinates. A fixed
+domain makes the critical value independent of output density. Rendering the
+bounds as connected line segments remains a plotting approximation.
+
+simultaneous_domain accepts two endpoints or a named list keyed by coordinate.
+By default it is the evaluation range. A single output point requires an
+explicit interval. Derivative stencils must remain in fitted spline support.
+tube_control exposes rel_tol, abs_tol, subdivisions, and root_tol. Tube
+calibration ignores n_sim, n_cores/ncores, and seed and does not change RNG state.
+interval_info records scope, domains, critical values, lengths, component
+counts, covariance flags, convergence diagnostics, and derivative settings.
+
+Unsupported bases, surfaces, constrained models, shape enforcement, varying
+numeric by multipliers, raw-scale derivatives of transformed coordinates,
+coordinate-dependent group contributions, and unresolved near-zero variance
+produce explicit errors. They do not trigger an automatic simulation fallback.
+
+Deterministic and regression checks
+
+The tests compare analytic circular-arc lengths and normal critical values;
+check coordinate and coefficient-basis invariance; exercise singular and
+invalid covariance, exact and near-zero variance, and duplicate subdivisions;
+and compare fitted matrices and derivative operators for all five bases.
+They also check covariance options, group means and contrast reversal, output
+density invariance, RNG preservation, nested estimates and metadata, GAM/BAM/
+GAMM/GAMM4 adapters, transformed smooth coordinates, and plotting wrappers.
+
+The single-point contrast regression checks model terms, so a group slope
+cannot be mistaken for a constant group contribution. Requests that exclude
+group means still work. Subsetting away the smooth label removes per-curve
+metadata without a missing-column warning.
+
+Final targeted run: 225 assertions passed, with no failures, warnings, or skips.
+
+Conditional Gaussian coverage
+
+Run: Rscript notes/tube-bands/validate.R
+Default: 50,000 draws for each of four quantities (200,000 total), seed 29017.
+
+The reference independently finds continuous maxima of each simulated cubic
+process. On each polynomial segment it solves all real roots of
+2 p'(x) q(x) - p(x) q'(x), for p(x)/sqrt(q(x)), and checks endpoints. It does
+not use the tube metric or an evaluation-grid maximum. For 100 common draws
+per quantity, it was cross-checked against a 5,001-point grid: continuous
+maxima were at least as large, with discrepancies below 0.01.
+
+Quantity       Tube c     Simulated continuous c    Coverage   95% binomial CI
+Smooth         2.791659   2.779203                  0.95178    0.94987--0.95364
+Derivative 1   2.802690   2.730431                  0.95938    0.95761--0.96109
+Derivative 2   2.699231   2.602733                  0.96068    0.95894--0.96237
+Difference     2.790140   2.782616                  0.95132    0.94940--0.95319
+
+All four results agree with the requested conservative Gaussian calibration.
+Tightening rel_tol to 1e-9 and abs_tol to 1e-10 changed the critical values by
+at most 1.4e-9. conditional-coverage.csv contains unrounded results.
+
+Repeated-fit experiments
+
+Run: Rscript notes/tube-bands/coverage.R
+Default: 200 independent refits in each of 10 scenarios (2,000 fitted models).
+Each scenario has reproducible seeds. experiment-config.csv records the final
+basis sizes, families, and unconditional settings. The raw refits-*.csv files
+retain every fit; RUN_REFITS=false regenerates summaries without fitting.
+
+Containment here is assessed on 401 points in [0.02, 0.98], against the known
+generating curve or analytic derivatives. This is a test of fixed-function
+coverage on a dense grid, not a certified continuous maximum of estimation
+error. Smooth targets are centered using the fitted covariate distribution.
+Difference targets include the group contributions. Non-Gaussian targets are
+on the linear predictor scale.
+
+Scenario                    Smooth    Derivative 1    Derivative 2
+Broad Gaussian              0.995     0.985           0.975
+Broad, corrected covariance 0.980     0.990           0.990
+Nearly linear               0.995     0.970           1.000
+Sharp peak, k = 40          0.915     0.965           0.980
+Sharp peak, k = 4           0.000     0.000           0.000
+Boundary with uneven data   0.985     0.800           0.865
+Binomial                    0.975     0.970           0.985
+Poisson                     0.970     0.975           0.975
+
+Equal-group difference: 0.975. Different-group difference: 0.950.
+All scenarios completed with zero interval computation errors.
+refit-coverage.csv includes exact binomial confidence intervals and widths.
+
+The boundary derivative results and inadequate peak basis show that calibrating
+the coefficient process does not correct spline approximation or smoothing
+bias. Even the larger peak basis had smooth coverage 0.915 (95% binomial CI
+0.867--0.950). These results support the Gaussian-process interpretation in
+the documentation; they do not support claiming universally nominal fixed-
+function coverage. The peak experiment uses k = 40 in the retained final run;
+k = 4 is a separate deliberate inadequate-basis experiment.
+
+Performance and plotting
+
+Run: Rscript notes/tube-bands/benchmark.R
+Compare cr/tp bases, k = 6/12, n = 100/1,000, smooth/second derivative,
+simulation with 10,000 draws, and medians of three repetitions. timings.csv
+contains all measurements, which describe this machine and configuration.
+
+For smooths with 1,000 returned points, cr tube times were 0.018--0.028 seconds
+versus 0.453--0.613 for simulation; tp tube times were 0.119--0.152 versus
+0.474--0.526. For second derivatives at that density, cr tube times were
+0.158--0.329 versus 0.482--0.592. Thin plate second derivatives were slower:
+3.07--3.55 seconds for tube calibration across the tested densities versus
+0.031--0.580 for simulation. Their numerous polynomial boundaries increase
+integration work. Tube calibration is therefore not uniformly faster.
+
+tube-plots.png was rendered and visually inspected. Smooth, second derivative,
+and difference bands render correctly and preserve existing caption formats.
+No numerical diagnostics or calibration commentary were added to captions.
+
+Package validation before rebase
+
+All tests and checks ran outside the sandbox as required by AGENTS.md.
+Documentation was regenerated with roxygen2; pkgdown's reference index check
+passed. The new public simultaneous_bands topic is indexed. The new example
+output was inserted into the saved example reference without rewriting the
+existing output. git diff --check passed.
+
+Documentation generation also emitted existing messages about plot_smooth S3
+methods lacking export tags. pkgdown emitted Pandoc deprecation messages for
+--katex. Its reference-index validation still completed successfully.
+
+The final R CMD build and R CMD check used no skip flags. Examples, the saved
+example comparison, code and Rd checks, compiled code, vignettes, vignette
+rebuilding, and the PDF manual all passed. The check ended with 1 ERROR,
+0 WARNINGs, and 0 NOTEs: its test phase had 14 existing SCAM/sdmTMB failures.
+The test summary was 26,746 passed assertions, 14 failures, 1 existing warning,
+and 200 skipped test cases. No tube tests failed. package-check.txt and
+package-tests.txt contain the complete check and test evidence.
+
+The 200 skips were the repository's skip_on_cran() cases: R CMD check ran
+with NOT_CRAN unset. No --no-tests, --no-manual, --no-vignettes, or
+--no-build-vignettes option was used. The skipped cases therefore reflect
+the package's CRAN test policy, while the development suite exercises them.
+
+The temporary installed package library was supplied through R_LIBS for the
+full development suite so fresh worker processes could load the current
+sampling worker code. This avoided failures caused by an older globally
+installed gratia. No unrelated sampling implementation was changed.
+
+The final development suite used CI=true and completed all files, with the
+same 14 existing SCAM/sdmTMB failures and the same existing sdmTMB warning.
+All 225 tube assertions passed. There were 13 repository CI-policy skips:
+the HGAM paper integration examples and selected existing deprecation,
+multivariate/zero-inflated fitting, response-derivative, Tweedie-validation,
+and utility cases. development-tests.txt lists the exact skipped cases.
+An earlier run without CI exercised these additional cases, including the
+21 HGAM paper assertions, without failures in those cases. The final fresh
+run verifies the completed tube implementation; tube-tests.txt records its
+separate targeted run. No new functionality is excluded by the CI setting.
+
+Existing SCAM and sdmTMB compatibility failures were reproduced in a clean
+archive of main. They were left unchanged, as requested. Their concrete
+failure messages are retained with the package-check evidence. A pre-existing
+sdmTMB warning reports dropping observations with non-finite values.
+
+Environment and reproduction
+
+R 4.6.1, macOS Tahoe 26.6.1, Apple arm64, mgcv 1.9-4, gratia 0.11.2-53.
+session-info.txt records the conditional experiment's complete session.
+
+From the feature worktree:
+  Rscript -e 'devtools::test(filter="tube", reporter="summary", stop_on_failure=TRUE)'
+  Rscript notes/tube-bands/validate.R
+  Rscript notes/tube-bands/coverage.R
+  Rscript notes/tube-bands/benchmark.R
+  Rscript -e 'roxygen2::roxygenise(); pkgdown::check_pkgdown(pkgdown::as_pkgdown("."))'
+
+Build and check from a separate directory:
+  R CMD build /path/to/feature/worktree
+  R CMD check gratia_0.11.2-53.tar.gz
+
+For the development suite, use R_LIBS pointing at the check directory containing
+the newly installed gratia, followed by:
+  CI=true Rscript -e 'testthat::set_max_fails(Inf); devtools::test(reporter="summary", stop_on_failure=TRUE)'
+Omit CI=true to include the additional integration cases described above.
+
+Sources implemented
+
+Sun and Loader (1994), Simultaneous confidence bands for linear regression
+and smoothing, Annals of Statistics 22, 1328--1345,
+doi:10.1214/aos/1176325631.
+Krivobokova, Kneib and Claeskens (2010), Simultaneous confidence bands for
+penalized spline estimators, JASA 105, 852--863,
+doi:10.1198/jasa.2010.tm09165.
+Wiesenfarth et al. (2012), Direct simultaneous inference in additive models
+and its application to model undernutrition, JASA 107, 1286--1296.
+Liebl and Reimherr (2023), Fast and fair simultaneous confidence bands for
+functional parameters, JRSS B 85, 842--868, doi:10.1093/jrsssb/qkad026.
+
+The implementation uses the conservative constant-threshold Gaussian crossing
+bound. It does not implement the adaptive thresholds proposed in the last
+reference, Student-t tube corrections, or smoothing-bias correction.
+
+Validation after rebase
+2026-10-17
+
+Base: main at 77cea657e8ecb2ffb2b6de52b28550490883e13c.
+Package version: 0.11.2-54. Implementation commit: 155fa1ec5.
+
+Rscript -e 'devtools::test(filter="tube", reporter="summary", stop_on_failure=TRUE)'
+completed outside the sandbox with 225 passed assertions and no failures,
+warnings, or skips. rebase-tube-tests.txt records the output. Only the new
+functionality was retested; unrelated failures were left unchanged.
+
+pkgdown::check_pkgdown(pkgdown::as_pkgdown(".")) passed after the reference
+index merged with main. Its existing Pandoc --katex deprecation messages
+remain; they do not indicate missing topics or failed pages. git diff
+--check passed. The original checkout remained on gls/response-moments
+with its existing untracked Rplots.pdf.
