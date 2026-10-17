@@ -40,7 +40,10 @@ partial_derivatives(object, ...)
   newdata = NULL,
   envir = NULL,
   wrt = c("smooth", "covariate"),
-  interval_method = c("auto", "gaussian", "bootstrap")
+  interval_method = c("auto", "gaussian", "bootstrap"),
+  simultaneous_method = c("simulation", "tube"),
+  simultaneous_domain = NULL,
+  tube_control = list()
 )
 
 \method{partial_derivatives}{gamm4}(object, ...)
@@ -131,6 +134,23 @@ such as \code{x}, and reevaluates expressions at each finite-difference point.}
 \item{interval_method}{character; use stored scasm bootstrap draws for
 pointwise intervals with \code{"auto"} (the default), or explicitly select
 \code{"gaussian"} or \code{"bootstrap"}. Bootstrap simultaneous bands are unavailable.}
+
+\item{simultaneous_method}{character; calibration for simultaneous bands.
+The default, \code{"simulation"}, uses coefficient draws on the evaluation
+grid. \code{"tube"} uses a conservative Gaussian threshold-crossing bound
+over a continuous interval for supported one-dimensional cubic splines.
+See \link{simultaneous_bands}.}
+
+\item{simultaneous_domain}{numeric pair of increasing finite endpoints, or
+a named list of such pairs keyed by spline coordinate. For tube bands,
+\code{NULL} uses the range of returned evaluation coordinates, including gaps.
+All returned points must lie inside the interval and the interval must
+lie inside the fitted spline support. Requires tube calibration.}
+
+\item{tube_control}{named list controlling numerical tube calibration:
+\code{rel_tol} (default \code{1e-6}), \code{abs_tol} (\code{1e-8}), \code{subdivisions} (\code{1000L}),
+and \code{root_tol} (\code{1e-8}). Requires tube calibration. Simulation controls
+\code{n_sim}, \code{n_cores} (or \code{ncores}), and \code{seed} are ignored by tube calibration.}
 }
 \value{
 A tibble, currently with the following variables:

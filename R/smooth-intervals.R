@@ -71,8 +71,13 @@ smooth_uncertainty_design <- function(smooth, X, model, V,
 add_smooth_intervals <- function(estimates, smooths, model, interval, ci_level,
                                  unconditional, frequentist, overall_uncertainty,
                                  n_sim, n_cores, seed, interval_method = "gaussian",
-                                 shape_specs = NULL) {
+                                 shape_specs = NULL, simultaneous_method = 'simulation',
+                                 simultaneous_domain = NULL, tube_control = list()) {
   interval <- normalize_smooth_interval(interval)
+  if (simultaneous_method == 'tube') {
+    return(tube_smooth_intervals(estimates, smooths, model, ci_level,
+      unconditional, frequentist, overall_uncertainty, simultaneous_domain, tube_control))
+  }
   validate_smooth_interval(interval, ci_level, n_sim, n_cores, seed)
   calculate <- function() {
     V <- deviations <- NULL

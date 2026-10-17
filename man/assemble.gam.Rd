@@ -67,7 +67,10 @@
   frequentist = FALSE,
   shape_source = c("gaussian", "bootstrap"),
   ...,
-  variables = NULL
+  variables = NULL,
+  simultaneous_method = c("simulation", "tube"),
+  simultaneous_domain = NULL,
+  tube_control = list()
 )
 
 \method{assemble}{scam}(object, ..., overall_uncertainty = FALSE, centre = c("model", "plot"))
@@ -331,14 +334,16 @@ marginal variances; the QQ display is not a test of independent normal effects.
 Specialist maps and graph plots are outside the scope of this display.}
 
 \item{interval}{character; \code{"confidence"} (default) draws pointwise intervals;
-\code{"simultaneous"} uses a band across the finite evaluation grid of each
+\code{"simultaneous"} uses a band across, by default, the finite evaluation grid of each
 smooth, including its slices and factor levels. Separate smooths are not a
 joint coverage set. \code{"credible"} aliases \code{"confidence"}, reflecting the
 approximate Bayesian credible interpretation of default-covariance bands.
 Parametric panels retain pointwise intervals and are labelled accordingly
 when simultaneous smooth bands are requested. Bands appear where the
 renderer displays interval bounds, including 3D effect surfaces when
-\code{ci_3d = TRUE}. Random-effect QQ plots retain their usual display.}
+\code{ci_3d = TRUE}. Random-effect QQ plots retain their usual display.
+\code{simultaneous_method = "tube"} calibrates supported univariate bands
+over a continuous interval; see \link{simultaneous_bands}.}
 
 \item{n_sim, n_cores}{positive integers; coefficient draws and simulation cores
 for simultaneous bands. Parallel simulation requires OpenMP support.}
@@ -375,6 +380,23 @@ Drawing saved estimates can change the order but uses only points already
 evaluated; evaluate again to change grid resolution or conditioning values.
 Continuous covariates must precede factors. Spherical smooths retain their
 latitude/longitude convention and do not support reordering.}
+
+\item{simultaneous_method}{character; calibration for simultaneous bands.
+The default, \code{"simulation"}, uses coefficient draws on the evaluation
+grid. \code{"tube"} uses a conservative Gaussian threshold-crossing bound
+over a continuous interval for supported one-dimensional cubic splines.
+See \link{simultaneous_bands}.}
+
+\item{simultaneous_domain}{numeric pair of increasing finite endpoints, or
+a named list of such pairs keyed by spline coordinate. For tube bands,
+\code{NULL} uses the range of returned evaluation coordinates, including gaps.
+All returned points must lie inside the interval and the interval must
+lie inside the fitted spline support. Requires tube calibration.}
+
+\item{tube_control}{named list controlling numerical tube calibration:
+\code{rel_tol} (default \code{1e-6}), \code{abs_tol} (\code{1e-8}), \code{subdivisions} (\code{1000L}),
+and \code{root_tol} (\code{1e-8}). Requires tube calibration. Simulation controls
+\code{n_sim}, \code{n_cores} (or \code{ncores}), and \code{seed} are ignored by tube calibration.}
 
 \item{centre}{character; for SCAM models, \code{"model"} retains each fitted
 smooth contribution. \code{"plot"} subtracts the evaluation-grid mean from

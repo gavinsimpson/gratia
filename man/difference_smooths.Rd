@@ -28,7 +28,10 @@ difference_smooths(model, ...)
   seed = NULL,
   variables = NULL,
   n_3d = 16,
-  n_4d = 4
+  n_4d = 4,
+  simultaneous_method = c("simulation", "tube"),
+  simultaneous_domain = NULL,
+  tube_control = list()
 )
 
 \method{difference_smooths}{scam}(model, ..., unconditional = FALSE)
@@ -115,6 +118,23 @@ latitude/longitude convention and do not support reordering.}
 \item{n_3d, n_4d}{numeric; the number of conditioning values for smooths of
 three or four covariates. The defaults are 16 and 4, respectively. If
 \code{NULL}, use \code{n}. Ignored when evaluation \code{data} are supplied.}
+
+\item{simultaneous_method}{character; calibration for simultaneous bands.
+The default, \code{"simulation"}, uses coefficient draws on the evaluation
+grid. \code{"tube"} uses a conservative Gaussian threshold-crossing bound
+over a continuous interval for supported one-dimensional cubic splines.
+See \link{simultaneous_bands}.}
+
+\item{simultaneous_domain}{numeric pair of increasing finite endpoints, or
+a named list of such pairs keyed by spline coordinate. For tube bands,
+\code{NULL} uses the range of returned evaluation coordinates, including gaps.
+All returned points must lie inside the interval and the interval must
+lie inside the fitted spline support. Requires tube calibration.}
+
+\item{tube_control}{named list controlling numerical tube calibration:
+\code{rel_tol} (default \code{1e-6}), \code{abs_tol} (\code{1e-8}), \code{subdivisions} (\code{1000L}),
+and \code{root_tol} (\code{1e-8}). Requires tube calibration. Simulation controls
+\code{n_sim}, \code{n_cores} (or \code{ncores}), and \code{seed} are ignored by tube calibration.}
 }
 \description{
 Estimates pairwise differences (comparisons) between factor smooth
@@ -123,13 +143,16 @@ defined by the factor. The group means can be optionally included in the
 difference.
 }
 \details{
-Simultaneous intervals jointly cover the underlying smooth differences at
+With the default simulation calibration, simultaneous intervals cover smooth differences at
 the evaluated covariate combinations for each pair of factor levels, with
 approximate posterior probability \code{ci_level} when using the Bayesian
 covariance. They do not provide joint coverage across all pairs, outside
 the evaluation set, or between its points. With \code{data = NULL}, the evaluation
 set is generated using \code{n}, \code{n_2d}, \code{n_3d}, and \code{n_4d}. Differences and interval
 limits are on the linear predictor scale, including group means when requested.
+For supported univariate cubic splines, \code{simultaneous_method = "tube"}
+instead covers a continuous interval, including between returned points;
+see \link{simultaneous_bands}. Coverage remains separate for each pair.
 
 \code{variables} determines the order used to generate and display the evaluation
 grid. The first two covariates are the x and y axes. The third covariate
@@ -140,7 +163,7 @@ estimates for use by \code{\link[=draw]{draw()}}.
 
 The intervals use the joint coefficient covariance selected by
 \code{unconditional} and \code{frequentist}, retaining covariance between the two
-smooths. The simulation covariance must be positive definite. With
+smooths. The covariance must be positive semidefinite. With
 \code{frequentist = TRUE}, simulation instead uses the frequentist covariance
 of the coefficient estimators. \code{n_sim}, \code{n_cores}, and \code{seed} are ignored for
 pointwise intervals. An explicit seed scopes the entire call: each pair uses

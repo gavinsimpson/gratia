@@ -73,6 +73,7 @@
   differentiate_factor_smooths = TRUE,
   ...
 ) {
+  tube_check_saved_controls(names(match.call(expand.dots = FALSE)$...))
   gratia_plot_arguments(c("change_col", "decrease_col", "increase_col", "lwd_change", "alpha"), environment())
   scales <- match.arg(scales)
   change_type <- match.arg(change_type)
@@ -867,6 +868,7 @@
                                      caption = NULL,
                                      angle = NULL, ...,
                                      variables = NULL) {
+  tube_check_saved_controls(names(match.call(expand.dots = FALSE)$...))
   gratia_plot_arguments(c("contour_col", "ci_alpha", "ci_col", "smooth_col", "line_col"), environment())
   scales <- match.arg(scales)
 

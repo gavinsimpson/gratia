@@ -56,6 +56,7 @@
 #' @param interval character; the type of interval to compute. One of
 #'   `"confidence"` for point-wise intervals, or `"simultaneous"` for
 #'   simultaneous intervals.
+#' @inheritParams smooth_estimates
 #' @param interval_method character; use stored scasm bootstrap draws for
 #'   pointwise intervals with `"auto"` (the default), or explicitly select
 #'   `"gaussian"` or `"bootstrap"`. Bootstrap simultaneous bands are unavailable.
@@ -194,7 +195,9 @@
   partial_match = FALSE,
   ...,
   newdata = NULL, envir = NULL, wrt = c("smooth", "covariate"),
-  focal = NULL, interval_method = c("auto", "gaussian", "bootstrap")
+  focal = NULL, interval_method = c("auto", "gaussian", "bootstrap"),
+  simultaneous_method = c('simulation', 'tube'),
+  simultaneous_domain = NULL, tube_control = list()
 ) {
   object_name <- deparse(substitute(object))
   object <- with_model_envir(object, envir)
@@ -246,6 +249,9 @@
   ## handle interval
   interval <- match.arg(interval)
   interval_method <- scasm_interval_method(object, interval_method, interval)
+  simultaneous_method <- resolve_simultaneous_method(simultaneous_method, interval,
+    simultaneous_domain, tube_control)
+  if (simultaneous_method == 'tube') tube_check_model(object, interval_method)
 
   # we only do derivatives with this function for univariate smooths
   # check the dimensionality here, drop any sm with dim > 1,
@@ -306,6 +312,9 @@
     sm <- get_smooths_by_id(object, id = smooth_ids[[i]])[[1]]
     focal_i <- derivative_focal(object, sm,
       if (is.null(focal)) NULL else focal[[if (length(focal) == 1L) 1L else i]], wrt)
+    if (simultaneous_method == 'tube' && !identical(focal_i, sm$term)) {
+      cli::cli_abort("Tube derivative bands currently differentiate on the smooth coordinate; use wrt = 'smooth' or simulation.")
+    }
     h <- derivative_step(object, focal_i, data, eps, order, type)
     # Prepare coordinates once, then recompute raw transformations per step.
     newd <- if (need_data) {
@@ -317,10 +326,15 @@
     }
     tasks[[i]] <- prepare_derivative_task(object, sm, newd, focal_i,
       wrt, type, order, h, betas, Vb, interval, interval_method, level,
-      n_sim, ncores)
+      n_sim, ncores, simultaneous_method = simultaneous_method)
   }
   result <- smooth_task_map(tasks, "calculate_smooth_derivative")
-  if (interval == "simultaneous") {
+  tube_records <- NULL
+  if (interval == 'simultaneous' && simultaneous_method == 'tube') {
+    result <- tube_derivative_intervals(result, tasks, object, level,
+      simultaneous_domain, tube_control)
+    tube_records <- attr(result, 'tube_records')
+  } else if (interval == "simultaneous") {
     result <- smooth_interval_map(result, lapply(tasks, function(x) smooth_coef_indices(x$sm)),
       Vb, level, n_sim, ncores, estimate = ".derivative", critical = TRUE)
   }
@@ -339,6 +353,10 @@
 
   attr(result, "wrt") <- wrt
   attr(result, "interval_info") <- scasm_interval_info(object, interval_method, interval, level)
+  if (simultaneous_method == 'tube') {
+    attr(result, 'interval_info') <- c(attr(result, 'interval_info'),
+      tube_info(tube_records, 'smooth', unconditional, frequentist))
+  }
   class(result) <- c("derivatives", class(result)) # add class
   result # return
 }
@@ -921,7 +939,13 @@
     offset = NULL, ncores = 1,
     partial_match = FALSE, seed = NULL, ..., newdata = NULL,
     envir = NULL, wrt = c("smooth", "covariate"),
-    interval_method = c("auto", "gaussian", "bootstrap")) {
+    interval_method = c("auto", "gaussian", "bootstrap"),
+    simultaneous_method = c("simulation", "tube"),
+    simultaneous_domain = NULL, tube_control = list()) {
+  simultaneous_method <- match.arg(simultaneous_method)
+  if (simultaneous_method != "simulation" || !is.null(simultaneous_domain) || length(tube_control)) {
+    cli::cli_abort("Tube bands are supported by derivatives() for one-dimensional smooths; use simulation for partial derivatives.")
+  }
   object <- with_model_envir(object, envir)
   wrt <- match.arg(wrt)
   if (lifecycle::is_present(term)) {

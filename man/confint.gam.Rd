@@ -94,7 +94,9 @@ an exact match? Can only be used if \code{length(parm)} is \code{1}.}
 
 \item{...}{additional arguments passed to \code{\link[=smooth_estimates]{smooth_estimates()}}, including
 \code{interval_method} to select Gaussian, stored scasm bootstrap, or
-shape-enforced intervals, and \code{shape_source} to choose their initial source.}
+shape-enforced intervals, and \code{shape_source} to choose their initial source.
+\code{simultaneous_method}, \code{simultaneous_domain}, and \code{tube_control} request
+and configure continuous-interval tube bands; see \link{simultaneous_bands}.}
 
 \item{newdata}{DEPRECATED! data frame; containing new values of the
 covariates used in the model fit. The selected smooth(s) will be evaluated
@@ -131,7 +133,8 @@ enforce shape constraints on their limits.
 \note{
 \code{overall_uncertainty} applies to both pointwise and simultaneous
 intervals. Each simultaneous band covers the evaluation points of one
-fitted smooth; separate smooths do not form a joint coverage set.
+fitted smooth by default, or its continuous domain with tube calibration;
+separate smooths do not form a joint coverage set.
 Native scasm fits default to \code{overall_uncertainty = FALSE} and use stored
 bootstrap draws for pointwise intervals when available, as in
 \code{\link[=smooth_estimates]{smooth_estimates()}}. Shifting and transforming a smooth preserves its

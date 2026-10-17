@@ -76,6 +76,10 @@
   attr(x, "surface_support") <- if (".smooth" %in% names(x)) {
     support[intersect(names(support), unique(x$.smooth))]
   } else NULL
+  if (!is.null(interval_info$curves)) {
+    interval_info$curves <- if (".smooth" %in% names(x)) interval_info$curves[vapply(interval_info$curves,
+      function(record) record$identity %in% x$.smooth, logical(1))] else list()
+  }
   attr(x, "interval_info") <- interval_info
   attr(x, "shape_constraints") <- if (!is.null(shape_constraints) &&
     ".smooth" %in% names(x)) {

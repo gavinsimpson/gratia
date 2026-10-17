@@ -120,6 +120,13 @@
   supported where their moments exist. Conditional moments can be drawn with
   `draw()`.
 
+* `smooth_estimates()`, `derivatives()`, and `difference_smooths()` offer
+  continuous-interval Gaussian simultaneous bands for supported one-dimensional
+  cubic splines via `simultaneous_method = "tube"`. Bands use a conservative
+  threshold-crossing bound, preserve the selected covariance and group means,
+  and record the domain and numerical diagnostics in interval metadata.
+  `draw()`, `assemble()`, and `confint()` forward the controls.
+
 * Smooth estimation and drawing, including `difference_smooths()`, now accept
   `variables` to choose x and y axes and the order of conditioning facets.
   Differences between 3D and 4D smooths can now be drawn as faceted surfaces
