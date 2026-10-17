@@ -83,7 +83,7 @@ test_that("Gamma moments use dispersion and include its uncertainty", {
   nd <- data.frame(x = c(0.2, 0.8))
   actual <- fitted_moments(m, data = nd, moments = "all")
   mu <- as.vector(predict(m, nd, type = "response"))
-  phi <- m$sig2
+  phi <- m$reml.scale
   take <- function(name) actual$.fitted[actual$.parameter == name]
   expect_equal(take("mean"), mu)
   expect_equal(take("variance"), phi * mu^2)
@@ -102,7 +102,7 @@ test_that("Gamma moments use dispersion and include its uncertainty", {
 test_that("analytic derivatives match independent coefficient perturbations", {
   models <- moment_test_models()
   for (nm in c("gaussian", "poisson", "gamma", "inverse_gaussian", "tweedie", "gammals", "twlss")) {
-    m <- models[[nm]]
+    m <- moment_scale_model(models[[nm]])
     ctx <- lss_prediction_context(m, data = models$data[1:2, ])
     ctx$family <- unserialize(serialize(ctx$family, NULL))
     pars <- moment_parameter_context(m, "estimated", FALSE)
@@ -384,18 +384,19 @@ test_that("invalid response parameters are not treated as valid moment draws", {
 })
 
 test_that("smoothing uncertainty is added once in the joint approximation", {
-  m <- moment_test_models()$gamma
+  m <- moment_scale_model(moment_test_models()$gamma)
   nd <- data.frame(x = 0.5)
   actual <- fitted_moments(m, data = nd, moments = c("mean", "cv"), unconditional = TRUE)
   mu <- as.vector(predict(m, nd, type = "response"))
   X <- predict(m, nd, type = "lpmatrix")
   D <- cbind(m$db.drho, 0)
-  covariance <- m$Vp + D %*% m$V.sp %*% t(D)
+  outer <- solve(m$outer.info$hess)
+  covariance <- m$Vp + D %*% outer %*% t(D)
   expected_mean_se <- mu * sqrt(drop(X %*% covariance %*% t(X)))
-  k <- nrow(m$V.sp)
-  expected_cv_se <- sqrt(m$sig2 * m$V.sp[k, k]) / 2
+  k <- nrow(outer)
+  expected_cv_se <- sqrt(m$sig2 * outer[k, k]) / 2
   expect_equal(actual$.se, c(expected_mean_se, expected_cv_se), tolerance = 1e-8)
-  expect_match(attr(actual, "moment_info")$covariance, "native outer covariance")
+  expect_match(attr(actual, "moment_info")$covariance, "outer Hessian")
   conditional <- fitted_moments(m, data = nd, moments = "cv")
   expect_equal(conditional$.se, sqrt(m$sig2 / m$outer.info$hess[k, k]) / 2)
 })
@@ -457,7 +458,7 @@ test_that("standard-family higher moments agree with independent response laws",
 
 test_that("fixed global parameters stay fixed when smoothing uncertainty is requested", {
   models <- moment_test_models()
-  m <- models$gamma
+  m <- moment_scale_model(models$gamma)
   nd <- data.frame(x = 0.5)
   idx <- seq_along(m$sp)
   D <- m$db.drho
@@ -499,4 +500,194 @@ test_that("fixed global parameters stay fixed when smoothing uncertainty is requ
   expect_length(warnings, 1)
   expect_match(warnings, "undefined")
   expect_identical(.Random.seed, before)
+})
+
+test_that("likelihood dispersion and coefficient covariance use the same estimator", {
+  d <- withr::with_seed(182, {
+    x <- runif(160)
+    data.frame(x, y = rgamma(160, shape = 0.5, scale = exp(x)))
+  })
+  m <- mgcv::gam(y ~ x, data = d, family = Gamma(link = "log"), method = "REML")
+  expect_gt(abs(m$sig2 - m$reml.scale), 0.01)
+  before <- m$Vp
+  nd <- data.frame(x = 0.6)
+  mu <- as.vector(predict(m, nd, type = "response"))
+  X <- predict(m, nd, type = "lpmatrix")
+  expected_mean_se <- mu * sqrt(drop(X %*% m$Vp %*% t(X)) * m$reml.scale / m$sig2)
+  delta <- fitted_moments(m, data = nd, moments = c("mean", "variance", "cv"))
+  expect_equal(delta$.fitted, c(mu, m$reml.scale * mu^2, sqrt(m$reml.scale)))
+  expect_equal(delta$.se[1], expected_mean_se)
+  for (mode in c("none", "simulation")) {
+    result <- fitted_moments(m, data = nd, moments = c("mean", "variance", "cv"),
+      uncertainty = mode, n_draws = 3000, seed = 98)
+    expect_equal(result$.fitted, delta$.fitted)
+    if (mode == "simulation") expect_equal(result$.se / delta$.se, rep(1, 3), tolerance = 0.07)
+  }
+  fixed <- fitted_moments(m, data = nd, moments = c("mean", "cv"), nuisance = "fixed")
+  expect_equal(fixed$.se, c(expected_mean_se, 0))
+  expect_identical(m$Vp, before)
+  expect_false(identical(m$sig2, m$reml.scale))
+  # With no smoothing parameters, unconditional has nothing extra to include.
+  unconditional <- fitted_moments(m, data = nd, moments = c("mean", "variance", "cv"),
+    unconditional = TRUE)
+  expect_equal(unconditional$.se, delta$.se)
+  expect_equal(unconditional$.lower_ci, delta$.lower_ci)
+})
+
+test_that("global shape covariance agrees with an independent likelihood Hessian", {
+  d <- withr::with_seed(114, {
+    x <- runif(200)
+    data.frame(x, y = rnbinom(200, mu = exp(1 + x), size = 2))
+  })
+  m <- mgcv::gam(y ~ x, data = d, family = mgcv::nb(), method = "ML")
+  joint <- moment_parameter_context(m, "estimated", FALSE)
+  negative_log_likelihood <- function(b) -sum(dnbinom(d$y,
+    mu = exp(b[1] + d$x * b[2]), size = exp(b[3]), log = TRUE))
+  H <- stats::optimHess(joint$centre, negative_log_likelihood)
+  independent <- solve(H)
+  # The nuisance block and cross-covariance agree with the full observed
+  # likelihood. The coefficient block uses mgcv's conditional Bayesian Vp.
+  expect_equal(joint$covariance[, 3], independent[, 3], tolerance = 1e-5)
+  expect_equal(joint$covariance[3, ], independent[3, ], tolerance = 1e-5)
+  h <- 1e-4
+  theta <- m$family$getTheta()
+  refit <- function(t) coef(mgcv::gam(y ~ x, data = d,
+    family = mgcv::nb(theta = exp(t)), method = "ML"))
+  D <- (refit(theta + h) - refit(theta - h)) / (2 * h)
+  expect_equal(as.vector(m$db.drho), unname(D), tolerance = 1e-6)
+  expect_equal(as.vector(joint$covariance[1:2, 3]), unname(D) * joint$covariance[3, 3],
+    tolerance = 1e-7)
+  nd <- data.frame(x = 0.6)
+  mu <- as.vector(predict(m, nd, type = "response"))
+  k <- exp(theta)
+  gradient <- c(mu * (1 + 2 * mu / k) * c(1, nd$x), -mu^2 / k)
+  expected <- sqrt(drop(gradient %*% joint$covariance %*% gradient))
+  actual <- fitted_moments(m, data = nd, moments = "variance")
+  expect_equal(actual$.se, expected, tolerance = 1e-7)
+})
+
+test_that("linked and fixed smoothing parameters map into the joint covariance", {
+  d <- withr::with_seed(75, {
+    x <- runif(200)
+    z <- runif(200)
+    data.frame(x, z, y = rgamma(200, shape = 3, scale = exp(sin(5 * x) + cos(4 * z))),
+      count = rnbinom(200, mu = exp(sin(5 * x) + cos(4 * z)), size = 3))
+  })
+  models <- list(
+    linked = mgcv::gam(y ~ s(x, k = 5, id = 1) + s(z, k = 5, id = 1),
+      data = d, family = Gamma(link = "log"), method = "REML"),
+    fixed = mgcv::gam(y ~ s(x, k = 5) + s(z, k = 5), sp = c(1, -1),
+      data = d, family = Gamma(link = "log"), method = "REML"),
+    nb_linked = mgcv::gam(count ~ s(x, k = 5, id = 1) + s(z, k = 5, id = 1),
+      data = d, family = mgcv::nb(), method = "REML"))
+  for (m in models) {
+    m <- moment_scale_model(m)
+    L <- attr(m$V.sp, "L")
+    D <- if (isTRUE(m$scale.estimated)) cbind(m$db.drho, 0) else m$db.drho
+    D <- D %*% L
+    H <- m$outer.info$hess
+    V <- m$Vp + D %*% solve(H, t(D))
+    nd <- data.frame(x = 0.4, z = 0.6)
+    X <- predict(m, nd, type = "lpmatrix")
+    mu <- as.vector(predict(m, nd, type = "response"))
+    joint <- moment_parameter_context(m, "estimated", TRUE)
+    expect_equal(joint$covariance[seq_along(coef(m)), seq_along(coef(m))], V,
+      tolerance = 1e-8)
+    actual <- fitted_moments(m, data = nd, moments = "mean", unconditional = TRUE)
+    expect_equal(actual$.se, mu * sqrt(drop(X %*% V %*% t(X))))
+    fixed <- fitted_moments(m, data = nd, moments = "mean", nuisance = "fixed", unconditional = TRUE)
+    smooth <- (m$family$n.theta %||% 0L) + 1L
+    fixed_V <- m$Vp + tcrossprod(D[, smooth, drop = FALSE]) / H[smooth, smooth]
+    expect_equal(fixed$.se, mu * sqrt(drop(X %*% fixed_V %*% t(X))))
+    simulation <- fitted_moments(m, data = nd, moments = "mean", unconditional = TRUE,
+      uncertainty = "simulation", n_draws = 2500, seed = 44)
+    expect_equal(simulation$.se / actual$.se, 1, tolerance = 0.06)
+  }
+})
+
+test_that("outer covariance uses curvature at the fitted parameters", {
+  m <- mgcv::gam(mpg ~ s(wt, k = 5), data = mtcars,
+    family = Gamma(link = "log"), method = "REML")
+  nd <- data.frame(wt = 3)
+  before <- fitted_moments(m, data = nd, moments = "all", unconditional = TRUE)
+  # Native V.sp can be regularised or based on a separate edge evaluation.
+  # Neither changes the Hessian or sensitivities at this fitted parameter.
+  m$V.sp[] <- 0
+  attr(m$outer.info$hess, "hess1") <- m$outer.info$hess * 2
+  after <- fitted_moments(m, data = nd, moments = "all", unconditional = TRUE)
+  expect_equal(after, before)
+  m$outer.info$hess[1, 1] <- -1
+  expect_error(fitted_moments(m, data = nd, unconditional = TRUE), "Joint uncertainty")
+})
+
+test_that("native family parameterisations agree with their response laws", {
+  columns <- c("mean", "variance", "skewness", "kurtosis")
+  compare <- function(family, eta, expected, scale = 1) {
+    actual <- moment_family_values(family, matrix(eta, nrow = 1L), scale, numeric())
+    expect_equal(as.vector(actual$values[, columns]), expected, tolerance = 1e-8,
+      info = family$family)
+  }
+  # The censored families describe the latent Gaussian, logistic and Poisson.
+  compare(gaussian(), 2, c(2, 0.49, 0, 3), scale = 0.49)
+  compare(mgcv::cnorm(theta = 0.7), 2, c(2, 0.49, 0, 3))
+  compare(mgcv::clog(theta = 0.7), 2, c(2, pi^2 * 0.49 / 3, 0, 4.2))
+  for (family in list(poisson(), mgcv::cpois()))
+    compare(family, family$linkfun(3), c(3, 3, 1 / sqrt(3), 3 + 1 / 3))
+  p <- 0.3
+  variance <- p * (1 - p)
+  compare(binomial(), qlogis(p), c(p, variance, (1 - 2 * p) / sqrt(variance),
+    1 / variance - 3))
+
+  family <- mgcv::gaulss()
+  eta <- vapply(1:2, function(j) family$linfo[[j]]$linkfun(c(2, 1 / 0.7)[j]), numeric(1))
+  compare(family, eta, c(2, 0.49, 0, 3))
+  family <- mgcv::gammals()
+  eta <- vapply(1:2, function(j) family$linfo[[j]]$linkfun(log(c(3, 0.4)[j])), numeric(1))
+  compare(family, eta, c(3, 0.4 * 9, 2 * sqrt(0.4), 3 + 6 * 0.4))
+
+  family <- mgcv::gumbls()
+  eta <- c(2, family$linfo[[2]]$linkfun(log(0.7)))
+  # Integrate the location/scale transformation of a standard Gumbel density.
+  integral <- function(fun) stats::integrate(function(z)
+    fun(2 + 0.7 * z) * exp(-z - exp(-z)), -12, 60, rel.tol = 1e-10)$value
+  mean <- integral(identity)
+  variance <- integral(function(y) (y - mean)^2)
+  compare(family, eta, c(mean, variance,
+    integral(function(y) (y - mean)^3) / variance^1.5,
+    integral(function(y) (y - mean)^4) / variance^2))
+
+  power <- 1.4
+  family <- mgcv::twlss(a = 1.1, b = 1.9)
+  eta <- c(log(3), log((power - 1.1) / (1.9 - power)), log(0.4))
+  cv <- sqrt(0.4) * 3^(power / 2 - 1)
+  compare(family, eta, c(3, 0.4 * 3^power, power * cv,
+    3 + power * (2 * power - 1) * cv^2))
+
+  # Explicit probability masses check both zero/positive Poisson mappings.
+  lambda <- 3
+  presence <- 0.6
+  y <- 0:100
+  probability <- c(1 - presence, presence * dpois(y[-1], lambda) / (1 - exp(-lambda)))
+  mean <- sum(y * probability)
+  variance <- sum((y - mean)^2 * probability)
+  expected <- c(mean, variance, sum((y - mean)^3 * probability) / variance^1.5,
+    sum((y - mean)^4 * probability) / variance^2)
+  compare(mgcv::ziplss(), c(log(lambda), log(-log1p(-presence))), expected)
+  intercept <- log(-log1p(-presence)) - log(lambda)
+  compare(mgcv::ziP(theta = c(intercept, log(0.8)), b = 0.2), log(lambda), expected)
+
+  # The scaled-t variance has the Gaussian limit even for an infinite df.
+  compare(mgcv::scat(theta = c(Inf, 0.7)), 2, c(2, 0.49, 0, 3))
+
+  # An identity mean link permits negative parameter draws, but these do not
+  # define a Tweedie distribution, including its apparently finite mean.
+  family <- mgcv::twlss(link = list("identity", "identity", "identity"))
+  evaluate <- function(eta) as.vector(moment_family_values(family,
+    matrix(eta, nrow = 1L), 1, numeric())$values)
+  invalid <- moment_family_values(family, matrix(c(-1, 0, log(0.4)), 1L), 1, numeric())
+  expect_true(all(is.na(invalid$values)))
+  expect_true(all(invalid$status == "numerical_failure"))
+  simulated <- moment_simulation(evaluate, rbind(c(1, 0, log(0.4)), c(-1, 0, log(0.4))), 0.95)
+  expect_equal(simulated$defined, rep(0.5, 7))
+  expect_true(all(is.na(simulated$se)))
 })

@@ -1,6 +1,23 @@
 # Joint first-order approximation: conditional coefficient covariance plus
 # sensitivity of those coefficients to mgcv's outer optimisation parameters.
 # The ordering is family parameters, log smoothing parameters, then log scale.
+
+# The outer ML/REML Hessian describes reml.scale, whereas sig2 and Vp can use
+# the separate Pearson/Fletcher estimate. Use the likelihood scale throughout
+# a local copy of the fit, including its conditional coefficient covariance.
+moment_scale_model <- function(model) {
+  scale <- model$reml.scale
+  if (isTRUE(model$scale.estimated) && model$method %in% c("ML", "REML") &&
+      length(scale) == 1L && is.finite(scale) && scale > 0) {
+    ratio <- scale / model$sig2
+    for (name in c("Vp", "Ve", "Vc")) {
+      if (!is.null(model[[name]])) model[[name]] <- model[[name]] * ratio
+    }
+    model$sig2 <- model$scale <- scale
+  }
+  model
+}
+
 moment_parameter_context <- function(model, nuisance, unconditional) {
   family <- stats::family(model)
   p <- length(stats::coef(model))
@@ -28,11 +45,11 @@ moment_parameter_context <- function(model, nuisance, unconditional) {
   fail <- function() {
     if (smooth_only) stop(paste0(
       "Smoothing uncertainty conditional on fixed global parameters requires ",
-      "a saved ML/REML outer Hessian and matching coefficient sensitivities. ",
+      "a saved, positive-definite ML/REML outer Hessian and matching coefficient sensitivities. ",
       "Use unconditional = FALSE for this fitting configuration."), call. = FALSE)
     stop(paste0(
       "Joint uncertainty for estimated family parameters requires a gam fit with ",
-      "a saved ML/REML outer Hessian and matching coefficient sensitivities. ",
+      "a saved, positive-definite ML/REML outer Hessian and matching coefficient sensitivities. ",
       "This fitting configuration is unsupported; use nuisance = 'fixed' explicitly ",
       "or uncertainty = 'none'."), call. = FALSE)
   }
@@ -41,12 +58,21 @@ moment_parameter_context <- function(model, nuisance, unconditional) {
   D <- model$db.drho
   if (inherits(model, "scam") || !model$method %in% c("ML", "REML") ||
       !is.matrix(H) || !identical(dim(H), c(k, k)) || any(!is.finite(H)) ||
-      !is.matrix(D) || !identical(dim(D), c(p, nth + q)) ||
-      any(!is.finite(D)) || length(raw_theta) < nth) fail()
+      !is.matrix(D) || nrow(D) != p || any(!is.finite(D)) ||
+      length(raw_theta) < nth) fail()
   nu <- c(seq_len(nth), if (estimated_scale) k)
   # Ordinary coefficient estimates have zero derivative with respect to log
   # scale at fixed smoothing parameters in mgcv's parameterisation.
   if (estimated_scale) D <- cbind(D, 0)
+  # db.drho uses the full penalty list; the Hessian uses free optimisation
+  # parameters. Linked or fixed smoothing parameters need mgcv's saved map.
+  L <- attr(model$V.sp, "L")
+  if (!is.null(L)) {
+    if (!is.matrix(L) || !identical(dim(L), c(ncol(D), k)) ||
+        any(!is.finite(L))) fail()
+    D <- D %*% L
+  }
+  if (!identical(dim(D), c(p, k))) fail()
   if (smooth_only) {
     selected <- nth + seq_len(q)
     precision <- (H[selected, selected, drop = FALSE] +
@@ -61,18 +87,21 @@ moment_parameter_context <- function(model, nuisance, unconditional) {
       fixed = TRUE, joint_sampling = TRUE, raw_theta = raw_theta))
   }
   if (unconditional) {
-    C <- model$V.sp
-    if (!is.matrix(C) || !identical(dim(C), c(k, k)) || any(!is.finite(C))) fail()
     selected <- seq_len(k)
-    source <- "native outer covariance and coefficient sensitivities"
+    source <- "outer Hessian and coefficient sensitivities"
   } else {
-    H <- (H[nu, nu, drop = FALSE] + t(H[nu, nu, drop = FALSE])) / 2
-    R <- tryCatch(chol(H), error = function(e) NULL)
-    if (is.null(R)) fail()
-    C <- chol2inv(R)
     selected <- nu
     source <- "outer Hessian conditional on smoothing parameters and coefficient sensitivities"
   }
+  # Native V.sp may regularise all parameters, or use curvature from an edge
+  # correction evaluated away from these coefficients and sensitivities.
+  # Invert matching curvature here, so only smoothing uncertainty changes
+  # when unconditional is requested and no extra prior is added to dispersion.
+  H <- (H[selected, selected, drop = FALSE] +
+    t(H[selected, selected, drop = FALSE])) / 2
+  R <- tryCatch(chol(H), error = function(e) NULL)
+  if (is.null(R)) fail()
+  C <- chol2inv(R)
   D <- D[, selected, drop = FALSE]
   where <- match(nu, selected)
   base <- get_vcov(model, unconditional = FALSE)

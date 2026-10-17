@@ -42,6 +42,11 @@
 #' @details
 #' Estimates describe one response at each covariate combination, with unit
 #' observation weight. Fitting weights are not transferred to new responses.
+#' For ML/REML fits with an estimated dispersion, all uncertainty modes use
+#' the likelihood estimate stored in `reml.scale`. The conditional coefficient
+#' covariance is rescaled to this value. This can differ from mgcv's separate
+#' Pearson/Fletcher estimate in `sig2`; the saved outer Hessian describes the
+#' likelihood estimate, so combining it with `sig2` would mix estimators.
 #' Response variance and uncertainty in its estimate are different quantities:
 #' `.fitted` contains the variance when `.parameter` is `"variance"`, and `.se`
 #' describes uncertainty in that estimate. These are not moments of a posterior
@@ -74,8 +79,11 @@
 #' second derivatives of the ML/REML fitting criterion and derivatives of the
 #' fitted coefficients with respect to the family and smoothing parameters. Without
 #' `unconditional`, outer curvature is conditioned on smoothing parameters.
-#' With `unconditional`, the stored native outer covariance is used, including
-#' its smoothing uncertainty. This does not also add the corrected coefficient
+#' With `unconditional`, the full saved outer Hessian is inverted, including
+#' its smoothing uncertainty. The curvature and coefficient sensitivities are
+#' evaluated at the fitted parameters, with mgcv's mapping for linked or fixed
+#' smoothing parameters. A positive-definite Hessian is required. This does not
+#' also add the corrected coefficient
 #' covariance, which would count that uncertainty twice. The fitted object must
 #' store a matching Hessian and sensitivities; unsupported fitting methods,
 #' including fast REML BAM fits, give an error. This is a local approximation
@@ -88,7 +96,9 @@
 #' the same saved outer Hessian and sensitivities when smoothing parameters are
 #' present. Legacy `negbin()` fits outside ML/REML require explicit
 #' `nuisance = "fixed"`; use `nb()` to estimate and propagate shape uncertainty.
-#' The `moment_info` attribute
+#' The covariance calculation uses a first-order expansion of the coefficient
+#' means and does not include mgcv's additional correction for changes in the
+#' conditional coefficient covariance. The `moment_info` attribute
 #' records which approximation was used.
 #'
 #' Nonexistent moments are retained as `NA` with a status and one warning per
@@ -176,7 +186,7 @@ fitted_moments.gam <- function(object, data = NULL,
   context <- if (grouped) moment_grouped_context(object, data, family_index, ...) else
     lss_prediction_context(object, data, ...)
   context$family <- unserialize(serialize(context$family, NULL))
-  model <- context$model
+  model <- context$model <- moment_scale_model(context$model)
   p <- length(stats::coef(model))
   theta <- if (is.function(f$getTheta) && inherits(f, "extended.family"))
     f$getTheta() else numeric()

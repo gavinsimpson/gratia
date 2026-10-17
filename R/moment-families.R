@@ -204,11 +204,10 @@ moment_family_values <- function(family, eta, scale, beta, scores = NULL) {
     response <- rep(paste0("response", seq_len(NCOL(eta))), each = n)
   } else {
     mu <- family_prediction_parameters(family, eta)
-    m <- as.vector(mu)
-    if (!inherits(family, "general.family")) {
-      invalid <- moment_invalid_mu(ft, m)
-      m[invalid] <- NA_real_
-    }
+    m <- if (is.matrix(mu)) mu[, 1L] else as.vector(mu)
+    invalid <- moment_invalid_mu(ft, m)
+    m[invalid] <- NA_real_
+    if (is.matrix(mu)) mu[invalid, 1L] <- NA_real_
     ans <- switch(ft,
       gaussian = moment_summary(m, scale, 0, 0),
       cnorm = moment_summary(m, th[1L]^2, 0, 0),
@@ -235,7 +234,7 @@ moment_family_values <- function(family, eta, scale, beta, scores = NULL) {
       scaled_t = {
         df <- th[1L]
         moment_summary(if (df > 1) m else rep(NA_real_, n),
-          if (df > 2) th[2L]^2 * df / (df - 2) else NA_real_,
+          if (df > 2) th[2L]^2 / (1 - 2 / df) else NA_real_,
           if (df > 3) 0 else NA_real_, if (df > 4) 6 / (df - 4) else NA_real_)
       },
       tweedie = {
@@ -275,9 +274,7 @@ moment_family_values <- function(family, eta, scale, beta, scores = NULL) {
     # Inverse and identity links can leave a family's parameter domain in
     # either a Gaussian draw or a numerical perturbation. No moment is valid
     # for those parameter values, even if a formula happens to return a number.
-    if (!inherits(family, "general.family")) {
-      ans[invalid, ] <- NA_real_
-    }
+    ans[invalid, ] <- NA_real_
   }
   list(values = ans, status = moment_family_status(family, eta, ans),
     category = category, response = response,
@@ -287,7 +284,7 @@ moment_family_values <- function(family, eta, scale, beta, scores = NULL) {
 moment_invalid_mu <- function(family, mu) {
   invalid <- !is.finite(mu)
   if (family %in% c("poisson", "cpois", "gamma", "inverse_gaussian",
-      "negative_binomial", "tweedie")) invalid <- invalid | mu <= 0
+      "negative_binomial", "tweedie", "gammals", "twlss")) invalid <- invalid | mu <= 0
   if (family %in% c("binomial", "beta_regression")) invalid <- invalid | mu < 0 | mu > 1
   if (family == "beta_regression") invalid <- invalid | mu == 0 | mu == 1
   invalid
