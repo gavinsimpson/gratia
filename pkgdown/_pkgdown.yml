@@ -103,7 +103,10 @@ reference:
       combining model terms rather than estimating individual term effects.
   - contents:
       - fitted_values
+      - fitted_moments
       - conditional_values
+      - conditional_moments
+      - draw.conditional_moments
       - draw.conditional_values
       - add_fitted
       - add_fitted.gam
