@@ -9,7 +9,7 @@ covariate, combining all model terms involving that covariate."><meta property="
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-53</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-56</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -183,11 +183,12 @@ for simultaneous intervals. Ignored for pointwise intervals.</p></dd>
 
 <dt id="arg-seed">seed<a class="anchor" aria-label="anchor" href="#arg-seed"></a></dt>
 <dd><p>optional integer seed for simultaneous intervals. An explicit
-seed preserves the caller's random-number state.</p></dd>
+seed preserves the caller's random-number state around interval simulation.</p></dd>
 
 
 <dt id="arg-block-size">block_size<a class="anchor" aria-label="anchor" href="#arg-block-size"></a></dt>
-<dd><p>positive integer; maximum reference rows processed at once.</p></dd>
+<dd><p>positive integer; maximum reference rows in each prediction
+block. Blocks can run in parallel when workers are configured; see Details.</p></dd>
 
 
 <dt id="arg-exclude">exclude<a class="anchor" aria-label="anchor" href="#arg-exclude"></a></dt>
@@ -251,6 +252,24 @@ points between them. No uncertainty for the reference distribution is added.</p>
 supplied only through the fitting function's <code>offset</code> argument are omitted,
 following explicit-newdata prediction semantics. BAM predictions use
 <code>discrete = FALSE</code>, including for models fitted with <code>discrete = TRUE</code>.</p>
+<p>Prediction blocks use an existing pool of workers configured with
+<code><a href="https://mirai.r-lib.org/reference/daemons.html" class="external-link">mirai::daemons()</a></code>, when mirai and carrier are installed. Set <code>block_size</code>
+small enough to give each worker a block; serial and parallel calculations
+retain the same block boundaries and accumulation order. Worker startup and
+model transfer can outweigh the benefit for small models or reference data.
+The caller owns the pool; <code>ale()</code> does not start or stop workers.
+<code>n_cores</code> controls coefficient simulation for simultaneous intervals, not the
+number of prediction workers. Workers use their configured BLAS thread limits.</p>
+<p>Data recovery and validation, centring, covariance calculations and interval
+simulation remain in the caller. Simultaneous bands use one shared set of
+coefficient deviations for all boundaries, preserving results and the
+caller's random-number state across worker counts. Models requiring custom
+prediction methods, family callbacks, contrasts or formula functions that
+workers cannot safely evaluate retain serial prediction. Standard arithmetic
+and common base and stats transformations can run on workers; local helpers,
+stochastic expressions, custom S3 transformation methods and other package
+functions retain serial prediction. Method checks do not invoke active or
+lazy caller bindings.</p>
 <p>This implementation is written independently from the published ALE
 definition, without using code from mgcViz or ALEPlot.</p>
     </div>

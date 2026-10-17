@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-53</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-56</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -95,7 +95,10 @@
 <span>  envir <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  wrt <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"smooth"</span>, <span class="st">"covariate"</span><span class="op">)</span>,</span>
 <span>  focal <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  interval_method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"auto"</span>, <span class="st">"gaussian"</span>, <span class="st">"bootstrap"</span><span class="op">)</span></span>
+<span>  interval_method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"auto"</span>, <span class="st">"gaussian"</span>, <span class="st">"bootstrap"</span><span class="op">)</span>,</span>
+<span>  simultaneous_method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"simulation"</span>, <span class="st">"tube"</span><span class="op">)</span>,</span>
+<span>  simultaneous_domain <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  tube_control <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'gamm4'</span></span>
@@ -232,6 +235,29 @@ for all selected univariate smooths.</p></dd>
 <dd><p>character; use stored scasm bootstrap draws for
 pointwise intervals with <code>"auto"</code> (the default), or explicitly select
 <code>"gaussian"</code> or <code>"bootstrap"</code>. Bootstrap simultaneous bands are unavailable.</p></dd>
+
+
+<dt id="arg-simultaneous-method">simultaneous_method<a class="anchor" aria-label="anchor" href="#arg-simultaneous-method"></a></dt>
+<dd><p>character; calibration for simultaneous bands.
+The default, <code>"simulation"</code>, uses coefficient draws on the evaluation
+grid. <code>"tube"</code> uses a conservative Gaussian threshold-crossing bound
+over a continuous interval for supported one-dimensional cubic splines.
+See <a href="simultaneous_bands.html">simultaneous_bands</a>.</p></dd>
+
+
+<dt id="arg-simultaneous-domain">simultaneous_domain<a class="anchor" aria-label="anchor" href="#arg-simultaneous-domain"></a></dt>
+<dd><p>numeric pair of increasing finite endpoints, or
+a named list of such pairs keyed by spline coordinate. For tube bands,
+<code>NULL</code> uses the range of returned evaluation coordinates, including gaps.
+All returned points must lie inside the interval and the interval must
+lie inside the fitted spline support. Requires tube calibration.</p></dd>
+
+
+<dt id="arg-tube-control">tube_control<a class="anchor" aria-label="anchor" href="#arg-tube-control"></a></dt>
+<dd><p>named list controlling numerical tube calibration:
+<code>rel_tol</code> (default <code>1e-6</code>), <code>abs_tol</code> (<code>1e-8</code>), <code>subdivisions</code> (<code>1000L</code>),
+and <code>root_tol</code> (<code>1e-8</code>). Requires tube calibration. Simulation controls
+<code>n_sim</code>, <code>n_cores</code> (or <code>ncores</code>), and <code>seed</code> are ignored by tube calibration.</p></dd>
 
 </dl></div>
     <div class="section level2">

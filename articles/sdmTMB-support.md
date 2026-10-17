@@ -374,7 +374,7 @@ link_prediction <- predict(cod_fit)
 response_prediction <- predict(cod_fit, type = "response")
 combined_mean <- plogis(link_prediction$est1) * exp(link_prediction$est2)
 max(abs(combined_mean - response_prediction$est))
-#> [1] 1.136868e-13
+#> [1] 0
 ```
 
 For other delta links, use the fitting package’s response
@@ -612,10 +612,10 @@ summary_draws |>
 #> # A tibble: 4 × 6
 #>   check                   summary          median   lower   upper observed
 #>   <chr>                   <chr>             <dbl>   <dbl>   <dbl>    <dbl>
-#> 1 New fields              density_95th    180.    149.    241.     157.   
-#> 2 New fields              proportion_zero   0.494   0.412   0.614    0.538
-#> 3 Uncertain fitted fields density_95th    157.    141.    176.     157.   
-#> 4 Uncertain fitted fields proportion_zero   0.542   0.527   0.556    0.538
+#> 1 New fields              density_95th    187.    143.    214.     157.   
+#> 2 New fields              proportion_zero   0.518   0.414   0.630    0.538
+#> 3 Uncertain fitted fields density_95th    161.    144.    182.     157.   
+#> 4 Uncertain fitted fields proportion_zero   0.542   0.525   0.554    0.538
 ```
 
 The conditional comparison asks whether new responses around the

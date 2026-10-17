@@ -15,7 +15,7 @@ been removed from the package."><meta property="og:image" content="https://gavin
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-53</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-56</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -105,7 +105,10 @@ been removed from the package.</p>
 <span>  interval_method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"auto"</span>, <span class="st">"gaussian"</span>, <span class="st">"bootstrap"</span>, <span class="st">"shape"</span><span class="op">)</span>,</span>
 <span>  shape_source <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"gaussian"</span>, <span class="st">"bootstrap"</span><span class="op">)</span>,</span>
 <span>  <span class="va">...</span>,</span>
-<span>  variables <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  variables <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  simultaneous_method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"simulation"</span>, <span class="st">"tube"</span><span class="op">)</span>,</span>
+<span>  simultaneous_domain <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  tube_control <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'gamlss'</span></span>
@@ -237,7 +240,7 @@ or their intervals at the chosen evaluation points.</p></dd>
 <dt id="arg-interval">interval<a class="anchor" aria-label="anchor" href="#arg-interval"></a></dt>
 <dd><p>character or <code>NULL</code>; <code>NULL</code> (the default) returns estimates
 and standard errors only. <code>"confidence"</code> adds pointwise intervals and
-<code>"simultaneous"</code> adds a band covering the finite evaluation grid of each
+<code>"simultaneous"</code> adds a band covering, by default, the finite evaluation grid of each
 fitted smooth. <code>"credible"</code> is an alias for <code>"confidence"</code>; the default
 Bayesian covariance gives approximate Bayesian credible intervals.</p></dd>
 
@@ -285,6 +288,29 @@ evaluated; evaluate again to change grid resolution or conditioning values.
 Continuous covariates must precede factors. Spherical smooths retain their
 latitude/longitude convention and do not support reordering.</p></dd>
 
+
+<dt id="arg-simultaneous-method">simultaneous_method<a class="anchor" aria-label="anchor" href="#arg-simultaneous-method"></a></dt>
+<dd><p>character; calibration for simultaneous bands.
+The default, <code>"simulation"</code>, uses coefficient draws on the evaluation
+grid. <code>"tube"</code> uses a conservative Gaussian threshold-crossing bound
+over a continuous interval for supported one-dimensional cubic splines.
+See <a href="simultaneous_bands.html">simultaneous_bands</a>.</p></dd>
+
+
+<dt id="arg-simultaneous-domain">simultaneous_domain<a class="anchor" aria-label="anchor" href="#arg-simultaneous-domain"></a></dt>
+<dd><p>numeric pair of increasing finite endpoints, or
+a named list of such pairs keyed by spline coordinate. For tube bands,
+<code>NULL</code> uses the range of returned evaluation coordinates, including gaps.
+All returned points must lie inside the interval and the interval must
+lie inside the fitted spline support. Requires tube calibration.</p></dd>
+
+
+<dt id="arg-tube-control">tube_control<a class="anchor" aria-label="anchor" href="#arg-tube-control"></a></dt>
+<dd><p>named list controlling numerical tube calibration:
+<code>rel_tol</code> (default <code>1e-6</code>), <code>abs_tol</code> (<code>1e-8</code>), <code>subdivisions</code> (<code>1000L</code>),
+and <code>root_tol</code> (<code>1e-8</code>). Requires tube calibration. Simulation controls
+<code>n_sim</code>, <code>n_cores</code> (or <code>ncores</code>), and <code>seed</code> are ignored by tube calibration.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -313,11 +339,13 @@ estimates. Smooth labels and selection remain unchanged.</p>
 example, tensor products of soap-film components), <code>.smooth_id</code> contains
 their fitted smooth indices. This preserves their identity in saved
 estimates and plots without changing the labels supplied by mgcv.</p>
-<p>Simultaneous coverage is per fitted smooth over its valid evaluation points,
+<p>By default, simultaneous coverage is per fitted smooth over its valid evaluation points,
 including all its slices and factor levels. Separate factor-by smooths remain
 separate coverage sets when grouped in one plot. This finite-grid band does
 not claim joint coverage across selected smooths or the full fitted model.
 Increasing grid resolution improves the approximation to whole-curve coverage.
+For supported univariate cubic splines, <code>simultaneous_method = "tube"</code>
+instead calibrates over a continuous interval; see <a href="simultaneous_bands.html">simultaneous_bands</a>.
 <code>overall_uncertainty</code> and covariance options apply to both interval types.
 SCAM smooth estimates retain the fitted centring and coefficient
 transformation when evaluation points are changed. Pointwise intervals use

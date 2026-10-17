@@ -125,6 +125,12 @@ smooth_type(smooth)
 # S3 method for class 'tedmd.smooth'
 smooth_type(smooth)
 
+# S3 method for class 'tedi.smooth'
+smooth_type(smooth)
+
+# S3 method for class 'teid.smooth'
+smooth_type(smooth)
+
 # S3 method for class 'temicx.smooth'
 smooth_type(smooth)
 

@@ -147,6 +147,36 @@
 
 ### New features
 
+- [`fitted_moments()`](https://gavinsimpson.github.io/gratia/reference/fitted_moments.md)
+  and
+  [`conditional_moments()`](https://gavinsimpson.github.io/gratia/reference/conditional_moments.md)
+  estimate response means, variances, SDs, coefficients of variation,
+  skewness and kurtosis. Delta-method intervals and joint Gaussian
+  simulation propagate covariance between distribution parameters.
+  Supported ML/REML fits also propagate estimated global family
+  parameters and dispersion; `nuisance = "fixed"` explicitly conditions
+  on their fitted values. Dispersion and coefficient covariance use the
+  same ML/REML scale estimate as the saved fitting curvature, including
+  models with linked or fixed smoothing parameters. Standard,
+  distributional, categorical, multivariate-normal, grouped and latent
+  censored response families are supported where their moments exist.
+  Conditional moments can be drawn with
+  [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md).
+
+- [`smooth_estimates()`](https://gavinsimpson.github.io/gratia/reference/smooth_estimates.md),
+  [`derivatives()`](https://gavinsimpson.github.io/gratia/reference/derivatives.md),
+  and
+  [`difference_smooths()`](https://gavinsimpson.github.io/gratia/reference/difference_smooths.md)
+  offer continuous-interval Gaussian simultaneous bands for supported
+  one-dimensional cubic splines via `simultaneous_method = "tube"`.
+  Bands use a conservative threshold-crossing bound, preserve the
+  selected covariance and group means, and record the domain and
+  numerical diagnostics in interval metadata.
+  [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md),
+  [`assemble()`](https://gavinsimpson.github.io/gratia/reference/assemble.md),
+  and [`confint()`](https://rdrr.io/r/stats/confint.html) forward the
+  controls.
+
 - Smooth estimation and drawing, including
   [`difference_smooths()`](https://gavinsimpson.github.io/gratia/reference/difference_smooths.md),
   now accept `variables` to choose x and y axes and the order of
@@ -204,9 +234,11 @@
   partial residuals
   ([\#215](https://github.com/gavinsimpson/gratia/issues/215)).
 
-- All 41 smooth constructors in scam 1.2-22 are supported for smooth
+- All 43 smooth constructors in scam 1.2-23 are supported for smooth
   estimates, bases, sampling and plots, including bivariate smooths,
-  cyclic margins, interactions and explicit `By` classes.
+  cyclic margins, interactions and explicit `By` classes. This includes
+  `tedi` and `teid` surfaces that increase along one covariate and
+  decrease along the other.
   [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)
   and
   [`assemble()`](https://gavinsimpson.github.io/gratia/reference/assemble.md)
@@ -225,8 +257,10 @@
   helpers, model summaries, concurvity, penalties and variance-component
   ratios. Independent-response likelihoods, LOO/WAIC, supplied
   coefficient draws and scalable posterior predictive plots are also
-  supported. See the SCAM support article for supported combinations and
-  uncertainty calculations.
+  supported. Concurvity excludes basis columns whose coefficients are
+  fixed to zero, restoring the correct calculation for curves that
+  become flat. See the SCAM support article for supported combinations
+  and uncertainty calculations.
 
 - [`shape_intervals()`](https://gavinsimpson.github.io/gratia/reference/shape_intervals.md)
   applies monotone rearrangement and convex or concave envelopes to
@@ -339,6 +373,12 @@
   simultaneous intervals.
   [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)
   plots saved results with parameter labels and a scale caption.
+  Prediction blocks can use workers configured by
+  [`mirai::daemons()`](https://mirai.r-lib.org/reference/daemons.html).
+  Block accumulation order, shared interval draws and caller RNG
+  handling are preserved. Custom prediction methods and transformations
+  that require caller functions or S3 methods retain serial prediction.
+  Method checks do not invoke active or lazy caller bindings.
 
 - [`data_sim()`](https://gavinsimpson.github.io/gratia/reference/data_sim.md)
   now accepts family objects, explicit predictors and generating
@@ -453,7 +493,11 @@
   Posterior predictive checks separately include approximate parameter
   uncertainty. See
   [`?diagnostic_support`](https://gavinsimpson.github.io/gratia/reference/diagnostic_support.md)
-  for what these checks assess and their limitations.
+  for what these checks assess and their limitations. Delta-model
+  diagnostics accept the dispersion parameter layouts in sdmTMB 1.1.0
+  and 1.2.0, including the TMB and RTMB backends. Fits with a dispersion
+  formula give an explicit error because observation-specific dispersion
+  is not yet supported by these diagnostics.
 
 - Diagnostic plots now support uncensored univariate
   [`GJRM::gamlss()`](https://rdrr.io/pkg/GJRM/man/gamlss.html) models

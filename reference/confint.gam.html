@@ -9,7 +9,7 @@ terms of a fitted GAM."><meta property="og:image" content="https://gavinsimpson.
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-53</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-56</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -191,7 +191,9 @@ an exact match? Can only be used if <code>length(parm)</code> is <code>1</code>.
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>additional arguments passed to <code><a href="smooth_estimates.html">smooth_estimates()</a></code>, including
 <code>interval_method</code> to select Gaussian, stored scasm bootstrap, or
-shape-enforced intervals, and <code>shape_source</code> to choose their initial source.</p></dd>
+shape-enforced intervals, and <code>shape_source</code> to choose their initial source.
+<code>simultaneous_method</code>, <code>simultaneous_domain</code>, and <code>tube_control</code> request
+and configure continuous-interval tube bands; see <a href="simultaneous_bands.html">simultaneous_bands</a>.</p></dd>
 
 
 <dt id="arg-newdata">newdata<a class="anchor" aria-label="anchor" href="#arg-newdata"></a></dt>
@@ -227,7 +229,8 @@ enforce shape constraints on their limits.</p>
     <h2 id="note">Note<a class="anchor" aria-label="anchor" href="#note"></a></h2>
     <p><code>overall_uncertainty</code> applies to both pointwise and simultaneous
 intervals. Each simultaneous band covers the evaluation points of one
-fitted smooth; separate smooths do not form a joint coverage set.
+fitted smooth by default, or its continuous domain with tube calibration;
+separate smooths do not form a joint coverage set.
 Native scasm fits default to <code>overall_uncertainty = FALSE</code> and use stored
 bootstrap draws for pointwise intervals when available, as in
 <code><a href="smooth_estimates.html">smooth_estimates()</a></code>. Shifting and transforming a smooth preserves its

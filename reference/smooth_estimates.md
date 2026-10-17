@@ -39,7 +39,10 @@ smooth_estimates(
   interval_method = c("auto", "gaussian", "bootstrap", "shape"),
   shape_source = c("gaussian", "bootstrap"),
   ...,
-  variables = NULL
+  variables = NULL,
+  simultaneous_method = c("simulation", "tube"),
+  simultaneous_domain = NULL,
+  tube_control = list()
 )
 
 # S3 method for class 'gamlss'
@@ -173,10 +176,10 @@ smooth_estimates(
 
   character or `NULL`; `NULL` (the default) returns estimates and
   standard errors only. `"confidence"` adds pointwise intervals and
-  `"simultaneous"` adds a band covering the finite evaluation grid of
-  each fitted smooth. `"credible"` is an alias for `"confidence"`; the
-  default Bayesian covariance gives approximate Bayesian credible
-  intervals.
+  `"simultaneous"` adds a band covering, by default, the finite
+  evaluation grid of each fitted smooth. `"credible"` is an alias for
+  `"confidence"`; the default Bayesian covariance gives approximate
+  Bayesian credible intervals.
 
 - ci_level:
 
@@ -226,6 +229,29 @@ smooth_estimates(
   covariates must precede factors. Spherical smooths retain their
   latitude/longitude convention and do not support reordering.
 
+- simultaneous_method:
+
+  character; calibration for simultaneous bands. The default,
+  `"simulation"`, uses coefficient draws on the evaluation grid.
+  `"tube"` uses a conservative Gaussian threshold-crossing bound over a
+  continuous interval for supported one-dimensional cubic splines. See
+  [simultaneous_bands](https://gavinsimpson.github.io/gratia/reference/simultaneous_bands.md).
+
+- simultaneous_domain:
+
+  numeric pair of increasing finite endpoints, or a named list of such
+  pairs keyed by spline coordinate. For tube bands, `NULL` uses the
+  range of returned evaluation coordinates, including gaps. All returned
+  points must lie inside the interval and the interval must lie inside
+  the fitted spline support. Requires tube calibration.
+
+- tube_control:
+
+  named list controlling numerical tube calibration: `rel_tol` (default
+  `1e-6`), `abs_tol` (`1e-8`), `subdivisions` (`1000L`), and `root_tol`
+  (`1e-8`). Requires tube calibration. Simulation controls `n_sim`,
+  `n_cores` (or `ncores`), and `seed` are ignored by tube calibration.
+
 ## Value
 
 A data frame (tibble), which is of class `"smooth_estimates"`. Its
@@ -261,23 +287,26 @@ example, tensor products of soap-film components), `.smooth_id` contains
 their fitted smooth indices. This preserves their identity in saved
 estimates and plots without changing the labels supplied by mgcv.
 
-Simultaneous coverage is per fitted smooth over its valid evaluation
-points, including all its slices and factor levels. Separate factor-by
-smooths remain separate coverage sets when grouped in one plot. This
-finite-grid band does not claim joint coverage across selected smooths
-or the full fitted model. Increasing grid resolution improves the
-approximation to whole-curve coverage. `overall_uncertainty` and
-covariance options apply to both interval types. SCAM smooth estimates
-retain the fitted centring and coefficient transformation when
-evaluation points are changed. Pointwise intervals use the covariance of
-the constrained coefficients. With `overall_uncertainty = TRUE`, their
-standard errors also include intercept uncertainty and its covariance
-with the smooth; estimates remain centred. Models without an intercept
-use smooth-only uncertainty for either setting. Native scasm fits use
-component-only uncertainty by default. Explicitly requesting
-`overall_uncertainty = TRUE` warns once if selected smooths lack the
-centring information needed to add mean uncertainty. Ordinary GAM
-defaults are unchanged.
+By default, simultaneous coverage is per fitted smooth over its valid
+evaluation points, including all its slices and factor levels. Separate
+factor-by smooths remain separate coverage sets when grouped in one
+plot. This finite-grid band does not claim joint coverage across
+selected smooths or the full fitted model. Increasing grid resolution
+improves the approximation to whole-curve coverage. For supported
+univariate cubic splines, `simultaneous_method = "tube"` instead
+calibrates over a continuous interval; see
+[simultaneous_bands](https://gavinsimpson.github.io/gratia/reference/simultaneous_bands.md).
+`overall_uncertainty` and covariance options apply to both interval
+types. SCAM smooth estimates retain the fitted centring and coefficient
+transformation when evaluation points are changed. Pointwise intervals
+use the covariance of the constrained coefficients. With
+`overall_uncertainty = TRUE`, their standard errors also include
+intercept uncertainty and its covariance with the smooth; estimates
+remain centred. Models without an intercept use smooth-only uncertainty
+for either setting. Native scasm fits use component-only uncertainty by
+default. Explicitly requesting `overall_uncertainty = TRUE` warns once
+if selected smooths lack the centring information needed to add mean
+uncertainty. Ordinary GAM defaults are unchanged.
 
 Bootstrap pointwise limits follow mgcv's percentiles and its `svar.only`
 correction for smoothing bias. The correction can move limits beyond the

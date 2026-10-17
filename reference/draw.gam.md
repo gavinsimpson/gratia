@@ -69,7 +69,10 @@ draw(
   frequentist = FALSE,
   shape_source = c("gaussian", "bootstrap"),
   ...,
-  variables = NULL
+  variables = NULL,
+  simultaneous_method = c("simulation", "tube"),
+  simultaneous_domain = NULL,
+  tube_control = list()
 )
 
 # S3 method for class 'scam'
@@ -473,15 +476,18 @@ draw(
 - interval:
 
   character; `"confidence"` (default) draws pointwise intervals;
-  `"simultaneous"` uses a band across the finite evaluation grid of each
-  smooth, including its slices and factor levels. Separate smooths are
-  not a joint coverage set. `"credible"` aliases `"confidence"`,
-  reflecting the approximate Bayesian credible interpretation of
-  default-covariance bands. Parametric panels retain pointwise intervals
-  and are labelled accordingly when simultaneous smooth bands are
-  requested. Bands appear where the renderer displays interval bounds,
-  including 3D effect surfaces when `ci_3d = TRUE`. Random-effect QQ
-  plots retain their usual display.
+  `"simultaneous"` uses a band across, by default, the finite evaluation
+  grid of each smooth, including its slices and factor levels. Separate
+  smooths are not a joint coverage set. `"credible"` aliases
+  `"confidence"`, reflecting the approximate Bayesian credible
+  interpretation of default-covariance bands. Parametric panels retain
+  pointwise intervals and are labelled accordingly when simultaneous
+  smooth bands are requested. Bands appear where the renderer displays
+  interval bounds, including 3D effect surfaces when `ci_3d = TRUE`.
+  Random-effect QQ plots retain their usual display.
+  `simultaneous_method = "tube"` calibrates supported univariate bands
+  over a continuous interval; see
+  [simultaneous_bands](https://gavinsimpson.github.io/gratia/reference/simultaneous_bands.md).
 
 - n_sim, n_cores:
 
@@ -536,6 +542,29 @@ draw(
   again to change grid resolution or conditioning values. Continuous
   covariates must precede factors. Spherical smooths retain their
   latitude/longitude convention and do not support reordering.
+
+- simultaneous_method:
+
+  character; calibration for simultaneous bands. The default,
+  `"simulation"`, uses coefficient draws on the evaluation grid.
+  `"tube"` uses a conservative Gaussian threshold-crossing bound over a
+  continuous interval for supported one-dimensional cubic splines. See
+  [simultaneous_bands](https://gavinsimpson.github.io/gratia/reference/simultaneous_bands.md).
+
+- simultaneous_domain:
+
+  numeric pair of increasing finite endpoints, or a named list of such
+  pairs keyed by spline coordinate. For tube bands, `NULL` uses the
+  range of returned evaluation coordinates, including gaps. All returned
+  points must lie inside the interval and the interval must lie inside
+  the fitted spline support. Requires tube calibration.
+
+- tube_control:
+
+  named list controlling numerical tube calibration: `rel_tol` (default
+  `1e-6`), `abs_tol` (`1e-8`), `subdivisions` (`1000L`), and `root_tol`
+  (`1e-8`). Requires tube calibration. Simulation controls `n_sim`,
+  `n_cores` (or `ncores`), and `seed` are ignored by tube calibration.
 
 - centre:
 

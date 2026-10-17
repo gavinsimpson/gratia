@@ -48,6 +48,7 @@
 <url><loc>https://gavinsimpson.github.io/gratia/reference/coef.scam.html</loc></url>
 <url><loc>https://gavinsimpson.github.io/gratia/reference/compare_smooths.html</loc></url>
 <url><loc>https://gavinsimpson.github.io/gratia/reference/conditional_differences.html</loc></url>
+<url><loc>https://gavinsimpson.github.io/gratia/reference/conditional_moments.html</loc></url>
 <url><loc>https://gavinsimpson.github.io/gratia/reference/conditional_values.html</loc></url>
 <url><loc>https://gavinsimpson.github.io/gratia/reference/confint.fderiv.html</loc></url>
 <url><loc>https://gavinsimpson.github.io/gratia/reference/confint.gam.html</loc></url>
@@ -67,6 +68,7 @@
 <url><loc>https://gavinsimpson.github.io/gratia/reference/draw.basis.html</loc></url>
 <url><loc>https://gavinsimpson.github.io/gratia/reference/draw.compare_smooths.html</loc></url>
 <url><loc>https://gavinsimpson.github.io/gratia/reference/draw.conditional_differences.html</loc></url>
+<url><loc>https://gavinsimpson.github.io/gratia/reference/draw.conditional_moments.html</loc></url>
 <url><loc>https://gavinsimpson.github.io/gratia/reference/draw.conditional_values.html</loc></url>
 <url><loc>https://gavinsimpson.github.io/gratia/reference/draw.derivatives.html</loc></url>
 <url><loc>https://gavinsimpson.github.io/gratia/reference/draw.difference_smooth.html</loc></url>
@@ -94,6 +96,7 @@
 <url><loc>https://gavinsimpson.github.io/gratia/reference/family_name.html</loc></url>
 <url><loc>https://gavinsimpson.github.io/gratia/reference/family_type.html</loc></url>
 <url><loc>https://gavinsimpson.github.io/gratia/reference/fderiv.html</loc></url>
+<url><loc>https://gavinsimpson.github.io/gratia/reference/fitted_moments.html</loc></url>
 <url><loc>https://gavinsimpson.github.io/gratia/reference/fitted_samples.html</loc></url>
 <url><loc>https://gavinsimpson.github.io/gratia/reference/fitted_values.html</loc></url>
 <url><loc>https://gavinsimpson.github.io/gratia/reference/fix_offset.html</loc></url>
@@ -171,6 +174,7 @@
 <url><loc>https://gavinsimpson.github.io/gratia/reference/shape_intervals.html</loc></url>
 <url><loc>https://gavinsimpson.github.io/gratia/reference/shift_values.html</loc></url>
 <url><loc>https://gavinsimpson.github.io/gratia/reference/simulate.html</loc></url>
+<url><loc>https://gavinsimpson.github.io/gratia/reference/simultaneous_bands.html</loc></url>
 <url><loc>https://gavinsimpson.github.io/gratia/reference/smallAges.html</loc></url>
 <url><loc>https://gavinsimpson.github.io/gratia/reference/smooth_coef_indices.html</loc></url>
 <url><loc>https://gavinsimpson.github.io/gratia/reference/smooth_coefs.html</loc></url>

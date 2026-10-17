@@ -27,7 +27,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-53</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-56</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -151,7 +151,76 @@ for the scale parameter to do this:</p>
 <p>The spread increases around the period of rapid change. Modelling it
 reduces a systematic residual pattern and describes how both mean
 acceleration and its spread change with time after impact.</p>
+<div class="section level3">
+<h3 id="estimate-means-and-variability">Estimate means and variability<a class="anchor" aria-label="anchor" href="#estimate-means-and-variability"></a>
+</h3>
+<p><code><a href="../reference/fitted_moments.html">fitted_moments()</a></code> converts the model’s distribution
+parameters into response moments and propagates their joint uncertainty.
+It can evaluate the fitting observations or supplied prediction
+rows:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="../reference/fitted_moments.html">fitted_moments</a></span><span class="op">(</span><span class="va">varying</span>, data <span class="op">=</span> <span class="va">impact_grid</span>,</span>
+<span>  moments <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mean"</span>, <span class="st">"variance"</span>, <span class="st">"sd"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 8</span></span></span>
+<span><span class="co">#&gt;    .row .parameter .fitted   .se .lower_ci .upper_ci .status times</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>     1 mean        -<span style="color: #BB0000;">0.506</span> 0.465    -<span style="color: #BB0000;">1.42</span>      0.405 ok       2.4 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>     1 variance     0.364 0.179     0.139     0.954 ok       2.4 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>     1 sd           0.603 0.148     0.373     0.977 ok       2.4 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>     2 mean        -<span style="color: #BB0000;">1.24</span>  0.332    -<span style="color: #BB0000;">1.89</span>     -<span style="color: #BB0000;">0.586</span> ok       2.96</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>     2 variance     0.494 0.230     0.199     1.23  ok       2.96</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span>     2 sd           0.703 0.163     0.446     1.11  ok       2.96</span></span></code></pre></div>
+<p>Each <code>.parameter</code> identifies a requested quantity. For
+variance rows, <code>.fitted</code> contains the estimated response
+variance, and <code>.se</code> describes uncertainty in that estimate.
+Standard errors and interval bounds are on the quantity’s own scale. By
+default the delta method differentiates the moment formulas and combines
+those derivatives with the full parameter covariance.</p>
+<p><code><a href="../reference/conditional_moments.html">conditional_moments()</a></code> builds the same covariate grid as
+<code><a href="../reference/conditional_values.html">conditional_values()</a></code>. Other covariates are held at their
+typical values. Choose posterior simulation to evaluate the moments at
+joint parameter draws, then summarise those values:</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/conditional_moments.html">conditional_moments</a></span><span class="op">(</span><span class="va">varying</span>, condition <span class="op">=</span> <span class="st">"times"</span>, moments <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mean"</span>, <span class="st">"sd"</span><span class="op">)</span>,</span>
+<span>  uncertainty <span class="op">=</span> <span class="st">"simulation"</span>, n_draws <span class="op">=</span> <span class="fl">1000</span>, seed <span class="op">=</span> <span class="fl">419</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<p><img src="response-distributions_files/figure-html/impact-conditional-moments-1.png" class="r-plt" alt="" width="700"></p>
+<p>The available quantities are mean, variance, SD, coefficient of
+variation (<code>"cv"</code>), skewness, kurtosis and excess kurtosis;
+<code>moments = "all"</code> requests all seven. CV requires a positive
+mean, so it is inappropriate where predicted acceleration is negative.
+Kurtosis is the fourth central moment divided by squared variance;
+excess kurtosis subtracts three.</p>
+<p>For a Gamma response with mean <code>mu</code> and dispersion
+<code>phi</code>, variance is <code>phi * mu^2</code>, CV is
+<code>sqrt(phi)</code>, skewness is <code>2 * sqrt(phi)</code>, and
+excess kurtosis is <code>6 * phi</code>. <code><a href="https://rdrr.io/r/stats/family.html" class="external-link">Gamma()</a></code> estimates
+a global dispersion, whereas <code><a href="https://rdrr.io/pkg/mgcv/man/gammals.html" class="external-link">gammals()</a></code> can let it vary with
+covariates. The default <code>nuisance = "estimated"</code> includes
+uncertainty in estimated global parameters using the fitting criterion’s
+second derivatives and the change in fitted coefficients as those
+parameters vary. Unsupported fitting configurations give an error;
+<code>nuisance = "fixed"</code> explicitly conditions on their fitted
+values. Parameters represented by coefficients, including scale and
+shape predictors, retain their joint uncertainty.</p>
+<p>For ML/REML fits, the moments use the likelihood dispersion in
+<code>reml.scale</code>, and rescale the conditional coefficient
+covariance to that same dispersion. This can differ from the
+Pearson/Fletcher estimate in <code>sig2</code>. The saved curvature
+describes the likelihood estimate, so it must be paired with that
+estimate when propagating uncertainty. Smoothing uncertainty uses
+curvature and coefficient sensitivities at the fitted parameters,
+including the mapping for linked or fixed smoothing parameters.</p>
+<p>Moments must exist at the fitted parameters and at the draws used for
+an interval. For example, GEV skewness requires shape below one third
+and kurtosis requires shape below one quarter. Undefined results are
+retained with a <code>.status</code>. Simulation also reports
+<code>.p_defined</code>; it withholds intervals if any draw is undefined
+instead of silently dropping those draws. See
+<code><a href="../reference/fitted_moments.html">fitted_moments()</a></code> for family coverage, categorical scoring,
+grouped models, and the distinction between latent and censored
+observations.</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/posterior_predictive_plot.html">posterior_predictive_plot</a></span><span class="op">(</span><span class="va">varying</span>, n <span class="op">=</span> <span class="fl">50</span>, seed <span class="op">=</span> <span class="fl">402</span><span class="op">)</span></span></code></pre></div>
 <p><img src="response-distributions_files/figure-html/impact-ppc-1.png" class="r-plt" alt="" width="700"></p>
 <p>All mean and scale coefficients are drawn together for this check,
@@ -159,6 +228,7 @@ retaining their covariance. Parameters outside the coefficient vector
 remain fitted. A kernel density overlay compares the full response
 distribution; it can conceal local failures, so retain the predictor
 plots too.</p>
+</div>
 <div class="section level3">
 <h3 id="the-same-question-with-gjrm">The same question with GJRM<a class="anchor" aria-label="anchor" href="#the-same-question-with-gjrm"></a>
 </h3>
@@ -166,16 +236,16 @@ plots too.</p>
 regression. This Gaussian fit asks the same mean-and-spread question
 with a different fitting procedure. It need not return identical
 smoothing estimates to mgcv.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://www.ucl.ac.uk/mathematical-physical-sciences/statistics/people/academic-and-lecturing-staff/professor-giampiero-marra" class="external-link">"GJRM"</a></span><span class="op">)</span></span>
 <span><span class="va">impact_gjrm</span> <span class="op">&lt;-</span> <span class="fu">GJRM</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/GJRM/man/gamlss.html" class="external-link">gamlss</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">accel</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">times</span>, k <span class="op">=</span> <span class="fl">20</span><span class="op">)</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">times</span>, k <span class="op">=</span> <span class="fl">6</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  data <span class="op">=</span> <span class="va">mcycle</span>, family <span class="op">=</span> <span class="st">"N"</span><span class="op">)</span></span>
 <span><span class="fu">gratia</span><span class="fu">::</span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">impact_gjrm</span><span class="op">)</span></span></code></pre></div>
 <p><img src="response-distributions_files/figure-html/gjrm-impact-1.png" class="r-plt" alt="" width="700"></p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/appraise.html">appraise</a></span><span class="op">(</span><span class="va">impact_gjrm</span>, seed <span class="op">=</span> <span class="fl">403</span><span class="op">)</span></span></code></pre></div>
 <p><img src="response-distributions_files/figure-html/gjrm-impact-2.png" class="r-plt" alt="" width="700"></p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/posterior_predictive_plot.html">posterior_predictive_plot</a></span><span class="op">(</span><span class="va">impact_gjrm</span>, n <span class="op">=</span> <span class="fl">50</span>, seed <span class="op">=</span> <span class="fl">404</span><span class="op">)</span></span></code></pre></div>
 <p><img src="response-distributions_files/figure-html/gjrm-impact-3.png" class="r-plt" alt="" width="700"></p>
 <p>Gratia uses final fitted distribution parameters for the response
@@ -203,7 +273,7 @@ positive concentrations whose squared coefficient of variation is
 <code>0.4 / precision</code>. A Gamma log-link model describes this
 protocol. The precision weights are part of the response distribution,
 not merely plotting weights.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">405</span><span class="op">)</span></span>
 <span><span class="va">chemical</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>flow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">400</span>, <span class="fl">0</span>, <span class="fl">10</span><span class="op">)</span>,</span>
 <span>  precision <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">4</span>, <span class="fl">8</span><span class="op">)</span>, length.out <span class="op">=</span> <span class="fl">400</span><span class="op">)</span><span class="op">)</span></span>
@@ -225,12 +295,12 @@ protocol, not a cosmetic adjustment.</p>
 variability to increase more rapidly with the mean. Fit it when that
 relationship is plausible and examine the tails, rather than selecting
 it because both families have positive support.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ig_fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="va">concentration</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">flow</span>, k <span class="op">=</span> <span class="fl">10</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">chemical</span>,</span>
 <span>  weights <span class="op">=</span> <span class="va">precision</span>, family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">inverse.gaussian</a></span><span class="op">(</span>link <span class="op">=</span> <span class="st">"log"</span><span class="op">)</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/qq_plot.html">qq_plot</a></span><span class="op">(</span><span class="va">ig_fit</span>, type <span class="op">=</span> <span class="st">"quantile"</span>, seed <span class="op">=</span> <span class="fl">406</span><span class="op">)</span></span></code></pre></div>
 <p><img src="response-distributions_files/figure-html/inverse-gaussian-1.png" class="r-plt" alt="" width="700"></p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/worm_plot.html">worm_plot</a></span><span class="op">(</span><span class="va">ig_fit</span>, method <span class="op">=</span> <span class="st">"uniform"</span>, seed <span class="op">=</span> <span class="fl">407</span><span class="op">)</span></span></code></pre></div>
 <p><img src="response-distributions_files/figure-html/inverse-gaussian-2.png" class="r-plt" alt="" width="700"></p>
 <p>Inverse Gaussian CDF and quantile calculations now work without an
@@ -248,7 +318,7 @@ with power between one and two represents a compound Poisson sum of
 positive Gamma amounts. It links the zero probability and positive
 distribution through the mean, dispersion and power. A delta model
 instead estimates separate occurrence and positive components; see <a href="sdmTMB-support.html">Spatial survey analysis</a>.</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">408</span><span class="op">)</span></span>
 <span><span class="va">rain</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>elevation <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">400</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">rain</span><span class="op">$</span><span class="va">amount</span> <span class="op">&lt;-</span> <span class="fu">mgcv</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/rTweedie.html" class="external-link">rTweedie</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="op">-</span><span class="fl">0.6</span> <span class="op">+</span> <span class="fl">1.5</span> <span class="op">*</span> <span class="va">rain</span><span class="op">$</span><span class="va">elevation</span><span class="op">)</span>, p <span class="op">=</span> <span class="fl">1.5</span>, phi <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
@@ -256,10 +326,10 @@ instead estimates separate occurrence and positive components; see <a href="sdmT
 <span>  family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/Tweedie.html" class="external-link">tw</a></span><span class="op">(</span><span class="op">)</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/qq_plot.html">qq_plot</a></span><span class="op">(</span><span class="va">rain_fit</span>, seed <span class="op">=</span> <span class="fl">409</span><span class="op">)</span></span></code></pre></div>
 <p><img src="response-distributions_files/figure-html/tweedie-1.png" class="r-plt" alt="" width="700"></p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/appraise.html">appraise</a></span><span class="op">(</span><span class="va">rain_fit</span>, type <span class="op">=</span> <span class="st">"quantile"</span>, seed <span class="op">=</span> <span class="fl">409</span><span class="op">)</span></span></code></pre></div>
 <p><img src="response-distributions_files/figure-html/tweedie-2.png" class="r-plt" alt="" width="700"></p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/posterior_predictive_plot.html">posterior_predictive_plot</a></span><span class="op">(</span><span class="va">rain_fit</span>, n <span class="op">=</span> <span class="fl">50</span>, seed <span class="op">=</span> <span class="fl">410</span><span class="op">)</span></span></code></pre></div>
 <p><img src="response-distributions_files/figure-html/tweedie-3.png" class="r-plt" alt="" width="700"></p>
 <p>The default QQ reference for traditional Tweedie residuals uses
@@ -269,7 +339,7 @@ which is not a left-tail continuous density. The continuous-response
 posterior plot uses a kernel density overlay, so it smooths the zeros
 into a peak; that peak is not the height of an actual continuous density
 at zero. Its formula gives a useful independent calculation:</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="va">rain_fit</span><span class="op">$</span><span class="va">family</span><span class="op">$</span><span class="fu">getTheta</span><span class="op">(</span><span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="va">phi</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">rain_fit</span><span class="op">)</span><span class="op">$</span><span class="va">scale</span></span>
 <span><span class="va">zero_probability</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/stats/fitted.values.html" class="external-link">fitted</a></span><span class="op">(</span><span class="va">rain_fit</span><span class="op">)</span><span class="op">^</span><span class="op">(</span><span class="fl">2</span> <span class="op">-</span> <span class="va">p</span><span class="op">)</span> <span class="op">/</span> <span class="op">(</span><span class="va">phi</span> <span class="op">*</span> <span class="op">(</span><span class="fl">2</span> <span class="op">-</span> <span class="va">p</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
@@ -297,7 +367,7 @@ mass and discards that information. To demonstrate the encoding clearly
 we simulate normally distributed log concentrations, with exact
 measurements above a fixed limit. The <code><a href="https://rdrr.io/pkg/mgcv/man/cnorm.html" class="external-link">cnorm()</a></code> response
 stores the limit and a censoring bound in two columns.</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">411</span><span class="op">)</span></span>
 <span><span class="va">assay</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>dose <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">300</span>, <span class="fl">0</span>, <span class="fl">4</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">latent</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">300</span>, mean <span class="op">=</span> <span class="fl">0.3</span> <span class="op">+</span> <span class="fl">0.5</span> <span class="op">*</span> <span class="va">assay</span><span class="op">$</span><span class="va">dose</span>, sd <span class="op">=</span> <span class="fl">0.7</span><span class="op">)</span></span>
@@ -306,11 +376,11 @@ stores the limit and a censoring bound in two columns.</p>
 <span><span class="va">assay</span><span class="op">$</span><span class="va">bound</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">latent</span> <span class="op">&lt;</span> <span class="va">limit</span>, <span class="op">-</span><span class="cn">Inf</span>, <span class="va">latent</span><span class="op">)</span></span>
 <span><span class="va">censored_fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">reading</span>, <span class="va">bound</span><span class="op">)</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">dose</span>, k <span class="op">=</span> <span class="fl">8</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">assay</span>,</span>
 <span>  family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/cnorm.html" class="external-link">cnorm</a></span><span class="op">(</span><span class="op">)</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">u</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/quantile_residuals.html">quantile_residuals</a></span><span class="op">(</span><span class="va">censored_fit</span>, type <span class="op">=</span> <span class="st">"pit"</span>, seed <span class="op">=</span> <span class="fl">412</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/qq_plot.html">qq_plot</a></span><span class="op">(</span><span class="va">censored_fit</span>, type <span class="op">=</span> <span class="st">"quantile"</span>, seed <span class="op">=</span> <span class="fl">412</span><span class="op">)</span></span></code></pre></div>
 <p><img src="response-distributions_files/figure-html/censored-checks-1.png" class="r-plt" alt="" width="700"></p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="va">assay</span>, pit <span class="op">=</span> <span class="va">u</span><span class="op">)</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">dose</span>, <span class="va">pit</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="va">bound</span> <span class="op">==</span> <span class="op">-</span><span class="cn">Inf</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Dose"</span>, y <span class="op">=</span> <span class="st">"PIT residual"</span>, colour <span class="op">=</span> <span class="st">"Below limit"</span><span class="op">)</span></span></code></pre></div>
@@ -335,7 +405,7 @@ can take values in steps of 1/20; a factor-valued Bernoulli response
 still has one binary trial, even if it carries likelihood weights.
 Gratia preserves this distinction in residuals and response draws. Here
 several sites have different visit totals:</p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">413</span><span class="op">)</span></span>
 <span><span class="va">visits</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>cover <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">240</span><span class="op">)</span>, trials <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">10</span>, <span class="fl">20</span><span class="op">)</span>, <span class="fl">80</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">visits</span><span class="op">$</span><span class="va">success</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html" class="external-link">rbinom</a></span><span class="op">(</span><span class="fl">240</span>, <span class="va">visits</span><span class="op">$</span><span class="va">trials</span>, <span class="fu"><a href="https://rdrr.io/r/stats/Logistic.html" class="external-link">plogis</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span> <span class="op">+</span> <span class="fl">2</span> <span class="op">*</span> <span class="va">visits</span><span class="op">$</span><span class="va">cover</span><span class="op">)</span><span class="op">)</span></span>
@@ -344,13 +414,13 @@ several sites have different visit totals:</p>
 <span>  family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">binomial</a></span><span class="op">(</span><span class="op">)</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/appraise.html">appraise</a></span><span class="op">(</span><span class="va">visit_fit</span>, type <span class="op">=</span> <span class="st">"quantile"</span>, seed <span class="op">=</span> <span class="fl">414</span><span class="op">)</span></span></code></pre></div>
 <p><img src="response-distributions_files/figure-html/trials-1.png" class="r-plt" alt="" width="700"></p>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/posterior_predictive_plot.html">posterior_predictive_plot</a></span><span class="op">(</span><span class="va">visit_fit</span>, n <span class="op">=</span> <span class="fl">50</span>, seed <span class="op">=</span> <span class="fl">414</span><span class="op">)</span></span></code></pre></div>
 <p><img src="response-distributions_files/figure-html/trials-2.png" class="r-plt" alt="" width="700"></p>
 <p>The generating probability has a linear logit, so a familiar ordinary
 logistic regression also answers this question. The same public
 diagnostics accept its <code>glm</code> object directly:</p>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">visit_glm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">success</span>, <span class="va">failure</span><span class="op">)</span> <span class="op">~</span> <span class="va">cover</span>, data <span class="op">=</span> <span class="va">visits</span>,</span>
 <span>  family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">binomial</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/qq_plot.html">qq_plot</a></span><span class="op">(</span><span class="va">visit_glm</span>, type <span class="op">=</span> <span class="st">"quantile"</span>, seed <span class="op">=</span> <span class="fl">414</span><span class="op">)</span></span></code></pre></div>
@@ -367,7 +437,7 @@ in the model.</p>
 <p>An ordered response, such as a four-level condition score, instead
 has category thresholds and an implicit ordering. A demonstration with
 custom thresholds can use gratia’s data simulator:</p>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ordinal_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/data_sim.html">data_sim</a></span><span class="op">(</span><span class="st">"eg1"</span>, n <span class="op">=</span> <span class="fl">400</span>, dist <span class="op">=</span> <span class="st">"ocat"</span>, n_cat <span class="op">=</span> <span class="fl">4</span>,</span>
 <span>  cuts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">3</span>, <span class="fl">7</span><span class="op">)</span>, seed <span class="op">=</span> <span class="fl">415</span><span class="op">)</span></span>
 <span><span class="va">ordinal_fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x0</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x1</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x2</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x3</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">ordinal_data</span>,</span>
@@ -400,7 +470,7 @@ true model. Changing the enumeration can change individual residuals and
 diagnostic sensitivity: the probabilities before a given category
 change. The coding does not turn the multinomial likelihood into an
 ordinal model.</p>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">417</span><span class="op">)</span></span>
 <span><span class="va">category_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">300</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">category_data</span><span class="op">$</span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fl">0</span><span class="op">:</span><span class="fl">2</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">category_data</span><span class="op">)</span>, replace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
@@ -424,7 +494,7 @@ and variance <code>pi^2 / 6</code>. Even binary
 difference between them has a logistic reference. This construction uses
 the whole utility vector and does not assign an order to the nominal
 outcomes.</p>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">417</span><span class="op">)</span></span>
 <span><span class="va">nominal_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">400</span>, <span class="op">-</span><span class="fl">2</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">locations</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">nominal_data</span><span class="op">$</span><span class="va">x</span>, <span class="op">-</span><span class="fl">.5</span> <span class="op">-</span> <span class="va">nominal_data</span><span class="op">$</span><span class="va">x</span><span class="op">)</span></span>
@@ -527,7 +597,7 @@ appropriate parameter. For multivariate normal and multinomial families,
 explicit <code>which_eta</code> selects and validates the predictor.
 Unsupported parameters are errors; a single-link user family can use its
 own functions without a family-name whitelist.</p>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/link.html">inv_link</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/twlss.html" class="external-link">twlss</a></span><span class="op">(</span><span class="op">)</span>, parameter <span class="op">=</span> <span class="st">"power"</span><span class="op">)</span><span class="op">(</span><span class="fl">0</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 0</span></span>
 <span><span class="fu"><a href="../reference/link.html">inv_link</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/twlss.html" class="external-link">twlss</a></span><span class="op">(</span><span class="op">)</span>, parameter <span class="op">=</span> <span class="st">"phi"</span><span class="op">)</span><span class="op">(</span><span class="fl">0</span><span class="op">)</span></span>

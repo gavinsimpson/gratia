@@ -9,7 +9,7 @@ ggplot2::ggplot()."><meta property="og:image" content="https://gavinsimpson.gith
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-53</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-56</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -130,7 +130,10 @@ ggplot2::ggplot()."><meta property="og:image" content="https://gavinsimpson.gith
 <span>  frequentist <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  shape_source <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"gaussian"</span>, <span class="st">"bootstrap"</span><span class="op">)</span>,</span>
 <span>  <span class="va">...</span>,</span>
-<span>  variables <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  variables <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  simultaneous_method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"simulation"</span>, <span class="st">"tube"</span><span class="op">)</span>,</span>
+<span>  simultaneous_domain <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  tube_control <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'scam'</span></span>
@@ -501,14 +504,16 @@ Specialist maps and graph plots are outside the scope of this display.</p></dd>
 
 <dt id="arg-interval">interval<a class="anchor" aria-label="anchor" href="#arg-interval"></a></dt>
 <dd><p>character; <code>"confidence"</code> (default) draws pointwise intervals;
-<code>"simultaneous"</code> uses a band across the finite evaluation grid of each
+<code>"simultaneous"</code> uses a band across, by default, the finite evaluation grid of each
 smooth, including its slices and factor levels. Separate smooths are not a
 joint coverage set. <code>"credible"</code> aliases <code>"confidence"</code>, reflecting the
 approximate Bayesian credible interpretation of default-covariance bands.
 Parametric panels retain pointwise intervals and are labelled accordingly
 when simultaneous smooth bands are requested. Bands appear where the
 renderer displays interval bounds, including 3D effect surfaces when
-<code>ci_3d = TRUE</code>. Random-effect QQ plots retain their usual display.</p></dd>
+<code>ci_3d = TRUE</code>. Random-effect QQ plots retain their usual display.
+<code>simultaneous_method = "tube"</code> calibrates supported univariate bands
+over a continuous interval; see <a href="simultaneous_bands.html">simultaneous_bands</a>.</p></dd>
 
 
 <dt id="arg-n-sim-n-cores">n_sim, n_cores<a class="anchor" aria-label="anchor" href="#arg-n-sim-n-cores"></a></dt>
@@ -559,6 +564,29 @@ Drawing saved estimates can change the order but uses only points already
 evaluated; evaluate again to change grid resolution or conditioning values.
 Continuous covariates must precede factors. Spherical smooths retain their
 latitude/longitude convention and do not support reordering.</p></dd>
+
+
+<dt id="arg-simultaneous-method">simultaneous_method<a class="anchor" aria-label="anchor" href="#arg-simultaneous-method"></a></dt>
+<dd><p>character; calibration for simultaneous bands.
+The default, <code>"simulation"</code>, uses coefficient draws on the evaluation
+grid. <code>"tube"</code> uses a conservative Gaussian threshold-crossing bound
+over a continuous interval for supported one-dimensional cubic splines.
+See <a href="simultaneous_bands.html">simultaneous_bands</a>.</p></dd>
+
+
+<dt id="arg-simultaneous-domain">simultaneous_domain<a class="anchor" aria-label="anchor" href="#arg-simultaneous-domain"></a></dt>
+<dd><p>numeric pair of increasing finite endpoints, or
+a named list of such pairs keyed by spline coordinate. For tube bands,
+<code>NULL</code> uses the range of returned evaluation coordinates, including gaps.
+All returned points must lie inside the interval and the interval must
+lie inside the fitted spline support. Requires tube calibration.</p></dd>
+
+
+<dt id="arg-tube-control">tube_control<a class="anchor" aria-label="anchor" href="#arg-tube-control"></a></dt>
+<dd><p>named list controlling numerical tube calibration:
+<code>rel_tol</code> (default <code>1e-6</code>), <code>abs_tol</code> (<code>1e-8</code>), <code>subdivisions</code> (<code>1000L</code>),
+and <code>root_tol</code> (<code>1e-8</code>). Requires tube calibration. Simulation controls
+<code>n_sim</code>, <code>n_cores</code> (or <code>ncores</code>), and <code>seed</code> are ignored by tube calibration.</p></dd>
 
 
 <dt id="arg-centre">centre<a class="anchor" aria-label="anchor" href="#arg-centre"></a></dt>

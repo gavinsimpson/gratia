@@ -240,6 +240,9 @@ residuals, and transform effects for interpretation.
   [`confint(`*`<scam>`*`)`](https://gavinsimpson.github.io/gratia/reference/confint.gam.md)
   : Point-wise and simultaneous confidence intervals for smooths
 
+- [`simultaneous_bands`](https://gavinsimpson.github.io/gratia/reference/simultaneous_bands.md)
+  : Simultaneous bands on an evaluation grid or a continuous interval
+
 - [`shape_intervals()`](https://gavinsimpson.github.io/gratia/reference/shape_intervals.md)
   : Enforce named shapes on estimates and interval endpoints
 
@@ -267,8 +270,14 @@ combining model terms rather than estimating individual term effects.
 
 - [`fitted_values()`](https://gavinsimpson.github.io/gratia/reference/fitted_values.md)
   : Generate fitted values from a estimated GAM
+- [`fitted_moments()`](https://gavinsimpson.github.io/gratia/reference/fitted_moments.md)
+  : Estimate moments of the conditional response distribution
 - [`conditional_values()`](https://gavinsimpson.github.io/gratia/reference/conditional_values.md)
   : Conditional predictions from a GAM
+- [`conditional_moments()`](https://gavinsimpson.github.io/gratia/reference/conditional_moments.md)
+  : Conditional moments of a GAM response distribution
+- [`draw(`*`<conditional_moments>`*`)`](https://gavinsimpson.github.io/gratia/reference/draw.conditional_moments.md)
+  : Draw conditional response moments
 - [`draw(`*`<conditional_values>`*`)`](https://gavinsimpson.github.io/gratia/reference/draw.conditional_values.md)
   : Plot conditional predictions
 - [`add_fitted()`](https://gavinsimpson.github.io/gratia/reference/add_fitted.md)

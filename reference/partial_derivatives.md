@@ -38,7 +38,10 @@ partial_derivatives(
   newdata = NULL,
   envir = NULL,
   wrt = c("smooth", "covariate"),
-  interval_method = c("auto", "gaussian", "bootstrap")
+  interval_method = c("auto", "gaussian", "bootstrap"),
+  simultaneous_method = c("simulation", "tube"),
+  simultaneous_domain = NULL,
+  tube_control = list()
 )
 
 # S3 method for class 'gamm4'
@@ -179,6 +182,29 @@ partial_derivatives(object, ..., unconditional = FALSE)
   character; use stored scasm bootstrap draws for pointwise intervals
   with `"auto"` (the default), or explicitly select `"gaussian"` or
   `"bootstrap"`. Bootstrap simultaneous bands are unavailable.
+
+- simultaneous_method:
+
+  character; calibration for simultaneous bands. The default,
+  `"simulation"`, uses coefficient draws on the evaluation grid.
+  `"tube"` uses a conservative Gaussian threshold-crossing bound over a
+  continuous interval for supported one-dimensional cubic splines. See
+  [simultaneous_bands](https://gavinsimpson.github.io/gratia/reference/simultaneous_bands.md).
+
+- simultaneous_domain:
+
+  numeric pair of increasing finite endpoints, or a named list of such
+  pairs keyed by spline coordinate. For tube bands, `NULL` uses the
+  range of returned evaluation coordinates, including gaps. All returned
+  points must lie inside the interval and the interval must lie inside
+  the fitted spline support. Requires tube calibration.
+
+- tube_control:
+
+  named list controlling numerical tube calibration: `rel_tol` (default
+  `1e-6`), `abs_tol` (`1e-8`), `subdivisions` (`1000L`), and `root_tol`
+  (`1e-8`). Requires tube calibration. Simulation controls `n_sim`,
+  `n_cores` (or `ncores`), and `seed` are ignored by tube calibration.
 
 ## Value
 

@@ -13,7 +13,7 @@ difference."><meta property="og:image" content="https://gavinsimpson.github.io/g
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-53</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-56</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -96,7 +96,10 @@ difference.</p>
 <span>  seed <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  variables <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  n_3d <span class="op">=</span> <span class="fl">16</span>,</span>
-<span>  n_4d <span class="op">=</span> <span class="fl">4</span></span>
+<span>  n_4d <span class="op">=</span> <span class="fl">4</span>,</span>
+<span>  simultaneous_method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"simulation"</span>, <span class="st">"tube"</span><span class="op">)</span>,</span>
+<span>  simultaneous_domain <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  tube_control <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'scam'</span></span>
@@ -225,16 +228,42 @@ latitude/longitude convention and do not support reordering.</p></dd>
 three or four covariates. The defaults are 16 and 4, respectively. If
 <code>NULL</code>, use <code>n</code>. Ignored when evaluation <code>data</code> are supplied.</p></dd>
 
+
+<dt id="arg-simultaneous-method">simultaneous_method<a class="anchor" aria-label="anchor" href="#arg-simultaneous-method"></a></dt>
+<dd><p>character; calibration for simultaneous bands.
+The default, <code>"simulation"</code>, uses coefficient draws on the evaluation
+grid. <code>"tube"</code> uses a conservative Gaussian threshold-crossing bound
+over a continuous interval for supported one-dimensional cubic splines.
+See <a href="simultaneous_bands.html">simultaneous_bands</a>.</p></dd>
+
+
+<dt id="arg-simultaneous-domain">simultaneous_domain<a class="anchor" aria-label="anchor" href="#arg-simultaneous-domain"></a></dt>
+<dd><p>numeric pair of increasing finite endpoints, or
+a named list of such pairs keyed by spline coordinate. For tube bands,
+<code>NULL</code> uses the range of returned evaluation coordinates, including gaps.
+All returned points must lie inside the interval and the interval must
+lie inside the fitted spline support. Requires tube calibration.</p></dd>
+
+
+<dt id="arg-tube-control">tube_control<a class="anchor" aria-label="anchor" href="#arg-tube-control"></a></dt>
+<dd><p>named list controlling numerical tube calibration:
+<code>rel_tol</code> (default <code>1e-6</code>), <code>abs_tol</code> (<code>1e-8</code>), <code>subdivisions</code> (<code>1000L</code>),
+and <code>root_tol</code> (<code>1e-8</code>). Requires tube calibration. Simulation controls
+<code>n_sim</code>, <code>n_cores</code> (or <code>ncores</code>), and <code>seed</code> are ignored by tube calibration.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>Simultaneous intervals jointly cover the underlying smooth differences at
+    <p>With the default simulation calibration, simultaneous intervals cover smooth differences at
 the evaluated covariate combinations for each pair of factor levels, with
 approximate posterior probability <code>ci_level</code> when using the Bayesian
 covariance. They do not provide joint coverage across all pairs, outside
 the evaluation set, or between its points. With <code>data = NULL</code>, the evaluation
 set is generated using <code>n</code>, <code>n_2d</code>, <code>n_3d</code>, and <code>n_4d</code>. Differences and interval
-limits are on the linear predictor scale, including group means when requested.</p>
+limits are on the linear predictor scale, including group means when requested.
+For supported univariate cubic splines, <code>simultaneous_method = "tube"</code>
+instead covers a continuous interval, including between returned points;
+see <a href="simultaneous_bands.html">simultaneous_bands</a>. Coverage remains separate for each pair.</p>
 <p><code>variables</code> determines the order used to generate and display the evaluation
 grid. The first two covariates are the x and y axes. The third covariate
 defines facets for three-dimensional smooths, or facet rows for
@@ -243,7 +272,7 @@ choose particular conditioning values. The resolved order is saved with the
 estimates for use by <code><a href="draw.html">draw()</a></code>.</p>
 <p>The intervals use the joint coefficient covariance selected by
 <code>unconditional</code> and <code>frequentist</code>, retaining covariance between the two
-smooths. The simulation covariance must be positive definite. With
+smooths. The covariance must be positive semidefinite. With
 <code>frequentist = TRUE</code>, simulation instead uses the frequentist covariance
 of the coefficient estimators. <code>n_sim</code>, <code>n_cores</code>, and <code>seed</code> are ignored for
 pointwise intervals. An explicit seed scopes the entire call: each pair uses

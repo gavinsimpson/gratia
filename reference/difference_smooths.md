@@ -31,7 +31,10 @@ difference_smooths(
   seed = NULL,
   variables = NULL,
   n_3d = 16,
-  n_4d = 4
+  n_4d = 4,
+  simultaneous_method = c("simulation", "tube"),
+  simultaneous_domain = NULL,
+  tube_control = list()
 )
 
 # S3 method for class 'scam'
@@ -164,16 +167,43 @@ difference_smooths(model, ..., unconditional = FALSE)
   four covariates. The defaults are 16 and 4, respectively. If `NULL`,
   use `n`. Ignored when evaluation `data` are supplied.
 
+- simultaneous_method:
+
+  character; calibration for simultaneous bands. The default,
+  `"simulation"`, uses coefficient draws on the evaluation grid.
+  `"tube"` uses a conservative Gaussian threshold-crossing bound over a
+  continuous interval for supported one-dimensional cubic splines. See
+  [simultaneous_bands](https://gavinsimpson.github.io/gratia/reference/simultaneous_bands.md).
+
+- simultaneous_domain:
+
+  numeric pair of increasing finite endpoints, or a named list of such
+  pairs keyed by spline coordinate. For tube bands, `NULL` uses the
+  range of returned evaluation coordinates, including gaps. All returned
+  points must lie inside the interval and the interval must lie inside
+  the fitted spline support. Requires tube calibration.
+
+- tube_control:
+
+  named list controlling numerical tube calibration: `rel_tol` (default
+  `1e-6`), `abs_tol` (`1e-8`), `subdivisions` (`1000L`), and `root_tol`
+  (`1e-8`). Requires tube calibration. Simulation controls `n_sim`,
+  `n_cores` (or `ncores`), and `seed` are ignored by tube calibration.
+
 ## Details
 
-Simultaneous intervals jointly cover the underlying smooth differences
-at the evaluated covariate combinations for each pair of factor levels,
-with approximate posterior probability `ci_level` when using the
-Bayesian covariance. They do not provide joint coverage across all
-pairs, outside the evaluation set, or between its points. With
+With the default simulation calibration, simultaneous intervals cover
+smooth differences at the evaluated covariate combinations for each pair
+of factor levels, with approximate posterior probability `ci_level` when
+using the Bayesian covariance. They do not provide joint coverage across
+all pairs, outside the evaluation set, or between its points. With
 `data = NULL`, the evaluation set is generated using `n`, `n_2d`,
 `n_3d`, and `n_4d`. Differences and interval limits are on the linear
-predictor scale, including group means when requested.
+predictor scale, including group means when requested. For supported
+univariate cubic splines, `simultaneous_method = "tube"` instead covers
+a continuous interval, including between returned points; see
+[simultaneous_bands](https://gavinsimpson.github.io/gratia/reference/simultaneous_bands.md).
+Coverage remains separate for each pair.
 
 `variables` determines the order used to generate and display the
 evaluation grid. The first two covariates are the x and y axes. The
@@ -185,7 +215,7 @@ saved with the estimates for use by
 
 The intervals use the joint coefficient covariance selected by
 `unconditional` and `frequentist`, retaining covariance between the two
-smooths. The simulation covariance must be positive definite. With
+smooths. The covariance must be positive semidefinite. With
 `frequentist = TRUE`, simulation instead uses the frequentist covariance
 of the coefficient estimators. `n_sim`, `n_cores`, and `seed` are
 ignored for pointwise intervals. An explicit seed scopes the entire
