@@ -108,6 +108,18 @@
 
 ## New features
 
+* `fitted_moments()` and `conditional_moments()` estimate response means,
+  variances, SDs, coefficients of variation, skewness and kurtosis. Delta-method
+  intervals and joint Gaussian simulation propagate covariance between
+  distribution parameters. Supported ML/REML fits also propagate estimated
+  global family parameters and dispersion; `nuisance = "fixed"` explicitly
+  conditions on their fitted values. Dispersion and coefficient covariance use
+  the same ML/REML scale estimate as the saved fitting curvature, including
+  models with linked or fixed smoothing parameters. Standard, distributional, categorical,
+  multivariate-normal, grouped and latent censored response families are
+  supported where their moments exist. Conditional moments can be drawn with
+  `draw()`.
+
 * Smooth estimation and drawing, including `difference_smooths()`, now accept
   `variables` to choose x and y axes and the order of conditioning facets.
   Differences between 3D and 4D smooths can now be drawn as faceted surfaces

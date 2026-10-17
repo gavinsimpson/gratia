@@ -75,6 +75,66 @@ The spread increases around the period of rapid change. Modelling it reduces a
 systematic residual pattern and describes how both mean acceleration and its
 spread change with time after impact.
 
+### Estimate means and variability
+
+`fitted_moments()` converts the model's distribution parameters into response
+moments and propagates their joint uncertainty. It can evaluate the fitting
+observations or supplied prediction rows:
+
+```{r impact-moments}
+head(fitted_moments(varying, data = impact_grid,
+  moments = c("mean", "variance", "sd")))
+```
+
+Each `.parameter` identifies a requested quantity. For variance rows, `.fitted`
+contains the estimated response variance, and `.se` describes uncertainty in
+that estimate. Standard errors and interval bounds are on the quantity's own
+scale. By default the delta method differentiates the moment formulas and
+combines those derivatives with the full parameter covariance.
+
+`conditional_moments()` builds the same covariate grid as `conditional_values()`.
+Other covariates are held at their typical values. Choose posterior simulation
+to evaluate the moments at joint parameter draws, then summarise those values:
+
+```{r impact-conditional-moments}
+conditional_moments(varying, condition = "times", moments = c("mean", "sd"),
+  uncertainty = "simulation", n_draws = 1000, seed = 419) |>
+  draw()
+```
+
+The available quantities are mean, variance, SD, coefficient of variation
+(`"cv"`), skewness, kurtosis and excess kurtosis; `moments = "all"` requests
+all seven. CV requires a positive mean, so it is inappropriate where predicted
+acceleration is negative. Kurtosis is the fourth central moment divided by
+squared variance; excess kurtosis subtracts three.
+
+For a Gamma response with mean `mu` and dispersion `phi`, variance is
+`phi * mu^2`, CV is `sqrt(phi)`, skewness is `2 * sqrt(phi)`, and excess
+kurtosis is `6 * phi`. `Gamma()` estimates a global dispersion, whereas
+`gammals()` can let it vary with covariates. The default
+`nuisance = "estimated"` includes uncertainty in estimated global parameters
+using the fitting criterion's second derivatives and the change in fitted
+coefficients as those parameters vary. Unsupported fitting configurations give
+an error; `nuisance = "fixed"` explicitly
+conditions on their fitted values. Parameters represented by coefficients,
+including scale and shape predictors, retain their joint uncertainty.
+
+For ML/REML fits, the moments use the likelihood dispersion in `reml.scale`,
+and rescale the conditional coefficient covariance to that same dispersion.
+This can differ from the Pearson/Fletcher estimate in `sig2`. The saved
+curvature describes the likelihood estimate, so it must be paired with that
+estimate when propagating uncertainty. Smoothing uncertainty uses curvature
+and coefficient sensitivities at the fitted parameters, including the mapping
+for linked or fixed smoothing parameters.
+
+Moments must exist at the fitted parameters and at the draws used for an
+interval. For example, GEV skewness requires shape below one third and kurtosis
+requires shape below one quarter. Undefined results are retained with a
+`.status`. Simulation also reports `.p_defined`; it withholds intervals if any
+draw is undefined instead of silently dropping those draws. See
+`fitted_moments()` for family coverage, categorical scoring, grouped models,
+and the distinction between latent and censored observations.
+
 ```{r impact-ppc}
 posterior_predictive_plot(varying, n = 50, seed = 402)
 ```
