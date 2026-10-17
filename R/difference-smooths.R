@@ -54,13 +54,16 @@
 #' @inheritSection derivatives Parallel calculation
 #'
 #' @details
-#' Simultaneous intervals jointly cover the underlying smooth differences at
+#' With the default simulation calibration, simultaneous intervals cover smooth differences at
 #' the evaluated covariate combinations for each pair of factor levels, with
 #' approximate posterior probability `ci_level` when using the Bayesian
 #' covariance. They do not provide joint coverage across all pairs, outside
 #' the evaluation set, or between its points. With `data = NULL`, the evaluation
 #' set is generated using `n`, `n_2d`, `n_3d`, and `n_4d`. Differences and interval
 #' limits are on the linear predictor scale, including group means when requested.
+#' For supported univariate cubic splines, `simultaneous_method = "tube"`
+#' instead covers a continuous interval, including between returned points;
+#' see [simultaneous_bands]. Coverage remains separate for each pair.
 #'
 #' `variables` determines the order used to generate and display the evaluation
 #' grid. The first two covariates are the x and y axes. The third covariate
@@ -71,7 +74,7 @@
 #'
 #' The intervals use the joint coefficient covariance selected by
 #' `unconditional` and `frequentist`, retaining covariance between the two
-#' smooths. The simulation covariance must be positive definite. With
+#' smooths. The covariance must be positive semidefinite. With
 #' `frequentist = TRUE`, simulation instead uses the frequentist covariance
 #' of the coefficient estimators. `n_sim`, `n_cores`, and `seed` are ignored for
 #' pointwise intervals. An explicit seed scopes the entire call: each pair uses
@@ -160,13 +163,18 @@
   seed = NULL,
   variables = NULL,
   n_3d = 16,
-  n_4d = 4
+  n_4d = 4,
+  simultaneous_method = c('simulation', 'tube'),
+  simultaneous_domain = NULL, tube_control = list()
 ) {
   interval <- match.arg(interval)
-  if (interval == "simultaneous") {
+  simultaneous_method <- resolve_simultaneous_method(simultaneous_method, interval,
+    simultaneous_domain, tube_control)
+  if (simultaneous_method == 'tube') tube_check_model(model)
+  if (interval == "simultaneous" && simultaneous_method == 'simulation') {
     validate_smooth_interval(interval, ci_level, n_sim, n_cores, seed)
   }
-  if (identical(interval, "simultaneous") && !is.null(seed) &&
+  if (simultaneous_method == 'simulation' && identical(interval, "simultaneous") && !is.null(seed) &&
       (!is.numeric(seed) || length(seed) != 1L || !is.finite(seed) ||
        abs(seed) > .Machine$integer.max || seed != trunc(seed))) {
     stop("`seed` must be NULL or a single integer.", call. = FALSE)
@@ -269,6 +277,15 @@
       coefs = coefs, group_means = group_means,
       interval = interval, ci_level = ci_level, n_sim = n_sim, n_cores = n_cores)
     result <- smooth_task_map(tasks, "calculate_difference")
+    if (interval == 'simultaneous' && simultaneous_method == 'tube') {
+      result <- tube_difference_intervals(result, tasks, model, smooths, data,
+        by_var, ci_level, simultaneous_domain, tube_control)
+      records <- attr(result, 'tube_records')
+      result <- bind_rows(result)
+      attr(result, 'interval_info') <- c(list(interval = interval, level = ci_level,
+        method = 'gaussian'), tube_info(records, 'comparison', unconditional, frequentist))
+      return(result)
+    }
     if (interval == "simultaneous") {
       columns <- lapply(tasks, function(x) match(names(x$coefs), names(coefs)))
       result <- smooth_interval_map(result, columns, V, ci_level, n_sim, n_cores,
@@ -277,7 +294,7 @@
     bind_rows(result)
   }
   # Scope the seed once: do not restart the same draw sequence for every pair.
-  result <- if (identical(interval, "simultaneous") && !is.null(seed)) {
+  result <- if (simultaneous_method == 'simulation' && identical(interval, "simultaneous") && !is.null(seed)) {
     withr::with_seed(seed, calculate())
   } else {
     calculate()

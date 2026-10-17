@@ -55,7 +55,8 @@ smooth_derivative_data <- function(model, smooth, n, focal, wrt, order, type, ep
 # the selected columns cross the process boundary.
 prepare_derivative_task <- function(model, sm, data, focal, wrt, type, order,
                                     h, betas, V, interval, interval_method,
-                                    level, n_sim, ncores) {
+                                    level, n_sim, ncores,
+                                    simultaneous_method = 'simulation') {
   if (!is.numeric(data[[focal]]) || is.matrix(data[[focal]])) {
     cli::cli_abort("The differentiation coordinate must be a numeric vector.")
   }
@@ -65,7 +66,7 @@ prepare_derivative_task <- function(model, sm, data, focal, wrt, type, order,
     smooth_derivative_matrix(sm, stencil, model, h, order,
       rownames(data), names(betas)[idx])
   } else NULL
-  if (interval == "simultaneous" || interval_method == "bootstrap") {
+  if ((interval == "simultaneous" && simultaneous_method == 'simulation') || interval_method == "bootstrap") {
     validate_smooth_interval(interval, level, n_sim, ncores, NULL)
   }
   bootstrap <- if (interval_method == "bootstrap") {
@@ -81,12 +82,12 @@ prepare_derivative_task <- function(model, sm, data, focal, wrt, type, order,
     model = smooth_matrix_model(model), X = X,
     betas = betas[idx], V = V[idx, idx, drop = FALSE],
     h = h, order = order, focal = focal, interval = interval,
-    level = level, bootstrap = bootstrap)
+    level = level, bootstrap = bootstrap, tube_type = type)
 }
 
 calculate_smooth_derivative <- function(sm, data, stencil, model, betas, V,
                                         h, order, focal, interval, level,
-                                        bootstrap, X = NULL) {
+                                        bootstrap, X = NULL, tube_type = NULL) {
   if (is.null(X)) {
     X <- smooth_derivative_matrix(sm, stencil, model, h, order,
       rownames(data), names(betas))

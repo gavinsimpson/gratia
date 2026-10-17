@@ -34,7 +34,10 @@ smooth_estimates(object, ...)
   interval_method = c("auto", "gaussian", "bootstrap", "shape"),
   shape_source = c("gaussian", "bootstrap"),
   ...,
-  variables = NULL
+  variables = NULL,
+  simultaneous_method = c("simulation", "tube"),
+  simultaneous_domain = NULL,
+  tube_control = list()
 )
 
 \method{smooth_estimates}{gamlss}(
@@ -126,7 +129,7 @@ or their intervals at the chosen evaluation points.}
 
 \item{interval}{character or \code{NULL}; \code{NULL} (the default) returns estimates
 and standard errors only. \code{"confidence"} adds pointwise intervals and
-\code{"simultaneous"} adds a band covering the finite evaluation grid of each
+\code{"simultaneous"} adds a band covering, by default, the finite evaluation grid of each
 fitted smooth. \code{"credible"} is an alias for \code{"confidence"}; the default
 Bayesian covariance gives approximate Bayesian credible intervals.}
 
@@ -161,6 +164,23 @@ Drawing saved estimates can change the order but uses only points already
 evaluated; evaluate again to change grid resolution or conditioning values.
 Continuous covariates must precede factors. Spherical smooths retain their
 latitude/longitude convention and do not support reordering.}
+
+\item{simultaneous_method}{character; calibration for simultaneous bands.
+The default, \code{"simulation"}, uses coefficient draws on the evaluation
+grid. \code{"tube"} uses a conservative Gaussian threshold-crossing bound
+over a continuous interval for supported one-dimensional cubic splines.
+See \link{simultaneous_bands}.}
+
+\item{simultaneous_domain}{numeric pair of increasing finite endpoints, or
+a named list of such pairs keyed by spline coordinate. For tube bands,
+\code{NULL} uses the range of returned evaluation coordinates, including gaps.
+All returned points must lie inside the interval and the interval must
+lie inside the fitted spline support. Requires tube calibration.}
+
+\item{tube_control}{named list controlling numerical tube calibration:
+\code{rel_tol} (default \code{1e-6}), \code{abs_tol} (\code{1e-8}), \code{subdivisions} (\code{1000L}),
+and \code{root_tol} (\code{1e-8}). Requires tube calibration. Simulation controls
+\code{n_sim}, \code{n_cores} (or \code{ncores}), and \code{seed} are ignored by tube calibration.}
 }
 \value{
 A data frame (tibble), which is of class \code{"smooth_estimates"}.
@@ -197,11 +217,13 @@ example, tensor products of soap-film components), \code{.smooth_id} contains
 their fitted smooth indices. This preserves their identity in saved
 estimates and plots without changing the labels supplied by mgcv.
 
-Simultaneous coverage is per fitted smooth over its valid evaluation points,
+By default, simultaneous coverage is per fitted smooth over its valid evaluation points,
 including all its slices and factor levels. Separate factor-by smooths remain
 separate coverage sets when grouped in one plot. This finite-grid band does
 not claim joint coverage across selected smooths or the full fitted model.
 Increasing grid resolution improves the approximation to whole-curve coverage.
+For supported univariate cubic splines, \code{simultaneous_method = "tube"}
+instead calibrates over a continuous interval; see \link{simultaneous_bands}.
 \code{overall_uncertainty} and covariance options apply to both interval types.
 SCAM smooth estimates retain the fitted centring and coefficient
 transformation when evaluation points are changed. Pointwise intervals use

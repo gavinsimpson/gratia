@@ -118,7 +118,9 @@
   interval_method = c("auto", "gaussian", "bootstrap", "shape"),
   frequentist = FALSE,
   shape_source = c("gaussian", "bootstrap"),
-  ..., variables = NULL
+  ..., variables = NULL,
+  simultaneous_method = c('simulation', 'tube'),
+  simultaneous_domain = NULL, tube_control = list()
 ) {
   gratia_plot_arguments(c("ci_alpha", "ci_col", "smooth_col", "resid_col", "contour_col", "ci_3d_alpha", "ci_3d_col"), environment())
   if (missing(overall_uncertainty) && is_scasm_model(object)) {
@@ -126,7 +128,9 @@
   }
   mrf_plot <- match.arg(mrf_plot)
   interval <- normalize_smooth_interval(interval)
-  validate_smooth_interval(interval, ci_level, n_sim, n_cores, seed)
+  simultaneous_method <- resolve_simultaneous_method(simultaneous_method, interval,
+    simultaneous_domain, tube_control)
+  if (simultaneous_method == 'simulation') validate_smooth_interval(interval, ci_level, n_sim, n_cores, seed)
   check_back_transform(back_transform)
   surface <- match.arg(surface)
   validate_surface_3d(surface_3d)
@@ -197,6 +201,8 @@
       unnest = FALSE,
       interval = interval, ci_level = ci_level,
       interval_method = interval_method,
+      simultaneous_method = simultaneous_method, simultaneous_domain = simultaneous_domain,
+      tube_control = tube_control,
       shape_source = shape_source,
       n_sim = n_sim, n_cores = n_cores, seed = seed
     )

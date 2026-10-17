@@ -58,7 +58,7 @@
 #'   or their intervals at the chosen evaluation points.
 #' @param interval character or `NULL`; `NULL` (the default) returns estimates
 #'   and standard errors only. `"confidence"` adds pointwise intervals and
-#'   `"simultaneous"` adds a band covering the finite evaluation grid of each
+#'   `"simultaneous"` adds a band covering, by default, the finite evaluation grid of each
 #'   fitted smooth. `"credible"` is an alias for `"confidence"`; the default
 #'   Bayesian covariance gives approximate Bayesian credible intervals.
 #' @param ci_level numeric; interval coverage, strictly between zero and one.
@@ -68,6 +68,20 @@
 #'   require stored draws. Simultaneous bootstrap bands are not supported.
 #'   `"shape"` applies [shape_intervals()] to supported scasm smooth components,
 #'   using the initial limits chosen by `shape_source`.
+#' @param simultaneous_method character; calibration for simultaneous bands.
+#'   The default, `"simulation"`, uses coefficient draws on the evaluation
+#'   grid. `"tube"` uses a conservative Gaussian threshold-crossing bound
+#'   over a continuous interval for supported one-dimensional cubic splines.
+#'   See [simultaneous_bands].
+#' @param simultaneous_domain numeric pair of increasing finite endpoints, or
+#'   a named list of such pairs keyed by spline coordinate. For tube bands,
+#'   `NULL` uses the range of returned evaluation coordinates, including gaps.
+#'   All returned points must lie inside the interval and the interval must
+#'   lie inside the fitted spline support. Requires tube calibration.
+#' @param tube_control named list controlling numerical tube calibration:
+#'   `rel_tol` (default `1e-6`), `abs_tol` (`1e-8`), `subdivisions` (`1000L`),
+#'   and `root_tol` (`1e-8`). Requires tube calibration. Simulation controls
+#'   `n_sim`, `n_cores` (or `ncores`), and `seed` are ignored by tube calibration.
 #' @param shape_source character; initial uncertainty for `interval_method =
 #'   "shape"`: `"gaussian"` (the default) or stored `"bootstrap"` pointwise
 #'   limits. Bootstrap sources require `frequentist = FALSE` and
@@ -121,11 +135,13 @@
 #' their fitted smooth indices. This preserves their identity in saved
 #' estimates and plots without changing the labels supplied by mgcv.
 #'
-#' Simultaneous coverage is per fitted smooth over its valid evaluation points,
+#' By default, simultaneous coverage is per fitted smooth over its valid evaluation points,
 #' including all its slices and factor levels. Separate factor-by smooths remain
 #' separate coverage sets when grouped in one plot. This finite-grid band does
 #' not claim joint coverage across selected smooths or the full fitted model.
 #' Increasing grid resolution improves the approximation to whole-curve coverage.
+#' For supported univariate cubic splines, `simultaneous_method = "tube"`
+#' instead calibrates over a continuous interval; see [simultaneous_bands].
 #' `overall_uncertainty` and covariance options apply to both interval types.
 #' SCAM smooth estimates retain the fitted centring and coefficient
 #' transformation when evaluation points are changed. Pointwise intervals use
@@ -299,12 +315,16 @@
     n_sim = 10000, n_cores = 1, seed = NULL,
     interval_method = c("auto", "gaussian", "bootstrap", "shape"),
     shape_source = c("gaussian", "bootstrap"),
-    ..., variables = NULL) {
+    ..., variables = NULL,
+    simultaneous_method = c('simulation', 'tube'),
+    simultaneous_domain = NULL, tube_control = list()) {
   overall_supplied <- !missing(overall_uncertainty)
   check_scam_unconditional(object, unconditional)
   check_back_transform(back_transform)
   interval <- normalize_smooth_interval(interval, allow_null = TRUE)
-  if (!is.null(interval)) {
+  simultaneous_method <- resolve_simultaneous_method(simultaneous_method, interval,
+    simultaneous_domain, tube_control)
+  if (!is.null(interval) && simultaneous_method == 'simulation') {
     validate_smooth_interval(interval, ci_level, n_sim, n_cores, seed)
   }
   model_name <- expr_label(substitute(object))
@@ -359,6 +379,10 @@
   resolved_method <- scasm_interval_method(object,
     if (enforce_shape) shape_source else interval_method,
     interval = interval %||% "confidence")
+
+  if (simultaneous_method == 'tube') {
+    tube_check_model(object, if (enforce_shape) 'shape' else resolved_method)
+  }
 
   ## loop over the smooths and evaluate them
   sm_list <- vector(mode = "list", length = length(smooths))
@@ -435,8 +459,12 @@
   if (!is.null(interval)) {
     sm_list <- add_smooth_intervals(sm_list, smooths, object, interval, ci_level,
       unconditional, frequentist, overall_uncertainty, n_sim, n_cores, seed,
-      interval_method = resolved_method, shape_specs = shape_specs)
+      interval_method = resolved_method, shape_specs = shape_specs,
+      simultaneous_method = simultaneous_method, simultaneous_domain = simultaneous_domain,
+      tube_control = tube_control)
   }
+
+  tube_records <- attr(sm_list, 'tube_records')
 
   # Tensor products of the two soap components can share both label and type.
   # Retain fitted indices only for otherwise indistinguishable output terms.
@@ -485,6 +513,10 @@
       names(shape_specs) <- as.character(smooth_ids)
       attr(sm_list, "interval_info") <- scasm_shape_interval_info(
         attr(sm_list, "interval_info"), shape_specs, object, frequentist, unconditional)
+    }
+    if (simultaneous_method == 'tube') {
+      attr(sm_list, 'interval_info') <- c(attr(sm_list, 'interval_info'),
+        tube_info(tube_records, 'smooth', unconditional, frequentist))
     }
     attr(sm_list, "interval_info")$scope <- "smooth"
     attr(sm_list, "interval_info")$overall_uncertainty <- overall_uncertainty &&
@@ -1573,7 +1605,8 @@ smooth_estimates.gamlss <- function(object, select = NULL, smooth = deprecated()
   gratia_plot_arguments(c("contour_col", "ci_alpha", "ci_col", "smooth_col", "resid_col", "decrease_col", "increase_col", "change_lwd", "ci_3d_alpha", "ci_3d_col"), environment())
   dots <- names(match.call(expand.dots = FALSE)$...)
   controls <- intersect(dots, c("interval_method", "shape_source", "frequentist",
-    "unconditional", "overall_uncertainty", "ci_level", "n_sim", "n_cores", "seed"))
+    "unconditional", "overall_uncertainty", "ci_level", "n_sim", "n_cores", "seed",
+    "simultaneous_method", "simultaneous_domain", "tube_control"))
   if (length(controls)) {
     cli::cli_abort(c("Interval computation controls require the fitted model: {paste(controls, collapse = ', ')}.",
       "i" = "Compute intervals with smooth_estimates(model, ...) before drawing saved estimates."))

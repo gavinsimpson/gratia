@@ -1,0 +1,322 @@
+
+R version 4.6.1 (2026-06-24) -- "Happy Hop"
+Copyright (C) 2026 The R Foundation for Statistical Computing
+Platform: aarch64-apple-darwin23
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> ## Test `gratia` using the `testthat` package
+>
+> ## Setup
+> library("testthat")
+> library("gratia")
+>
+> ## Runs the tests in tests/testthat
+> test_check("gratia")
+Note: in most cases the default test statistic 'mean' is too weak to detect anything of interest.
+NOTE: The kernel density estimate assumes continuous observations and is not optimal for discrete observations.
+Prediction data contain 7 rows with combinations of categorical predictor levels absent from the fitting data.
+i Factors: `a` and `b`. Input rows: 3, 7, 11, 15, 19, 23, 27.
+Prediction data contain 7 rows with combinations of categorical predictor levels absent from the fitting data.
+i Factors: `a` and `b`. Input rows: 3, 7, 11, 15, 19, 23, 27.
+Prediction data contain 7 rows with combinations of categorical predictor levels absent from the fitting data.
+i Factors: `a` and `b`. Input rows: 2, 4, 6, 8, 10, 12, 14.
+Prediction data contain 7 rows with combinations of categorical predictor levels absent from the fitting data.
+i Factors: `a` and `b`. Input rows: 2, 4, 6, 8, 10, 12, 14.
+Using simulated reference quantiles: an inverse CDF is unavailable.
+Using simulated reference quantiles: an inverse CDF is unavailable.
+Saving _problems/test-diagnostic-posterior-224.R
+i Unable to draw any of the model terms.
+i Unable to draw any of the model terms.
+
+ Maximum number of PQL iterations:  20
+
+ Maximum number of PQL iterations:  20
+
+ Maximum number of PQL iterations:  20
+Using joint simulated reference quantiles for dependent responses.
+
+ Maximum number of PQL iterations:  20
+! Ignoring univariate smooths & those involving random effects.
+
+Random effect smooths not currently supported.
+Ignoring: <s(fac)>
+
+Saving _problems/test-residuals-covariate-plot-377.R
+Saving _problems/test-scam-basis-adapter-68.R
+Saving _problems/test-scam-gam-api-193.R
+Saving _problems/test-scam-smooth-coverage-47.R
+Saving _problems/test-scam-smooth-coverage-52.R
+Saving _problems/test-scam-smooth-coverage-96.R
+Saving _problems/test-scam-smooth-coverage-253.R
+Saving _problems/test-sdmtmb-dependence-137.R
+Saving _problems/test-sdmtmb-dependence-137.R
+Saving _problems/test-sdmtmb-diagnostic-adapters-26.R
+Saving _problems/test-sdmtmb-diagnostic-adapters-30.R
+Saving _problems/test-sdmtmb-diagnostic-adapters-32.R
+Saving _problems/test-sdmtmb-diagnostic-adapters-37.R
+Student-t degrees of freedom parameter fixed at 5. To estimate it, set `df = NULL`.
+Student-t degrees of freedom parameter will be estimated. This used to be fixed at 3 by default. To fix it, supply a value to `df` (e.g., `df = 3`).
+Student-t degrees of freedom parameter fixed at 1.5. To estimate it, set `df = NULL`.
+Student-t degrees of freedom parameter fixed at 1.5. To estimate it, set `df = NULL`.
+i Unable to draw any of the model terms.
+[ FAIL 14 | WARN 1 | SKIP 200 | PASS 26746 ]
+
+══ Skipped tests (200) ═════════════════════════════════════════════════════════
+• On CRAN (200): 'test-add-functions.R:185:1', 'test-add-functions.R:193:1',
+  'test-add-functions.R:201:1', 'test-add-functions.R:209:1',
+  'test-add-functions.R:218:1', 'test-ale.R:512:3', 'test-assemble.R:2:3',
+  'test-assemble.R:7:3', 'test-assemble.R:12:3', 'test-assemble.R:18:3',
+  'test-bam-ar.R:3:1', 'test-basis.R:37:3', 'test-basis.R:71:3',
+  'test-basis.R:93:3', 'test-basis.R:103:3', 'test-basis.R:111:3',
+  'test-basis.R:121:3', 'test-by-variables.R:7:3', 'test-by-variables.R:14:3',
+  'test-by-variables.R:61:3', 'test-compare-smooths.R:33:3',
+  'test-concurvity.R:16:3', 'test-concurvity.R:35:3',
+  'test-conditional-values.R:13:3', 'test-conditional-values.R:38:3',
+  'test-conditional-values.R:49:3', 'test-conditional-values.R:60:3',
+  'test-conditional-values.R:71:3', 'test-conditional-values.R:75:1',
+  'test-conditional-values.R:84:3', 'test-conditional-values.R:92:3',
+  'test-conditional-values.R:100:3', 'test-conditional-values.R:108:3',
+  'test-conditional-values.R:116:3', 'test-confint-methods.R:202:3',
+  'test-data-sim.R:17:3', 'test-data-sim.R:26:3', 'test-data-slice.R:240:1',
+  'test-data-slice.R:245:1', 'test-data-slice.R:263:1', 'test-datagen.R:3:1',
+  'test-derivatives.R:400:3', 'test-derivatives.R:443:3',
+  'test-derivatives.R:485:3', 'test-derivatives.R:549:3',
+  'test-derivatives.R:553:1', 'test-diagnostic-plots.R:12:3',
+  'test-diagnostic-plots.R:60:3', 'test-diagnostic-plots.R:77:3',
+  'test-diagnostic-plots.R:94:3', 'test-diagnostic-plots.R:112:3',
+  'test-diagnostic-plots.R:130:3', 'test-diagnostic-plots.R:140:3',
+  'test-diagnostic-plots.R:150:3', 'test-diagnostic-plots.R:154:3',
+  'test-diagnostic-plots.R:165:3', 'test-diagnostic-plots.R:176:3',
+  'test-diagnostic-plots.R:188:3', 'test-difference-smooths.R:11:3',
+  'test-difference-smooths.R:25:3', 'test-difference-smooths.R:36:3',
+  'test-difference-smooths.R:47:3', 'test-difference-smooths.R:51:3',
+  'test-difference-smooths.R:65:3', 'test-difference-smooths.R:78:3',
+  'test-difference-smooths.R:109:3', 'test-difference-smooths.R:113:3',
+  'test-difference-smooths.R:137:3', 'test-draw-gam.R:3:1',
+  'test-draw-methods.R:4:1', 'test-draw-parametric-effects.R:8:3',
+  'test-draw-parametric-effects.R:16:3', 'test-draw-parametric-effects.R:26:3',
+  'test-draw-parametric-effects.R:36:3', 'test-draw-parametric-effects.R:44:3',
+  'test-draw-parametric-effects.R:48:3',
+  'test-draw-parametric-effects.R:141:3',
+  'test-draw-parametric-effects.R:191:3', 'test-draw-smooth-estimates.R:3:1',
+  'test-edf.R:5:1', 'test-edf.R:14:1', 'test-edf.R:28:1', 'test-edf.R:37:1',
+  'test-edf.R:55:1', 'test-edf.R:64:1', 'test-edf.R:73:1', 'test-edf.R:82:1',
+  'test-edf.R:91:1', 'test-fderiv.R:6:3', 'test-fitted-values.R:113:3',
+  'test-fitted-values.R:124:3', 'test-fitted-values.R:135:3',
+  'test-fix-family.R:92:1', 'test-fix-family.R:108:1',
+  'test-fix-family.R:124:1', 'test-fix-family.R:140:1',
+  'test-fix-family.R:156:1', 'test-fix-family.R:170:1',
+  'test-fix-family.R:184:1', 'test-fix-family.R:236:1',
+  'test-fix-family.R:253:1', 'test-fix-family.R:270:1',
+  'test-gfam-diagnostics.R:189:3', 'test-gfam-diagnostics.R:445:1',
+  'test-gfam-quantile-diagnostics.R:267:3', 'test-gfam.R:18:3',
+  'test-gjrm-methods.R:3:1', 'test-glmmtmb-effects.R:252:3',
+  'test-glmmtmb.R:286:3', 'test-hgam-paper.R:2:1', 'test-lp-matrix.R:25:3',
+  'test-mrf.R:196:3', 'test-overview.R:21:1', 'test-overview.R:30:1',
+  'test-overview.R:39:1', 'test-parallel-smooth-operations.R:344:3',
+  'test-parametric-effects-interactions.R:198:5',
+  'test-parametric-effects.R:96:3', 'test-parametric-effects.R:122:3',
+  'test-partial-derivatives.R:68:1', 'test-partial-derivatives.R:77:1',
+  'test-partial-derivatives.R:87:1', 'test-penalty.R:52:3',
+  'test-penalty.R:65:3', 'test-penalty.R:76:3', 'test-penalty.R:106:3',
+  'test-penalty.R:125:3', 'test-posterior-predictive-plot.R:338:3',
+  'test-posterior-samples.R:17:3', 'test-posterior-samples.R:33:3',
+  'test-posterior-samples.R:256:3', 'test-posterior-samples.R:264:3',
+  'test-posterior-samples.R:297:3', 'test-posterior-samples.R:325:3',
+  'test-posterior-samples.R:346:3', 'test-posterior-samples.R:388:3',
+  'test-posterior-samples.R:418:3', 'test-posterior-samples.R:423:3',
+  'test-posterior-samples.R:476:3', 'test-posterior-samples.R:548:3',
+  'test-posterior-samples.R:557:3', 'test-posterior-samples.R:566:3',
+  'test-prepare-surface-plot.R:237:3', 'test-qq-plot.R:23:3',
+  'test-qq-plot.R:32:3', 'test-qq-plot.R:41:3', 'test-qq-plot.R:49:3',
+  'test-qq-plot.R:59:3', 'test-qq-plot.R:66:3', 'test-qq-plot.R:74:3',
+  'test-qq-plot.R:84:3', 'test-qq-plot.R:94:3',
+  'test-quantile-residuals.R:1:1', 'test-quantile-residuals.R:7:1',
+  'test-response-derivatives.R:5:3', 'test-response-derivatives.R:40:3',
+  'test-rfoo.R:2:3', 'test-rfoo.R:18:3', 'test-rfoo.R:34:3',
+  'test-rfoo.R:43:3', 'test-rfoo.R:53:3', 'test-rfoo.R:63:3',
+  'test-rootograms.R:4:3', 'test-rootograms.R:15:3', 'test-rootograms.R:19:3',
+  'test-rootograms.R:32:3', 'test-scalable-density.R:110:3',
+  'test-scalable-diagnostics.R:209:1', 'test-scales.R:18:3',
+  'test-sdmtmb.R:290:3', 'test-simulate-methods.R:76:3',
+  'test-simulate-methods.R:85:3', 'test-simulate-methods.R:95:3',
+  'test-smooth-bands.R:211:3', 'test-smooth-bands.R:274:3',
+  'test-smooth-coefs.R:53:1', 'test-smooth-estimates.R:286:3',
+  'test-smooth-estimates.R:293:3', 'test-smooth-estimates.R:300:3',
+  'test-soap-films.R:3:1', 'test-spherical-geometry.R:114:3',
+  'test-surface-3d-intervals.R:200:3', 'test-surface-3d.R:260:3',
+  'test-surface-3d.R:426:3', 'test-utilities.R:381:3',
+  'test-utilities.R:595:3', 'test-variance-components.R:14:3',
+  'test-variance-components.R:26:3', 'test-variance-components.R:38:3',
+  'test-variance-components.R:50:3', 'test-variance-components.R:62:3',
+  'test-worm-plot.R:25:3', 'test-worm-plot.R:32:3', 'test-worm-plot.R:42:3',
+  'test-worm-plot.R:53:3', 'test-worm-plot.R:60:3', 'test-worm-plot.R:70:3',
+  'test-worm-plot.R:81:3', 'test-worm-plot.R:91:3', 'test-worm-plot.R:101:3'
+
+══ Failed tests ════════════════════════════════════════════════════════════════
+── Error ('test-diagnostic-posterior.R:223:5'): delta posterior checks retain selected components and rows ──
+Error: No finite calibrated residuals are available.
+Backtrace:
+     ▆
+  1. ├─gratia::appraise(...) at test-diagnostic-posterior.R:223:5
+  2. └─gratia:::appraise.sdmTMB(...)
+  3.   ├─gratia::appraise(...)
+  4.   └─gratia:::appraise.gratia_diagnostic_proxy(...)
+  5.     └─gratia:::appraise.gam(model, type = type, ...)
+  6.       ├─gratia (local) qq_plot_fun(...)
+  7.       └─gratia:::qq_plot.gratia_diagnostic_proxy(...)
+  8.         └─gratia:::qq_plot.gam(model, type = type, ...)
+  9.           └─gratia:::calibrated_qq_plot(...)
+ 10.             └─gratia:::calibrated_qq_data(...)
+ 11.               └─gratia:::calibrated_residual_reference(...)
+── Error ('test-residuals-covariate-plot.R:376:3'): sdmTMB components keep their fitted observation rows ──
+Error: No finite observations for x.
+Backtrace:
+    ▆
+ 1. └─gratia::residuals_covariate_plot(...) at test-residuals-covariate-plot.R:376:3
+ 2.   └─gratia:::residual_covariate_plots(...)
+ 3.     └─base::lapply(...)
+ 4.       └─gratia (local) FUN(X[[i]], ...)
+── Failure ('test-scam-basis-adapter.R:68:3'): SCAM smooth registry covers the installed constructors ──
+Expected `scam_smooth_classes()` to have the same values as `expected`.
+Actual: "mpi.smooth", "mpd.smooth", "cx.smooth", "cv.smooth", "micx.smooth", "micv.smooth", "mdcx.smooth", "mdcv.smooth", "miso.smooth", ...
+Expected: "cpopspline.smooth", "cv.smooth", "cvBy.smooth", "cx.smooth", "cxBy.smooth", "dpo.smooth", "ipo.smooth", "lipl.smooth", "lmpi.smooth", ...
+Absent: "tedi.smooth", "teid.smooth"
+── Failure ('test-scam-gam-api.R:192:3'): SCAM model matrices and concurvity omit plateau coefficients fixed to zero ──
+Expected `con$.concurvity[con$.term == sm$label]` to equal `sum(projection^2)/sum(term^2)`.
+Differences:
+  `actual`: 0.67
+`expected`: 0.00
+
+── Failure ('test-scam-smooth-coverage.R:47:3'): every SCAM constructor has a type and evaluates the fitted function ──
+Expected `fixtures$models` to have length 41.
+Actual length: 43.
+── Error ('test-scam-smooth-coverage.R:52:5'): every SCAM constructor has a type and evaluates the fitted function ──
+Error in `smooth_type.default(sm)`: Unknown type of smooth
+Backtrace:
+    ▆
+ 1. ├─testthat::expect_type(smooth_type(sm), "character") at test-scam-smooth-coverage.R:52:5
+ 2. │ └─testthat::quasi_label(enquo(object))
+ 3. │   └─rlang::eval_bare(expr, quo_get_env(quo))
+ 4. ├─gratia::smooth_type(sm)
+ 5. └─gratia:::smooth_type.default(sm)
+── Error ('test-scam-smooth-coverage.R:95:5'): SCAM plots reproduce native functions with an explicit surface centre ──
+Error in `smooth_type.default(sm)`: Unknown type of smooth
+Backtrace:
+     ▆
+  1. ├─gratia::draw(...) at test-scam-smooth-coverage.R:95:5
+  2. └─gratia:::draw.scam(...)
+  3.   ├─gratia:::draw.gam(...)
+  4.   │ └─base::eval(.call, parent.frame())
+  5.   │   └─base::eval(.call, parent.frame())
+  6.   ├─gratia (local) `<fn>`(...)
+  7.   │ └─base::eval(.call, parent.frame())
+  8.   │   └─base::eval(.call, parent.frame())
+  9.   ├─gratia::assemble(...)
+ 10.   └─gratia:::assemble.scam(...)
+ 11.     └─gratia:::assemble.gam(...)
+ 12.       └─gratia:::plan_tensor_plots(object, which(select), data, re_levels)
+ 13.         ├─gratia:::is_tensor_plot_type(smooth_type(sm))
+ 14.         │ └─type %in% ...
+ 15.         ├─gratia::smooth_type(sm)
+ 16.         └─gratia:::smooth_type.default(sm)
+── Error ('test-scam-smooth-coverage.R:251:5'): all-missing SCAM smooth grids retain missing simultaneous intervals ──
+<purrr_error_indexed/rlang_error/error/condition>
+Error in `map(smooths, eval_smooth, model = object, n = n, n_2d = n_2d, n_3d = n_3d, n_4d = n_4d, data = data, unconditional = unconditional, frequentist = frequentist, overall_uncertainty = overall_uncertainty, dist = dist, clip = clip, back_transform = back_transform)`: i In index: 1.
+Caused by error in `smooth_type.default()`:
+! Unknown type of smooth
+Backtrace:
+     ▆
+  1. ├─gratia::smooth_estimates(...) at test-scam-smooth-coverage.R:251:5
+  2. ├─gratia:::smooth_estimates.scam(...)
+  3. │ └─gratia:::smooth_estimates.gam(object, ..., unconditional = unconditional)
+  4. │   └─purrr::map(...)
+  5. │     └─purrr:::map_("list", .x, .f, ..., .progress = .progress)
+  6. │       ├─purrr:::with_indexed_errors(...)
+  7. │       │ └─base::withCallingHandlers(...)
+  8. │       ├─purrr:::call_with_cleanup(...)
+  9. │       ├─gratia (local) .f(.x[[i]], ...)
+ 10. │       └─gratia:::eval_smooth.mgcv.smooth(.x[[i]], ...)
+ 11. │         ├─gratia:::add_smooth_type_column(eval_sm, sm_type = smooth_type(smooth))
+ 12. │         │ └─tibble::add_column(object, .type = rep(sm_type, times = n), .after = 1L)
+ 13. │         │   └─tibble::tibble(..., .name_repair = .name_repair)
+ 14. │         │     └─tibble:::tibble_quos(xs, .rows, .name_repair)
+ 15. │         │       └─rlang::eval_tidy(xs[[j]], mask)
+ 16. │         ├─gratia::smooth_type(smooth)
+ 17. │         └─gratia:::smooth_type.default(smooth)
+ 18. │           └─base::stop("Unknown type of smooth")
+ 19. └─base::.handleSimpleError(`<fn>`, "Unknown type of smooth", base::quote(smooth_type.default(smooth)))
+ 20.   └─purrr (local) h(simpleError(msg, call))
+ 21.     └─cli::cli_abort(...)
+ 22.       └─rlang::abort(...)
+── Failure ('test-sdmtmb-dependence.R:137:7'): nonlinear spatial and delta laws retain native dependence and means ──
+Expected `qnorm(positive$distribution$cdf(positive$y))` to equal `native[keep]`.
+Differences:
+  `actual`:  NA  NA  NA  NA  NA  NA  NA  NA
+`expected`: 0.0 1.3 0.1 0.8 0.6 2.5 1.2 2.5
+
+── Failure ('test-sdmtmb-dependence.R:137:7'): nonlinear spatial and delta laws retain native dependence and means ──
+Expected `qnorm(positive$distribution$cdf(positive$y))` to equal `native[keep]`.
+Differences:
+  `actual`:  NA  NA   NA  NA  NA  NA  NA  NA
+`expected`: 1.3 2.2 -0.7 1.9 0.8 0.2 0.4 1.5
+
+── Failure ('test-sdmtmb-diagnostic-adapters.R:26:3'): sdmTMB delta diagnostics calibrate the entire response mixture ──
+Expected `p$distribution$cdf(rep(0, 80))` to equal `1 - native$est1`.
+Differences:
+  `actual`:  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA and 70 more...
+`expected`: 0.4 0.4 0.4 0.4 0.4 0.4 0.4 0.4 0.4 0.4            ...
+
+── Failure ('test-sdmtmb-diagnostic-adapters.R:29:3'): sdmTMB delta diagnostics calibrate the entire response mixture ──
+Expected `p$distribution$cdf_left(b$lower)[p$y == 0]` to equal `rep(0, sum(p$y == 0))`.
+Differences:
+  `actual`:  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA and 17 more...
+`expected`: 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0            ...
+
+── Failure ('test-sdmtmb-diagnostic-adapters.R:32:3'): sdmTMB delta diagnostics calibrate the entire response mixture ──
+Expected `all(...)` to be TRUE.
+Differences:
+`actual`:   <NA>
+`expected`: TRUE
+
+── Failure ('test-sdmtmb-diagnostic-adapters.R:36:3'): sdmTMB delta diagnostics calibrate the entire response mixture ──
+Expected `r` to equal `as.vector(residuals(m, type = "mle-eb", model = 2))[d$y > 0]`.
+Differences:
+  `actual`:  NA  NA   NA   NA  NA  NA  NA  NA   NA  NA and 43 more...
+`expected`: 0.7 0.9 -0.9 -1.3 0.3 0.9 1.9 0.5 -1.3 1.0            ...
+
+
+[ FAIL 14 | WARN 1 | SKIP 200 | PASS 26746 ]
+Deleting unused snapshots: 'ale/draw-numeric-ale-on-response-scale.svg',
+'bam-ar/draw-bam-ar-1-factor-by.svg', 'bam-ar/draw-bam-ar-1-single-series.svg',
+'basis/draw-basis-works-ok-with-weighted-basis-funs.svg',
+'basis/draw-basis-works-with-a-bivariate-te-contour.svg',
+'basis/draw-basis-works-with-a-bivariate-te.svg',
+'basis/draw-basis-works-with-a-bivariate-tprs-contour.svg',
+'basis/draw-basis-works-with-a-bivariate-tprs.svg',
+'basis/draw-basis-works-with-a-gam-multiple-smooths.svg',
+'basis/draw-basis-works-with-a-gam-single-smooth.svg',
+'by-variables/continuous-by-variable-smmoth-fixed-scales.svg',
+'by-variables/continuous-by-variable-smmoth.svg',
+'by-variables/draw-gam-user-select-and-parametric-true.svg',
+'compare-smooths/compare-smooths-all-smooths.svg',
+'compare-smooths/compare-smooths-bottom-legend.svg',
+'compare-smooths/compare-smooths-set-nrow-ncol.svg',
+'concurvity/draw-concurvity-overall.svg',
+'concurvity/draw-concurvity-pairwise.svg', …,
+'worm-plot/worm-plot-uniform-randomisation-response-residuals.svg', and
+'worm-plot/worm-plot-uniform-randomisation.svg'
+Error:
+! Test failures.
+Execution halted

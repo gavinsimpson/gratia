@@ -1,0 +1,11 @@
+"scenario","family","k","unconditional"
+"broad","gaussian",8,FALSE
+"broad_corrected","gaussian",8,TRUE
+"nearly_linear","gaussian",8,FALSE
+"peak","gaussian",40,FALSE
+"peak_small_basis","gaussian",4,FALSE
+"boundary_uneven","gaussian",10,FALSE
+"binomial","binomial",8,FALSE
+"poisson","poisson",8,FALSE
+"groups_equal","gaussian",8,FALSE
+"groups_different","gaussian",8,FALSE

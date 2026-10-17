@@ -90,6 +90,7 @@ reference:
       - draw.ale
       - add_confint
       - confint.gam
+      - simultaneous_bands
       - shape_intervals
       - shape_confidence_set
       - add_constant

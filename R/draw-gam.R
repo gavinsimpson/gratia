@@ -100,7 +100,7 @@
 #'   uncertainty due to smoothness selection? If `TRUE`, the corrected Bayesian
 #'   covariance matrix will be used.
 #' @param interval character; `"confidence"` (default) draws pointwise intervals;
-#'   `"simultaneous"` uses a band across the finite evaluation grid of each
+#'   `"simultaneous"` uses a band across, by default, the finite evaluation grid of each
 #'   smooth, including its slices and factor levels. Separate smooths are not a
 #'   joint coverage set. `"credible"` aliases `"confidence"`, reflecting the
 #'   approximate Bayesian credible interpretation of default-covariance bands.
@@ -108,6 +108,8 @@
 #'   when simultaneous smooth bands are requested. Bands appear where the
 #'   renderer displays interval bounds, including 3D effect surfaces when
 #'   `ci_3d = TRUE`. Random-effect QQ plots retain their usual display.
+#'   `simultaneous_method = "tube"` calibrates supported univariate bands
+#'   over a continuous interval; see [simultaneous_bands].
 #' @inheritParams smooth_estimates
 #' @param n_sim,n_cores positive integers; coefficient draws and simulation cores
 #'   for simultaneous bands. Parallel simulation requires OpenMP support.
@@ -394,7 +396,9 @@
   interval_method = c("auto", "gaussian", "bootstrap", "shape"),
   frequentist = FALSE,
   shape_source = c("gaussian", "bootstrap"),
-  ..., variables = NULL
+  ..., variables = NULL,
+  simultaneous_method = c('simulation', 'tube'),
+  simultaneous_domain = NULL, tube_control = list()
 ) {
   .call <- match.call()
   .call[[1L]] <- if (is_scasm_model(object)) draw.scasm else draw_gam_impl
@@ -456,7 +460,9 @@ draw_gam_impl <- function(
   interval_method = c("auto", "gaussian", "bootstrap", "shape"),
   frequentist = FALSE,
   shape_source = c("gaussian", "bootstrap"),
-  ..., variables = NULL
+  ..., variables = NULL,
+  simultaneous_method = c('simulation', 'tube'),
+  simultaneous_domain = NULL, tube_control = list()
 ) {
   surface <- match.arg(surface)
   validate_surface_3d(surface_3d)
