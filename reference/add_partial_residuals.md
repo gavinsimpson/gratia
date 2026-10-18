@@ -51,6 +51,13 @@ add_partial_residuals(data, model, ...)
   logical; should smooths be selected by partial matches with `select`?
   If `TRUE`, `select` can only be a single string to match against.
 
+## Details
+
+Partial residuals require working residuals and working weights from the
+fitted model. Families that do not provide these, including the
+location-scale families in `mgcv`, are not supported, even for terms in
+the location predictor.
+
 ## See also
 
 [gamm4_support](https://gavinsimpson.github.io/gratia/reference/gamm4_support.md)

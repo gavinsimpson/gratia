@@ -48,6 +48,11 @@ retained observations are returned. Computation uses aligned working
 residuals, working weights and term predictions before restoring
 excluded positions.
 
+Partial residuals require working residuals and working weights from the
+fitted model. Families that do not provide these, including the
+location-scale families in `mgcv`, are not supported, even for terms in
+the location predictor.
+
 ## Examples
 
 ``` r

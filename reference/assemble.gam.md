@@ -125,7 +125,9 @@ assemble(object, ..., overall_uncertainty = FALSE, centre = c("model", "plot"))
 - residuals:
 
   logical; should partial residuals for a smooth be drawn? Ignored for
-  anything but a simple univariate smooth.
+  anything but a simple univariate smooth. If the model does not provide
+  working residuals and working weights, warns once and draws the
+  smooths without partial residuals.
 
 - scales:
 

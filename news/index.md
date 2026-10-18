@@ -901,6 +901,15 @@
 
 ### Bug fixes
 
+- [`partial_residuals()`](https://gavinsimpson.github.io/gratia/reference/partial_residuals.md)
+  and
+  [`add_partial_residuals()`](https://gavinsimpson.github.io/gratia/reference/add_partial_residuals.md)
+  now give an informative error for models without working residuals or
+  working weights, including mgcv’s location-scale families.
+  `draw(residuals = TRUE)` warns once and draws the smooths without
+  partial residuals for these models
+  ([\#414](https://github.com/gavinsimpson/gratia/issues/414)).
+
 - [`draw.difference_smooth()`](https://gavinsimpson.github.io/gratia/reference/draw.difference_smooth.md)
   now uses supplied `xlab` and `caption` values when drawing differences
   between curves.

@@ -193,7 +193,9 @@ use the grid and surface controls below, as described in
 
 <dt id="arg-residuals">residuals<a class="anchor" aria-label="anchor" href="#arg-residuals"></a></dt>
 <dd><p>logical; should partial residuals for a smooth be drawn?
-Ignored for anything but a simple univariate smooth.</p></dd>
+Ignored for anything but a simple univariate smooth.
+If the model does not provide working residuals and working weights,
+warns once and draws the smooths without partial residuals.</p></dd>
 
 
 <dt id="arg-scales">scales<a class="anchor" aria-label="anchor" href="#arg-scales"></a></dt>
