@@ -96,8 +96,19 @@
 <div class="section level2">
 <h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
 </h2>
-<p>Working with GAMs within the ‘tidyverse’ can be tedious and even difficult without a good understanding of GAMs themselves and how the model is returned by ‘mgcv’ and what the model objects contain. ‘gratia’ is designed to help with this.</p>
-<p>‘gratia’ provides ‘ggplot’-based graphics and utility functions for working with generalized additive models (GAMs) fitted using the ‘mgcv’ package, via a reimplementation of the <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> method for GAMs that ‘mgcv’ provides, as well as ‘tidyverse’ compatible representations of estimated smooths.</p>
+<p>Working with GAMs and models containing penalised spline terms within the ‘tidyverse’ can be tedious and even difficult without a good understanding of these models themselves and how the model is returned by <em>mgcv</em> or other packages, and what the model objects contain. <em>gratia</em> is designed to help with this.</p>
+<p><em>gratia</em> provides <em>ggplot</em>-based graphics and utility functions for working with generalized additive models (GAMs) fitted using the <em>mgcv</em> package, via a reimplementation of the <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> method for GAMs that <em>mgcv</em> provides, as well as <em>tidyverse</em> compatible representations of estimated smooths. Additionally, <em>gratia</em> supports several related packages that allow <em>mgcv</em>’s smooths to be included in their models:</p>
+<ul>
+<li>
+<em>GJRM</em>,</li>
+<li>
+<em>glmmTMB</em>,</li>
+<li>
+<em>gamm4</em>,</li>
+<li>
+<em>scam</em>,</li>
+<li><em>sdmTMB</em></li>
+</ul>
 </div>
 <div class="section level2">
 <h2 id="citation">Citation<a class="anchor" aria-label="anchor" href="#citation"></a>
@@ -108,26 +119,47 @@
 <div class="section level2">
 <h2 id="features">Features<a class="anchor" aria-label="anchor" href="#features"></a>
 </h2>
-<p>The main features of <em>gratia</em> are currently</p>
 <ul>
 <li>
-<p>A <em>ggplot2</em>-based replacement for <code>mgcv:::plot.gam()</code>: <code><a href="reference/draw.gam.html">draw.gam()</a></code>.</p>
-<p>For example, the classic four term additive example from Gu &amp; Wahba:</p>
-<figure><p><img src="reference/figures/README-draw-gam-figure-1.png" alt="Estimated smooths from a GAM"></p>
-<figcaption aria-hidden="true"><p>Estimated smooths from a GAM</p>
-</figcaption></figure><p>Or for a bivariate smooth:</p>
-<figure><p><img src="reference/figures/README-draw-gam-figure-2d-1.png" alt="Estimated smooths from a GAM"></p>
-<figcaption aria-hidden="true"><p>Estimated smooths from a GAM</p>
-</figcaption></figure><p>Univariate, <em>factor</em> and <em>continuous</em> <code>by</code>-variable smooths, simple random effect smooths (<code>bs = "re"</code>), factor-smooth interaction smooths (<code>bs = "fs"</code>), constrained factor smooths (<code>bs = "sz"</code>), soap-film smooths (<code>bs = "so"</code>) and their boundary (<code>bs = "sf"</code>) and wiggly (<code>bs = "sw"</code>) components, and bivariate, trivariate, and quadvariate TPRS and tensor product smooths are supported,</p>
-</li>
-<li><p>Estimation of derivatives of fitted smoothers: <code><a href="reference/derivatives.html">derivatives()</a></code>,</p></li>
-<li><p>Estimation of point-wise across-the-function confidence intervals and simultaneous intervals for smooths: <code><a href="reference/confint.gam.html">confint.gam()</a></code>.</p></li>
-<li>
-<p>Model diagnostics via <code><a href="reference/appraise.html">appraise()</a></code></p>
-<figure><p><img src="reference/figures/README-appraise-figure-1.png" alt="Model diagnostics figure"></p>
-<figcaption aria-hidden="true"><p>Model diagnostics figure</p>
+<p><strong>Visualise model effects.</strong> Plot smooths, parametric effects and interactions with <code><a href="reference/draw.html">draw()</a></code>, including surfaces and effects that vary between groups. Customise individual plots or complete figures using native ggplot2 themes. For example, draw the smooths and partial residuals from a GAM:</p>
+<figure><p><img src="reference/figures/README-draw-gam-figure-1.png" alt="Estimated smooths and partial residuals from a GAM"></p>
+<figcaption aria-hidden="true"><p>Estimated smooths and partial residuals from a GAM</p>
+</figcaption></figure><p>Or plot a smooth surface:</p>
+<figure><p><img src="reference/figures/README-draw-gam-figure-2d-1.png" alt="Estimated smooth surface from a GAM"></p>
+<figcaption aria-hidden="true"><p>Estimated smooth surface from a GAM</p>
 </figcaption></figure>
 </li>
+<li>
+<p><strong>Understand how effects and predictions change.</strong> Estimate derivatives, compare smooths, contrast fitted responses between groups, and calculate accumulated local effects. Work with transformed covariates while displaying effects on their original scales. Here, <code><a href="reference/conditional_differences.html">conditional_differences()</a></code> compares fitted responses for two groups across a covariate:</p>
+<figure><p><img src="reference/figures/README-conditional-differences-figure-1.png" alt="Difference in fitted responses between two groups"></p>
+<figcaption aria-hidden="true"><p>Difference in fitted responses between two groups</p>
+</figcaption></figure>
+</li>
+<li>
+<p><strong>Quantify uncertainty across smooths.</strong> Calculate pointwise and simultaneous intervals for smooths, derivatives, differences and predictions. For example, estimate how quickly a smooth changes with <code><a href="reference/derivatives.html">derivatives()</a></code> and draw its derivative with a 95% simultaneous interval:</p>
+<figure><p><img src="reference/figures/README-derivatives-figure-1.png" alt="Derivative of a smooth with a simultaneous interval"></p>
+<figcaption aria-hidden="true"><p>Derivative of a smooth with a simultaneous interval</p>
+</figcaption></figure>
+</li>
+<li>
+<p><strong>Check models with diagnostics suited to their response distributions.</strong> Use <code><a href="reference/appraise.html">appraise()</a></code> for an overview of model fit, or draw individual diagnostic plots. Check a wide range of response distributions, including categorical and censored responses, using appropriate residuals and posterior predictive checks. Plots designed for large datasets keep diagnostic displays readable while using all observations.</p>
+<figure><p><img src="reference/figures/README-appraise-figure-1.png" alt="Residual diagnostics for a GAM"></p>
+<figcaption aria-hidden="true"><p>Residual diagnostics for a GAM</p>
+</figcaption></figure>
+</li>
+<li>
+<p><strong>Explore the fitted response distribution.</strong> Estimate and plot response means, variances and other distribution summaries, with uncertainty. These tools also work with models where several distribution parameters depend on covariates. Here, <code><a href="reference/conditional_moments.html">conditional_moments()</a></code> shows how mean acceleration and its standard deviation vary with time in the motorcycle impact data:</p>
+<figure><p><img src="reference/figures/README-response-moments-figure-1.png" alt="Estimated mean and standard deviation of acceleration over time"></p>
+<figcaption aria-hidden="true"><p>Estimated mean and standard deviation of acceleration over time</p>
+</figcaption></figure>
+</li>
+<li>
+<p><strong>Simulate from fitted models.</strong> Generate coefficient, smooth, derivative, fitted-response and predictive draws from approximate posterior distributions. Multiple chains, sampling diagnostics, and integration with <a href="https://CRAN.R-project.org/package=posterior" class="external-link">posterior</a>, <a href="https://CRAN.R-project.org/package=coda" class="external-link">coda</a> and <a href="https://CRAN.R-project.org/package=bayesplot" class="external-link">bayesplot</a> support more extensive posterior exploration. For example, <code><a href="reference/smooth_samples.html">smooth_samples()</a></code> generates possible smooth curves:</p>
+<figure><p><img src="reference/figures/README-smooth-samples-figure-1.png" alt="Twenty draws of a smooth from its approximate posterior distribution"></p>
+<figcaption aria-hidden="true"><p>Twenty draws of a smooth from its approximate posterior distribution</p>
+</figcaption></figure>
+</li>
+<li><p><strong>Use familiar tools across more model classes.</strong> Explore shape-constrained models from <a href="https://CRAN.R-project.org/package=scam" class="external-link">scam</a> and <code><a href="https://rdrr.io/pkg/mgcv/man/scasm.html" class="external-link">mgcv::scasm()</a></code>, as well as models from <a href="https://CRAN.R-project.org/package=GJRM" class="external-link">GJRM</a>, <a href="https://CRAN.R-project.org/package=gamm4" class="external-link">gamm4</a>, <a href="https://CRAN.R-project.org/package=glmmTMB" class="external-link">glmmTMB</a> and <a href="https://CRAN.R-project.org/package=sdmTMB" class="external-link">sdmTMB</a>. See the articles on <a href="https://gavinsimpson.github.io/gratia/articles/scam-support.html">SCAM</a>, <a href="https://gavinsimpson.github.io/gratia/articles/glmmTMB-support.html">glmmTMB</a> and <a href="https://gavinsimpson.github.io/gratia/articles/sdmTMB-support.html">sdmTMB</a> for the operations supported by these model classes.</p></li>
 </ul>
 </div>
 <div class="section level2">
@@ -137,16 +169,20 @@
 <p><em>gratia</em> is now available on CRAN, and can be installed with</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"gratia"</span><span class="op">)</span></span></code></pre></div>
-<p>however <em>gratia</em> is under active development and you may wish to install the development version from github. The easiest way to do this is via the <code>install_github()</code> function from package <em>remotes</em>. Make sure you have <em>remotes</em> installed, then run</p>
+<p>however <em>gratia</em> is under active development and you may wish to install the development version from github. The easiest way to do this is via the binary packages of the development version that are provided by rOpenSci’s R Universe service:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"gavinsimpson/gratia"</span><span class="op">)</span></span></code></pre></div>
-<p>to install the package. Alternatively, binary packages of the development version are available from rOpenSci’s R Universe service:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Install gratia in R</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"gratia"</span>, repos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
-<span>  <span class="st">"https://gavinsimpson.r-universe.dev"</span>,</span>
-<span>  <span class="st">"https://cloud.r-project.org"</span></span>
-<span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span></span>
+<span>  <span class="st">"gratia"</span>,</span>
+<span>  repos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>    <span class="st">"https://gavinsimpson.r-universe.dev"</span>,</span>
+<span>    <span class="st">"https://cloud.r-project.org"</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>Alternatively, install from source using the <code>install_github()</code> function from package <em>remotes</em>. Make sure you have <em>remotes</em> installed, then run</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"gavinsimpson/gratia"</span><span class="op">)</span></span></code></pre></div>
+<p>to install the package.</p>
 </div>
 <div class="section level2">
 <h2 id="history">History<a class="anchor" aria-label="anchor" href="#history"></a>
@@ -156,7 +192,7 @@
 <div class="section level2">
 <h2 id="why-gratia">Why <em>gratia</em>?<a class="anchor" aria-label="anchor" href="#why-gratia"></a>
 </h2>
-<p>In naming his <a href="https://github.com/greta-dev/greta" class="external-link"><em>greta</em></a> package, Nick Golding observed the recent phenomena of naming statistical modelling software, such as Stan or Edward, after individuals that played a prominent role in the development of the field. This lead Nick to name his Tensor Flow-based package <em>greta</em> after <a href="https://greta-stats.org/articles/webpages/why_greta.html" class="external-link"><em>Grete Hermann</em></a>.</p>
+<p>In naming his <em>greta</em> package, Nick Golding observed the recent phenomena of naming statistical modelling software, such as Stan or Edward, after individuals that played a prominent role in the development of the field. This lead Nick to name his Tensor Flow-based package <em>greta</em> after <em>Grete Hermann</em>.</p>
 <p>In the same spirit, <em>gratia</em> is named in recognition of the contributions of <a href="https://en.wikipedia.org/wiki/Grace_Wahba" class="external-link">Grace Wahba</a>, who did pioneering work on the penalised spline models that are at the foundation of the way GAMs are estimated in <em>mgcv</em>. I wanted to name the package <em>grace</em>, to explicitly recognise Grace’s contributions, but unfortunately there was already a package named <em>Grace</em> on CRAN. So I looked elsewhere for inspiration.</p>
 <p>The English word “grace” derives from the Latin <em>gratia</em>, meaning “favour, charm, thanks” (<a href="https://www.merriam-webster.com/dictionary/grace" class="external-link">according to Merriam Webster</a>).</p>
 <p>The chair that Grace Wahba currently holds is named after <a href="https://en.wikipedia.org/wiki/Isaac_Jacob_Schoenberg" class="external-link">Isaac J Schoenberg</a>, a former University Madison-Wisconsin Professor of Mathematics, who in a 1946 paper provided the first mathematical reference to “splines”. (Hence the previous name for the package.)</p>
