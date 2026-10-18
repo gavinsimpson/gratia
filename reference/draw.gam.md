@@ -670,44 +670,14 @@ Gavin L. Simpson
 ``` r
 load_mgcv()
 
-# simulate some data
-df1 <- data_sim("eg1", n = 400, dist = "normal", scale = 2, seed = 2)
-# fit GAM
+# Simulate data and fit a GAM
+df1 <- data_sim("eg1", n = 200, dist = "normal", scale = 2, seed = 2)
 m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df1, method = "REML")
 
-# plot all smooths
+# Plot all smooths
 draw(m1)
 
 
-# can add partial residuals
-draw(m1, residuals = TRUE)
-
-
-df2 <- data_sim("eg2", n = 1000, dist = "normal", scale = 1, seed = 2)
-m2 <- gam(y ~ s(x, z, k = 40), data = df2, method = "REML")
-draw(m2, contour = FALSE, n_2d = 50)
-
-draw(m2, surface = "tile", n_2d = 30)
-
-
-if (requireNamespace("ggcube", quietly = TRUE)) {
-  draw(m2, surface = "3d", n_2d = 20,
-    surface_3d = list(yaw = 45, persp = FALSE))
-  draw(m2, surface = "3d", ci_3d = TRUE, n_2d = 20) &
-    ggplot2::theme(gratia.alpha.surface.interval = 0.12)
-  panels <- assemble(m2, surface = "3d", n_2d = 20)
-  # Replace coordinates to customize a single term; retain the current theme.
-  panels[[1]] <- panels[[1]] +
-    ggcube::coord_3d(yaw = -20,
-      light = ggcube::light(backface_scale = 1))[[1]]
-  patchwork::wrap_plots(panels)
-}
-#> Coordinate system already present.
-#> i Adding new coordinate system, which will replace the existing one.
-
-
 # See https://gavinsimpson.github.io/gratia/articles/custom-plotting.html
-# for more examples and for details on how to modify the theme of all the
-# plots produced by draw(). To modify all panels, for example to change the
-# theme, use the & operator
+# for more examples. Use the & operator to modify the theme of all panels.
 ```

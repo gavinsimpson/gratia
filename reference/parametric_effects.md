@@ -187,55 +187,32 @@ drawn as additional surfaces.
 ``` r
 load_mgcv()
 
-# Simulate group-specific slopes and a three-variable interaction
+# Simulate numeric and factor effects
 set.seed(42)
 d <- data.frame(
-  x0 = runif(200),
-  x1 = runif(200),
-  x2 = runif(200, -1, 1),
-  x3 = runif(200, 1, 2),
-  group = factor(rep(c("A", "B"), each = 100))
+  x = runif(100),
+  group = factor(rep(c("A", "B"), each = 50))
 )
-d$y <- with(d, 2 * x0 + (group == "B") * (1 + x0) +
-  3 * x1 * x2 * x3 + rnorm(200, sd = 0.25))
-m <- gam(y ~ x0 * group + x1:x2:x3, data = d, method = "REML")
+d$y <- with(d, 2 * x + (group == "B") + rnorm(100, sd = 0.25))
+m <- gam(y ~ x + group, data = d, method = "REML")
 
-# The interaction surface is shown at four values of x3
-pe <- parametric_effects(m, n_2d = 20, n_3d = 4)
+# Estimate and draw the contribution of each parametric term
+pe <- parametric_effects(m)
+pe
+#> # A tibble: 102 x 6
+#>    .term .type   .value .level .partial    .se
+#>    <chr> <chr>    <dbl> <chr>     <dbl>  <dbl>
+#>  1 x     numeric  0.915 NA        1.91  0.0412
+#>  2 x     numeric  0.937 NA        1.96  0.0423
+#>  3 x     numeric  0.286 NA        0.598 0.0411
+#>  4 x     numeric  0.830 NA        1.73  0.0375
+#>  5 x     numeric  0.642 NA        1.34  0.0329
+#>  6 x     numeric  0.519 NA        1.08  0.0333
+#>  7 x     numeric  0.737 NA        1.54  0.0345
+#>  8 x     numeric  0.135 NA        0.281 0.0493
+#>  9 x     numeric  0.657 NA        1.37  0.0330
+#> 10 x     numeric  0.705 NA        1.47  0.0338
+#> # i 92 more rows
 draw(pe)
 
-draw(m, parametric = TRUE, terms = "x0:group")
-
-
-# Render the same interaction as 3D surfaces
-if (requireNamespace("ggcube", quietly = TRUE)) {
-  pe_surface <- parametric_effects(m, terms = "x1:x2:x3",
-    n_2d = 20, n_3d = 4)
-  draw(pe_surface, surface = "3d")
-}
-
-
-# Draw a transformed covariate on either scale
-m_log <- gam(y ~ log(x1), data = d)
-draw(m_log) # log(x1) on the x axis
-#> Error in recover_raw_data(object, data = data, envir = envir): Cannot recover raw model covariates.
-#> x object 'd' not found
-#> i Supply reference `data` and, if needed, `envir`; stored transformed values
-#>   cannot be inverted automatically.
-#> Caused by error:
-#> ! object 'd' not found
-draw(m_log, back_transform = TRUE) # x1 on the x axis
-#> Error in recover_raw_data(object, data = data, envir = envir): Cannot recover raw model covariates.
-#> x object 'd' not found
-#> i Supply reference `data` and, if needed, `envir`; stored transformed values
-#>   cannot be inverted automatically.
-#> Caused by error:
-#> ! object 'd' not found
-draw(parametric_effects(m_log), back_transform = TRUE)
-#> Error in recover_raw_data(object, data = data, envir = envir): Cannot recover raw model covariates.
-#> x object 'd' not found
-#> i Supply reference `data` and, if needed, `envir`; stored transformed values
-#>   cannot be inverted automatically.
-#> Caused by error:
-#> ! object 'd' not found
 ```
