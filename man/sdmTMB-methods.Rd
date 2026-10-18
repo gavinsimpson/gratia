@@ -72,7 +72,7 @@ second. Character selections use \code{\link[=smooths]{smooths()}} labels, such 
 and \code{s.1(x)} for the second component.}
 
 \item{unconditional, frequentist}{Must be \code{FALSE}. Intervals use the joint
-TMB or RTMB covariance; mgcv-specific alternatives are unavailable.}
+RTMB covariance; mgcv-specific alternatives are unavailable.}
 
 \item{envir}{Optional environment for evaluating model covariates.}
 
@@ -115,7 +115,9 @@ penalties are supported. Fits require stored smooth metadata; mapping or
 profiling required coefficients and non-positive-definite Hessians
 give errors.
 
-Support is for sdmTMB >= 1.1.0, including development fits using RTMB.
+Support requires sdmTMB >= 1.2.0 models fitted with the RTMB backend.
+Refit older models or TMB fits with
+\code{control = sdmTMB::sdmTMBcontrol(backend = "rtmb")}.
 Diagnostics use complete fitted predictors, including spatial, spatiotemporal
 and independent group effects and offsets. Supported single-response and standard delta
 families provide PIT/quantile residuals, ordinary and scalable diagnostic

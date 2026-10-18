@@ -1,5 +1,5 @@
 test_that("sdmTMB fitted diagnostics agree with native conditional calibration", {
-  skip_if_not_installed("sdmTMB")
+  skip_if_not_installed("sdmTMB", minimum_version = "1.2.0")
   set.seed(123)
   d <- data.frame(x = seq(-1, 1, length.out = 60), offset = 0.3)
   d$y <- rnorm(60, 1 + d$x + d$offset, sd = 0.7)
@@ -14,7 +14,7 @@ test_that("sdmTMB fitted diagnostics agree with native conditional calibration",
 })
 
 test_that("sdmTMB delta diagnostics calibrate the entire response mixture", {
-  skip_if_not_installed("sdmTMB")
+  skip_if_not_installed("sdmTMB", minimum_version = "1.2.0")
   set.seed(345)
   d <- data.frame(x = seq(-1, 1, length.out = 80))
   d$y <- rbinom(80, 1, 0.65) * rgamma(80, shape = 2, scale = 0.8)
@@ -62,7 +62,7 @@ test_that("sdmTMB diagnostics identify unsupported dispersion formulas", {
 })
 
 test_that("sdmTMB binomial counts use trial-sized probability bounds", {
-  skip_if_not_installed("sdmTMB")
+  skip_if_not_installed("sdmTMB", minimum_version = "1.2.0")
   set.seed(42)
   d <- data.frame(x = runif(60), n = sample(3:10, 60, replace = TRUE))
   d$y <- rbinom(60, d$n, plogis(d$x))
@@ -85,7 +85,7 @@ test_that("sdmTMB binomial counts use trial-sized probability bounds", {
 })
 
 test_that("sdmTMB diagnostics retain fitted IID effects", {
-  skip_if_not_installed("sdmTMB")
+  skip_if_not_installed("sdmTMB", minimum_version = "1.2.0")
   if (!full_test_run()) {
     withr::local_options(gratia.diagnostics.marginal_draws = 29L)
   }
@@ -105,7 +105,7 @@ test_that("sdmTMB diagnostics retain fitted IID effects", {
 })
 
 test_that("sdmTMB spatial calibration retains the fitted field", {
-  skip_if_not_installed("sdmTMB")
+  skip_if_not_installed("sdmTMB", minimum_version = "1.2.0")
   set.seed(202)
   d <- data.frame(x = runif(50), north = runif(50))
   d$y <- sin(3 * d$x) + cos(3 * d$north) + rnorm(50, sd = 0.3)

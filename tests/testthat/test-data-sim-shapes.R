@@ -27,24 +27,28 @@ test_that("shape functions and analytic derivatives have the advertised signs", 
   expect_equal(attr(d, "truth")$parameters$dispersion, exp(d$f_scale))
 })
 
-test_that("scasm reference recipes fit and enforce the requested shapes", {
-  skip_if_not(exists("scasm", asNamespace("mgcv")))
-  constraints <- list(increasing = "m+", decreasing = "m-", convex = "c+", concave = "c-",
-    positive = "+", increasing_convex = c("m+", "c+"), increasing_concave = c("m+", "c-"),
-    decreasing_convex = c("m-", "c+"), decreasing_concave = c("m-", "c-"))
-  for (shape in names(constraints)) {
+scasm_recipe_constraints <- list(
+  increasing = "m+", decreasing = "m-", convex = "c+", concave = "c-",
+  positive = "+", increasing_convex = c("m+", "c+"),
+  increasing_concave = c("m+", "c-"), decreasing_convex = c("m-", "c+"),
+  decreasing_concave = c("m-", "c-"))
+
+for (shape in names(scasm_recipe_constraints)) {
+  test_that(paste("scasm reference recipe fits and enforces", shape), {
+    skip_if_not(exists("scasm", asNamespace("mgcv")))
     d <- data_sim(paste0("sc_", shape), n = 160, seed = 21)
-    xt <- constraints[[shape]]
+    xt <- scasm_recipe_constraints[[shape]]
     form <- if (shape == "positive") y ~ s(x, bs = "sc", xt = xt, k = 7) - 1 else
       y ~ s(x, bs = "sc", xt = xt, k = 7)
-    m <- mgcv::scasm(form, data = d, bs = 0)
+    m <- builder_diagnostic_step(paste("scasm fit", shape),
+      mgcv::scasm(form, data = d, bs = 0))
     expect_true(all(drop(m$Ain %*% stats::coef(m)) >= m$bin - 1e-7), info = shape)
     expect_true(all(is.finite(smooth_estimates(m)$.estimate)), info = shape)
     deriv <- derivatives(m, order = if (shape %in% c("convex", "concave")) 2 else 1)
     expect_true(all(is.finite(deriv$.derivative)), info = shape)
     if (shape == "positive") expect_true(all(stats::predict(m) >= -1e-7))
-  }
-})
+  })
+}
 
 test_that("documented univariate scasm recipes fit and enforce their shapes", {
   skip_if_not(exists("scasm", asNamespace("mgcv")))

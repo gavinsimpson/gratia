@@ -12,41 +12,51 @@ permissions:
 
 jobs:
   compatibility:
-    runs-on: ubuntu-latest
-    name: sdmTMB (${{ matrix.config.name }})
+    runs-on: ${{ matrix.config.os }}
+    name: sdmTMB (${{ matrix.config.os }}, ${{ matrix.config.name }})
     strategy:
       fail-fast: false
       matrix:
         config:
-          - {name: legacy-1.1.0, package: 'sdmTMB@1.1.0', backend: ''}
-          - {name: release-TMB, package: 'any::sdmTMB', backend: tmb}
-          - {name: release-RTMB, package: 'any::sdmTMB', backend: rtmb}
+          - {os: ubuntu-latest, name: release-RTMB, package: 'any::sdmTMB', backend: rtmb}
+          - {os: windows-11-arm, name: release-RTMB, package: 'any::sdmTMB', backend: rtmb, diagnostics: 'true'}
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       NOT_CRAN: 'true'
       VDIFFR_RUN_TESTS: 'false'
       GRATIA_SDMTMB_BACKEND: ${{ matrix.config.backend }}
+      GRATIA_TEST_DIAGNOSTICS: ${{ matrix.config.diagnostics || 'false' }}
     steps:
       - uses: actions/checkout@v6
       - uses: r-lib/actions/setup-r@v2
         with:
-          use-public-rspm: true
+          use-public-rspm: ${{ runner.arch != 'ARM64' }}
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: |
             any::pkgload
             any::glmmTMB
+            any::RTMB
             ${{ matrix.config.package }}
           needs: check
       - name: Check formula effects and response diagnostics
         run: |
           backend <- Sys.getenv("GRATIA_SDMTMB_BACKEND")
-          if (nzchar(backend)) options(sdmTMB.backend = backend)
-          pkgload::load_all()
-          print(packageVersion("sdmTMB"))
-          source("tests/testthat/helper-vdiffr.R")
-          files <- list.files("tests/testthat", pattern = "^test-sdmtmb.*\\.R$",
-            full.names = TRUE)
-          for (file in files) testthat::test_file(file,
-            reporter = "summary", stop_on_failure = TRUE)
+          stopifnot(requireNamespace("RTMB", quietly = TRUE),
+            packageVersion("sdmTMB") >= "1.2.0", backend == "rtmb")
+          options(sdmTMB.backend = "rtmb")
+          if (Sys.getenv("RUNNER_ARCH") == "ARM64") {
+            stopifnot(grepl("aarch64|arm64", R.version$platform, ignore.case = TRUE))
+          }
+          print(sessionInfo())
+          for (package in c("sdmTMB", "RTMB", "TMB", "Matrix", "mgcv")) {
+            cat(package, as.character(packageVersion(package)), "\n")
+          }
+          cat("Requested sdmTMB backend:", backend, "\n")
+          reporter <- if (Sys.getenv("GRATIA_TEST_DIAGNOSTICS") == "true") {
+            testthat::MultiReporter$new(list(testthat::SummaryReporter$new(),
+              testthat::LocationReporter$new(file = stderr())))
+          } else "summary"
+          testthat::test_local(filter = "^sdmtmb", reporter = reporter,
+            stop_on_failure = TRUE)
         shell: Rscript {0}

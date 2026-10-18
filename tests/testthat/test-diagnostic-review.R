@@ -46,7 +46,7 @@ test_that("appraisal retains distribution checks when a response mean is undefin
 
 
 test_that("prepared field diagnostics use requested conventions in every plot path", {
-  skip_if_not_installed("sdmTMB")
+  skip_if_not_installed("sdmTMB", minimum_version = "1.2.0")
   set.seed(86)
   d <- data.frame(group = factor(rep(1:5, each = 6)), y = rnorm(30))
   m <- sdmTMB::sdmTMB(y ~ 1 + (1 | group), data = d, family = gaussian(),

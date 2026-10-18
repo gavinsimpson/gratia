@@ -289,7 +289,7 @@ test_that("glmmTMB forwards bounds for smooth and parametric distributional effe
 })
 
 test_that("sdmTMB drawing and assembly forward bounds for both delta components", {
-  skip_if_not_installed("sdmTMB", "1.1.0")
+  skip_if_not_installed("sdmTMB", minimum_version = "1.2.0")
   d <- ci3d_data()
   d$positive <- withr::with_seed(114,
     ifelse(runif(nrow(d)) < 0.6, exp(d$y), 0))

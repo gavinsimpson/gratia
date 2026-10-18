@@ -1,9 +1,18 @@
 # sdmTMB stores smooth null-space coefficients in bs and penalized weights in
 # b_smooth. Delta components are columns of both matrices, not separate bases.
-sdmtmb_components <- function(object) {
-  if (!requireNamespace("sdmTMB", quietly = TRUE)) {
-    stop("Package 'sdmTMB' is required.", call. = FALSE)
+check_sdmtmb_fit <- function(object) {
+  rlang::check_installed(c("sdmTMB", "RTMB"), version = c("1.2.0", NA))
+  if (is.null(object$version) || object$version < "1.2.0" ||
+      !identical(object$backend, "rtmb")) {
+    stop("gratia requires sdmTMB >= 1.2.0 models fitted with the RTMB backend; ",
+      "refit with control = sdmTMB::sdmTMBcontrol(backend = \"rtmb\").",
+      call. = FALSE)
   }
+  invisible(NULL)
+}
+
+sdmtmb_components <- function(object) {
+  check_sdmtmb_fit(object)
   if (is.null(object$last.par.best) || is.null(object$parlist)) {
     stop("Expected a fitted sdmTMB model with stored parameters.",
       call. = FALSE)
@@ -20,7 +29,7 @@ sdmtmb_bases <- function(object) {
   stored <- object$smoothers$basis_out
   bases <- if (is.list(stored)) do.call(c, stored)
   if (isTRUE(as.logical(object$tmb_data$has_smooths)) && !length(bases)) {
-    stop("sdmTMB smooth metadata is unavailable; refit with sdmTMB >= 1.1.0.",
+    stop("sdmTMB smooth metadata is unavailable; refit with sdmTMB >= 1.2.0.",
       call. = FALSE
     )
   }
@@ -76,15 +85,7 @@ sdmtmb_joint_covariance <- function(object, index) {
         call. = FALSE
       )
     }
-    # Current development routes both TMB and RTMB through this helper. Older
-    # releases have only the TMB backend. Keep that dependency boundary here.
-    ns <- asNamespace("sdmTMB")
-    report <- if (exists("sdreport_sdmTMB", ns, inherits = FALSE)) {
-      get("sdreport_sdmTMB", ns)
-    } else {
-      TMB::sdreport
-    }
-    sdr <- report(object$tmb_obj, getJointPrecision = TRUE)
+    sdr <- RTMB::sdreport(object$tmb_obj, getJointPrecision = TRUE)
   }
   mixed_joint_covariance(sdr, p, index, "sdmTMB")
 }
@@ -267,7 +268,7 @@ sdmtmb_smooth_model <- function(
 #'   smooths are selected explicitly, as for [draw.gam()].
 #' @param residuals Must be `FALSE`; partial residuals are not supported.
 #' @param unconditional,frequentist Must be `FALSE`. Intervals use the joint
-#'   TMB or RTMB covariance; mgcv-specific alternatives are unavailable.
+#'   RTMB covariance; mgcv-specific alternatives are unavailable.
 #' @param envir Optional environment for evaluating model covariates.
 #' @param ... Arguments passed to the corresponding gratia methods, including
 #'   grid, interval, transformation, surface, styling and layout controls.
@@ -291,7 +292,9 @@ sdmtmb_smooth_model <- function(
 #' profiling required coefficients and non-positive-definite Hessians
 #' give errors.
 #'
-#' Support is for sdmTMB >= 1.1.0, including development fits using RTMB.
+#' Support requires sdmTMB >= 1.2.0 models fitted with the RTMB backend.
+#' Refit older models or TMB fits with
+#' `control = sdmTMB::sdmTMBcontrol(backend = "rtmb")`.
 #' Diagnostics use complete fitted predictors, including spatial, spatiotemporal
 #' and independent group effects and offsets. Supported single-response and standard delta
 #' families provide PIT/quantile residuals, ordinary and scalable diagnostic

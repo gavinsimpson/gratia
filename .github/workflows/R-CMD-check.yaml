@@ -19,7 +19,9 @@ jobs:
       matrix:
         config:
           - {os: macOS-latest,   r: 'release', tests: 'full', not_cran: 'true'}
+          - {os: macOS-latest,   r: 'oldrel', tests: 'CRAN core', not_cran: 'false'}
           - {os: windows-latest, r: 'release', tests: 'full', not_cran: 'true'}
+          - {os: windows-11-arm, r: 'release', tests: 'full', not_cran: 'true'}
           - {os: ubuntu-latest,   r: 'devel', http-user-agent: 'release', tests: 'full', not_cran: 'true'}
           - {os: ubuntu-latest,   r: 'release', tests: 'full', not_cran: 'true'}
           - {os: ubuntu-latest,   r: 'release', tests: 'CRAN core', not_cran: 'false'}
@@ -42,7 +44,14 @@ jobs:
         with:
           r-version: ${{ matrix.config.r }}
           http-user-agent: ${{ matrix.config.http-user-agent }}
-          use-public-rspm: always
+          use-public-rspm: ${{ runner.os != 'Windows' || runner.arch != 'ARM64' }}
+
+      - name: Verify native Windows ARM R
+        if: runner.os == 'Windows' && runner.arch == 'ARM64'
+        shell: Rscript {0}
+        run: |
+          stopifnot(grepl("aarch64|arm64", R.version$platform, ignore.case = TRUE))
+          print(sessionInfo())
 
       - name: Install ghostscript on Linux
         if: runner.os == 'Linux'

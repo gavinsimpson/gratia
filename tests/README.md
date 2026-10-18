@@ -28,8 +28,9 @@ Actions summary, plus an `hgam-test-timings` CSV artifact retained for 90 days.
 Per-test times include work performed before a visual snapshot skip; the total
 also includes shared setup and runner overhead.
 
-The R-CMD-check matrix runs the broader suite on all its platforms and an
-additional CRAN-core check on Linux. Coverage uses the broader suite. A separate
+The R-CMD-check matrix runs the broader suite on its release/development
+platforms and CRAN-core checks on Linux and macOS oldrel. Coverage uses the
+broader suite. A separate
 macOS job runs visual comparisons with a fixed R version and Apple Accelerate
 BLAS, matching the local baseline environment; image differences
 should be reviewed, not automatically accepted. Existing platform restrictions
@@ -57,3 +58,27 @@ on legacy numerical snapshots remain in place.
 For an installed-package check, export `NOT_CRAN=false` (core) or `NOT_CRAN=true`
 (broader suite) before `R CMD check`. The existing Makefile targets
 `check-test-cran` and `check` respectively set these variables.
+
+## Builder diagnostics
+
+Each scasm reference shape has a separate named test, so fitting errors identify
+the shape even when fitting stops before an assertion.
+
+Windows ARM package checks automatically print test locations and flushed
+START/DONE checkpoints around the Student-t fitting, diagnostic and predictive
+calls. An abrupt process exit leaves the last START without its matching DONE.
+The sdmTMB compatibility workflow also runs these diagnostics on Windows ARM
+with sdmTMB >= 1.2.0 and the RTMB backend, and records dependency versions.
+
+To enable the same checkpoints on another platform:
+
+```r
+Sys.setenv(GRATIA_TEST_DIAGNOSTICS = "true")
+testthat::test_local(
+  filter = "^(data-sim-shapes|sdmtmb-student-predictive)$",
+  reporter = "location"
+)
+```
+
+Set `GRATIA_TEST_DIAGNOSTICS=false` to disable them explicitly. Calls expected
+to raise an error also have no DONE; their enclosing tests still finish normally.

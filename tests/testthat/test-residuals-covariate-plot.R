@@ -363,7 +363,7 @@ test_that("GJRM smooth labels expand covariates across equations", {
 })
 
 test_that("sdmTMB components keep their fitted observation rows", {
-  skip_if_not_installed("sdmTMB")
+  skip_if_not_installed("sdmTMB", minimum_version = "1.2.0")
   f <- covariate_plot_fixture()
   m <- sdmTMB::sdmTMB(y ~ s(x, k = 5), data = f$data, spatial = "off")
   p <- residuals_covariate_plot(m, terms = smooths(m), smooth = FALSE,

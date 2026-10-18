@@ -204,7 +204,7 @@ test_that("new Gaussian posterior adapters reject unsupported requests", {
 })
 
 test_that("delta posterior checks retain selected components and rows", {
-  skip_if_not_installed("sdmTMB")
+  skip_if_not_installed("sdmTMB", minimum_version = "1.2.0")
   withr::local_seed(345)
   d <- data.frame(x = seq(-1, 1, length.out = 80))
   d$y <- rbinom(80, 1, 0.65) * rgamma(80, shape = 2, scale = 0.8)

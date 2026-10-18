@@ -74,6 +74,7 @@ sdmtmb_response_dependence <- function(model, conditioning, field_method, keep) 
 # delta response together. Select response components and rows afterwards.
 sdmtmb_diagnostic_model <- function(model, conditioning = NULL,
     component = "response", field_method = c("mle-mvn", "mle-eb", "mle-mvn-integrated"), seed = NULL) {
+  check_sdmtmb_fit(model)
   conditioning <- match.arg(conditioning %||% "conditional", c("conditional", "marginal"))
   field_method <- match.arg(field_method)
   component <- match.arg(component, c("response", "binomial", "positive"))

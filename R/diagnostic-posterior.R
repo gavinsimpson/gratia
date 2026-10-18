@@ -517,6 +517,7 @@ posterior_samples.glmmTMB <- function(
 # Extract fitting observations without requiring an analytic response CDF.
 # Native posterior simulations can cover more families than residual diagnostics.
 sdmtmb_posterior_observations <- function(model, component = "response") {
+  check_sdmtmb_fit(model)
   component <- match.arg(component, c("response", "binomial", "positive"))
   delta <- isTRUE(model$family$delta)
   if (!delta && component != "response") stop(
@@ -558,6 +559,7 @@ diagnostic_posterior_observed.sdmTMB <- function(model, conditioning = NULL,
 diagnostic_posterior_sampler.sdmTMB <- function(model, n, seed = NULL,
                                                conditioning = NULL,
                                                component = "response", ...) {
+  check_sdmtmb_fit(model)
   if (!is.null(list(...)$field_method)) stop(
     "'field_method' selects residual diagnostics; posterior predictive draws use ",
     "their joint coefficient and field approximation.", call. = FALSE)
@@ -577,10 +579,7 @@ diagnostic_posterior_sampler.sdmTMB <- function(model, n, seed = NULL,
   index <- seq_along(p)
   draws <- diagnostic_joint_parameter_draws(p, n, model$sd_report,
     report = function() {
-      ns <- asNamespace("sdmTMB")
-      report <- if (exists("sdreport_sdmTMB", ns, inherits = FALSE))
-        get("sdreport_sdmTMB", ns) else TMB::sdreport
-      report(model$tmb_obj, getJointPrecision = TRUE)
+      RTMB::sdreport(model$tmb_obj, getJointPrecision = TRUE)
     }, label = "sdmTMB")
   observed <- sdmtmb_posterior_observations(model, component)
   delta <- isTRUE(model$family$delta)

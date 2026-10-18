@@ -1,4 +1,4 @@
-skip_if_not_installed("sdmTMB", minimum_version = "1.1.0")
+skip_if_not_installed("sdmTMB", minimum_version = "1.2.0")
 
 sdmtmb_test_data <- function() {
   withr::local_seed(823)
@@ -15,14 +15,9 @@ sdmtmb_test_data <- function() {
   d
 }
 
-# The same tests run against the release and development backends in CI.
+# Fit explicitly with the backend supported by gratia.
 sdmtmb_test_fit <- function(formula, data, ...) {
-  backend <- Sys.getenv("GRATIA_SDMTMB_BACKEND")
-  control <- if (nzchar(backend)) {
-    sdmTMB::sdmTMBcontrol(backend = backend)
-  } else {
-    sdmTMB::sdmTMBcontrol()
-  }
+  control <- sdmTMB::sdmTMBcontrol(backend = "rtmb")
   sdmTMB::sdmTMB(formula, data = data, spatial = "off", control = control, ...)
 }
 
@@ -204,9 +199,7 @@ test_that("parametric effects retain fitted transforms and contrasts", {
 test_that("spatial and IID effects are excluded from formula plots", {
   d <- sdmtmb_test_data()
   mesh <- sdmTMB::make_mesh(d, c("X", "Y"), n_knots = 15)
-  control <- sdmTMB::sdmTMBcontrol()
-  backend <- Sys.getenv("GRATIA_SDMTMB_BACKEND")
-  if (nzchar(backend)) control <- sdmTMB::sdmTMBcontrol(backend = backend)
+  control <- sdmTMB::sdmTMBcontrol(backend = "rtmb")
   withr::local_seed(245)
   d$y <- d$y + 2 * sin(4 * d$X) + 2 * cos(4 * d$Y)
   m <- sdmTMB::sdmTMB(y ~ z + s(x, k = 5) + (1 | g), d,
@@ -282,6 +275,28 @@ test_that("unavailable sdmTMB reports and metadata fail explicitly", {
   m$control$profile <- FALSE
   m$smoothers$basis_out <- NULL
   expect_error(draw(m), "smooth metadata")
+})
+
+test_that("sdmTMB methods require recent fits made with RTMB", {
+  d <- sdmtmb_test_data()
+  m <- sdmTMB::sdmTMB(y ~ s(x, k = 5), data = d, spatial = "off",
+    control = sdmTMB::sdmTMBcontrol(backend = "tmb"))
+  methods <- list(smooths, smooth_estimates, parametric_effects, draw,
+    response_distribution, diagnostic_data, quantile_residuals,
+    function(model) posterior_predictive_plot(model, n = 2, seed = 1),
+    function(model) posterior_samples(model, n_draws = 2, seed = 1))
+  for (method in methods) {
+    expect_error(method(m), "sdmTMB >= 1.2.0.*RTMB")
+  }
+
+  m <- sdmtmb_test_fit(y ~ s(x, k = 5), d)
+  m$version <- package_version("1.1.0")
+  expect_error(smooth_estimates(m), "sdmTMB >= 1.2.0.*RTMB")
+  expect_error(diagnostic_data(m), "sdmTMB >= 1.2.0.*RTMB")
+  expect_error(posterior_samples(m, n_draws = 2), "sdmTMB >= 1.2.0.*RTMB")
+  m$version <- package_version("1.2.0")
+  m$backend <- NULL
+  expect_error(draw(m), "sdmTMB >= 1.2.0.*RTMB")
 })
 
 test_that("sdmTMB plots retain the existing smooth visual conventions", {

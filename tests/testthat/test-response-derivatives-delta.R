@@ -145,7 +145,11 @@ test_that("delta supports BAM smooths and preserves single-row predictions", {
     expected <- out[1, ]
     estimates <- c(".derivative", ".se", ".lower_ci", ".upper_ci")
     metadata <- setdiff(names(expected), estimates)
-    expect_identical(attributes(one), attributes(expected))
+    # R versions can store the same attributes in a different order.
+    expect_setequal(names(attributes(one)), names(attributes(expected)))
+    for (nm in names(attributes(expected))) {
+      expect_identical(attr(one, nm), attr(expected, nm))
+    }
     expect_identical(one[metadata], expected[metadata])
     # Second finite differences amplify prediction roundoff across batch sizes.
     expect_equal(one[estimates], expected[estimates], tolerance = 1e-7)

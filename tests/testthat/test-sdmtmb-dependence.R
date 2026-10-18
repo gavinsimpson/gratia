@@ -27,7 +27,7 @@ sdmtmb_dependence_state <- function(family = gaussian(), iid = FALSE,
 }
 
 test_that("sdm diagnostic modes use their stated native joint response law", {
-  skip_if_not_installed("sdmTMB")
+  skip_if_not_installed("sdmTMB", minimum_version = "1.2.0")
   withr::local_options(gratia.diagnostics.marginal_draws = 29L)
   m <- sdmtmb_dependence_state(iid = TRUE)
   for (setting in list(c("conditional", "mle-eb"), c("conditional", "mle-mvn"),
@@ -73,7 +73,7 @@ test_that("sdm diagnostic modes use their stated native joint response law", {
 })
 
 test_that("sdm dependence follows shared design and native smoother selection", {
-  skip_if_not_installed("sdmTMB")
+  skip_if_not_installed("sdmTMB", minimum_version = "1.2.0")
   withr::local_options(gratia.diagnostics.marginal_draws = 29L)
   m <- sdmtmb_dependence_state(iid = TRUE, unique_groups = TRUE)
   expect_true(sdmtmb_response_dependence(m, "conditional", "mle-mvn-integrated", 1:12)$independent)
@@ -87,7 +87,7 @@ test_that("sdm dependence follows shared design and native smoother selection", 
 })
 
 test_that("native temporal simulations retain AR1 field covariance", {
-  skip_if_not_installed("sdmTMB")
+  skip_if_not_installed("sdmTMB", minimum_version = "1.2.0")
   withr::local_options(gratia.diagnostics.marginal_draws = 29L)
   m <- sdmtmb_dependence_state(temporal = TRUE)
   values <- simulate(m, nsim = 2000, seed = 1, re_form = NA,
@@ -108,7 +108,7 @@ test_that("native temporal simulations retain AR1 field covariance", {
 })
 
 test_that("nonlinear spatial and delta laws retain native dependence and means", {
-  skip_if_not_installed("sdmTMB")
+  skip_if_not_installed("sdmTMB", minimum_version = "1.2.0")
   withr::local_options(gratia.diagnostics.marginal_draws = 29L)
   for (family in list(poisson(), sdmTMB::delta_gamma(),
       sdmTMB::delta_gamma(type = "poisson-link"))) {
@@ -164,7 +164,7 @@ test_that("nonlinear spatial and delta laws retain native dependence and means",
 })
 
 test_that("PPC parameter draws do not add a second fitted-field draw", {
-  skip_if_not_installed("sdmTMB")
+  skip_if_not_installed("sdmTMB", minimum_version = "1.2.0")
   withr::local_options(gratia.diagnostics.marginal_draws = 29L)
   m <- sdmtmb_dependence_state(iid = TRUE)
   testthat::local_mocked_bindings(diagnostic_joint_parameter_draws = function(p, n, ...) {
@@ -182,7 +182,7 @@ test_that("PPC parameter draws do not add a second fitted-field draw", {
 
 
 test_that("sdm field modes reach ordinary, scalable and prepared plot paths", {
-  skip_if_not_installed("sdmTMB")
+  skip_if_not_installed("sdmTMB", minimum_version = "1.2.0")
   withr::local_options(gratia.diagnostics.marginal_draws = 29L)
   m <- sdmtmb_dependence_state(iid = TRUE)
   prepared <- diagnostic_data(m, seed = 4, field_method = "mle-eb")
@@ -211,7 +211,7 @@ test_that("sdm field modes reach ordinary, scalable and prepared plot paths", {
 
 
 test_that("marginal PPC rejects latent blocks outside verified native simulation", {
-  skip_if_not_installed("sdmTMB")
+  skip_if_not_installed("sdmTMB", minimum_version = "1.2.0")
   m <- sdmtmb_dependence_state(iid = TRUE)
   testthat::local_mocked_bindings(sdmtmb_random_tags = function(model) "unverified_effect")
   expect_error(posterior_samples(m, n_draws = 1, conditioning = "marginal"),

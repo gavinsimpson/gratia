@@ -350,10 +350,9 @@
   (`conditioning = "marginal"`). Plot labels identify the choice. Posterior
   predictive checks separately include approximate parameter uncertainty. See
   `?diagnostic_support` for what these checks assess and their limitations.
-  Delta-model diagnostics accept the dispersion parameter layouts in sdmTMB
-  1.1.0 and 1.2.0, including the TMB and RTMB backends. Fits with a dispersion
-  formula give an explicit error because observation-specific dispersion is
-  not yet supported by these diagnostics.
+  Delta-model diagnostics use the response family's dispersion parameter.
+  Fits with a dispersion formula give an explicit error because
+  observation-specific dispersion is not yet supported by these diagnostics.
 
 * Diagnostic plots now support uncensored univariate `GJRM::gamlss()` models
   with N, LN, GA, GAi, P, NBI and NBII families. They use randomised quantile
@@ -461,9 +460,9 @@
 
 * `draw()` and `assemble()` now support formula smooths and parametric effects
   from sdmTMB models, including both predictors of delta models. Companion
-  methods provide smooth labels, coefficients and effect estimates. Smooths
-  use joint TMB/RTMB covariance; tensor smooths with multiple penalties are
-  supported.
+  methods provide smooth labels, coefficients and effect estimates. Support
+  requires sdmTMB >= 1.2.0 models fitted with the RTMB backend. Smooths use joint
+  RTMB covariance; tensor smooths with multiple penalties are supported.
 
 * Smooth plot subtitles now identify the model part or distributional
   parameter for glmmTMB, mgcv and `GJRM::gamlss()` models with multiple linear

@@ -1368,41 +1368,15 @@ detaching ‘package:mgcv’
 >
 > load_mgcv()
 >
-> # simulate some data
-> df1 <- data_sim("eg1", n = 400, dist = "normal", scale = 2, seed = 2)
-> # fit GAM
+> # Simulate data and fit a GAM
+> df1 <- data_sim("eg1", n = 200, dist = "normal", scale = 2, seed = 2)
 > m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df1, method = "REML")
 >
-> # plot all smooths
+> # Plot all smooths
 > draw(m1)
 >
-> # can add partial residuals
-> draw(m1, residuals = TRUE)
->
-> df2 <- data_sim("eg2", n = 1000, dist = "normal", scale = 1, seed = 2)
-> m2 <- gam(y ~ s(x, z, k = 40), data = df2, method = "REML")
-> draw(m2, contour = FALSE, n_2d = 50)
-> draw(m2, surface = "tile", n_2d = 30)
->
-> if (requireNamespace("ggcube", quietly = TRUE)) {
-+   draw(m2, surface = "3d", n_2d = 20,
-+     surface_3d = list(yaw = 45, persp = FALSE))
-+   draw(m2, surface = "3d", ci_3d = TRUE, n_2d = 20) &
-+     ggplot2::theme(gratia.alpha.surface.interval = 0.12)
-+   panels <- assemble(m2, surface = "3d", n_2d = 20)
-+   # Replace coordinates to customize a single term; retain the current theme.
-+   panels[[1]] <- panels[[1]] +
-+     ggcube::coord_3d(yaw = -20,
-+       light = ggcube::light(backface_scale = 1))[[1]]
-+   patchwork::wrap_plots(panels)
-+ }
-Coordinate system already present.
-i Adding new coordinate system, which will replace the existing one.
->
 > # See https://gavinsimpson.github.io/gratia/articles/custom-plotting.html
-> # for more examples and for details on how to modify the theme of all the
-> # plots produced by draw(). To modify all panels, for example to change the
-> # theme, use the & operator
+> # for more examples. Use the & operator to modify the theme of all panels.
 >
 >
 >
@@ -2671,52 +2645,49 @@ detaching ‘package:mgcv’
 
 > nameEx("parametric_effects")
 > ### * parametric_effects
-> 
+>
 > flush(stderr()); flush(stdout())
-> 
+>
 > ### Name: parametric_effects
 > ### Title: Estimated values for parametric model terms
 > ### Aliases: parametric_effects parametric_effects.gamm4
 > ###   parametric_effects.gam parametric_effects.scam
-> 
+>
 > ### ** Examples
-> 
+>
 > load_mgcv()
-> 
-> # Simulate group-specific slopes and a three-variable interaction
+>
+> # Simulate numeric and factor effects
 > set.seed(42)
 > d <- data.frame(
-+   x0 = runif(200),
-+   x1 = runif(200),
-+   x2 = runif(200, -1, 1),
-+   x3 = runif(200, 1, 2),
-+   group = factor(rep(c("A", "B"), each = 100))
++   x = runif(100),
++   group = factor(rep(c("A", "B"), each = 50))
 + )
-> d$y <- with(d, 2 * x0 + (group == "B") * (1 + x0) +
-+   3 * x1 * x2 * x3 + rnorm(200, sd = 0.25))
-> m <- gam(y ~ x0 * group + x1:x2:x3, data = d, method = "REML")
-> 
-> # The interaction surface is shown at four values of x3
-> pe <- parametric_effects(m, n_2d = 20, n_3d = 4)
+> d$y <- with(d, 2 * x + (group == "B") + rnorm(100, sd = 0.25))
+> m <- gam(y ~ x + group, data = d, method = "REML")
+>
+> # Estimate and draw the contribution of each parametric term
+> pe <- parametric_effects(m)
+> pe
+# A tibble: 102 x 6
+   .term .type   .value .level .partial    .se
+   <chr> <chr>    <dbl> <chr>     <dbl>  <dbl>
+ 1 x     numeric  0.915 <NA>      1.91  0.0412
+ 2 x     numeric  0.937 <NA>      1.96  0.0423
+ 3 x     numeric  0.286 <NA>      0.598 0.0411
+ 4 x     numeric  0.830 <NA>      1.73  0.0375
+ 5 x     numeric  0.642 <NA>      1.34  0.0329
+ 6 x     numeric  0.519 <NA>      1.08  0.0333
+ 7 x     numeric  0.737 <NA>      1.54  0.0345
+ 8 x     numeric  0.135 <NA>      0.281 0.0493
+ 9 x     numeric  0.657 <NA>      1.37  0.0330
+10 x     numeric  0.705 <NA>      1.47  0.0338
+# i 92 more rows
 > draw(pe)
-> draw(m, parametric = TRUE, terms = "x0:group")
-> 
-> # Render the same interaction as 3D surfaces
-> if (requireNamespace("ggcube", quietly = TRUE)) {
-+   pe_surface <- parametric_effects(m, terms = "x1:x2:x3",
-+     n_2d = 20, n_3d = 4)
-+   draw(pe_surface, surface = "3d")
-+ }
-> 
-> # Draw a transformed covariate on either scale
-> m_log <- gam(y ~ log(x1), data = d)
-> draw(m_log) # log(x1) on the x axis
-> draw(m_log, back_transform = TRUE) # x1 on the x axis
-> draw(parametric_effects(m_log), back_transform = TRUE)
-> 
-> 
-> 
-> 
+>
+>
+>
+>
 > cleanEx()
 
 detaching ‘package:mgcv’

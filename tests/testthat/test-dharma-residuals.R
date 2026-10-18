@@ -275,7 +275,7 @@ test_that("scalable summaries retain endpoint residuals and labels", {
 })
 
 test_that("sdmTMB component and field options reach the response generator", {
-  skip_if_not_installed("sdmTMB", minimum_version = "1.1.0")
+  skip_if_not_installed("sdmTMB", minimum_version = "1.2.0")
   withr::local_seed(25)
   d <- data.frame(x = seq(-1, 1, length.out = 50))
   d$y <- rbinom(50, 1, .65) * rgamma(50, 2, scale = .8)
