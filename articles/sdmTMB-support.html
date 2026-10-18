@@ -114,11 +114,13 @@ Columbia. Biomass density is measured in kg/km²; <code>X</code> and
 years and the spatial and year-specific fields. Our adaptations add a
 separate mean for each survey year, use six basis functions for the
 depth smooth, and use the introduction’s 10 km mesh cutoff.</p>
-<p>You need the optional package <strong>sdmTMB &gt;= 1.1.0</strong>;
-older fitted objects may lack the stored smooth information that gratia
-needs. mgcv supplies the smooth syntax. The example also uses dplyr,
-tidyr, ggplot2 and patchwork. Fitting and simulation cost more than
-plotting an ordinary GAM, so we use modest simulation counts.</p>
+<p>You need the optional package <strong>sdmTMB &gt;= 1.2.0</strong> and
+models fitted with its RTMB backend, which is the default. Refit older
+models or TMB fits with
+<code>control = sdmTMBcontrol(backend = "rtmb")</code>. mgcv supplies
+the smooth syntax. The example also uses dplyr, tidyr, ggplot2 and
+patchwork. Fitting and simulation cost more than plotting an ordinary
+GAM, so we use modest simulation counts.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://sdmTMB.github.io/sdmTMB/" class="external-link">"sdmTMB"</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st">"mgcv"</span><span class="op">)</span></span>
@@ -654,7 +656,7 @@ multi-predictor families, threshold or nonlocal effects. It cannot use
 mapped or profiled coefficients needed for extraction, unavailable
 smooth metadata, or a covariance from a non-positive-definite Hessian.
 <code>unconditional = TRUE</code> and <code>frequentist = TRUE</code>
-are mgcv covariance choices and do not apply to these joint TMB
+are mgcv covariance choices and do not apply to these joint RTMB
 intervals. Use sdmTMB’s prediction and plotting methods for fields and
 unsupported formula effects. If the covariance is unavailable,
 investigate convergence before interpreting intervals. Diagnostic

@@ -87,7 +87,7 @@ draw(
 
 - unconditional, frequentist:
 
-  Must be `FALSE`. Intervals use the joint TMB or RTMB covariance;
+  Must be `FALSE`. Intervals use the joint RTMB covariance;
   mgcv-specific alternatives are unavailable.
 
 - envir:
@@ -144,14 +144,16 @@ smooths with multiple penalties are supported. Fits require stored
 smooth metadata; mapping or profiling required coefficients and
 non-positive-definite Hessians give errors.
 
-Support is for sdmTMB \>= 1.1.0, including development fits using RTMB.
-Diagnostics use complete fitted predictors, including spatial,
-spatiotemporal and independent group effects and offsets. Supported
-single-response and standard delta families provide PIT/quantile
-residuals, ordinary and scalable diagnostic plots, and joint approximate
-posterior predictive checks. Delta diagnostics can select the complete
-response, occurrence or positive component. Raw posterior response draws
-are available through
+Support requires sdmTMB \>= 1.2.0 models fitted with the RTMB backend.
+Refit older models or TMB fits with
+`control = sdmTMB::sdmTMBcontrol(backend = "rtmb")`. Diagnostics use
+complete fitted predictors, including spatial, spatiotemporal and
+independent group effects and offsets. Supported single-response and
+standard delta families provide PIT/quantile residuals, ordinary and
+scalable diagnostic plots, and joint approximate posterior predictive
+checks. Delta diagnostics can select the complete response, occurrence
+or positive component. Raw posterior response draws are available
+through
 [`posterior_samples()`](https://gavinsimpson.github.io/gratia/reference/posterior_samples.md).
 By default, fields are drawn together once from their approximate
 posterior and held fixed (`mle-mvn`), following sdmTMB's recommended

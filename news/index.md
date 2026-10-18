@@ -494,10 +494,10 @@
   uncertainty. See
   [`?diagnostic_support`](https://gavinsimpson.github.io/gratia/reference/diagnostic_support.md)
   for what these checks assess and their limitations. Delta-model
-  diagnostics accept the dispersion parameter layouts in sdmTMB 1.1.0
-  and 1.2.0, including the TMB and RTMB backends. Fits with a dispersion
-  formula give an explicit error because observation-specific dispersion
-  is not yet supported by these diagnostics.
+  diagnostics use the response family’s dispersion parameter. Fits with
+  a dispersion formula give an explicit error because
+  observation-specific dispersion is not yet supported by these
+  diagnostics.
 
 - Diagnostic plots now support uncensored univariate
   [`GJRM::gamlss()`](https://rdrr.io/pkg/GJRM/man/gamlss.html) models
@@ -663,8 +663,9 @@
   [`assemble()`](https://gavinsimpson.github.io/gratia/reference/assemble.md)
   now support formula smooths and parametric effects from sdmTMB models,
   including both predictors of delta models. Companion methods provide
-  smooth labels, coefficients and effect estimates. Smooths use joint
-  TMB/RTMB covariance; tensor smooths with multiple penalties are
+  smooth labels, coefficients and effect estimates. Support requires
+  sdmTMB \>= 1.2.0 models fitted with the RTMB backend. Smooths use
+  joint RTMB covariance; tensor smooths with multiple penalties are
   supported.
 
 - Smooth plot subtitles now identify the model part or distributional

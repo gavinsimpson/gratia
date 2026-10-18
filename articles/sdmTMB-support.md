@@ -27,9 +27,10 @@ year-specific fields. Our adaptations add a separate mean for each
 survey year, use six basis functions for the depth smooth, and use the
 introduction’s 10 km mesh cutoff.
 
-You need the optional package **sdmTMB \>= 1.1.0**; older fitted objects
-may lack the stored smooth information that gratia needs. mgcv supplies
-the smooth syntax. The example also uses dplyr, tidyr, ggplot2 and
+You need the optional package **sdmTMB \>= 1.2.0** and models fitted
+with its RTMB backend, which is the default. Refit older models or TMB
+fits with `control = sdmTMBcontrol(backend = "rtmb")`. mgcv supplies the
+smooth syntax. The example also uses dplyr, tidyr, ggplot2 and
 patchwork. Fitting and simulation cost more than plotting an ordinary
 GAM, so we use modest simulation counts.
 
@@ -653,7 +654,7 @@ multi-predictor families, threshold or nonlocal effects. It cannot use
 mapped or profiled coefficients needed for extraction, unavailable
 smooth metadata, or a covariance from a non-positive-definite Hessian.
 `unconditional = TRUE` and `frequentist = TRUE` are mgcv covariance
-choices and do not apply to these joint TMB intervals. Use sdmTMB’s
+choices and do not apply to these joint RTMB intervals. Use sdmTMB’s
 prediction and plotting methods for fields and unsupported formula
 effects. If the covariance is unavailable, investigate convergence
 before interpreting intervals. Diagnostic families and additional limits
