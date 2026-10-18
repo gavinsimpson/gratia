@@ -40,8 +40,7 @@ for (shape in names(scasm_recipe_constraints)) {
     xt <- scasm_recipe_constraints[[shape]]
     form <- if (shape == "positive") y ~ s(x, bs = "sc", xt = xt, k = 7) - 1 else
       y ~ s(x, bs = "sc", xt = xt, k = 7)
-    m <- builder_diagnostic_step(paste("scasm fit", shape),
-      mgcv::scasm(form, data = d, bs = 0))
+    m <- mgcv::scasm(form, data = d, bs = 0)
     expect_true(all(drop(m$Ain %*% stats::coef(m)) >= m$bin - 1e-7), info = shape)
     expect_true(all(is.finite(smooth_estimates(m)$.estimate)), info = shape)
     deriv <- derivatives(m, order = if (shape %in% c("convex", "concave")) 2 else 1)

@@ -1,10 +1,7 @@
 # stderr checkpoints survive an abrupt exit before testthat prints its summary.
-# Enable them automatically on Windows ARM, or explicitly on another builder.
+# The focused Windows ARM sdmTMB job enables them explicitly.
 builder_diagnostics_enabled <- function() {
-  setting <- Sys.getenv("GRATIA_TEST_DIAGNOSTICS")
-  if (nzchar(setting)) return(identical(setting, "true"))
-  .Platform$OS.type == "windows" &&
-    grepl("aarch64|arm64", R.version$platform, ignore.case = TRUE)
+  identical(Sys.getenv("GRATIA_TEST_DIAGNOSTICS"), "true")
 }
 
 builder_diagnostic_step <- function(label, code) {

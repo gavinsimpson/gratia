@@ -53,10 +53,5 @@ jobs:
             cat(package, as.character(packageVersion(package)), "\n")
           }
           cat("Requested sdmTMB backend:", backend, "\n")
-          reporter <- if (Sys.getenv("GRATIA_TEST_DIAGNOSTICS") == "true") {
-            testthat::MultiReporter$new(list(testthat::SummaryReporter$new(),
-              testthat::LocationReporter$new(file = stderr())))
-          } else "summary"
-          testthat::test_local(filter = "^sdmtmb", reporter = reporter,
-            stop_on_failure = TRUE)
+          testthat::test_local(filter = "^sdmtmb", stop_on_failure = TRUE)
         shell: Rscript {0}

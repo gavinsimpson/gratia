@@ -64,21 +64,25 @@ For an installed-package check, export `NOT_CRAN=false` (core) or `NOT_CRAN=true
 Each scasm reference shape has a separate named test, so fitting errors identify
 the shape even when fitting stops before an assertion.
 
-Windows ARM package checks automatically print test locations and flushed
-START/DONE checkpoints around the Student-t fitting, diagnostic and predictive
-calls. An abrupt process exit leaves the last START without its matching DONE.
-The sdmTMB compatibility workflow also runs these diagnostics on Windows ARM
-with sdmTMB >= 1.2.0 and the RTMB backend, and records dependency versions.
+All package checks use the normal testthat reporter. The full Windows ARM
+R-release check runs alongside the Windows x64 check, verifies that R is native
+ARM, and retains the repositories provided by the ARM R installation.
+
+Only the focused Windows ARM sdmTMB compatibility job enables the temporary
+START/DONE checkpoints around Student-t fitting, diagnostic and predictive
+calls. They write directly to stderr and flush immediately. An abrupt process
+exit leaves the last START without its matching DONE. This job uses
+sdmTMB >= 1.2.0 with RTMB and records dependency versions.
 
 To enable the same checkpoints on another platform:
 
 ```r
 Sys.setenv(GRATIA_TEST_DIAGNOSTICS = "true")
 testthat::test_local(
-  filter = "^(data-sim-shapes|sdmtmb-student-predictive)$",
-  reporter = "location"
+  filter = "^sdmtmb-student-predictive$"
 )
 ```
 
-Set `GRATIA_TEST_DIAGNOSTICS=false` to disable them explicitly. Calls expected
-to raise an error also have no DONE; their enclosing tests still finish normally.
+The checkpoints are disabled unless `GRATIA_TEST_DIAGNOSTICS=true` is set
+explicitly. Calls expected to raise an error also have no DONE; their enclosing
+tests still finish normally.
