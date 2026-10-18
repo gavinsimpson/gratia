@@ -42,6 +42,12 @@ against.}
 \description{
 Add partial residuals
 }
+\details{
+Partial residuals require working residuals and working weights from
+the fitted model. Families that do not provide these, including the
+location-scale families in \code{mgcv}, are not supported, even for terms in the
+location predictor.
+}
 \examples{
 load_mgcv()
 \dontshow{

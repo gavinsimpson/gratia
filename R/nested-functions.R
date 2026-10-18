@@ -202,6 +202,7 @@ nested_component_observations <- function(object, ids, data = NULL,
   smooths <- get_smooths_by_id(object, ids)
   values <- NULL
   if (partial) {
+    check_partial_residuals(object)
     used <- model_used_rows(object)
     values <- predict(used, newdata = used$model, type = "terms")
     columns <- ncol(values) - length(object$smooth) + ids

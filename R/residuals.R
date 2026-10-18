@@ -10,6 +10,10 @@
 #' observations are returned. Computation uses aligned working residuals,
 #' working weights and term predictions before restoring excluded positions.
 #'
+#' Partial residuals require working residuals and working weights from the
+#' fitted model. Families that do not provide these, including the location-scale
+#' families in `mgcv`, are not supported, even for terms in the location predictor.
+#'
 #' @export
 `partial_residuals` <- function(object, ...) {
   UseMethod("partial_residuals")
@@ -99,10 +103,27 @@
   partial_residuals(gamm4_gam(object), ...)
 }
 
+# Check the stored working quantities, not default residuals or prior weights.
+# General families can provide the latter without supporting partial residuals.
+check_partial_residuals <- function(object, warn = FALSE) {
+  if (!is.null(object[["residuals"]]) && !is.null(object[["weights"]])) {
+    return(TRUE)
+  }
+  msg <- paste0("Partial residuals are not available for family <",
+    family_name(family(object)), ">: working residuals and working weights ",
+    "are required.")
+  if (warn) {
+    warning(msg, " Drawing smooths without partial residuals.", call. = FALSE)
+    return(FALSE)
+  }
+  stop(msg, call. = FALSE)
+}
+
 ## Internal function to compute weighted residuals for use by other functions
 #' @importFrom stats residuals weights
 #' @importFrom tibble as_tibble
 `compute_partial_residuals` <- function(object, terms = NULL, data = NULL) {
+  check_partial_residuals(object)
   used <- model_used_rows(object)
   w <- weights(used, type = "working")
   w_resid <- as.numeric(residuals(used, "working")) * sqrt(w)

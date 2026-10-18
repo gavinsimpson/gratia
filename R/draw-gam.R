@@ -59,6 +59,8 @@
 #'   Fitted factor order and ordered status are retained.
 #' @param residuals logical; should partial residuals for a smooth be drawn?
 #'   Ignored for anything but a simple univariate smooth.
+#'   If the model does not provide working residuals and working weights,
+#'   warns once and draws the smooths without partial residuals.
 #' @param scales character; should all univariate smooths be plotted with the
 #'   same y-axis scale? If `scales = "free"`, the default, each univariate
 #'   smooth has its own y-axis scale. If `scales = "fixed"`, a common y axis

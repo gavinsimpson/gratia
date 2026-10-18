@@ -114,7 +114,9 @@ use the grid and surface controls below, as described in
 \code{\link[=parametric_effects]{parametric_effects()}}.}
 
 \item{residuals}{logical; should partial residuals for a smooth be drawn?
-Ignored for anything but a simple univariate smooth.}
+Ignored for anything but a simple univariate smooth.
+If the model does not provide working residuals and working weights,
+warns once and draws the smooths without partial residuals.}
 
 \item{scales}{character; should all univariate smooths be plotted with the
 same y-axis scale? If \code{scales = "free"}, the default, each univariate

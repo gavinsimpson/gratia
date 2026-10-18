@@ -38,6 +38,10 @@ With \code{na.exclude}, excluded observations are restored as \code{NA} partial
 residuals, in fitting order after any \code{subset}. With \code{na.omit}, only retained
 observations are returned. Computation uses aligned working residuals,
 working weights and term predictions before restoring excluded positions.
+
+Partial residuals require working residuals and working weights from the
+fitted model. Families that do not provide these, including the location-scale
+families in \code{mgcv}, are not supported, even for terms in the location predictor.
 }
 \examples{
 \dontshow{

@@ -173,6 +173,11 @@
 #'   available. S3 method dispatch is performed on the `model` argument.
 #' @param ... arguments passed to other methods.
 #'
+#' @details Partial residuals require working residuals and working weights from
+#'   the fitted model. Families that do not provide these, including the
+#'   location-scale families in `mgcv`, are not supported, even for terms in the
+#'   location predictor.
+#'
 #' @export
 `add_partial_residuals` <- function(data, model, ...) {
   UseMethod("add_partial_residuals", model)

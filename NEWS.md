@@ -625,6 +625,11 @@
 
 ## Bug fixes
 
+* `partial_residuals()` and `add_partial_residuals()` now give an informative
+  error for models without working residuals or working weights, including
+  mgcv's location-scale families. `draw(residuals = TRUE)` warns once and draws
+  the smooths without partial residuals for these models (#414).
+
 * `draw.difference_smooth()` now uses supplied `xlab` and `caption` values
   when drawing differences between curves.
 

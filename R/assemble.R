@@ -183,6 +183,9 @@
 
   # do we have any smooths to plot?
   if (any(select)) {
+    if (isTRUE(residuals)) {
+      residuals <- check_partial_residuals(object, warn = TRUE)
+    }
     # evaluate all requested smooths
     sm_eval <- smooth_estimates(object,
       envir = envir, back_transform = back_transform,
@@ -262,49 +265,45 @@
     # partial residuals, `partial_residual`
     p_resids_rng <- NULL
     if (isTRUE(residuals)) {
-      if (is.null(residuals(object)) || is.null(weights(object))) {
-        residuals <- FALSE
+      # get residuals in a suitable format
+      p_resids <- if (anyDuplicated(S)) {
+        nested_component_observations(object, which(select),
+          data = observation_data, partial = TRUE)
       } else {
-        # get residuals in a suitable format
-        p_resids <- if (anyDuplicated(S)) {
-          nested_component_observations(object, which(select),
-            data = observation_data, partial = TRUE)
-        } else {
-          nested_partial_residuals(object, terms = S[select], data = observation_data)
-        }
-
-        # compute the range of residuals for each smooth
-        # p_resids_rng <- p_resids |>
-        #     rowwise() |>
-        #     dplyr::reframe(rng =
-        #         range(.data$partial_residual$partial_residual)) |>
-        #     pluck("rng")
-        if (utils::packageVersion("dplyr") > "1.0.10") {
-          p_resids_rng <- p_resids |>
-            rowwise() |>
-            utils::getFromNamespace("reframe", "dplyr")(
-              rng = range(.data$partial_residual$partial_residual)) |>
-            pluck("rng")
-        } else {
-          p_resids_rng <- p_resids |>
-            rowwise() |>
-            summarise(
-              rng =
-                range(.data$partial_residual$partial_residual)
-            ) |>
-            pluck("rng")
-        }
-        if (".smooth_id" %in% names(sm_eval)) {
-          p_resids <- select(p_resids, all_of(c(".smooth_id", "partial_residual")))
-        } else p_resids$.smooth_id <- NULL
-        # merge with the evaluated smooth
-        sm_eval <- suppress_matches_multiple_warning(
-          left_join(sm_eval, p_resids,
-            by = if (".smooth_id" %in% names(sm_eval)) ".smooth_id" else {
-            if (anyDuplicated(S)) c(".smooth", ".type") else ".smooth"
-          })
-        )
+        nested_partial_residuals(object, terms = S[select], data = observation_data)
       }
+
+      # compute the range of residuals for each smooth
+      # p_resids_rng <- p_resids |>
+      #     rowwise() |>
+      #     dplyr::reframe(rng =
+      #         range(.data$partial_residual$partial_residual)) |>
+      #     pluck("rng")
+      if (utils::packageVersion("dplyr") > "1.0.10") {
+        p_resids_rng <- p_resids |>
+          rowwise() |>
+          utils::getFromNamespace("reframe", "dplyr")(
+            rng = range(.data$partial_residual$partial_residual)) |>
+          pluck("rng")
+      } else {
+        p_resids_rng <- p_resids |>
+          rowwise() |>
+          summarise(
+            rng =
+              range(.data$partial_residual$partial_residual)
+          ) |>
+          pluck("rng")
+      }
+      if (".smooth_id" %in% names(sm_eval)) {
+        p_resids <- select(p_resids, all_of(c(".smooth_id", "partial_residual")))
+      } else p_resids$.smooth_id <- NULL
+      # merge with the evaluated smooth
+      sm_eval <- suppress_matches_multiple_warning(
+        left_join(sm_eval, p_resids,
+          by = if (".smooth_id" %in% names(sm_eval)) ".smooth_id" else {
+          if (anyDuplicated(S)) c(".smooth", ".type") else ".smooth"
+        })
+      )
     }
 
     # add rug data?
