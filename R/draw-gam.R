@@ -49,6 +49,16 @@
 #'   Parametric estimates retain both scales; multi-column basis
 #'   expansions retain raw axes on either setting. Does not transform estimated
 #'   effects or their intervals; use `fun` for that.
+#' @param cyclic character; use Cartesian coordinates (`"cartesian"`, the
+#'   default) or polar coordinates (`"polar"`) for one-dimensional cyclic
+#'   smooths. Other smooths and parametric terms keep their usual displays.
+#' @param polar_args named list of options passed to [ggplot2::coord_radial()].
+#'   Accepts `start`, `reverse`, `inner.radius`, `r.axis.inside`,
+#'   `rotate.angle` and `clip`. The radial axis is inside the circle by
+#'   default (`r.axis.inside = TRUE`); supplied values override this default.
+#'   Other options use their ggplot2 defaults. Requires
+#'   `cyclic = "polar"` when nonempty. The angular variable, fitted cycle
+#'   boundaries, full-circle extent and angular expansion are set by gratia.
 #' @param mrf_plot character; display Markov random field smooths as area-labelled
 #'   estimates and intervals (`"effects"`, the default), or a descriptive Gaussian
 #'   quantile plot (`"qq"`). MRF effects are correlated and need not have equal
@@ -248,6 +258,25 @@
 #' default. Custom `title`, `xlab` and `ylab` can also be supplied through `...`.
 #' These labels apply to smooth panels.
 #'
+#' Polar plots support cyclic cubic and cyclic P splines, including positive
+#' cyclic P splines from scam, factor-by smooths and one-dimensional tensor
+#' smooths with a cyclic margin. The covariate forms the angular axis and the
+#' partial effect forms the radial axis, retaining their original numerical
+#' values and units. By default the lower fitted cycle boundary is at twelve
+#' o'clock, with values increasing clockwise. `scales = "fixed"` uses a common
+#' radial effect range. Grouped smooths must have matching cycle boundaries.
+#' The radial axis retains ggplot2's usual expansion, leaving space between
+#' the interval band and the outer rug. Angular limits have no expansion.
+#' Radial tick labels are inside the circle beside their grid rings by
+#' default. Set `polar_args = list(r.axis.inside = FALSE)` to place them
+#' outside, or supply a numeric covariate value to position the axis.
+#' With automatic evaluation data, `n` points span both fitted cycle boundaries.
+#' Supplied `data` and saved estimates keep their evaluation points, so partial
+#' cycle coverage leaves a gap. Saved estimates require the `cyclic_info`
+#' attribute returned by [smooth_estimates()]; recompute older estimates to
+#' obtain fitted boundaries. Polar plots of transformed cyclic covariates
+#' require `back_transform = FALSE`.
+#'
 #' Random-effect tensor plots put continuous covariates before factors. Two
 #' continuous covariates form a surface, with remaining factor levels and numeric
 #' slices forming conditioning panels, consistently for `te()`, `ti()` and `t2()`.
@@ -317,6 +346,13 @@
 #' # Plot all smooths
 #' draw(m1)
 #'
+#' # Draw a complete cycle in polar coordinates, using fitted knot boundaries
+#' m_cycle <- gam(y ~ s(x0, bs = "cc", k = 10), data = df1,
+#'   knots = list(x0 = c(0, 1)), method = "REML")
+#' draw(m_cycle, cyclic = "polar")
+#' draw(m_cycle, cyclic = "polar",
+#'   polar_args = list(start = -pi / 2, reverse = "theta"))
+#'
 #' # See https://gavinsimpson.github.io/gratia/articles/custom-plotting.html
 #' # for more examples. Use the & operator to modify the theme of all panels.
 `draw.gam` <- function(
@@ -376,7 +412,8 @@
   shape_source = c("gaussian", "bootstrap"),
   ..., variables = NULL,
   simultaneous_method = c('simulation', 'tube'),
-  simultaneous_domain = NULL, tube_control = list()
+  simultaneous_domain = NULL, tube_control = list(),
+  cyclic = c("cartesian", "polar"), polar_args = list()
 ) {
   .call <- match.call()
   .call[[1L]] <- if (is_scasm_model(object)) draw.scasm else draw_gam_impl
@@ -440,7 +477,8 @@ draw_gam_impl <- function(
   shape_source = c("gaussian", "bootstrap"),
   ..., variables = NULL,
   simultaneous_method = c('simulation', 'tube'),
-  simultaneous_domain = NULL, tube_control = list()
+  simultaneous_domain = NULL, tube_control = list(),
+  cyclic = c("cartesian", "polar"), polar_args = list()
 ) {
   surface <- match.arg(surface)
   validate_surface_3d(surface_3d)

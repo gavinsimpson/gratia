@@ -108,6 +108,16 @@
 
 ## New features
 
+* `draw()` and `assemble()` can draw one-dimensional cyclic smooths with
+  `cyclic = "polar"`, including factor-by and one-dimensional tensor smooths
+  across supported model classes. Fitted cycle boundaries configure the angular
+  axis and automatic evaluation grids span a complete cycle. Saved smooth
+  estimates retain these boundaries; supplied evaluation points are unchanged.
+  `polar_args` customizes the polar coordinate display. Radial padding
+  separates interval bands from the outer observation rug. Radial axes
+  appear inside the circle by default; override their position through
+  `polar_args`.
+
 * `draw.basis()` now plots basis functions of three- and four-covariate
   smooths as separate surfaces with conditioning facets (#258, #259).
   `basis()` and `draw.basis()` accept `variables` to choose the axes and

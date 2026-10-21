@@ -284,6 +284,9 @@ sdmtmb_smooth_model <- function(
 #' Use `surface = "3d", ci_3d = TRUE` in `draw()` or `assemble()` to add
 #' interval surfaces to smooths and numeric parametric interactions in either
 #' component. `ci_3d_alpha` and `ci_3d_col` control their opacity and fill colour.
+#' Pass `cyclic = "polar"` and optional `polar_args` to `draw()` or
+#' `assemble()` for polar plots of supported one-dimensional cyclic smooths.
+#' See [draw.gam()] for the coordinate options.
 #'
 #' Delta components have separate smooth and parametric coefficients and are
 #' drawn separately, with component subtitles. Upstream sdmTMB restrictions on

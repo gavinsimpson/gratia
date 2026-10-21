@@ -71,7 +71,9 @@
   variables = NULL,
   simultaneous_method = c("simulation", "tube"),
   simultaneous_domain = NULL,
-  tube_control = list()
+  tube_control = list(),
+  cyclic = c("cartesian", "polar"),
+  polar_args = list()
 )
 
 \method{draw}{scam}(object, ..., overall_uncertainty = FALSE, centre = c("model", "plot"))
@@ -407,6 +409,18 @@ lie inside the fitted spline support. Requires tube calibration.}
 and \code{root_tol} (\code{1e-8}). Requires tube calibration. Simulation controls
 \code{n_sim}, \code{n_cores} (or \code{ncores}), and \code{seed} are ignored by tube calibration.}
 
+\item{cyclic}{character; use Cartesian coordinates (\code{"cartesian"}, the
+default) or polar coordinates (\code{"polar"}) for one-dimensional cyclic
+smooths. Other smooths and parametric terms keep their usual displays.}
+
+\item{polar_args}{named list of options passed to \code{\link[ggplot2:coord_radial]{ggplot2::coord_radial()}}.
+Accepts \code{start}, \code{reverse}, \code{inner.radius}, \code{r.axis.inside},
+\code{rotate.angle} and \code{clip}. The radial axis is inside the circle by
+default (\code{r.axis.inside = TRUE}); supplied values override this default.
+Other options use their ggplot2 defaults. Requires
+\code{cyclic = "polar"} when nonempty. The angular variable, fitted cycle
+boundaries, full-circle extent and angular expansion are set by gratia.}
+
 \item{centre}{character; for SCAM models, \code{"model"} retains each fitted
 smooth contribution. \code{"plot"} subtracts the evaluation-grid mean from
 each bivariate smooth to match \code{\link[scam:plot.scam]{scam::plot.scam()}}. The same linear
@@ -435,6 +449,25 @@ By-variable information is appended to the default subtitle. Supply \code{subtit
 through \code{...} to replace it, or \code{subtitle = ""} to suppress it; \code{NULL} uses the
 default. Custom \code{title}, \code{xlab} and \code{ylab} can also be supplied through \code{...}.
 These labels apply to smooth panels.
+
+Polar plots support cyclic cubic and cyclic P splines, including positive
+cyclic P splines from scam, factor-by smooths and one-dimensional tensor
+smooths with a cyclic margin. The covariate forms the angular axis and the
+partial effect forms the radial axis, retaining their original numerical
+values and units. By default the lower fitted cycle boundary is at twelve
+o'clock, with values increasing clockwise. \code{scales = "fixed"} uses a common
+radial effect range. Grouped smooths must have matching cycle boundaries.
+The radial axis retains ggplot2's usual expansion, leaving space between
+the interval band and the outer rug. Angular limits have no expansion.
+Radial tick labels are inside the circle beside their grid rings by
+default. Set \code{polar_args = list(r.axis.inside = FALSE)} to place them
+outside, or supply a numeric covariate value to position the axis.
+With automatic evaluation data, \code{n} points span both fitted cycle boundaries.
+Supplied \code{data} and saved estimates keep their evaluation points, so partial
+cycle coverage leaves a gap. Saved estimates require the \code{cyclic_info}
+attribute returned by \code{\link[=smooth_estimates]{smooth_estimates()}}; recompute older estimates to
+obtain fitted boundaries. Polar plots of transformed cyclic covariates
+require \code{back_transform = FALSE}.
 
 Random-effect tensor plots put continuous covariates before factors. Two
 continuous covariates form a surface, with remaining factor levels and numeric
@@ -491,6 +524,13 @@ m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df1, method = "REML")
 
 # Plot all smooths
 draw(m1)
+
+# Draw a complete cycle in polar coordinates, using fitted knot boundaries
+m_cycle <- gam(y ~ s(x0, bs = "cc", k = 10), data = df1,
+  knots = list(x0 = c(0, 1)), method = "REML")
+draw(m_cycle, cyclic = "polar")
+draw(m_cycle, cyclic = "polar",
+  polar_args = list(start = -pi / 2, reverse = "theta"))
 
 # See https://gavinsimpson.github.io/gratia/articles/custom-plotting.html
 # for more examples. Use the & operator to modify the theme of all panels.

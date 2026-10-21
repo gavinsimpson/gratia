@@ -120,6 +120,9 @@ by glmmTMB; gratia does not expand the smooth types glmmTMB can fit.
 Use \code{draw(model, surface = "3d", ci_3d = TRUE)} for interval surfaces on
 smooths and numeric parametric interactions in any linear predictor.
 \code{ci_3d_alpha} and \code{ci_3d_col} control their opacity and fill colour.
+Pass \code{cyclic = "polar"} and optional \code{polar_args} to \code{draw()} or
+\code{assemble()} for polar plots of supported one-dimensional cyclic smooths.
+See \code{\link[=draw.gam]{draw.gam()}} for the coordinate options.
 
 Parametric effects use fitted contrast coding and exclude smooth null-space
 coefficients. Their intervals include uncertainty in the intercept of their

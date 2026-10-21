@@ -70,7 +70,9 @@
   variables = NULL,
   simultaneous_method = c("simulation", "tube"),
   simultaneous_domain = NULL,
-  tube_control = list()
+  tube_control = list(),
+  cyclic = c("cartesian", "polar"),
+  polar_args = list()
 )
 
 \method{assemble}{scam}(object, ..., overall_uncertainty = FALSE, centre = c("model", "plot"))
@@ -400,6 +402,18 @@ lie inside the fitted spline support. Requires tube calibration.}
 and \code{root_tol} (\code{1e-8}). Requires tube calibration. Simulation controls
 \code{n_sim}, \code{n_cores} (or \code{ncores}), and \code{seed} are ignored by tube calibration.}
 
+\item{cyclic}{character; use Cartesian coordinates (\code{"cartesian"}, the
+default) or polar coordinates (\code{"polar"}) for one-dimensional cyclic
+smooths. Other smooths and parametric terms keep their usual displays.}
+
+\item{polar_args}{named list of options passed to \code{\link[ggplot2:coord_radial]{ggplot2::coord_radial()}}.
+Accepts \code{start}, \code{reverse}, \code{inner.radius}, \code{r.axis.inside},
+\code{rotate.angle} and \code{clip}. The radial axis is inside the circle by
+default (\code{r.axis.inside = TRUE}); supplied values override this default.
+Other options use their ggplot2 defaults. Requires
+\code{cyclic = "polar"} when nonempty. The angular variable, fitted cycle
+boundaries, full-circle extent and angular expansion are set by gratia.}
+
 \item{centre}{character; for SCAM models, \code{"model"} retains each fitted
 smooth contribution. \code{"plot"} subtracts the evaluation-grid mean from
 each bivariate smooth to match \code{\link[scam:plot.scam]{scam::plot.scam()}}. The same linear
@@ -416,7 +430,9 @@ Plots smooth and parametric contributions from a fitted GAM model using
 \details{
 Smooth plot subtitles identify the model part or distributional
 parameter as described in \code{\link[=draw.gam]{draw.gam()}}. Custom smooth labels, including
-\code{subtitle}, can be passed through \code{...}.
+\code{subtitle}, can be passed through \code{...}. Use \code{cyclic = "polar"} to draw
+one-dimensional cyclic smooths with polar coordinates; \code{polar_args}
+customizes the coordinate display as described in \code{\link[=draw.gam]{draw.gam()}}.
 }
 \note{
 Internally, plots of each smooth are created using \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}}

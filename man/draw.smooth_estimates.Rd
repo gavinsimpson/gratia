@@ -40,7 +40,9 @@
   mrf_plot = c("effects", "qq"),
   interval = NULL,
   ...,
-  variables = NULL
+  variables = NULL,
+  cyclic = c("cartesian", "polar"),
+  polar_args = list()
 )
 }
 \arguments{
@@ -227,9 +229,31 @@ Drawing saved estimates can change the order but uses only points already
 evaluated; evaluate again to change grid resolution or conditioning values.
 Continuous covariates must precede factors. Spherical smooths retain their
 latitude/longitude convention and do not support reordering.}
+
+\item{cyclic}{character; use Cartesian coordinates (\code{"cartesian"}, the
+default) or polar coordinates (\code{"polar"}) for one-dimensional cyclic
+smooths. Other smooths and parametric terms keep their usual displays.}
+
+\item{polar_args}{named list of options passed to \code{\link[ggplot2:coord_radial]{ggplot2::coord_radial()}}.
+Accepts \code{start}, \code{reverse}, \code{inner.radius}, \code{r.axis.inside},
+\code{rotate.angle} and \code{clip}. The radial axis is inside the circle by
+default (\code{r.axis.inside = TRUE}); supplied values override this default.
+Other options use their ggplot2 defaults. Requires
+\code{cyclic = "polar"} when nonempty. The angular variable, fitted cycle
+boundaries, full-circle extent and angular expansion are set by gratia.}
 }
 \description{
 Plot the result of a call to \code{smooth_estimates()}
+}
+\details{
+\code{cyclic = "polar"} uses fitted cycle boundaries stored in the
+\code{cyclic_info} attribute. Evaluation points are unchanged: estimates
+covering only part of a cycle leave a gap. To draw a complete cycle,
+supply both fitted boundary values when computing estimates, or use
+\code{draw(model, cyclic = "polar")} to generate the full-cycle grid.
+Recompute older saved estimates with \code{\link[=smooth_estimates]{smooth_estimates()}} if their
+fitted cycle boundaries are unavailable. See \code{\link[=draw.gam]{draw.gam()}} for supported
+smooths and coordinate options.
 }
 \examples{
 load_mgcv()
