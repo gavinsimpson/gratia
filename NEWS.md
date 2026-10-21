@@ -108,6 +108,12 @@
 
 ## New features
 
+* `draw.basis()` now plots basis functions of three- and four-covariate
+  smooths as separate surfaces with conditioning facets (#258, #259).
+  `basis()` and `draw.basis()` accept `variables` to choose the axes and
+  conditioning order. Automatic grids use the existing `n_2d`, `n_3d`, and
+  `n_4d` controls, and saved bases retain their chosen covariate order.
+
 * `fitted_moments()` and `conditional_moments()` estimate response means,
   variances, SDs, coefficients of variation, skewness and kurtosis. Delta-method
   intervals and joint Gaussian simulation propagate covariance between

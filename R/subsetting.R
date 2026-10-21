@@ -1,4 +1,18 @@
 #' @export
+#' @keywords internal
+#' @noRd
+`[.basis` <- function(x, i, j, drop = FALSE) {
+  orders <- attr(x, "plot_variables")
+  x <- NextMethod()
+  if (is.data.frame(x)) {
+    attr(x, "plot_variables") <- if (".smooth" %in% names(x)) {
+      orders[intersect(names(orders), unique(x$.smooth))]
+    } else NULL
+  }
+  x
+}
+
+#' @export
 #' @importFrom rlang has_name
 `[.smooth_samples` <- function(x, i, j, drop = FALSE) {
   cls <- class(x)

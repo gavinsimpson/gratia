@@ -22,7 +22,8 @@ basis(object, ...)
   n_4d = 4,
   partial_match = FALSE,
   envir = NULL,
-  ...
+  ...,
+  variables = NULL
 )
 
 \method{basis}{scam}(
@@ -35,7 +36,8 @@ basis(object, ...)
   n_3d = 16,
   n_4d = 4,
   partial_match = FALSE,
-  ...
+  ...,
+  variables = NULL
 )
 
 \method{basis}{gamm}(
@@ -48,7 +50,8 @@ basis(object, ...)
   n_3d = 16,
   n_4d = 4,
   partial_match = FALSE,
-  ...
+  ...,
+  variables = NULL
 )
 
 \method{basis}{gamm4}(
@@ -61,7 +64,8 @@ basis(object, ...)
   n_3d = 16,
   n_4d = 4,
   partial_match = FALSE,
-  ...
+  ...,
+  variables = NULL
 )
 
 \method{basis}{default}(
@@ -73,7 +77,8 @@ basis(object, ...)
   diagonalize = FALSE,
   coefficients = NULL,
   envir = NULL,
-  ...
+  ...,
+  variables = NULL
 )
 }
 \arguments{
@@ -115,6 +120,11 @@ new observations.}
 in model expressions. The available model formula environment is used when
 \code{NULL}. Covariate observations should be supplied in \code{data}.}
 
+\item{variables}{character; smooth covariates in plotting order. Supply every
+covariate exactly once. The first two define surface axes and the remaining
+covariates define conditioning facets. Selected smooths must have the same
+covariates. If \code{NULL}, use the usual smooth plotting order.}
+
 \item{knots}{a list or data frame with named components containing
 knots locations. Names must match the covariates for which the basis
 is required. See \code{\link[mgcv:smoothCon]{mgcv::smoothCon()}}.}
@@ -134,7 +144,8 @@ the penalty null space.}
 basis functions.}
 }
 \value{
-A tibble.
+A tibble with class \code{basis}. Its \code{plot_variables} attribute stores
+covariate orders by smooth label for subsequent plotting.
 }
 \description{
 Basis expansions from a definition of a smoother using the syntax of \emph{mgcv}'s
@@ -145,6 +156,9 @@ directly from a fitted GAM(M).
 When evaluating a fitted smooth at explicit data, missing covariates required
 by that smooth produce \code{NA} basis values. Missing values in other model
 variables do not discard otherwise evaluable rows.
+The covariate order chosen by \code{variables} also determines which automatically
+generated axes use \code{n_2d}, \code{n_3d}, and \code{n_4d}. Supplied \code{data} or \code{at} values
+are unchanged. Set a resolution argument to \code{NULL} to use \code{n} instead.
 }
 \examples{
 load_mgcv()

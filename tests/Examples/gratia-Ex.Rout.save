@@ -1270,6 +1270,17 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > 
 > bf <- basis(m, "s(x2)")
 > draw(bf)
+>
+> # A three-covariate basis, evaluated at two conditioning values
+> m3 <- gam(y ~ s(x0, x1, x2, k = 12), data = df)
+> bf3 <- basis(m3, variables = c("x1", "x2", "x0"),
++   n_2d = 15, n_3d = 2)
+> draw(bf3, ncol = 3)
+>
+> # Four covariates: conditioning values form facet rows and columns
+> m4 <- gam(y ~ s(x0, x1, x2, x3, k = 20), data = df)
+> bf4 <- basis(m4, n_2d = 15, n_4d = 2)
+> draw(bf4, ncol = 3)
 > 
 > 
 > 

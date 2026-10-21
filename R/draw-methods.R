@@ -305,6 +305,16 @@
 #' @param ... arguments passed to other methods. Not used by this method.
 #'
 #' @inheritParams draw.gam
+#' @inheritParams basis
+#'
+#' @details
+#' For smooths of three or four covariates, each basis function has its own
+#' plot. The first two covariates define the surface axes. Three-covariate
+#' smooths have wrapped facets for the third covariate; four-covariate smooths
+#' have the third covariate in rows and the fourth in columns. `ncol` and `nrow`
+#' control the outer arrangement of plots. Fill scales share a range within
+#' each smooth. Use `variables` in [basis()] to choose the axes before grid
+#' generation, or here to rearrange existing evaluations without resampling.
 #'
 #' @return A `patchwork` object.
 #'
@@ -312,7 +322,6 @@
 #'
 #' @importFrom purrr map map_lgl
 #' @importFrom patchwork wrap_plots
-#' @importFrom dplyr group_split
 #'
 #' @export
 #'
@@ -326,6 +335,17 @@
 #'
 #' bf <- basis(m, "s(x2)")
 #' draw(bf)
+#'
+#' # A three-covariate basis, evaluated at two conditioning values
+#' m3 <- gam(y ~ s(x0, x1, x2, k = 12), data = df)
+#' bf3 <- basis(m3, variables = c("x1", "x2", "x0"),
+#'   n_2d = 15, n_3d = 2)
+#' draw(bf3, ncol = 3)
+#'
+#' # Four covariates: conditioning values form facet rows and columns
+#' m4 <- gam(y ~ s(x0, x1, x2, x3, k = 20), data = df)
+#' bf4 <- basis(m4, n_2d = 15, n_4d = 2)
+#' draw(bf4, ncol = 3)
 `draw.basis` <- function(object,
                          legend = FALSE,
                          labeller = NULL,
@@ -338,10 +358,10 @@
                          contour = FALSE,
                          n_contour = 10,
                          contour_col = "black",
-                         ...) {
+                         ..., variables = NULL) {
   gratia_plot_arguments(c("contour_col"), environment())
   sm <- unique(object[[".smooth"]])
-  sm_l <- group_split(object, factor(.data$.smooth, levels = sm))
+  sm_l <- lapply(sm, function(label) object[object$.smooth == label, ])
   sm_plts <- map(sm_l,
     plot_basis,
     legend = legend,
@@ -354,7 +374,7 @@
     contour = contour,
     n_contour = n_contour,
     contour_col = contour_col,
-    ...
+    ..., variables = variables
   )
 
   # filter out NULLs as those are types of smooths we can't plot (yet)
@@ -365,6 +385,11 @@
     message("Unable to draw any of the bases.")
     return(invisible())
   }
+
+  # Higher-dimensional bases return one faceted plot per basis function.
+  sm_plts <- do.call(c, lapply(sm_plts, function(x) {
+    if (inherits(x, "ggplot")) list(x) else x
+  }))
 
   # return
   n_plots <- length(sm_plts)
@@ -388,9 +413,9 @@
                          contour = TRUE,
                          n_contour = 10,
                          contour_col = "black",
-                         ...) {
-  ## capture the univariate smooth variable
-  smooth_var <- vars_from_label(unique(object[[".smooth"]]))
+                         ..., variables = NULL) {
+  smooth_var <- basis_plot_variables(object, variables)
+  if (is.null(title)) title <- unique(object$.smooth)
   n_sms <- length(smooth_var)
 
   plt <- switch(n_sms,
@@ -398,15 +423,25 @@
       legend = legend,
       labeller = labeller, xlab = xlab, ylab = ylab,
       title = title, subtitle = subtitle, caption = caption,
-      angle = angle, ...
+      angle = angle, ..., variables = smooth_var
     ),
     plot_bivariate_basis(object,
       legend = legend,
       labeller = labeller, xlab = xlab, ylab = ylab,
       title = title, subtitle = subtitle, caption = caption,
       angle = angle, contour = contour, n_contour = n_contour,
-      contour_col = contour_col, ...
-    )
+      contour_col = contour_col, ..., variables = smooth_var
+    ),
+    plot_multivariate_basis(object, variables = smooth_var,
+      legend = legend, labeller = labeller, xlab = xlab, ylab = ylab,
+      title = title, subtitle = subtitle, caption = caption,
+      angle = angle, contour = contour, n_contour = n_contour,
+      contour_col = contour_col, ...),
+    plot_multivariate_basis(object, variables = smooth_var,
+      legend = legend, labeller = labeller, xlab = xlab, ylab = ylab,
+      title = title, subtitle = subtitle, caption = caption,
+      angle = angle, contour = contour, n_contour = n_contour,
+      contour_col = contour_col, ...)
   )
 
   plt
@@ -419,8 +454,8 @@
                                     title = NULL, subtitle = NULL,
                                     caption = NULL,
                                     angle = NULL,
-                                    ...) {
-  smooth_var <- vars_from_label(unique(object[[".smooth"]]))
+                                    ..., variables = NULL) {
+  smooth_var <- basis_plot_variables(object, variables)
   plt <- add_curve_interval(gratia_plot(object,
     aes(x = .data[[smooth_var]], y = .data[[".value"]],
       colour = .data[[".bf"]]))) +
@@ -446,11 +481,12 @@
                                    contour = TRUE,
                                    n_contour = 10,
                                    contour_col = "black",
-                                   ...) {
-  smooth_var <- vars_from_label(unique(object[[".smooth"]]))
+                                   ..., variables = NULL, fill_limits = NULL) {
+  smooth_var <- basis_plot_variables(object, variables)
   coord <- if (str_detect(object[[".type"]][1L], "TPRS")) coord_equal() else NULL
   plt <- prepare_surface_plot(object,
     x_var = smooth_var[1], y_var = smooth_var[2], fill_var = ".value",
+    fill_limits = fill_limits,
     mapping = aes(x = .data[[smooth_var[1]]], y = .data[[smooth_var[2]]],
       fill = .data[[".value"]], group = .data[[".bf"]]),
     labels = prepare_basis_labels(object, smooth_var, xlab = xlab, ylab = ylab,
@@ -467,6 +503,34 @@
   }
   plt
 
+}
+
+# Resolve saved orders before falling back to labels for older basis objects.
+basis_plot_variables <- function(object, variables = NULL) {
+  label <- unique(object$.smooth)
+  order <- attr(object, "plot_variables")[[label]]
+  if (is.null(order)) order <- vars_from_label(label)
+  resolved <- validate_plot_variables(variables, order)
+  if (!is.null(variables)) validate_plot_variable_types(resolved, object)
+  if (identical(unique(object$.type), "SOS") &&
+      !identical(unname(resolved), unname(order))) {
+    cli::cli_abort("`variables` cannot reorder latitude and longitude in a spline on the sphere.")
+  }
+  resolved
+}
+
+# Each basis function has its own conditioning facets and a shared fill range.
+plot_multivariate_basis <- function(object, variables, subtitle = NULL, ...) {
+  finite <- object$.value[is.finite(object$.value)]
+  limits <- if (length(finite)) range(finite) else NULL
+  bfs <- levels(object$.bf)
+  bfs <- bfs[bfs %in% unique(object$.bf)]
+  lapply(bfs, function(bf) {
+    data <- object[object$.bf == bf, ]
+    plot_bivariate_basis(data, variables = variables, fill_limits = limits,
+      subtitle = if (is.null(subtitle)) paste("Basis function", bf) else subtitle,
+      ...)
+  })
 }
 
 #' Plot posterior smooths

@@ -104,7 +104,7 @@ prepare_derivative_plot <- function(object, x_var, y_var, labels,
 #' Resolve labels for plots of basis functions
 #'
 #' @param object Basis evaluations with smooth metadata.
-#' @param variables One or two covariate names, in plotting order.
+#' @param variables Covariate names, in plotting order.
 #' @param xlab,ylab Axis labels; `NULL` selects basis-specific defaults.
 #' @param title Plot title; `NULL` uses the stored smooth call, falling back to
 #'   the smooth label for basis evaluations computed from a model.
@@ -114,7 +114,7 @@ prepare_derivative_plot <- function(object, x_var, y_var, labels,
 #' @noRd
 prepare_basis_labels <- function(object, variables, xlab = NULL, ylab = NULL,
   title = NULL, subtitle = NULL, caption = NULL) {
-  surface <- length(variables) == 2L
+  surface <- length(variables) >= 2L
   if (is.null(xlab)) xlab <- variables[1L]
   if (is.null(ylab)) ylab <- if (surface) variables[2L] else "Value"
   if (is.null(title)) {
@@ -130,7 +130,7 @@ prepare_basis_labels <- function(object, variables, xlab = NULL, ylab = NULL,
 #' Resolve the existing basis-plot facet convention
 #'
 #' @param object Basis evaluations containing `.by` and `.bf` metadata.
-#' @param variables One or two covariate names.
+#' @param variables Up to four covariate names, in plotting order.
 #' @param labeller Facet labeller; `NULL` uses `prefix_label_both`.
 #' @return A facet specification or `NULL`. Factor/character by variables take
 #'   precedence over basis-function facets, preserving the existing convention.
@@ -138,6 +138,14 @@ prepare_basis_labels <- function(object, variables, xlab = NULL, ylab = NULL,
 #' @noRd
 prepare_basis_facet <- function(object, variables, labeller = NULL) {
   if (is.null(labeller)) labeller <- prefix_label_both
+  if (length(variables) == 3L) {
+    return(facet_wrap(vars(.data[[variables[3L]]]), labeller = labeller))
+  }
+  if (length(variables) == 4L) {
+    return(facet_grid(rows = vars(.data[[variables[3L]]]),
+      cols = vars(.data[[variables[4L]]]), labeller = labeller,
+      as.table = is.factor(object[[variables[3L]]])))
+  }
   if (all(!is.na(object[[".by"]]))) {
     by_var <- unique(object[[".by"]])
     if (is.character(object[[by_var]]) || is.factor(object[[by_var]])) {

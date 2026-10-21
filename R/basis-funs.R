@@ -37,11 +37,16 @@
 #'   the penalty null space.
 #' @param coefficients numeric; vector of values for the coefficients of the
 #'   basis functions.
+#' @param variables character; smooth covariates in plotting order. Supply every
+#'   covariate exactly once. The first two define surface axes and the remaining
+#'   covariates define conditioning facets. Selected smooths must have the same
+#'   covariates. If `NULL`, use the usual smooth plotting order.
 #' @param ... other arguments passed to [mgcv::smoothCon()].
 #'
 #' @inheritParams smooth_estimates
 #'
-#' @return A tibble.
+#' @return A tibble with class `basis`. Its `plot_variables` attribute stores
+#'   covariate orders by smooth label for subsequent plotting.
 #'
 #' @author Gavin L. Simpson
 #'
@@ -49,6 +54,9 @@
 #' When evaluating a fitted smooth at explicit data, missing covariates required
 #' by that smooth produce `NA` basis values. Missing values in other model
 #' variables do not discard otherwise evaluable rows.
+#' The covariate order chosen by `variables` also determines which automatically
+#' generated axes use `n_2d`, `n_3d`, and `n_4d`. Supplied `data` or `at` values
+#' are unchanged. Set a resolution argument to `NULL` to use `n` instead.
 #'
 #' @export
 #'
@@ -90,7 +98,7 @@
   n_4d = 4,
   partial_match = FALSE,
   envir = NULL,
-  ...
+  ..., variables = NULL
 ) {
   model_name <- expr_label(substitute(object))
   object <- with_model_envir(object, envir)
@@ -109,6 +117,7 @@
       model_name = model_name
     )
   ids <- which(select)
+  object <- plan_smooth_variables(object, ids, variables = variables)
 
   # extract the mgcv.smooth objects
   smooths <- get_smooths_by_id(object, ids)
@@ -155,6 +164,9 @@
 
   ## class this up
   class(bfuns) <- append(class(bfuns), c("basis"), after = 0L)
+  attr(bfuns, "plot_variables") <- stats::setNames(
+    lapply(ids, smooth_plot_variables, model = object), sms[ids]
+  )
 
   bfuns # return
 }
@@ -168,7 +180,7 @@
   data = NULL,
   n = 100, n_2d = 50, n_3d = 16, n_4d = 4,
   partial_match = FALSE,
-  ...
+  ..., variables = NULL
 ) {
   if (lifecycle::is_present(term)) {
     lifecycle::deprecate_warn("0.8.9.9", "basis(term)", "basis(select)")
@@ -178,7 +190,7 @@
   bfuns <- basis.gam(
     object, select = select, data = data, n = n,
     n_2d = n_2d, n_3d = n_3d, n_4d = n_4d, partial_match = partial_match,
-    ...
+    ..., variables = variables
   )
   bfuns
 }
@@ -195,7 +207,7 @@
   n_3d = 16,
   n_4d = 4,
   partial_match = FALSE,
-  ...
+  ..., variables = NULL
 ) {
   if (lifecycle::is_present(term)) {
     lifecycle::deprecate_warn("0.8.9.9", "basis(term)", "basis(select)")
@@ -204,7 +216,7 @@
   basis(object[["gam"]],
     select = select, data = data, n = n,
     n_2d = n_2d, n_3d = n_3d, n_4d = n_4d, partial_match = partial_match,
-    ...
+    ..., variables = variables
   )
 }
 
@@ -220,7 +232,7 @@
   n_3d = 16,
   n_4d = 4,
   partial_match = FALSE,
-  ...
+  ..., variables = NULL
 ) {
   if (lifecycle::is_present(term)) {
     lifecycle::deprecate_warn("0.8.9.9", "basis(term)", "basis(select)")
@@ -229,7 +241,7 @@
   basis(gamm4_gam(object),
     select = select, data = data, n = n,
     n_2d = n_2d, n_3d = n_3d, n_4d = n_4d, partial_match = partial_match,
-    ...
+    ..., variables = variables
   )
 }
 
@@ -274,7 +286,7 @@
   diagonalize = FALSE,
   coefficients = NULL,
   envir = NULL,
-  ...
+  ..., variables = NULL
 ) {
   # class of object and check for ".smooth.spec"
   cls <- class(object)
@@ -302,6 +314,21 @@
 
   ## rebind
   bfuns <- bind_rows(bfuns)
+  orders <- lapply(sm, function(smooth) {
+    order <- if (inherits(smooth, "fs.interaction")) {
+      reorder_fs_smooth_terms(smooth)
+    } else if (!is.null(smooth[["margin"]])) {
+      reorder_tensor_smooth_terms(smooth)
+    } else smooth_variable(smooth)
+    order <- tensor_plot_variables(order, bfuns)
+    resolved <- validate_plot_variables(variables, order)
+    if (!is.null(variables)) validate_plot_variable_types(resolved, bfuns)
+    if (inherits(smooth, "sos.smooth") &&
+        !identical(unname(resolved), unname(order))) {
+      cli::cli_abort("`variables` cannot reorder latitude and longitude in a spline on the sphere.")
+    }
+    resolved
+  })
 
   # if coefficients not null, then weight the respective basis functions
   if (isFALSE(is.null(coefficients))) {
@@ -338,6 +365,9 @@
 
   ## store the basis definition as an attribute
   attr(bfuns, "smooth_object") <- deparse(substitute(object))
+  attr(bfuns, "plot_variables") <- stats::setNames(
+    orders, vapply(sm, smooth_label, character(1))
+  )
 
   ## return
   bfuns
