@@ -189,14 +189,16 @@ smooth_estimates.gratia_mixed_smooth <- function(
   out
 }
 
-# Parametric components use the ordinary fixed-effect columns only. Smooth
-# null-space coefficients belong to their smooth, not to a parametric term.
+# Linear parametric components use the ordinary fixed-effect columns only.
+# Smooth null-space coefficients belong to their smooth. Nonlinear threshold
+# terms have separate metadata and follow the same selection rules.
 #' @export
 parametric_terms.gratia_mixed_smooth <- function(model, ...) {
   if (!is.null(model$models)) {
     return(do.call(c, unname(lapply(model$models, parametric_terms))))
   }
   labels <- attr(model$pterms, "term.labels")
+  labels <- c(labels, model$threshold$label)
   if (!length(labels)) {
     return(stats::setNames(character(), character()))
   }
@@ -256,6 +258,9 @@ predict_parametric_effects.gratia_mixed_smooth <- function(
 #' @export
 parametric_effects.gratia_mixed_smooth <- function(object, terms = NULL, ...) {
   if (is.null(object$models)) {
+    if (!is.null(object$threshold)) {
+      return(sdmtmb_threshold_effects(object, terms = terms, ...))
+    }
     return(parametric_effects.gam(object,
       terms = terms, ...
     ))
@@ -281,9 +286,13 @@ parametric_effects.gratia_mixed_smooth <- function(object, terms = NULL, ...) {
     local$formula <- stats::formula(local$pterms)
     local$terms <- local$pterms
     local <- with_model_envir(local, attr(object, "gratia.envir", exact = TRUE))
-    parametric_effects.gam(local, terms = want, ...)
+    parametric_effects(local, terms = want, ...)
   })
   results <- Filter(Negate(is.null), results)
+  mixed_bind_parametric_effects(results)
+}
+
+mixed_bind_parametric_effects <- function(results) {
   out <- dplyr::bind_rows(results)
   for (attribute in c("factor_levels", "term_info", "axis_info")) {
     # Predictor names must not prefix the term labels used by the renderer.

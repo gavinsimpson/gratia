@@ -61,7 +61,10 @@
 \item{object, model}{A fitted \code{sdmTMB} model.}
 
 \item{...}{Arguments passed to the corresponding gratia methods, including
-grid, interval, transformation, surface, styling and layout controls.}
+grid, interval, transformation, surface, styling and layout controls.
+For threshold terms, \code{n} sets the number of evenly spaced evaluation
+points over the fitted covariate range; a fitted breakpoint within that
+range is also included. Supplied \code{data} determines evaluation locations.}
 
 \item{id}{Integer positions of smooths across model components.}
 
@@ -77,7 +80,8 @@ RTMB covariance; mgcv-specific alternatives are unavailable.}
 \item{envir}{Optional environment for evaluating model covariates.}
 
 \item{terms}{Parametric terms to evaluate or draw, as returned by
-\code{\link[=parametric_terms]{parametric_terms()}}. Second-component selectors have a \code{.1} suffix.}
+\code{\link[=parametric_terms]{parametric_terms()}}, including \code{breakpt(x)} and \code{logistic(x)} threshold
+terms. Second-component selectors have a \code{.1} suffix.}
 
 \item{parametric}{Include parametric effects? \code{NULL} includes them unless
 smooths are selected explicitly, as for \code{\link[=draw.gam]{draw.gam()}}.}
@@ -135,8 +139,20 @@ residual ranks, including for nonlinear and coupled delta responses. See
 \link{diagnostic_support} for treatment of coefficients, fields and covariance,
 and what each check assesses.
 
+Threshold curves are partial contributions without centring. They follow
+parametric selection rules: \code{terms} selects them and \code{parametric = FALSE}
+excludes them. Both delta components have separate threshold parameters.
+Threshold intervals use the delta method with the joint covariance of
+the fitted parameters, including uncertainty in the breakpoint or logistic
+width. By default they include intercept uncertainty and its covariance
+with the curve, without adding the intercept to the estimated contribution.
+Use \code{overall_uncertainty = FALSE} for term-only uncertainty. At the
+breakpoint, the derivative is taken from the constant side, matching native
+sdmTMB prediction. Threshold intervals remain pointwise when simultaneous
+smooth bands are requested. Rugs show fitting observations.
+
 Smooth extraction and effect plots do not support dispersion formulas,
-other multi-predictor families, or threshold and nonlocal effects.
+other multi-predictor families, or nonlocal effects.
 Random-effect plots are not provided.
 }
 \examples{

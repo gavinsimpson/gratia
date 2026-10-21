@@ -500,6 +500,11 @@
   methods provide smooth labels, coefficients and effect estimates. Support
   requires sdmTMB >= 1.2.0 models fitted with the RTMB backend. Smooths use joint
   RTMB covariance; tensor smooths with multiple penalties are supported.
+  Breakpoint (`breakpt()`) and logistic (`logistic()`) curves are available
+  through `parametric_terms()` and `parametric_effects()`, and are selected
+  with `terms` in `draw()` and `assemble()`. Their pointwise delta-method
+  intervals include threshold parameter uncertainty and, by default,
+  intercept uncertainty and its covariance with the threshold parameters.
 
 * Smooth plot subtitles now identify the model part or distributional
   parameter for glmmTMB, mgcv and `GJRM::gamlss()` models with multiple linear

@@ -100,11 +100,21 @@ sdmtmb_smooth_model <- function(
       sdmtmb_smooth_model(object, component, covariance = FALSE, envir = envir)
     })
     names(models) <- components
-    return(mixed_all_smooths(
+    out <- mixed_all_smooths(
       models, sdmtmb_smooths(object), object$last.par.best,
       if (covariance) function(index) sdmtmb_joint_covariance(object, index),
       length(components)
-    ))
+    )
+    if (covariance) {
+      out$models <- lapply(out$models, function(local) {
+        if (!is.null(local$threshold)) {
+          local$threshold$covariance <- sdmtmb_joint_covariance(
+            object, local$threshold$indices)
+        }
+        local
+      })
+    }
+    return(out)
   }
   component <- as.character(component)
   if (length(component) != 1L || !component %in% components) {
@@ -183,7 +193,7 @@ sdmtmb_smooth_model <- function(
   }
   frame <- object$data
   if (is.null(tt) || ncol(X) != length(fixed) ||
-    nrow(X) != nrow(frame) || is.null(colnames(X))) {
+    nrow(X) != nrow(frame) || (ncol(X) > 0L && is.null(colnames(X)))) {
     stop("Cannot align sdmTMB parametric design with fitted coefficients.",
       call. = FALSE)
   }
@@ -228,6 +238,7 @@ sdmtmb_smooth_model <- function(
       call = object$call, component = component, fitter = "sdmTMB",
       component_labels = labels, predictor = i,
       pterms = tt, parametric = seq_along(fixed),
+      threshold = sdmtmb_threshold(object, component, fixed, X, covariance),
       contrasts = object$contrasts[[i]], xlevels = object$xlevels[[i]],
       pred.formula = if (length(all.vars(stats::delete.response(tt)))) {
         stats::reformulate(all.vars(stats::delete.response(tt)),
@@ -263,7 +274,8 @@ sdmtmb_smooth_model <- function(
 #'   and `s.1(x)` for the second component.
 #' @param id Integer positions of smooths across model components.
 #' @param terms Parametric terms to evaluate or draw, as returned by
-#'   [parametric_terms()]. Second-component selectors have a `.1` suffix.
+#'   [parametric_terms()], including `breakpt(x)` and `logistic(x)` threshold
+#'   terms. Second-component selectors have a `.1` suffix.
 #' @param parametric Include parametric effects? `NULL` includes them unless
 #'   smooths are selected explicitly, as for [draw.gam()].
 #' @param residuals Must be `FALSE`; partial residuals are not supported.
@@ -272,6 +284,9 @@ sdmtmb_smooth_model <- function(
 #' @param envir Optional environment for evaluating model covariates.
 #' @param ... Arguments passed to the corresponding gratia methods, including
 #'   grid, interval, transformation, surface, styling and layout controls.
+#'   For threshold terms, `n` sets the number of evenly spaced evaluation
+#'   points over the fitted covariate range; a fitted breakpoint within that
+#'   range is also included. Supplied `data` determines evaluation locations.
 #'
 #' @details
 #' Estimates are partial contributions on each component's link scale. Spatial,
@@ -312,8 +327,20 @@ sdmtmb_smooth_model <- function(
 #' [diagnostic_support] for treatment of coefficients, fields and covariance,
 #' and what each check assesses.
 #'
+#' Threshold curves are partial contributions without centring. They follow
+#' parametric selection rules: `terms` selects them and `parametric = FALSE`
+#' excludes them. Both delta components have separate threshold parameters.
+#' Threshold intervals use the delta method with the joint covariance of
+#' the fitted parameters, including uncertainty in the breakpoint or logistic
+#' width. By default they include intercept uncertainty and its covariance
+#' with the curve, without adding the intercept to the estimated contribution.
+#' Use `overall_uncertainty = FALSE` for term-only uncertainty. At the
+#' breakpoint, the derivative is taken from the constant side, matching native
+#' sdmTMB prediction. Threshold intervals remain pointwise when simultaneous
+#' smooth bands are requested. Rugs show fitting observations.
+#'
 #' Smooth extraction and effect plots do not support dispersion formulas,
-#' other multi-predictor families, or threshold and nonlocal effects.
+#' other multi-predictor families, or nonlocal effects.
 #' Random-effect plots are not provided.
 #'
 #' @return Smooth labels, smooth objects, coefficients, effect estimates, or
