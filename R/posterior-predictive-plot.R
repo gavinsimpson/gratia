@@ -80,8 +80,11 @@
 #' `gamm4` defaults to `conditioning = "conditional"`, checking the full fitted
 #' mixed model while including uncertainty in fitted effects. Use the explicit
 #' `"gam_component"` option for the extracted GAM calculations. GJRM draws the final
-#' distributional coefficients jointly. These are approximate predictive checks;
-#' no refitting is performed.
+#' distributional coefficients jointly for supported uncensored univariate
+#' families, including BE, LO, WEI, IG, GU and rGU. Both distributional equations
+#' retain their coefficient covariance; beta scale draws use its logit link.
+#' See [diagnostic_support] for the family list. These are approximate predictive
+#' checks; no refitting is performed.
 #'
 #' Continuous responses use kernel density estimates with a common bandwidth
 #' derived from the observed responses and a shared evaluation grid. Discrete

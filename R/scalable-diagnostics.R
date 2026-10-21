@@ -196,7 +196,7 @@ diagnostic_data.gamlss <- function(model, type = NULL, seed = NULL, conditioning
   check_distribution_conditioning(conditioning)
   proxy <- gjrm_diagnostic_model(model)
   d <- diagnostic_data(proxy, type, seed, n_dharma = n_dharma)
-  d$eta_label <- "Linear predictor (mu)"
+  d$eta_label <- gjrm_diagnostic_predictor_label(model)
   d
 }
 
@@ -596,14 +596,16 @@ render_diagnostic_qq <- function(
 #'   except its internal worm setting.
 #' @return A ggplot object containing aggregated plotting data.
 #' @details GJRM support covers uncensored univariate N, LN, GA, GAi, P, NBI,
-#'   and NBII models. PIT/quantile references are uniform/normal; traditional
+#'   NBII, BE, LO, WEI, IG, GU and rGU models. PIT/quantile references are
+#'   uniform/normal; traditional
 #'   response/Pearson references use inverse-CDF or simulated responses.
 #'   Probabilities are recomputed from final likelihood parameters. Quantile QQ
 #'   bands give pointwise intervals for ordered standard-normal residuals,
 #'   conditional on the fitted distribution,
 #'   without accounting for parameter estimation. Observed-versus-fitted plots
-#'   use response means, including the lognormal mean correction. Residuals are
-#'   plotted against the first distributional linear predictor.
+#'   use response means, including the lognormal, Weibull and Gumbel mean
+#'   corrections. Residuals are plotted against the first distributional linear
+#'   predictor.
 #'
 #'   Grouped-family models retain the residual defaults, component reference
 #'   distributions, predictor ranks and layout controls of [appraise()]. QQ

@@ -735,9 +735,11 @@ diagnostic_posterior_sampler.gamlss <- function(model, n, seed = NULL,
     "Cannot align GJRM distributional coefficients with fitted predictors.", call. = FALSE)
   offset2 <- if (length(idx2)) rep_len(as.vector(model$eta2), nrow(X1)) -
     drop(X2 %*% beta[idx2]) else NULL
+  scale_inverse <- if (model$margins[1L] == "BE") stats::plogis else exp
   function(i) {
     eta <- drop(X1 %*% draws[i, idx1]) + offset1
-    sigma <- if (length(idx2)) exp(drop(X2 %*% draws[i, idx2]) + offset2) else NULL
+    sigma <- if (length(idx2))
+      scale_inverse(drop(X2 %*% draws[i, idx2]) + offset2) else NULL
     distribution <- gjrm_response_distribution(model, eta = eta, sigma = sigma)
     diagnostic_response_table(distribution$rd(), i)
   }

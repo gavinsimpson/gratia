@@ -3,10 +3,12 @@
 check_gjrm_diagnostics <- function(model) {
   if (!inherits(model, "SemiParBIV") || !isTRUE(model$univar.gamlss))
     stop("Only univariate GJRM::gamlss() models are supported.", call. = FALSE)
-  if (!model$margins[1L] %in% c("N", "LN", "GA", "GAi", "P", "NBI", "NBII") ||
+  if (!model$margins[1L] %in% c("N", "LN", "GA", "GAi", "P", "NBI", "NBII",
+      "BE", "LO", "WEI", "IG", "GU", "rGU") ||
       isTRUE(model$surv.flex) || isTRUE(model$VC$surv) ||
       (!is.null(model$cens) && any(model$cens != 1)))
-    stop("GJRM diagnostics require an uncensored N, LN, GA, GAi, P, NBI or NBII model.",
+    stop("GJRM diagnostics require an uncensored N, LN, GA, GAi, P, NBI, NBII, ",
+      "BE, LO, WEI, IG, GU or rGU model.",
       call. = FALSE)
   invisible(model)
 }
@@ -20,6 +22,15 @@ gjrm_response_distribution <- function(model, eta = NULL, sigma = NULL, nu = NUL
   margin <- model$margins[1L]
   eta <- as.vector(eta %||% model$eta1)
   sigma <- as.vector(sigma %||% model$sigma2 %||% 1)
+  distribution <- switch(margin,
+    BE = distribution_from_parameters("beta", stats::plogis(eta),
+      dispersion = 1 / sigma^2 - 1),
+    LO = logistic_response_distribution(eta, sigma),
+    WEI = weibull_response_distribution(scale = exp(eta), shape = sigma),
+    IG = inverse_gaussian_response_distribution(exp(eta), sigma^2),
+    GU = gumbel_response_distribution(eta, sigma, reverse = TRUE),
+    rGU = gumbel_response_distribution(eta, sigma))
+  if (!is.null(distribution)) return(distribution)
   family <- switch(margin, N = "gaussian", LN = "lognormal", GA =, GAi = "Gamma",
     P = "poisson", NBI = "nbinom2", NBII = "nbinom1")
   mu <- switch(margin, N =, GAi = eta, LN = exp(eta + sigma^2 / 2), exp(eta))
@@ -50,8 +61,15 @@ gjrm_diagnostic_model <- function(model) {
     distribution, model = frame, original = model,
     na.action = model$gam1$na.action)
   proxy$diagnostic_default_type <- "quantile"
-  proxy$eta_label <- "Linear predictor (mu)"
+  proxy$eta_label <- gjrm_diagnostic_predictor_label(model)
   proxy
+}
+
+# The first predictor controls Weibull scale and Gumbel/logistic location.
+gjrm_diagnostic_predictor_label <- function(model) {
+  parameter <- switch(model$margins[1L], WEI = "scale",
+    GU =, rGU =, LO = "location", "mu")
+  paste0("Linear predictor (", parameter, ")")
 }
 
 #' @export

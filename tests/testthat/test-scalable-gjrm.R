@@ -106,7 +106,7 @@ test_that("GJRM class collisions and unsupported fits are rejected", {
   dummy <- structure(
     list(
       univar.gamlss = TRUE,
-      margins = "WEI",
+      margins = "FISK",
       cens = 1,
       VC = list(surv = FALSE)
     ),

@@ -165,13 +165,31 @@ identify their parameter in subtitles. Agreement between diagnostic patterns
 across fits helps distinguish a modelling issue from one fitting procedure's
 choice of smoothness.
 
-Supported uncensored univariate GJRM distributions are N, LN, GA, GAi, P, NBI
-and NBII. Other joint, survival and censored models remain unsupported. GAi
+Supported uncensored univariate GJRM distributions are N, LN, GA, GAi, P, NBI,
+NBII, BE (beta), LO (logistic), WEI (Weibull), IG (inverse Gaussian), GU and rGU
+(the two Gumbel orientations). Other joint, survival and censored models remain
+unsupported. GAi
 parameterisation is supported by the diagnostic adapter where an appropriate
 fit is available; some GJRM versions do not accept GAi in `gamlss()`. NB family
 names differ across packages: GJRM NBII has size equal to fitted mean divided
 by its dispersion parameter. Gratia uses that likelihood definition, rather
 than a stored Poisson CDF present in some upstream versions.
+
+For Weibull fits, the first predictor controls scale rather than the response
+mean. For logistic and Gumbel fits it controls location; a Gumbel location is
+also different from its mean. Gratia calculates response means and variances
+from both fitted parameters for observed-versus-fitted and Pearson residual
+plots. Posterior predictive checks draw both equations' coefficients together,
+using the logit scale link for beta fits and the log scale link for the others.
+
+All these families support PIT/quantile, response, Pearson and DHARMa-style
+residuals in ordinary and scalable plots. Deviance residuals are available for
+N, GA, GAi and P. For example, a fitted beta model `beta_fit` can be checked with
+`appraise(beta_fit, seed = 405)` or
+`appraise(beta_fit, ppcheck = TRUE, n_ppc = 50, seed = 405)`.
+To simulate a QQ reference for Pearson residuals, use
+`qq_plot(beta_fit, type = "pearson", method = "simulate", seed = 405)`.
+The default quantile residuals instead use a fixed standard-normal reference.
 
 ## Positive observations and precision weights
 
