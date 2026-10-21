@@ -93,6 +93,9 @@ selection, by-variable information and custom subtitles are retained.
 Pass \verb{surface = "3d", ci_3d = TRUE} through \code{...} to add interval surfaces
 to smooths and numeric parametric interactions in any equation.
 \code{ci_3d_alpha} and \code{ci_3d_col} control their opacity and fill colour.
+Pass \code{cyclic = "polar"} and optional \code{polar_args} through \code{...} for
+polar plots of supported one-dimensional cyclic smooths in any equation;
+see \code{\link[=draw.gam]{draw.gam()}} for the coordinate options.
 }
 \examples{
 if (suppressPackageStartupMessages(require("GJRM", quietly = TRUE))) {

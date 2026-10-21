@@ -27,6 +27,9 @@
 #'   Pass `surface = "3d", ci_3d = TRUE` through `...` to add interval surfaces
 #'   to smooths and numeric parametric interactions in any equation.
 #'   `ci_3d_alpha` and `ci_3d_col` control their opacity and fill colour.
+#'   Pass `cyclic = "polar"` and optional `polar_args` through `...` for
+#'   polar plots of supported one-dimensional cyclic smooths in any equation;
+#'   see [draw.gam()] for the coordinate options.
 #'
 #' @examples
 #' if (suppressPackageStartupMessages(require("GJRM", quietly = TRUE))) {

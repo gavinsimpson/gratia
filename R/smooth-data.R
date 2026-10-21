@@ -116,6 +116,14 @@
     NULL
   }
   grid_vars <- smooth_vars
+  cyclic_info <- if (isTRUE(attr(model, "gratia.cyclic_polar"))) {
+    cyclic_smooth_info(sm)
+  } else NULL
+  if (!is.null(cyclic_info) && back_transform &&
+      !identical(smooth_coordinate_info(cyclic_info$variable, model)$original,
+        cyclic_info$variable)) {
+    cli::cli_abort("Polar cyclic smooths with transformed covariates require `back_transform = FALSE`.")
+  }
   if (back_transform) {
     axes <- lapply(smooth_vars, smooth_coordinate_info, model = model)
     if (any(vapply(axes, function(x) is.null(x$original), logical(1)))) {
@@ -207,6 +215,16 @@
       n = n, n_2d = n_2d, n_3d = n_3d, n_4d = n_4d,
       round_extra = !back_transform
     )
+  }
+
+  if (!is.null(cyclic_info)) {
+    boundaries <- cyclic_info$boundaries
+    if (length(boundaries) != 2L || any(!is.finite(boundaries)) ||
+        boundaries[[1L]] >= boundaries[[2L]]) {
+      cli::cli_abort("Fitted cycle boundaries are unavailable for smooth {.val {smooth_label(sm)}}.")
+    }
+    newlist[[cyclic_info$variable]] <- seq(boundaries[[1L]], boundaries[[2L]],
+      length.out = n)
   }
 
   if (is_mrf_smooth(sm)) {

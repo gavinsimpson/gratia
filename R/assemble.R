@@ -25,7 +25,9 @@
 #' @inheritParams draw.gam
 #' @details Smooth plot subtitles identify the model part or distributional
 #'   parameter as described in [draw.gam()]. Custom smooth labels, including
-#'   `subtitle`, can be passed through `...`.
+#'   `subtitle`, can be passed through `...`. Use `cyclic = "polar"` to draw
+#'   one-dimensional cyclic smooths with polar coordinates; `polar_args`
+#'   customizes the coordinate display as described in [draw.gam()].
 #' @param ... Additional smooth plotting arguments, including `title`,
 #'   `subtitle`, `xlab` and `ylab`.
 #'
@@ -120,12 +122,15 @@
   shape_source = c("gaussian", "bootstrap"),
   ..., variables = NULL,
   simultaneous_method = c('simulation', 'tube'),
-  simultaneous_domain = NULL, tube_control = list()
+  simultaneous_domain = NULL, tube_control = list(),
+  cyclic = c("cartesian", "polar"), polar_args = list()
 ) {
   gratia_plot_arguments(c("ci_alpha", "ci_col", "smooth_col", "resid_col", "contour_col", "ci_3d_alpha", "ci_3d_col"), environment())
   if (missing(overall_uncertainty) && is_scasm_model(object)) {
     overall_uncertainty <- FALSE
   }
+  cyclic <- match.arg(cyclic)
+  validate_cyclic_polar(cyclic, polar_args)
   mrf_plot <- match.arg(mrf_plot)
   interval <- normalize_smooth_interval(interval)
   simultaneous_method <- resolve_simultaneous_method(simultaneous_method, interval,
@@ -176,6 +181,7 @@
     )
   object <- with_model_envir(object, envir)
   object <- plan_tensor_plots(object, which(select), data, re_levels)
+  attr(object, "gratia.cyclic_polar") <- identical(cyclic, "polar")
 
   # this is needed for the parametric terms below
   sm_plts <- NULL
@@ -373,6 +379,8 @@
     # improve performance.
     sm_plts <- map(sm_l,
       draw_smooth_estimates,
+      cyclic = cyclic, polar_args = polar_args,
+      cyclic_info = attr(sm_eval, "cyclic_info"),
       surface = surface, surface_3d = surface_3d,
       ci_3d = ci_3d, ci_3d_alpha = ci_3d_alpha, ci_3d_col = ci_3d_col,
       surface_support = surface_support,

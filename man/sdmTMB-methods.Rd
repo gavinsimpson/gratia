@@ -107,6 +107,9 @@ intervals. \code{fun} transforms displayed partial effects, not full predictions
 Use \verb{surface = "3d", ci_3d = TRUE} in \code{draw()} or \code{assemble()} to add
 interval surfaces to smooths and numeric parametric interactions in either
 component. \code{ci_3d_alpha} and \code{ci_3d_col} control their opacity and fill colour.
+Pass \code{cyclic = "polar"} and optional \code{polar_args} to \code{draw()} or
+\code{assemble()} for polar plots of supported one-dimensional cyclic smooths.
+See \code{\link[=draw.gam]{draw.gam()}} for the coordinate options.
 
 Delta components have separate smooth and parametric coefficients and are
 drawn separately, with component subtitles. Upstream sdmTMB restrictions on

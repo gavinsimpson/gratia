@@ -111,6 +111,10 @@
 #' @return A data frame (tibble), which is of class `"smooth_estimates"`.
 #'   Its `plot_variables` attribute is a list of resolved covariate orders,
 #'   named by smooth label, used when drawing the saved estimates.
+#'   Its `cyclic_info` attribute retains the fitted cycle boundaries for
+#'   supported one-dimensional cyclic components, allowing
+#'   `draw(object, cyclic = "polar")` to configure the angular axis.
+#'   This attribute is retained in nested and unnested output.
 #'
 #' @details
 #' For [GJRM::gamlss()] models, smooths are evaluated in equation and smooth
@@ -502,6 +506,7 @@
   attr(sm_list, "coordinate_info") <- coordinate_info
   attr(sm_list, "surface_support") <- surface_support
   attr(sm_list, "tensor_plot_info") <- tensor_plot_info(object, smooths)
+  attr(sm_list, "cyclic_info") <- smooth_cyclic_info(smooths, smooth_ids)
   if (length(shape_constraints)) attr(sm_list, "shape_constraints") <- shape_constraints
   scam_info <- scam_smooth_info(object, smooths, smooth_ids)
   if (length(scam_info)) attr(sm_list, "scam_smooth_info") <- scam_info
@@ -553,6 +558,7 @@ smooth_estimates.gamlss <- function(object, select = NULL, smooth = deprecated()
   results <- list()
   start <- 0L
   for (m in components) {
+    attr(m, "gratia.cyclic_polar") <- attr(object, "gratia.cyclic_polar")
     count <- length(m$smooth)
     index <- start + seq_len(count)
     if (any(selected[index])) {
@@ -567,7 +573,7 @@ smooth_estimates.gamlss <- function(object, select = NULL, smooth = deprecated()
 
   out <- bind_rows(results)
   for (attribute in c("tensor_term_order", "surface_support", "tensor_plot_info",
-      "plot_variables")) {
+      "plot_variables", "cyclic_info")) {
     attr(out, attribute) <- do.call(c, lapply(results, attr, attribute))
   }
   coordinates <- lapply(results, attr, "coordinate_info")
@@ -1522,6 +1528,15 @@ smooth_estimates.gamlss <- function(object, select = NULL, smooth = deprecated()
 #'   `frequentist`, and `unconditional` also require the fitted model; they
 #'   cannot change intervals when drawing saved estimates.
 #'
+#' @details `cyclic = "polar"` uses fitted cycle boundaries stored in the
+#'   `cyclic_info` attribute. Evaluation points are unchanged: estimates
+#'   covering only part of a cycle leave a gap. To draw a complete cycle,
+#'   supply both fitted boundary values when computing estimates, or use
+#'   `draw(model, cyclic = "polar")` to generate the full-cycle grid.
+#'   Recompute older saved estimates with [smooth_estimates()] if their
+#'   fitted cycle boundaries are unavailable. See [draw.gam()] for supported
+#'   smooths and coordinate options.
+#'
 #' @export
 #' @importFrom patchwork wrap_plots
 #'
@@ -1601,7 +1616,9 @@ smooth_estimates.gamlss <- function(object, select = NULL, smooth = deprecated()
                                     re_levels = NULL,
                                     mrf_plot = c("effects", "qq"),
                                     interval = NULL,
-                                    ..., variables = NULL) {
+                                    ..., variables = NULL,
+                                    cyclic = c("cartesian", "polar"),
+                                    polar_args = list()) {
   gratia_plot_arguments(c("contour_col", "ci_alpha", "ci_col", "smooth_col", "resid_col", "decrease_col", "increase_col", "change_lwd", "ci_3d_alpha", "ci_3d_col"), environment())
   dots <- names(match.call(expand.dots = FALSE)$...)
   controls <- intersect(dots, c("interval_method", "shape_source", "frequentist",
@@ -1611,6 +1628,9 @@ smooth_estimates.gamlss <- function(object, select = NULL, smooth = deprecated()
     cli::cli_abort(c("Interval computation controls require the fitted model: {paste(controls, collapse = ', ')}.",
       "i" = "Compute intervals with smooth_estimates(model, ...) before drawing saved estimates."))
   }
+  cyclic <- match.arg(cyclic)
+  validate_cyclic_polar(cyclic, polar_args)
+  cyclic_info <- attr(object, "cyclic_info")
   check_back_transform(back_transform)
   mrf_plot <- match.arg(mrf_plot)
   surface <- match.arg(surface)
@@ -1673,6 +1693,7 @@ smooth_estimates.gamlss <- function(object, select = NULL, smooth = deprecated()
   ## plot
   plts <- map(sm_l,
     draw_smooth_estimates,
+    cyclic = cyclic, polar_args = polar_args, cyclic_info = cyclic_info,
     re_levels = re_levels,
     mrf_plot = mrf_plot,
     tensor_plot_info = plot_info,
@@ -1761,6 +1782,8 @@ smooth_estimates.gamlss <- function(object, select = NULL, smooth = deprecated()
                                     shape_constraints = NULL,
                                     scam_smooth_info = NULL,
                                     plot_variables = NULL,
+                                    cyclic = "cartesian", polar_args = list(),
+                                    cyclic_info = NULL,
                                     variables = NULL,
                                     ...) {
   check_shape_effect_transform(interval_info, constant, fun)
@@ -1793,6 +1816,9 @@ smooth_estimates.gamlss <- function(object, select = NULL, smooth = deprecated()
       !identical(unname(variables), unname(fitted_variables))) {
     cli::cli_abort("`variables` cannot reorder latitude and longitude in a spline on the sphere.")
   }
+
+  polar_info <- resolve_cyclic_plot(object, sm_vars, cyclic, cyclic_info,
+    back_transform, coordinate_info)
 
   # set some values to NULL in case these components don't exist
   rug_data <- NULL
@@ -1989,7 +2015,7 @@ smooth_estimates.gamlss <- function(object, select = NULL, smooth = deprecated()
   attr(object, "interval_info") <- interval_info
   attr(object, "shape_constraints") <- shape_constraints
   attr(object, "scam_smooth_info") <- scam_smooth_info
-  plot_smooth(
+  plt <- plot_smooth(
     object,
     mrf_plot = mrf_plot,
     surface = surface, surface_3d = surface_3d,
@@ -2024,4 +2050,8 @@ smooth_estimates.gamlss <- function(object, select = NULL, smooth = deprecated()
     grouped_by = grouped_by,
     ...
   )
+  if (!is.null(polar_info)) {
+    plt <- add_cyclic_polar(plt, polar_info, polar_args, angle)
+  }
+  plt
 }

@@ -186,6 +186,10 @@ and \code{root_tol} (\code{1e-8}). Requires tube calibration. Simulation control
 A data frame (tibble), which is of class \code{"smooth_estimates"}.
 Its \code{plot_variables} attribute is a list of resolved covariate orders,
 named by smooth label, used when drawing the saved estimates.
+Its \code{cyclic_info} attribute retains the fitted cycle boundaries for
+supported one-dimensional cyclic components, allowing
+\code{draw(object, cyclic = "polar")} to configure the angular axis.
+This attribute is retained in nested and unnested output.
 }
 \description{
 Evaluate a smooth at a grid of evenly spaced value over the range of the
