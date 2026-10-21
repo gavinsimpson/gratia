@@ -71,7 +71,11 @@ draw(
 - ...:
 
   Arguments passed to the corresponding gratia methods, including grid,
-  interval, transformation, surface, styling and layout controls.
+  interval, transformation, surface, styling and layout controls. For
+  threshold terms, `n` sets the number of evenly spaced evaluation
+  points over the fitted covariate range; a fitted breakpoint within
+  that range is also included. Supplied `data` determines evaluation
+  locations.
 
 - id:
 
@@ -97,7 +101,8 @@ draw(
 - terms:
 
   Parametric terms to evaluate or draw, as returned by
-  [`parametric_terms()`](https://gavinsimpson.github.io/gratia/reference/parametric_terms.md).
+  [`parametric_terms()`](https://gavinsimpson.github.io/gratia/reference/parametric_terms.md),
+  including `breakpt(x)` and `logistic(x)` threshold terms.
   Second-component selectors have a `.1` suffix.
 
 - parametric:
@@ -170,9 +175,22 @@ and coupled delta responses. See
 for treatment of coefficients, fields and covariance, and what each
 check assesses.
 
+Threshold curves are partial contributions without centring. They follow
+parametric selection rules: `terms` selects them and
+`parametric = FALSE` excludes them. Both delta components have separate
+threshold parameters. Threshold intervals use the delta method with the
+joint covariance of the fitted parameters, including uncertainty in the
+breakpoint or logistic width. By default they include intercept
+uncertainty and its covariance with the curve, without adding the
+intercept to the estimated contribution. Use
+`overall_uncertainty = FALSE` for term-only uncertainty. At the
+breakpoint, the derivative is taken from the constant side, matching
+native sdmTMB prediction. Threshold intervals remain pointwise when
+simultaneous smooth bands are requested. Rugs show fitting observations.
+
 Smooth extraction and effect plots do not support dispersion formulas,
-other multi-predictor families, or threshold and nonlocal effects.
-Random-effect plots are not provided.
+other multi-predictor families, or nonlocal effects. Random-effect plots
+are not provided.
 
 ## Examples
 

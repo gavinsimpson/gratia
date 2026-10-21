@@ -27,7 +27,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-58</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-59</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -638,6 +638,89 @@ area-standardised biomass index requires predictions across the survey
 domain.</p>
 </div>
 <div class="section level2">
+<h2 id="breakpoint-and-logistic-curves">Breakpoint and logistic curves<a class="anchor" aria-label="anchor" href="#breakpoint-and-logistic-curves"></a>
+</h2>
+<p>sdmTMB also offers two structured alternatives to a smooth.
+<code>breakpt(x)</code> fits a line up to an estimated breakpoint and a
+constant beyond it. <code>logistic(x)</code> fits a sigmoid curve.
+gratia draws these as parametric effects, with one curve for each
+component of a delta model. The argument of either term must name a
+column in the fitting data, following sdmTMB’s formula restrictions.</p>
+<p>A small simulated example shows both shapes without refitting the
+survey model. Starting values place the breakpoint within the observed
+range and give the logistic curve a positive distance between its 50%
+and 95% locations. sdmTMB stores the logarithm of this distance as the
+second logistic parameter.</p>
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">312</span><span class="op">)</span></span>
+<span><span class="va">threshold_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">400</span>, <span class="fl">0</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">threshold_data</span><span class="op">$</span><span class="va">breakpt_y</span> <span class="op">&lt;-</span> <span class="fl">0.4</span> <span class="op">+</span> <span class="fl">1.8</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">pmin</a></span><span class="op">(</span><span class="va">threshold_data</span><span class="op">$</span><span class="va">x</span>, <span class="fl">0.9</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">threshold_data</span><span class="op">)</span>, sd <span class="op">=</span> <span class="fl">0.15</span><span class="op">)</span></span>
+<span><span class="va">threshold_data</span><span class="op">$</span><span class="va">logistic_y</span> <span class="op">&lt;-</span> <span class="fl">0.4</span> <span class="op">+</span></span>
+<span>  <span class="fl">2.2</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/stats/Logistic.html" class="external-link">plogis</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">19</span><span class="op">)</span> <span class="op">*</span> <span class="op">(</span><span class="va">threshold_data</span><span class="op">$</span><span class="va">x</span> <span class="op">-</span> <span class="fl">0.8</span><span class="op">)</span> <span class="op">/</span> <span class="fl">0.6</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">threshold_data</span><span class="op">)</span>, sd <span class="op">=</span> <span class="fl">0.15</span><span class="op">)</span></span>
+<span><span class="va">breakpt_fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://sdmTMB.github.io/sdmTMB/reference/sdmTMB.html" class="external-link">sdmTMB</a></span><span class="op">(</span></span>
+<span>  <span class="va">breakpt_y</span> <span class="op">~</span> <span class="fu">breakpt</span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">threshold_data</span>, spatial <span class="op">=</span> <span class="st">"off"</span>,</span>
+<span>  control <span class="op">=</span> <span class="fu"><a href="https://sdmTMB.github.io/sdmTMB/reference/sdmTMBcontrol.html" class="external-link">sdmTMBcontrol</a></span><span class="op">(</span>backend <span class="op">=</span> <span class="st">"rtmb"</span>,</span>
+<span>    start <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>b_threshold <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1.5</span>, <span class="fl">0.8</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">logistic_fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://sdmTMB.github.io/sdmTMB/reference/sdmTMB.html" class="external-link">sdmTMB</a></span><span class="op">(</span></span>
+<span>  <span class="va">logistic_y</span> <span class="op">~</span> <span class="fu">logistic</span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">threshold_data</span>, spatial <span class="op">=</span> <span class="st">"off"</span>,</span>
+<span>  control <span class="op">=</span> <span class="fu"><a href="https://sdmTMB.github.io/sdmTMB/reference/sdmTMBcontrol.html" class="external-link">sdmTMBcontrol</a></span><span class="op">(</span>backend <span class="op">=</span> <span class="st">"rtmb"</span>,</span>
+<span>    start <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>b_threshold <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.8</span>, <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">0.6</span><span class="op">)</span>, <span class="fl">2</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://sdmTMB.github.io/sdmTMB/reference/sanity.html" class="external-link">sanity</a></span><span class="op">(</span><span class="va">breakpt_fit</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://sdmTMB.github.io/sdmTMB/reference/sanity.html" class="external-link">sanity</a></span><span class="op">(</span><span class="va">logistic_fit</span><span class="op">)</span></span></code></pre></div>
+<p>Select these curves using <code>terms</code>, as for the survey-year
+effects above. <code><a href="../reference/parametric_terms.html">parametric_terms()</a></code> lists their labels. In a
+delta model, <code>breakpt(x).1</code> or <code>logistic(x).1</code>
+selects the second component. <code>parametric = FALSE</code> suppresses
+threshold curves; selecting smooths with <code>select</code> excludes
+parametric effects unless <code>parametric = TRUE</code> is also
+supplied.</p>
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/parametric_terms.html">parametric_terms</a></span><span class="op">(</span><span class="va">breakpt_fit</span><span class="op">)</span></span>
+<span><span class="co">#&gt;   breakpt(x) </span></span>
+<span><span class="co">#&gt; "breakpt(x)"</span></span>
+<span><span class="fu"><a href="../reference/parametric_terms.html">parametric_terms</a></span><span class="op">(</span><span class="va">logistic_fit</span><span class="op">)</span></span>
+<span><span class="co">#&gt;   logistic(x) </span></span>
+<span><span class="co">#&gt; "logistic(x)"</span></span>
+<span><span class="va">threshold_panels</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">breakpt_fit</span>, terms <span class="op">=</span> <span class="st">"breakpt(x)"</span>, n <span class="op">=</span> <span class="fl">100</span>, wrap <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="../reference/assemble.html">assemble</a></span><span class="op">(</span><span class="va">logistic_fit</span>, terms <span class="op">=</span> <span class="st">"logistic(x)"</span>, n <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://patchwork.data-imaginist.com/reference/wrap_plots.html" class="external-link">wrap_plots</a></span><span class="op">(</span><span class="va">threshold_panels</span>, ncol <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
+<p><img src="sdmTMB-support_files/figure-html/threshold-curves-1.png" class="r-plt" alt="Estimated breakpoint and logistic contributions, with pointwise uncertainty bands and rugs." width="700"></p>
+<p>Each curve is its uncentred contribution to the linear predictor. The
+intercept is not added to that contribution. The bands use pointwise
+delta-method standard errors from the joint covariance of the fitted
+threshold parameters. By default, they also include the intercept’s
+uncertainty and its covariance with those parameters. Use
+<code>overall_uncertainty = FALSE</code> for uncertainty in the
+threshold contribution alone. Threshold bands remain pointwise when
+<code>interval = "simultaneous"</code> is requested for smooths in the
+same model.</p>
+<p>The default evaluation grid contains <code>n</code> equally spaced
+values over the fitted covariate range. For a breakpoint curve, it also
+contains the fitted breakpoint when that lies within the range, so the
+plotted line changes slope at the fitted location. Supply
+<code>data</code> to choose evaluation locations instead. Rugs continue
+to show fitting observations. The threshold covariate is already on its
+original scale, so <code>back_transform</code> does not change its axis.
+<code>constant</code> shifts the curve and interval together;
+<code>fun</code> then transforms both.</p>
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/parametric_effects.html">parametric_effects</a></span><span class="op">(</span><span class="va">logistic_fit</span>, terms <span class="op">=</span> <span class="st">"logistic(x)"</span>,</span>
+<span>  data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.25</span>, <span class="fl">0.75</span>, <span class="fl">1.25</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  overall_uncertainty <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3 × 5</span></span></span>
+<span><span class="co">#&gt;   .term       .type   .value .partial    .se</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> logistic(x) numeric   0.25    0.112 0.015<span style="text-decoration: underline;">6</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> logistic(x) numeric   0.75    0.930 0.035<span style="text-decoration: underline;">1</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> logistic(x) numeric   1.25    1.97  0.024<span style="text-decoration: underline;">6</span></span></span></code></pre></div>
+</div>
+<div class="section level2">
 <h2 id="applying-the-workflow-to-another-survey">Applying the workflow to another survey<a class="anchor" aria-label="anchor" href="#applying-the-workflow-to-another-survey"></a>
 </h2>
 <p>Retain the scientific unit of the response and its zeros when
@@ -652,9 +735,9 @@ plots.</p>
 <p>The support has deliberate limits. gratia does not supply partial
 residual overlays or random-field effect plots for sdmTMB.
 Formula-effect extraction does not cover dispersion formulas, other
-multi-predictor families, threshold or nonlocal effects. It cannot use
-mapped or profiled coefficients needed for extraction, unavailable
-smooth metadata, or a covariance from a non-positive-definite Hessian.
+multi-predictor families, or nonlocal effects. It cannot use mapped or
+profiled coefficients needed for extraction, unavailable smooth
+metadata, or a covariance from a non-positive-definite Hessian.
 <code>unconditional = TRUE</code> and <code>frequentist = TRUE</code>
 are mgcv covariance choices and do not apply to these joint RTMB
 intervals. Use sdmTMB’s prediction and plotting methods for fields and

@@ -636,6 +636,101 @@ discrepancy. These summaries describe the sampling locations; an
 area-standardised biomass index requires predictions across the survey
 domain.
 
+## Breakpoint and logistic curves
+
+sdmTMB also offers two structured alternatives to a smooth. `breakpt(x)`
+fits a line up to an estimated breakpoint and a constant beyond it.
+`logistic(x)` fits a sigmoid curve. gratia draws these as parametric
+effects, with one curve for each component of a delta model. The
+argument of either term must name a column in the fitting data,
+following sdmTMB’s formula restrictions.
+
+A small simulated example shows both shapes without refitting the survey
+model. Starting values place the breakpoint within the observed range
+and give the logistic curve a positive distance between its 50% and 95%
+locations. sdmTMB stores the logarithm of this distance as the second
+logistic parameter.
+
+``` r
+
+set.seed(312)
+threshold_data <- data.frame(x = runif(400, 0, 2))
+threshold_data$breakpt_y <- 0.4 + 1.8 * pmin(threshold_data$x, 0.9) +
+  rnorm(nrow(threshold_data), sd = 0.15)
+threshold_data$logistic_y <- 0.4 +
+  2.2 * plogis(log(19) * (threshold_data$x - 0.8) / 0.6) +
+  rnorm(nrow(threshold_data), sd = 0.15)
+breakpt_fit <- sdmTMB(
+  breakpt_y ~ breakpt(x), data = threshold_data, spatial = "off",
+  control = sdmTMBcontrol(backend = "rtmb",
+    start = list(b_threshold = matrix(c(1.5, 0.8), ncol = 1)))
+)
+logistic_fit <- sdmTMB(
+  logistic_y ~ logistic(x), data = threshold_data, spatial = "off",
+  control = sdmTMBcontrol(backend = "rtmb",
+    start = list(b_threshold = matrix(c(0.8, log(0.6), 2), ncol = 1)))
+)
+sanity(breakpt_fit)
+sanity(logistic_fit)
+```
+
+Select these curves using `terms`, as for the survey-year effects above.
+[`parametric_terms()`](https://gavinsimpson.github.io/gratia/reference/parametric_terms.md)
+lists their labels. In a delta model, `breakpt(x).1` or `logistic(x).1`
+selects the second component. `parametric = FALSE` suppresses threshold
+curves; selecting smooths with `select` excludes parametric effects
+unless `parametric = TRUE` is also supplied.
+
+``` r
+
+parametric_terms(breakpt_fit)
+#>   breakpt(x) 
+#> "breakpt(x)"
+parametric_terms(logistic_fit)
+#>   logistic(x) 
+#> "logistic(x)"
+threshold_panels <- c(
+  draw(breakpt_fit, terms = "breakpt(x)", n = 100, wrap = FALSE),
+  assemble(logistic_fit, terms = "logistic(x)", n = 100)
+)
+wrap_plots(threshold_panels, ncol = 2)
+```
+
+![Estimated breakpoint and logistic contributions, with pointwise
+uncertainty bands and
+rugs.](sdmTMB-support_files/figure-html/threshold-curves-1.png)
+
+Each curve is its uncentred contribution to the linear predictor. The
+intercept is not added to that contribution. The bands use pointwise
+delta-method standard errors from the joint covariance of the fitted
+threshold parameters. By default, they also include the intercept’s
+uncertainty and its covariance with those parameters. Use
+`overall_uncertainty = FALSE` for uncertainty in the threshold
+contribution alone. Threshold bands remain pointwise when
+`interval = "simultaneous"` is requested for smooths in the same model.
+
+The default evaluation grid contains `n` equally spaced values over the
+fitted covariate range. For a breakpoint curve, it also contains the
+fitted breakpoint when that lies within the range, so the plotted line
+changes slope at the fitted location. Supply `data` to choose evaluation
+locations instead. Rugs continue to show fitting observations. The
+threshold covariate is already on its original scale, so
+`back_transform` does not change its axis. `constant` shifts the curve
+and interval together; `fun` then transforms both.
+
+``` r
+
+parametric_effects(logistic_fit, terms = "logistic(x)",
+  data = data.frame(x = c(0.25, 0.75, 1.25)),
+  overall_uncertainty = FALSE)
+#> # A tibble: 3 × 5
+#>   .term       .type   .value .partial    .se
+#>   <chr>       <chr>    <dbl>    <dbl>  <dbl>
+#> 1 logistic(x) numeric   0.25    0.112 0.0156
+#> 2 logistic(x) numeric   0.75    0.930 0.0351
+#> 3 logistic(x) numeric   1.25    1.97  0.0246
+```
+
 ## Applying the workflow to another survey
 
 Retain the scientific unit of the response and its zeros when selecting
@@ -650,9 +745,9 @@ examine spatial patterns alongside marginal distribution plots.
 The support has deliberate limits. gratia does not supply partial
 residual overlays or random-field effect plots for sdmTMB.
 Formula-effect extraction does not cover dispersion formulas, other
-multi-predictor families, threshold or nonlocal effects. It cannot use
-mapped or profiled coefficients needed for extraction, unavailable
-smooth metadata, or a covariance from a non-positive-definite Hessian.
+multi-predictor families, or nonlocal effects. It cannot use mapped or
+profiled coefficients needed for extraction, unavailable smooth
+metadata, or a covariance from a non-positive-definite Hessian.
 `unconditional = TRUE` and `frequentist = TRUE` are mgcv covariance
 choices and do not apply to these joint RTMB intervals. Use sdmTMB’s
 prediction and plotting methods for fields and unsupported formula
