@@ -2,6 +2,8 @@
 #'
 #' Plots smooth and parametric contributions from a fitted GAM model using
 #' [ggplot2::ggplot()].
+#' For models fitted by [mgcv::gamm()], `draw()` and [assemble()] use the
+#' fitted `gam` component.
 #'
 #' @param object a fitted GAM, the result of a call to [mgcv::gam()].
 #' @param data an optional data frame that is used to supply the data at which
@@ -524,8 +526,16 @@ draw_gam_impl <- function(
 }
 
 #' @export
+#' @rdname draw.gam
 `draw.gamm` <- function(object, ...) {
-  draw(object$gam, ...)
+  draw(gamm_plot_model(object), ...)
+}
+
+gamm_plot_model <- function(object) {
+  if (!is.list(object) || !inherits(object[["gam"]], "gam")) {
+    stop("Expected a gamm model with a valid 'gam' component.", call. = FALSE)
+  }
+  object[["gam"]]
 }
 
 #' @export

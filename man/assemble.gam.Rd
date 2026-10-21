@@ -2,6 +2,7 @@
 % Please edit documentation in R/assemble.R
 \name{assemble.gam}
 \alias{assemble.gam}
+\alias{assemble.gamm}
 \alias{assemble.scam}
 \title{Plot smooth and parametric terms from a fitted GAM}
 \usage{
@@ -74,6 +75,8 @@
   cyclic = c("cartesian", "polar"),
   polar_args = list()
 )
+
+\method{assemble}{gamm}(object, ...)
 
 \method{assemble}{scam}(object, ..., overall_uncertainty = FALSE, centre = c("model", "plot"))
 }
@@ -426,6 +429,8 @@ A list of \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}} objects.
 \description{
 Plots smooth and parametric contributions from a fitted GAM model using
 \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}}.
+For models fitted by \code{\link[mgcv:gamm]{mgcv::gamm()}}, \code{assemble()} and \code{\link[=draw]{draw()}} use the
+fitted \code{gam} component.
 }
 \details{
 Smooth plot subtitles identify the model part or distributional
@@ -455,6 +460,11 @@ assemble(m1)
 # can be passed to patchwork::wrap_plots()
 suppressPackageStartupMessages(library("patchwork"))
 assemble(m1) |> wrap_plots(ncol = 2, nrow = 2)
+
+# Prepare individual plots from a GAMM
+m2 <- gamm(y ~ s(x0) + x1, data = df1, method = "REML")
+gamm_plots <- assemble(m2)
+gamm_plots[[1]]
 }
 \author{
 Gavin L. Simpson

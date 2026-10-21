@@ -112,6 +112,10 @@
 
 ## New features
 
+* `assemble()` now supports models fitted by `mgcv::gamm()`, returning named
+  plots of smooth and parametric contributions. It shares preparation of the
+  fitted GAM component with `draw()`.
+
 * `assemble()` now supports models fitted by `GJRM::gamlss()`, returning a
   named list of smooth and parametric plots across equations. It shares model
   preparation, selection and scale handling with `draw()`.

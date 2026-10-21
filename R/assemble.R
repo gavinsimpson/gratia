@@ -21,6 +21,8 @@
 #'
 #' Plots smooth and parametric contributions from a fitted GAM model using
 #' [ggplot2::ggplot()].
+#' For models fitted by [mgcv::gamm()], `assemble()` and [draw()] use the
+#' fitted `gam` component.
 #'
 #' @inheritParams draw.gam
 #' @details Smooth plot subtitles identify the model part or distributional
@@ -65,6 +67,11 @@
 #' # can be passed to patchwork::wrap_plots()
 #' suppressPackageStartupMessages(library("patchwork"))
 #' assemble(m1) |> wrap_plots(ncol = 2, nrow = 2)
+#'
+#' # Prepare individual plots from a GAMM
+#' m2 <- gamm(y ~ s(x0) + x1, data = df1, method = "REML")
+#' gamm_plots <- assemble(m2)
+#' gamm_plots[[1]]
 `assemble.gam` <- function(
   object,
   data = NULL,
@@ -568,6 +575,12 @@
   cli_ol(names(x))
   cli_par()
   cli_end()
+}
+
+#' @export
+#' @rdname assemble.gam
+assemble.gamm <- function(object, ...) {
+  assemble(gamm_plot_model(object), ...)
 }
 
 #' @export

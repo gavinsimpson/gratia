@@ -2,6 +2,7 @@
 % Please edit documentation in R/draw-gam.R, R/scasm-methods.R
 \name{draw.gam}
 \alias{draw.gam}
+\alias{draw.gamm}
 \alias{draw.scam}
 \alias{draw.scasm}
 \title{Plot smooth and parametric terms from a fitted GAM}
@@ -75,6 +76,8 @@
   cyclic = c("cartesian", "polar"),
   polar_args = list()
 )
+
+\method{draw}{gamm}(object, ...)
 
 \method{draw}{scam}(object, ..., overall_uncertainty = FALSE, centre = c("model", "plot"))
 
@@ -433,6 +436,8 @@ The object returned is created by \code{\link[patchwork:wrap_plots]{patchwork::w
 \description{
 Plots smooth and parametric contributions from a fitted GAM model using
 \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}}.
+For models fitted by \code{\link[mgcv:gamm]{mgcv::gamm()}}, \code{draw()} and \code{\link[=assemble]{assemble()}} use the
+fitted \code{gam} component.
 }
 \details{
 For models with multiple linear predictors, smooth plot subtitles identify

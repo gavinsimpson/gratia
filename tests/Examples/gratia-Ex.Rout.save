@@ -371,7 +371,7 @@ detaching ‘package:ggplot2’, ‘package:mgcv’
 > 
 > ### Name: assemble.gam
 > ### Title: Plot smooth and parametric terms from a fitted GAM
-> ### Aliases: assemble.gam assemble.scam
+> ### Aliases: assemble.gam assemble.gamm assemble.scam
 > 
 > ### ** Examples
 > 
@@ -396,6 +396,11 @@ detaching ‘package:ggplot2’, ‘package:mgcv’
 > # can be passed to patchwork::wrap_plots()
 > suppressPackageStartupMessages(library("patchwork"))
 > assemble(m1) |> wrap_plots(ncol = 2, nrow = 2)
+>
+> # Prepare individual plots from a GAMM
+> m2 <- gamm(y ~ s(x0) + x1, data = df1, method = "REML")
+> gamm_plots <- assemble(m2)
+> gamm_plots[[1]]
 > 
 > 
 > 
@@ -1373,7 +1378,7 @@ detaching ‘package:mgcv’
 >
 > ### Name: draw.gam
 > ### Title: Plot smooth and parametric terms from a fitted GAM
-> ### Aliases: draw.gam draw.scam draw.scasm
+> ### Aliases: draw.gam draw.gamm draw.scam draw.scasm
 >
 > ### ** Examples
 >
