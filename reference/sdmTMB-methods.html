@@ -13,7 +13,7 @@ back to the constrained mgcv basis."><meta property="og:image" content="https://
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-59</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-60</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -112,7 +112,8 @@ back to the constrained mgcv basis.</p>
 <span>  residuals <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  unconditional <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  frequentist <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  envir <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  envir <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  time_varying_style <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ribbon"</span>, <span class="st">"pointrange"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'sdmTMB'</span></span>
@@ -123,7 +124,8 @@ back to the constrained mgcv basis.</p>
 <span>  residuals <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  unconditional <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  frequentist <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  envir <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  envir <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  time_varying_style <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ribbon"</span>, <span class="st">"pointrange"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -167,7 +169,8 @@ RTMB covariance; mgcv-specific alternatives are unavailable.</p></dd>
 <dt id="arg-terms">terms<a class="anchor" aria-label="anchor" href="#arg-terms"></a></dt>
 <dd><p>Parametric terms to evaluate or draw, as returned by
 <code><a href="parametric_terms.html">parametric_terms()</a></code>, including <code>breakpt(x)</code> and <code>logistic(x)</code> threshold
-terms. Second-component selectors have a <code>.1</code> suffix.</p></dd>
+terms and <code>time_varying(temperature)</code> coefficient trajectories.
+Second-component selectors have a <code>.1</code> suffix.</p></dd>
 
 
 <dt id="arg-parametric">parametric<a class="anchor" aria-label="anchor" href="#arg-parametric"></a></dt>
@@ -177,6 +180,12 @@ smooths are selected explicitly, as for <code><a href="draw.gam.html">draw.gam()
 
 <dt id="arg-residuals">residuals<a class="anchor" aria-label="anchor" href="#arg-residuals"></a></dt>
 <dd><p>Must be <code>FALSE</code>; partial residuals are not supported.</p></dd>
+
+
+<dt id="arg-time-varying-style">time_varying_style<a class="anchor" aria-label="anchor" href="#arg-time-varying-style"></a></dt>
+<dd><p>Display time-varying coefficients with a line,
+points and uncertainty ribbon (<code>"ribbon"</code>, the default), or with points,
+interval bars and a faint connecting line (<code>"pointrange"</code>).</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -188,9 +197,10 @@ or named panels with <code>wrap = FALSE</code>; <code><a href="assemble.html">as
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>Estimates are partial contributions on each component's link scale. Spatial,
-spatiotemporal, IID random effects, offsets, and varying coefficients are
-not added to the effects. Their influence on coefficient uncertainty is
+    <p>Smooth, ordinary parametric and threshold estimates are partial contributions
+on each component's link scale. Spatial, spatiotemporal, IID random effects,
+offsets and varying coefficients are not added to these effects. Their
+influence on coefficient uncertainty is
 retained through the joint covariance. Smooth intervals include uncertainty
 in their component's overall mean by default; parametric intervals include
 the component's intercept. Use <code>overall_uncertainty = FALSE</code> for term-only
@@ -234,9 +244,32 @@ Use <code>overall_uncertainty = FALSE</code> for term-only uncertainty. At the
 breakpoint, the derivative is taken from the constant side, matching native
 sdmTMB prediction. Threshold intervals remain pointwise when simultaneous
 smooth bands are requested. Rugs show fitting observations.</p>
+<p>Time-varying coefficients are plotted at their stored time steps, including
+<code>extra_time</code>; <code>n</code> does not add time steps. Select each fitted design column
+with a label such as <code>time_varying(temperature)</code> or
+<code>time_varying(Intercept)</code>. A covariate named <code>Intercept</code> is distinguished
+from the intercept by backticks: <code>time_varying(`Intercept`)</code>.
+Factor contrasts, transformations and interactions
+retain the fitted coefficient coding. For <code>rw</code>, estimates are the temporal
+coefficients. For <code>rw0</code> and <code>ar1</code>, the matching ordinary coefficient is added
+to its temporal deviation. Their joint covariance includes the variance of
+both parts and their covariance. An absent ordinary coefficient contributes
+zero. Matching columns must have compatible coding in the main and temporal
+designs. Default effects omit ordinary terms whose coefficients are already
+included in trajectories; their ordinary selectors remain available for
+explicit requests. <code>overall_uncertainty</code> governs ordinary partial effects;
+temporal panels always retain their complete coefficient covariance.
+Temporal intervals remain pointwise when simultaneous smooth bands are
+requested. Supplied <code>data</code> selects stored time steps if it contains the
+model's time column; otherwise all stored times are retained. Missing or
+unknown requested times give an error. sdmTMB 1.2.0 requires numeric time
+values for time-varying processes.</p>
+<p>Time-varying estimates from <code><a href="parametric_effects.html">parametric_effects()</a></code> use <code>.type = "time_varying"</code>, <code>.value</code> for time, <code>.partial</code> for the full coefficient,
+and <code>.se</code> for its standard error. Both display styles are also available
+through <code><a href="draw.parametric_effects.html">draw.parametric_effects()</a></code>, including nested saved estimates.</p>
 <p>Smooth extraction and effect plots do not support dispersion formulas,
 other multi-predictor families, or nonlocal effects.
-Random-effect plots are not provided.</p>
+Spatial fields and group random effects are not plotted.</p>
     </div>
 
     <div class="section level2">

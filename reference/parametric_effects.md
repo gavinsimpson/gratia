@@ -157,6 +157,16 @@ treatment contrasts, a numeric-by-factor interaction represents a
 departure from the reference-level slope, rather than a complete slope
 for each level.
 
+For sdmTMB time-varying coefficients, `.type = "time_varying"`
+identifies coefficient trajectories. In these rows, `.value` contains
+time, `.partial` contains the full coefficient, and `.se` includes the
+joint uncertainty of its ordinary coefficient and temporal deviation.
+Default selection omits ordinary terms already included in these
+trajectories; their usual selectors remain available for explicit
+requests. See
+[sdmTMB-methods](https://gavinsimpson.github.io/gratia/reference/sdmTMB-methods.md)
+for details.
+
 A multi-column term such as `poly(x, 3)` is one component, whereas `x`
 and `I(x^2)` remain separate components. Scalar numeric transformations
 use model coordinates by default, including each axis of an interaction.

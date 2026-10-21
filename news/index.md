@@ -734,7 +734,15 @@
   [`assemble()`](https://gavinsimpson.github.io/gratia/reference/assemble.md).
   Their pointwise delta-method intervals include threshold parameter
   uncertainty and, by default, intercept uncertainty and its covariance
-  with the threshold parameters.
+  with the threshold parameters. Time-varying coefficients from `rw`,
+  `rw0` and `ar1` models are also available, with the ordinary
+  coefficient and its temporal deviation combined where appropriate.
+  Their pointwise intervals use the joint covariance of both parts.
+  Select trajectories with labels such as `time_varying(temperature)` in
+  `terms`; the corresponding ordinary-effect panels are omitted by
+  default and remain available through explicit selection. Use
+  `time_varying_style = "pointrange"` for points and interval bars
+  instead of the default line, points and ribbon.
 
 - Smooth plot subtitles now identify the model part or distributional
   parameter for glmmTMB, mgcv and

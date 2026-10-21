@@ -13,7 +13,7 @@ fitted gam component."><meta property="og:image" content="https://gavinsimpson.g
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-59</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-60</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -141,7 +141,8 @@ fitted <code>gam</code> component.</p>
 <span>  simultaneous_domain <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  tube_control <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  cyclic <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"cartesian"</span>, <span class="st">"polar"</span><span class="op">)</span>,</span>
-<span>  polar_args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
+<span>  polar_args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  time_varying_style <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ribbon"</span>, <span class="st">"pointrange"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'gamm'</span></span>
@@ -616,6 +617,13 @@ default (<code>r.axis.inside = TRUE</code>); supplied values override this defau
 Other options use their ggplot2 defaults. Requires
 <code>cyclic = "polar"</code> when nonempty. The angular variable, fitted cycle
 boundaries, full-circle extent and angular expansion are set by gratia.</p></dd>
+
+
+<dt id="arg-time-varying-style">time_varying_style<a class="anchor" aria-label="anchor" href="#arg-time-varying-style"></a></dt>
+<dd><p>Display sdmTMB time-varying coefficients using
+a line, points and interval ribbon (<code>"ribbon"</code>, the default), or points
+and interval bars with a connecting line (<code>"pointrange"</code>). Other model
+terms keep their usual displays.</p></dd>
 
 
 <dt id="arg-centre">centre<a class="anchor" aria-label="anchor" href="#arg-centre"></a></dt>

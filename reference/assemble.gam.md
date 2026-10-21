@@ -79,7 +79,8 @@ assemble(
   simultaneous_domain = NULL,
   tube_control = list(),
   cyclic = c("cartesian", "polar"),
-  polar_args = list()
+  polar_args = list(),
+  time_varying_style = c("ribbon", "pointrange")
 )
 
 # S3 method for class 'gamm'
@@ -589,6 +590,13 @@ assemble(object, ..., overall_uncertainty = FALSE, centre = c("model", "plot"))
   `cyclic = "polar"` when nonempty. The angular variable, fitted cycle
   boundaries, full-circle extent and angular expansion are set by
   gratia.
+
+- time_varying_style:
+
+  Display sdmTMB time-varying coefficients using a line, points and
+  interval ribbon (`"ribbon"`, the default), or points and interval bars
+  with a connecting line (`"pointrange"`). Other model terms keep their
+  usual displays.
 
 - centre:
 

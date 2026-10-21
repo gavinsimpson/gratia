@@ -47,7 +47,8 @@ assemble(
   residuals = FALSE,
   unconditional = FALSE,
   frequentist = FALSE,
-  envir = NULL
+  envir = NULL,
+  time_varying_style = c("ribbon", "pointrange")
 )
 
 # S3 method for class 'sdmTMB'
@@ -58,7 +59,8 @@ draw(
   residuals = FALSE,
   unconditional = FALSE,
   frequentist = FALSE,
-  envir = NULL
+  envir = NULL,
+  time_varying_style = c("ribbon", "pointrange")
 )
 ```
 
@@ -102,8 +104,9 @@ draw(
 
   Parametric terms to evaluate or draw, as returned by
   [`parametric_terms()`](https://gavinsimpson.github.io/gratia/reference/parametric_terms.md),
-  including `breakpt(x)` and `logistic(x)` threshold terms.
-  Second-component selectors have a `.1` suffix.
+  including `breakpt(x)` and `logistic(x)` threshold terms and
+  `time_varying(temperature)` coefficient trajectories. Second-component
+  selectors have a `.1` suffix.
 
 - parametric:
 
@@ -114,6 +117,12 @@ draw(
 - residuals:
 
   Must be `FALSE`; partial residuals are not supported.
+
+- time_varying_style:
+
+  Display time-varying coefficients with a line, points and uncertainty
+  ribbon (`"ribbon"`, the default), or with points, interval bars and a
+  faint connecting line (`"pointrange"`).
 
 ## Value
 
@@ -127,15 +136,15 @@ parametric effects.
 
 ## Details
 
-Estimates are partial contributions on each component's link scale.
-Spatial, spatiotemporal, IID random effects, offsets, and varying
-coefficients are not added to the effects. Their influence on
-coefficient uncertainty is retained through the joint covariance. Smooth
-intervals include uncertainty in their component's overall mean by
-default; parametric intervals include the component's intercept. Use
-`overall_uncertainty = FALSE` for term-only intervals. `fun` transforms
-displayed partial effects, not full predictions. Use
-`surface = "3d", ci_3d = TRUE` in
+Smooth, ordinary parametric and threshold estimates are partial
+contributions on each component's link scale. Spatial, spatiotemporal,
+IID random effects, offsets and varying coefficients are not added to
+these effects. Their influence on coefficient uncertainty is retained
+through the joint covariance. Smooth intervals include uncertainty in
+their component's overall mean by default; parametric intervals include
+the component's intercept. Use `overall_uncertainty = FALSE` for
+term-only intervals. `fun` transforms displayed partial effects, not
+full predictions. Use `surface = "3d", ci_3d = TRUE` in
 [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md) or
 [`assemble()`](https://gavinsimpson.github.io/gratia/reference/assemble.md)
 to add interval surfaces to smooths and numeric parametric interactions
@@ -188,9 +197,39 @@ breakpoint, the derivative is taken from the constant side, matching
 native sdmTMB prediction. Threshold intervals remain pointwise when
 simultaneous smooth bands are requested. Rugs show fitting observations.
 
+Time-varying coefficients are plotted at their stored time steps,
+including `extra_time`; `n` does not add time steps. Select each fitted
+design column with a label such as `time_varying(temperature)` or
+`time_varying(Intercept)`. A covariate named `Intercept` is
+distinguished from the intercept by backticks:
+`` time_varying(`Intercept`) ``. Factor contrasts, transformations and
+interactions retain the fitted coefficient coding. For `rw`, estimates
+are the temporal coefficients. For `rw0` and `ar1`, the matching
+ordinary coefficient is added to its temporal deviation. Their joint
+covariance includes the variance of both parts and their covariance. An
+absent ordinary coefficient contributes zero. Matching columns must have
+compatible coding in the main and temporal designs. Default effects omit
+ordinary terms whose coefficients are already included in trajectories;
+their ordinary selectors remain available for explicit requests.
+`overall_uncertainty` governs ordinary partial effects; temporal panels
+always retain their complete coefficient covariance. Temporal intervals
+remain pointwise when simultaneous smooth bands are requested. Supplied
+`data` selects stored time steps if it contains the model's time column;
+otherwise all stored times are retained. Missing or unknown requested
+times give an error. sdmTMB 1.2.0 requires numeric time values for
+time-varying processes.
+
+Time-varying estimates from
+[`parametric_effects()`](https://gavinsimpson.github.io/gratia/reference/parametric_effects.md)
+use `.type = "time_varying"`, `.value` for time, `.partial` for the full
+coefficient, and `.se` for its standard error. Both display styles are
+also available through
+[`draw.parametric_effects()`](https://gavinsimpson.github.io/gratia/reference/draw.parametric_effects.md),
+including nested saved estimates.
+
 Smooth extraction and effect plots do not support dispersion formulas,
-other multi-predictor families, or nonlocal effects. Random-effect plots
-are not provided.
+other multi-predictor families, or nonlocal effects. Spatial fields and
+group random effects are not plotted.
 
 ## Examples
 

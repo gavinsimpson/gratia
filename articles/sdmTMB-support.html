@@ -27,7 +27,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-59</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-60</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -618,8 +618,8 @@ frequency and a positive-tail summary:</p>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> New fields              density_95th    187.    143.    214.     157.   </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> New fields              proportion_zero   0.518   0.414   0.630    0.538</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> Uncertain fitted fields density_95th    161.    144.    182.     157.   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> Uncertain fitted fields proportion_zero   0.542   0.525   0.554    0.538</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> Uncertain fitted fields density_95th    158.    138.    175.     157.   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> Uncertain fitted fields proportion_zero   0.539   0.524   0.559    0.538</span></span></code></pre></div>
 <p>The conditional comparison asks whether new responses around the
 inferred survey fields reproduce these summaries. The marginal
 comparison asks whether new field realisations at the survey locations
@@ -719,6 +719,216 @@ original scale, so <code>back_transform</code> does not change its axis.
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> logistic(x) numeric   0.25    0.112 0.015<span style="text-decoration: underline;">6</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> logistic(x) numeric   0.75    0.930 0.035<span style="text-decoration: underline;">1</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> logistic(x) numeric   1.25    1.97  0.024<span style="text-decoration: underline;">6</span></span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="coefficients-that-vary-through-time">Coefficients that vary through time<a class="anchor" aria-label="anchor" href="#coefficients-that-vary-through-time"></a>
+</h2>
+<p>A covariate’s coefficient can change through time in sdmTMB. For
+example, temperature may have a stronger association with abundance in
+some years than in others. The <code>time_varying</code> formula
+specifies which coefficients vary, while <code>time_varying_type</code>
+defines the process connecting successive values. <code>~ 1</code>
+varies the intercept; <code>~ 0 + temperature</code> varies just the
+temperature coefficient; <code>~ temperature</code> varies both.</p>
+<p>The three processes differ in how they represent the coefficient’s
+level:</p>
+<ul>
+<li>
+<code>"rw"</code> estimates the first coefficient freely and
+penalises changes between time steps. Omit its corresponding ordinary
+term from the main formula. If the intercept varies, omit the main
+formula’s intercept too.</li>
+<li>
+<code>"rw0"</code> estimates deviations whose first value is shrunk
+towards zero, followed by a random walk. Include an ordinary coefficient
+for the baseline.</li>
+<li>
+<code>"ar1"</code> estimates correlated deviations around zero.
+Include an ordinary coefficient for the average effect.</li>
+</ul>
+<p>This simulated example fits all three specifications to the same
+data. The temperature coefficient changes over 20 years, with 35
+observations per year. Spatial and spatiotemporal fields are switched
+off so that the example focuses on the changing coefficient.</p>
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">420</span><span class="op">)</span></span>
+<span><span class="va">coefficient_years</span> <span class="op">&lt;-</span> <span class="fl">2005</span><span class="op">:</span><span class="fl">2024</span></span>
+<span><span class="va">temperature_coefficient</span> <span class="op">&lt;-</span> <span class="fl">0.8</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/arima.sim.html" class="external-link">arima.sim</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>ar <span class="op">=</span> <span class="fl">0.72</span><span class="op">)</span>, n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">coefficient_years</span><span class="op">)</span>, sd <span class="op">=</span> <span class="fl">0.13</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">coefficient_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  year <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="va">coefficient_years</span>, each <span class="op">=</span> <span class="fl">35</span><span class="op">)</span>,</span>
+<span>  temperature <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">coefficient_years</span><span class="op">)</span> <span class="op">*</span> <span class="fl">35</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">coefficient_data</span><span class="op">$</span><span class="va">response</span> <span class="op">&lt;-</span> <span class="fl">0.6</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="va">temperature_coefficient</span>, each <span class="op">=</span> <span class="fl">35</span><span class="op">)</span> <span class="op">*</span> <span class="va">coefficient_data</span><span class="op">$</span><span class="va">temperature</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">coefficient_data</span><span class="op">)</span>, sd <span class="op">=</span> <span class="fl">0.65</span><span class="op">)</span></span>
+<span><span class="va">coefficient_fits</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"rw"</span>, <span class="st">"rw0"</span>, <span class="st">"ar1"</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">process</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">main_formula</span> <span class="op">&lt;-</span> <span class="kw">if</span> <span class="op">(</span><span class="va">process</span> <span class="op">==</span> <span class="st">"rw"</span><span class="op">)</span> <span class="va">response</span> <span class="op">~</span> <span class="fl">1</span> <span class="kw">else</span> <span class="va">response</span> <span class="op">~</span> <span class="va">temperature</span></span>
+<span>  <span class="fu"><a href="https://sdmTMB.github.io/sdmTMB/reference/sdmTMB.html" class="external-link">sdmTMB</a></span><span class="op">(</span></span>
+<span>    <span class="va">main_formula</span>, data <span class="op">=</span> <span class="va">coefficient_data</span>, time <span class="op">=</span> <span class="st">"year"</span>,</span>
+<span>    time_varying <span class="op">=</span> <span class="op">~</span> <span class="fl">0</span> <span class="op">+</span> <span class="va">temperature</span>, time_varying_type <span class="op">=</span> <span class="va">process</span>,</span>
+<span>    spatial <span class="op">=</span> <span class="st">"off"</span>, spatiotemporal <span class="op">=</span> <span class="st">"off"</span>,</span>
+<span>    control <span class="op">=</span> <span class="fu"><a href="https://sdmTMB.github.io/sdmTMB/reference/sdmTMBcontrol.html" class="external-link">sdmTMBcontrol</a></span><span class="op">(</span>backend <span class="op">=</span> <span class="st">"rtmb"</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">}</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">coefficient_fits</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"rw"</span>, <span class="st">"rw0"</span>, <span class="st">"ar1"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">coefficient_fits</span>, <span class="va">sanity</span><span class="op">)</span></span>
+<span><span class="co">#&gt; $rw</span></span>
+<span><span class="co">#&gt; $rw$hessian_ok</span></span>
+<span><span class="co">#&gt; [1] TRUE</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $rw$eigen_values_ok</span></span>
+<span><span class="co">#&gt; [1] TRUE</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $rw$nlminb_ok</span></span>
+<span><span class="co">#&gt; [1] TRUE</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $rw$range_ok</span></span>
+<span><span class="co">#&gt; [1] TRUE</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $rw$gradients_ok</span></span>
+<span><span class="co">#&gt; [1] TRUE</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $rw$se_magnitude_ok</span></span>
+<span><span class="co">#&gt; [1] TRUE</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $rw$se_na_ok</span></span>
+<span><span class="co">#&gt; [1] TRUE</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $rw$sigmas_ok</span></span>
+<span><span class="co">#&gt; [1] TRUE</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $rw$all_ok</span></span>
+<span><span class="co">#&gt; [1] TRUE</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $rw0</span></span>
+<span><span class="co">#&gt; $rw0$hessian_ok</span></span>
+<span><span class="co">#&gt; [1] TRUE</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $rw0$eigen_values_ok</span></span>
+<span><span class="co">#&gt; [1] TRUE</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $rw0$nlminb_ok</span></span>
+<span><span class="co">#&gt; [1] TRUE</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $rw0$range_ok</span></span>
+<span><span class="co">#&gt; [1] TRUE</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $rw0$gradients_ok</span></span>
+<span><span class="co">#&gt; [1] TRUE</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $rw0$se_magnitude_ok</span></span>
+<span><span class="co">#&gt; [1] TRUE</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $rw0$se_na_ok</span></span>
+<span><span class="co">#&gt; [1] TRUE</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $rw0$sigmas_ok</span></span>
+<span><span class="co">#&gt; [1] TRUE</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $rw0$all_ok</span></span>
+<span><span class="co">#&gt; [1] TRUE</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $ar1</span></span>
+<span><span class="co">#&gt; $ar1$hessian_ok</span></span>
+<span><span class="co">#&gt; [1] TRUE</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $ar1$eigen_values_ok</span></span>
+<span><span class="co">#&gt; [1] TRUE</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $ar1$nlminb_ok</span></span>
+<span><span class="co">#&gt; [1] TRUE</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $ar1$range_ok</span></span>
+<span><span class="co">#&gt; [1] TRUE</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $ar1$gradients_ok</span></span>
+<span><span class="co">#&gt; [1] TRUE</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $ar1$se_magnitude_ok</span></span>
+<span><span class="co">#&gt; [1] TRUE</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $ar1$se_na_ok</span></span>
+<span><span class="co">#&gt; [1] TRUE</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $ar1$sigmas_ok</span></span>
+<span><span class="co">#&gt; [1] TRUE</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $ar1$all_ok</span></span>
+<span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
+<p><code><a href="../reference/draw.html">draw()</a></code> plots the full coefficient over time: the fitted
+trajectory for <code>rw</code>, or the ordinary coefficient plus its
+temporal deviation for <code>rw0</code> and <code>ar1</code>. Points
+mark the modelled time steps, straight lines connect them, and a ribbon
+shows the pointwise interval. The following panels are ordered
+<code>rw</code>, <code>rw0</code> and <code>ar1</code>.</p>
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">coefficient_panels</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">coefficient_fits</span>, <span class="kw">function</span><span class="op">(</span><span class="va">fit</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="../reference/assemble.html">assemble</a></span><span class="op">(</span><span class="va">fit</span>, terms <span class="op">=</span> <span class="st">"time_varying(temperature)"</span><span class="op">)</span><span class="op">[[</span><span class="fl">1L</span><span class="op">]</span><span class="op">]</span></span>
+<span><span class="op">}</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://patchwork.data-imaginist.com/reference/wrap_plots.html" class="external-link">wrap_plots</a></span><span class="op">(</span><span class="va">coefficient_panels</span>, ncol <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
+<p><img src="sdmTMB-support_files/figure-html/time-varying-coefficient-ribbons-1.png" class="r-plt" alt="Full temperature coefficient trajectories from rw, rw0 and ar1 models, with points at each year and uncertainty ribbons." width="1152"></p>
+<p>Use <code>time_varying_style = "pointrange"</code> to show interval
+bars at each time step. This also works when drawing saved
+estimates.</p>
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">coefficient_estimates</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/parametric_effects.html">parametric_effects</a></span><span class="op">(</span><span class="va">coefficient_fits</span><span class="op">$</span><span class="va">ar1</span>,</span>
+<span>  terms <span class="op">=</span> <span class="st">"time_varying(temperature)"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">coefficient_estimates</span>, time_varying_style <span class="op">=</span> <span class="st">"pointrange"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="sdmTMB-support_files/figure-html/time-varying-coefficient-intervals-1.png" class="r-plt" alt="Full temperature coefficients from the AR1 model, with pointwise interval bars and a connecting line." width="700"></p>
+<p>For a coefficient written as <span class="math inline">b_t = \beta +
+\gamma_t</span>, the variance is</p>
+<p><span class="math display">
+\operatorname{Var}(b_t) = \operatorname{Var}(\beta) +
+  \operatorname{Var}(\gamma_t) + 2\operatorname{Cov}(\beta, \gamma_t).
+</span></p>
+<p>gratia uses this joint covariance when combining the ordinary
+coefficient and temporal deviations. A slope’s interval includes
+uncertainty in that slope’s ordinary coefficient, without adding
+uncertainty from a separate response intercept.
+<code>overall_uncertainty</code> continues to control ordinary partial
+effects; time-varying panels always retain the full coefficient’s
+uncertainty. These intervals remain pointwise when simultaneous bands
+are requested for smooths in the same model. <code>ci_level</code>
+changes their coverage; <code>constant</code> shifts estimates and
+intervals together, then <code>fun</code> transforms both.</p>
+<p><code><a href="../reference/parametric_terms.html">parametric_terms()</a></code> lists the available labels. Use
+<code>time_varying(Intercept)</code> for a varying intercept, and append
+<code>.1</code> to select a trajectory in the second delta component.
+Each fitted coefficient gets its own panel, including separate factor
+contrasts, transformed variables and interaction coefficients. The
+ordinary and time-varying design columns must have compatible coding
+when the corresponding ordinary term is present. An absent ordinary
+coefficient contributes zero to the full coefficient.</p>
+<p>By default, the ordinary-effect panel is omitted when its
+coefficients are included in a trajectory. Request its original selector
+explicitly to draw it, for example
+<code>draw(coefficient_fits$ar1, terms = "temperature")</code>.
+<code>parametric = FALSE</code> suppresses trajectories; selecting
+smooths with <code>select</code> excludes them unless
+<code>parametric = TRUE</code> is also supplied.</p>
+<p>The estimates use the stored modelled time steps, including
+<code>extra_time</code> values supplied when fitting. <code>n</code>
+does not create additional coefficient states. The stored time spacing
+is retained. A <code>data</code> frame containing the time column
+selects stored times; missing or unknown requested times give an error.
+If <code>data</code> has no time column, the complete trajectory is
+retained.</p>
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/parametric_terms.html">parametric_terms</a></span><span class="op">(</span><span class="va">coefficient_fits</span><span class="op">$</span><span class="va">ar1</span><span class="op">)</span></span>
+<span><span class="co">#&gt;                 temperature   time_varying(temperature) </span></span>
+<span><span class="co">#&gt;               "temperature" "time_varying(temperature)"</span></span>
+<span><span class="fu"><a href="../reference/parametric_effects.html">parametric_effects</a></span><span class="op">(</span><span class="va">coefficient_fits</span><span class="op">$</span><span class="va">ar1</span>,</span>
+<span>  terms <span class="op">=</span> <span class="st">"time_varying(temperature)"</span>,</span>
+<span>  data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>year <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2005</span>, <span class="fl">2010</span>, <span class="fl">2020</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3 × 5</span></span></span>
+<span><span class="co">#&gt;   .term                     .type        .value .partial   .se</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> time_varying(temperature) time_varying   <span style="text-decoration: underline;">2</span>005    0.693 0.101</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> time_varying(temperature) time_varying   <span style="text-decoration: underline;">2</span>010    0.813 0.108</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> time_varying(temperature) time_varying   <span style="text-decoration: underline;">2</span>020    0.716 0.102</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="applying-the-workflow-to-another-survey">Applying the workflow to another survey<a class="anchor" aria-label="anchor" href="#applying-the-workflow-to-another-survey"></a>

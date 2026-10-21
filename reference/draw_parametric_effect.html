@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-59</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-60</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -97,6 +97,8 @@
 <span>  axis_info <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  from_raw <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  back_transform <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  time_varying_info <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  time_varying_style <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ribbon"</span>, <span class="st">"pointrange"</span><span class="op">)</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -294,6 +296,17 @@ be drawn with <code>back_transform = FALSE</code>.
 Parametric estimates retain both scales; multi-column basis
 expansions retain raw axes on either setting. Does not transform estimated
 effects or their intervals; use <code>fun</code> for that.</p></dd>
+
+
+<dt id="arg-time-varying-info">time_varying_info<a class="anchor" aria-label="anchor" href="#arg-time-varying-info"></a></dt>
+<dd><p>Internal per-term labels for time-varying coefficients.</p></dd>
+
+
+<dt id="arg-time-varying-style">time_varying_style<a class="anchor" aria-label="anchor" href="#arg-time-varying-style"></a></dt>
+<dd><p>Display sdmTMB time-varying coefficients using
+a line, points and interval ribbon (<code>"ribbon"</code>, the default), or points
+and interval bars with a connecting line (<code>"pointrange"</code>). Other model
+terms keep their usual displays.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>

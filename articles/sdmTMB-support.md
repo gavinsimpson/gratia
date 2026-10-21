@@ -615,8 +615,8 @@ summary_draws |>
 #>   <chr>                   <chr>             <dbl>   <dbl>   <dbl>    <dbl>
 #> 1 New fields              density_95th    187.    143.    214.     157.   
 #> 2 New fields              proportion_zero   0.518   0.414   0.630    0.538
-#> 3 Uncertain fitted fields density_95th    161.    144.    182.     157.   
-#> 4 Uncertain fitted fields proportion_zero   0.542   0.525   0.554    0.538
+#> 3 Uncertain fitted fields density_95th    158.    138.    175.     157.   
+#> 4 Uncertain fitted fields proportion_zero   0.539   0.524   0.559    0.538
 ```
 
 The conditional comparison asks whether new responses around the
@@ -729,6 +729,232 @@ parametric_effects(logistic_fit, terms = "logistic(x)",
 #> 1 logistic(x) numeric   0.25    0.112 0.0156
 #> 2 logistic(x) numeric   0.75    0.930 0.0351
 #> 3 logistic(x) numeric   1.25    1.97  0.0246
+```
+
+## Coefficients that vary through time
+
+A covariate’s coefficient can change through time in sdmTMB. For
+example, temperature may have a stronger association with abundance in
+some years than in others. The `time_varying` formula specifies which
+coefficients vary, while `time_varying_type` defines the process
+connecting successive values. `~ 1` varies the intercept;
+`~ 0 + temperature` varies just the temperature coefficient;
+`~ temperature` varies both.
+
+The three processes differ in how they represent the coefficient’s
+level:
+
+- `"rw"` estimates the first coefficient freely and penalises changes
+  between time steps. Omit its corresponding ordinary term from the main
+  formula. If the intercept varies, omit the main formula’s intercept
+  too.
+- `"rw0"` estimates deviations whose first value is shrunk towards zero,
+  followed by a random walk. Include an ordinary coefficient for the
+  baseline.
+- `"ar1"` estimates correlated deviations around zero. Include an
+  ordinary coefficient for the average effect.
+
+This simulated example fits all three specifications to the same data.
+The temperature coefficient changes over 20 years, with 35 observations
+per year. Spatial and spatiotemporal fields are switched off so that the
+example focuses on the changing coefficient.
+
+``` r
+
+set.seed(420)
+coefficient_years <- 2005:2024
+temperature_coefficient <- 0.8 +
+  as.numeric(arima.sim(list(ar = 0.72), n = length(coefficient_years), sd = 0.13))
+coefficient_data <- data.frame(
+  year = rep(coefficient_years, each = 35),
+  temperature = rnorm(length(coefficient_years) * 35)
+)
+coefficient_data$response <- 0.6 +
+  rep(temperature_coefficient, each = 35) * coefficient_data$temperature +
+  rnorm(nrow(coefficient_data), sd = 0.65)
+coefficient_fits <- lapply(c("rw", "rw0", "ar1"), function(process) {
+  main_formula <- if (process == "rw") response ~ 1 else response ~ temperature
+  sdmTMB(
+    main_formula, data = coefficient_data, time = "year",
+    time_varying = ~ 0 + temperature, time_varying_type = process,
+    spatial = "off", spatiotemporal = "off",
+    control = sdmTMBcontrol(backend = "rtmb")
+  )
+})
+names(coefficient_fits) <- c("rw", "rw0", "ar1")
+lapply(coefficient_fits, sanity)
+#> $rw
+#> $rw$hessian_ok
+#> [1] TRUE
+#> 
+#> $rw$eigen_values_ok
+#> [1] TRUE
+#> 
+#> $rw$nlminb_ok
+#> [1] TRUE
+#> 
+#> $rw$range_ok
+#> [1] TRUE
+#> 
+#> $rw$gradients_ok
+#> [1] TRUE
+#> 
+#> $rw$se_magnitude_ok
+#> [1] TRUE
+#> 
+#> $rw$se_na_ok
+#> [1] TRUE
+#> 
+#> $rw$sigmas_ok
+#> [1] TRUE
+#> 
+#> $rw$all_ok
+#> [1] TRUE
+#> 
+#> 
+#> $rw0
+#> $rw0$hessian_ok
+#> [1] TRUE
+#> 
+#> $rw0$eigen_values_ok
+#> [1] TRUE
+#> 
+#> $rw0$nlminb_ok
+#> [1] TRUE
+#> 
+#> $rw0$range_ok
+#> [1] TRUE
+#> 
+#> $rw0$gradients_ok
+#> [1] TRUE
+#> 
+#> $rw0$se_magnitude_ok
+#> [1] TRUE
+#> 
+#> $rw0$se_na_ok
+#> [1] TRUE
+#> 
+#> $rw0$sigmas_ok
+#> [1] TRUE
+#> 
+#> $rw0$all_ok
+#> [1] TRUE
+#> 
+#> 
+#> $ar1
+#> $ar1$hessian_ok
+#> [1] TRUE
+#> 
+#> $ar1$eigen_values_ok
+#> [1] TRUE
+#> 
+#> $ar1$nlminb_ok
+#> [1] TRUE
+#> 
+#> $ar1$range_ok
+#> [1] TRUE
+#> 
+#> $ar1$gradients_ok
+#> [1] TRUE
+#> 
+#> $ar1$se_magnitude_ok
+#> [1] TRUE
+#> 
+#> $ar1$se_na_ok
+#> [1] TRUE
+#> 
+#> $ar1$sigmas_ok
+#> [1] TRUE
+#> 
+#> $ar1$all_ok
+#> [1] TRUE
+```
+
+[`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)
+plots the full coefficient over time: the fitted trajectory for `rw`, or
+the ordinary coefficient plus its temporal deviation for `rw0` and
+`ar1`. Points mark the modelled time steps, straight lines connect them,
+and a ribbon shows the pointwise interval. The following panels are
+ordered `rw`, `rw0` and `ar1`.
+
+``` r
+
+coefficient_panels <- lapply(coefficient_fits, function(fit) {
+  assemble(fit, terms = "time_varying(temperature)")[[1L]]
+})
+wrap_plots(coefficient_panels, ncol = 3)
+```
+
+![Full temperature coefficient trajectories from rw, rw0 and ar1 models,
+with points at each year and uncertainty
+ribbons.](sdmTMB-support_files/figure-html/time-varying-coefficient-ribbons-1.png)
+
+Use `time_varying_style = "pointrange"` to show interval bars at each
+time step. This also works when drawing saved estimates.
+
+``` r
+
+coefficient_estimates <- parametric_effects(coefficient_fits$ar1,
+  terms = "time_varying(temperature)")
+draw(coefficient_estimates, time_varying_style = "pointrange")
+```
+
+![Full temperature coefficients from the AR1 model, with pointwise
+interval bars and a connecting
+line.](sdmTMB-support_files/figure-html/time-varying-coefficient-intervals-1.png)
+
+For a coefficient written as b_t = \beta + \gamma_t, the variance is
+
+\operatorname{Var}(b_t) = \operatorname{Var}(\beta) +
+\operatorname{Var}(\gamma_t) + 2\operatorname{Cov}(\beta, \gamma_t).
+
+gratia uses this joint covariance when combining the ordinary
+coefficient and temporal deviations. A slope’s interval includes
+uncertainty in that slope’s ordinary coefficient, without adding
+uncertainty from a separate response intercept. `overall_uncertainty`
+continues to control ordinary partial effects; time-varying panels
+always retain the full coefficient’s uncertainty. These intervals remain
+pointwise when simultaneous bands are requested for smooths in the same
+model. `ci_level` changes their coverage; `constant` shifts estimates
+and intervals together, then `fun` transforms both.
+
+[`parametric_terms()`](https://gavinsimpson.github.io/gratia/reference/parametric_terms.md)
+lists the available labels. Use `time_varying(Intercept)` for a varying
+intercept, and append `.1` to select a trajectory in the second delta
+component. Each fitted coefficient gets its own panel, including
+separate factor contrasts, transformed variables and interaction
+coefficients. The ordinary and time-varying design columns must have
+compatible coding when the corresponding ordinary term is present. An
+absent ordinary coefficient contributes zero to the full coefficient.
+
+By default, the ordinary-effect panel is omitted when its coefficients
+are included in a trajectory. Request its original selector explicitly
+to draw it, for example
+`draw(coefficient_fits$ar1, terms = "temperature")`.
+`parametric = FALSE` suppresses trajectories; selecting smooths with
+`select` excludes them unless `parametric = TRUE` is also supplied.
+
+The estimates use the stored modelled time steps, including `extra_time`
+values supplied when fitting. `n` does not create additional coefficient
+states. The stored time spacing is retained. A `data` frame containing
+the time column selects stored times; missing or unknown requested times
+give an error. If `data` has no time column, the complete trajectory is
+retained.
+
+``` r
+
+parametric_terms(coefficient_fits$ar1)
+#>                 temperature   time_varying(temperature) 
+#>               "temperature" "time_varying(temperature)"
+parametric_effects(coefficient_fits$ar1,
+  terms = "time_varying(temperature)",
+  data = data.frame(year = c(2005, 2010, 2020)))
+#> # A tibble: 3 × 5
+#>   .term                     .type        .value .partial   .se
+#>   <chr>                     <chr>         <int>    <dbl> <dbl>
+#> 1 time_varying(temperature) time_varying   2005    0.693 0.101
+#> 2 time_varying(temperature) time_varying   2010    0.813 0.108
+#> 3 time_varying(temperature) time_varying   2020    0.716 0.102
 ```
 
 ## Applying the workflow to another survey

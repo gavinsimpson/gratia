@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-59</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-60</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -212,6 +212,12 @@ predictor. Intercepts, main effects and other terms are not added to an
 interaction. Components follow the model's contrast coding: with treatment
 contrasts, a numeric-by-factor interaction represents a departure from the
 reference-level slope, rather than a complete slope for each level.</p>
+<p>For sdmTMB time-varying coefficients, <code>.type = "time_varying"</code> identifies
+coefficient trajectories. In these rows, <code>.value</code> contains time, <code>.partial</code>
+contains the full coefficient, and <code>.se</code> includes the joint uncertainty of
+its ordinary coefficient and temporal deviation. Default selection omits
+ordinary terms already included in these trajectories; their usual selectors
+remain available for explicit requests. See <a href="sdmTMB-methods.html">sdmTMB-methods</a> for details.</p>
 <p>A multi-column term such as <code>poly(x, 3)</code> is one component, whereas <code>x</code> and
 <code>I(x^2)</code> remain separate components. Scalar numeric transformations use model
 coordinates by default, including each axis of an interaction. Basis
