@@ -12,6 +12,7 @@
 \alias{glmmTMB-methods}
 \alias{smooth_estimates.glmmTMB}
 \alias{smooth_coefs.glmmTMB}
+\alias{assemble.glmmTMB}
 \alias{draw.glmmTMB}
 \title{Effects and diagnostics for glmmTMB models}
 \usage{
@@ -38,6 +39,17 @@
 \method{smooth_estimates}{glmmTMB}(object, ..., unconditional = FALSE, frequentist = FALSE)
 
 \method{smooth_coefs}{glmmTMB}(object, select, ...)
+
+\method{assemble}{glmmTMB}(
+  object,
+  ...,
+  parametric = NULL,
+  residuals = FALSE,
+  unconditional = FALSE,
+  frequentist = FALSE,
+  ranef_lines = FALSE,
+  envir = NULL
+)
 
 \method{draw}{glmmTMB}(
   object,
@@ -94,6 +106,9 @@ slopes and structured covariance terms retain separate QQ plots.}
 }
 \value{
 Smooth estimates, coefficients, or plots, as for the GAM methods.
+\code{assemble()} returns a named list of ggplot objects, of class
+\code{"assembled_plots"}. \code{draw()} combines these plots into a patchwork unless
+\code{wrap = FALSE}, which returns the individual plots instead.
 All smooths, native random effects and parametric terms are plotted by
 default, as for \code{draw.gam()}. Smooths in later
 linear predictors use mgcv-style labels such as \code{s.1(x)} and \code{s.2(x)}.
@@ -103,7 +118,7 @@ For models with multiple linear predictors, smooth subtitles identify the
 "Conditional model", "Zero-inflation model" or "Dispersion model",
 consistently with native random-effect panels. Constant dispersion alone
 does not trigger these subtitles.
-\code{names(draw(object, wrap = FALSE, parametric = FALSE))} also lists native
+\code{names(assemble(object, parametric = FALSE))} also lists native
 random-effect coefficient panels.
 }
 \description{
@@ -120,8 +135,8 @@ by glmmTMB; gratia does not expand the smooth types glmmTMB can fit.
 Use \code{draw(model, surface = "3d", ci_3d = TRUE)} for interval surfaces on
 smooths and numeric parametric interactions in any linear predictor.
 \code{ci_3d_alpha} and \code{ci_3d_col} control their opacity and fill colour.
-Pass \code{cyclic = "polar"} and optional \code{polar_args} to \code{draw()} for polar
-plots of supported one-dimensional cyclic smooths.
+Pass \code{cyclic = "polar"} and optional \code{polar_args} to \code{draw()} or
+\code{assemble()} for polar plots of supported one-dimensional cyclic smooths.
 See \code{\link[=draw.gam]{draw.gam()}} for the coordinate options.
 
 Parametric effects use fitted contrast coding and exclude smooth null-space
@@ -164,6 +179,9 @@ if (requireNamespace("glmmTMB", quietly = TRUE)) {
   m <- glmmTMB::glmmTMB(y ~ s(x, k = 8), data = d, REML = TRUE)
   n_smooths(m) # one smooth term
   draw(m)
+  # Get individual ggplot objects for further customization
+  panels <- assemble(m)
+  panels[["s(x)"]]
   appraise(m, seed = 42)
 
   # Parametric terms and native random intercepts and slopes

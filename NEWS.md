@@ -112,6 +112,10 @@
 
 ## New features
 
+* `assemble()` now supports glmmTMB models, returning named plots for
+  smooths, native random effects and parametric terms. It shares model
+  preparation and argument checks with `draw()`.
+
 * `draw()` and `assemble()` can draw one-dimensional cyclic smooths with
   `cyclic = "polar"`, including factor-by and one-dimensional tensor smooths
   across supported model classes. Fitted cycle boundaries configure the angular

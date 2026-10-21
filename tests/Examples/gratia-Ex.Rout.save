@@ -2066,7 +2066,7 @@ detaching ‘package:lme4’, ‘package:Matrix’, ‘package:mgcv’
 > ### Aliases: qq_plot.glmmTMB worm_plot.glmmTMB appraise.glmmTMB
 > ###   parametric_terms.glmmTMB parametric_effects.glmmTMB smooths.glmmTMB
 > ###   get_smooths_by_id.glmmTMB glmmTMB-methods smooth_estimates.glmmTMB
-> ###   smooth_coefs.glmmTMB draw.glmmTMB
+> ###   smooth_coefs.glmmTMB assemble.glmmTMB draw.glmmTMB
 > 
 > ### ** Examples
 > 
@@ -2078,6 +2078,9 @@ detaching ‘package:lme4’, ‘package:Matrix’, ‘package:mgcv’
 +   m <- glmmTMB::glmmTMB(y ~ s(x, k = 8), data = d, REML = TRUE)
 +   n_smooths(m) # one smooth term
 +   draw(m)
++   # Get individual ggplot objects for further customization
++   panels <- assemble(m)
++   panels[["s(x)"]]
 +   appraise(m, seed = 42)
 + 
 +   # Parametric terms and native random intercepts and slopes

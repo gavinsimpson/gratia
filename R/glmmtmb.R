@@ -208,8 +208,8 @@ glmmtmb_smooth_model <- function(object, component = NULL, covariance = TRUE) {
 #' Use `draw(model, surface = "3d", ci_3d = TRUE)` for interval surfaces on
 #' smooths and numeric parametric interactions in any linear predictor.
 #' `ci_3d_alpha` and `ci_3d_col` control their opacity and fill colour.
-#' Pass `cyclic = "polar"` and optional `polar_args` to `draw()` for polar
-#' plots of supported one-dimensional cyclic smooths.
+#' Pass `cyclic = "polar"` and optional `polar_args` to `draw()` or
+#' `assemble()` for polar plots of supported one-dimensional cyclic smooths.
 #' See [draw.gam()] for the coordinate options.
 #'
 #' Parametric effects use fitted contrast coding and exclude smooth null-space
@@ -244,6 +244,9 @@ glmmtmb_smooth_model <- function(object, component = NULL, covariance = TRUE) {
 #' See [diagnostic_support] for conditioning choices and remaining limitations.
 #'
 #' @return Smooth estimates, coefficients, or plots, as for the GAM methods.
+#'   `assemble()` returns a named list of ggplot objects, of class
+#'   `"assembled_plots"`. `draw()` combines these plots into a patchwork unless
+#'   `wrap = FALSE`, which returns the individual plots instead.
 #'   All smooths, native random effects and parametric terms are plotted by
 #'   default, as for `draw.gam()`. Smooths in later
 #'   linear predictors use mgcv-style labels such as `s.1(x)` and `s.2(x)`.
@@ -253,7 +256,7 @@ glmmtmb_smooth_model <- function(object, component = NULL, covariance = TRUE) {
 #'   "Conditional model", "Zero-inflation model" or "Dispersion model",
 #'   consistently with native random-effect panels. Constant dispersion alone
 #'   does not trigger these subtitles.
-#'   `names(draw(object, wrap = FALSE, parametric = FALSE))` also lists native
+#'   `names(assemble(object, parametric = FALSE))` also lists native
 #'   random-effect coefficient panels.
 #' @name glmmTMB-methods
 #' @examples
@@ -265,6 +268,9 @@ glmmtmb_smooth_model <- function(object, component = NULL, covariance = TRUE) {
 #'   m <- glmmTMB::glmmTMB(y ~ s(x, k = 8), data = d, REML = TRUE)
 #'   n_smooths(m) # one smooth term
 #'   draw(m)
+#'   # Get individual ggplot objects for further customization
+#'   panels <- assemble(m)
+#'   panels[["s(x)"]]
 #'   appraise(m, seed = 42)
 #'
 #'   # Parametric terms and native random intercepts and slopes
@@ -303,11 +309,8 @@ smooth_coefs.glmmTMB <- function(object, select, ...) {
   smooth_coefs.gam(glmmtmb_smooth_model(object, covariance = FALSE), select, ...)
 }
 
-#' @rdname glmmTMB-methods
-#' @export
-draw.glmmTMB <- function(object, ..., parametric = NULL,
-    residuals = FALSE, unconditional = FALSE, frequentist = FALSE,
-    ranef_lines = FALSE, envir = NULL) {
+glmmtmb_plot_model <- function(object, residuals, unconditional,
+    frequentist, ranef_lines) {
   glmmtmb_covariance_options(unconditional, frequentist)
   if (!identical(residuals, FALSE)) {
     stop("glmmTMB partial residual overlays are not yet supported.")
@@ -323,6 +326,26 @@ draw.glmmTMB <- function(object, ..., parametric = NULL,
   model <- glmmtmb_smooth_model(object)
   model$native_random_effects <- glmmtmb_random_effects(object)
   model$ranef_lines <- ranef_lines
+  model
+}
+
+#' @rdname glmmTMB-methods
+#' @export
+assemble.glmmTMB <- function(object, ..., parametric = NULL,
+    residuals = FALSE, unconditional = FALSE, frequentist = FALSE,
+    ranef_lines = FALSE, envir = NULL) {
+  model <- glmmtmb_plot_model(object, residuals, unconditional,
+    frequentist, ranef_lines)
+  assemble(model, ..., parametric = parametric, envir = envir)
+}
+
+#' @rdname glmmTMB-methods
+#' @export
+draw.glmmTMB <- function(object, ..., parametric = NULL,
+    residuals = FALSE, unconditional = FALSE, frequentist = FALSE,
+    ranef_lines = FALSE, envir = NULL) {
+  model <- glmmtmb_plot_model(object, residuals, unconditional,
+    frequentist, ranef_lines)
   draw.gam(model, ..., parametric = parametric, envir = envir)
 }
 
