@@ -43,6 +43,18 @@ smooth_estimates(object, ..., unconditional = FALSE, frequentist = FALSE)
 smooth_coefs(object, select, ...)
 
 # S3 method for class 'glmmTMB'
+assemble(
+  object,
+  ...,
+  parametric = NULL,
+  residuals = FALSE,
+  unconditional = FALSE,
+  frequentist = FALSE,
+  ranef_lines = FALSE,
+  envir = NULL
+)
+
+# S3 method for class 'glmmTMB'
 draw(
   object,
   ...,
@@ -132,9 +144,13 @@ draw(
 
 ## Value
 
-Smooth estimates, coefficients, or plots, as for the GAM methods. All
-smooths, native random effects and parametric terms are plotted by
-default, as for
+Smooth estimates, coefficients, or plots, as for the GAM methods.
+[`assemble()`](https://gavinsimpson.github.io/gratia/reference/assemble.md)
+returns a named list of ggplot objects, of class `"assembled_plots"`.
+[`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)
+combines these plots into a patchwork unless `wrap = FALSE`, which
+returns the individual plots instead. All smooths, native random effects
+and parametric terms are plotted by default, as for
 [`draw.gam()`](https://gavinsimpson.github.io/gratia/reference/draw.gam.md).
 Smooths in later linear predictors use mgcv-style labels such as
 `s.1(x)` and `s.2(x)`. Predictor order is conditional, zero-inflation
@@ -143,8 +159,8 @@ Smooths in later linear predictors use mgcv-style labels such as
 predictors, smooth subtitles identify the "Conditional model",
 "Zero-inflation model" or "Dispersion model", consistently with native
 random-effect panels. Constant dispersion alone does not trigger these
-subtitles. `names(draw(object, wrap = FALSE, parametric = FALSE))` also
-lists native random-effect coefficient panels.
+subtitles. `names(assemble(object, parametric = FALSE))` also lists
+native random-effect coefficient panels.
 
 ## Details
 
@@ -155,7 +171,13 @@ availability is determined by glmmTMB; gratia does not expand the smooth
 types glmmTMB can fit. Use `draw(model, surface = "3d", ci_3d = TRUE)`
 for interval surfaces on smooths and numeric parametric interactions in
 any linear predictor. `ci_3d_alpha` and `ci_3d_col` control their
-opacity and fill colour.
+opacity and fill colour. Pass `cyclic = "polar"` and optional
+`polar_args` to
+[`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md) or
+[`assemble()`](https://gavinsimpson.github.io/gratia/reference/assemble.md)
+for polar plots of supported one-dimensional cyclic smooths. See
+[`draw.gam()`](https://gavinsimpson.github.io/gratia/reference/draw.gam.md)
+for the coordinate options.
 
 Parametric effects use fitted contrast coding and exclude smooth
 null-space coefficients. Their intervals include uncertainty in the
@@ -203,6 +225,9 @@ if (requireNamespace("glmmTMB", quietly = TRUE)) {
   m <- glmmTMB::glmmTMB(y ~ s(x, k = 8), data = d, REML = TRUE)
   n_smooths(m) # one smooth term
   draw(m)
+  # Get individual ggplot objects for further customization
+  panels <- assemble(m)
+  panels[["s(x)"]]
   appraise(m, seed = 42)
 
   # Parametric terms and native random intercepts and slopes

@@ -15,7 +15,7 @@ been removed from the package."><meta property="og:image" content="https://gavin
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-56</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-57</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -316,7 +316,11 @@ and <code>root_tol</code> (<code>1e-8</code>). Requires tube calibration. Simula
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A data frame (tibble), which is of class <code>"smooth_estimates"</code>.
 Its <code>plot_variables</code> attribute is a list of resolved covariate orders,
-named by smooth label, used when drawing the saved estimates.</p>
+named by smooth label, used when drawing the saved estimates.
+Its <code>cyclic_info</code> attribute retains the fitted cycle boundaries for
+supported one-dimensional cyclic components, allowing
+<code>draw(object, cyclic = "polar")</code> to configure the angular axis.
+This attribute is retained in nested and unnested output.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>

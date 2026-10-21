@@ -1,9 +1,15 @@
 # Plot smooths of a GAMLSS model estimated by `GJRM::gamlss`
 
-Provides a
-[`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)
-method for GAMLSS (distributional GAMs) fitted by
+Provides
+[`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md) and
+[`assemble()`](https://gavinsimpson.github.io/gratia/reference/assemble.md)
+methods for GAMLSS (distributional GAMs) fitted by
 [`GJRM::gamlss()`](https://rdrr.io/pkg/GJRM/man/gamlss.html).
+[`assemble()`](https://gavinsimpson.github.io/gratia/reference/assemble.md)
+returns the individual plots;
+[`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)
+arranges them using
+[`patchwork::wrap_plots()`](https://patchwork.data-imaginist.com/reference/wrap_plots.html).
 
 ## Usage
 
@@ -25,6 +31,19 @@ draw(
   terms = NULL,
   partial_match = FALSE,
   wrap = TRUE
+)
+
+# S3 method for class 'gamlss'
+assemble(
+  object,
+  scales = c("free", "fixed"),
+  ...,
+  n = 100,
+  envir = NULL,
+  select = NULL,
+  parametric = NULL,
+  terms = NULL,
+  partial_match = FALSE
 )
 ```
 
@@ -67,7 +86,7 @@ draw(
 - ...:
 
   arguments passed to
-  [`draw.gam()`](https://gavinsimpson.github.io/gratia/reference/draw.gam.md)
+  [`assemble.gam()`](https://gavinsimpson.github.io/gratia/reference/assemble.gam.md)
 
 - n:
 
@@ -118,6 +137,17 @@ draw(
   Logical; return an assembled patchwork when `TRUE` (the default), or a
   flat named list of plots when `FALSE`.
 
+## Value
+
+[`assemble()`](https://gavinsimpson.github.io/gratia/reference/assemble.md)
+and `draw(wrap = FALSE)` return a flat named list of plots, ordered by
+equation and then by term within each equation. Smooth names use the
+model-wide labels returned by
+[`smooths()`](https://gavinsimpson.github.io/gratia/reference/smooths.md).
+[`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)
+returns a patchwork by default. Both methods return invisible `NULL`
+when there are no plots to draw.
+
 ## Note
 
 For models with multiple linear predictors, smooth plot subtitles
@@ -128,7 +158,11 @@ labels, selection, by-variable information and custom subtitles are
 retained. Pass `surface = "3d", ci_3d = TRUE` through `...` to add
 interval surfaces to smooths and numeric parametric interactions in any
 equation. `ci_3d_alpha` and `ci_3d_col` control their opacity and fill
-colour.
+colour. Pass `cyclic = "polar"` and optional `polar_args` through `...`
+for polar plots of supported one-dimensional cyclic smooths in any
+equation; see
+[`draw.gam()`](https://gavinsimpson.github.io/gratia/reference/draw.gam.md)
+for the coordinate options.
 
 ## Examples
 
@@ -152,6 +186,9 @@ if (suppressPackageStartupMessages(require("GJRM", quietly = TRUE))) {
   m <- gamlss(fl, data = dataSim)
 
   draw(m)
+  plots <- assemble(m, parametric = FALSE)
+  names(plots)
+  plots[[1]]
   if (requireNamespace("ggcube", quietly = TRUE)) {
     surface <- GJRM::gamlss(list(y1 ~ s(x2, x3, k = 10), ~ s(x3, k = 6)),
       data = dataSim)

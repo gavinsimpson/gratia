@@ -43,7 +43,9 @@ draw(
   mrf_plot = c("effects", "qq"),
   interval = NULL,
   ...,
-  variables = NULL
+  variables = NULL,
+  cyclic = c("cartesian", "polar"),
+  polar_args = list()
 )
 ```
 
@@ -330,6 +332,37 @@ draw(
   again to change grid resolution or conditioning values. Continuous
   covariates must precede factors. Spherical smooths retain their
   latitude/longitude convention and do not support reordering.
+
+- cyclic:
+
+  character; use Cartesian coordinates (`"cartesian"`, the default) or
+  polar coordinates (`"polar"`) for one-dimensional cyclic smooths.
+  Other smooths and parametric terms keep their usual displays.
+
+- polar_args:
+
+  named list of options passed to
+  [`ggplot2::coord_radial()`](https://ggplot2.tidyverse.org/reference/coord_radial.html).
+  Accepts `start`, `reverse`, `inner.radius`, `r.axis.inside`,
+  `rotate.angle` and `clip`. The radial axis is inside the circle by
+  default (`r.axis.inside = TRUE`); supplied values override this
+  default. Other options use their ggplot2 defaults. Requires
+  `cyclic = "polar"` when nonempty. The angular variable, fitted cycle
+  boundaries, full-circle extent and angular expansion are set by
+  gratia.
+
+## Details
+
+`cyclic = "polar"` uses fitted cycle boundaries stored in the
+`cyclic_info` attribute. Evaluation points are unchanged: estimates
+covering only part of a cycle leave a gap. To draw a complete cycle,
+supply both fitted boundary values when computing estimates, or use
+`draw(model, cyclic = "polar")` to generate the full-cycle grid.
+Recompute older saved estimates with
+[`smooth_estimates()`](https://gavinsimpson.github.io/gratia/reference/smooth_estimates.md)
+if their fitted cycle boundaries are unavailable. See
+[`draw.gam()`](https://gavinsimpson.github.io/gratia/reference/draw.gam.md)
+for supported smooths and coordinate options.
 
 ## Examples
 

@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-56</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-57</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -77,10 +77,11 @@
 <span>  nrow <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  angle <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  guides <span class="op">=</span> <span class="st">"keep"</span>,</span>
-<span>  contour <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  contour <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  n_contour <span class="op">=</span> <span class="fl">10</span>,</span>
 <span>  contour_col <span class="op">=</span> <span class="st">"black"</span>,</span>
-<span>  <span class="va">...</span></span>
+<span>  <span class="va">...</span>,</span>
+<span>  variables <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -154,10 +155,36 @@ settings instead. Colour specification for contour lines.</p></dd>
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>arguments passed to other methods. Not used by this method.</p></dd>
 
+
+<dt id="arg-variables">variables<a class="anchor" aria-label="anchor" href="#arg-variables"></a></dt>
+<dd><p>Character vector giving every covariate of the selected
+smooths exactly once, in plotting order: x, y, then the conditioning
+covariate for 3D smooths, or facet rows and columns for 4D smooths.
+When supplied, selected smooths must use the same covariates. Use fitted coordinate names,
+such as <code>"log(x)"</code> for a transformed covariate. The default, <code>NULL</code>, favours
+a two-variable tensor margin for x and y, otherwise retaining fitted order.
+Grid resolution follows this order. Supplied <code>data</code> are evaluated unchanged.
+Drawing saved estimates can change the order but uses only points already
+evaluated; evaluate again to change grid resolution or conditioning values.
+Continuous covariates must precede factors. Spherical smooths retain their
+latitude/longitude convention and do not support reordering.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A <code>patchwork</code> object.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>For smooths of three or four covariates, each basis function has its own
+plot. The first two covariates define the surface axes. Three-covariate
+smooths have wrapped facets for the third covariate; four-covariate smooths
+have the third covariate in rows and the fourth in columns. <code>ncol</code> and <code>nrow</code>
+control the outer arrangement of plots. Fill scales share a range within
+each smooth. Use <code>variables</code> in <code><a href="basis.html">basis()</a></code> to choose the axes before grid
+generation, or here to rearrange existing evaluations without resampling.
+Surface plots include contour lines by default, matching <code><a href="draw.gam.html">draw.gam()</a></code>.
+Use <code>contour = FALSE</code> to draw surfaces without contour lines.</p>
     </div>
     <div class="section level2">
     <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>
@@ -177,6 +204,19 @@ settings instead. Colour specification for contour lines.</p></dd>
 <span class="r-in"><span><span class="va">bf</span> <span class="op">&lt;-</span> <span class="fu"><a href="basis.html">basis</a></span><span class="op">(</span><span class="va">m</span>, <span class="st">"s(x2)"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="va">bf</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="draw.basis-2.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># A three-covariate basis, evaluated at two conditioning values</span></span></span>
+<span class="r-in"><span><span class="va">m3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x0</span>, <span class="va">x1</span>, <span class="va">x2</span>, k <span class="op">=</span> <span class="fl">12</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">df</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">bf3</span> <span class="op">&lt;-</span> <span class="fu"><a href="basis.html">basis</a></span><span class="op">(</span><span class="va">m3</span>, variables <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"x1"</span>, <span class="st">"x2"</span>, <span class="st">"x0"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  n_2d <span class="op">=</span> <span class="fl">15</span>, n_3d <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="va">bf3</span>, ncol <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="draw.basis-3.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Four covariates: conditioning values form facet rows and columns</span></span></span>
+<span class="r-in"><span><span class="va">m4</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x0</span>, <span class="va">x1</span>, <span class="va">x2</span>, <span class="va">x3</span>, k <span class="op">=</span> <span class="fl">20</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">df</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">bf4</span> <span class="op">&lt;-</span> <span class="fu"><a href="basis.html">basis</a></span><span class="op">(</span><span class="va">m4</span>, n_2d <span class="op">=</span> <span class="fl">15</span>, n_4d <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="va">bf4</span>, ncol <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="draw.basis-4.png" alt="" width="700" height="433"></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

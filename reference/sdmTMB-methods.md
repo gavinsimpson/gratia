@@ -135,7 +135,12 @@ displayed partial effects, not full predictions. Use
 [`assemble()`](https://gavinsimpson.github.io/gratia/reference/assemble.md)
 to add interval surfaces to smooths and numeric parametric interactions
 in either component. `ci_3d_alpha` and `ci_3d_col` control their opacity
-and fill colour.
+and fill colour. Pass `cyclic = "polar"` and optional `polar_args` to
+[`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md) or
+[`assemble()`](https://gavinsimpson.github.io/gratia/reference/assemble.md)
+for polar plots of supported one-dimensional cyclic smooths. See
+[`draw.gam()`](https://gavinsimpson.github.io/gratia/reference/draw.gam.md)
+for the coordinate options.
 
 Delta components have separate smooth and parametric coefficients and
 are drawn separately, with component subtitles. Upstream sdmTMB

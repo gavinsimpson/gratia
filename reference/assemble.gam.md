@@ -2,6 +2,11 @@
 
 Plots smooth and parametric contributions from a fitted GAM model using
 [`ggplot2::ggplot()`](https://ggplot2.tidyverse.org/reference/ggplot.html).
+For models fitted by
+[`mgcv::gamm()`](https://rdrr.io/pkg/mgcv/man/gamm.html),
+[`assemble()`](https://gavinsimpson.github.io/gratia/reference/assemble.md)
+and [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)
+use the fitted `gam` component.
 
 ## Usage
 
@@ -72,8 +77,13 @@ assemble(
   variables = NULL,
   simultaneous_method = c("simulation", "tube"),
   simultaneous_domain = NULL,
-  tube_control = list()
+  tube_control = list(),
+  cyclic = c("cartesian", "polar"),
+  polar_args = list()
 )
+
+# S3 method for class 'gamm'
+assemble(object, ...)
 
 # S3 method for class 'scam'
 assemble(object, ..., overall_uncertainty = FALSE, centre = c("model", "plot"))
@@ -562,6 +572,24 @@ assemble(object, ..., overall_uncertainty = FALSE, centre = c("model", "plot"))
   (`1e-8`). Requires tube calibration. Simulation controls `n_sim`,
   `n_cores` (or `ncores`), and `seed` are ignored by tube calibration.
 
+- cyclic:
+
+  character; use Cartesian coordinates (`"cartesian"`, the default) or
+  polar coordinates (`"polar"`) for one-dimensional cyclic smooths.
+  Other smooths and parametric terms keep their usual displays.
+
+- polar_args:
+
+  named list of options passed to
+  [`ggplot2::coord_radial()`](https://ggplot2.tidyverse.org/reference/coord_radial.html).
+  Accepts `start`, `reverse`, `inner.radius`, `r.axis.inside`,
+  `rotate.angle` and `clip`. The radial axis is inside the circle by
+  default (`r.axis.inside = TRUE`); supplied values override this
+  default. Other options use their ggplot2 defaults. Requires
+  `cyclic = "polar"` when nonempty. The angular variable, fitted cycle
+  boundaries, full-circle extent and angular expansion are set by
+  gratia.
+
 - centre:
 
   character; for SCAM models, `"model"` retains each fitted smooth
@@ -585,6 +613,10 @@ Smooth plot subtitles identify the model part or distributional
 parameter as described in
 [`draw.gam()`](https://gavinsimpson.github.io/gratia/reference/draw.gam.md).
 Custom smooth labels, including `subtitle`, can be passed through `...`.
+Use `cyclic = "polar"` to draw one-dimensional cyclic smooths with polar
+coordinates; `polar_args` customizes the coordinate display as described
+in
+[`draw.gam()`](https://gavinsimpson.github.io/gratia/reference/draw.gam.md).
 
 ## Note
 
@@ -625,4 +657,10 @@ assemble(m1)
 # can be passed to patchwork::wrap_plots()
 suppressPackageStartupMessages(library("patchwork"))
 assemble(m1) |> wrap_plots(ncol = 2, nrow = 2)
+
+
+# Prepare individual plots from a GAMM
+m2 <- gamm(y ~ s(x0) + x1, data = df1, method = "REML")
+gamm_plots <- assemble(m2)
+gamm_plots[[1]]
 ```

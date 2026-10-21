@@ -13,7 +13,7 @@ back to the constrained mgcv basis."><meta property="og:image" content="https://
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-56</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-57</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -193,7 +193,10 @@ the component's intercept. Use <code>overall_uncertainty = FALSE</code> for term
 intervals. <code>fun</code> transforms displayed partial effects, not full predictions.
 Use <code>surface = "3d", ci_3d = TRUE</code> in <code><a href="draw.html">draw()</a></code> or <code><a href="assemble.html">assemble()</a></code> to add
 interval surfaces to smooths and numeric parametric interactions in either
-component. <code>ci_3d_alpha</code> and <code>ci_3d_col</code> control their opacity and fill colour.</p>
+component. <code>ci_3d_alpha</code> and <code>ci_3d_col</code> control their opacity and fill colour.
+Pass <code>cyclic = "polar"</code> and optional <code>polar_args</code> to <code><a href="draw.html">draw()</a></code> or
+<code><a href="assemble.html">assemble()</a></code> for polar plots of supported one-dimensional cyclic smooths.
+See <code><a href="draw.gam.html">draw.gam()</a></code> for the coordinate options.</p>
 <p>Delta components have separate smooth and parametric coefficients and are
 drawn separately, with component subtitles. Upstream sdmTMB restrictions on
 supported bases and delta formulas still apply. Tensor smooths with multiple

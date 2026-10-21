@@ -4,6 +4,12 @@
 
 ### User visible changes
 
+- [`draw.basis()`](https://gavinsimpson.github.io/gratia/reference/draw.basis.md)
+  now draws contour lines on surface plots by default
+  (`contour = TRUE`), matching
+  [`draw.gam()`](https://gavinsimpson.github.io/gratia/reference/draw.gam.md).
+  Use `contour = FALSE` to restore the previous appearance.
+
 - Plot aesthetic arguments for colours, opacity and line widths are
   deprecated in favour of ggplot2 component themes
   ([\#215](https://github.com/gavinsimpson/gratia/issues/215)). Existing
@@ -146,6 +152,52 @@
   so the development version of glmmTMB is no longer needed.
 
 ### New features
+
+- [`assemble()`](https://gavinsimpson.github.io/gratia/reference/assemble.md)
+  now supports models fitted by
+  [`mgcv::gamm()`](https://rdrr.io/pkg/mgcv/man/gamm.html), returning
+  named plots of smooth and parametric contributions. It shares
+  preparation of the fitted GAM component with
+  [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md).
+
+- [`assemble()`](https://gavinsimpson.github.io/gratia/reference/assemble.md)
+  now supports models fitted by
+  [`GJRM::gamlss()`](https://rdrr.io/pkg/GJRM/man/gamlss.html),
+  returning a named list of smooth and parametric plots across
+  equations. It shares model preparation, selection and scale handling
+  with
+  [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md).
+
+- [`assemble()`](https://gavinsimpson.github.io/gratia/reference/assemble.md)
+  now supports glmmTMB models, returning named plots for smooths, native
+  random effects and parametric terms. It shares model preparation and
+  argument checks with
+  [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md).
+
+- [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)
+  and
+  [`assemble()`](https://gavinsimpson.github.io/gratia/reference/assemble.md)
+  can draw one-dimensional cyclic smooths with `cyclic = "polar"`,
+  including factor-by and one-dimensional tensor smooths across
+  supported model classes. Fitted cycle boundaries configure the angular
+  axis and automatic evaluation grids span a complete cycle. Saved
+  smooth estimates retain these boundaries; supplied evaluation points
+  are unchanged. `polar_args` customizes the polar coordinate display.
+  Radial padding separates interval bands from the outer observation
+  rug. Radial axes appear inside the circle by default; override their
+  position through `polar_args`.
+
+- [`draw.basis()`](https://gavinsimpson.github.io/gratia/reference/draw.basis.md)
+  now plots basis functions of three- and four-covariate smooths as
+  separate surfaces with conditioning facets
+  ([\#258](https://github.com/gavinsimpson/gratia/issues/258),
+  [\#259](https://github.com/gavinsimpson/gratia/issues/259)).
+  [`basis()`](https://gavinsimpson.github.io/gratia/reference/basis.md)
+  and
+  [`draw.basis()`](https://gavinsimpson.github.io/gratia/reference/draw.basis.md)
+  accept `variables` to choose the axes and conditioning order.
+  Automatic grids use the existing `n_2d`, `n_3d`, and `n_4d` controls,
+  and saved bases retain their chosen covariate order.
 
 - [`fitted_moments()`](https://gavinsimpson.github.io/gratia/reference/fitted_moments.md)
   and

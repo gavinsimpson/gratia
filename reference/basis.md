@@ -25,7 +25,8 @@ basis(
   n_4d = 4,
   partial_match = FALSE,
   envir = NULL,
-  ...
+  ...,
+  variables = NULL
 )
 
 # S3 method for class 'scam'
@@ -39,7 +40,8 @@ basis(
   n_3d = 16,
   n_4d = 4,
   partial_match = FALSE,
-  ...
+  ...,
+  variables = NULL
 )
 
 # S3 method for class 'gamm'
@@ -53,7 +55,8 @@ basis(
   n_3d = 16,
   n_4d = 4,
   partial_match = FALSE,
-  ...
+  ...,
+  variables = NULL
 )
 
 # S3 method for class 'gamm4'
@@ -67,7 +70,8 @@ basis(
   n_3d = 16,
   n_4d = 4,
   partial_match = FALSE,
-  ...
+  ...,
+  variables = NULL
 )
 
 # Default S3 method
@@ -80,7 +84,8 @@ basis(
   diagonalize = FALSE,
   coefficients = NULL,
   envir = NULL,
-  ...
+  ...,
+  variables = NULL
 )
 ```
 
@@ -150,6 +155,13 @@ basis(
   model expressions. The available model formula environment is used
   when `NULL`. Covariate observations should be supplied in `data`.
 
+- variables:
+
+  character; smooth covariates in plotting order. Supply every covariate
+  exactly once. The first two define surface axes and the remaining
+  covariates define conditioning facets. Selected smooths must have the
+  same covariates. If `NULL`, use the usual smooth plotting order.
+
 - knots:
 
   a list or data frame with named components containing knots locations.
@@ -180,13 +192,18 @@ basis(
 
 ## Value
 
-A tibble.
+A tibble with class `basis`. Its `plot_variables` attribute stores
+covariate orders by smooth label for subsequent plotting.
 
 ## Details
 
 When evaluating a fitted smooth at explicit data, missing covariates
 required by that smooth produce `NA` basis values. Missing values in
-other model variables do not discard otherwise evaluable rows.
+other model variables do not discard otherwise evaluable rows. The
+covariate order chosen by `variables` also determines which
+automatically generated axes use `n_2d`, `n_3d`, and `n_4d`. Supplied
+`data` or `at` values are unchanged. Set a resolution argument to `NULL`
+to use `n` instead.
 
 ## Author
 

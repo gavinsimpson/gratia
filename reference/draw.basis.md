@@ -18,10 +18,11 @@ draw(
   nrow = NULL,
   angle = NULL,
   guides = "keep",
-  contour = FALSE,
+  contour = TRUE,
   n_contour = 10,
   contour_col = "black",
-  ...
+  ...,
+  variables = NULL
 )
 ```
 
@@ -99,9 +100,39 @@ draw(
 
   arguments passed to other methods. Not used by this method.
 
+- variables:
+
+  Character vector giving every covariate of the selected smooths
+  exactly once, in plotting order: x, y, then the conditioning covariate
+  for 3D smooths, or facet rows and columns for 4D smooths. When
+  supplied, selected smooths must use the same covariates. Use fitted
+  coordinate names, such as `"log(x)"` for a transformed covariate. The
+  default, `NULL`, favours a two-variable tensor margin for x and y,
+  otherwise retaining fitted order. Grid resolution follows this order.
+  Supplied `data` are evaluated unchanged. Drawing saved estimates can
+  change the order but uses only points already evaluated; evaluate
+  again to change grid resolution or conditioning values. Continuous
+  covariates must precede factors. Spherical smooths retain their
+  latitude/longitude convention and do not support reordering.
+
 ## Value
 
 A `patchwork` object.
+
+## Details
+
+For smooths of three or four covariates, each basis function has its own
+plot. The first two covariates define the surface axes. Three-covariate
+smooths have wrapped facets for the third covariate; four-covariate
+smooths have the third covariate in rows and the fourth in columns.
+`ncol` and `nrow` control the outer arrangement of plots. Fill scales
+share a range within each smooth. Use `variables` in
+[`basis()`](https://gavinsimpson.github.io/gratia/reference/basis.md) to
+choose the axes before grid generation, or here to rearrange existing
+evaluations without resampling. Surface plots include contour lines by
+default, matching
+[`draw.gam()`](https://gavinsimpson.github.io/gratia/reference/draw.gam.md).
+Use `contour = FALSE` to draw surfaces without contour lines.
 
 ## Author
 
@@ -120,4 +151,17 @@ draw(bf)
 
 bf <- basis(m, "s(x2)")
 draw(bf)
+
+
+# A three-covariate basis, evaluated at two conditioning values
+m3 <- gam(y ~ s(x0, x1, x2, k = 12), data = df)
+bf3 <- basis(m3, variables = c("x1", "x2", "x0"),
+  n_2d = 15, n_3d = 2)
+draw(bf3, ncol = 3)
+
+
+# Four covariates: conditioning values form facet rows and columns
+m4 <- gam(y ~ s(x0, x1, x2, x3, k = 20), data = df)
+bf4 <- basis(m4, n_2d = 15, n_4d = 2)
+draw(bf4, ncol = 3)
 ```

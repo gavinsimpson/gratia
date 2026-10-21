@@ -256,7 +256,11 @@ smooth_estimates(
 
 A data frame (tibble), which is of class `"smooth_estimates"`. Its
 `plot_variables` attribute is a list of resolved covariate orders, named
-by smooth label, used when drawing the saved estimates.
+by smooth label, used when drawing the saved estimates. Its
+`cyclic_info` attribute retains the fitted cycle boundaries for
+supported one-dimensional cyclic components, allowing
+`draw(object, cyclic = "polar")` to configure the angular axis. This
+attribute is retained in nested and unnested output.
 
 ## Details
 

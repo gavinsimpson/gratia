@@ -11,7 +11,7 @@ directly from a fitted GAM(M)."><meta property="og:image" content="https://gavin
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-56</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-57</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -84,7 +84,8 @@ directly from a fitted GAM(M).</p>
 <span>  n_4d <span class="op">=</span> <span class="fl">4</span>,</span>
 <span>  partial_match <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  envir <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  <span class="va">...</span></span>
+<span>  <span class="va">...</span>,</span>
+<span>  variables <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'scam'</span></span>
@@ -98,7 +99,8 @@ directly from a fitted GAM(M).</p>
 <span>  n_3d <span class="op">=</span> <span class="fl">16</span>,</span>
 <span>  n_4d <span class="op">=</span> <span class="fl">4</span>,</span>
 <span>  partial_match <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  <span class="va">...</span></span>
+<span>  <span class="va">...</span>,</span>
+<span>  variables <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'gamm'</span></span>
@@ -112,7 +114,8 @@ directly from a fitted GAM(M).</p>
 <span>  n_3d <span class="op">=</span> <span class="fl">16</span>,</span>
 <span>  n_4d <span class="op">=</span> <span class="fl">4</span>,</span>
 <span>  partial_match <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  <span class="va">...</span></span>
+<span>  <span class="va">...</span>,</span>
+<span>  variables <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'gamm4'</span></span>
@@ -126,7 +129,8 @@ directly from a fitted GAM(M).</p>
 <span>  n_3d <span class="op">=</span> <span class="fl">16</span>,</span>
 <span>  n_4d <span class="op">=</span> <span class="fl">4</span>,</span>
 <span>  partial_match <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  <span class="va">...</span></span>
+<span>  <span class="va">...</span>,</span>
+<span>  variables <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Default S3 method</span></span>
@@ -139,7 +143,8 @@ directly from a fitted GAM(M).</p>
 <span>  diagonalize <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  coefficients <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  envir <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  <span class="va">...</span></span>
+<span>  <span class="va">...</span>,</span>
+<span>  variables <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -207,6 +212,13 @@ in model expressions. The available model formula environment is used when
 <code>NULL</code>. Covariate observations should be supplied in <code>data</code>.</p></dd>
 
 
+<dt id="arg-variables">variables<a class="anchor" aria-label="anchor" href="#arg-variables"></a></dt>
+<dd><p>character; smooth covariates in plotting order. Supply every
+covariate exactly once. The first two define surface axes and the remaining
+covariates define conditioning facets. Selected smooths must have the same
+covariates. If <code>NULL</code>, use the usual smooth plotting order.</p></dd>
+
+
 <dt id="arg-knots">knots<a class="anchor" aria-label="anchor" href="#arg-knots"></a></dt>
 <dd><p>a list or data frame with named components containing
 knots locations. Names must match the covariates for which the basis
@@ -237,13 +249,17 @@ basis functions.</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A tibble.</p>
+    <p>A tibble with class <code>basis</code>. Its <code>plot_variables</code> attribute stores
+covariate orders by smooth label for subsequent plotting.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>When evaluating a fitted smooth at explicit data, missing covariates required
 by that smooth produce <code>NA</code> basis values. Missing values in other model
-variables do not discard otherwise evaluable rows.</p>
+variables do not discard otherwise evaluable rows.
+The covariate order chosen by <code>variables</code> also determines which automatically
+generated axes use <code>n_2d</code>, <code>n_3d</code>, and <code>n_4d</code>. Supplied <code>data</code> or <code>at</code> values
+are unchanged. Set a resolution argument to <code>NULL</code> to use <code>n</code> instead.</p>
     </div>
     <div class="section level2">
     <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>
