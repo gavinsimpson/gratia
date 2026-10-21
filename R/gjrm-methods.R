@@ -1,12 +1,13 @@
 #' Plot smooths of a GAMLSS model estimated by `GJRM::gamlss`
 #'
-#' Provides a [gratia::draw()] method for GAMLSS (distributional GAMs) fitted
-#' by [GJRM::gamlss()].
+#' Provides [gratia::draw()] and [gratia::assemble()] methods for GAMLSS
+#' (distributional GAMs) fitted by [GJRM::gamlss()]. `assemble()` returns the
+#' individual plots; `draw()` arranges them using [patchwork::wrap_plots()].
 #'
 #' @inheritParams smooth_estimates
 #'
 #' @param object a model, fitted by [GJRM::gamlss()]
-#' @param ... arguments passed to [gratia::draw.gam()]
+#' @param ... arguments passed to [gratia::assemble.gam()]
 #' @param select Smooth selection across all equations, using the labels from
 #'   [smooths()], or numeric or logical indices in equation and smooth order.
 #'   Repeated labels receive suffixes such as `s.1(x)`; existing distinct labels
@@ -15,6 +16,12 @@
 #'   or a flat named list of plots when `FALSE`.
 #'
 #' @inheritParams draw.gam
+#'
+#' @return `assemble()` and `draw(wrap = FALSE)` return a flat named list of
+#'   plots, ordered by equation and then by term within each equation. Smooth
+#'   names use the model-wide labels returned by [smooths()]. `draw()` returns
+#'   a patchwork by default. Both methods return invisible `NULL` when there
+#'   are no plots to draw.
 #'
 #' @importFrom patchwork wrap_plots
 #' @export
@@ -51,6 +58,9 @@
 #'   m <- gamlss(fl, data = dataSim)
 #'
 #'   draw(m)
+#'   plots <- assemble(m, parametric = FALSE)
+#'   names(plots)
+#'   plots[[1]]
 #'   if (requireNamespace("ggcube", quietly = TRUE)) {
 #'     surface <- GJRM::gamlss(list(y1 ~ s(x2, x3, k = 10), ~ s(x3, k = 6)),
 #'       data = dataSim)
@@ -64,6 +74,25 @@
                           n = 100, envir = NULL, select = NULL,
                           parametric = NULL, terms = NULL,
                           partial_match = FALSE, wrap = TRUE) {
+  plts <- assemble.gamlss(object, scales = scales, ..., n = n, envir = envir,
+    select = select, parametric = parametric, terms = terms,
+    partial_match = partial_match)
+  if (!length(plts)) return(invisible(NULL))
+  if (!wrap) return(plts)
+
+  # Count all panels, including parametric effects, before choosing the layout.
+  layout <- prepare_plot_layout(length(plts), ncol = ncol, nrow = nrow)
+  if (length(plts) > 1L && is.null(widths)) widths <- 1
+  wrap_plots(plts, byrow = TRUE, nrow = layout$nrow, ncol = layout$ncol,
+    guides = guides, heights = heights, widths = widths)
+}
+
+#' @rdname draw.gamlss
+#' @export
+assemble.gamlss <- function(object, scales = c("free", "fixed"), ...,
+                            n = 100, envir = NULL, select = NULL,
+                            parametric = NULL, terms = NULL,
+                            partial_match = FALSE) {
   scales <- match.arg(scales)
   components <- gjrm_gamlss_components(object)
   labels <- gjrm_gamlss_smooth_labels(components)
@@ -91,9 +120,9 @@
     local_parametric <- isTRUE(parametric) &&
       (is.null(terms) || length(local_terms) > 0L)
     if (any(local_select) || local_parametric) {
-      panels <- draw(m, select = local_select, parametric = local_parametric,
+      panels <- assemble(m, select = local_select, parametric = local_parametric,
         terms = local_terms, partial_match = FALSE, n = n, envir = envir,
-        wrap = FALSE, ...)
+        ...)
       # Preserve familiar titles; names expose the unambiguous selection keys.
       panel_names <- names(panels)
       for (i in which(local_select)) {
@@ -117,9 +146,8 @@
         }
       })
       effect_limits <- range(unlist(ranges), finite = TRUE)
-      plts <- lapply(seq_along(plts), function(i) {
-        p <- plts[[i]]
-        if (is_3d[i]) {
+      plts <- lapply(plts, function(p) {
+        if (inherits(p$coordinates, "Coord3D")) {
           p + ggplot2::expand_limits(z = effect_limits)
         } else if (!inherits(p$coordinates, "CoordSf")) {
           p + ggplot2::expand_limits(y = effect_limits)
@@ -131,13 +159,7 @@
       plts <- lapply(plts, \(p) p + lims(y = y_lim))
     }
   }
-  if (!wrap) return(plts)
-
-  # Count all panels, including parametric effects, before choosing the layout.
-  layout <- prepare_plot_layout(length(plts), ncol = ncol, nrow = nrow)
-  if (length(plts) > 1L && is.null(widths)) widths <- 1
-  wrap_plots(plts, byrow = TRUE, nrow = layout$nrow, ncol = layout$ncol,
-    guides = guides, heights = heights, widths = widths)
+  plts
 }
 
 # Prepare embedded GAMs with the final coefficients and covariance, in equation

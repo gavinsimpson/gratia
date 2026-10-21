@@ -1409,7 +1409,7 @@ detaching ‘package:mgcv’
 > 
 > ### Name: draw.gamlss
 > ### Title: Plot smooths of a GAMLSS model estimated by 'GJRM::gamlss'
-> ### Aliases: draw.gamlss
+> ### Aliases: draw.gamlss assemble.gamlss
 > 
 > ### ** Examples
 > 
@@ -1432,6 +1432,9 @@ detaching ‘package:mgcv’
 +   m <- gamlss(fl, data = dataSim)
 + 
 +   draw(m)
++   plots <- assemble(m, parametric = FALSE)
++   names(plots)
++   plots[[1]]
 +   if (requireNamespace("ggcube", quietly = TRUE)) {
 +     surface <- GJRM::gamlss(list(y1 ~ s(x2, x3, k = 10), ~ s(x3, k = 6)),
 +       data = dataSim)

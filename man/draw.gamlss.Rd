@@ -2,6 +2,7 @@
 % Please edit documentation in R/gjrm-methods.R
 \name{draw.gamlss}
 \alias{draw.gamlss}
+\alias{assemble.gamlss}
 \title{Plot smooths of a GAMLSS model estimated by \code{GJRM::gamlss}}
 \usage{
 \method{draw}{gamlss}(
@@ -20,6 +21,18 @@
   terms = NULL,
   partial_match = FALSE,
   wrap = TRUE
+)
+
+\method{assemble}{gamlss}(
+  object,
+  scales = c("free", "fixed"),
+  ...,
+  n = 100,
+  envir = NULL,
+  select = NULL,
+  parametric = NULL,
+  terms = NULL,
+  partial_match = FALSE
 )
 }
 \arguments{
@@ -45,7 +58,7 @@ there is more than 1 plot and \code{widths = NULL}, the value of \code{widths} w
 be set internally to \code{widths = 1} to accommodate plots of smooths that
 use a fixed aspect ratio.}
 
-\item{...}{arguments passed to \code{\link[=draw.gam]{draw.gam()}}}
+\item{...}{arguments passed to \code{\link[=assemble.gam]{assemble.gam()}}}
 
 \item{n}{numeric; the number of points over the range of the covariate at
 which to evaluate a univariate smooth.}
@@ -80,9 +93,17 @@ use the grid and surface controls below, as described in
 \item{wrap}{Logical; return an assembled patchwork when \code{TRUE} (the default),
 or a flat named list of plots when \code{FALSE}.}
 }
+\value{
+\code{assemble()} and \code{draw(wrap = FALSE)} return a flat named list of
+plots, ordered by equation and then by term within each equation. Smooth
+names use the model-wide labels returned by \code{\link[=smooths]{smooths()}}. \code{draw()} returns
+a patchwork by default. Both methods return invisible \code{NULL} when there
+are no plots to draw.
+}
 \description{
-Provides a \code{\link[=draw]{draw()}} method for GAMLSS (distributional GAMs) fitted
-by \code{\link[GJRM:gamlss]{GJRM::gamlss()}}.
+Provides \code{\link[=draw]{draw()}} and \code{\link[=assemble]{assemble()}} methods for GAMLSS
+(distributional GAMs) fitted by \code{\link[GJRM:gamlss]{GJRM::gamlss()}}. \code{assemble()} returns the
+individual plots; \code{draw()} arranges them using \code{\link[patchwork:wrap_plots]{patchwork::wrap_plots()}}.
 }
 \note{
 For models with multiple linear predictors, smooth plot subtitles
@@ -117,6 +138,9 @@ if (suppressPackageStartupMessages(require("GJRM", quietly = TRUE))) {
   m <- gamlss(fl, data = dataSim)
 
   draw(m)
+  plots <- assemble(m, parametric = FALSE)
+  names(plots)
+  plots[[1]]
   if (requireNamespace("ggcube", quietly = TRUE)) {
     surface <- GJRM::gamlss(list(y1 ~ s(x2, x3, k = 10), ~ s(x3, k = 6)),
       data = dataSim)

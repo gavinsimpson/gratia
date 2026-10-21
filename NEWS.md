@@ -112,6 +112,10 @@
 
 ## New features
 
+* `assemble()` now supports models fitted by `GJRM::gamlss()`, returning a
+  named list of smooth and parametric plots across equations. It shares model
+  preparation, selection and scale handling with `draw()`.
+
 * `assemble()` now supports glmmTMB models, returning named plots for
   smooths, native random effects and parametric terms. It shares model
   preparation and argument checks with `draw()`.

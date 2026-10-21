@@ -248,8 +248,9 @@ test_that("GJRM shares vertical ranges across equations without changing covaria
   options <- list(object = m, surface = "3d", ci_3d = TRUE, n_2d = 4,
     n = 8, wrap = FALSE, rug = FALSE)
   free <- do.call(draw, options)
-  fixed <- do.call(draw, c(options, list(scales = "fixed")))
+  fixed <- do.call(assemble, c(options, list(scales = "fixed")))
   expect_length(fixed, 5)
+  expect_identical(names(fixed), names(free))
   vertical <- list()
   for (i in seq_along(fixed)) {
     a <- ggplot2::ggplot_build(free[[i]])
