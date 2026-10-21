@@ -66,7 +66,7 @@ test_that("basis() works with bivariate tprs smooths", {
   ))
   expect_s3_class(bs, "basis")
 
-  plt1 <- draw(bs)
+  plt1 <- draw(bs, contour = FALSE)
 
   skip_on_cran()
   plt2 <- draw(bs, contour = TRUE)
@@ -88,7 +88,7 @@ test_that("basis() works with bivariate te smooths", {
   ))
   expect_s3_class(bs, "basis")
 
-  plt1 <- draw(bs)
+  plt1 <- draw(bs, contour = FALSE)
 
   skip_on_cran()
   plt2 <- draw(bs, contour = TRUE)

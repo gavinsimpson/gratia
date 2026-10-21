@@ -315,6 +315,8 @@
 #' control the outer arrangement of plots. Fill scales share a range within
 #' each smooth. Use `variables` in [basis()] to choose the axes before grid
 #' generation, or here to rearrange existing evaluations without resampling.
+#' Surface plots include contour lines by default, matching [draw.gam()].
+#' Use `contour = FALSE` to draw surfaces without contour lines.
 #'
 #' @return A `patchwork` object.
 #'
@@ -355,7 +357,7 @@
                          ncol = NULL, nrow = NULL,
                          angle = NULL,
                          guides = "keep",
-                         contour = FALSE,
+                         contour = TRUE,
                          n_contour = 10,
                          contour_col = "black",
                          ..., variables = NULL) {
@@ -494,6 +496,7 @@
     facet = prepare_basis_facet(object, smooth_var, labeller = labeller),
     coord = coord, contour = contour, contour_col = contour_col,
     n_contour = n_contour,
+    contour_stat = StatBasisContour,
     contour_mapping = aes(z = .data[[".value"]],
       group = .data[[".bf"]], fill = NULL),
     axis_guide = guide_axis(angle = angle, check.overlap = TRUE),
@@ -504,6 +507,36 @@
   plt
 
 }
+
+# A basis slice may be constant or contain none of the shared contour levels.
+# Keep ggplot2's contour calculation and levels, but allow an empty result.
+StatBasisContour <- ggplot2::ggproto("StatBasisContour", ggplot2::StatContour,
+  compute_group = function(data, scales, z.range, bins = NULL,
+    binwidth = NULL, breaks = NULL, na.rm = FALSE) {
+    values <- data$z[is.finite(data$z)]
+    if (length(values) < 2L ||
+        diff(range(values)) <= sqrt(.Machine$double.eps) * max(abs(values))) {
+      return(data.frame())
+    }
+    empty <- FALSE
+    withCallingHandlers(
+      ggplot2::StatContour$compute_group(data, scales, z.range = z.range,
+        bins = bins, binwidth = binwidth, breaks = breaks, na.rm = na.rm),
+      warning = function(cnd) {
+        msg <- conditionMessage(cnd)
+        if (grepl("Zero contours were generated", msg, fixed = TRUE)) {
+          empty <<- TRUE
+          invokeRestart("muffleWarning")
+        }
+        if (empty && msg %in% c(
+          "no non-missing arguments to min; returning Inf",
+          "no non-missing arguments to max; returning -Inf")) {
+          invokeRestart("muffleWarning")
+        }
+      }
+    )
+  }
+)
 
 # Resolve saved orders before falling back to labels for older basis objects.
 basis_plot_variables <- function(object, variables = NULL) {

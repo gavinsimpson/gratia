@@ -467,7 +467,7 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
   fill_guide = guide_colourbar(title = fill_title, direction = "vertical"),
   legend_position = "right", tile_colour = NA,
   facet_vars = character(), surface_support = NULL, isotropic = FALSE,
-  z_limits = fill_limits
+  z_limits = fill_limits, contour_stat = "contour"
 ) {
   surface <- match.arg(surface)
   validate_surface_3d(surface_3d)
@@ -538,7 +538,8 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
       contour_mapping <- aes(z = .data[[fill_var]])
     }
     plt <- plt + geom_gratia_contour(contour_mapping, data = contour_data,
-      colour = contour_col, bins = n_contour, na.rm = contour_na_rm)
+      colour = contour_col, bins = n_contour, na.rm = contour_na_rm,
+      stat = contour_stat)
   }
   plt <- plt + labels + continuous_fill
   if (!is.null(fill_limits)) {

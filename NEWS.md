@@ -2,6 +2,10 @@
 
 ## User visible changes
 
+* `draw.basis()` now draws contour lines on surface plots by default
+  (`contour = TRUE`), matching `draw.gam()`. Use `contour = FALSE` to restore
+  the previous appearance.
+
 * Plot aesthetic arguments for colours, opacity and line widths are deprecated
   in favour of ggplot2 component themes (#215). Existing default appearances are
   unchanged, and explicitly supplied arguments remain fixed overrides during

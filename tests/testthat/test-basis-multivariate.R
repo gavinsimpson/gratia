@@ -30,6 +30,52 @@ basis_grid_counts <- function(b, variables) {
   unname(vapply(b[variables], function(x) length(unique(x)), integer(1)))
 }
 
+test_that("basis surfaces draw contours by default and allow opting out", {
+  data <- multivariate_basis_model()$model
+  models <- list(mgcv::gam(y ~ s(x, z, k = 10), data = data),
+    multivariate_basis_model(3L), multivariate_basis_model(4L))
+  for (model in models) {
+    b <- basis(model, n_2d = 8, n_3d = 2, n_4d = 2)
+    b <- b[b$.bf == "2", ]
+    default <- draw(b)[[1L]]
+    explicit <- draw(b, contour = TRUE)[[1L]]
+    flat <- draw(b, contour = FALSE)[[1L]]
+    contour_layer <- function(p) which(vapply(p$layers,
+      function(layer) inherits(layer$stat, "StatContour"), logical(1)))
+    i <- contour_layer(default)
+    expect_length(i, 1L)
+    expect_length(contour_layer(flat), 0L)
+    expect_silent(built <- ggplot2::ggplot_build(default))
+    expect_gt(nrow(built$data[[i]]), 0L)
+    expect_equal(built$data, ggplot2::ggplot_build(explicit)$data)
+    expect_equal(built$layout$layout, ggplot2::ggplot_build(flat)$layout$layout)
+  }
+})
+
+test_that("constant basis slices keep surfaces without contour warnings", {
+  b <- basis(multivariate_basis_model(), n_2d = 5, n_3d = 2)
+  b <- b[b$.bf == "2", ]
+  first_slice <- b$w == min(b$w)
+  b$.value <- ifelse(first_slice, 5, b$x + b$z)
+  p <- draw(b)[[1L]]
+  expect_identical(p$data$.value, b$.value)
+  expect_silent(built <- ggplot2::ggplot_build(p))
+  expect_equal(nrow(built$layout$layout), 2L)
+  expect_equal(unique(as.character(built$data[[2L]]$PANEL)), "2")
+  # A varying slice can also lie between the shared contour levels.
+  b$.value <- ifelse(first_slice, 100 + b$x * 1e-6, b$x + b$z)
+  expect_silent(built <- ggplot2::ggplot_build(draw(b)[[1L]]))
+  expect_equal(unique(as.character(built$data[[2L]]$PANEL)), "2")
+  # Round-off around a constant should not create spurious lines.
+  b$.value <- 5 + 1e-14 * b$x
+  expect_silent(built <- ggplot2::ggplot_build(draw(b)[[1L]]))
+  expect_equal(nrow(built$data[[2L]]), 0L)
+  # A small but varying surface still has contour lines.
+  b$.value <- 1e-15 * (b$x + b$z)
+  expect_silent(built <- ggplot2::ggplot_build(draw(b)[[1L]]))
+  expect_gt(nrow(built$data[[2L]]), 0L)
+})
+
 test_that("basis covariate orders control 3D and 4D grids and values", {
   for (dimension in 3:4) for (type in c("tp", "te", "t2")) {
     model <- multivariate_basis_model(dimension, type)

@@ -16,7 +16,7 @@
   nrow = NULL,
   angle = NULL,
   guides = "keep",
-  contour = FALSE,
+  contour = TRUE,
   n_contour = 10,
   contour_col = "black",
   ...,
@@ -89,6 +89,8 @@ have the third covariate in rows and the fourth in columns. \code{ncol} and \cod
 control the outer arrangement of plots. Fill scales share a range within
 each smooth. Use \code{variables} in \code{\link[=basis]{basis()}} to choose the axes before grid
 generation, or here to rearrange existing evaluations without resampling.
+Surface plots include contour lines by default, matching \code{\link[=draw.gam]{draw.gam()}}.
+Use \code{contour = FALSE} to draw surfaces without contour lines.
 }
 \examples{
 load_mgcv()
