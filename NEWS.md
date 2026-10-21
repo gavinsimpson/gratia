@@ -2,6 +2,12 @@
 
 ## User visible changes
 
+* `grouped_by` is deprecated in `draw()` and `assemble()`. Include
+  `"factor-by"` in the new `grouped` argument to overlay factor-by curves,
+  or omit it to draw them separately. Explicit uses of `grouped_by` still
+  update factor-by grouping, including ordered factors, while retaining
+  the requested grouping of `sz` and `fs` curves.
+
 * `draw.basis()` now draws contour lines on surface plots by default
   (`contour = TRUE`), matching `draw.gam()`. Use `contour = FALSE` to restore
   the previous appearance.
@@ -111,6 +117,17 @@
   the development version of glmmTMB is no longer needed.
 
 ## New features
+
+* `draw()` and `assemble()` can separate `sz` and `fs` curves into individual
+  plots (#244). `grouped` names the types to overlay: `"factor-by"`, `"sz"`,
+  and `"fs"`. `show_ci` independently selects which types show intervals,
+  including optional intervals for `fs` curves. The defaults retain existing
+  grouping and interval visibility. Ordered-factor deviations use the
+  factor-by settings and keep their reference smooth separate. Saved smooth
+  estimates support the same controls. Common axis ranges use displayed
+  estimates and visible intervals. Grouped factor-by plots retain observations
+  from every plotted level and accept custom colour and fill scales. Smooth
+  and custom titles retain colons within their text.
 
 * `assemble()` now supports models fitted by `mgcv::gamm()`, returning named
   plots of smooth and parametric contributions. It shares preparation of the

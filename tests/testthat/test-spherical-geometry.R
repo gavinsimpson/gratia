@@ -163,14 +163,14 @@ test_that("spherical observation rugs validate columns and omit incomplete rows"
 
 test_that("SOS factor-by panels keep distinct estimates, contours and observation rugs", {
   skip_if_not_installed("sf", "1.0-0")
-  separate <- assemble(m_sos_by, grouped_by = FALSE, parametric = FALSE,
+  separate <- assemble(m_sos_by, grouped = c("sz", "fs"), parametric = FALSE,
     n_2d = 5, contour = TRUE, crs = 4326)
   expect_length(separate, 2L)
   for (p in separate) {
     expect_equal(length(unique(p$data$region)), 1L)
     expect_silent(ggplot2::ggplot_build(p))
   }
-  grouped <- assemble(m_sos_by, grouped_by = TRUE, parametric = FALSE,
+  grouped <- assemble(m_sos_by, grouped = c("factor-by", "sz", "fs"), parametric = FALSE,
     n_2d = 5, contour = TRUE, crs = 4326)
   expect_length(grouped, 1L)
   p <- grouped[[1L]]
@@ -202,9 +202,9 @@ test_that("SOS factor-by panels keep distinct estimates, contours and observatio
   }
 
   sm <- smooth_estimates(m_sos_by, n_2d = 5)
-  expect_silent(q <- draw(sm, grouped_by = TRUE, crs = 4326, contour = FALSE)[[1L]])
+  expect_silent(q <- draw(sm, grouped = c("factor-by", "sz", "fs"), crs = 4326, contour = FALSE)[[1L]])
   expect_equal(as.character(ggplot2::ggplot_build(q)$layout$layout$region), c("a", "b"))
-  expect_silent(draw(m_sos_by, grouped_by = FALSE, parametric = FALSE,
+  expect_silent(draw(m_sos_by, grouped = c("sz", "fs"), parametric = FALSE,
     n_2d = 5, crs = 4326, contour = FALSE))
 })
 

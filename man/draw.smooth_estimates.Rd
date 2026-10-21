@@ -9,7 +9,7 @@
   constant = NULL,
   fun = NULL,
   contour = TRUE,
-  grouped_by = FALSE,
+  grouped_by = deprecated(),
   contour_col = "black",
   n_contour = NULL,
   ci_alpha = 0.2,
@@ -42,7 +42,9 @@
   ...,
   variables = NULL,
   cyclic = c("cartesian", "polar"),
-  polar_args = list()
+  polar_args = list(),
+  grouped = c("sz", "fs"),
+  show_ci = c("factor-by", "sz")
 )
 }
 \arguments{
@@ -62,9 +64,8 @@ provided.}
 \item{contour}{logical; should contours be draw on the plot using
 \code{\link[ggplot2:geom_contour]{ggplot2::geom_contour()}}.}
 
-\item{grouped_by}{logical; should factor by smooths be drawn as one panel
-per level of the factor (\code{FALSE}, the default), or should the individual
-smooths be combined into a single panel containing all levels (\code{TRUE})?}
+\item{grouped_by}{Deprecated; use \code{grouped}. Explicit \code{TRUE} adds
+\code{"factor-by"} to \code{grouped}; \code{FALSE} removes it, retaining the other types.}
 
 \item{contour_col}{Deprecated; use \code{\link[=gratia_theme_get]{gratia_theme_get()}} theme
 settings instead. Colour specification for contour lines.}
@@ -241,6 +242,23 @@ default (\code{r.axis.inside = TRUE}); supplied values override this default.
 Other options use their ggplot2 defaults. Requires
 \code{cyclic = "polar"} when nonempty. The angular variable, fitted cycle
 boundaries, full-circle extent and angular expansion are set by gratia.}
+
+\item{grouped}{character; factor smooth types whose curves share a panel.
+Choose any of \code{"factor-by"}, \code{"sz"}, and \code{"fs"}, or \code{character(0)} to
+separate all their curves. The default, \code{c("sz", "fs")}, overlays \code{sz}
+and \code{fs} curves and separates factor-by curves. \code{"factor-by"} includes
+ordered factors. In reference-plus-deviation models the reference smooth
+remains separate; only fitted nonreference deviations are grouped.
+For \code{sz} terms with several factors, separate plots show each evaluated
+combination of levels. Applies to curves with one continuous covariate;
+existing surface displays are unchanged.}
+
+\item{show_ci}{character; factor smooth types whose curves show intervals.
+Choose any of \code{"factor-by"}, \code{"sz"}, and \code{"fs"}, or \code{character(0)} to
+hide all their ribbons. The default, \code{c("factor-by", "sz")}, retains
+existing interval visibility; including \code{"fs"} enables its intervals.
+Controls display only, independently of \code{interval} and \code{grouped}.
+Ordinary smooths and parametric effects retain their intervals.}
 }
 \description{
 Plot the result of a call to \code{smooth_estimates()}

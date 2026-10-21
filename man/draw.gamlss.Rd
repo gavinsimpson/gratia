@@ -32,7 +32,10 @@
   select = NULL,
   parametric = NULL,
   terms = NULL,
-  partial_match = FALSE
+  partial_match = FALSE,
+  grouped_by = deprecated(),
+  grouped = c("sz", "fs"),
+  show_ci = c("factor-by", "sz")
 )
 }
 \arguments{
@@ -92,6 +95,26 @@ use the grid and surface controls below, as described in
 
 \item{wrap}{Logical; return an assembled patchwork when \code{TRUE} (the default),
 or a flat named list of plots when \code{FALSE}.}
+
+\item{grouped_by}{Deprecated; use \code{grouped}. Explicit \code{TRUE} adds
+\code{"factor-by"} to \code{grouped}; \code{FALSE} removes it, retaining the other types.}
+
+\item{grouped}{character; factor smooth types whose curves share a panel.
+Choose any of \code{"factor-by"}, \code{"sz"}, and \code{"fs"}, or \code{character(0)} to
+separate all their curves. The default, \code{c("sz", "fs")}, overlays \code{sz}
+and \code{fs} curves and separates factor-by curves. \code{"factor-by"} includes
+ordered factors. In reference-plus-deviation models the reference smooth
+remains separate; only fitted nonreference deviations are grouped.
+For \code{sz} terms with several factors, separate plots show each evaluated
+combination of levels. Applies to curves with one continuous covariate;
+existing surface displays are unchanged.}
+
+\item{show_ci}{character; factor smooth types whose curves show intervals.
+Choose any of \code{"factor-by"}, \code{"sz"}, and \code{"fs"}, or \code{character(0)} to
+hide all their ribbons. The default, \code{c("factor-by", "sz")}, retains
+existing interval visibility; including \code{"fs"} enables its intervals.
+Controls display only, independently of \code{interval} and \code{grouped}.
+Ordinary smooths and parametric effects retain their intervals.}
 }
 \value{
 \code{assemble()} and \code{draw(wrap = FALSE)} return a flat named list of

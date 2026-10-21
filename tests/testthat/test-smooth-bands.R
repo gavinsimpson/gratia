@@ -54,7 +54,7 @@ test_that("coverage is per fitted term and independent of selection order or gro
       }
     }
   }
-  panels <- assemble(su_m_factor_by_x2, grouped_by = TRUE, rug = FALSE,
+  panels <- assemble(su_m_factor_by_x2, grouped = c("factor-by", "sz", "fs"), rug = FALSE,
     interval = "simultaneous", n = 12, n_sim = 120, seed = 5)
   values <- smooth_estimates(su_m_factor_by_x2, n = 12, interval = "simultaneous",
     n_sim = 120, seed = 5)
@@ -212,7 +212,7 @@ test_that("simultaneous smooth visual regressions cover curves, factor grouping 
     select = "s(x)", interval = "simultaneous", n = 35, n_sim = 300, seed = 314,
     rug = FALSE))
   expect_doppelganger("simultaneous factor by smooths", draw(su_m_factor_by_x2,
-    interval = "simultaneous", grouped_by = TRUE, n = 35, n_sim = 300,
+    interval = "simultaneous", grouped = c("factor-by", "sz", "fs"), n = 35, n_sim = 300,
     seed = 314, rug = FALSE, parametric = FALSE))
   expect_doppelganger("simultaneous tensor slices", draw(su_m_trivar_te,
     interval = "simultaneous", n_2d = 8, n_3d = 3, n_sim = 300,

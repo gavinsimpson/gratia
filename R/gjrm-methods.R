@@ -92,7 +92,11 @@
 assemble.gamlss <- function(object, scales = c("free", "fixed"), ...,
                             n = 100, envir = NULL, select = NULL,
                             parametric = NULL, terms = NULL,
-                            partial_match = FALSE) {
+                            partial_match = FALSE,
+                            grouped_by = deprecated(), grouped = c("sz", "fs"),
+                            show_ci = c("factor-by", "sz")) {
+  factor_controls <- resolve_factor_plot_controls(grouped, show_ci, grouped_by,
+    "assemble.gamlss")
   scales <- match.arg(scales)
   components <- gjrm_gamlss_components(object)
   labels <- gjrm_gamlss_smooth_labels(components)
@@ -122,6 +126,7 @@ assemble.gamlss <- function(object, scales = c("free", "fixed"), ...,
     if (any(local_select) || local_parametric) {
       panels <- assemble(m, select = local_select, parametric = local_parametric,
         terms = local_terms, partial_match = FALSE, n = n, envir = envir,
+        grouped = factor_controls$grouped, show_ci = factor_controls$show_ci,
         ...)
       # Preserve familiar titles; names expose the unambiguous selection keys.
       panel_names <- names(panels)

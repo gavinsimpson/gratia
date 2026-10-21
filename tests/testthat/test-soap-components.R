@@ -64,16 +64,16 @@ test_that("component clipping preserves holes, boundary loops and offsets", {
 test_that("split component plotting keeps separate panels and observations", {
   for (grouped in c(FALSE, TRUE)) {
     for (surface in c("raster", "tile")) {
-      panels <- assemble(m_soap_sep, n_2d = 7, grouped_by = grouped,
+      panels <- assemble(m_soap_sep, n_2d = 7, grouped = if (grouped) c("factor-by", "sz", "fs") else c("sz", "fs"),
         surface = surface, residuals = TRUE)
       expect_length(panels, 2L)
       expect_silent(lapply(panels, ggplot2::ggplot_build))
       sm <- smooth_estimates(m_soap_sep, n_2d = 7, clip = TRUE)
-      saved <- draw(sm, grouped_by = grouped, surface = surface)
+      saved <- draw(sm, grouped = if (grouped) c("factor-by", "sz", "fs") else c("sz", "fs"), surface = surface)
       expect_silent(ggplot2::ggplot_build(saved))
       expect_length(split_smooth_components(sm), 2L)
       nested <- smooth_estimates(m_soap_sep, n_2d = 7, clip = TRUE, unnest = FALSE)
-      expect_silent(ggplot2::ggplot_build(draw(nested, grouped_by = grouped,
+      expect_silent(ggplot2::ggplot_build(draw(nested, grouped = if (grouped) c("factor-by", "sz", "fs") else c("sz", "fs"),
         surface = surface)))
     }
   }
@@ -158,12 +158,12 @@ test_that("tensor components sharing both label and type retain fitted indices",
   expect_identical(nested$.smooth_id, 1:2)
   expect_false(".smooth_id" %in% names(smooth_estimates(m_soap_sep, n_2d = 7)))
   for (grouped in c(FALSE, TRUE)) {
-    panels <- assemble(model, n_2d = 7, n_3d = 2, grouped_by = grouped,
+    panels <- assemble(model, n_2d = 7, n_3d = 2, grouped = if (grouped) c("factor-by", "sz", "fs") else c("sz", "fs"),
       residuals = TRUE)
     expect_length(panels, 2L)
     expect_silent(lapply(panels, ggplot2::ggplot_build))
     for (values in list(sm, nested)) {
-      drawn <- draw(values, grouped_by = grouped)
+      drawn <- draw(values, grouped = if (grouped) c("factor-by", "sz", "fs") else c("sz", "fs"))
       expect_silent(ggplot2::ggplot_build(drawn))
     }
   }

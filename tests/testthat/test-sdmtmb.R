@@ -103,7 +103,7 @@ test_that("sdmTMB smooths handle multiple penalties and by variables", {
   }
   m <- sdmtmb_test_fit(y ~ fac + s(x, by = fac, k = 5), d)
   expect_identical(smooths(m), paste0("s(x):fac", letters[1:3]))
-  sdmtmb_expect_build(assemble(m, grouped_by = TRUE, n = 8))
+  sdmtmb_expect_build(assemble(m, grouped = c("factor-by", "sz", "fs"), n = 8))
   m <- sdmtmb_test_fit(y ~ s(log(x), k = 5), d)
   raw <- smooth_estimates(m, n = 8, back_transform = TRUE)
   expect_equal(range(draw(raw, back_transform = TRUE)[[1L]]$data$x), range(d$x))
