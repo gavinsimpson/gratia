@@ -19,7 +19,7 @@ diagnostic_support."><meta property="og:image" content="https://gavinsimpson.git
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-57</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-58</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -345,14 +345,16 @@ indicating how to calculate the number of bins.</p></dd>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>GJRM support covers uncensored univariate N, LN, GA, GAi, P, NBI,
-and NBII models. PIT/quantile references are uniform/normal; traditional
+NBII, BE, LO, WEI, IG, GU and rGU models. PIT/quantile references are
+uniform/normal; traditional
 response/Pearson references use inverse-CDF or simulated responses.
 Probabilities are recomputed from final likelihood parameters. Quantile QQ
 bands give pointwise intervals for ordered standard-normal residuals,
 conditional on the fitted distribution,
 without accounting for parameter estimation. Observed-versus-fitted plots
-use response means, including the lognormal mean correction. Residuals are
-plotted against the first distributional linear predictor.</p>
+use response means, including the lognormal, Weibull and Gumbel mean
+corrections. Residuals are plotted against the first distributional linear
+predictor.</p>
 <p>Grouped-family models retain the residual defaults, component reference
 distributions, predictor ranks and layout controls of <code><a href="appraise.html">appraise()</a></code>. QQ
 bin limits apply separately to each component. Pooled residual

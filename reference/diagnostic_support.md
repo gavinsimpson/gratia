@@ -49,7 +49,7 @@ This table applies to the supported response families described below.
 | gamm/nlme::lme | Conditional/marginal | Depends on independence | Gaussian; PQL limits | Yes | Gaussian; approximate PQL without residual correlation |
 | gamm4/lme4::merMod | Conditional/marginal | Depends on independence | Joint, including GLMMs | Yes | Conditional/marginal |
 | glmmTMB | Conditional/marginal | Depends on independence | Joint, including non-Gaussian | Yes | Conditional/marginal |
-| GJRM::gamlss | Seven univariate families | Yes | Yes | Yes | Coefficients drawn together |
+| GJRM::gamlss | Supported univariate families | Yes | Yes | Yes | Coefficients drawn together |
 | sdmTMB | Depends on treatment of fields | Depends on independence | Joint, including delta | Yes | Parameters and fields drawn together |
 
 - `lm`/`glm`: weighted Gaussian and supported response families, with
@@ -88,10 +88,25 @@ This table applies to the supported response families described below.
   covariance and correlated random slopes.
 
 - Univariate [`GJRM::gamlss`](https://rdrr.io/pkg/GJRM/man/gamlss.html):
-  uncensored N, LN, GA, GAi, P, NBI and NBII. Probabilities use the
-  final likelihood parameters. This corrects stored NBII probabilities
-  that use a Poisson CDF in some upstream versions. Other families and
-  joint, censored and survival models are not yet supported.
+  uncensored N, LN, GA, GAi, P, NBI, NBII, BE, LO, WEI, IG, GU and rGU.
+  These include beta, logistic, Weibull, inverse Gaussian and both
+  Gumbel orientations. GAi is accepted by the diagnostic adapter, but
+  some GJRM versions do not offer it in `gamlss()`. Probabilities use
+  the final likelihood parameters. This corrects stored NBII
+  probabilities that use a Poisson CDF in some upstream versions. Other
+  families and joint, censored and survival models are not yet
+  supported. PIT/quantile, response, Pearson and DHARMa-style residuals
+  are available for all these families. Deviance residuals are available
+  for N, GA, GAi and P only. Quantile QQ plots use `method = NULL` or
+  `"normal"`; PIT and DHARMa-style QQ plots require `method = NULL`.
+  Response and Pearson QQ plots support inverse-CDF (`"uniform"`),
+  simulated (`"simulate"`), normal approximation (`"normal"`) and pooled
+  marginal (`"marginal"`) references. Observed-versus-fitted panels use
+  response means, including the Weibull and Gumbel corrections.
+  Residuals are plotted against the first predictor, which controls
+  Weibull scale or logistic/Gumbel location in those families. Posterior
+  predictive checks draw both equations' coefficients together,
+  including beta's logit-linked scale parameter.
 
 - `sdmTMB`: supported single-response and delta families retain spatial,
   spatiotemporal, grouping, time-varying and smooth effects. Standard

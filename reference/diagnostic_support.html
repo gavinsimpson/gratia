@@ -11,7 +11,7 @@ reference values and plots across fitting packages."><meta property="og:image" c
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-57</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-58</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -96,7 +96,7 @@ fitted probability, and covariate panels separate categories.
 Select them explicitly with <code>type = "surrogate"</code>; see <code><a href="surrogate_residuals.html">surrogate_residuals()</a></code>.
 A posterior predictive check (PPC) compares observed responses with simulated
 data sets that also include approximate uncertainty in fitted parameters.</p>
-<p>This table applies to the supported response families described below.</p><table class="table table"><tr><td>Fitter</td><td>PIT/quantile</td><td>Uniform QQ</td><td>Simulated QQ</td><td>Scalable plots</td><td>PPC</td></tr><tr><td>lm/glm</td><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes</td><td>Approximate coefficient draws</td></tr><tr><td>mgcv::gam</td><td>Yes</td><td>Depends on family</td><td>Yes</td><td>Yes</td><td>Coefficients drawn together</td></tr><tr><td>mgcv::bam</td><td>Marginal families</td><td>Marginal or joint</td><td>Gaussian AR1; otherwise marginal for GEE</td><td>Yes</td><td>Excludes GEE AR1</td></tr><tr><td>gamm/nlme::lme</td><td>Conditional/marginal</td><td>Depends on independence</td><td>Gaussian; PQL limits</td><td>Yes</td><td>Gaussian; approximate PQL without residual correlation</td></tr><tr><td>gamm4/lme4::merMod</td><td>Conditional/marginal</td><td>Depends on independence</td><td>Joint, including GLMMs</td><td>Yes</td><td>Conditional/marginal</td></tr><tr><td>glmmTMB</td><td>Conditional/marginal</td><td>Depends on independence</td><td>Joint, including non-Gaussian</td><td>Yes</td><td>Conditional/marginal</td></tr><tr><td>GJRM::gamlss</td><td>Seven univariate families</td><td>Yes</td><td>Yes</td><td>Yes</td><td>Coefficients drawn together</td></tr><tr><td>sdmTMB</td><td>Depends on treatment of fields</td><td>Depends on independence</td><td>Joint, including delta</td><td>Yes</td><td>Parameters and fields drawn together</td></tr></table><ul><li><p><code>lm</code>/<code>glm</code>: weighted Gaussian and supported response families, with their
+<p>This table applies to the supported response families described below.</p><table class="table table"><tr><td>Fitter</td><td>PIT/quantile</td><td>Uniform QQ</td><td>Simulated QQ</td><td>Scalable plots</td><td>PPC</td></tr><tr><td>lm/glm</td><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes</td><td>Approximate coefficient draws</td></tr><tr><td>mgcv::gam</td><td>Yes</td><td>Depends on family</td><td>Yes</td><td>Yes</td><td>Coefficients drawn together</td></tr><tr><td>mgcv::bam</td><td>Marginal families</td><td>Marginal or joint</td><td>Gaussian AR1; otherwise marginal for GEE</td><td>Yes</td><td>Excludes GEE AR1</td></tr><tr><td>gamm/nlme::lme</td><td>Conditional/marginal</td><td>Depends on independence</td><td>Gaussian; PQL limits</td><td>Yes</td><td>Gaussian; approximate PQL without residual correlation</td></tr><tr><td>gamm4/lme4::merMod</td><td>Conditional/marginal</td><td>Depends on independence</td><td>Joint, including GLMMs</td><td>Yes</td><td>Conditional/marginal</td></tr><tr><td>glmmTMB</td><td>Conditional/marginal</td><td>Depends on independence</td><td>Joint, including non-Gaussian</td><td>Yes</td><td>Conditional/marginal</td></tr><tr><td>GJRM::gamlss</td><td>Supported univariate families</td><td>Yes</td><td>Yes</td><td>Yes</td><td>Coefficients drawn together</td></tr><tr><td>sdmTMB</td><td>Depends on treatment of fields</td><td>Depends on independence</td><td>Joint, including delta</td><td>Yes</td><td>Parameters and fields drawn together</td></tr></table><ul><li><p><code>lm</code>/<code>glm</code>: weighted Gaussian and supported response families, with their
 fitted dispersion. Quasi families do not specify a response distribution,
 so they do not support PIT/quantile residuals or PPCs.</p></li>
 <li><p><code>gam</code>/<code>bam</code>: ordinary, distributional and grouped families, including
@@ -124,10 +124,24 @@ zero inflation and dispersion. Marginal simulations also provide reference
 samples for other families that glmmTMB can simulate. Unsupported conditional
 family CDFs remain unavailable. The package's own joint simulator preserves
 temporal AR1, spatial covariance and correlated random slopes.</p></li>
-<li><p>Univariate <code><a href="https://rdrr.io/pkg/GJRM/man/gamlss.html" class="external-link">GJRM::gamlss</a></code>: uncensored N, LN, GA, GAi, P, NBI and NBII.
+<li><p>Univariate <code><a href="https://rdrr.io/pkg/GJRM/man/gamlss.html" class="external-link">GJRM::gamlss</a></code>: uncensored N, LN, GA, GAi, P, NBI, NBII,
+BE, LO, WEI, IG, GU and rGU. These include beta, logistic, Weibull,
+inverse Gaussian and both Gumbel orientations. GAi is accepted by the
+diagnostic adapter, but some GJRM versions do not offer it in <code>gamlss()</code>.
 Probabilities use the final likelihood parameters. This corrects stored NBII
 probabilities that use a Poisson CDF in some upstream versions. Other
-families and joint, censored and survival models are not yet supported.</p></li>
+families and joint, censored and survival models are not yet supported.
+PIT/quantile, response, Pearson and DHARMa-style residuals are available
+for all these families. Deviance residuals are available for N, GA, GAi
+and P only. Quantile QQ plots use <code>method = NULL</code> or <code>"normal"</code>; PIT and
+DHARMa-style QQ plots require <code>method = NULL</code>. Response and Pearson QQ
+plots support inverse-CDF (<code>"uniform"</code>), simulated (<code>"simulate"</code>), normal
+approximation (<code>"normal"</code>) and pooled marginal (<code>"marginal"</code>) references.
+Observed-versus-fitted panels use response means, including the Weibull
+and Gumbel corrections. Residuals are plotted against the first predictor,
+which controls Weibull scale or logistic/Gumbel location in those families.
+Posterior predictive checks draw both equations' coefficients together,
+including beta's logit-linked scale parameter.</p></li>
 <li><p><code>sdmTMB</code>: supported single-response and delta families retain spatial,
 spatiotemporal, grouping, time-varying and smooth effects. Standard deltas
 and deltas with the coupled Poisson link support checks of the complete

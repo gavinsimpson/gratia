@@ -9,7 +9,7 @@ from the approximate posterior predictive distribution of a fitted model."><meta
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-57</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-58</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -229,8 +229,11 @@ specify a joint distribution for responses from the fitted family.
 <code>gamm4</code> defaults to <code>conditioning = "conditional"</code>, checking the full fitted
 mixed model while including uncertainty in fitted effects. Use the explicit
 <code>"gam_component"</code> option for the extracted GAM calculations. GJRM draws the final
-distributional coefficients jointly. These are approximate predictive checks;
-no refitting is performed.</p>
+distributional coefficients jointly for supported uncensored univariate
+families, including BE, LO, WEI, IG, GU and rGU. Both distributional equations
+retain their coefficient covariance; beta scale draws use its logit link.
+See <a href="diagnostic_support.html">diagnostic_support</a> for the family list. These are approximate predictive
+checks; no refitting is performed.</p>
 <p>Continuous responses use kernel density estimates with a common bandwidth
 derived from the observed responses and a shared evaluation grid. Discrete
 responses show observed empirical probability masses as points, alongside

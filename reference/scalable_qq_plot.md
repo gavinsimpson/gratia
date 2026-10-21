@@ -303,15 +303,16 @@ A ggplot object containing aggregated plotting data.
 
 ## Details
 
-GJRM support covers uncensored univariate N, LN, GA, GAi, P, NBI, and
-NBII models. PIT/quantile references are uniform/normal; traditional
-response/Pearson references use inverse-CDF or simulated responses.
-Probabilities are recomputed from final likelihood parameters. Quantile
-QQ bands give pointwise intervals for ordered standard-normal residuals,
-conditional on the fitted distribution, without accounting for parameter
-estimation. Observed-versus-fitted plots use response means, including
-the lognormal mean correction. Residuals are plotted against the first
-distributional linear predictor.
+GJRM support covers uncensored univariate N, LN, GA, GAi, P, NBI, NBII,
+BE, LO, WEI, IG, GU and rGU models. PIT/quantile references are
+uniform/normal; traditional response/Pearson references use inverse-CDF
+or simulated responses. Probabilities are recomputed from final
+likelihood parameters. Quantile QQ bands give pointwise intervals for
+ordered standard-normal residuals, conditional on the fitted
+distribution, without accounting for parameter estimation.
+Observed-versus-fitted plots use response means, including the
+lognormal, Weibull and Gumbel mean corrections. Residuals are plotted
+against the first distributional linear predictor.
 
 Grouped-family models retain the residual defaults, component reference
 distributions, predictor ranks and layout controls of

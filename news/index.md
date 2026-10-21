@@ -553,11 +553,16 @@
 
 - Diagnostic plots now support uncensored univariate
   [`GJRM::gamlss()`](https://rdrr.io/pkg/GJRM/man/gamlss.html) models
-  with N, LN, GA, GAi, P, NBI and NBII families. They use randomised
+  with N, LN, GA, GAi, P, NBI, NBII, BE, LO, WEI, IG, GU and rGU
+  families. Residual plots, response simulation and ordinary and
+  scalable posterior predictive checks use the final fitted
+  distribution. Posterior draws retain covariance between distributional
+  equations, including beta’s logit-linked scale. They use randomised
   quantile residuals with a standard-normal reference.
   Observed-versus-fitted panels show response means calculated from the
-  final distribution parameters. NBII probabilities are calculated from
-  the final fitted likelihood parameters, rather than relying on stored
+  final distribution parameters, including lognormal, Weibull and Gumbel
+  mean corrections. NBII probabilities are calculated from the final
+  fitted likelihood parameters, rather than relying on stored
   probabilities that can use a Poisson distribution.
 
 - [`appraise()`](https://gavinsimpson.github.io/gratia/reference/appraise.md),
