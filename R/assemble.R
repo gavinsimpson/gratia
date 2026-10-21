@@ -130,7 +130,8 @@
   ..., variables = NULL,
   simultaneous_method = c('simulation', 'tube'),
   simultaneous_domain = NULL, tube_control = list(),
-  cyclic = c("cartesian", "polar"), polar_args = list()
+  cyclic = c("cartesian", "polar"), polar_args = list(),
+  time_varying_style = c("ribbon", "pointrange")
 ) {
   gratia_plot_arguments(c("ci_alpha", "ci_col", "smooth_col", "resid_col", "contour_col", "ci_3d_alpha", "ci_3d_col"), environment())
   if (missing(overall_uncertainty) && is_scasm_model(object)) {
@@ -144,6 +145,7 @@
     simultaneous_domain, tube_control)
   if (simultaneous_method == 'simulation') validate_smooth_interval(interval, ci_level, n_sim, n_cores, seed)
   check_back_transform(back_transform)
+  time_varying_style <- match.arg(time_varying_style)
   surface <- match.arg(surface)
   validate_surface_3d(surface_3d)
   validate_ci_3d(ci_3d, ci_3d_alpha, ci_3d_col)
@@ -486,7 +488,8 @@
             .keep = TRUE,
             .f = ~ draw_parametric_effect(.x,
               ci_level = ci_level,
-              caption = if (isTRUE(caption) && interval == "simultaneous") {
+              caption = if (isTRUE(caption) && interval == "simultaneous" &&
+                  !identical(unique(.x$.type), "time_varying")) {
                 paste0(format(100 * ci_level), "% pointwise intervals (parametric effect)")
               } else if (identical(caption, FALSE)) FALSE else NULL,
               ci_col = ci_col,
@@ -500,6 +503,8 @@
               ylim = ylims,
               factor_levels = f_levels, term_info = attr(para, "term_info"),
               axis_info = attr(para, "axis_info"), from_raw = back_transform,
+              time_varying_info = attr(para, "time_varying_info"),
+              time_varying_style = time_varying_style,
               back_transform = back_transform,
               contour = contour, contour_col = contour_col, n_contour = n_contour,
               surface = surface, surface_3d = surface_3d,

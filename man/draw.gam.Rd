@@ -74,7 +74,8 @@
   simultaneous_domain = NULL,
   tube_control = list(),
   cyclic = c("cartesian", "polar"),
-  polar_args = list()
+  polar_args = list(),
+  time_varying_style = c("ribbon", "pointrange")
 )
 
 \method{draw}{gamm}(object, ...)
@@ -423,6 +424,11 @@ default (\code{r.axis.inside = TRUE}); supplied values override this default.
 Other options use their ggplot2 defaults. Requires
 \code{cyclic = "polar"} when nonempty. The angular variable, fitted cycle
 boundaries, full-circle extent and angular expansion are set by gratia.}
+
+\item{time_varying_style}{Display sdmTMB time-varying coefficients using
+a line, points and interval ribbon (\code{"ribbon"}, the default), or points
+and interval bars with a connecting line (\code{"pointrange"}). Other model
+terms keep their usual displays.}
 
 \item{centre}{character; for SCAM models, \code{"model"} retains each fitted
 smooth contribution. \code{"plot"} subtracts the evaluation-grid mean from
