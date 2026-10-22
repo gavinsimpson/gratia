@@ -173,6 +173,15 @@
 
 ### New features
 
+- [`basis()`](https://gavinsimpson.github.io/gratia/reference/basis.md)
+  accepts `unweighted = TRUE` for fitted GAM(M)s to return basis
+  functions without multiplying by fitted coefficients.
+  [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)
+  shows these shared bases, and bases from factor-by smooth
+  specifications, once per factor-by set. Coefficient-weighted fitted
+  bases remain separate by level
+  ([\#428](https://github.com/gavinsimpson/gratia/issues/428)).
+
 - [`fitted_values()`](https://gavinsimpson.github.io/gratia/reference/fitted_values.md)
   and
   [`fitted_samples()`](https://gavinsimpson.github.io/gratia/reference/fitted_samples.md)
@@ -1049,6 +1058,10 @@
   needing a recognised family name.
 
 ### Bug fixes
+
+- Bivariate factor-by basis plots now put each basis function in its own
+  panel, instead of drawing their surfaces on top of one another
+  ([\#428](https://github.com/gavinsimpson/gratia/issues/428)).
 
 - Gumbel LSS fitted location estimates are no longer exponentiated.
   Natural location is computed separately from the scale-dependent

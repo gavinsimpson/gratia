@@ -26,7 +26,8 @@ basis(
   partial_match = FALSE,
   envir = NULL,
   ...,
-  variables = NULL
+  variables = NULL,
+  unweighted = FALSE
 )
 
 # S3 method for class 'scam'
@@ -41,7 +42,8 @@ basis(
   n_4d = 4,
   partial_match = FALSE,
   ...,
-  variables = NULL
+  variables = NULL,
+  unweighted = FALSE
 )
 
 # S3 method for class 'gamm'
@@ -56,7 +58,8 @@ basis(
   n_4d = 4,
   partial_match = FALSE,
   ...,
-  variables = NULL
+  variables = NULL,
+  unweighted = FALSE
 )
 
 # S3 method for class 'gamm4'
@@ -71,7 +74,8 @@ basis(
   n_4d = 4,
   partial_match = FALSE,
   ...,
-  variables = NULL
+  variables = NULL,
+  unweighted = FALSE
 )
 
 # Default S3 method
@@ -162,6 +166,14 @@ basis(
   covariates define conditioning facets. Selected smooths must have the
   same covariates. If `NULL`, use the usual smooth plotting order.
 
+- unweighted:
+
+  logical; for fitted models, return basis functions without multiplying
+  by fitted coefficients? The default, `FALSE`, returns the
+  coefficient-weighted contributions. With `TRUE`,
+  [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)
+  shows the shared basis once for each factor-by set.
+
 - knots:
 
   a list or data frame with named components containing knots locations.
@@ -193,7 +205,11 @@ basis(
 ## Value
 
 A tibble with class `basis`. Its `plot_variables` attribute stores
-covariate orders by smooth label for subsequent plotting.
+covariate orders by smooth label for subsequent plotting. When the basis
+is shared across factor levels, `factor_by_groups` records the smooth
+labels that
+[`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)
+combines. The returned rows retain each level.
 
 ## Details
 

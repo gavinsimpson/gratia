@@ -134,6 +134,13 @@ default, matching
 [`draw.gam()`](https://gavinsimpson.github.io/gratia/reference/draw.gam.md).
 Use `contour = FALSE` to draw surfaces without contour lines.
 
+Factor-by bases from smooth specifications are drawn once for the whole
+factor-by set, using evaluations from all available levels. For fitted
+models, `basis(model)` returns coefficient-weighted contributions, which
+remain separate for each level. Use `basis(model, unweighted = TRUE)` to
+draw the shared basis once. Subsetting the basis before drawing
+restricts the plot to the retained evaluations and basis functions.
+
 ## Author
 
 Gavin L. Simpson
@@ -151,6 +158,12 @@ draw(bf)
 
 bf <- basis(m, "s(x2)")
 draw(bf)
+
+
+# A single shared basis for a factor-by set
+df_by <- data_sim("eg4", n = 400, seed = 42)
+m_by <- gam(y ~ fac + s(x2, by = fac), data = df_by)
+draw(basis(m_by, unweighted = TRUE))
 
 
 # A three-covariate basis, evaluated at two conditioning values

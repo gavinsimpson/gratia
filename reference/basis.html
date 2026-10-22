@@ -11,7 +11,7 @@ directly from a fitted GAM(M)."><meta property="og:image" content="https://gavin
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-62</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-63</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -85,7 +85,8 @@ directly from a fitted GAM(M).</p>
 <span>  partial_match <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  envir <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span>,</span>
-<span>  variables <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  variables <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  unweighted <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'scam'</span></span>
@@ -100,7 +101,8 @@ directly from a fitted GAM(M).</p>
 <span>  n_4d <span class="op">=</span> <span class="fl">4</span>,</span>
 <span>  partial_match <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span>,</span>
-<span>  variables <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  variables <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  unweighted <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'gamm'</span></span>
@@ -115,7 +117,8 @@ directly from a fitted GAM(M).</p>
 <span>  n_4d <span class="op">=</span> <span class="fl">4</span>,</span>
 <span>  partial_match <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span>,</span>
-<span>  variables <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  variables <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  unweighted <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'gamm4'</span></span>
@@ -130,7 +133,8 @@ directly from a fitted GAM(M).</p>
 <span>  n_4d <span class="op">=</span> <span class="fl">4</span>,</span>
 <span>  partial_match <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span>,</span>
-<span>  variables <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  variables <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  unweighted <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Default S3 method</span></span>
@@ -219,6 +223,13 @@ covariates define conditioning facets. Selected smooths must have the same
 covariates. If <code>NULL</code>, use the usual smooth plotting order.</p></dd>
 
 
+<dt id="arg-unweighted">unweighted<a class="anchor" aria-label="anchor" href="#arg-unweighted"></a></dt>
+<dd><p>logical; for fitted models, return basis functions without
+multiplying by fitted coefficients? The default, <code>FALSE</code>, returns the
+coefficient-weighted contributions. With <code>TRUE</code>, <code><a href="draw.html">draw()</a></code> shows the shared
+basis once for each factor-by set.</p></dd>
+
+
 <dt id="arg-knots">knots<a class="anchor" aria-label="anchor" href="#arg-knots"></a></dt>
 <dd><p>a list or data frame with named components containing
 knots locations. Names must match the covariates for which the basis
@@ -250,7 +261,9 @@ basis functions.</p></dd>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A tibble with class <code>basis</code>. Its <code>plot_variables</code> attribute stores
-covariate orders by smooth label for subsequent plotting.</p>
+covariate orders by smooth label for subsequent plotting. When the basis
+is shared across factor levels, <code>factor_by_groups</code> records the smooth
+labels that <code><a href="draw.html">draw()</a></code> combines. The returned rows retain each level.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
