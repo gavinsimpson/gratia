@@ -34,8 +34,8 @@ jobs:
       # Visual snapshots run in the separate macOS workflow.
       VDIFFR_RUN_TESTS: "false"
       VDIFFR_LOG_PATH: "../vdiffr.Rout.fail"
-      # Temporary call checkpoints belong to the focused sdmTMB job.
-      GRATIA_TEST_DIAGNOSTICS: "false"
+      # Keep macOS oldrel progress outside captured messages and snapshots.
+      GRATIA_TEST_DIAGNOSTICS: ${{ matrix.config.os == 'macOS-latest' && matrix.config.r == 'oldrel' && 'true' || 'false' }}
 
     steps:
       - uses: actions/checkout@v6
@@ -73,6 +73,14 @@ jobs:
           pak-version: stable
           needs: check
 
+      - name: Run focused macOS oldrel threshold tests
+        if: runner.os == 'macOS' && matrix.config.r == 'oldrel'
+        timeout-minutes: 15
+        env:
+          GRATIA_TEST_PROGRESS: ${{ runner.temp }}/threshold-test-progress.log
+        run: Rscript --vanilla tools/test-sdmtmb-thresholds.R
+        shell: bash
+
       - name: Check optional inlaws diagnostic integration
         if: runner.os == 'Linux' && matrix.config.r == 'release' && matrix.config.tests == 'full' && matrix.config.glmmtmb != 'development'
         shell: Rscript {0}
@@ -86,6 +94,36 @@ jobs:
         shell: bash
 
       - uses: r-lib/actions/check-r-package@v2
+        env:
+          GRATIA_TEST_PROGRESS: ${{ runner.os == 'macOS' && matrix.config.r == 'oldrel' && format('{0}/check-test-progress.log', runner.temp) || '' }}
         with:
           upload-snapshots: true
           build_args: 'c("--no-manual","--compact-vignettes=gs+qpdf")'
+
+      - name: Show macOS oldrel test output
+        if: always() && runner.os == 'macOS' && matrix.config.r == 'oldrel'
+        shell: bash
+        run: |
+          for log in "$RUNNER_TEMP/threshold-test-progress.log" "$RUNNER_TEMP/check-test-progress.log"; do
+            if [ -f "$log" ]; then
+              printf '\n%s\n' "$log"
+              tail -n 100 "$log"
+            fi
+          done
+          if [ -d check ]; then
+            find check -type f \( -name 'test-all.Rout*' -o -name '00check.log' \) \
+              -print -exec tail -n 100 '{}' \;
+          fi
+
+      - name: Upload macOS oldrel check logs
+        if: always() && runner.os == 'macOS' && matrix.config.r == 'oldrel'
+        uses: actions/upload-artifact@v7
+        with:
+          name: macOS-oldrel-check-logs
+          if-no-files-found: ignore
+          path: |
+            ${{ runner.temp }}/threshold-test-progress.log
+            ${{ runner.temp }}/check-test-progress.log
+            check/**/tests/test-all.Rout*
+            check/**/00check.log
+            check/**/00install.out

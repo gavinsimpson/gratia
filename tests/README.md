@@ -64,11 +64,28 @@ For an installed-package check, export `NOT_CRAN=false` (core) or `NOT_CRAN=true
 Each scasm reference shape has a separate named test, so fitting errors identify
 the shape even when fitting stops before an assertion.
 
-All package checks use the normal testthat reporter. The full Windows ARM
-R-release check runs alongside the Windows x64 check, verifies that R is native
-ARM, and retains the repositories provided by the ARM R installation.
+Package checks use the normal testthat reporter. The macOS oldrel check also
+writes test locations and call checkpoints to a separate progress file, keeping
+them out of captured messages and snapshots. It first runs the focused sdmTMB
+threshold tests with a 15-minute limit. Progress files, `test-all.Rout*`, and
+check logs are uploaded even when a step fails or is cancelled.
 
-Only the focused Windows ARM sdmTMB compatibility job enables the temporary
+To run the same focused tests locally:
+
+```sh
+NOT_CRAN=false VDIFFR_RUN_TESTS=false GRATIA_TEST_DIAGNOSTICS=true \
+  GRATIA_TEST_PROGRESS=/tmp/gratia-threshold-progress.log \
+  Rscript --vanilla tools/test-sdmtmb-thresholds.R
+```
+
+The report includes dependency versions, per-test times, and total elapsed time.
+An unfinished fitting or prediction call leaves a START checkpoint without DONE.
+
+The full Windows ARM R-release check runs alongside the Windows x64 check,
+verifies that R is native ARM, and retains the repositories provided by the
+ARM R installation.
+
+The focused Windows ARM sdmTMB compatibility job also enables the temporary
 START/DONE checkpoints around Student-t fitting, diagnostic and predictive
 calls. They write directly to stderr and flush immediately. An abrupt process
 exit leaves the last START without its matching DONE. This job uses
