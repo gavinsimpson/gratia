@@ -61,11 +61,11 @@ We might simulate from the posterior distribution of a single estimated smooth f
 gratia has functionality for all these options through the following functions
 
 1. `smooth_samples()` generates draws from the posterior distribution of single estimated smooth functions,
-2. `fitted_samples()` generates draws from the posterior distribution of $\mathbb{E}(y_i | \mathbf{X}_i = x_i)$, the expected value of the response,
+2. `fitted_samples()` generates joint draws of distribution parameters; use `quantity = "expectation"` for draws of $\mathbb{E}(y_i | \mathbf{X}_i = x_i)$, the expected response,
 3. `predicted_samples()` generates new response data given supplied values of covariates $y^{\ast}_i | \mathbf{X}_i = x^{\ast}_i$
 4. `posterior_samples()`, generates draws from the posterior distribution of the model, including the uncertainty in the estimated parameters of that model.
 
-In simpler terms, `fitted_samples()` generates predictions about the "average" or expected value of the response at values of the covariates. These predictions only include the uncertainty in the estimated values of the model coefficients. In contrast, `posterior_samples()` generates predictions of the actual values of the response we might expect to observe (if the model is correct) given values of the covariates. These predicted values include the variance of the sampling distribution (error term). `predicted_samples()` lies somewhere in between these two; the predicted values only include the variation in the sampling distribution, and take the model as fixed, known.
+With `quantity = "expectation"`, `fitted_samples()` describes uncertainty in the expected response at the supplied covariates. It adds no response noise. `posterior_samples()` draws observations after drawing model coefficients, so it includes response variation as well as coefficient uncertainty. `predicted_samples()` draws observations with the coefficients held at their fitted values.
 
 It is worth reminding ourselves that these posterior draws are all conditional upon the selected values of the smoothing parameter(s) $\lambda_j$. We act as if the wiggliness of the estimated smooths was known, when in actual fact we estimated (selected is perhaps a better description) these wiglinesses from the data during model fitting. If the estimated GAM has been fitted with `method` argument `"REML"`, or `"ML"`, then a version of $\mathbf{V}_{\text{b}}$ that is corrected for having selected smoothing parameters, $\mathbf{V}_{\text{c}}$, is generally available. This allows, to an extent, for posterior simulation to account for the additional source of uncertainty of having chosen then values of $\boldsymbol{\lambda}$.
 
@@ -74,7 +74,7 @@ There are two additional functions available in gratia that do posterior simulat
 * `simulate()`, and
 * `derivative_samples()`.
 
-gratia provides `simulate()` methods for models estimated using `gam()`, `bam()`, and `gamm()`, as well as those fitted via `scam()` in the scam package. `simulate()` is a base R convention that does the same thing as `predicted_samples()`, just in a non-tidy way (that is not pejorative; it returns the simulated response values as a matrix, which is arguably more useful if you are doing math or further statistical computation.) `derivative_samples()` provides draws from the posterior distribution of the derivative of response variable for a small change in a focal covariate value. `derivative_samples()` is a less general version of `fitted_samples()`; you could achieve the same thing by two separate calls to `fitted_samples()`. We'll reserve discussion of `derivative_samples()` to a separate vignette focused on estimating derivatives from GAMs.
+gratia provides `simulate()` methods for models estimated using `gam()`, `bam()`, and `gamm()`, as well as those fitted via `scam()` in the scam package. `simulate()` is a base R convention that does the same thing as `predicted_samples()`, returning simulated responses as a matrix. `derivative_samples()` draws derivatives of the expected response with respect to a focal covariate. It evaluates expectations at neighbouring covariate values using the same coefficient draws, preserving their dependence. We'll reserve discussion of derivatives for a separate vignette focused on estimating derivatives from GAMs.
 
 In the following sections we'll look at each of the four main posterior simulation functions in turn.
 
@@ -128,7 +128,7 @@ Following @Marra2012-bq, the blue credible interval will contain on average 95% 
 
 ## Posterior fitted values via `fitted_samples()`
 
-Posterior fitted values are draws from the posterior distribution of the mean or expected value of the response. These expectations are what is returned when you use `predict()` on an estimated GAM, except `fitted_samples()` includes the uncertainty in the estimated model coefficients, whereas `predict()` just uses the estimated coefficients.
+In this section we request `quantity = "expectation"` explicitly. For an ordinary mean-based GAM, these are draws of the same expected response estimated by `predict()`. Distributional models can have several predictors, and their first parameter need not be the expected response. The default `quantity = "parameters"` returns those parameters instead; `family_parameters()` describes their meanings.
 
 In this example, using `data_sim()` we simulate data from example 6 of @Luo1997-xg
 
@@ -159,11 +159,11 @@ new_df <- data_slice(m, x = evenly(x, lower = 0, upper = 1, n = 200)) |>
 ```
 then we compute the fitted values for the new data
 ```{r luo-wabha-fitted}
-fv <- fitted_values(m, data = new_df)
+fv <- fitted_values(m, quantity = "expectation", data = new_df)
 ```
 The posterior fitted values are drawn with `fitted_samples()` using a Gaussian approximation to the posterior. Here we just take 10 draws from the posterior for each observation in `new_df` and merge the posterior draws with the data
 ```{r luo-wabha-posterior}
-fs <- fitted_samples(m, data = new_df, n_draws = 10, seed = 4) |>
+fs <- fitted_samples(m, quantity = "expectation", data = new_df, n_draws = 10, seed = 4) |>
   left_join(new_df |> select(.row, x), by = join_by(.row == .row))
 ```
 Adding the posterior fitted samples to the plot of the data, superimposing the Bayesian credible interval on the fitted values
@@ -325,7 +325,7 @@ df |>
 The orange region shows the expected density of response values at $x^{\ast} = 0.5$ that our model predicts we could expect to observe. This region assumes there is no uncertainty in the estimate of the mean of variance. Prediction intervals take into account the variation about the expected value, plus the uncertainty in the expected value. `fitted_values()` conveniently returns this uncertainty for us, which by default is a 95% credible interval
 
 ```{r expected-value-uncertainty-gaussian-gam}
-fitted_values(m, data = data.frame(x = 0.5))
+fitted_values(m, quantity = "expectation", data = data.frame(x = 0.5))
 ```
 
 The `.se` column is the standard error (standard deviation) of the estimated value (`.fitted`), while `.lower_ci` and `.upper_ci` are lower and upper uncertainty bounds (at the 95% level) on the estimated value respectively. With GAMs fitted through mgcv we don't have a corresponding estimate of the uncertainty in the scale parameter, $\phi$, which for this model is the estimated standard deviation $\hat{\sigma}$.
@@ -339,7 +339,7 @@ ds <- data_slice(m, x = evenly(x, n = 200)) |>
 ```
 The added variable `.row` will be used later to match posterior simulated values to the row in the prediction data set `ds`. We also compute the fitted values for these new observations using `fitted_values()`.
 ```{r fitted-values-gaussian-gam}
-fv <- fitted_values(m, data = ds)
+fv <- fitted_values(m, quantity = "expectation", data = ds)
 ```
 That step isn't required in order to do posterior simulation with gratia, but we'll use the fitted values later to show the model estimated values and their uncertainty in contrast to the prediction interval.
 
@@ -446,8 +446,8 @@ m_logit <- gam(y ~ s(x, k = 15), data = df, method = "REML", family = binomial)
 ```
 and then generate sample from the posterior distribution using the default Gaussian approximation and subsequently using the simpler Metropolis Hastings sampler.
 ```{r}
-fs_ga <- fitted_samples(m_logit, n_draws = 2000, seed = 2)
-fs_mh <- fitted_samples(m_logit,
+fs_ga <- fitted_samples(m_logit, quantity = "expectation", n_draws = 2000, seed = 2)
+fs_mh <- fitted_samples(m_logit, quantity = "expectation",
   n_draws = 2000, seed = 2, method = "mh", thin = 2,
   rw_scale = 0.4
 )

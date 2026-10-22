@@ -1,7 +1,7 @@
 # test conditional_values() and related functions
 
 # constants
-cv_names <- c(".row", ".fitted", ".se", ".lower_ci", ".upper_ci")
+cv_names <- c(".row", ".parameter", ".fitted", ".se", ".lower_ci", ".upper_ci")
 
 # conditional_values()
 test_that("conditional_values for a GAM with vector condition", {

@@ -177,7 +177,8 @@ functions.
 For LSS models, each smooth is a contribution to its own linear predictor.
 Select its full smooth label to distinguish predictors, for example \code{s(x)}
 and \code{s.1(x)}. These are component draws on the predictor scale; use
-\code{\link[=fitted_samples]{fitted_samples()}} for the expected response and \code{\link[=derivative_samples]{derivative_samples()}} for
+\code{\link[=fitted_samples]{fitted_samples()}} with \code{quantity = "expectation"} for the expected response
+and \code{\link[=derivative_samples]{derivative_samples()}} for
 its derivative. Coefficients are drawn jointly across all predictors.
 }
 \section{Warning}{

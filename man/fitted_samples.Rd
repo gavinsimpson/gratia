@@ -34,7 +34,8 @@ fitted_samples(model, ...)
   block_size = 10000L,
   dense_limit = 5e+06,
   scale = c("response", "linear_predictor"),
-  family_index = NULL
+  family_index = NULL,
+  quantity = c("parameters", "expectation")
 )
 
 \method{fitted_samples}{scam}(
@@ -59,7 +60,8 @@ fitted_samples(model, ...)
   mvn_method = c("mvnfast", "mgcv"),
   block_size = 10000L,
   dense_limit = 5e+06,
-  scale = c("response", "linear_predictor")
+  scale = c("response", "linear_predictor"),
+  quantity = c("parameters", "expectation")
 )
 }
 \arguments{
@@ -147,13 +149,9 @@ gratia MH evaluator. Large designs are evaluated without storing a full matrix.}
 \item{dense_limit}{numeric; maximum number of design-matrix elements to cache
 for the gratia MH backend. Use zero to force blockwise evaluation.}
 
-\item{scale}{character; \code{"response"} returns the expected response;
-\code{"linear_predictor"} returns the first linear predictor. For LSS models,
-this is the predictor for location, which need not be the expected response.
-For multinomial models both scales return every category, labelled
-\code{response1}, \code{response2}, and so on. On the linear predictor scale,
-\code{response1} is the reference category with predictor zero; other values
-are log odds relative to it. Response-scale values are probabilities.}
+\item{scale}{character; \code{"response"} returns natural distribution parameters;
+\code{"link"}, \code{"linear_predictor"} and \code{"linear predictor"} return their
+predictors. Expectations require \code{"response"}.}
 
 \item{family_index}{numeric; optional family-list positions for grouped
 family (\code{\link[mgcv:gfam]{mgcv::gfam()}}) response predictions, with one integer per requested
@@ -161,35 +159,51 @@ row. By default membership is recovered from the response/index expression
 in \code{data}, or the fitted membership when \code{data} is omitted. This is useful
 when predicting without responses or with a complex response expression.
 An explicit index must agree with membership recoverable from \code{data}.}
+
+\item{quantity}{character; \code{"parameters"} (the default) returns all
+distribution parameters represented by predictors, including intercept-only
+predictors. \code{"expectation"} returns the expected response, using every
+parameter on which it depends, on the response scale only.}
 }
 \value{
 A tibble (data frame) in long format, with columns:
 \itemize{
 \item \code{.row}: row of the evaluation data;
 \item \code{.draw}: globally unique draw identifier;
-\item \code{.parameter}: \code{"location"} for scalar fitted values, or a response/category
-label for multivariate or multinomial models;
-\item \code{.fitted}: expected response or linear predictor, as selected by \code{scale}.
+\item \code{.parameter}: the distribution parameter name, or \code{"expectation"};
+\item \code{.fitted}: the parameter, predictor or expected response requested.
 Multiple-chain output also includes \code{.chain} and \code{.iteration}. Attached
 coefficient diagnostics are available through \code{\link[=sampling_diagnostics]{sampling_diagnostics()}}.
 }
 }
 \description{
-Expectations (fitted values) of the response drawn from the posterior
-distribution of fitted model using a Gaussian approximation to the
-posterior or a simple Metropolis Hastings sampler.
+Distribution parameters or expected responses drawn from the posterior
+distribution of a fitted model.
 }
 \details{
-For LSS models, \code{scale = "response"} returns the expected response, using
-all parameters on which it depends. This includes the mean correction for
-Gumbel, GEV and sinh-arcsinh distributions and the hurdle probability for
-\code{ziplss()}. The Gamma LSS mean is the exponential of its first predictor.
-\code{scale = "linear_predictor"} returns only the first predictor (location);
-it is not a transformation of the expectation for these multi-parameter
-distributions. The existing \code{.parameter = "location"} label is retained on
-both scales. A GEV expectation does not exist at shape >= 1: response-scale
-fitted and derivative sampling then fail explicitly, while response draws
-and location-predictor draws remain available.
+Parameter names and definitions are available through \code{\link[=family_parameters]{family_parameters()}}.
+Gaussian LSS returns \code{mean} and \code{sd}, GEV returns \code{location}, \code{scale} and
+\code{shape}, and sinh-arcsinh returns \code{location}, \code{scale}, \code{skewness} and
+\code{tailweight}. These shape parameters are not response moments. Natural
+parameters can differ from native mgcv predictions and \code{inv_link()} values.
+Every parameter in one draw uses the same joint coefficient draw. Global
+parameters outside the coefficient vector remain fixed and are described
+in the metadata, rather than returned as fitted parameters.
+
+Use \code{quantity = "expectation"} for expected responses labelled
+\code{"expectation"}. This includes Gumbel, GEV and sinh-arcsinh mean adjustments
+and the zero-truncated Poisson adjustment in \code{ziplss()}. A GEV expectation
+does not exist at shape >= 1; parameter and response draws remain available.
+Categorical expectations are category probabilities, not numeric category
+scores. \code{.category} identifies categories, and \code{.y} identifies multivariate
+responses. Multinomial link output includes a zero reference predictor.
+Ordinal parameter output is the latent location predictor; its thresholds
+are global parameters.
+
+The \code{prediction_info} attribute records the quantity, scale and resolved
+parameter descriptions. Unlike \code{\link[=posterior_samples]{posterior_samples()}}, these draws add no
+response noise. \code{\link[=predicted_samples]{predicted_samples()}} instead simulates observations with
+coefficients held at their fitted values.
 
 For grouped families, coefficient draws preserve the joint model covariance;
 each row is then transformed using its own fitted component family. Explicit
@@ -200,10 +214,10 @@ as \code{cbind(y, index)}, the \code{index} expression can be supplied without \
 Missing indices behave like missing required predictors. Link-scale draws
 do not require family membership.
 
-Grouped response-scale draws currently support scalar fitted means, including
-families with a scalar prediction transform such as \code{\link[mgcv:ziP]{mgcv::ziP()}}. They do
-not support \code{\link[mgcv:ocat]{mgcv::ocat()}} category-probability output; use the link scale
-for grouped ordinal models. Distributional nuisance parameters are held at
+Grouped parameter output includes the latent location for ordinal components.
+Grouped expectations include scalar fitted means and ordinal category
+probabilities, with \code{.category} identifying the ordinal category and \code{NA}
+for scalar components. Distributional nuisance parameters are held at
 their fitted values. This does not add support for general/location-scale
 families that \code{gfam()} itself rejects, nor repair upstream fitting failures
 (including fixed-theta negative-binomial components and some \code{ziP()} fits

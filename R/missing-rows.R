@@ -166,7 +166,7 @@ restore_prediction_table <- function(x, layout, include_data = FALSE) {
     x$.row <- rows[x$.row]
     return(x)
   }
-  keys <- intersect(c(".draw", ".parameter", ".category", ".y"), names(x))
+  keys <- intersect(c(".draw", ".parameter", ".category", ".y", ".component"), names(x))
   # Retain each output's existing ordering (row-major or parameter-major).
   groups <- if (length(keys)) {
     unique(as.data.frame(x[keys]))
@@ -175,7 +175,9 @@ restore_prediction_table <- function(x, layout, include_data = FALSE) {
   }
   # LSS fitted tables interleave parameters within rows. Sampling tables
   # always group by draw, even when only one observation could be evaluated.
-  row_major <- ".parameter" %in% names(x) && !".draw" %in% names(x)
+  row_major <- ".parameter" %in% names(x) && !".draw" %in% names(x) &&
+    !identical(attr(x, "prediction_order", exact = TRUE), "parameter") &&
+    (nrow(x) < 2L || x$.row[1L] == x$.row[2L])
   if (row_major) {
     gi <- rep(seq_len(NROW(groups)), times = length(layout$map))
     ri <- rep(seq_along(layout$map), each = NROW(groups))

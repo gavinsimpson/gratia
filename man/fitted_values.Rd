@@ -22,7 +22,9 @@ fitted_values(object, ...)
   n_cores = 1,
   seed = NULL,
   unconditional = FALSE,
-  interval_method = c("auto", "gaussian", "bootstrap")
+  interval_method = c("auto", "gaussian", "bootstrap"),
+  quantity = c("parameters", "expectation"),
+  family_index = NULL
 )
 
 \method{fitted_values}{gamm}(object, ...)
@@ -44,7 +46,8 @@ are to be returned.}
 
 \item{scale}{character; what scale should the fitted values be returned on?
 \code{"linear predictor"} is a synonym for \code{"link"} if you prefer that
-terminology.}
+terminology. \code{"linear_predictor"} is also accepted. Expectations require
+\code{"response"}; parameter predictions use natural values or their predictors.}
 
 \item{ci_level}{numeric; a value between 0 and 1 indicating the coverage of
 the credible interval.}
@@ -76,22 +79,35 @@ for pointwise intervals when available and Gaussian intervals otherwise.
 \code{"gaussian"} requests covariance-based limits and \code{"bootstrap"} requires
 stored draws. Simultaneous bootstrap bands are unsupported. Shape-enforced
 intervals are available for smooth components through \code{\link[=smooth_estimates]{smooth_estimates()}}.}
+
+\item{quantity}{character; \code{"parameters"} (the default) returns all
+distribution parameters represented by predictors, including intercept-only
+predictors. \code{"expectation"} returns the expected response, using every
+parameter on which it depends, on the response scale only.}
+
+\item{family_index}{numeric; optional family-list positions for grouped
+family (\code{\link[mgcv:gfam]{mgcv::gfam()}}) response predictions, with one integer per requested
+row. By default membership is recovered from the response/index expression
+in \code{data}, or the fitted membership when \code{data} is omitted. This is useful
+when predicting without responses or with a complex response expression.
+An explicit index must agree with membership recoverable from \code{data}.}
 }
 \value{
 A tibble (data frame) whose first \emph{m} columns contain either the data
 used to fit the model (if \code{data} was \code{NULL}), or the variables supplied to
-\code{data}. Four further columns are added:
+\code{data}. The result also includes:
 \itemize{
-\item \code{.fitted}: the fitted values on the specified scale,
-\item \code{.se}: the standard error of the fitted values (always on the \emph{link} scale),
+\item \code{.parameter}: parameter name, or \code{"expectation"},
+\item \code{.fitted}: the requested quantity on the specified scale,
+\item \code{.se}: standard error; see \code{prediction_info} for its scale,
 \item \code{.lower_ci}, \code{.upper_ci}: the limits of the credible interval on the fitted values,
 on the specified scale.
 }
 
 Models fitted with certain families will include additional variables
 \itemize{
-\item \code{mgcv::ocat()} models: when \code{scale = "response"}, the returned object will
-contain a \code{row} column and a \code{category} column, which indicate to which row
+\item \code{mgcv::ocat()} models: when \code{quantity = "expectation"}, the returned object will
+contain a \code{.row} column and a \code{.category} column, which indicate to which row
 of the \code{data} each row of the returned object belongs. Additionally, there
 will be \code{nrow(data) * n_categories} rows in the returned object; each row
 is the predicted probability for a single category of the response.
@@ -101,6 +117,27 @@ is the predicted probability for a single category of the response.
 Generate fitted values from a estimated GAM
 }
 \details{
+\code{quantity = "parameters"} returns all distribution parameters represented
+by predictors, including intercept-only predictors. See \code{\link[=family_parameters]{family_parameters()}}
+for their definitions. These are natural distribution parameters, which
+can differ from mgcv's native response predictions: Gaussian LSS returns
+standard deviation, GEV returns location rather than expectation, and
+sinh-arcsinh returns shape parameters rather than response moments.
+
+\code{quantity = "expectation"} returns the expected response on the response
+scale, labelled \code{"expectation"}. Categorical expectations are probabilities
+of category membership; multivariate models return a mean per response.
+\code{.category} and \code{.y} identify the category or response separately from
+\code{.parameter}. Global parameters are described but held fixed when calculating
+coefficient uncertainty. Coupled expectations use the full coefficient
+covariance and a delta-method Jacobian. Their intervals are pointwise.
+
+The \code{prediction_info} attribute records the quantity, scale, standard-error
+scale and parameter descriptions. Parameter standard errors retain their
+link-scale meaning; category-probability and expectation standard errors are
+on the response scale. Unsupported simultaneous or bootstrap transformations
+are rejected rather than combining marginal parameter intervals.
+
 Native scasm fits with stored bootstrap draws use mgcv's pointwise limits
 by default, including its \code{svar.only} correction for smoothing bias.
 \code{interval_method = "gaussian"} restores covariance-based limits. \code{.se}
@@ -174,11 +211,9 @@ expected response. Use the link scale for sums of smooth contributions, and
 consider the intercept and offset treatment when selecting terms.
 }
 \note{
-For most families, regardless of the scale on which the fitted values
-are returned, the \code{se} component of the returned object is on the \emph{link}
-(\emph{linear predictor}) scale, not the response scale. An exception is the
-\code{mgcv::ocat()} family, for which the \code{se} is on the response scale if
-\code{scale = "response"}.
+For parameter output, the \code{.se} component is on the \emph{link}
+(\emph{linear predictor}) scale. Multinomial probabilities on the response scale
+and all expected responses have response-scale standard errors.
 }
 \examples{
 load_mgcv()

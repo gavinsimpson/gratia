@@ -187,7 +187,8 @@ test_that("random-only groups and category expansion do not alter diagnostics", 
   expect_equal(expected$.fitted, expect_factor_support_message(
     capture_factor_support(fitted_values(factor_support_models$gamm4, data = nd)))$.fitted)
   for (scale in c("link", "response")) {
-    result <- capture_factor_support(fitted_values(factor_support_response, data = nd, scale = scale))
+    result <- capture_factor_support(fitted_values(factor_support_response, data = nd, scale = scale,
+      quantity = if (scale == "response") "expectation" else "parameters"))
     actual <- expect_factor_support_message(result)
     expect_equal(nrow(actual), nrow(nd) * if (scale == "response") 3L else 1L)
     native <- predict(factor_support_response, newdata = nd, type = scale, se.fit = TRUE)

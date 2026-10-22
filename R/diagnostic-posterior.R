@@ -839,6 +839,7 @@ diagnostic_mvn_posterior_sampler <- function(model, betas, rows) {
   function(i) {
     fits <- fitted_samples(
       model,
+      quantity = "expectation",
       n_draws = 1L,
       method = "user",
       draws = betas[i, , drop = FALSE]
@@ -846,7 +847,7 @@ diagnostic_mvn_posterior_sampler <- function(model, betas, rows) {
     mu <- vapply(
       paste0("response", seq_len(p)),
       function(parameter) {
-        fits$.fitted[fits$.parameter == parameter]
+        fits$.fitted[fits$.y == parameter]
       },
       numeric(n_obs)
     )

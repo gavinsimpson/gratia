@@ -165,7 +165,8 @@ test_that("LSS evaluation draws include real prescribed smooth boundaries", {
   newdata <- nd; newdata$z <- NULL
   actual <- posterior_samples(m, data = newdata, method = "user", draws = B, seed = 82)
   expect_equal(actual$.response, expected, tolerance = 1e-10)
-  actual <- fitted_samples(m, data = newdata, method = "user", draws = B[1, , drop = FALSE])
+  actual <- fitted_samples(m, data = newdata, method = "user", draws = B[1, , drop = FALSE],
+    quantity = "expectation")
   expect_equal(actual$.fitted, as.numeric(eta[, 1]), tolerance = 1e-10)
   h <- 1e-5
   plus <- minus <- newdata

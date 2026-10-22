@@ -1849,6 +1849,43 @@ detaching ‘package:mgcv’
 
 detaching ‘package:mgcv’
 
+> nameEx("family_parameters")
+> ### * family_parameters
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: family_parameters
+> ### Title: Describe a model family's distribution parameters
+> ### Aliases: family_parameters
+> 
+> ### ** Examples
+> 
+> family_parameters(mgcv::gevlss())
+# A tibble: 3 x 10
+  parameter symbol definition   native predictor source link  component returned
+  <chr>     <chr>  <chr>        <chr>      <int> <chr>  <chr> <chr>     <lgl>   
+1 location  mu     Location pa~ locat~         1 predi~ iden~ <NA>      TRUE    
+2 scale     sigma  Positive sc~ log s~         2 predi~ iden~ <NA>      TRUE    
+3 shape     xi     Distributio~ shape          3 predi~ logit <NA>      TRUE    
+# i 1 more variable: uncertainty <chr>
+> family_parameters(mgcv::gaulss())
+# A tibble: 2 x 10
+  parameter symbol definition   native predictor source link  component returned
+  <chr>     <chr>  <chr>        <chr>      <int> <chr>  <chr> <chr>     <lgl>   
+1 mean      mu     Mean of the~ mean           1 predi~ iden~ <NA>      TRUE    
+2 sd        sigma  Standard de~ recip~         2 predi~ logb  <NA>      TRUE    
+# i 1 more variable: uncertainty <chr>
+> family_parameters(mgcv::ziplss())
+# A tibble: 2 x 10
+  parameter   symbol definition native predictor source link  component returned
+  <chr>       <chr>  <chr>      <chr>      <int> <chr>  <chr> <chr>     <lgl>   
+1 rate        lambda Poisson r~ log r~         1 predi~ iden~ <NA>      TRUE    
+2 presence_p~ p      Probabili~ clogl~         2 predi~ iden~ <NA>      TRUE    
+# i 1 more variable: uncertainty <chr>
+> 
+> 
+> 
+> cleanEx()
 > nameEx("fderiv")
 > ### * fderiv
 > 
@@ -1996,44 +2033,44 @@ detaching ‘package:mgcv’
 > m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = sim_df, method = "REML")
 > fv <- fitted_values(m)
 > fv
-# A tibble: 400 x 9
-    .row       x0        x1         x2       x3  .fitted      .se .lower_ci
-   <int>    <dbl>     <dbl>      <dbl>    <dbl>    <dbl>    <dbl>     <dbl>
- 1     1 0.184882 0.617142  0.415244   0.132410  8.73875 0.354677   8.04360
- 2     2 0.702374 0.569064  0.531439   0.365331  7.62581 0.337779   6.96378
- 3     3 0.573326 0.153970  0.00324621 0.454532  3.12106 0.591862   1.96103
- 4     4 0.168052 0.0348332 0.252100   0.537114 11.1124  0.402378  10.3237 
- 5     5 0.943839 0.997953  0.155229   0.185495 14.0533  0.452947  13.1655 
- 6     6 0.943475 0.835574  0.878840   0.449276  6.13080 0.364521   5.41635
- 7     7 0.129159 0.586562  0.203511   0.256527 12.4838  0.355808  11.7864 
- 8     8 0.833449 0.339117  0.583528   0.618458  6.25215 0.344700   5.57655
- 9     9 0.468019 0.166883  0.804473   0.880744  4.21463 0.372003   3.48552
-10    10 0.549984 0.807410  0.264717   0.317747 15.5283  0.369999  14.8031 
+# A tibble: 400 x 10
+    .row       x0        x1         x2       x3 .parameter  .fitted      .se
+   <int>    <dbl>     <dbl>      <dbl>    <dbl> <chr>         <dbl>    <dbl>
+ 1     1 0.184882 0.617142  0.415244   0.132410 mean        8.73875 0.354677
+ 2     2 0.702374 0.569064  0.531439   0.365331 mean        7.62581 0.337779
+ 3     3 0.573326 0.153970  0.00324621 0.454532 mean        3.12106 0.591862
+ 4     4 0.168052 0.0348332 0.252100   0.537114 mean       11.1124  0.402378
+ 5     5 0.943839 0.997953  0.155229   0.185495 mean       14.0533  0.452947
+ 6     6 0.943475 0.835574  0.878840   0.449276 mean        6.13080 0.364521
+ 7     7 0.129159 0.586562  0.203511   0.256527 mean       12.4838  0.355808
+ 8     8 0.833449 0.339117  0.583528   0.618458 mean        6.25215 0.344700
+ 9     9 0.468019 0.166883  0.804473   0.880744 mean        4.21463 0.372003
+10    10 0.549984 0.807410  0.264717   0.317747 mean       15.5283  0.369999
 # i 390 more rows
-# i 1 more variable: .upper_ci <dbl>
+# i 2 more variables: .lower_ci <dbl>, .upper_ci <dbl>
 > 
 > # Simultaneous intervals for two arbitrary covariate combinations
 > fitted_values(m, data = sim_df[c(1, 20), ], interval = "simultaneous",
 +   n_sim = 1000, seed = 42)
-# A tibble: 2 x 15
+# A tibble: 2 x 16
    .row       y        x0       x1       x2       x3       f       f0      f1
   <int>   <dbl>     <dbl>    <dbl>    <dbl>    <dbl>   <dbl>    <dbl>   <dbl>
 1     1 7.12834 0.184882  0.617142 0.415244 0.132410 8.38643 1.09743  3.43592
 2     2 2.93507 0.0749794 0.797900 0.874521 0.203225 5.57766 0.466765 4.93227
-# i 6 more variables: f2 <dbl>, f3 <dbl>, .fitted <dbl>, .se <dbl>,
-#   .lower_ci <dbl>, .upper_ci <dbl>
+# i 7 more variables: f2 <dbl>, f3 <dbl>, .parameter <chr>, .fitted <dbl>,
+#   .se <dbl>, .lower_ci <dbl>, .upper_ci <dbl>
 > 
 > # A selected sum of smooth contributions on the link scale
 > fitted_values(m, data = sim_df[c(1, 20), ], scale = "link",
 +   terms = c("s(x2)", "s(x3)"), interval = "simultaneous",
 +   n_sim = 1000, seed = 42)
-# A tibble: 2 x 15
+# A tibble: 2 x 16
    .row       y        x0       x1       x2       x3       f       f0      f1
   <int>   <dbl>     <dbl>    <dbl>    <dbl>    <dbl>   <dbl>    <dbl>   <dbl>
 1     1 7.12834 0.184882  0.617142 0.415244 0.132410 8.38643 1.09743  3.43592
 2     2 2.93507 0.0749794 0.797900 0.874521 0.203225 5.57766 0.466765 4.93227
-# i 6 more variables: f2 <dbl>, f3 <dbl>, .fitted <dbl>, .se <dbl>,
-#   .lower_ci <dbl>, .upper_ci <dbl>
+# i 7 more variables: f2 <dbl>, f3 <dbl>, .parameter <chr>, .fitted <dbl>,
+#   .se <dbl>, .lower_ci <dbl>, .upper_ci <dbl>
 > ## Don't show: 
 > options(op)
 > ## End(Don't show)

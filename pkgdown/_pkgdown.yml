@@ -186,8 +186,9 @@ reference:
 
   - title: Sample from fitted models
     desc: >
-      Draw individual smooths with `smooth_samples()` or expected responses
-      with `fitted_samples()`; `posterior_samples()` generates new responses
+      Draw individual smooths with `smooth_samples()` or distribution parameters
+      with `fitted_samples()`; request `quantity = "expectation"` for expected
+      responses. `posterior_samples()` generates new responses
       including coefficient uncertainty, while `predicted_samples()` simulates
       responses conditional on the fitted coefficients. Examine chains with
       [as_mcmc_draws()](as_mcmc_draws.html) and
@@ -258,6 +259,7 @@ reference:
       - family.gam
       - family_name
       - family_type
+      - family_parameters
       - link
       - has_theta
       - n_eta

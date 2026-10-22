@@ -32,7 +32,7 @@ test_that("multinomial fitted draws honour scale and each predictor's offset", {
       expect_silent(a <- fitted_samples(m, data = input, method = "user",
         draws = B, scale = scale))
       expect_identical(nrow(a), nrow(nd) * 3L * nrow(B))
-      expect_identical(unique(a$.parameter), paste0("response", 1:3))
+      expect_identical(unique(a$.category), paste0("category", 1:3))
       expect_identical(unique(a$.draw), 1:2)
       for (j in seq_len(nrow(B))) {
         expected <- eta[[j]]
@@ -40,7 +40,7 @@ test_that("multinomial fitted draws honour scale and each predictor's offset", {
           expected <- exp(expected) / rowSums(exp(expected))
         }
         actual <- a[a$.draw == j, ]
-        actual <- actual[order(actual$.parameter, actual$.row), ]
+        actual <- actual[order(actual$.category, actual$.row), ]
         expect_equal(actual$.fitted, as.numeric(expected))
       }
     }
@@ -57,9 +57,9 @@ test_that("one-predictor multinomial draws include the reference category", {
   eta <- cbind(0, as.numeric(predict(m, nd, type = "link")))
   for (scale in c("linear_predictor", "response")) {
     a <- fitted_samples(m, data = nd, method = "user", draws = B, scale = scale)
-    a <- a[order(a$.parameter, a$.row), ]
+    a <- a[order(a$.category, a$.row), ]
     expected <- if (scale == "response") exp(eta) / rowSums(exp(eta)) else eta
-    expect_identical(unique(a$.parameter), paste0("response", 1:2))
+    expect_identical(unique(a$.category), paste0("category", 1:2))
     expect_identical(nrow(a), 4L)
     expect_equal(a$.fitted, as.numeric(expected))
   }
@@ -87,8 +87,8 @@ test_that("Gaussian location-scale fitted draws retain their mean interpretation
         expected <- if (scale == "response" && location_link == "log") {
           exp(eta)
         } else eta
-        expect_identical(unique(a$.parameter), "location")
-        expect_equal(a$.fitted, as.numeric(expected))
+        expect_identical(unique(a$.parameter), c("mean", "sd"))
+        expect_equal(a$.fitted[a$.parameter == "mean"], as.numeric(expected))
       }
     }
   }
@@ -112,13 +112,13 @@ test_that("zero-inflated Poisson fitted draws use both predictors for the mean",
     lambda <- exp(eta1)
     expected <- (-expm1(-exp(eta2))) * lambda / (-expm1(-lambda))
     expect_silent(a <- fitted_samples(m, data = input, method = "user",
-      draws = B, scale = "response"))
-    expect_identical(unique(a$.parameter), "location")
+      draws = B, quantity = "expectation", scale = "response"))
+    expect_identical(unique(a$.parameter), "expectation")
     expect_equal(a$.fitted, as.numeric(expected))
     expect_silent(a <- fitted_samples(m, data = input, method = "user",
       draws = B, scale = "linear_predictor"))
-    expect_identical(unique(a$.parameter), "location")
-    expect_equal(a$.fitted, as.numeric(eta1))
+    expect_identical(unique(a$.parameter), c("rate", "presence_probability"))
+    expect_equal(a$.fitted[a$.parameter == "rate"], as.numeric(eta1))
     expect_silent(a <- posterior_samples(m, data = input, n_draws = nrow(B),
       method = "user", draws = B, seed = 14))
     expect_identical(nrow(a), nrow(rows) * nrow(B))

@@ -6,7 +6,9 @@
 #'   are to be returned.
 #' @param scale character; what scale should the fitted values be returned on?
 #'   `"linear predictor"` is a synonym for `"link"` if you prefer that
-#'   terminology.
+#'   terminology. `"linear_predictor"` is also accepted. Expectations require
+#'   `"response"`; parameter predictions use natural values or their predictors.
+#' @inheritParams fitted_samples
 #' @inheritParams smooth_estimates
 #' @param ci_level numeric; a value between 0 and 1 indicating the coverage of
 #'   the credible interval.
@@ -33,6 +35,27 @@
 #'   intervals are available for smooth components through [smooth_estimates()].
 #'
 #' @details
+#' `quantity = "parameters"` returns all distribution parameters represented
+#' by predictors, including intercept-only predictors. See [family_parameters()]
+#' for their definitions. These are natural distribution parameters, which
+#' can differ from mgcv's native response predictions: Gaussian LSS returns
+#' standard deviation, GEV returns location rather than expectation, and
+#' sinh-arcsinh returns shape parameters rather than response moments.
+#'
+#' `quantity = "expectation"` returns the expected response on the response
+#' scale, labelled `"expectation"`. Categorical expectations are probabilities
+#' of category membership; multivariate models return a mean per response.
+#' `.category` and `.y` identify the category or response separately from
+#' `.parameter`. Global parameters are described but held fixed when calculating
+#' coefficient uncertainty. Coupled expectations use the full coefficient
+#' covariance and a delta-method Jacobian. Their intervals are pointwise.
+#'
+#' The `prediction_info` attribute records the quantity, scale, standard-error
+#' scale and parameter descriptions. Parameter standard errors retain their
+#' link-scale meaning; category-probability and expectation standard errors are
+#' on the response scale. Unsupported simultaneous or bootstrap transformations
+#' are rejected rather than combining marginal parameter intervals.
+#'
 #' Native scasm fits with stored bootstrap draws use mgcv's pointwise limits
 #' by default, including its `svar.only` correction for smoothing bias.
 #' `interval_method = "gaussian"` restores covariance-based limits. `.se`
@@ -105,25 +128,24 @@
 #' expected response. Use the link scale for sums of smooth contributions, and
 #' consider the intercept and offset treatment when selecting terms.
 #'
-#' @note For most families, regardless of the scale on which the fitted values
-#'   are returned, the `se` component of the returned object is on the *link*
-#'   (*linear predictor*) scale, not the response scale. An exception is the
-#'   `mgcv::ocat()` family, for which the `se` is on the response scale if
-#'   `scale = "response"`.
+#' @note For parameter output, the `.se` component is on the *link*
+#'   (*linear predictor*) scale. Multinomial probabilities on the response scale
+#'   and all expected responses have response-scale standard errors.
 #'
 #' @return A tibble (data frame) whose first *m* columns contain either the data
 #'   used to fit the model (if `data` was `NULL`), or the variables supplied to
-#'  `data`. Four further columns are added:
+#'  `data`. The result also includes:
 #'
-#' * `.fitted`: the fitted values on the specified scale,
-#' * `.se`: the standard error of the fitted values (always on the *link* scale),
+#' * `.parameter`: parameter name, or `"expectation"`,
+#' * `.fitted`: the requested quantity on the specified scale,
+#' * `.se`: standard error; see `prediction_info` for its scale,
 #' * `.lower_ci`, `.upper_ci`: the limits of the credible interval on the fitted values,
 #'     on the specified scale.
 #'
 #' Models fitted with certain families will include additional variables
 #'
-#' * `mgcv::ocat()` models: when `scale = "response"`, the returned object will
-#'   contain a `row` column and a `category` column, which indicate to which row
+#' * `mgcv::ocat()` models: when `quantity = "expectation"`, the returned object will
+#'   contain a `.row` column and a `.category` column, which indicate to which row
 #'   of the `data` each row of the returned object belongs. Additionally, there
 #'   will be `nrow(data) * n_categories` rows in the returned object; each row
 #'   is the predicted probability for a single category of the response.
@@ -170,44 +192,28 @@
                                 interval = c("confidence", "simultaneous"),
                                 n_sim = 10000, n_cores = 1, seed = NULL,
                                 unconditional = FALSE,
-                                interval_method = c("auto", "gaussian", "bootstrap")) {
+                                interval_method = c("auto", "gaussian", "bootstrap"),
+                                quantity = c("parameters", "expectation"),
+                                family_index = NULL) {
   interval <- match.arg(interval)
   object <- with_model_envir(object, envir)
-  # Handle everything up to and including the extended families, but not more
-  fn <- family_type(object)
-  if (inherits(family(object), "general.family")) {
-    allowed <- c(
-      "gaulss", "gammals", "gumbls", "gevlss", "shash", "ziplss",
-      "twlss", "multivariate_normal", "multinom"
-    )
-    if (!fn %in% allowed) {
-      stop("General likelihood GAMs not yet supported.")
-    }
-  }
-  scale <- match.arg(scale)
+  choice <- prediction_choice(quantity[1L], scale[1L])
+  quantity <- choice$quantity
+  scale <- choice$scale
+  spec <- distribution_spec(object)
 
-  layout <- prediction_layout(object, data, na.action = list(...)$na.action %||% stats::na.pass)
+  grouped <- is_gfam_family(stats::family(object))
+  if (!grouped && !is.null(family_index)) stop("'family_index' is only supported for grouped-family models.", call. = FALSE)
+  group_context <- if (grouped) gfam_prediction_context(object, data, family_index,
+    na.action = list(...)$na.action %||% stats::na.pass) else NULL
+  layout <- if (grouped) group_context$layout else
+    prediction_layout(object, data, na.action = list(...)$na.action %||% stats::na.pass)
   inform_unobserved_factor_combinations(object, layout)
   object <- model_used_rows(object)
   data <- as_tibble(layout$data)
 
-  # handle special distributions that return more than vector fit & std. err.
-  # find the name of the function that produces fitted values for this family
-  fit_vals_fun <- get_fit_fun(fn)
   resolved_method <- scasm_interval_method(object, interval_method, interval,
-    supported = scasm_fitted_bootstrap_supported(fit_vals_fun, scale))
-  extra_fns <- switch(fn,
-    "gumbls" = post_link_funs(location = exp, scale = exp),
-    "gammals" = post_link_funs(location = exp, scale = exp),
-    "gevlss" = post_link_funs(scale = exp),
-    "shash" = post_link_funs(scale = exp, kurtosis = exp),
-    "ziplss" = post_link_funs(
-      location = exp,
-      pi = inv_link(binomial("cloglog"))
-    ),
-    "twlss" = post_link_funs(power = twlss_theta_2_power, scale = exp),
-    post_link_funs()
-  )
+    supported = distribution_bootstrap_supported(spec, quantity))
   # compute fitted values
   if (identical(interval, "simultaneous")) {
     fit <- fit_vals_simultaneous(object,
@@ -215,21 +221,48 @@
       n_sim = n_sim, n_cores = n_cores, seed = seed,
       unconditional = unconditional, empty = !any(!is.na(layout$map)), ...
     )
+    fit$.parameter <- if (quantity == "expectation") "expectation" else
+      spec$parameters$parameter[spec$parameters$returned][1L]
+    if (quantity == "expectation") {
+      eta <- predict_model(object, newdata = data, type = "link", ...)
+      # Check finite-mean conditions even when the expectation is a location
+      # parameter, as in a scaled t model with fixed degrees of freedom.
+      if (any(!is.na(layout$map)))
+        distribution_output(spec, matrix(eta, ncol = 1L), quantity, scale)
+      fit$.se <- fit$.se * abs(stats::family(object)$mu.eta(eta))
+    }
+  } else if (grouped) {
+    fit <- fit_vals_grouped(object, data, group_context, quantity, scale,
+      ci_level, unconditional, ...)
   } else {
-    fit <- fit_vals_fun(object,
-      data = data, ci_level = ci_level,
-      scale = scale, extra_fns = extra_fns,
-      unconditional = unconditional, ...
+    fit <- fit_vals_distribution(object, data = data, spec = spec,
+      quantity = quantity, ci_level = ci_level, scale = scale,
+      unconditional = unconditional, empty = !any(!is.na(layout$map)), ...
     )
   }
   if (resolved_method == "bootstrap") {
-    fit <- scasm_fitted_bootstrap(object, data, fit, scale, ci_level,
-      extra_fns, unconditional, ...)
+    fit <- distribution_bootstrap_limits(object, data, fit, spec, quantity,
+      scale, ci_level, unconditional, ...)
   }
   if (identical(scale, "response")) {
     fit <- order_interval_bounds(fit)
   }
+  # One retained observation cannot reveal the original parameter ordering.
+  attr(fit, "prediction_order") <- "parameter"
   fit <- restore_prediction_table(fit, layout, include_data = TRUE)
+  attr(fit, "prediction_order") <- NULL
+  if (grouped) {
+    input_row <- if (".row" %in% names(layout$output_data))
+      layout$rows[match(fit$.row, layout$output_data$.row)] else fit$.row
+    fit$.family <- group_context$family_index[input_row]
+    if (quantity == "expectation" && gfam_category_expectations(group_context)) {
+      fit <- gfam_expectation_table(fit, group_context, ci_level)
+    }
+    if (quantity == "parameters") {
+      labels <- vapply(spec$components, function(s) s$parameters$parameter[1L], character(1L))
+      fit$.parameter <- labels[fit$.family]
+    }
+  }
   if (layout$training) {
     f <- formula(object)
     if (!is.list(f)) f <- list(f)
@@ -241,9 +274,12 @@
     fit <- fit[, !names(fit) %in% remove, drop = FALSE]
   }
   attr(fit, "terms") <- NULL
+  fit <- dplyr::relocate(fit, ".parameter", .before = ".fitted")
   attr(fit, "interval_info") <- scasm_interval_info(object, resolved_method,
     interval, ci_level)
-  fit
+  attach_prediction_spec(fit, spec, quantity, scale,
+    se_scale = if (quantity == "expectation" || (spec$categorical && scale == "response"))
+      "response" else "link")
 }
 
 #' @export
@@ -332,588 +368,3 @@ fit_vals_simultaneous <- function(
   # prediction_layout() supplies compact data without an existing .row column.
   bind_cols(data, fit) |> relocate(".row", .before = 1L)
 }
-
-#' @importFrom rlang set_names .data
-#' @importFrom dplyr bind_cols mutate across
-#' @importFrom tibble as_tibble is_tibble
-#' @importFrom tidyselect any_of
-`fit_vals_default` <- function(
-    object, data, ci_level = 0.95,
-    scale = "response", ...) {
-  fit <- predict_model(object,
-    newdata = data,
-    ...,
-    type = "link",
-    se.fit = TRUE
-  ) |>
-    as.data.frame() |>
-    rlang::set_names(c(".fitted", ".se")) |>
-    as_tibble()
-  # add .row *unless* it already exists
-  if (!".row" %in% names(data)) {
-    fit <- mutate(fit, .row = row_number())
-  }
-  fit <- bind_cols(data, fit) |>
-    relocate(".row", .before = 1L)
-
-  # create the confidence interval
-  crit <- coverage_normal(ci_level)
-  fit <- mutate(fit,
-    ".lower_ci" = .data[[".fitted"]] - (crit * .data[[".se"]]),
-    ".upper_ci" = .data[[".fitted"]] + (crit * .data[[".se"]])
-  )
-
-  # convert to the response scale if requested
-  if (identical(scale, "response")) {
-    fit <- fit |>
-      mutate(across(all_of(c(".fitted", ".lower_ci", ".upper_ci")),
-        .fns = inv_link(object)
-      ))
-  }
-
-  fit
-}
-
-#' @importFrom dplyr mutate across recode_values
-#' @importFrom tidyr pivot_longer
-#' @importFrom tibble as_tibble add_column
-`fit_vals_general_lss` <- function(
-    object, data, ci_level = 0.95,
-    scale = "response", extra_fns = post_link_funs(), ...) {
-  crit <- coverage_normal(ci_level)
-  # get the fitted values for data
-  fv <- predict_model(object,
-    newdata = data, ..., type = "link",
-    se.fit = TRUE
-  )
-  std_err <- fv[[2L]]
-  fv <- fv[[1]]
-  colnames(std_err) <- colnames(fv) <- lss_parameters(object)
-  # convert fv to tibble then long format
-  fv <- fv |>
-    as_tibble() |>
-    mutate(.row = row_number()) |>
-    relocate(".row", .before = 1L) |>
-    tidyr::pivot_longer(!matches("\\.row"),
-      values_to = ".fitted",
-      names_to = ".parameter"
-    )
-  # convert fv to tibble then long format
-  std_err <- std_err |>
-    as_tibble() |>
-    mutate(.row = row_number()) |>
-    relocate(".row", .before = 1L) |>
-    tidyr::pivot_longer(!matches("\\.row"),
-      values_to = ".std_err",
-      names_to = ".parameter"
-    )
-  # bind .std_err to fv...
-  fit <- fv |>
-    add_column(.se = pull(std_err, ".std_err")) |>
-    # ...and compute interval
-    mutate(
-      .lower_ci = .data$.fitted - (crit * .data$.se),
-      .upper_ci = .data$.fitted + (crit * .data$.se)
-    )
-
-  # convert to the response scale if requested
-  if (identical(scale, "response")) {
-    il <- lss_links(object, inverse = TRUE)
-
-    fit <- fit |>
-      mutate(across(all_of(c(".fitted", ".lower_ci", ".upper_ci")),
-        .fns = ~ recode_values(
-          .data$.parameter,
-          "location" ~ extra_fns[["location"]](il[["location"]](.x)),
-          "scale" ~ extra_fns[["scale"]](il[["scale"]](.x)),
-          "shape" ~ extra_fns[["shape"]](il[["shape"]](.x)),
-          "skewness" ~ extra_fns[["skewness"]](il[["skewness"]](.x)),
-          "kurtosis" ~ extra_fns[["kurtosis"]](il[["kurtosis"]](.x)),
-          "power" ~ extra_fns[["power"]](il[["power"]](.x)),
-          "pi" ~ extra_fns[["pi"]](il[["pi"]](.x))
-        )
-      ))
-  }
-
-  fit
-}
-
-#' @importFrom dplyr mutate across recode_values row_number
-#' @importFrom tidyr pivot_longer
-#' @importFrom tibble as_tibble add_column
-`fit_vals_ziplss` <- function(
-    object, data, ci_level = 0.95,
-    scale = "response", extra_fns = post_link_funs(), ...) {
-  crit <- coverage_normal(ci_level)
-  # get the fitted values for data
-  fv <- predict_model(object,
-    newdata = data, ..., type = "link",
-    se.fit = TRUE
-  )
-  std_err <- fv[[2L]]
-  fv <- fv[[1]]
-  colnames(std_err) <- colnames(fv) <- lss_parameters(object)
-  # convert fv to tibble then long format
-  fv <- fv |>
-    as_tibble() |>
-    mutate(.row = row_number()) |>
-    relocate(".row", .before = 1L) |>
-    tidyr::pivot_longer(!matches("\\.row"),
-      values_to = ".fitted",
-      names_to = ".parameter"
-    )
-  # convert fv to tibble then long format
-  std_err <- std_err |>
-    as_tibble() |>
-    tidyr::pivot_longer(everything(),
-      values_to = ".std_err",
-      names_to = ".parameter"
-    )
-  # bind .std_err to fv...
-  fit <- fv |>
-    add_column(.se = pull(std_err, ".std_err")) |>
-    # ...and compute interval
-    mutate(
-      .lower_ci = .data$.fitted - (crit * .data$.se),
-      .upper_ci = .data$.fitted + (crit * .data$.se)
-    )
-
-  # convert to the response scale if requested
-  if (identical(scale, "response")) {
-    ilink_loc <- inv_link(object, parameter = "location")
-    ilink_pi <- inv_link(object, parameter = "pi")
-
-    fit <- fit |>
-      mutate(across(all_of(c(".fitted", ".lower_ci", ".upper_ci")),
-        .fns = ~ recode_values(
-          .data$.parameter,
-          "location" ~ extra_fns[["location"]](ilink_loc(.x)),
-          "pi" ~ extra_fns[["pi"]](ilink_pi(.x))
-        )
-      ))
-  }
-
-  fit
-}
-
-#' @importFrom dplyr mutate across recode_values row_number
-#' @importFrom tidyr pivot_longer
-#' @importFrom tibble as_tibble add_column
-`fit_vals_twlss` <- function(
-    object, data, ci_level = 0.95,
-    scale = "response", extra_fns = post_link_funs(), ...) {
-  crit <- coverage_normal(ci_level)
-  # get the fitted values for data
-  fv <- predict_model(object,
-    newdata = data, ..., type = "link",
-    se.fit = TRUE
-  )
-  std_err <- fv[[2L]]
-  fv <- fv[[1]]
-  colnames(std_err) <- colnames(fv) <- lss_parameters(object)
-  # convert fv to tibble then long format
-  fv <- fv |>
-    as_tibble() |>
-    mutate(.row = row_number()) |>
-    relocate(".row", .before = 1L) |>
-    tidyr::pivot_longer(!matches("\\.row"),
-      values_to = ".fitted",
-      names_to = ".parameter"
-    )
-  # convert fv to tibble then long format
-  std_err <- std_err |>
-    as_tibble() |>
-    tidyr::pivot_longer(everything(),
-      values_to = ".std_err",
-      names_to = ".parameter"
-    )
-  # bind .std_err to fv...
-  fit <- fv |>
-    add_column(.se = pull(std_err, ".std_err")) |>
-    # ...and compute interval
-    mutate(
-      .lower_ci = .data$.fitted - (crit * .data$.se),
-      .upper_ci = .data$.fitted + (crit * .data$.se)
-    )
-
-  # convert to the response scale if requested
-  if (identical(scale, "response")) {
-    il <- lss_links(object, inverse = TRUE)
-    bounds <- get_twlss_bounds(object)
-
-    fit <- fit |>
-      mutate(across(all_of(c(".fitted", ".lower_ci", ".upper_ci")),
-        .fns = ~ recode_values(
-          .data$.parameter,
-          "location" ~ extra_fns[["location"]](il[["location"]](.x)),
-          "power" ~ extra_fns[["power"]](il[["power"]](.x),
-            a = bounds[1], b = bounds[2]),
-          "scale" ~ extra_fns[["scale"]](il[["scale"]](.x))
-        )
-      ))
-  }
-
-  fit
-}
-
-#' @importFrom dplyr bind_rows relocate
-#' @importFrom tidyr expand_grid
-#' @importFrom tibble tibble
-`fit_vals_ocat` <- function(
-    object, data, ci_level = 0.95, scale = "response",
-    ...) {
-  # if link (linear predictor) scale, we can just use `fit_vals_fun()`
-  if (scale %in% c("link", "linear predictor")) {
-    fit <- fit_vals_default(object,
-      data = data, ci_level = ci_level,
-      scale = "link", ...
-    )
-  } else {
-    # predict, needs to be response scale for ocat!
-    fv <- predict_model(object,
-      newdata = data, ..., type = "response",
-      se.fit = TRUE
-    )
-    crit <- coverage_normal(ci_level)
-
-    # extract information on how many thresholds, categories in the model
-    theta <- theta(object) # the estimated thresholds, first is always -1
-    n_cut <- length(theta) # how many thresholds...
-    n_cat <- n_cut + 1 # ...which implies this many categories
-    n_data <- NROW(data) # how many data are we predicting for
-
-    # \hat{pi} is the estimated probability of each class for each data
-    # \hat{pi} is given by fv$fit
-    # std. err. of \hat{pi} is given by fv$se.fit
-
-    # compute standard error of logit(\hat{pi}) via delta method
-    # this comes from Christensen RHB (2022), a vignette of ordinal
-    # package:
-    # https://cran.r-project.org/web/packages/ordinal/vignettes/clm_article.pdf
-    #
-    # se(logit(pi)) = se(pi) / (pi * (1 - pi))
-    se_lp <- fv$se.fit / (fv$fit * (1 - fv$fit))
-
-    # grab slightly better versions of plogis() & qlogis() from the binomial
-    # family
-    bin_fam <- binomial()
-    lfun <- link(bin_fam)
-    ifun <- inv_link(bin_fam)
-
-    # convert \hat{pi} to logit scale and form a Wald interval, then back
-    # transform the interval only (we already have \hat{pi})
-    fit_lp <- lfun(fv$fit) # logit(\hat{pi})
-    fit_lwr <- ifun(fit_lp - (crit * se_lp))
-    fit_upr <- ifun(fit_lp + (crit * se_lp))
-
-    # create the return object
-    fit <- tibble(
-      .row = rep(seq_len(n_data), times = n_cat),
-      .category = factor(rep(seq_len(n_cat), each = n_data)),
-      .fitted = as.numeric(fv$fit),
-      .se = as.numeric(fv$se.fit),
-      .lower_ci = as.numeric(fit_lwr),
-      .upper_ci = as.numeric(fit_upr)
-    )
-
-    # expand data so it is replicated once per category & add to the fitted
-    # values
-    fit <- expand_grid(category = seq_len(n_cat), data) |>
-      select(-c("category")) |>
-      bind_cols(fit) |>
-      relocate(".row", .before = 1)
-  }
-  fit
-}
-
-`fit_vals_mvn` <- function(
-  object, data, ci_level = 0.95, scale = "response", ...
-) {
-  # scale is ignored as these are correlated Gaussians
-  # but we have multiple columns in the predictions, 1 per Y
-  # predict, can predict on link scale as link is identity
-  fv <- predict(
-    object, newdata = data, ..., type = "link", se.fit = TRUE
-  )
-  crit <- coverage_normal(ci_level)
-  n_data <- NROW(data)
-  n_y <- n_eta(object)
-
-  # fv$fit and fv$se.fit are matrices - need to stack everything
-  fit_lp  <- as.vector(fv$fit)
-  fit_se  <- as.vector(fv$se)
-  fit_lwr <- fit_lp - (crit * fit_se)
-  fit_upr <- fit_lp + (crit * fit_se)
-
-  # pull everything into a tibble for return
-  fit <- tibble(
-    .row = rep(seq_len(n_data), times = n_y),
-    .y = paste0("response", rep(seq_len(n_y), each = n_data)),
-    .fitted = as.numeric(fit_lp),
-    .se = as.numeric(fit_se),
-    .lower_ci = as.numeric(fit_lwr),
-    .upper_ci = as.numeric(fit_upr)
-  )
-
-  # expand data so it is replicated once per response & add to fitted values
-  fit <- expand_grid(..response = seq_len(n_y), data) |>
-    select(-c("..response")) |>
-    bind_cols(fit) |>
-    relocate(".row", .before = 1)
-
-  # return
-  fit
-}
-
-`fit_vals_multinom` <- function(
-  object, data, ci_level = 0.95, scale = "response", ...
-) {
-  if (scale %in% c("link", "linear predictor")) {
-    stop("link scale predictions not support for `multinom()`")
-  }
-  # there are only n_lp columns in these; Y_categories - 1
-  # predict on response scale
-  fv <- predict(
-    object, newdata = data, ..., type = "response", se.fit = TRUE
-  )
-  crit <- coverage_normal(ci_level)
-  n_data <- NROW(data)
-  n_lp <- n_eta(object) # number of linear predictors
-  n_y <- n_lp + 1
-
-  # as with ocat() we'll transform from response to a logit scale
-  # form se on this link scale, then back transform
-  se_lp <- fv$se.fit / (fv$fit * (1 - fv$fit))
-
-  # grab slightly better versions of plogis() & qlogis() from the binomial
-  # family
-  bin_fam <- binomial()
-  lfun <- link(bin_fam)
-  ifun <- inv_link(bin_fam)
-
-  # convert \hat{pi} to logit scale and form a Wald interval, then back
-  # transform the interval only (we already have \hat{pi})
-  fit_lp <- lfun(fv$fit) # logit(\hat{pi})
-  fit_lwr <- ifun(fit_lp - (crit * se_lp))
-  fit_upr <- ifun(fit_lp + (crit * se_lp))
-
-  # create the return object
-  fit <- tibble(
-    .row = rep(seq_len(n_data), times = n_y),
-    .category = factor(
-      rep(seq_len(n_y), each = n_data)
-    ),
-    .fitted = as.vector(fv$fit),
-    .se = as.vector(fv$se.fit),
-    .lower_ci = as.vector(fit_lwr),
-    .upper_ci = as.vector(fit_upr)
-  )
-
-  # expand data so it is replicated once per response & add to fitted values
-  fit <- expand_grid(..response = seq_len(n_y), data) |>
-    select(-c("..response")) |>
-    bind_cols(fit) |>
-    relocate(".row", .before = 1)
-
-  # return
-  fit
-}
-
-`fit_vals_zip` <- function(
-  object, data, ci_level = 0.95, scale = "response", ...
-) {
-  fv <- predict(
-    object, newdata = data, ..., type = "link", se.fit = TRUE
-  )
-  crit <- coverage_normal(ci_level)
-  fam <- family(object)
-
-  # use fam$predict() to do the conversion to response scale
-  # fit_lp  <- as.vector(fv$fit)
-  fit_se  <- as.vector(fv$se)
-  fit_lwr <- as.vector(as.vector(fv$fit) - (crit * fit_se))
-  fit_upr <- as.vector(as.vector(fv$fit) + (crit * fit_se))
-
-  # pull everything into a tibble for return
-  fit <- tibble(
-    .row = seq_len(NROW(data)),
-    .fitted = as.vector(fv$fit),
-    .se = as.numeric(fit_se),
-    .lower_ci = as.numeric(fit_lwr),
-    .upper_ci = as.numeric(fit_upr)
-  )
-
-  # convert to the response scale if requested
-  if (identical(scale, "response")) {
-    fit <- fit |>
-      mutate(across(all_of(c(".fitted", ".lower_ci", ".upper_ci")),
-        .fns = \(eta) fam$predict(fam, eta = eta)[[1]] |> as.vector()
-      ))
-  }
-
-  # return
-  fit
-}
-
-# Dave has added a clognorm family to mgcvUtils with a bespoke fitted_values
-# clone. Only difference with fit_vals_default is a pre-processing of fit
-# by `exp()`. Might be worth adding a pre_processing step if there are more
-# families like this?
-
-#' @importFrom rlang set_names .data
-#' @importFrom dplyr bind_cols mutate across
-#' @importFrom tibble as_tibble is_tibble
-#' @importFrom tidyselect any_of
-`fit_vals_clognorm` <- function(
-  object,
-  data,
-  ci_level = 0.95,
-  scale = "response",
-  ...
-) {
-  # get the transformation used
-  base <- attr(family(object), "base")
-  if(base == "e") { 
-    base <- exp(1)
-    trans <- exp
-  } else {
-    trans <- function(x) base^x
-  }
-
-  fit <- predict_model(object,
-    newdata = data,
-    ...,
-    type = "response",
-    se.fit = TRUE
-  ) |>
-    as.data.frame() |>
-    rlang::set_names(c(".fitted", ".se")) |>
-    as_tibble()|>
-    mutate(
-      .fitted = logb(.data[[".fitted"]], base = base)
-    )
-  # add .row *unless* it already exists
-  if (!".row" %in% names(data)) {
-    fit <- mutate(fit, .row = row_number())
-  }
-  fit <- bind_cols(data, fit) |>
-    relocate(".row", .before = 1L)
-
-  # create the confidence interval
-  crit <- coverage_normal(ci_level)
-  fit <- mutate(fit,
-    ".lower_ci" = .data[[".fitted"]] - (crit * .data[[".se"]]),
-    ".upper_ci" = .data[[".fitted"]] + (crit * .data[[".se"]])
-  )
-
-  # convert to the response scale if requested
-  if (identical(scale, "response")) {
-    fit <- fit |>
-      mutate(across(all_of(c(".fitted", ".lower_ci", ".upper_ci")),
-        .fns = trans
-      ))
-  }
-
-  fit
-}
-
-#' @importFrom dplyr case_when
-`get_fit_fun` <- function(fam) {
-  fam <- case_when(
-    grepl("^ordered_categorical", fam, ignore.case = TRUE) == TRUE ~ "ocat",
-    grepl("^multivariate_normal", fam, ignore.case = TRUE) == TRUE ~ "mvn",
-    grepl("^multinom", fam, ignore.case = TRUE) == TRUE ~ "multinom",
-    grepl("^zero_inflated_poisson\\(", fam, ignore.case = TRUE) == TRUE ~ "zip",
-    grepl("^clog(e|[[:digit:]]+)norm", fam, ignore.case = TRUE) == TRUE ~ "clognorm",
-    fam == "gaulss" ~ "general_lss",
-    fam == "gammals" ~ "general_lss",
-    fam == "gumbls" ~ "general_lss",
-    fam == "gevlss" ~ "general_lss",
-    fam == "shash" ~ "general_lss",
-    fam == "ziplss" ~ "ziplss",
-    fam == "twlss" ~ "twlss",
-    .default = "default"
-  )
-  get(paste0("fit_vals_", fam), mode = "function")
-}
-
-## my original code trying to follow Simon's ocat
-
-# lp <- as.numeric(fv$fit)
-# se <- as.numeric(fv$se.fit)
-# upr <- lp + (crit * se)
-# lwr <- lp - (crit * se)
-
-# theta <- theta(object)
-# n_cut <- length(theta)
-# n_cat <- n_cut + 1
-# n_data <- NROW(data)
-# p_fit <- p_lwr <- p_upr <- matrix(0, nrow = n_data,
-#     ncol = n_cut + 2)
-# # cumulative probability should sum to 1 over the latent
-# # fill final column with 1 to reflect that
-# p_fit[, n_cut + 2] <- p_lwr[, n_cut + 2] <- p_upr[, n_cut + 2] <- 1
-
-# # function to give probability from latent
-# `ocat_prob` <- function(lp, theta) {
-#     p <- theta - lp
-#     i <- p > 0
-#     p[i] <- 1 / (1 + exp(-p[i]))
-#     p[!i] <- exp(p[!i]) / (1 + exp(p[!i]))
-#     p
-# }
-
-# # fill in the matrix of cumulative probability
-# for (j in seq_along(theta)) {
-#     p_fit[, j + 1] <- ocat_prob(lp, theta[j])
-#     p_lwr[, j + 1] <- ocat_prob(lwr, theta[j])
-#     p_upr[, j + 1] <- ocat_prob(upr, theta[j])
-# }
-# #browser()
-# p_fit <- as.numeric(t(diff(t(p_fit))))
-# p_lwr <- as.numeric(t(diff(t(p_lwr))))
-# p_upr <- as.numeric(t(diff(t(p_upr))))
-
-# fit <- tibble(row = rep(seq_len(n_data), times = n_cat),
-#     category = factor(rep(seq_len(n_cat), each = n_data)),
-#     fitted = p_fit,
-#     lower = p_lwr,
-#     upper = p_upr)
-# # expand data so it is replicated once per category
-# fit <- expand_grid(category = seq_len(n_cat), data) |>
-#     select(-c("category")) |>
-#     bind_cols(fit) |>
-#     relocate(row, .before = 1)
-# fit
-
-# ## trying to do somethign for multinom
-# fv <- predict(
-#   m_multinom, newdata = head(multinom_df), se.fit = TRUE,
-#   type = "response"
-# )
-
-# se_lp <- fv$se.fit / (fv$fit * (1 - fv$fit))
-
-# # grab slightly better versions of plogis() & qlogis() from the binomial
-# # family
-# bin_fam <- binomial()
-# lfun <- link(bin_fam)
-# ifun <- inv_link(bin_fam)
-
-# # convert \hat{pi} to logit scale and form a Wald interval, then back
-# # transform the interval only (we already have \hat{pi})
-# fit_lp <- lfun(fv$fit) # logit(\hat{pi})
-# fit_lwr <- ifun(fit_lp - (crit * se_lp))
-# fit_upr <- ifun(fit_lp + (crit * se_lp))
-
-# # create the return object
-# fit <- tibble(
-#   .row = rep(seq_len(nrow(head(multinom_df))), times = n_eta(m_multinom) + 1),
-#   .category = factor(
-#     rep(seq_len(n_eta(m_multinom) + 1), each = nrow(head(multinom_df)))
-#   ),
-#   .fitted = as.vector(fv$fit),
-#   .se = as.vector(fv$se.fit),
-#   .lower_ci = as.vector(fit_lwr),
-#   .upper_ci = as.vector(fit_upr)
-  # )

@@ -129,7 +129,7 @@ as_mcmc_draws <- function(x,
         data.frame(.draw = draws, .chain = 1L, .iteration = seq_along(draws))
       } else meta[meta$.draw %in% x$.draw, , drop = FALSE]
     }
-    keys <- intersect(c(".smooth", ".term", ".focal", ".parameter", ".category", ".y", ".row"), names(x))
+    keys <- intersect(c(".smooth", ".term", ".focal", ".parameter", ".category", ".y", ".component", ".row"), names(x))
     if (!length(keys)) stop("Sampled quantities need observation or parameter identifiers.", call. = FALSE)
     labels <- do.call(paste, c(lapply(keys, function(k) paste0(k, "=", x[[k]])), sep = ","))
     labels <- paste0(sub("^\\.", "", value), "[", labels, "]")

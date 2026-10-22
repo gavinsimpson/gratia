@@ -60,11 +60,11 @@ test_that("location-scale bootstrap limits use existing parameter transformation
   native <- predict(m, nd, type = "link", se.fit = 0.95)
   link <- fitted_values(m, data = nd, scale = "link")
   response <- fitted_values(m, data = nd)
-  expect_equal(link$.lower_ci, as.vector(t(native$ll)))
-  expect_equal(link$.upper_ci, as.vector(t(native$ul)))
-  expect_equal(response$.lower_ci[response$.parameter == "location"],
+  expect_equal(link$.lower_ci, as.vector(native$ll))
+  expect_equal(link$.upper_ci, as.vector(native$ul))
+  expect_equal(response$.lower_ci[response$.parameter == "mean"],
     exp(native$ll[, 1]), ignore_attr = TRUE)
-  expect_true(all(response$.lower_ci[response$.parameter == "scale"] > 0))
+  expect_true(all(response$.lower_ci[response$.parameter == "dispersion"] > 0))
   expect_equal(link$.se, response$.se)
   expect_error(fitted_values(m, interval = "simultaneous",
     interval_method = "bootstrap"), "Simultaneous bootstrap")
