@@ -10,15 +10,13 @@ We’ll need the following packages for this vignette:
 
 pkgs <- c(
   "mgcv", "gratia", "dplyr", "tidyr", "ggplot2", "ggdist",
-  "distributional", "tibble", "withr", "patchwork", "ggokabeito"
+  "distributional", "tibble", "withr", "patchwork"
 )
 vapply(pkgs, library, logical(1L), logical.return = TRUE, character.only = TRUE)
 #>           mgcv         gratia          dplyr          tidyr        ggplot2 
 #>           TRUE           TRUE           TRUE           TRUE           TRUE 
 #>         ggdist distributional         tibble          withr      patchwork 
-#>           TRUE           TRUE           TRUE           TRUE           TRUE 
-#>     ggokabeito 
-#>           TRUE
+#>           TRUE           TRUE           TRUE           TRUE           TRUE
 ```
 
 A generalized additive model (GAM) has the following form
@@ -418,7 +416,7 @@ plt_gau <- sim_gau |>
   ggplot(aes(x = times)) +
   geom_point(aes(y = accel, colour = type, alpha = .alpha)) +
   plt_labs +
-  scale_colour_okabe_ito(order = c(6, 5)) +
+  scale_colour_manual(values = gratia_palette()(9)[c(6, 5)]) +
   scale_alpha_identity()
 ```
 

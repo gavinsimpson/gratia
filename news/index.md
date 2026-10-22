@@ -4,6 +4,11 @@
 
 ### User visible changes
 
+- gratia no longer requires ggokabeito; default plot colours and their
+  ordering are unchanged. Unused curl and svglite suggestions have been
+  removed, and ggdist, distributional and hexbin are now listed as
+  website dependencies because they are used only in a website article.
+
 - `grouped_by` is deprecated in
   [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)
   and

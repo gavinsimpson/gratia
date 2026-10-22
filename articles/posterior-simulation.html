@@ -27,7 +27,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-63</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-64</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -101,15 +101,13 @@ generalized additive models.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pkgs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
 <span>  <span class="st">"mgcv"</span>, <span class="st">"gratia"</span>, <span class="st">"dplyr"</span>, <span class="st">"tidyr"</span>, <span class="st">"ggplot2"</span>, <span class="st">"ggdist"</span>,</span>
-<span>  <span class="st">"distributional"</span>, <span class="st">"tibble"</span>, <span class="st">"withr"</span>, <span class="st">"patchwork"</span>, <span class="st">"ggokabeito"</span></span>
+<span>  <span class="st">"distributional"</span>, <span class="st">"tibble"</span>, <span class="st">"withr"</span>, <span class="st">"patchwork"</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">vapply</a></span><span class="op">(</span><span class="va">pkgs</span>, <span class="va">library</span>, <span class="fu"><a href="https://rdrr.io/r/base/logical.html" class="external-link">logical</a></span><span class="op">(</span><span class="fl">1L</span><span class="op">)</span>, logical.return <span class="op">=</span> <span class="cn">TRUE</span>, character.only <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt;           mgcv         gratia          dplyr          tidyr        ggplot2 </span></span>
 <span><span class="co">#&gt;           TRUE           TRUE           TRUE           TRUE           TRUE </span></span>
 <span><span class="co">#&gt;         ggdist distributional         tibble          withr      patchwork </span></span>
-<span><span class="co">#&gt;           TRUE           TRUE           TRUE           TRUE           TRUE </span></span>
-<span><span class="co">#&gt;     ggokabeito </span></span>
-<span><span class="co">#&gt;           TRUE</span></span></code></pre></div>
+<span><span class="co">#&gt;           TRUE           TRUE           TRUE           TRUE           TRUE</span></span></code></pre></div>
 <p>A generalized additive model (GAM) has the following form</p>
 <p><span class="math display">
 g(\mu_i) = \eta_i = A_i + \mathbf{X}_i \boldsymbol{\gamma} +
@@ -430,7 +428,7 @@ Now we can plot the observed and simulated data</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">times</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">accel</span>, colour <span class="op">=</span> <span class="va">type</span>, alpha <span class="op">=</span> <span class="va">.alpha</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="va">plt_labs</span> <span class="op">+</span></span>
-<span>  <span class="fu">scale_colour_okabe_ito</span><span class="op">(</span>order <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">6</span>, <span class="fl">5</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_colour_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="../reference/gratia_palette.html">gratia_palette</a></span><span class="op">(</span><span class="op">)</span><span class="op">(</span><span class="fl">9</span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">6</span>, <span class="fl">5</span><span class="op">)</span><span class="op">]</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_identity.html" class="external-link">scale_alpha_identity</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>The resulting plot is shown in the left-hand panel of the figure
 below. There is clearly a problem here; the simulated data don’t look
