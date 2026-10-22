@@ -30,6 +30,10 @@
 #'   with more than 512 distinct response values aggregate probability into
 #'   512 shared equal-width bins to bound memory and plot size.
 #' @inheritParams observed_fitted_plot
+#' @param response For [mgcv::gfam()] models, `NULL` uses all components; a
+#'   single integer selects observations assigned to that family-list position.
+#'   Repeated families retain distinct indices. Each selected component is
+#'   displayed in its own facet.
 #' @param xlab character or expression; label for the response axis.
 #' @param ... arguments passed to [posterior_samples()], such as
 #'   `unconditional` or `mvn_method`. For delta sdmTMB fits,
@@ -141,8 +145,16 @@ posterior_predictive_plot <- function(
   scalable = NULL,
   scalable_threshold = 10000L,
   batch_size = 10L,
-  ...
+  ..., response = NULL
 ) {
+  if (inherits(model, "gratia_diagnostics") &&
+      tryCatch(is_gfam_family(stats::family(model$source)), error = function(e) FALSE))
+    model <- model$source
+  if (!missing(response)) {
+    diagnostic_response_selection(model, response)
+    grouped <- tryCatch(is_gfam_family(stats::family(model)), error = function(e) FALSE)
+    if (grouped) model <- gfam_select_diagnostics(model, response, supplied = TRUE, seed = seed)
+  }
   gratia_plot_arguments(c("observed_col", "replicated_col", "replicated_alpha"), environment())
   diagnostic_posterior_count(n)
   if (!is.numeric(level) || length(level) != 1L || !is.finite(level) ||

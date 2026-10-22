@@ -4,6 +4,7 @@
 \alias{smooth_estimates}
 \alias{smooth_estimates.gam}
 \alias{smooth_estimates.gamlss}
+\alias{smooth_estimates.gjrm}
 \title{Evaluate smooths at covariate values}
 \usage{
 smooth_estimates(object, ...)
@@ -47,10 +48,18 @@ smooth_estimates(object, ...)
   ...,
   partial_match = FALSE
 )
+
+\method{smooth_estimates}{gjrm}(
+  object,
+  select = NULL,
+  smooth = deprecated(),
+  ...,
+  partial_match = FALSE
+)
 }
 \arguments{
 \item{object}{a fitted model, including objects of class \code{"gam"}, \code{"gamm"}
-or models fitted by \code{\link[GJRM:gamlss]{GJRM::gamlss()}}.}
+or models fitted by \code{\link[GJRM:gamlss]{GJRM::gamlss()}} or \code{\link[GJRM:gjrm]{GJRM::gjrm()}}.}
 
 \item{...}{arguments passed to other methods.}
 
@@ -190,6 +199,10 @@ Its \code{cyclic_info} attribute retains the fitted cycle boundaries for
 supported one-dimensional cyclic components, allowing
 \code{draw(object, cyclic = "polar")} to configure the angular axis.
 This attribute is retained in nested and unnested output.
+When no evaluation rows remain, flat output has zero rows and retains the
+estimate, standard error and predictor columns with their original types.
+With \code{unnest = FALSE}, each selected smooth retains its metadata record
+and a data table with zero rows in the \code{data} list column.
 }
 \description{
 Evaluate a smooth at a grid of evenly spaced value over the range of the
@@ -199,7 +212,7 @@ implementation of \code{evaluate_smooth()}, and replaces that function, which ha
 been removed from the package.
 }
 \details{
-For \code{\link[GJRM:gamlss]{GJRM::gamlss()}} models, smooths are evaluated in equation and smooth
+For \code{\link[GJRM:gamlss]{GJRM::gamlss()}} and \code{\link[GJRM:gjrm]{GJRM::gjrm()}} models, smooths are evaluated in equation and smooth
 order using the final fitted GJRM coefficients and covariance matrices.
 Selection uses the model-wide labels returned by \code{\link[=smooths]{smooths()}}, including
 suffixes such as \code{s.1(x)} for repeated labels. Equations without smooths

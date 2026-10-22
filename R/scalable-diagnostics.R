@@ -11,7 +11,8 @@
 # passing it to the same QQ, histogram and density-summary renderers.
 # Plotting and aggregation consume these results without inspecting model classes.
 # These S3 methods remain internal while support for additional models develops.
-diagnostic_data <- function(model, type = NULL, seed = NULL, conditioning = NULL, ..., n_dharma = NULL) {
+diagnostic_data <- function(model, type = NULL, seed = NULL, conditioning = NULL, ..., n_dharma = NULL, response = NULL) {
+  diagnostic_response_selection(model, response)
   UseMethod("diagnostic_data")
 }
 
@@ -84,11 +85,13 @@ new_diagnostic_data <- function(
 }
 
 #' @export
-diagnostic_data.gam <- function(model, type = NULL, seed = NULL, conditioning = NULL, ..., n_dharma = NULL) {
+diagnostic_data.gam <- function(model, type = NULL, seed = NULL, conditioning = NULL, ..., n_dharma = NULL, response = NULL) {
+  model <- gfam_select_diagnostics(model, response, supplied = !missing(response), seed = seed)
   check_distribution_conditioning(conditioning)
   type <- diagnostic_type(model, type, allow_pit = TRUE)
+  model <- gfam_cache_selected_residuals(model, type, seed, n_dharma)
   action <- stats::na.action(model)
-  rows <- which(!is.na(model_row_map(model)))
+  rows <- attr(model, "gratia.gfam.rows", exact = TRUE) %||% which(!is.na(model_row_map(model)))
   model <- model_used_rows(model)
   if (is_multinom_surrogate(model, type))
     return(multinom_diagnostic_data(model, rows, action, seed))
@@ -591,7 +594,9 @@ render_diagnostic_qq <- function(
 #' @inheritParams residuals_hist_plot
 #' @inheritParams residuals_linpred_plot
 #' @param ... optional arguments used to prepare the model for diagnostics,
-#'   including sdmTMB `field_method`.
+#'   including sdmTMB `field_method`. For grouped-family GAMs and joint GJRM
+#'   models, `response = NULL` uses every response and an integer selects one;
+#'   see [appraise()]. Selection leaves `by_family` independent.
 #'   For `scalable_worm_plot()`, other arguments pass to `scalable_qq_plot()`
 #'   except its internal worm setting.
 #' @return A ggplot object containing aggregated plotting data.
@@ -1238,6 +1243,8 @@ compact_diagnostic_plot <- function(plot) {
 
 # Grouped families use the same layout rules as the ordinary diagnostic plots.
 diagnostic_data_by_family <- function(d, by_family = NULL) {
+  if (inherits(d$source, "gratia_gjrm_diagnostic") && identical(by_family, FALSE))
+    stop("GJRM diagnostics separate responses into facets; 'by_family' must be NULL or TRUE.", call. = FALSE)
   if (
     !is.null(by_family) &&
       (!is.logical(by_family) || length(by_family) != 1L || is.na(by_family))
@@ -1246,7 +1253,7 @@ diagnostic_data_by_family <- function(d, by_family = NULL) {
   }
   ".family" %in%
     names(d$data) &&
-    if (is.null(by_family)) !d$type %in% c("quantile", "pit", "dharma") else by_family
+    if (is.null(by_family)) d$by_family %||% !d$type %in% c("quantile", "pit", "dharma") else by_family
 }
 
 diagnostic_grouped_grid <- function(dat, x, y, bins, density, by_family,
@@ -1277,6 +1284,16 @@ scalable_grouped_histogram <- function(
   caption
 ) {
   by_family <- diagnostic_data_by_family(d, by_family)
+  if (inherits(d$source, "gratia_gjrm_diagnostic")) {
+    df <- dplyr::bind_rows(lapply(split(d$data, d$data$.family, drop = TRUE), function(part) {
+      out <- diagnostic_histogram(part$residuals, n_bins)
+      out$value <- out$count
+      out$.family <- part$.family[1L]
+      out
+    }))
+    return(render_grouped_histogram(df, TRUE,
+      xlab %||% diagnostic_residual_label(d$type), ylab, title, subtitle, caption))
+  }
   old <- residuals_hist_plot(
     d$source,
     type = d$type,

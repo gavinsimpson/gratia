@@ -53,7 +53,7 @@ test_that("model subtitles coexist with by labels and respect user labels", {
     parametric = FALSE, wrap = FALSE)), expected)
   p <- draw(smooth_estimates(m), grouped_by = TRUE)
   expect_identical(vapply(seq_len(length(p)), function(i)
-    p[[i]]$labels$subtitle, character(1)), rev(expected))
+    p[[i]]$labels$subtitle, character(1)), expected)
   for (subtitle in list("Custom subtitle", "", expression(sigma))) {
     p <- draw(m, select = 3, subtitle = subtitle, title = "Custom title",
       xlab = "Covariate", ylab = "Effect", wrap = FALSE)[[1]]

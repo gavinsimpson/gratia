@@ -94,7 +94,15 @@ add_smooth_intervals <- function(estimates, smooths, model, interval, ci_level,
       pieces <- estimates[[i]]$data
       sizes <- vapply(pieces, nrow, integer(1))
       d <- dplyr::bind_rows(pieces)
-      if (!nrow(d)) next
+      if (!nrow(d)) {
+        for (j in seq_along(pieces)) {
+          pieces[[j]]$.crit <- double()
+          pieces[[j]]$.lower_ci <- double()
+          pieces[[j]]$.upper_ci <- double()
+        }
+        estimates[[i]]$data <- pieces
+        next
+      }
       if (interval == "confidence" && interval_method == "bootstrap") {
         X <- smooth_predict_matrix(smooths[[i]], d, model)
         cols <- smooths[[i]]$first.para:smooths[[i]]$last.para

@@ -160,9 +160,18 @@ check_partial_residuals <- function(object, warn = FALSE) {
 #'   extracted GAM (`"gam_component"`), where supported. See [diagnostic_support].
 #' @param component character; which delta sdmTMB component to check; see
 #'   [appraise()].
+#' @param response `NULL` uses all responses; a single integer selects one.
+#'   For [mgcv::gfam()] models, the integer indexes the family list and selects
+#'   observations assigned to that component. For joint GJRM models, it selects
+#'   a response in model order. All-response GJRM residuals form a matrix with
+#'   one column per response; selecting one returns a vector. Grouped-family
+#'   residuals are always vectors.
 #' @details
 #' With `na.exclude`, excluded observations are restored as `NA` residuals;
-#' with `na.omit`, only observations used for fitting are returned.
+#' with `na.omit`, only observations used for fitting are returned. Selecting a
+#' grouped-family component with `response` returns only its retained fitting
+#' observations, without placeholders for excluded rows whose component
+#' membership is unavailable.
 #'
 #' For `mgcv::cnorm()`, `mgcv::clog()` and `mgcv::cpois()` models, censored
 #' observations have PIT residuals sampled uniformly between `F(l)` and `F(u)`.
@@ -176,7 +185,11 @@ check_partial_residuals <- function(object, warn = FALSE) {
 #'
 #' For grouped-family GAMs fitted with [mgcv::gfam()], each observation uses its
 #' component's CDF, fitted nuisance parameters, dispersion and weights. Residuals
-#' are returned in fitting order. All active components must supply supported
+#' are returned in fitting order. `response = NULL` uses all components; an
+#' integer selects observations assigned to that family-list position. Repeated
+#' families retain distinct indices. With an explicit seed, selected residuals
+#' match the corresponding rows of an all-component call whenever all
+#' components support the calculation. All selected active components must supply supported
 #' CDFs and probability limits for discrete or censored observations. Unsupported
 #' components give an error; [appraise()] can instead select deviance residuals
 #' automatically. See [appraise()] for supported families. Tweedie zeros have
@@ -209,8 +222,9 @@ check_partial_residuals <- function(object, warn = FALSE) {
 #'
 #' @export
 `quantile_residuals` <- function(
-  model, type = c("pit", "quantile"), seed = NULL, ...
+  model, type = c("pit", "quantile"), seed = NULL, ..., response = NULL
 ) {
+  diagnostic_response_selection(model, response)
   UseMethod("quantile_residuals")
 }
 
@@ -218,9 +232,14 @@ check_partial_residuals <- function(object, warn = FALSE) {
 #' @export
 #' @rdname quantile_residuals
 quantile_residuals.gam <- function(model, type = c("pit", "quantile"),
-                                    seed = NULL, conditioning = NULL, ...) {
+                                    seed = NULL, conditioning = NULL, ..., response = NULL) {
+  model <- gfam_select_diagnostics(model, response, supplied = !missing(response), seed = seed)
   check_distribution_conditioning(conditioning)
   type <- match.arg(type)
+  model <- gfam_cache_selected_residuals(model, type, seed)
+  cached <- attr(model, "gratia.diagnostics")
+  if (!is.null(attr(model, "gratia.gfam.original", exact = TRUE)) && identical(cached$type, type))
+    return(cached$residuals)
   used <- model_used_rows(model)
   if (is_gfam_family(stats::family(used))) {
     r <- diagnostic_seed(seed, gfam_quantile_residuals(gfam_diagnostic_context(used), type))

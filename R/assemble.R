@@ -349,7 +349,6 @@
 
     # draw smooths
     sm_l <- if (isTRUE(grouped_by)) {
-      sm_levels <- unique(sm_eval$.smooth)
       levs <- unique(str_split_fixed(sm_eval$.smooth, ":", n = 2)[, 1])
       sm_l <- sm_eval |>
         mutate(
@@ -363,7 +362,7 @@
         relocate(".term", .before = 1L)
       grp_by_levs <- unique(sm_l$"..by..")
       sm_l <- sm_l |>
-        group_split(factor(.data$.term, levels = sm_levels),
+        group_split(factor(.data$.term, levels = levs),
           factor(.data$"..by..", levels = grp_by_levs),
           factor(.data$..component.., levels = unique(.data$..component..)))
       # sometimes the steps to get the order right above don't work

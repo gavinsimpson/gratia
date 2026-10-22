@@ -112,6 +112,18 @@
 
 ## New features
 
+* Grouped-family diagnostics now accept `response = NULL` for all family
+  components or a single integer family-list index for one component.
+  This uses the same selection convention as joint GJRM diagnostics.
+  `by_family` independently controls the existing pooling and faceting
+  behaviour, and selected results retain their original component labels.
+
+* `assemble()`, `draw()` and `smooth_estimates()` now support joint models
+  fitted by `GJRM::gjrm()`, using the final joint coefficients and covariance
+  matrices for smooths, random effects and parametric effects. Diagnostic
+  functions support ordinary uncensored joint models whose predictors do not
+  include modeled responses; `appraise()` facets each panel by response.
+
 * `assemble()` now supports models fitted by `mgcv::gamm()`, returning named
   plots of smooth and parametric contributions. It shares preparation of the
   fitted GAM component with `draw()`.
@@ -666,6 +678,17 @@
 
 ## Bug fixes
 
+* Grouped plots of factor-by smooths now keep different smooth terms and
+  linear predictors separate, including when drawing saved smooth estimates.
+  Models with several factor-by terms no longer fail during plot assembly.
+
+* For GJRM models, `scales = "fixed"` now shares effect ranges without
+  expanding the covariate axes of two-dimensional smooth plots.
+
+* `appraise(rank = TRUE)` now uses within-response or within-family predictor
+  ranks in ordinary diagnostic panels, matching the standalone and scalable
+  plots.
+
 * `partial_residuals()` and `add_partial_residuals()` now give an informative
   error for models without working residuals or working weights, including
   mgcv's location-scale families. `draw(residuals = TRUE)` warns once and draws
@@ -687,6 +710,9 @@
 
 * B-spline evaluation handles empty data and factor-by calls whose evaluation
   data omit fitted levels, including constrained tensor products.
+  `smooth_estimates()` retains estimate, standard error and predictor
+  columns and their types when no evaluation rows remain. Nested output
+  keeps each selected smooth with its empty data table.
 
 * MH acceptance rates are extracted from the correct mgcv return components.
 

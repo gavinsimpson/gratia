@@ -3,7 +3,9 @@
 \name{draw.gamlss}
 \alias{draw.gamlss}
 \alias{assemble.gamlss}
-\title{Plot smooths of a GAMLSS model estimated by \code{GJRM::gamlss}}
+\alias{draw.gjrm}
+\alias{assemble.gjrm}
+\title{Plot smooths of models estimated by GJRM}
 \usage{
 \method{draw}{gamlss}(
   object,
@@ -27,6 +29,38 @@
   object,
   scales = c("free", "fixed"),
   ...,
+  residuals = FALSE,
+  n = 100,
+  envir = NULL,
+  select = NULL,
+  parametric = NULL,
+  terms = NULL,
+  partial_match = FALSE
+)
+
+\method{draw}{gjrm}(
+  object,
+  scales = c("free", "fixed"),
+  ncol = NULL,
+  nrow = NULL,
+  guides = "keep",
+  widths = NULL,
+  heights = NULL,
+  ...,
+  n = 100,
+  envir = NULL,
+  select = NULL,
+  parametric = NULL,
+  terms = NULL,
+  partial_match = FALSE,
+  wrap = TRUE
+)
+
+\method{assemble}{gjrm}(
+  object,
+  scales = c("free", "fixed"),
+  ...,
+  residuals = FALSE,
   n = 100,
   envir = NULL,
   select = NULL,
@@ -36,7 +70,7 @@
 )
 }
 \arguments{
-\item{object}{a model, fitted by \code{\link[GJRM:gamlss]{GJRM::gamlss()}}}
+\item{object}{a model fitted by \code{\link[GJRM:gamlss]{GJRM::gamlss()}} or \code{\link[GJRM:gjrm]{GJRM::gjrm()}}.}
 
 \item{scales}{character; should all univariate smooths be plotted with the
 same y-axis scale? If \code{scales = "free"}, the default, each univariate
@@ -92,6 +126,11 @@ use the grid and surface controls below, as described in
 
 \item{wrap}{Logical; return an assembled patchwork when \code{TRUE} (the default),
 or a flat named list of plots when \code{FALSE}.}
+
+\item{residuals}{logical; should partial residuals for a smooth be drawn?
+Ignored for anything but a simple univariate smooth.
+If the model does not provide working residuals and working weights,
+warns once and draws the smooths without partial residuals.}
 }
 \value{
 \code{assemble()} and \code{draw(wrap = FALSE)} return a flat named list of
@@ -102,21 +141,36 @@ are no plots to draw.
 }
 \description{
 Provides \code{\link[=draw]{draw()}} and \code{\link[=assemble]{assemble()}} methods for GAMLSS
-(distributional GAMs) fitted by \code{\link[GJRM:gamlss]{GJRM::gamlss()}}. \code{assemble()} returns the
+and joint models fitted by \code{\link[GJRM:gamlss]{GJRM::gamlss()}} or \code{\link[GJRM:gjrm]{GJRM::gjrm()}}. \code{assemble()} returns the
 individual plots; \code{draw()} arranges them using \code{\link[patchwork:wrap_plots]{patchwork::wrap_plots()}}.
 }
 \note{
 For models with multiple linear predictors, smooth plot subtitles
 identify the distributional parameter using the parent model's margin and
 equation order, rather than the working family of the embedded GAMs.
-Single-predictor models omit these automatic labels. Existing smooth labels,
-selection, by-variable information and custom subtitles are retained.
+Univariate GAMLSS models with one predictor omit these automatic labels.
+Joint models retain equation labels even when only dependence is estimated.
+Existing smooth labels, selection, by-variable information and custom
+subtitles are retained.
 Pass \verb{surface = "3d", ci_3d = TRUE} through \code{...} to add interval surfaces
 to smooths and numeric parametric interactions in any equation.
 \code{ci_3d_alpha} and \code{ci_3d_col} control their opacity and fill colour.
 Pass \code{cyclic = "polar"} and optional \code{polar_args} through \code{...} for
 polar plots of supported one-dimensional cyclic smooths in any equation;
 see \code{\link[=draw.gam]{draw.gam()}} for the coordinate options.
+
+Joint models use the final joint coefficients and covariance for every
+embedded GAM, including dependence equations and random-effect smooths.
+Parametric plot subtitles also identify their response and parameter.
+A parametric term repeated across equations has list names such as
+\verb{x (equation 1)} and \verb{x (equation 2)}; unique terms keep their original names.
+Grouped factor-by panels also receive an equation suffix when their
+base name would hide another smooth's selection label.
+Ordinal cutpoints are excluded from smooth and intercept uncertainty.
+Fixed-margin fits plot their estimated dependence equation only.
+Flexible survival equations fitted using SCAM are not yet supported.
+Working residuals from preliminary GAM fits are unavailable for joint
+models; requesting partial residuals warns and draws the smooths alone.
 }
 \examples{
 if (suppressPackageStartupMessages(require("GJRM", quietly = TRUE))) {
@@ -146,5 +200,18 @@ if (suppressPackageStartupMessages(require("GJRM", quietly = TRUE))) {
       data = dataSim)
     draw(surface, surface = "3d", ci_3d = TRUE, n_2d = 15)
   }
+}
+
+if (requireNamespace("GJRM", quietly = TRUE)) {
+  load_mgcv()
+  set.seed(12)
+  d <- data.frame(x = runif(150), z = runif(150))
+  d$y1 <- sin(2 * pi * d$x) + rnorm(150)
+  d$y2 <- cos(2 * pi * d$z) + 0.3 * d$y1 + rnorm(150)
+  joint <- GJRM::gjrm(list(y1 ~ s(x, k = 5), y2 ~ s(z, k = 5),
+    ~ 1, ~ 1, ~ s(x, k = 4)), data = d, margins = c("N", "N"),
+    model = "B")
+  draw(joint, parametric = FALSE)
+  smooth_estimates(joint, select = smooths(joint)[3])
 }
 }

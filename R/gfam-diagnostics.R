@@ -22,6 +22,7 @@ gfam_diagnostic_context <- function(model) {
   context$mu <- numeric(length(context$eta))
   for (i in seq_along(context$components)) {
     rows <- which(context$index == i)
+    if (!length(rows)) next
     context$mu[rows] <- context$families[[i]]$linkinv(context$eta[rows])
   }
   context
@@ -450,7 +451,7 @@ check_gfam_appraise <- function(model) invisible(model)
 # Rank predictors using only finite rows included in the plot. Use each family's
 # own denominator; tied constants appear at 0.5.
 diagnostic_predictor_data <- function(data, model, by_family, rank = NULL) {
-  grouped <- is_gfam_family(family(model))
+  grouped <- is_gfam_family(family(model)) || inherits(model, "gratia_gjrm_diagnostic")
   if (!is.null(rank) && (!is.logical(rank) || length(rank) != 1L || is.na(rank)))
     stop("'rank' must be TRUE, FALSE, or NULL.", call. = FALSE)
   ranked <- if (is.null(rank)) grouped && !by_family else rank
@@ -502,4 +503,104 @@ gfam_observed_breaks <- function(data) {
     if (length(ticks) > 3L) ticks <- ticks[round(seq(1L, length(ticks), length.out = 3L))]
     unname(ticks)
   }
+}
+
+# Selection uses the original family-list positions, even for repeated families.
+# Copies retain fitted coefficients and nuisance parameters; only observation
+# slots and the getfl() index are restricted. The original fitted family is never changed.
+diagnostic_response_selection <- function(model, response) {
+  if (is.null(response)) return(invisible(model))
+  source <- if (inherits(model, "gratia_diagnostics")) model$source else model
+  grouped <- tryCatch(is_gfam_family(stats::family(source)), error = function(e) FALSE)
+  joint <- inherits(diagnostic_original(source), "gjrm") &&
+    !isTRUE(diagnostic_original(source)$univar.gamlss)
+  if (!grouped && !joint) stop("'response' selection is available for grouped-family GAMs and joint GJRM diagnostics.",
+    call. = FALSE)
+  invisible(model)
+}
+
+gfam_select_diagnostics <- function(model, response = NULL, supplied = FALSE, seed = NULL) {
+  original <- attr(model, "gratia.gfam.original", exact = TRUE)
+  if (!supplied) return(model)
+  diagnostic_response_selection(model, response)
+  if (!is.null(original)) model <- original
+  if (is.null(response)) {
+    cached <- attr(model, "gratia.diagnostics")
+    if (!is.null(original) && !is.null(seed) && !identical(cached$seed, seed))
+      attr(model, "gratia.diagnostics") <- NULL
+    return(model)
+  }
+  families <- stats::family(model)$getfl()
+  if (!is.numeric(response) || length(response) != 1L || is.na(response) ||
+      !is.finite(response) || response != floor(response) ||
+      !response %in% seq_along(families))
+    stop("'response' must be NULL or one integer family-list position in the model.", call. = FALSE)
+  original <- model
+  row_map <- which(!is.na(model_row_map(model)))
+  model <- model_used_rows(model)
+  index <- as.integer(attr(model$family$getfl(), "fi"))
+  rows <- which(index == response)
+  if (!length(rows)) stop("The selected response has no retained fitting observations.", call. = FALSE)
+  n <- nrow(model$model)
+  for (name in c("y", "fitted.values", "linear.predictors", "residuals", "weights",
+      "prior.weights", "working.weights", "AR.start", "X")) {
+    if (!is.null(model[[name]]) && NROW(model[[name]]) == n)
+      model[[name]] <- slice_observations(model[[name]], rows)
+  }
+  model$model <- model$model[rows, , drop = FALSE]
+  attr(model$model, "na.action") <- NULL
+  subset_offset <- function(x) if (length(x) > 1L) slice_observations(x, rows) else x
+  model$offset <- if (is.list(model$offset)) lapply(model$offset, subset_offset)
+    else subset_offset(model$offset)
+  model$na.action <- NULL
+  attr(families, "fi") <- index[rows]
+  model$family$getfl <- local({ value <- families; function() value })
+  attr(model, "gratia.fitting.predictors") <- TRUE
+  attr(model, "gratia.gfam.original") <- original
+  attr(model, "gratia.gfam.response") <- as.integer(response)
+  attr(model, "gratia.gfam.rows") <- row_map[rows]
+  attr(model, "gratia.gfam.retained") <- rows
+  attr(model, "gratia.diagnostics") <- NULL
+  model
+}
+
+# Preserve the established component-order random draws when all components
+# support the calculation. A supported selected component can still be checked
+# when an unselected component lacks a CDF or response generator.
+gfam_cache_selected_residuals <- function(model, type, seed = NULL, n_dharma = NULL) {
+  original <- attr(model, "gratia.gfam.original", exact = TRUE)
+  if (is.null(original) || !type %in% c("pit", "quantile", "dharma")) return(model)
+  count <- if (type == "dharma") dharma_simulation_count(model, n_dharma) else NULL
+  cached <- attr(model, "gratia.diagnostics")
+  if (identical(cached$type, type) && (is.null(seed) || identical(cached$seed, seed)) &&
+      (type != "dharma" || identical(cached$n_dharma, count))) return(model)
+  full <- model_used_rows(original)
+  full_cache <- attr(full, "gratia.diagnostics")
+  if (!is.null(seed) && !identical(full_cache$seed, seed))
+    attr(full, "gratia.diagnostics") <- NULL
+  supported <- tryCatch({
+    if (type == "dharma") {
+      distribution <- response_distribution(full)
+      is.function(distribution$rd %||% distribution$marginal_rd)
+    } else !length(gfam_cdf_support(gfam_diagnostic_context(full)))
+  }, error = function(e) FALSE)
+  # A failure in an unselected component must not prevent checking the
+  # selected component. Its own calculation below still reports invalid data
+  # or unsupported operations rather than silently replacing residuals.
+  residuals <- if (supported) tryCatch(
+    diagnostic_residuals(full, type, seed, n_dharma = count),
+    error = function(e) NULL) else NULL
+  if (!is.null(residuals)) {
+    attr(original, "gratia.diagnostics") <- list(type = type, residuals = residuals,
+      seed = seed, n_dharma = count)
+    attr(model, "gratia.gfam.original") <- original
+    residuals <- residuals[attr(model, "gratia.gfam.retained")]
+  } else {
+    attr(model, "gratia.diagnostics") <- NULL
+    residuals <- if (type == "dharma") model_dharma_residuals(model, count, seed) else
+      diagnostic_seed(seed, gfam_quantile_residuals(gfam_diagnostic_context(model), type))
+  }
+  attr(model, "gratia.diagnostics") <- list(type = type, residuals = residuals,
+    seed = seed, n_dharma = count)
+  model
 }

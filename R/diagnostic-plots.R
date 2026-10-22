@@ -572,7 +572,9 @@ qq_uniform <- function(model, n = 10,
 #' @param seed integer; random seed to use for PIT, quantile, surrogate or
 #'   DHARMa-style residuals.
 #' @param ... optional arguments passed to model preparation, such as the
-#'   sdmTMB `field_method`.
+#'   sdmTMB `field_method`. For grouped-family GAMs and joint GJRM models,
+#'   `response = NULL` uses every response and an integer selects one; see
+#'   [appraise()]. Selection leaves `by_family` independent.
 #'
 #' @details The default subtitle identifies the response family. Conditioning
 #'   and field choices appear in the caption where relevant. Supply `caption`
@@ -602,6 +604,12 @@ qq_uniform <- function(model, n = 10,
 ) {
   gratia_plot_arguments(c("point_col", "point_alpha", "line_col"), environment())
   model <- diagnostic_plot_source(model, type = type, seed = seed, conditioning = conditioning, n_dharma = if (missing(n_dharma)) NULL else n_dharma, ...)
+  if (inherits(model, "gratia_gjrm_diagnostic")) {
+    d <- diagnostic_data(model, type, seed, n_dharma = if (missing(n_dharma)) NULL else n_dharma)
+    return(gjrm_diagnostic_point_plot(d, "predictor", point_col = point_col,
+      point_alpha = point_alpha, line_col = line_col, xlab = xlab, ylab = ylab,
+      title = title, subtitle = subtitle, caption = caption, rank = rank, by_family = by_family))
+  }
   if (is_multinom_surrogate(model, type)) return(multinom_residual_plot(
     prepare_diagnostic_data(model, type, seed), "predictor", FALSE,
     rank = rank, xlab = xlab, ylab = ylab,
@@ -715,6 +723,11 @@ qq_uniform <- function(model, n = 10,
 ) {
   gratia_plot_arguments(c("point_col", "point_alpha"), environment())
   model <- diagnostic_plot_source(model, type = "response", conditioning = conditioning, ...)
+  if (inherits(model, "gratia_gjrm_diagnostic")) {
+    return(gjrm_diagnostic_point_plot(diagnostic_data(model, type = "response"),
+      "observed", point_col = point_col, point_alpha = point_alpha,
+      xlab = xlab, ylab = ylab, title = title, subtitle = subtitle, caption = caption, by_family = by_family))
+  }
   original <- model
   model <- model_used_rows(model)
   check_gfam_appraise(model)
@@ -802,6 +815,12 @@ qq_uniform <- function(model, n = 10,
   conditioning = NULL, ..., n_dharma = 250L
 ) {
   model <- diagnostic_plot_source(model, type = type, seed = seed, conditioning = conditioning, n_dharma = if (missing(n_dharma)) NULL else n_dharma, ...)
+  if (inherits(model, "gratia_gjrm_diagnostic")) {
+    return(scalable_residuals_hist_plot(diagnostic_data(model, type, seed,
+      n_dharma = if (missing(n_dharma)) NULL else n_dharma), n_bins = n_bins,
+      ylab = ylab %||% "Frequency", xlab = xlab, title = title,
+      subtitle = subtitle, caption = caption, by_family = by_family))
+  }
   if (is_multinom_surrogate(model, type)) return(multinom_residual_plot(
     prepare_diagnostic_data(model, type, seed), "histogram", FALSE,
     n_bins = n_bins, xlab = xlab, ylab = ylab, title = title,

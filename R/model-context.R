@@ -53,14 +53,27 @@ model_context.gamm4 <- function(object, component = NULL) {
 #' @export
 model_context.gamlss <- function(object, component = NULL) {
   if (is.null(component)) component <- "gam1"
-  if (!is.character(component) || !component %in% names(object) ||
+  if (!is.character(component) || length(component) != 1L || is.na(component) ||
+      !component %in% names(object) ||
       !inherits(object[[component]], "gam")) {
     cli::cli_abort("Select an embedded GJRM GAM using {.arg component}.")
   }
   ctx <- model_context(object[[component]])
-  ctx$call$data <- object$call$data
+  ctx$call <- gjrm_original_call(object, ctx$call)
   ctx$component <- component
   ctx
+}
+
+#' @export
+model_context.gjrm <- function(object, component = NULL) {
+  components <- gjrm_component_names(object)
+  if (!length(components)) cli::cli_abort("No estimated GJRM GAM component is available.")
+  if (is.null(component)) component <- components[[1L]]
+  if (!is.character(component) || length(component) != 1L || is.na(component) ||
+      !component %in% components) {
+    cli::cli_abort("Select an estimated GJRM GAM using {.arg component}.")
+  }
+  model_context.gamlss(object, component = component)
 }
 
 # The attribute belongs to a local model copy and is serializable for workers.

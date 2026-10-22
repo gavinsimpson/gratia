@@ -1,7 +1,8 @@
 # Distribution functions capture fitted parameters before diagnostics call them.
 # NULL marks an unavailable operation. Model-specific functions prepare these
 # inputs so other packages do not have to use mgcv's family argument signatures.
-response_distribution <- function(model, conditioning = NULL, ...) {
+response_distribution <- function(model, conditioning = NULL, ..., response = NULL) {
+  diagnostic_response_selection(model, response)
   UseMethod("response_distribution")
 }
 
@@ -78,13 +79,17 @@ response_distribution.glm <- function(model, conditioning = NULL, ...) {
 }
 
 #' @export
-response_distribution.gam <- function(model, conditioning = NULL, ...) {
+response_distribution.gam <- function(model, conditioning = NULL, ..., response = NULL) {
+  model <- gfam_select_diagnostics(model, response, supplied = !missing(response))
   check_distribution_conditioning(conditioning)
   model <- model_used_rows(model)
   if (is_gfam_family(stats::family(model))) {
     context <- gfam_diagnostic_context(model)
+    selected <- attr(model, "gratia.gfam.response", exact = TRUE)
+    if (!is.null(selected)) return(bam_response_dependence(model,
+      gfam_component_distribution(context, selected), stats::family(model)))
     components <- lapply(seq_along(context$components), function(i)
-      gfam_component_distribution(context, i))
+      if (any(context$index == i)) gfam_component_distribution(context, i) else NULL)
     return(bam_response_dependence(model,
       combine_response_distributions(components, context$index), stats::family(model)))
   }

@@ -335,6 +335,7 @@ qq_merge_files <- function(left, right, output, block) {
 # the original fitted object remains available for the package's own methods.
 diagnostic_plot_source <- function(model, type = NULL, seed = NULL,
                                     conditioning = NULL, ..., n_dharma = NULL) {
+  diagnostic_response_selection(model, list(...)$response)
   UseMethod("diagnostic_plot_source")
 }
 #' @export
@@ -363,9 +364,14 @@ diagnostic_plot_source.gratia_diagnostics <- function(model, type = NULL,
 }
 #' @export
 diagnostic_plot_source.gam <- function(model, type = NULL, seed = NULL,
-                                       conditioning = NULL, ..., n_dharma = NULL) {
+                                       conditioning = NULL, ..., n_dharma = NULL, response = NULL) {
+  model <- gfam_select_diagnostics(model, response, supplied = !missing(response), seed = seed)
   if (!is.null(type)) type <- diagnostic_type(model, type)
   check_distribution_conditioning(conditioning)
+  if (!is.null(attr(model, "gratia.gfam.original", exact = TRUE))) {
+    type <- diagnostic_type(model, type)
+    model <- gfam_cache_selected_residuals(model, type, seed, n_dharma)
+  }
   if (identical(type, "dharma")) return(cache_dharma_residuals(model, n_dharma, seed))
   model
 }
@@ -540,6 +546,7 @@ diagnostic_mean_panel <- function(distribution) {
 # A field or component selection then reaches the function that prepares
 # diagnostic inputs, rather than the function that arranges the plots.
 diagnostic_adapter_arguments <- function(model, arguments) {
+  diagnostic_response_selection(model, arguments$response)
   original <- diagnostic_original(model)
   supported <- character()
   for (generic in c("diagnostic_data", "response_distribution")) {

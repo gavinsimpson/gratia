@@ -180,7 +180,9 @@ uses the extracted GAM. Availability and defaults depend on the model; see
 \link{diagnostic_support}.}
 
 \item{...}{optional arguments used to prepare the model for diagnostics,
-including sdmTMB \code{field_method}.
+including sdmTMB \code{field_method}. For grouped-family GAMs and joint GJRM
+models, \code{response = NULL} uses every response and an integer selects one;
+see \code{\link[=appraise]{appraise()}}. Selection leaves \code{by_family} independent.
 For \code{scalable_worm_plot()}, other arguments pass to \code{scalable_qq_plot()}
 except its internal worm setting.}
 

@@ -336,7 +336,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > ### Name: appraise
 > ### Title: Model diagnostic plots
 > ### Aliases: appraise appraise.gam appraise.lm appraise.gamlss
-> ###   appraise.default appraise.gamm4 appraise.gamm
+> ###   appraise.default appraise.gamm4 appraise.gjrm appraise.gamm
 > ###   appraise.gratia_diagnostic_proxy appraise.lme appraise.merMod
 > ###   appraise.sdmTMB
 >
@@ -357,6 +357,20 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > ## change the ggplot theme for all panels
 > library("ggplot2")
 > appraise(mod, seed = 42) & theme_minimal()
+>
+> ## Select a grouped-family component by its position in the family list
+> set.seed(53)
+> grouped <- data.frame(x = runif(160), family_id = rep(1:2, 80))
+> grouped$component <- factor(grouped$family_id)
+> grouped$y <- rnorm(160, sin(2 * pi * grouped$x), 0.4)
+> is_count <- grouped$family_id == 2L
+> grouped$y[is_count] <- rpois(sum(is_count), exp(grouped$x[is_count]))
+> grouped_fit <- gam(cbind(y, family_id) ~ component +
++   s(x, by = component, k = 6), data = grouped,
++   family = gfam(list(gaussian(), poisson())), method = "REML")
+> appraise(grouped_fit, response = 2, seed = 54)
+> ## Layout remains a separate choice
+> qq_plot(grouped_fit, response = 2, by_family = TRUE, seed = 54)
 >
 >
 >
@@ -1413,8 +1427,8 @@ detaching ‘package:mgcv’
 > flush(stderr()); flush(stdout())
 > 
 > ### Name: draw.gamlss
-> ### Title: Plot smooths of a GAMLSS model estimated by 'GJRM::gamlss'
-> ### Aliases: draw.gamlss assemble.gamlss
+> ### Title: Plot smooths of models estimated by GJRM
+> ### Aliases: draw.gamlss assemble.gamlss draw.gjrm assemble.gjrm
 > 
 > ### ** Examples
 > 
@@ -1447,8 +1461,35 @@ detaching ‘package:mgcv’
 +   }
 + }
 > 
+> if (requireNamespace("GJRM", quietly = TRUE)) {
++   load_mgcv()
++   set.seed(12)
++   d <- data.frame(x = runif(150), z = runif(150))
++   d$y1 <- sin(2 * pi * d$x) + rnorm(150)
++   d$y2 <- cos(2 * pi * d$z) + 0.3 * d$y1 + rnorm(150)
++   joint <- GJRM::gjrm(list(y1 ~ s(x, k = 5), y2 ~ s(z, k = 5),
++     ~ 1, ~ 1, ~ s(x, k = 4)), data = d, margins = c("N", "N"),
++     model = "B")
++   draw(joint, parametric = FALSE)
++   smooth_estimates(joint, select = smooths(joint)[3])
++ }
+# A tibble: 100 x 7
+   .smooth .type .by   .estimate   .se       x .model
+   <chr>   <chr> <chr>     <dbl> <dbl>   <dbl> <chr>
+ 1 s.4(x)  TPRS  <NA>    -0.155  0.307 0.00832 Dependence (theta)
+ 2 s.4(x)  TPRS  <NA>    -0.146  0.294 0.0181  Dependence (theta)
+ 3 s.4(x)  TPRS  <NA>    -0.138  0.282 0.0280  Dependence (theta)
+ 4 s.4(x)  TPRS  <NA>    -0.129  0.270 0.0378  Dependence (theta)
+ 5 s.4(x)  TPRS  <NA>    -0.121  0.258 0.0476  Dependence (theta)
+ 6 s.4(x)  TPRS  <NA>    -0.112  0.246 0.0574  Dependence (theta)
+ 7 s.4(x)  TPRS  <NA>    -0.104  0.234 0.0673  Dependence (theta)
+ 8 s.4(x)  TPRS  <NA>    -0.0956 0.223 0.0771  Dependence (theta)
+ 9 s.4(x)  TPRS  <NA>    -0.0875 0.212 0.0869  Dependence (theta)
+10 s.4(x)  TPRS  <NA>    -0.0794 0.202 0.0967  Dependence (theta)
+# i 90 more rows
 > 
 > 
+>
 > cleanEx()
 
 detaching ‘package:mgcv’, ‘package:GJRM’
@@ -3112,8 +3153,9 @@ detaching ‘package:mgcv’
 > ### Name: qq_plot
 > ### Title: Quantile-quantile plot of model residuals
 > ### Aliases: qq_plot qq_plot.default qq_plot.gam qq_plot.glm qq_plot.lm
-> ###   qq_plot.gamm4 qq_plot.gamm qq_plot.gratia_diagnostic_proxy
-> ###   qq_plot.lme qq_plot.merMod qq_plot.gamlss qq_plot.sdmTMB
+> ###   qq_plot.gamm4 qq_plot.gjrm qq_plot.gamm
+> ###   qq_plot.gratia_diagnostic_proxy qq_plot.lme qq_plot.merMod
+> ###   qq_plot.gamlss qq_plot.sdmTMB
 > 
 > ### ** Examples
 > 
@@ -3646,6 +3688,7 @@ detaching ‘package:mgcv’
 > ### Name: smooth_estimates
 > ### Title: Evaluate smooths at covariate values
 > ### Aliases: smooth_estimates smooth_estimates.gam smooth_estimates.gamlss
+> ###   smooth_estimates.gjrm
 > 
 > ### ** Examples
 > 
@@ -3925,8 +3968,9 @@ detaching ‘package:mgcv’
 > ### Name: worm_plot
 > ### Title: Worm plot of model residuals
 > ### Aliases: worm_plot worm_plot.gam worm_plot.glm worm_plot.lm
-> ###   worm_plot.gamm4 worm_plot.gamm worm_plot.gratia_diagnostic_proxy
-> ###   worm_plot.lme worm_plot.merMod worm_plot.gamlss worm_plot.sdmTMB
+> ###   worm_plot.gamm4 worm_plot.gjrm worm_plot.gamm
+> ###   worm_plot.gratia_diagnostic_proxy worm_plot.lme worm_plot.merMod
+> ###   worm_plot.gamlss worm_plot.sdmTMB
 > 
 > ### ** Examples
 > 

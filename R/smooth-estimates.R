@@ -7,7 +7,7 @@
 #' been removed from the package.
 #'
 #' @param object a fitted model, including objects of class `"gam"`, `"gamm"`
-#'   or models fitted by [GJRM::gamlss()].
+#'   or models fitted by [GJRM::gamlss()] or [GJRM::gjrm()].
 #' @param select character, numeric or logical; smooths to evaluate, using labels
 #'   from [smooths()] or indices in fitted smooth order. The default (`NULL`)
 #'   evaluates all smooths.
@@ -115,9 +115,13 @@
 #'   supported one-dimensional cyclic components, allowing
 #'   `draw(object, cyclic = "polar")` to configure the angular axis.
 #'   This attribute is retained in nested and unnested output.
+#'   When no evaluation rows remain, flat output has zero rows and retains the
+#'   estimate, standard error and predictor columns with their original types.
+#'   With `unnest = FALSE`, each selected smooth retains its metadata record
+#'   and a data table with zero rows in the `data` list column.
 #'
 #' @details
-#' For [GJRM::gamlss()] models, smooths are evaluated in equation and smooth
+#' For [GJRM::gamlss()] and [GJRM::gjrm()] models, smooths are evaluated in equation and smooth
 #' order using the final fitted GJRM coefficients and covariance matrices.
 #' Selection uses the model-wide labels returned by [smooths()], including
 #' suffixes such as `s.1(x)` for repeated labels. Equations without smooths
@@ -587,10 +591,19 @@ smooth_estimates.gamlss <- function(object, select = NULL, smooth = deprecated()
     interval_info$overall_uncertainty <- all(vapply(results, function(x) {
       isTRUE(attr(x, "interval_info")$overall_uncertainty)
     }, logical(1)))
+    if (identical(interval_info$calibration, "tube")) {
+      interval_info$curves <- do.call(c, lapply(results, function(x) {
+        attr(x, "interval_info")$curves
+      }))
+    }
     attr(out, "interval_info") <- interval_info
   }
   out
 }
+
+#' @rdname smooth_estimates
+#' @export
+smooth_estimates.gjrm <- smooth_estimates.gamlss
 
 #' @export
 `smooth_estimates.gamm` <- function(object, ...) {
@@ -798,11 +811,9 @@ smooth_estimates.gamlss <- function(object, select = NULL, smooth = deprecated()
   data <- select(data, all_of(keep_vars))
 
   ## Return object
-  tbl <- tibble(.smooth = rep(label, nrow(X)), .estimate = fit, .se = se.fit)
-  ## bind on the data
-  tbl <- bind_cols(tbl, data)
-  ## nest all columns with varying data
-  tbl <- nest(tbl, data = all_of(c(".estimate", ".se", names(data))))
+  values <- bind_cols(tibble(.estimate = fit, .se = se.fit), data)
+  # Keep the selected smooth and its data prototype even with no observations.
+  tbl <- tibble(.smooth = label, data = list(values))
 
   tbl
 }
@@ -887,14 +898,8 @@ smooth_estimates.gamlss <- function(object, select = NULL, smooth = deprecated()
   data <- select(data, all_of(keep_vars))
 
   ## Return object
-  tbl <- tibble(
-    .smooth = rep(label, nrow(data)), .estimate = fit,
-    .se = se_fit
-  )
-  ## bind on the data
-  tbl <- bind_cols(tbl, data)
-  ## nest all columns with varying data
-  tbl <- nest(tbl, data = all_of(c(".estimate", ".se", names(data))))
+  values <- bind_cols(tibble(.estimate = fit, .se = se_fit), data)
+  tbl <- tibble(.smooth = label, data = list(values))
 
   tbl
 }
@@ -1671,21 +1676,25 @@ smooth_estimates.gamlss <- function(object, select = NULL, smooth = deprecated()
     levs <- unique(str_split_fixed(object$.smooth, ":", n = 2)[, 1])
     # nest the object so we can reuse the code/ideas from draw.gam
     sm_l <- object |>
-      nest(data = !any_of(c(".smooth", ".type", ".by", ".smooth_id"))) |>
+      nest(data = !any_of(c(".smooth", ".type", ".by", ".smooth_id", ".model"))) |>
         mutate(
           ..smooth.. = factor(.data$.smooth, levels = sm_levs),
           .term = str_split_fixed(.data$.smooth, ":", n = 2)[, 1],
           ..by.. = if_else(is.na(.data$.by), "..no_level..", .data$.by),
           ..component.. = if (".smooth_id" %in% names(object)) {
             .data$.smooth_id
-          } else match(.data$.type, unique(.data$.type))
+          } else match(.data$.type, unique(.data$.type)),
+          ..model.. = if (".model" %in% names(object)) {
+            factor(.data$.model, levels = unique(.data$.model))
+          } else factor(1L)
         ) |>
         relocate(".term", .before = 1L)
     grp_by_levs <- unique(sm_l$"..by..")
     sm_l |>
-      group_split(factor(.data$.term, levels = sm_levs),
+      group_split(factor(.data$.term, levels = levs),
         factor(.data$"..by..", levels = grp_by_levs),
-        factor(.data$..component.., levels = unique(.data$..component..)))
+        factor(.data$..component.., levels = unique(.data$..component..)),
+        .data$..model..)
   } else {
     # the factor is to reorder to way the smooths entered the model
     split_smooth_components(object)

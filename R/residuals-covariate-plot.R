@@ -43,7 +43,9 @@
 #'   settings instead. Colour for reference lines and categorical group means.
 #' @param n_dharma positive integer; number of simulations for DHARMa residuals.
 #' @param ... arguments used to prepare model diagnostics, such as sdmTMB
-#'   `component` and `field_method`.
+#'   `component` and `field_method`. For grouped-family GAMs and joint GJRM
+#'   models, `response = NULL` uses every response and an integer selects one;
+#'   see [appraise()]. Selection leaves `by_family` independent.
 #' @return A ggplot for one panel, or a patchwork composition for several.
 #'   Scalable plots retain only summaries and evaluated trend curves.
 #'
@@ -158,7 +160,7 @@ residual_covariate_context <- function(model) {
     ctx <- list(model = model, data = lme_fitting_data(model), formula = ff,
       terms = stats::terms(ff), envir = environment(ff), call = model$call)
   } else ctx <- model_context(model)
-  if (inherits(model, "gamlss")) {
+  if (inherits(model, c("gamlss", "gjrm"))) {
     # Embedded GAMs contain working responses. Verify the final observed
     # response and the predictors from every equation instead.
     components <- gjrm_gamlss_components(model)
@@ -172,12 +174,18 @@ residual_covariate_context <- function(model) {
     }
     response <- paste(deparse(model$formula[[1L]][[2L]], width.cutoff = 500L), collapse = "")
     frame[[response]] <- as.vector(model$y1)
+    if (inherits(model, "gjrm") && !isTRUE(model$univar.gamlss)) {
+      for (i in seq_along(model$margins)) {
+        response <- paste(deparse(model$formula[[i]][[2L]], width.cutoff = 500L), collapse = "")
+        frame[[response]] <- as.vector(model[[paste0("y", i)]])
+      }
+    }
     ctx$data <- frame
     ctx$verification_labels <- names(frame)
   }
   structural <- ctx$model
   labels <- if (inherits(model, c("merMod", "lme"))) character() else smooths(model)
-  sms <- if (inherits(model, "gamlss")) {
+  sms <- if (inherits(model, c("gamlss", "gjrm"))) {
     unlist(lapply(gjrm_gamlss_components(model), `[[`, "smooth"), recursive = FALSE)
   } else if (length(labels)) get_smooths_by_id(model, seq_along(labels)) else list()
   list(model = model, context = ctx, structural = structural,
@@ -202,7 +210,7 @@ residual_random_inputs <- function(expr) {
 
 residual_default_covariates <- function(info) {
   m <- info$structural
-  pterms <- if (inherits(info$model, "gamlss")) {
+  pterms <- if (inherits(info$model, c("gamlss", "gjrm"))) {
     lapply(gjrm_gamlss_components(info$model), `[[`, "pterms")
   } else if (inherits(info$model, "glmmTMB")) {
     lapply(glmmtmb_components(info$model), function(component)

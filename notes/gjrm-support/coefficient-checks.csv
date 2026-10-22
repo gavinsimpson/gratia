@@ -1,0 +1,8 @@
+"","smooths","evaluation_rows","estimate_error","standard_error_error"
+"gaussian",5,1800,0,0
+"binary_lognormal",3,1200,0,0
+"count_gaussian",3,1080,0,0
+"factor_by",4,720,0,0
+"tensor",3,1080,0,0
+"ordinal",3,1080,0,0
+"fixed_margins",1,360,0,0
