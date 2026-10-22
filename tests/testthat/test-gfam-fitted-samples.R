@@ -7,7 +7,7 @@ test_that("every joint coefficient draw receives its row's response transform", 
     expect_s3_class(samples, "fitted_samples")
     expect_identical(samples$.row, rep(seq_len(nrow(gfam_data)), 3))
     expect_identical(samples$.draw, rep(1:3, each = nrow(gfam_data)))
-    expect_true(all(samples$.parameter == "location"))
+    expect_true(all(samples$.parameter == "mean"))
     expect_equal(gfam_test_matrix(samples), expected, ignore_attr = TRUE)
     expect_equal(gfam_test_matrix(fitted_samples(model, method = "user",
       draws = draws, scale = "linear_predictor")), eta, ignore_attr = TRUE)
@@ -236,10 +236,22 @@ test_that("prediction arguments and corrected covariance are preserved", {
 })
 
 
-test_that("public ordinal fitted sampling rejects probabilities but permits eta", {
+test_that("grouped ordinal sampling returns parameters and category expectations", {
   draws <- gfam_test_draws(gfam_ordinal_model)
-  expect_error(fitted_samples(gfam_ordinal_model, method = "user", draws = draws),
-    "ordinal response-scale fitted")
+  expectations <- fitted_samples(gfam_ordinal_model, method = "user", draws = draws,
+    quantity = "expectation")
+  expect_identical(unique(expectations$.parameter), "expectation")
+  expect_equal(as.numeric(tapply(expectations$.fitted[expectations$.family == 1L],
+    list(expectations$.row[expectations$.family == 1L],
+      expectations$.draw[expectations$.family == 1L]), sum)),
+    rep(1, sum(gfam_ordinal_data$family_id == 1L) * nrow(draws)))
+  parameters <- fitted_samples(gfam_ordinal_model, method = "user", draws = draws)
+  eta <- gfam_test_eta(gfam_ordinal_model, gfam_ordinal_data, draws)
+  expected_parameters <- eta
+  poisson_rows <- gfam_ordinal_data$family_id == 2L
+  expected_parameters[poisson_rows, ] <- exp(eta[poisson_rows, , drop = FALSE])
+  expect_equal(gfam_test_matrix(parameters), expected_parameters, ignore_attr = TRUE)
+  expect_setequal(unique(parameters$.parameter), c("location", "mean"))
   data <- gfam_ordinal_data[c(1, 8, 13), ]
   expected <- gfam_test_eta(gfam_ordinal_model, data, draws)
   data$y <- NULL

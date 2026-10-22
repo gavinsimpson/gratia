@@ -466,6 +466,7 @@
       data = data,
       seed = coefficient_seed,
       scale = "response",
+      quantity = "parameters",
       method = method,
       n_threads = n_threads,
       n_cores = n_cores,
@@ -487,6 +488,16 @@
   )
 
   sampling <- attr(sim_eta, "sampling")
+  # Response generators consume native distribution parameters, not an
+  # expectation substituted for the first parameter.
+  spec <- distribution_spec(model)
+  if (!is_multivariate_y(model)) {
+    sim_eta$.fitted <- as.numeric(spec$to_native(matrix(sim_eta$.fitted, ncol = 1L)))
+  } else if (".y" %in% names(sim_eta)) {
+    sim_eta$.parameter <- sim_eta$.y
+  } else if (".category" %in% names(sim_eta)) {
+    sim_eta$.parameter <- sub("^category", "response", sim_eta$.category)
+  }
   ## rd function if available
   rd_fun <- missing_safe_rd(
     choose_rd_fun(model),
@@ -637,17 +648,16 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
 
 #' Draw fitted values from the posterior distribution
 #'
-#' Expectations (fitted values) of the response drawn from the posterior
-#' distribution of fitted model using a Gaussian approximation to the
-#' posterior or a simple Metropolis Hastings sampler.
+#' Distribution parameters or expected responses drawn from the posterior
+#' distribution of a fitted model.
 #'
-#' @param scale character; `"response"` returns the expected response;
-#'   `"linear_predictor"` returns the first linear predictor. For LSS models,
-#'   this is the predictor for location, which need not be the expected response.
-#'   For multinomial models both scales return every category, labelled
-#'   `response1`, `response2`, and so on. On the linear predictor scale,
-#'   `response1` is the reference category with predictor zero; other values
-#'   are log odds relative to it. Response-scale values are probabilities.
+#' @param quantity character; `"parameters"` (the default) returns all
+#'   distribution parameters represented by predictors, including intercept-only
+#'   predictors. `"expectation"` returns the expected response, using every
+#'   parameter on which it depends, on the response scale only.
+#' @param scale character; `"response"` returns natural distribution parameters;
+#'   `"link"`, `"linear_predictor"` and `"linear predictor"` return their
+#'   predictors. Expectations require `"response"`.
 #'
 #' @param family_index numeric; optional family-list positions for grouped
 #'   family ([mgcv::gfam()]) response predictions, with one integer per requested
@@ -657,16 +667,29 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
 #'   An explicit index must agree with membership recoverable from `data`.
 #'
 #' @details
-#' For LSS models, `scale = "response"` returns the expected response, using
-#' all parameters on which it depends. This includes the mean correction for
-#' Gumbel, GEV and sinh-arcsinh distributions and the hurdle probability for
-#' `ziplss()`. The Gamma LSS mean is the exponential of its first predictor.
-#' `scale = "linear_predictor"` returns only the first predictor (location);
-#' it is not a transformation of the expectation for these multi-parameter
-#' distributions. The existing `.parameter = "location"` label is retained on
-#' both scales. A GEV expectation does not exist at shape >= 1: response-scale
-#' fitted and derivative sampling then fail explicitly, while response draws
-#' and location-predictor draws remain available.
+#' Parameter names and definitions are available through [family_parameters()].
+#' Gaussian LSS returns `mean` and `sd`, GEV returns `location`, `scale` and
+#' `shape`, and sinh-arcsinh returns `location`, `scale`, `skewness` and
+#' `tailweight`. These shape parameters are not response moments. Natural
+#' parameters can differ from native mgcv predictions and `inv_link()` values.
+#' Every parameter in one draw uses the same joint coefficient draw. Global
+#' parameters outside the coefficient vector remain fixed and are described
+#' in the metadata, rather than returned as fitted parameters.
+#'
+#' Use `quantity = "expectation"` for expected responses labelled
+#' `"expectation"`. This includes Gumbel, GEV and sinh-arcsinh mean adjustments
+#' and the zero-truncated Poisson adjustment in `ziplss()`. A GEV expectation
+#' does not exist at shape >= 1; parameter and response draws remain available.
+#' Categorical expectations are category probabilities, not numeric category
+#' scores. `.category` identifies categories, and `.y` identifies multivariate
+#' responses. Multinomial link output includes a zero reference predictor.
+#' Ordinal parameter output is the latent location predictor; its thresholds
+#' are global parameters.
+#'
+#' The `prediction_info` attribute records the quantity, scale and resolved
+#' parameter descriptions. Unlike [posterior_samples()], these draws add no
+#' response noise. [predicted_samples()] instead simulates observations with
+#' coefficients held at their fitted values.
 #'
 #' For grouped families, coefficient draws preserve the joint model covariance;
 #' each row is then transformed using its own fitted component family. Explicit
@@ -677,10 +700,10 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
 #' Missing indices behave like missing required predictors. Link-scale draws
 #' do not require family membership.
 #'
-#' Grouped response-scale draws currently support scalar fitted means, including
-#' families with a scalar prediction transform such as [mgcv::ziP()]. They do
-#' not support [mgcv::ocat()] category-probability output; use the link scale
-#' for grouped ordinal models. Distributional nuisance parameters are held at
+#' Grouped parameter output includes the latent location for ordinal components.
+#' Grouped expectations include scalar fitted means and ordinal category
+#' probabilities, with `.category` identifying the ordinal category and `NA`
+#' for scalar components. Distributional nuisance parameters are held at
 #' their fitted values. This does not add support for general/location-scale
 #' families that `gfam()` itself rejects, nor repair upstream fitting failures
 #' (including fixed-theta negative-binomial components and some `ziP()` fits
@@ -703,9 +726,8 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
 #' @return A tibble (data frame) in long format, with columns:
 #' * `.row`: row of the evaluation data;
 #' * `.draw`: globally unique draw identifier;
-#' * `.parameter`: `"location"` for scalar fitted values, or a response/category
-#'   label for multivariate or multinomial models;
-#' * `.fitted`: expected response or linear predictor, as selected by `scale`.
+#' * `.parameter`: the distribution parameter name, or `"expectation"`;
+#' * `.fitted`: the parameter, predictor or expected response requested.
 #' Multiple-chain output also includes `.chain` and `.iteration`. Attached
 #' coefficient diagnostics are available through [sampling_diagnostics()].
 #'
@@ -808,7 +830,8 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
   block_size = 10000L,
   dense_limit = 5e6,
   scale = c("response", "linear_predictor"),
-  family_index = NULL
+  family_index = NULL,
+  quantity = c("parameters", "expectation")
 ) {
   sampling_check_names(substitute(list(...)), derivative = FALSE)
   sampling_check_extra(substitute(list(...)), prediction = TRUE)
@@ -852,6 +875,7 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
     draws = draws,
     mvn_method = mvn_method,
     family_index = family_index,
+    quantity = quantity,
     ...
   )
 }
@@ -880,7 +904,8 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
   mvn_method = c("mvnfast", "mgcv"),
   block_size = 10000L,
   dense_limit = 5e6,
-  scale = c("response", "linear_predictor")
+  scale = c("response", "linear_predictor"),
+  quantity = c("parameters", "expectation")
 ) {
   sampling_check_names(substitute(list(...)), derivative = FALSE)
   sampling_check_extra(substitute(list(...)), prediction = TRUE)
@@ -924,6 +949,7 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
     unconditional = unconditional,
     draws = draws,
     mvn_method = mvn_method,
+    quantity = quantity,
     ...
   )
 }
@@ -947,6 +973,7 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
   mvn_method = c("mvnfast", "mgcv"),
   envir = NULL,
   family_index = NULL,
+  quantity = c("parameters", "expectation"),
   chains = 1L,
   diagnostics = FALSE,
   mh_backend = c("mgcv", "gratia", "family"),
@@ -968,7 +995,9 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
     on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
   }
 
-  scale <- match.arg(scale)
+  choice <- prediction_choice(quantity[1L], scale[1L])
+  quantity <- choice$quantity
+  scale <- if (choice$scale == "link") "linear_predictor" else "response"
   fn <- family_type(model)
   gen_fam <- inherits(family(model), "general.family")
   if (gen_fam && scale == "response" &&
@@ -984,7 +1013,8 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
       call. = FALSE
     )
   }
-  context <- if (grouped && identical(scale, "response")) {
+  context <- if (grouped && (identical(scale, "response") || training ||
+      !is.null(family_index) || !is.null(gfam_data_index(model, data)))) {
     gfam_prediction_context(
       model,
       data,
@@ -1035,119 +1065,27 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
     )
   )
   sampling <- attr(betas, "sampling")
-  if (is_lss_family(stats::family(model))) {
+  if (!grouped) {
     context <- lss_prediction_context(model, layout = layout, ...)
-    values <- lss_fitted_values(context, betas, scale)
-    sims <- tibble::tibble(
-      .row = rep(seq_len(NROW(values)), NROW(betas)),
-      .draw = rep(seq_len(NROW(betas)), each = NROW(values)),
-      .parameter = "location", .fitted = as.numeric(values))
-    sims <- restore_prediction_table(sims, layout)
+    sims <- distribution_fitted_draws(context, betas, quantity, choice$scale)
     attr(sims, "seed") <- RNGstate
     class(sims) <- c("fitted_samples", class(sims))
     return(attach_sampling(sims, sampling, draw_index = TRUE))
   }
-  ## betas is for *all* coefs, including distributional parameters
-  lss_idx <- lss_eta_index(model)
-  if (gen_fam) {
-    # some general families should allow all linear predictors;
-    # e.g., mvn(), multinom()
-    if (fn %in% c("multivariate_normal", "multinom")) {
-      lss_loc <- lss_idx # for mvn we want to loop over all the linpreds
-    } else if (scale == "linear_predictor") {
-      lss_loc <- lss_idx[[1L]]
-      lss_idx <- lss_idx[1L]
-    } else {
-      if (family_type(model) == "cox_ph") {
-        stop("Cox survival predictions require evaluation times and strata; ",
-          "a location parameter alone does not define an expected response.",
-          call. = FALSE)
-      }
-      stop("The expected response is not implemented for family <", family_name(model),
-        ">; a family-specific expectation adapter is required.", call. = FALSE)
-    }
-  } else {
-    lss_loc <- lss_idx[[1L]]
-    lss_idx <- lss_idx[1L] # keep as a list
-  }
-  # function to control predictions
-  pred_fun <- function(Xp, betas, lss_loc, scale, lp = 1L) {
-    sims <- Xp[, lss_loc, drop = FALSE] %*% t(betas[, lss_loc, drop = FALSE])
-    # handle the offset if present; it is an attribute on the Xp matrix
-    # it is a list - with 1 component if a normal model and `l` components if it
-    # is a model with `l` linear predictors.
-    m_offset <- attr(Xp, "model.offset")
-    if (is.list(m_offset)) {
-      m_offset <- m_offset[[lp]]
-    }
-    if (!is.null(m_offset)) {
-      sims <- sims + m_offset
-    }
-    # handle transformation to response scale
-    if (identical(scale, "response") && fn != "multinom") {
-      if (grouped) {
-        sims <- gfam_response_means(sims, context)
-      } else {
-        ilink <- inv_link(model, parameter = "location")
-        sims <- ilink(sims)
-      }
-    }
-    colnames(sims) <- paste0(".V", seq_len(NCOL(sims)))
-    sims <- as_tibble(sims)
-    names(sims) <- as.character(seq_len(ncol(sims)))
-    sims
-  }
-  ## don't need to pass freq, unconditional here as that is done for V
-  Xp <- if (grouped) {
-    gfam_predict_eta(model, data, type = "lpmatrix", ...)
-  } else {
-    predict_model(model, newdata = data, type = "lpmatrix", ...)
-  }
-  attr(Xp, "model.offset") <- prediction_offsets(model, Xp)
+  Xp <- gfam_predict_eta(model, data, type = "lpmatrix", ...)
+  offset <- prediction_offsets(model, Xp)[[1L]]
   if (training) {
-    # Native fitting predictions retain offsets supplied as fitting arguments.
-    # Apply the same term exclusions to the native predictor and design matrix.
-    eta <- matrix(
-      predict_model(model, type = "link", ...) +
-        fitting_link_correction(model),
-      nrow = NROW(Xp)
-    )
-    indices <- attr(Xp, "lpi") %||% lss_eta_index(model)
-    attr(Xp, "model.offset") <- lapply(seq_along(indices), function(i) {
-      j <- indices[[i]]
-      eta[, i] - drop(Xp[, j, drop = FALSE] %*% stats::coef(model)[j])
-    })
+    eta <- predict_model(model, type = "link", ...) + fitting_link_correction(model)
+    offset <- as.numeric(eta) - drop(Xp %*% stats::coef(model))
   }
-  ## predict step; for mvn() and multinom() models, we do want to loop over
-  ##   the linear predictors
-  n_eta <- length(lss_idx) # number of linear predictors to work with
-  if (n_eta > 1L || fn == "multinom") {
-    # this is where we need to handle non-standard predictions
-    n_data <- NROW(data)
-    n_lp <- n_eta(model)
-    sims <- lapply(
-      seq_len(n_eta),
-      FUN = \(i, Xp, betas, lss_loc, scale) {
-        pred_fun(Xp, betas, lss_loc[[i]], scale, lp = i)
-      },
-      Xp = Xp,
-      betas = betas,
-      lss_loc = lss_loc,
-      scale = scale
-    )
-    sims <- switch(
-      fn,
-      multivariate_normal = yhat_mvn(sims, n_data, n_lp),
-      multinom = yhat_multinom(sims, n_data, n_lp, fam = family(model),
-        scale = scale)
-    )
-  } else {
-    sims <- pred_fun(Xp, betas, lss_loc, scale) |>
-      add_column(
-        .row = seq_len(nrow(data)),
-        .parameter = rep("location", nrow(data))
-      )
-  }
+  values <- Xp %*% t(betas) + offset
+  category_expectations <- quantity == "expectation" && gfam_category_expectations(context)
+  if (scale == "response" && !category_expectations)
+    values <- gfam_response_means(values, context, quantity)
+  sims <- tibble::as_tibble(values, .name_repair = "minimal")
+  names(sims) <- as.character(seq_len(ncol(sims)))
+  sims$.row <- seq_len(nrow(data))
+  sims$.parameter <- rep("predictor1", nrow(data))
   sims <- sims |>
     pivot_longer(
       cols = !any_of(c(".row", ".parameter")),
@@ -1158,64 +1096,22 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
     ) |>
     relocate(c(".row", ".draw", ".parameter"), .before = 1L)
   sims <- restore_prediction_table(sims, layout)
+  spec <- distribution_spec(model)
+  sims$.parameter <- if (quantity == "expectation") "expectation" else "predictor1"
+  if (!is.null(context)) {
+    index <- context$family_index[sims$.row]
+    sims$.family <- index
+    if (category_expectations) sims <- gfam_expectation_table(sims, context)
+    if (quantity == "parameters") {
+      labels <- vapply(spec$components, function(s) s$parameters$parameter[1L], character(1L))
+      sims$.parameter <- labels[index]
+    }
+  }
+  sims <- attach_prediction_spec(sims, spec, quantity, choice$scale)
   attr(sims, "seed") <- RNGstate
   ## add classes
   class(sims) <- c("fitted_samples", class(sims))
   attach_sampling(sims, sampling, draw_index = TRUE)
-}
-
-`yhat_mvn` <- function(sims, n_data, n_eta) {
-  sims <- sims |>
-    bind_rows() |>
-    add_column(
-      .row = rep(seq_len(n_data), times = n_eta),
-      .parameter = paste0(
-        "response",
-        rep(seq_len(n_eta), each = n_data)
-      )
-    )
-  sims
-}
-
-`yhat_multinom` <- function(sims, n_data, n_eta, fam, scale) {
-  n_y <- n_eta + 1
-  sims <- sims |>
-    bind_rows()
-  n_sim <- NCOL(sims)
-  out <- lapply(
-    sims,
-    FUN = \(x, n_data, n_eta, fam, scale) {
-      eta <- matrix(x, ncol = n_eta, nrow = n_data)
-      r <- if (scale == "response") {
-        fam$predict(fam, eta = eta)[[1L]]
-      } else {
-        cbind(0, eta)
-      }
-      r |>
-        data.frame() |>
-        setNames(nm = paste0("response", seq_len(n_y))) |>
-        as_tibble()
-    },
-    n_data = n_data, n_eta = n_eta, fam = fam, scale = scale
-  ) |>
-    bind_rows() |>
-    add_column(
-      .row = rep(seq_len(n_data), times = n_sim),
-      .draw = rep(seq_len(n_sim), each = n_data),
-      .before = 1L
-    ) |>
-    pivot_longer(
-      cols = -c(".row", ".draw"),
-      cols_vary = "slowest",
-      names_to = ".parameter",
-      values_to = ".fitted"
-    ) |>
-    pivot_wider(
-      id_cols = c(".row", ".parameter"),
-      names_from = ".draw",
-      values_from = ".fitted"
-    )
-  out
 }
 
 #' Draw new response values from the conditional distribution of the response
@@ -2261,6 +2157,7 @@ calculate_smooth_samples <- function(sm, data, model, betas, label, Xp = NULL) {
       draws = draws,
       mvn_method = mvn_method,
       scale = scale,
+      quantity = if (scale == "response") "expectation" else "parameters",
       chains = chains,
       diagnostics = diagnostics,
       mh_backend = mh_backend,
@@ -2271,6 +2168,10 @@ calculate_smooth_samples <- function(sm, data, model, betas, label, Xp = NULL) {
   )
 
   sampling <- attr(fs, "sampling")
+  if (scale != "response" && is_lss_family(stats::family(object))) {
+    first <- family_parameters(object)$parameter[1L]
+    fs <- fs[fs$.parameter == first, , drop = FALSE]
+  }
   fs <- fs |>
     left_join(
       select(fd_data, all_of(c(".row", "..type", "..orig"))),

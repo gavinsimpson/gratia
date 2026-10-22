@@ -261,6 +261,7 @@ conditional_differences.gam <- function(model, by, condition = NULL, data = NULL
     # sample independently per group or treat these as posterior observations.
     simulate <- function() sampling_call(fitted_samples, list(model, n_draws = if (method == "user") NULL else n_sim, data = pd, seed = seed,
       scale = if (response && !simultaneous) "response" else "linear_predictor",
+      quantity = if (response && !simultaneous) "expectation" else "parameters",
       method = method, n_threads = n_cores, n_cores = n_cores, draws = draws,
       unconditional = unconditional, mvn_method = mvn_method,
       burnin = burnin, thin = thin, t_df = t_df, rw_scale = rw_scale, ...))

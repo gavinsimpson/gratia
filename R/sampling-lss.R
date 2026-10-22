@@ -24,7 +24,7 @@ lss_prediction_context <- function(model, data = NULL, layout = NULL, ...) {
   family <- stats::family(model)
   if (family_type(family) == "gumbls") attr(family, "gratia.gumbel_mean") <-
     native_mgcv_hook(family$predict, mgcv::gumbls()$predict)
-  list(model = model, family = family, X = X, index = idx,
+  list(model = model, family = family, spec = distribution_spec(model), X = X, index = idx,
     offsets = do.call(cbind, offsets), layout = layout)
 }
 
@@ -33,29 +33,6 @@ lss_predictors <- function(context, beta) {
     drop(context$X[, j, drop = FALSE] %*% beta[j])
   })
   do.call(cbind, eta) + context$offsets
-}
-
-lss_fitted_values <- function(context, betas, scale) {
-  n <- NROW(context$X)
-  values <- matrix(NA_real_, n, NROW(betas))
-  if (all(is.na(context$layout$map))) return(values)
-  # Bound temporary parameter matrices while using compiled matrix products.
-  batch <- max(1L, floor(1e5 / n))
-  starts <- seq.int(1L, NROW(betas), by = batch)
-  for (start in starts) {
-    rows <- seq.int(start, min(start + batch - 1L, NROW(betas)))
-    predictors <- if (scale == "linear_predictor") 1L else seq_along(context$index)
-    eta <- lapply(predictors, function(i) {
-      j <- context$index[[i]]
-      sims <- context$X[, j, drop = FALSE] %*% t(betas[rows, j, drop = FALSE])
-      as.numeric(sims + context$offsets[, i])
-    })
-    values[, rows] <- if (scale == "linear_predictor") eta[[1L]] else {
-      mu <- family_prediction_parameters(context$family, do.call(cbind, eta))
-      lss_expectation(context$family, mu)
-    }
-  }
-  values
 }
 
 lss_expectation <- function(family, mu) {
@@ -114,7 +91,7 @@ lss_response_generator <- function(context, betas, weights = NULL) {
     eta <- do.call(cbind, lapply(seq_along(design), function(k) {
       drop(design[[k]] %*% betas[i, context$index[[k]]])
     })) + context$offsets
-    mu <- family_prediction_parameters(context$family, eta)
+    mu <- context$spec$to_native(eta = eta)
     as.numeric(rd(mu = mu, wt = wt, scale = dispersion))
   }
 }

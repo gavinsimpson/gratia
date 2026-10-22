@@ -203,8 +203,9 @@ test_that("grouped matrix responses and ordinal components work at new data", {
   expect_true(all(actual$.response[rows] %in% 1:4))
   expect_true(all(actual$.response[!rows] >= 0 &
     actual$.response[!rows] == floor(actual$.response[!rows])))
-  expect_error(fitted_samples(gfam_ordinal_model, data = data,
-    method = "user", draws = draws), "Grouped ordinal")
+  expectations <- fitted_samples(gfam_ordinal_model, data = data,
+    method = "user", draws = draws, quantity = "expectation")
+  expect_true(all(is.na(expectations$.category[expectations$.family == 2L])))
   expect_error(derivative_samples(gfam_model, data = gfam_data[1:4, ], focal = "x",
     n_draws = 2, family_index = 1:4), "family_index.*not supported")
 })

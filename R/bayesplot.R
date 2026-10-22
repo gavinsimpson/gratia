@@ -364,11 +364,12 @@ bayesplot_distribution_mean <- function(distribution) {
 # LOO weights and response draws must use the same drawn precision matrix.
 bayesplot_mvn_samples <- function(prep, n) {
   d <- n_eta(prep$model)
-  fits <- fitted_samples(prep$model, method = "user", draws = prep$betas)
+  fits <- fitted_samples(prep$model, method = "user", draws = prep$betas,
+    quantity = "expectation")
   ids <- attr(prep$betas, "sampling")$draw_ids$.draw %||% seq_len(n)
   out <- dplyr::bind_rows(lapply(seq_len(n), function(i) {
     mu <- vapply(paste0("response", seq_len(d)), function(parameter)
-      fits$.fitted[fits$.draw == ids[i] & fits$.parameter == parameter],
+      fits$.fitted[fits$.draw == ids[i] & fits$.y == parameter],
       numeric(length(prep$rows)))
     R <- posterior_likelihood_mvn_R(prep$betas[i, ], d)
     values <- matrix(stats::rnorm(length(mu)), nrow = nrow(mu)) %*%

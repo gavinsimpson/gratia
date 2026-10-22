@@ -272,7 +272,7 @@ test_that("multivariate LOO response draws retain drawn covariance parameters", 
   fits <- fitted_samples(prep$model, n_draws = 2, method = "user", draws = prep$betas)
   expected <- withr::with_seed(100, lapply(1:2, function(i) {
     mu <- vapply(paste0("response", seq_len(d)), function(parameter)
-      fits$.fitted[fits$.draw == i & fits$.parameter == parameter],
+      fits$.fitted[fits$.draw == i & fits$.y == parameter],
       numeric(length(prep$rows)))
     R <- posterior_likelihood_mvn_R(prep$betas[i, ], d)
     matrix(stats::rnorm(length(mu)), nrow = nrow(mu)) %*% t(solve(R)) + mu

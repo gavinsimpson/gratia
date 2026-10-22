@@ -18,23 +18,6 @@ lss_parameters <- function(object) {
   par_names
 }
 
-#' A list of transformation functions named for LSS parameters in a GAMLSS
-#'
-#' @keywords internal
-post_link_funs <- function(
-    location = identity_fun,
-    scale = identity_fun,
-    shape = identity_fun,
-    skewness = identity_fun,
-    kurtosis = identity_fun,
-    power = identity_fun,
-    pi = identity_fun) {
-  list(
-    location = location, scale = scale, shape = shape, skewness = skewness,
-    kurtosis = kurtosis, power = power, pi = pi
-  )
-}
-
 #' @importFrom purrr map
 lss_links <- function(object, inverse = FALSE, which_eta = NULL) {
   params <- lss_parameters(object)

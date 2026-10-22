@@ -273,3 +273,62 @@ Censored-family generators return latent uncensored responses; posterior
 predictive checks need a censoring observation process. Cox survival models
 lack a response generator for this interface, and expected survival times
 cannot be obtained from a location parameter alone.
+
+## Distribution parameters and expected responses
+
+`fitted_values()` and `fitted_samples()` now default to
+`quantity = "parameters"`. They return each parameter represented by a
+predictor, including an intercept-only predictor, with its natural meaning.
+Use `family_parameters(model)` to inspect the names, definitions, predictor
+order and native representation. Global parameters appear in that description
+but remain fixed during coefficient sampling.
+
+Use `quantity = "expectation"` to request the expected response. Expectations
+are available only on the response scale. Use `scale = "link"` with parameter
+output for the model predictors. Gaussian LSS returns `mean` and `sd`;
+GEV returns `location`, `scale` and `shape`. GEV location is generally not
+its expectation. Zero-inflated Poisson returns `rate` and
+`presence_probability`; its expectation includes the zero-truncation adjustment.
+
+```r
+family_parameters(model)
+fitted_samples(model, n_draws = 100, quantity = "parameters")
+fitted_samples(model, n_draws = 100, quantity = "expectation")
+fitted_values(model, quantity = "expectation")
+```
+
+For categorical models, expectation output contains category probabilities.
+Categories and multivariate responses use `.category` and `.y`, separately
+from `.parameter`. Expected responses use `.parameter = "expectation"`.
+`posterior_samples()` draws new observations after drawing coefficients;
+`predicted_samples()` draws observations with fitted coefficients held fixed.
+Neither is a substitute for draws of an expectation.
+
+### Location, rate and expectation
+
+The following models illustrate why the quantity must be explicit:
+
+```r
+library("mgcv")
+set.seed(426)
+d <- data.frame(x = runif(200), y = rnorm(200))
+gev_fit <- gam(list(y ~ x, ~1, ~1), data = d, family = gevlss())
+family_parameters(gev_fit)
+fitted_values(gev_fit) # location, scale and shape
+fitted_values(gev_fit, quantity = "expectation")
+
+d$y <- rpois(200, exp(1 + d$x))
+zip_fit <- gam(list(y ~ x, ~1), data = d, family = ziplss())
+fitted_samples(zip_fit, n_draws = 5) # rate and presence probability
+fitted_samples(zip_fit, n_draws = 5, quantity = "expectation")
+
+tw_fit <- gam(list(y ~ x, ~1, ~1), data = d, family = twlss())
+fitted_values(tw_fit) # mean, power and dispersion
+fitted_values(tw_fit, quantity = "expectation") # equals the mean parameter
+```
+
+For `ziplss()`, writing rate as lambda and presence probability as p,
+the expectation is `p * lambda / (1 - exp(-lambda))`. The denominator
+accounts for the zero-truncated Poisson distribution of positive counts.
+GEV location generally differs from its expectation. Tweedie's mean parameter
+is already its expectation, but its power and dispersion are separate parameters.

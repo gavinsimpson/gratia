@@ -35,10 +35,17 @@
   Explicit controls that do not apply to the selected sampler are rejected.
   See `vignette("sampling-migration")`.
 
-* `fitted_samples()` rejects response-scale requests for general families
-  without an expected-response adapter. Use `scale = "linear_predictor"`
-  for the first predictor. Supported LSS families use their full expected
-  response instead of treating location as the mean.
+* **Breaking change:** `fitted_samples()` now defaults to all distribution
+  parameters represented by predictors, matching `fitted_values()`. Request
+  `quantity = "expectation"` for the expected response, on the response scale
+  only. Both functions use explicit parameter names, including for scalar
+  models. Gaussian LSS returns standard deviation rather than reciprocal
+  standard deviation; GEV location is labelled separately from expectation.
+  Multivariate responses and categories have separate `.y` and `.category`
+  identifiers. Global family parameters remain fixed during coefficient
+  sampling. Unknown general families require a natural-parameter or
+  expectation specification; their first predictor remains available on
+  the link scale (#426).
 
 * Gaussian coefficient sampling for `mgcv::scasm()` fits with linear inequality
   constraints now warns that the draws need not satisfy the fitted shapes.
@@ -111,6 +118,16 @@
   the development version of glmmTMB is no longer needed.
 
 ## New features
+
+* `fitted_values()` and `fitted_samples()` accept `quantity` to select
+  distribution parameters or expected responses. Parameter draws retain
+  their joint coefficient uncertainty; coupled expectation intervals use
+  the full covariance. `family_parameters()` describes natural parameters,
+  native representations, predictor order and fixed global parameters.
+  These shared descriptions also provide parameters for posterior response
+  simulation, including when an expectation does not exist. Grouped ordinal
+  expectations return category probabilities alongside scalar component means
+  (#426).
 
 * `assemble()` now supports models fitted by `mgcv::gamm()`, returning named
   plots of smooth and parametric contributions. It shares preparation of the
@@ -673,6 +690,9 @@
   recognised family name.
 
 ## Bug fixes
+
+* Gumbel LSS fitted location estimates are no longer exponentiated. Natural
+  location is computed separately from the scale-dependent expectation.
 
 * `partial_residuals()` and `add_partial_residuals()` now give an informative
   error for models without working residuals or working weights, including

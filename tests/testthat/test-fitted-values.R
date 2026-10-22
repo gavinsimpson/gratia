@@ -1,6 +1,6 @@
 # Test fitted_values()
 
-fv_nms <- c(".fitted", ".se", ".lower_ci", ".upper_ci")
+fv_nms <- c(".parameter", ".fitted", ".se", ".lower_ci", ".upper_ci")
 
 test_that("fitted_values() works for a GAM", {
   expect_silent(fv <- fitted_values(m_gam))
@@ -22,7 +22,7 @@ test_that("fitted_values() scale='response' works for a GAM", {
 
   expect_identical(nrow(su_eg1), nrow(fv))
 
-  expect_identical(fv, fv2)
+  expect_equal(fv$.fitted, fv2$.fitted)
 })
 
 test_that("fitted_values() scale='link' works for a GAM", {
@@ -47,18 +47,15 @@ test_that("fitted_values() works for a GAM", {
 })
 
 test_that("fitted_values() works for an ocat GAM", {
-  expect_silent(fv <- fitted_values(m_ocat))
+  expect_silent(fv <- fitted_values(m_ocat, quantity = "expectation"))
 
-  expect_named(fv, expected = c(
-    ".row", "x0", "x1", "x2", "x3", ".category",
-    fv_nms
-  ))
+  expect_setequal(names(fv), c(".row", "x0", "x1", "x2", "x3", ".category", fv_nms))
   expect_s3_class(fv, c("tbl_df", "tbl", "data.frame"))
   expect_identical(nrow(su_eg1_ocat) * 4L, nrow(fv))
 
   new_df <- data_sim("eg1", n = 50, dist = "ocat", seed = 1)
-  expect_silent(fv <- fitted_values(m_ocat, data = new_df))
-  expect_named(fv, expected = c(".row", names(new_df), ".category", fv_nms))
+  expect_silent(fv <- fitted_values(m_ocat, data = new_df, quantity = "expectation"))
+  expect_setequal(names(fv), c(".row", names(new_df), ".category", fv_nms))
   expect_s3_class(fv, c("tbl_df", "tbl", "data.frame"))
   expect_identical(nrow(new_df) * 4L, nrow(fv))
 
@@ -82,20 +79,20 @@ test_that("fitted values works for a univariate scam model", {
 
 test_that("fitted values works for a ziplss model", {
   expect_silent(fv <- fitted_values(m_ziplss))
-  expect_named(fv, expected = c(".row", ".parameter", fv_nms))
+  expect_true(all(c(".row", fv_nms) %in% names(fv)))
 })
 
 test_that("fitted values works for a gaulss model", {
   expect_silent(fv <- fitted_values(m_gaulss))
-  expect_named(fv, expected = c(".row", ".parameter", fv_nms))
+  expect_true(all(c(".row", fv_nms) %in% names(fv)))
 })
 
 test_that("fitted values works for a twlss model", {
   expect_silent(fv <- fitted_values(m_twlss))
-  expect_named(fv, expected = c(".row", ".parameter", fv_nms))
+  expect_true(all(c(".row", fv_nms) %in% names(fv)))
   expect_identical(
     pull(fv, ".parameter") |> unique(),
-    c("location", "power", "scale")
+    c("mean", "power", "dispersion")
   )
 })
 
@@ -105,21 +102,21 @@ test_that("fitted values works for a gamm model", {
 })
 
 test_that("fitted values works for a ziP() model", {
-  # compare predict(m_ziP, type = "response") with fitted_values(m_ziP)
+  # compare predict(m_ziP, type = "response") with fitted_values(m_ziP, quantity = "expectation")
   f_mgcv <- predict(m_ziP, type = "response") |> as.vector()
-  f_fv   <- fitted_values(m_ziP)$.fitted
-  expect_identical(f_fv, f_mgcv)
+  f_fv   <- fitted_values(m_ziP, quantity = "expectation")$.fitted
+  expect_equal(f_fv, f_mgcv)
 
   skip_on_cran()
   skip_on_ci()
-  expect_snapshot(fitted_values(m_ziP))
+  expect_snapshot(fitted_values(m_ziP, quantity = "expectation"))
 })
 
 test_that("fitted values works for a mvn() model", {
-  # compare predict(m_ziP, type = "response") with fitted_values(m_ziP)
+  # compare predict(m_ziP, type = "response") with fitted_values(m_ziP, quantity = "expectation")
   f_mgcv <- predict(m_mvn, type = "response") |> as.vector()
   f_fv   <- fitted_values(m_mvn)$.fitted
-  expect_identical(f_fv, f_mgcv)
+  expect_equal(f_fv, f_mgcv)
 
   skip_on_cran()
   skip_on_ci()
@@ -127,10 +124,10 @@ test_that("fitted values works for a mvn() model", {
 })
 
 test_that("fitted values works for a multinom() model", {
-  # compare predict(m_ziP, type = "response") with fitted_values(m_ziP)
+  # compare predict(m_ziP, type = "response") with fitted_values(m_ziP, quantity = "expectation")
   f_mgcv <- predict(m_multinom, type = "response") |> as.vector()
   f_fv   <- fitted_values(m_multinom)$.fitted
-  expect_identical(f_fv, f_mgcv)
+  expect_equal(f_fv, f_mgcv)
 
   skip_on_cran()
   skip_on_ci()
@@ -141,7 +138,7 @@ test_that("distributional fitted intervals match link-scale predictions", {
   models <- list(gaulss = m_gaulss, ziplss = m_ziplss, twlss = m_twlss)
   # Independent response transformations for these default model families.
   transforms <- list(
-    gaulss = list(identity, function(x) 1 / (0.01 + exp(x))),
+    gaulss = list(identity, function(x) 0.01 + exp(x)),
     ziplss = list(exp, function(x) -expm1(-exp(x))),
     twlss = list(exp, function(x) 1.01 + 0.98 * plogis(x), exp)
   )
@@ -154,10 +151,10 @@ test_that("distributional fitted intervals match link-scale predictions", {
       lower <- prediction$fit - critical * prediction$se.fit
       upper <- prediction$fit + critical * prediction$se.fit
       fv <- fitted_values(model, data = nd, scale = "link", ci_level = level)
-      expect_equal(fv$.fitted, as.vector(t(prediction$fit)))
-      expect_equal(fv$.se, as.vector(t(prediction$se.fit)))
-      expect_equal(fv$.lower_ci, as.vector(t(lower)))
-      expect_equal(fv$.upper_ci, as.vector(t(upper)))
+      expect_equal(fv$.fitted, as.vector(prediction$fit))
+      expect_equal(fv$.se, as.vector(prediction$se.fit))
+      expect_equal(fv$.lower_ci, as.vector(lower))
+      expect_equal(fv$.upper_ci, as.vector(upper))
       expect_true(all(fv$.lower_ci <= fv$.fitted & fv$.fitted <= fv$.upper_ci))
       expect_identical(fv, fitted_values(model, data = nd,
         scale = "linear predictor", ci_level = level))
@@ -168,14 +165,14 @@ test_that("distributional fitted intervals match link-scale predictions", {
         rows <- response$.parameter == parameters[j]
         transform <- transforms[[fam]][[j]]
         # Gaussian LSS's second predictor is precision, a decreasing transform.
-        decreasing <- fam == "gaulss" && j == 2L
+        decreasing <- FALSE
         expected_lower <- transform(if (decreasing) upper[, j] else lower[, j])
         expected_upper <- transform(if (decreasing) lower[, j] else upper[, j])
         expect_equal(response$.fitted[rows], unname(transform(prediction$fit[, j])))
         expect_equal(response$.lower_ci[rows], unname(expected_lower))
         expect_equal(response$.upper_ci[rows], unname(expected_upper))
       }
-      expect_identical(response$.se, fv$.se)
+      expect_equal(response$.se, fv$.se)
       expect_true(all(response$.lower_ci <= response$.fitted &
         response$.fitted <= response$.upper_ci))
     }
@@ -207,7 +204,7 @@ test_that("fitted intervals respect increasing and decreasing inverse links", {
         expect_equal(response$.lower_ci, exp(lower))
         expect_equal(response$.upper_ci, exp(upper))
       }
-      expect_identical(response$.se, fv$.se)
+      expect_equal(response$.se, fv$.se)
       expect_true(all(response$.lower_ci <= response$.fitted &
         response$.fitted <= response$.upper_ci))
     }

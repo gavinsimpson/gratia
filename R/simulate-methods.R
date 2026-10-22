@@ -181,8 +181,7 @@
 
   if (is_lss_family(stats::family(object))) {
     context <- lss_prediction_context(object, layout = layout, ...)
-    mu <- family_prediction_parameters(context$family,
-      lss_predictors(context, stats::coef(object)))
+    mu <- context$spec$to_native(eta = lss_predictors(context, stats::coef(object)))
   }
 
   if (training && !is.null(object$AR1.rho) && object$AR1.rho != 0) {

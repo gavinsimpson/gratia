@@ -28,7 +28,7 @@ test_that("fitted simultaneous intervals cover arbitrary factor combinations", {
       expect_equal(fv$.se, reference$se)
       expect_equal(fv$.lower_ci, unname(reference$lower))
       expect_equal(fv$.upper_ci, unname(reference$upper))
-      expect_named(fv, c(".row", names(nd), ".fitted", ".se", ".lower_ci", ".upper_ci"))
+      expect_named(fv, c(".row", names(nd), ".parameter", ".fitted", ".se", ".lower_ci", ".upper_ci"))
     }
   }
   default <- fitted_values(model, data = nd)

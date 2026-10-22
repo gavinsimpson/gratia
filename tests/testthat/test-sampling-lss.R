@@ -1,84 +1,3 @@
-# All reference calculations below use the distribution definitions, separately
-# from the parameter adapter used by the sampling functions.
-lss_test_models <- local({
-  cache <- new.env(parent = emptyenv())
-  function(name = "gaulss") {
-    if (exists(name, cache, inherits = FALSE)) return(cache[[name]])
-    m <- withr::with_seed(281, {
-      n <- 400L
-      d <- data.frame(x = runif(n), o1 = runif(n, -.1, .1),
-        o2 = runif(n, -.1, .1), o3 = runif(n, -.05, .05),
-        o4 = runif(n, -.05, .05), w = rep(c(1, 2), n / 2))
-      mu <- .4 + .3 * d$x + d$o1
-      d$y <- switch(name,
-        gaulss = rnorm(n, mu, .8),
-        gammals = rgamma(n, 4, scale = exp(mu) / 4),
-        gumbls = mu - .7 * log(-log(runif(n))),
-        gevlss = mu + .7 * ((-log(runif(n)))^(-.1) - 1) / .1,
-        shash = mu + 1.2 * .7 * sinh((asinh(rnorm(n)) + .4) / 1.2),
-        twlss = mgcv::rTweedie(exp(mu), p = 1.5, phi = .6),
-        ziplss = {
-          u <- runif(n)
-          lambda <- exp(mu)
-          ifelse(runif(n) < .7, qpois(exp(-lambda) + u * (-expm1(-lambda)), lambda), 0)
-        })
-      family <- get(name, asNamespace("mgcv"))()
-      formulas <- list(y ~ x + offset(o1), ~x + offset(o2),
-        ~x + offset(o3), ~x + offset(o4))[seq_len(family$nlp)]
-      if (name == "shash") {
-        formulas <- list(y ~ x, ~x, ~x, ~x)
-        d[c("o1", "o2", "o3", "o4")] <- 0
-      }
-      # mgcv can try points outside GEV support during optimisation.
-      fit <- withCallingHandlers(
-        mgcv::gam(formulas, data = d, weights = w, family = family, method = "REML"),
-        warning = function(w) {
-          if (name == "gevlss" && conditionMessage(w) == "NaNs produced")
-            invokeRestart("muffleWarning")
-        })
-      attr(fit, "lss_test_data") <- d
-      fit
-    })
-    cache[[name]] <- m
-    m
-  }
-})
-
-lss_test_beta <- function(name) {
-  switch(name,
-    gaulss = c(.4, .3, -.4, .2),
-    gammals = c(.4, .3, -1, .2),
-    gumbls = c(.4, .3, -1, .2),
-    gevlss = c(.4, .3, -1, .2, -.5, .1),
-    shash = c(.4, .3, -1, .2, .4, .1, .1, .1),
-    twlss = c(.4, .3, .1, .2, -.4, .1),
-    ziplss = c(.4, .3, -.1, .2))
-}
-
-lss_test_eta <- function(beta, d) {
-  do.call(cbind, lapply(seq_len(length(beta) / 2), function(j) {
-    beta[2 * j - 1] + beta[2 * j] * d$x + d[[paste0("o", j)]]
-  }))
-}
-
-lss_test_mean <- function(name, eta) {
-  switch(name,
-    gaulss = eta[, 1], gammals = exp(eta[, 1]), twlss = exp(eta[, 1]),
-    gumbls = eta[, 1] - digamma(1) * (exp(eta[, 2]) + exp(-7)),
-    gevlss = {
-      xi <- -1 + 1.5 * plogis(eta[, 3])
-      eta[, 1] + exp(eta[, 2]) * (gamma(1 - xi) - 1) / xi
-    },
-    shash = vapply(seq_len(nrow(eta)), function(i) {
-      sigma <- exp(eta[i, 2]) + .01
-      delta <- exp(eta[i, 4])
-      integrate(function(z) (eta[i, 1] + delta * sigma *
-          sinh((asinh(z) + eta[i, 3]) / delta)) * dnorm(z), -10, 10,
-        rel.tol = 1e-10)$value
-    }, numeric(1)),
-    ziplss = (-expm1(-exp(eta[, 2]))) * exp(eta[, 1]) / (-expm1(-exp(eta[, 1]))))
-}
-
 test_that("every installed LSS family predicts its expectation from joint draws", {
   for (name in c("gaulss", "gammals", "gumbls", "gevlss", "shash", "twlss", "ziplss")) {
     m <- lss_test_models(name)
@@ -89,11 +8,11 @@ test_that("every installed LSS family predicts its expectation from joint draws"
     beta <- lss_test_beta(name)
     b <- rbind(beta, beta + .01)
     for (data in list(d, nd)) {
-      expect_silent(f <- fitted_samples(m, data = data, method = "user", draws = b))
+      expect_silent(f <- fitted_samples(m, quantity = "expectation", data = data, method = "user", draws = b))
       expected <- unlist(lapply(1:2, function(i) lss_test_mean(name, lss_test_eta(b[i, ], data))))
       expect_equal(f$.fitted, expected, tolerance = 1e-8, info = name)
       link <- fitted_samples(m, data = data, method = "user", draws = b, scale = "linear_predictor")
-      expect_equal(link$.fitted, unlist(lapply(1:2, function(i) lss_test_eta(b[i, ], data)[, 1])), info = name)
+      expect_equal(link$.fitted[link$.parameter == family_parameters(m)$parameter[1L]], unlist(lapply(1:2, function(i) lss_test_eta(b[i, ], data)[, 1])), info = name)
       expect_silent(p <- posterior_samples(m, data = data, method = "user", draws = b, seed = 281))
       expect_true(all(is.finite(p$.response)), info = name)
       expect_identical(p$.row, rep(1:3, 2))
@@ -101,7 +20,7 @@ test_that("every installed LSS family predicts its expectation from joint draws"
       expect_identical(p, posterior_samples(m, data = data, method = "user", draws = b, seed = 281))
     }
     # Fitting observations retain their full offsets and prior weights.
-    f <- fitted_samples(m, method = "user", draws = b)
+    f <- fitted_samples(m, quantity = "expectation", method = "user", draws = b)
     expect_equal(f$.fitted[1:nrow(m$model)],
       lss_test_mean(name, lss_test_eta(beta, attr(m, "lss_test_data"))), tolerance = 1e-8, info = name)
     expect_silent(posterior_samples(m, method = "user", draws = b, seed = 281))
@@ -203,8 +122,8 @@ test_that("LSS missing rows, chains, supplied draws and add helpers retain ident
   }
   for (fun in list(add_fitted_samples, add_posterior_samples)) {
     out <- fun(nd, m, method = "user", draws = b, seed = 9)
-    expect_identical(nrow(out), 160L)
-    expect_identical(out$x, rep(nd$x, each = 40))
+    expect_identical(nrow(out), if (identical(fun, add_fitted_samples)) 320L else 160L)
+    expect_identical(out$x, rep(nd$x, each = if (identical(fun, add_fitted_samples)) 80 else 40))
     expect_identical(sampling_diagnostics(out), sampling_diagnostics(b))
   }
   p <- predicted_samples(m, data = nd, n_draws = 2, seed = 9, na.action = na.omit)
@@ -228,7 +147,7 @@ test_that("fitting-call offsets and excluded fitting rows are retained for LSS",
   m$linear.predictors[, 2] <- m$linear.predictors[, 2] - d$off[-3]
   m$offset <- list(d$off, -d$off)
   b <- matrix(coef(m), 1)
-  f <- fitted_samples(m, method = "user", draws = b)
+  f <- fitted_samples(m, quantity = "expectation", method = "user", draws = b)
   expected <- as.numeric(coef(m)[1] + coef(m)[2] * d$x + d$off)
   expect_equal(f$.fitted, expected, tolerance = 1e-12)
   p <- posterior_samples(m, method = "user", draws = b, seed = 9)
@@ -239,7 +158,7 @@ test_that("fitting-call offsets and excluded fitting rows are retained for LSS",
   ref <- withr::with_seed(9, rnorm(119, eta[, 1], exp(eta[, 2]) + .01))
   expect_equal(p$.response[-3], ref, tolerance = 1e-12)
   # Supplied data follows predict.gam(): fitting-call offsets are not transferred.
-  new <- fitted_samples(m, data = d[1:2, c("x", "z")], method = "user", draws = b)
+  new <- fitted_samples(m, quantity = "expectation", data = d[1:2, c("x", "z")], method = "user", draws = b)
   expect_equal(new$.fitted, coef(m)[1] + coef(m)[2] * d$x[1:2], ignore_attr = TRUE)
 })
 
@@ -264,7 +183,9 @@ test_that("GEV expectations fail precisely when shape has no finite mean", {
   m$family <- mgcv::gevlss(link = c("identity", "identity", "identity"))
   b <- matrix(c(.4, .3, -1, .2, 1.1, .1), 1)
   nd <- data.frame(x = .3, o1 = 0, o2 = 0, o3 = 0)
-  expect_error(fitted_samples(m, data = nd, method = "user", draws = b), "expected response does not exist.*shape >= 1")
+  expect_silent(fitted_samples(m, data = nd, method = "user", draws = b))
+  expect_error(fitted_samples(m, data = nd, method = "user", draws = b,
+    quantity = "expectation"), "expected response does not exist.*shape >= 1")
   expect_error(derivative_samples(m, focal = "x", data = nd, method = "user", draws = b), "expected response does not exist")
   expect_silent(fitted_samples(m, data = nd, method = "user", draws = b, scale = "linear_predictor"))
   expect_true(is.finite(posterior_samples(m, data = nd, method = "user", draws = b, seed = 1)$.response))
@@ -340,7 +261,7 @@ test_that("censored draws are latent and survival sampling reports the missing p
   cox <- mgcv::gam(t ~ x, family = mgcv::cox.ph(), data = d,
     weights = rep(1, 160))
   expect_error(posterior_samples(cox, data = nd, n_draws = 2), "observation process.*response generator")
-  expect_error(fitted_samples(cox, data = nd, n_draws = 2), "Cox survival predictions require evaluation times")
+  expect_error(fitted_samples(quantity = "expectation", cox, data = nd, n_draws = 2), "Cox survival predictions require evaluation times")
 })
 
 test_that("Cox predictor draws remain available without implying a response mean", {
@@ -363,7 +284,7 @@ test_that("LSS prediction retains fitted non-default links and bounds", {
   nd <- data.frame(x = c(.2, .8), off = c(.1, -.1))
   mean <- exp(.4 + .3 * nd$x)
   expected <- withr::with_seed(9, rnorm(2, mean, exp(-.4 + .2 * nd$x + nd$off) + .2))
-  expect_equal(fitted_samples(m, data = nd, method = "user", draws = b)$.fitted, mean)
+  expect_equal(fitted_samples(m, quantity = "expectation", data = nd, method = "user", draws = b)$.fitted, mean)
   expect_equal(posterior_samples(m, data = nd, method = "user", draws = b, seed = 9)$.response, expected)
 })
 
@@ -372,7 +293,7 @@ test_that("bounded prediction batches preserve joint LSS draw positions", {
   nd <- data.frame(x = seq(.1, .9, length.out = 200), o1 = .03, o2 = -.02)
   b <- outer(seq(-.02, .02, length.out = 1001), rep(1, 4)) +
     matrix(lss_test_beta("gumbls"), 1001, 4, byrow = TRUE)
-  out <- fitted_samples(m, data = nd, method = "user", draws = b)
+  out <- fitted_samples(m, quantity = "expectation", data = nd, method = "user", draws = b)
   expected <- as.numeric(vapply(seq_len(nrow(b)), function(i) {
     lss_test_mean("gumbls", lss_test_eta(b[i, ], nd))
   }, numeric(nrow(nd))))

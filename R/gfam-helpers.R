@@ -138,21 +138,70 @@ gfam_prediction_context <- function(model, data = NULL, family_index = NULL,
 # Convert every observation-by-draw entry, retaining the original dimensions.
 # A whole gfam linkinv closure is training-row specific and indexes matrices as
 # vectors. It is therefore unsuitable for either new rows or multiple draws.
-gfam_response_means <- function(eta, context) {
+gfam_category_expectations <- function(context) {
+  !is.null(context) && any(vapply(context$families,
+    function(f) distribution_spec(f)$categorical, logical(1L)))
+}
+
+# Expand ordinal expectations after row restoration, so each observation keeps
+# its own family and category identities even when some predictors are missing.
+gfam_expectation_table <- function(table, context, ci_level = NULL) {
+  table$.prediction_order <- seq_len(nrow(table))
+  parts <- lapply(seq_along(context$families), function(i) {
+    rows <- which(table$.family == i)
+    spec <- distribution_spec(context$families[[i]])
+    eta <- matrix(table$.fitted[rows], ncol = 1L)
+    evaluate <- function(x) distribution_output(spec, x, "expectation", "response")
+    value <- evaluate(eta)
+    labels <- distribution_table(spec, value, "expectation")
+    out <- table[rows[labels$.row], , drop = FALSE]
+    out$.parameter <- "expectation"
+    out$.fitted <- labels$.fitted
+    out$.category <- if (".category" %in% names(labels)) labels$.category else NA_character_
+    if (!is.null(ci_level)) {
+      step <- .Machine$double.eps^(1 / 3) * pmax(1, abs(eta))
+      slope <- (evaluate(eta + step) - evaluate(eta - step)) / (2 * as.numeric(step))
+      se <- abs(slope) * table$.se[rows]
+      critical <- coverage_normal(ci_level)
+      if (spec$categorical) {
+        link_se <- se / (value * (1 - value))
+        lower <- plogis(qlogis(value) - critical * link_se)
+        upper <- plogis(qlogis(value) + critical * link_se)
+      } else {
+        lower <- evaluate(eta - critical * table$.se[rows])
+        upper <- evaluate(eta + critical * table$.se[rows])
+      }
+      out$.se <- as.numeric(se)
+      out$.lower_ci <- as.numeric(pmin(lower, upper))
+      out$.upper_ci <- as.numeric(pmax(lower, upper))
+    }
+    out
+  })
+  missing <- table[is.na(table$.family), , drop = FALSE]
+  missing$.category <- NA_character_
+  missing$.parameter <- "expectation"
+  out <- dplyr::bind_rows(c(parts, list(missing)))
+  out <- out[order(out$.prediction_order), , drop = FALSE]
+  out$.prediction_order <- NULL
+  out
+}
+
+gfam_response_means <- function(eta, context, quantity = "expectation") {
   out <- eta
   out[] <- NA_real_
   for (i in seq_along(context$families)) {
     rows <- which(context$index == i)
     if (!length(rows)) next
     family <- context$families[[i]]
-    if (startsWith(family$family, "Ordered Categorical")) {
+    if (quantity == "expectation" && startsWith(family$family, "Ordered Categorical")) {
       stop("Grouped ordinal response-scale fitted draws are not supported; ",
         "use 'scale = \"linear_predictor\"'.", call. = FALSE)
     }
     values <- as.vector(eta[rows, , drop = FALSE])
-    means <- if (is.function(family$predict)) {
-      family$predict(family, se = FALSE, eta = values)[[1L]]
-    } else family$linkinv(values)
+    spec <- distribution_spec(family)
+    pars <- spec$to_parameters(matrix(values, ncol = 1L))
+    means <- if (quantity == "expectation") as.numeric(spec$expectation(pars)) else
+      as.numeric(pars)
     if (!is.numeric(means) || length(means) != length(values) ||
         (is.matrix(means) && NCOL(means) != 1L)) {
       stop("Grouped-family fitted draws require a scalar response mean per row; ",

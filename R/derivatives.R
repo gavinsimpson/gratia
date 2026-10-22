@@ -1550,7 +1550,7 @@
 `compute_y_fdiff_1` <- function(samples, type, eps = 1e-7) {
   samples <- samples |>
     pivot_wider(
-      id_cols = matches(c("..orig", ".draw", "..type")),
+      id_cols = any_of(c("..orig", ".draw", ".category", ".y", ".family")),
       names_from = "..type", values_from = ".fitted",
       names_prefix = ".."
     )
@@ -1565,7 +1565,7 @@
 `compute_y_fdiff_2` <- function(samples, type, eps = 1e-7) {
   samples <- samples |>
     pivot_wider(
-      id_cols = matches(c("..orig", ".draw", "..type")),
+      id_cols = any_of(c("..orig", ".draw", ".category", ".y", ".family")),
       names_from = "..type", values_from = ".fitted",
       names_prefix = ".."
     )

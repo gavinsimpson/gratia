@@ -46,16 +46,16 @@
       # A tibble: 5,000 x 4
           .row .draw .parameter .fitted
          <int> <int> <chr>        <dbl>
-       1     1     1 location      4.94
-       2     2     1 location      5.68
-       3     3     1 location      4.19
-       4     4     1 location     11.0 
-       5     5     1 location     11.2 
-       6     6     1 location      4.48
-       7     7     1 location      5.84
-       8     8     1 location      6.72
-       9     9     1 location      9.68
-      10    10     1 location      7.29
+       1     1     1 mean          4.94
+       2     2     1 mean          5.68
+       3     3     1 mean          4.19
+       4     4     1 mean         11.0 
+       5     5     1 mean         11.2 
+       6     6     1 mean          4.48
+       7     7     1 mean          5.84
+       8     8     1 mean          6.72
+       9     9     1 mean          9.68
+      10    10     1 mean          7.29
       # i 4,990 more rows
 
 # smooth_samples example output doesn't change
