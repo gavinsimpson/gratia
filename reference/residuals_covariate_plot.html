@@ -9,7 +9,7 @@ covariates or pairs of numeric covariates."><meta property="og:image" content="h
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-60</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-61</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -260,7 +260,9 @@ supplied, a suitable label will be generated.</p></dd>
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>arguments used to prepare model diagnostics, such as sdmTMB
-<code>component</code> and <code>field_method</code>.</p></dd>
+<code>component</code> and <code>field_method</code>. For grouped-family GAMs and joint GJRM
+models, <code>response = NULL</code> uses every response and an integer selects one;
+see <code><a href="appraise.html">appraise()</a></code>. Selection leaves <code>by_family</code> independent.</p></dd>
 
 
 <dt id="arg-density-bins">density_bins<a class="anchor" aria-label="anchor" href="#arg-density-bins"></a></dt>

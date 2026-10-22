@@ -229,6 +229,96 @@ but it is instructive to know how to combine the outputs of
 should the need arise, such as when you want to create a patchwork of
 plots from different models.
 
+## Grouping factor smooths and showing their intervals
+
+`grouped` selects which factor smooth types share a plot. Choose any of
+`"factor-by"`, `"sz"`, and `"fs"`. Types omitted from the vector are
+drawn separately for each level, or each evaluated combination of levels
+for `sz` terms with several factors. `show_ci` independently selects
+which of these types show interval ribbons. These controls apply to
+curves with one continuous covariate; ordinary smooths and surface plots
+retain their displays.
+
+The defaults, `grouped = c("sz", "fs")` and
+`show_ci = c("factor-by", "sz")`, retain the existing grouping and
+interval visibility. Use `FALSE` to select none. Separate curves use the
+usual univariate styling: a black fitted line and a translucent black
+interval. Here is a factor-by example:
+
+``` r
+
+factor_data <- data_sim("eg4", n = 400, seed = 244)
+m_by <- gam(y ~ fac + s(x2, by = fac), data = factor_data, method = "REML")
+m_sz <- gam(y ~ s(x2) + s(x2, fac, bs = "sz"),
+  data = factor_data, method = "REML")
+m_fs <- gam(y ~ s(x2, fac, bs = "fs"),
+  data = factor_data, method = "REML")
+```
+
+Overlay the factor-by curves with intervals:
+
+``` r
+
+draw(m_by, grouped = "factor-by", parametric = FALSE)
+```
+
+![](custom-plotting_files/figure-html/factor-by-grouped-1.png)
+
+Separate the `sz` deviations and hide their intervals. The ordinary
+smooth retains its interval:
+
+``` r
+
+draw(m_sz, grouped = FALSE, show_ci = "factor-by")
+```
+
+![](custom-plotting_files/figure-html/sz-separate-no-intervals-1.png)
+
+`fs` terms represent a fitted curve for each factor level. Separate
+those curves and include their intervals with:
+
+``` r
+
+draw(m_fs, grouped = FALSE, show_ci = "fs")
+```
+
+![](custom-plotting_files/figure-html/fs-separate-intervals-1.png)
+
+The same controls work with saved estimates. Changing their display does
+not recalculate the estimates or interval bounds. Simultaneous bands
+keep their coverage over the original fitted smooth, including its
+evaluated factor levels:
+
+``` r
+
+sz_estimates <- smooth_estimates(m_sz)
+draw(sz_estimates, grouped = FALSE, show_ci = FALSE)
+```
+
+![](custom-plotting_files/figure-html/factor-saved-estimates-1.png)
+
+Ordered-factor `by` smooths use `"factor-by"` too. In the following
+model, `s(x2)` is the reference smooth and the ordered-factor terms
+describe deviations for the other levels. Grouping overlays only those
+deviations; the reference smooth remains a separate plot. No smooth is
+created for the ordered factor’s first level, and the displayed
+deviations do not have the reference smooth added to them.
+
+``` r
+
+factor_data$ordered_fac <- ordered(factor_data$fac)
+m_ordered <- gam(y ~ fac + s(x2) + s(x2, by = ordered_fac),
+  data = factor_data, method = "REML")
+draw(m_ordered, grouped = "factor-by", parametric = FALSE)
+```
+
+![](custom-plotting_files/figure-html/ordered-factor-grouping-1.png)
+
+`grouped_by` is deprecated. Replace `grouped_by = TRUE` with
+`grouped = c("factor-by", "sz", "fs")`; replace `grouped_by = FALSE`
+with `grouped = c("sz", "fs")`. During migration, an explicit
+`grouped_by` updates only `"factor-by"` membership in `grouped`.
+
 ## Drawing surfaces in 3D
 
 Numeric smooth and parametric surfaces can be displayed with

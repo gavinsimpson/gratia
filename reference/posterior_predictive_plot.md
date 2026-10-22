@@ -24,7 +24,8 @@ posterior_predictive_plot(
   scalable = NULL,
   scalable_threshold = 10000L,
   batch_size = 10L,
-  ...
+  ...,
+  response = NULL
 )
 ```
 
@@ -121,6 +122,14 @@ posterior_predictive_plot(
   `component = "response"`, `"binomial"`, or `"positive"` selects the
   complete response or a fitted component. Prediction at new data is not
   supported.
+
+- response:
+
+  For [`mgcv::gfam()`](https://rdrr.io/pkg/mgcv/man/gfam.html) models,
+  `NULL` uses all components; a single integer selects observations
+  assigned to that family-list position. Repeated families retain
+  distinct indices. Each selected component is displayed in its own
+  facet.
 
 ## Value
 

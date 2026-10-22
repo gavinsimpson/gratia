@@ -8,6 +8,9 @@ How many smooths in a fitted model
 # S3 method for class 'gamm4'
 n_smooths(object)
 
+# S3 method for class 'gjrm'
+n_smooths(object)
+
 # S3 method for class 'glmmTMB'
 n_smooths(object)
 

@@ -46,6 +46,9 @@ qq_plot(model, ...)
 # S3 method for class 'gamm4'
 qq_plot(model, conditioning = NULL, ...)
 
+# S3 method for class 'gjrm'
+qq_plot(model, ..., type = "quantile", seed = NULL, response = NULL)
+
 # S3 method for class 'gamm'
 qq_plot(model, conditioning = NULL, ...)
 
@@ -242,6 +245,15 @@ qq_plot(
   positive integer; number of response simulations for
   `type = "dharma"`. This is separate from `n_simulate`, which controls
   traditional QQ reference calculations. Defaults to 250.
+
+- response:
+
+  `NULL` uses all responses; a single integer selects one. For
+  [`mgcv::gfam()`](https://rdrr.io/pkg/mgcv/man/gfam.html) models, the
+  integer indexes the family list and selects observations assigned to
+  that component, including when families repeat. For joint GJRM models,
+  it selects a response in model order. Selection is independent of
+  `by_family`.
 
 - component:
 

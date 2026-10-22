@@ -15,7 +15,7 @@ been removed from the package."><meta property="og:image" content="https://gavin
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-60</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-61</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -118,6 +118,15 @@ been removed from the package.</p>
 <span>  smooth <span class="op">=</span> <span class="fu">deprecated</span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  <span class="va">...</span>,</span>
 <span>  partial_match <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for class 'gjrm'</span></span>
+<span><span class="fu">smooth_estimates</span><span class="op">(</span></span>
+<span>  <span class="va">object</span>,</span>
+<span>  select <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  smooth <span class="op">=</span> <span class="fu">deprecated</span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  partial_match <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -127,7 +136,7 @@ been removed from the package.</p>
 
 <dl><dt id="arg-object">object<a class="anchor" aria-label="anchor" href="#arg-object"></a></dt>
 <dd><p>a fitted model, including objects of class <code>"gam"</code>, <code>"gamm"</code>
-or models fitted by <code><a href="https://rdrr.io/pkg/GJRM/man/gamlss.html" class="external-link">GJRM::gamlss()</a></code>.</p></dd>
+or models fitted by <code><a href="https://rdrr.io/pkg/GJRM/man/gamlss.html" class="external-link">GJRM::gamlss()</a></code> or <code><a href="https://rdrr.io/pkg/GJRM/man/gjrm.html" class="external-link">GJRM::gjrm()</a></code>.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
@@ -320,11 +329,15 @@ named by smooth label, used when drawing the saved estimates.
 Its <code>cyclic_info</code> attribute retains the fitted cycle boundaries for
 supported one-dimensional cyclic components, allowing
 <code>draw(object, cyclic = "polar")</code> to configure the angular axis.
-This attribute is retained in nested and unnested output.</p>
+This attribute is retained in nested and unnested output.
+When no evaluation rows remain, flat output has zero rows and retains the
+estimate, standard error and predictor columns with their original types.
+With <code>unnest = FALSE</code>, each selected smooth retains its metadata record
+and a data table with zero rows in the <code>data</code> list column.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>For <code><a href="https://rdrr.io/pkg/GJRM/man/gamlss.html" class="external-link">GJRM::gamlss()</a></code> models, smooths are evaluated in equation and smooth
+    <p>For <code><a href="https://rdrr.io/pkg/GJRM/man/gamlss.html" class="external-link">GJRM::gamlss()</a></code> and <code><a href="https://rdrr.io/pkg/GJRM/man/gjrm.html" class="external-link">GJRM::gjrm()</a></code> models, smooths are evaluated in equation and smooth
 order using the final fitted GJRM coefficients and covariance matrices.
 Selection uses the model-wide labels returned by <code><a href="smooths.html">smooths()</a></code>, including
 suffixes such as <code>s.1(x)</code> for repeated labels. Equations without smooths

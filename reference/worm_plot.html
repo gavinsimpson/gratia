@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-60</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-61</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -54,7 +54,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Worm plot of model residuals</h1>
-      <small class="dont-index">Source: <a href="https://github.com/gavinsimpson/gratia/blob/main/R/diagnostic-plots.R" class="external-link"><code>R/diagnostic-plots.R</code></a>, <a href="https://github.com/gavinsimpson/gratia/blob/main/R/gamm4-methods.R" class="external-link"><code>R/gamm4-methods.R</code></a>, <a href="https://github.com/gavinsimpson/gratia/blob/main/R/mixed-diagnostics.R" class="external-link"><code>R/mixed-diagnostics.R</code></a>, and 2 more</small>
+      <small class="dont-index">Source: <a href="https://github.com/gavinsimpson/gratia/blob/main/R/diagnostic-plots.R" class="external-link"><code>R/diagnostic-plots.R</code></a>, <a href="https://github.com/gavinsimpson/gratia/blob/main/R/gamm4-methods.R" class="external-link"><code>R/gamm4-methods.R</code></a>, <a href="https://github.com/gavinsimpson/gratia/blob/main/R/gjrm-diagnostics.R" class="external-link"><code>R/gjrm-diagnostics.R</code></a>, and 3 more</small>
       <div class="d-none name"><code>worm_plot.Rd</code></div>
     </div>
 
@@ -99,6 +99,9 @@
 <span></span>
 <span><span class="co"># S3 method for class 'gamm4'</span></span>
 <span><span class="fu">worm_plot</span><span class="op">(</span><span class="va">model</span>, conditioning <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for class 'gjrm'</span></span>
+<span><span class="fu">worm_plot</span><span class="op">(</span><span class="va">model</span>, <span class="va">...</span>, type <span class="op">=</span> <span class="st">"quantile"</span>, seed <span class="op">=</span> <span class="cn">NULL</span>, response <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'gamm'</span></span>
 <span><span class="fu">worm_plot</span><span class="op">(</span><span class="va">model</span>, conditioning <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
@@ -268,6 +271,14 @@ uses the extracted GAM. Availability and defaults depend on the model; see
 <dd><p>positive integer; number of response simulations for
 <code>type = "dharma"</code>. This is separate from <code>n_simulate</code>, which controls
 traditional QQ reference calculations. Defaults to 250.</p></dd>
+
+
+<dt id="arg-response">response<a class="anchor" aria-label="anchor" href="#arg-response"></a></dt>
+<dd><p><code>NULL</code> uses all responses; a single integer selects one.
+For <code><a href="https://rdrr.io/pkg/mgcv/man/gfam.html" class="external-link">mgcv::gfam()</a></code> models, the integer indexes the family list and selects
+observations assigned to that component, including when families repeat.
+For joint GJRM models, it selects a response in model order.
+Selection is independent of <code>by_family</code>.</p></dd>
 
 
 <dt id="arg-component">component<a class="anchor" aria-label="anchor" href="#arg-component"></a></dt>

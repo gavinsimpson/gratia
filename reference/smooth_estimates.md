@@ -53,6 +53,15 @@ smooth_estimates(
   ...,
   partial_match = FALSE
 )
+
+# S3 method for class 'gjrm'
+smooth_estimates(
+  object,
+  select = NULL,
+  smooth = deprecated(),
+  ...,
+  partial_match = FALSE
+)
 ```
 
 ## Arguments
@@ -60,8 +69,8 @@ smooth_estimates(
 - object:
 
   a fitted model, including objects of class `"gam"`, `"gamm"` or models
-  fitted by
-  [`GJRM::gamlss()`](https://rdrr.io/pkg/GJRM/man/gamlss.html).
+  fitted by [`GJRM::gamlss()`](https://rdrr.io/pkg/GJRM/man/gamlss.html)
+  or [`GJRM::gjrm()`](https://rdrr.io/pkg/GJRM/man/gjrm.html).
 
 - ...:
 
@@ -260,14 +269,19 @@ by smooth label, used when drawing the saved estimates. Its
 `cyclic_info` attribute retains the fitted cycle boundaries for
 supported one-dimensional cyclic components, allowing
 `draw(object, cyclic = "polar")` to configure the angular axis. This
-attribute is retained in nested and unnested output.
+attribute is retained in nested and unnested output. When no evaluation
+rows remain, flat output has zero rows and retains the estimate,
+standard error and predictor columns with their original types. With
+`unnest = FALSE`, each selected smooth retains its metadata record and a
+data table with zero rows in the `data` list column.
 
 ## Details
 
-For [`GJRM::gamlss()`](https://rdrr.io/pkg/GJRM/man/gamlss.html) models,
-smooths are evaluated in equation and smooth order using the final
-fitted GJRM coefficients and covariance matrices. Selection uses the
-model-wide labels returned by
+For [`GJRM::gamlss()`](https://rdrr.io/pkg/GJRM/man/gamlss.html) and
+[`GJRM::gjrm()`](https://rdrr.io/pkg/GJRM/man/gjrm.html) models, smooths
+are evaluated in equation and smooth order using the final fitted GJRM
+coefficients and covariance matrices. Selection uses the model-wide
+labels returned by
 [`smooths()`](https://gavinsimpson.github.io/gratia/reference/smooths.md),
 including suffixes such as `s.1(x)` for repeated labels. Equations
 without smooths are skipped; a model without any smooths gives an error.

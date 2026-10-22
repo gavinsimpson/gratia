@@ -8,6 +8,9 @@ Names of smooths in a GAM
 # S3 method for class 'gamlss'
 smooths(object, ...)
 
+# S3 method for class 'gjrm'
+smooths(object, ...)
+
 smooths(object, ...)
 
 # Default S3 method
@@ -35,7 +38,7 @@ smooths(object, ...)
 
 ## Details
 
-For GJRM GAMLSS models, labels follow equation and smooth order. Labels
+For GJRM models, labels follow equation and smooth order. Labels
 repeated in later equations receive suffixes such as `s.1(x)`. These
 labels can be supplied to
 [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md) or

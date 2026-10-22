@@ -247,8 +247,12 @@ scalable_residuals_hist_plot(
 - ...:
 
   optional arguments used to prepare the model for diagnostics,
-  including sdmTMB `field_method`. For `scalable_worm_plot()`, other
-  arguments pass to `scalable_qq_plot()` except its internal worm
+  including sdmTMB `field_method`. For grouped-family GAMs and joint
+  GJRM models, `response = NULL` uses every response and an integer
+  selects one; see
+  [`appraise()`](https://gavinsimpson.github.io/gratia/reference/appraise.md).
+  Selection leaves `by_family` independent. For `scalable_worm_plot()`,
+  other arguments pass to `scalable_qq_plot()` except its internal worm
   setting.
 
 - n_dharma:

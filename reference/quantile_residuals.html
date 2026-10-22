@@ -15,7 +15,7 @@ Discrete observations require randomisation over their probability mass."><meta 
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-60</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-61</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -88,6 +88,15 @@ Discrete observations require randomisation over their probability mass.</p>
 <span><span class="co"># S3 method for class 'gamlss'</span></span>
 <span><span class="fu">quantile_residuals</span><span class="op">(</span><span class="va">model</span>, type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"pit"</span>, <span class="st">"quantile"</span><span class="op">)</span>, seed <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
+<span><span class="co"># S3 method for class 'gjrm'</span></span>
+<span><span class="fu">quantile_residuals</span><span class="op">(</span></span>
+<span>  <span class="va">model</span>,</span>
+<span>  type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"pit"</span>, <span class="st">"quantile"</span><span class="op">)</span>,</span>
+<span>  seed <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  response <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span>
+<span></span>
 <span><span class="co"># S3 method for class 'gamm'</span></span>
 <span><span class="fu">quantile_residuals</span><span class="op">(</span></span>
 <span>  <span class="va">model</span>,</span>
@@ -124,7 +133,13 @@ Discrete observations require randomisation over their probability mass.</p>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">quantile_residuals</span><span class="op">(</span><span class="va">model</span>, type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"pit"</span>, <span class="st">"quantile"</span><span class="op">)</span>, seed <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">quantile_residuals</span><span class="op">(</span></span>
+<span>  <span class="va">model</span>,</span>
+<span>  type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"pit"</span>, <span class="st">"quantile"</span><span class="op">)</span>,</span>
+<span>  seed <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  response <span class="op">=</span> <span class="cn">NULL</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'gam'</span></span>
 <span><span class="fu">quantile_residuals</span><span class="op">(</span></span>
@@ -132,7 +147,8 @@ Discrete observations require randomisation over their probability mass.</p>
 <span>  type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"pit"</span>, <span class="st">"quantile"</span><span class="op">)</span>,</span>
 <span>  seed <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  conditioning <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  <span class="va">...</span></span>
+<span>  <span class="va">...</span>,</span>
+<span>  response <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'glm'</span></span>
@@ -209,6 +225,15 @@ extracted GAM (<code>"gam_component"</code>), where supported. See <a href="diag
 <dd><p>arguments passed to other methods.</p></dd>
 
 
+<dt id="arg-response">response<a class="anchor" aria-label="anchor" href="#arg-response"></a></dt>
+<dd><p><code>NULL</code> uses all responses; a single integer selects one.
+For <code><a href="https://rdrr.io/pkg/mgcv/man/gfam.html" class="external-link">mgcv::gfam()</a></code> models, the integer indexes the family list and selects
+observations assigned to that component. For joint GJRM models, it selects
+a response in model order. All-response GJRM residuals form a matrix with
+one column per response; selecting one returns a vector. Grouped-family
+residuals are always vectors.</p></dd>
+
+
 <dt id="arg-component">component<a class="anchor" aria-label="anchor" href="#arg-component"></a></dt>
 <dd><p>character; which delta sdmTMB component to check; see
 <code><a href="appraise.html">appraise()</a></code>.</p></dd>
@@ -246,7 +271,10 @@ posterior predictive checks remain available when this variance is infinite.</p>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>With <code>na.exclude</code>, excluded observations are restored as <code>NA</code> residuals;
-with <code>na.omit</code>, only observations used for fitting are returned.</p>
+with <code>na.omit</code>, only observations used for fitting are returned. Selecting a
+grouped-family component with <code>response</code> returns only its retained fitting
+observations, without placeholders for excluded rows whose component
+membership is unavailable.</p>
 <p>For <code><a href="https://rdrr.io/pkg/mgcv/man/cnorm.html" class="external-link">mgcv::cnorm()</a></code>, <code><a href="https://rdrr.io/pkg/mgcv/man/clog.html" class="external-link">mgcv::clog()</a></code> and <code><a href="https://rdrr.io/pkg/mgcv/man/cpois.html" class="external-link">mgcv::cpois()</a></code> models, censored
 observations have PIT residuals sampled uniformly between <code>F(l)</code> and <code>F(u)</code>.
 Here <code>l</code> and <code>u</code> bound the censoring interval and <code>F</code> is the fitted cumulative
@@ -258,7 +286,11 @@ observations use <code>F(y)</code>; uncensored Poisson observations are randomis
 recommended by mgcv.</p>
 <p>For grouped-family GAMs fitted with <code><a href="https://rdrr.io/pkg/mgcv/man/gfam.html" class="external-link">mgcv::gfam()</a></code>, each observation uses its
 component's CDF, fitted nuisance parameters, dispersion and weights. Residuals
-are returned in fitting order. All active components must supply supported
+are returned in fitting order. <code>response = NULL</code> uses all components; an
+integer selects observations assigned to that family-list position. Repeated
+families retain distinct indices. With an explicit seed, selected residuals
+match the corresponding rows of an all-component call whenever all
+components support the calculation. All selected active components must supply supported
 CDFs and probability limits for discrete or censored observations. Unsupported
 components give an error; <code><a href="appraise.html">appraise()</a></code> can instead select deviance residuals
 automatically. See <code><a href="appraise.html">appraise()</a></code> for supported families. Tweedie zeros have

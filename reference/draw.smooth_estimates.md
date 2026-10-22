@@ -12,7 +12,7 @@ draw(
   constant = NULL,
   fun = NULL,
   contour = TRUE,
-  grouped_by = FALSE,
+  grouped_by = deprecated(),
   contour_col = "black",
   n_contour = NULL,
   ci_alpha = 0.2,
@@ -45,7 +45,9 @@ draw(
   ...,
   variables = NULL,
   cyclic = c("cartesian", "polar"),
-  polar_args = list()
+  polar_args = list(),
+  grouped = c("sz", "fs"),
+  show_ci = c("factor-by", "sz")
 )
 ```
 
@@ -78,9 +80,8 @@ draw(
 
 - grouped_by:
 
-  logical; should factor by smooths be drawn as one panel per level of
-  the factor (`FALSE`, the default), or should the individual smooths be
-  combined into a single panel containing all levels (`TRUE`)?
+  Deprecated; use `grouped`. Explicit `TRUE` adds `"factor-by"` to
+  `grouped`; `FALSE` removes it, retaining the other types.
 
 - contour_col:
 
@@ -350,6 +351,30 @@ draw(
   `cyclic = "polar"` when nonempty. The angular variable, fitted cycle
   boundaries, full-circle extent and angular expansion are set by
   gratia.
+
+- grouped:
+
+  character or `FALSE`; factor smooth types whose curves share a panel.
+  Choose any of `"factor-by"`, `"sz"`, and `"fs"`, or `FALSE` to
+  separate all their curves. The default, `c("sz", "fs")`, overlays `sz`
+  and `fs` curves and separates factor-by curves. `"factor-by"` includes
+  ordered factors. In reference-plus-deviation models the reference
+  smooth remains separate; only fitted nonreference deviations are
+  grouped. For `sz` terms with several factors, separate plots show each
+  evaluated combination of levels. Applies to curves with one continuous
+  covariate; existing surface displays are unchanged. Separate curves
+  use the usual univariate styling: a black line and a translucent black
+  interval by default, with colours and opacity controlled by the smooth
+  theme settings.
+
+- show_ci:
+
+  character or `FALSE`; factor smooth types whose curves show intervals.
+  Choose any of `"factor-by"`, `"sz"`, and `"fs"`, or `FALSE` to hide
+  all their ribbons. The default, `c("factor-by", "sz")`, retains
+  existing interval visibility; including `"fs"` enables its intervals.
+  Controls display only, independently of `interval` and `grouped`.
+  Ordinary smooths and parametric effects retain their intervals.
 
 ## Details
 

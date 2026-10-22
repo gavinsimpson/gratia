@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-60</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-61</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -67,6 +67,9 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S3 method for class 'gamlss'</span></span>
 <span><span class="fu">smooths</span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
+<span><span class="co"># S3 method for class 'gjrm'</span></span>
+<span><span class="fu">smooths</span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
 <span><span class="fu">smooths</span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Default S3 method</span></span>
@@ -94,7 +97,7 @@ to <code><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">m
 </dl></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>For GJRM GAMLSS models, labels follow equation and smooth order.
+    <p>For GJRM models, labels follow equation and smooth order.
 Labels repeated in later equations receive suffixes such as <code>s.1(x)</code>.
 These labels can be supplied to <code><a href="draw.html">draw()</a></code> or <code><a href="smooth_estimates.html">smooth_estimates()</a></code> to select
 smooths across equations.</p>

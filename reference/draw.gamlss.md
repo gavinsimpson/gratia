@@ -1,10 +1,11 @@
-# Plot smooths of a GAMLSS model estimated by `GJRM::gamlss`
+# Plot smooths of models estimated by GJRM
 
 Provides
 [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md) and
 [`assemble()`](https://gavinsimpson.github.io/gratia/reference/assemble.md)
-methods for GAMLSS (distributional GAMs) fitted by
-[`GJRM::gamlss()`](https://rdrr.io/pkg/GJRM/man/gamlss.html).
+methods for GAMLSS and joint models fitted by
+[`GJRM::gamlss()`](https://rdrr.io/pkg/GJRM/man/gamlss.html) or
+[`GJRM::gjrm()`](https://rdrr.io/pkg/GJRM/man/gjrm.html).
 [`assemble()`](https://gavinsimpson.github.io/gratia/reference/assemble.md)
 returns the individual plots;
 [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)
@@ -38,12 +39,52 @@ assemble(
   object,
   scales = c("free", "fixed"),
   ...,
+  residuals = FALSE,
   n = 100,
   envir = NULL,
   select = NULL,
   parametric = NULL,
   terms = NULL,
-  partial_match = FALSE
+  partial_match = FALSE,
+  grouped_by = deprecated(),
+  grouped = c("sz", "fs"),
+  show_ci = c("factor-by", "sz")
+)
+
+# S3 method for class 'gjrm'
+draw(
+  object,
+  scales = c("free", "fixed"),
+  ncol = NULL,
+  nrow = NULL,
+  guides = "keep",
+  widths = NULL,
+  heights = NULL,
+  ...,
+  n = 100,
+  envir = NULL,
+  select = NULL,
+  parametric = NULL,
+  terms = NULL,
+  partial_match = FALSE,
+  wrap = TRUE
+)
+
+# S3 method for class 'gjrm'
+assemble(
+  object,
+  scales = c("free", "fixed"),
+  ...,
+  residuals = FALSE,
+  n = 100,
+  envir = NULL,
+  select = NULL,
+  parametric = NULL,
+  terms = NULL,
+  partial_match = FALSE,
+  grouped_by = deprecated(),
+  grouped = c("sz", "fs"),
+  show_ci = c("factor-by", "sz")
 )
 ```
 
@@ -51,8 +92,9 @@ assemble(
 
 - object:
 
-  a model, fitted by
-  [`GJRM::gamlss()`](https://rdrr.io/pkg/GJRM/man/gamlss.html)
+  a model fitted by
+  [`GJRM::gamlss()`](https://rdrr.io/pkg/GJRM/man/gamlss.html) or
+  [`GJRM::gjrm()`](https://rdrr.io/pkg/GJRM/man/gjrm.html).
 
 - scales:
 
@@ -137,6 +179,42 @@ assemble(
   Logical; return an assembled patchwork when `TRUE` (the default), or a
   flat named list of plots when `FALSE`.
 
+- residuals:
+
+  logical; should partial residuals for a smooth be drawn? Ignored for
+  anything but a simple univariate smooth. If the model does not provide
+  working residuals and working weights, warns once and draws the
+  smooths without partial residuals.
+
+- grouped_by:
+
+  Deprecated; use `grouped`. Explicit `TRUE` adds `"factor-by"` to
+  `grouped`; `FALSE` removes it, retaining the other types.
+
+- grouped:
+
+  character or `FALSE`; factor smooth types whose curves share a panel.
+  Choose any of `"factor-by"`, `"sz"`, and `"fs"`, or `FALSE` to
+  separate all their curves. The default, `c("sz", "fs")`, overlays `sz`
+  and `fs` curves and separates factor-by curves. `"factor-by"` includes
+  ordered factors. In reference-plus-deviation models the reference
+  smooth remains separate; only fitted nonreference deviations are
+  grouped. For `sz` terms with several factors, separate plots show each
+  evaluated combination of levels. Applies to curves with one continuous
+  covariate; existing surface displays are unchanged. Separate curves
+  use the usual univariate styling: a black line and a translucent black
+  interval by default, with colours and opacity controlled by the smooth
+  theme settings.
+
+- show_ci:
+
+  character or `FALSE`; factor smooth types whose curves show intervals.
+  Choose any of `"factor-by"`, `"sz"`, and `"fs"`, or `FALSE` to hide
+  all their ribbons. The default, `c("factor-by", "sz")`, retains
+  existing interval visibility; including `"fs"` enables its intervals.
+  Controls display only, independently of `interval` and `grouped`.
+  Ordinary smooths and parametric effects retain their intervals.
+
 ## Value
 
 [`assemble()`](https://gavinsimpson.github.io/gratia/reference/assemble.md)
@@ -153,16 +231,30 @@ when there are no plots to draw.
 For models with multiple linear predictors, smooth plot subtitles
 identify the distributional parameter using the parent model's margin
 and equation order, rather than the working family of the embedded GAMs.
-Single-predictor models omit these automatic labels. Existing smooth
-labels, selection, by-variable information and custom subtitles are
-retained. Pass `surface = "3d", ci_3d = TRUE` through `...` to add
-interval surfaces to smooths and numeric parametric interactions in any
-equation. `ci_3d_alpha` and `ci_3d_col` control their opacity and fill
-colour. Pass `cyclic = "polar"` and optional `polar_args` through `...`
-for polar plots of supported one-dimensional cyclic smooths in any
-equation; see
+Univariate GAMLSS models with one predictor omit these automatic labels.
+Joint models retain equation labels even when only dependence is
+estimated. Existing smooth labels, selection, by-variable information
+and custom subtitles are retained. Pass `surface = "3d", ci_3d = TRUE`
+through `...` to add interval surfaces to smooths and numeric parametric
+interactions in any equation. `ci_3d_alpha` and `ci_3d_col` control
+their opacity and fill colour. Pass `cyclic = "polar"` and optional
+`polar_args` through `...` for polar plots of supported one-dimensional
+cyclic smooths in any equation; see
 [`draw.gam()`](https://gavinsimpson.github.io/gratia/reference/draw.gam.md)
 for the coordinate options.
+
+Joint models use the final joint coefficients and covariance for every
+embedded GAM, including dependence equations and random-effect smooths.
+Parametric plot subtitles also identify their response and parameter. A
+parametric term repeated across equations has list names such as
+`x (equation 1)` and `x (equation 2)`; unique terms keep their original
+names. Grouped factor-by panels also receive an equation suffix when
+their base name would hide another smooth's selection label. Ordinal
+cutpoints are excluded from smooth and intercept uncertainty.
+Fixed-margin fits plot their estimated dependence equation only.
+Flexible survival equations fitted using SCAM are not yet supported.
+Working residuals from preliminary GAM fits are unavailable for joint
+models; requesting partial residuals warns and draws the smooths alone.
 
 ## Examples
 
@@ -195,4 +287,19 @@ if (suppressPackageStartupMessages(require("GJRM", quietly = TRUE))) {
     draw(surface, surface = "3d", ci_3d = TRUE, n_2d = 15)
   }
 }
+
+
+if (requireNamespace("GJRM", quietly = TRUE)) {
+  load_mgcv()
+  set.seed(12)
+  d <- data.frame(x = runif(150), z = runif(150))
+  d$y1 <- sin(2 * pi * d$x) + rnorm(150)
+  d$y2 <- cos(2 * pi * d$z) + 0.3 * d$y1 + rnorm(150)
+  joint <- GJRM::gjrm(list(y1 ~ s(x, k = 5), y2 ~ s(z, k = 5),
+    ~ 1, ~ 1, ~ s(x, k = 4)), data = d, margins = c("N", "N"),
+    model = "B")
+  draw(joint, parametric = FALSE)
+  smooth_estimates(joint, select = smooths(joint)[3])
+}
+#> Error in eval(mf): object 'd' not found
 ```

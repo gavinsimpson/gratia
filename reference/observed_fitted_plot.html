@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-60</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-61</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -141,7 +141,9 @@ uses the extracted GAM. Availability and defaults depend on the model; see
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>optional arguments passed to model preparation, such as the
-sdmTMB <code>field_method</code>.</p></dd>
+sdmTMB <code>field_method</code>. For grouped-family GAMs and joint GJRM models,
+<code>response = NULL</code> uses every response and an integer selects one; see
+<code><a href="appraise.html">appraise()</a></code>. Selection leaves <code>by_family</code> independent.</p></dd>
 
 </dl></div>
 

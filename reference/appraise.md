@@ -61,6 +61,19 @@ appraise(
 # S3 method for class 'gamm4'
 appraise(model, conditioning = NULL, ...)
 
+# S3 method for class 'gjrm'
+appraise(
+  model,
+  ...,
+  type = "quantile",
+  seed = NULL,
+  conditioning = NULL,
+  response = NULL,
+  ppcheck = FALSE,
+  by_family = NULL,
+  n_dharma = 250L
+)
+
 # S3 method for class 'gamm'
 appraise(model, conditioning = NULL, ...)
 
@@ -309,6 +322,15 @@ appraise(
   `type = "dharma"`. This is separate from `n_simulate`, which controls
   traditional QQ reference calculations. Defaults to 250.
 
+- response:
+
+  `NULL` uses all responses; a single integer selects one. For
+  [`mgcv::gfam()`](https://rdrr.io/pkg/mgcv/man/gfam.html) models, the
+  integer indexes the family list and selects observations assigned to
+  that component, including when families repeat. For joint GJRM models,
+  it selects a response in model order. Selection is independent of
+  `by_family`.
+
 - component:
 
   character; for delta sdmTMB models, select the complete `"response"`,
@@ -378,6 +400,16 @@ supported; genuine censoring requires recoverable, aligned censoring
 bounds. Matrix censored responses rejected by
 [`gfam()`](https://rdrr.io/pkg/mgcv/man/gfam.html) and upstream fitting
 failures are not repaired.
+
+Use `response = NULL` to check every grouped-family component or a
+single integer to select a component by its position in the
+[`mgcv::gfam()`](https://rdrr.io/pkg/mgcv/man/gfam.html) family list.
+Repeated families remain distinct. Selection filters fitting
+observations without refitting the model and retains original component
+labels. `by_family` independently controls the layout of the selected
+data. With an explicit seed, selected residuals match the corresponding
+rows of an all-component calculation whenever all components support
+that calculation.
 
 `by_family = NULL` pools quantile residuals with colours identifying
 indexed family components, including repeated uses of the same family.
@@ -464,4 +496,20 @@ appraise(mod, ppcheck = TRUE, n_ppc = 20, seed = 42)
 ## change the ggplot theme for all panels
 library("ggplot2")
 appraise(mod, seed = 42) & theme_minimal()
+
+
+## Select a grouped-family component by its position in the family list
+set.seed(53)
+grouped <- data.frame(x = runif(160), family_id = rep(1:2, 80))
+grouped$component <- factor(grouped$family_id)
+grouped$y <- rnorm(160, sin(2 * pi * grouped$x), 0.4)
+is_count <- grouped$family_id == 2L
+grouped$y[is_count] <- rpois(sum(is_count), exp(grouped$x[is_count]))
+grouped_fit <- gam(cbind(y, family_id) ~ component +
+  s(x, by = component, k = 6), data = grouped,
+  family = gfam(list(gaussian(), poisson())), method = "REML")
+appraise(grouped_fit, response = 2, seed = 54)
+
+## Layout remains a separate choice
+qq_plot(grouped_fit, response = 2, by_family = TRUE, seed = 54)
 ```

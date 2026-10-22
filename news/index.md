@@ -4,6 +4,16 @@
 
 ### User visible changes
 
+- `grouped_by` is deprecated in
+  [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)
+  and
+  [`assemble()`](https://gavinsimpson.github.io/gratia/reference/assemble.md).
+  Include `"factor-by"` in the new `grouped` argument to overlay
+  factor-by curves, or omit it to draw them separately. Explicit uses of
+  `grouped_by` still update factor-by grouping, including ordered
+  factors, while retaining the requested grouping of `sz` and `fs`
+  curves.
+
 - [`draw.basis()`](https://gavinsimpson.github.io/gratia/reference/draw.basis.md)
   now draws contour lines on surface plots by default
   (`contour = TRUE`), matching
@@ -152,6 +162,44 @@
   so the development version of glmmTMB is no longer needed.
 
 ### New features
+
+- Grouped-family diagnostics now accept `response = NULL` for all family
+  components or a single integer family-list index for one component.
+  This uses the same selection convention as joint GJRM diagnostics.
+  `by_family` independently controls the existing pooling and faceting
+  behaviour, and selected results retain their original component
+  labels.
+
+- [`assemble()`](https://gavinsimpson.github.io/gratia/reference/assemble.md),
+  [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)
+  and
+  [`smooth_estimates()`](https://gavinsimpson.github.io/gratia/reference/smooth_estimates.md)
+  now support joint models fitted by
+  [`GJRM::gjrm()`](https://rdrr.io/pkg/GJRM/man/gjrm.html), using the
+  final joint coefficients and covariance matrices for smooths, random
+  effects and parametric effects. Diagnostic functions support ordinary
+  uncensored joint models whose predictors do not include modeled
+  responses;
+  [`appraise()`](https://gavinsimpson.github.io/gratia/reference/appraise.md)
+  facets each panel by response.
+
+- [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)
+  and
+  [`assemble()`](https://gavinsimpson.github.io/gratia/reference/assemble.md)
+  can separate `sz` and `fs` curves into individual plots
+  ([\#244](https://github.com/gavinsimpson/gratia/issues/244)).
+  `grouped` names the types to overlay: `"factor-by"`, `"sz"`, and
+  `"fs"`. `show_ci` independently selects which types show intervals,
+  including optional intervals for `fs` curves. The defaults retain
+  existing grouping and interval visibility. Ordered-factor deviations
+  use the factor-by settings and keep their reference smooth separate.
+  Saved smooth estimates support the same controls. Common axis ranges
+  use displayed estimates and visible intervals. Grouped factor-by plots
+  retain observations from every plotted level and accept custom colour
+  and fill scales. Smooth and custom titles retain colons within their
+  text. Separate curves use the usual black line and translucent black
+  interval. Set `grouped = FALSE` to separate all factor-related curves,
+  or `show_ci = FALSE` to hide their intervals.
 
 - [`assemble()`](https://gavinsimpson.github.io/gratia/reference/assemble.md)
   now supports models fitted by
@@ -978,6 +1026,18 @@
 
 ### Bug fixes
 
+- Grouped plots of factor-by smooths now keep different smooth terms and
+  linear predictors separate, including when drawing saved smooth
+  estimates. Models with several factor-by terms no longer fail during
+  plot assembly.
+
+- For GJRM models, `scales = "fixed"` now shares effect ranges without
+  expanding the covariate axes of two-dimensional smooth plots.
+
+- `appraise(rank = TRUE)` now uses within-response or within-family
+  predictor ranks in ordinary diagnostic panels, matching the standalone
+  and scalable plots.
+
 - [`partial_residuals()`](https://gavinsimpson.github.io/gratia/reference/partial_residuals.md)
   and
   [`add_partial_residuals()`](https://gavinsimpson.github.io/gratia/reference/add_partial_residuals.md)
@@ -1011,6 +1071,10 @@
 - B-spline evaluation handles empty data and factor-by calls whose
   evaluation data omit fitted levels, including constrained tensor
   products.
+  [`smooth_estimates()`](https://gavinsimpson.github.io/gratia/reference/smooth_estimates.md)
+  retains estimate, standard error and predictor columns and their types
+  when no evaluation rows remain. Nested output keeps each selected
+  smooth with its empty data table.
 
 - MH acceptance rates are extracted from the correct mgcv return
   components.

@@ -214,7 +214,11 @@ scalable_residuals_covariate_plot(
 - ...:
 
   arguments used to prepare model diagnostics, such as sdmTMB
-  `component` and `field_method`.
+  `component` and `field_method`. For grouped-family GAMs and joint GJRM
+  models, `response = NULL` uses every response and an integer selects
+  one; see
+  [`appraise()`](https://gavinsimpson.github.io/gratia/reference/appraise.md).
+  Selection leaves `by_family` independent.
 
 - density_bins:
 

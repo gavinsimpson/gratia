@@ -22,6 +22,15 @@ quantile_residuals(
 # S3 method for class 'gamlss'
 quantile_residuals(model, type = c("pit", "quantile"), seed = NULL, ...)
 
+# S3 method for class 'gjrm'
+quantile_residuals(
+  model,
+  type = c("pit", "quantile"),
+  seed = NULL,
+  response = NULL,
+  ...
+)
+
 # S3 method for class 'gamm'
 quantile_residuals(
   model,
@@ -58,7 +67,13 @@ quantile_residuals(
   ...
 )
 
-quantile_residuals(model, type = c("pit", "quantile"), seed = NULL, ...)
+quantile_residuals(
+  model,
+  type = c("pit", "quantile"),
+  seed = NULL,
+  ...,
+  response = NULL
+)
 
 # S3 method for class 'gam'
 quantile_residuals(
@@ -66,7 +81,8 @@ quantile_residuals(
   type = c("pit", "quantile"),
   seed = NULL,
   conditioning = NULL,
-  ...
+  ...,
+  response = NULL
 )
 
 # S3 method for class 'glm'
@@ -143,6 +159,16 @@ quantile_residuals(
 
   arguments passed to other methods.
 
+- response:
+
+  `NULL` uses all responses; a single integer selects one. For
+  [`mgcv::gfam()`](https://rdrr.io/pkg/mgcv/man/gfam.html) models, the
+  integer indexes the family list and selects observations assigned to
+  that component. For joint GJRM models, it selects a response in model
+  order. All-response GJRM residuals form a matrix with one column per
+  response; selecting one returns a vector. Grouped-family residuals are
+  always vectors.
+
 - component:
 
   character; which delta sdmTMB component to check; see
@@ -188,6 +214,9 @@ quantile_residuals(
 
 With `na.exclude`, excluded observations are restored as `NA` residuals;
 with `na.omit`, only observations used for fitting are returned.
+Selecting a grouped-family component with `response` returns only its
+retained fitting observations, without placeholders for excluded rows
+whose component membership is unavailable.
 
 For [`mgcv::cnorm()`](https://rdrr.io/pkg/mgcv/man/cnorm.html),
 [`mgcv::clog()`](https://rdrr.io/pkg/mgcv/man/clog.html) and
@@ -207,9 +236,14 @@ mgcv.
 For grouped-family GAMs fitted with
 [`mgcv::gfam()`](https://rdrr.io/pkg/mgcv/man/gfam.html), each
 observation uses its component's CDF, fitted nuisance parameters,
-dispersion and weights. Residuals are returned in fitting order. All
-active components must supply supported CDFs and probability limits for
-discrete or censored observations. Unsupported components give an error;
+dispersion and weights. Residuals are returned in fitting order.
+`response = NULL` uses all components; an integer selects observations
+assigned to that family-list position. Repeated families retain distinct
+indices. With an explicit seed, selected residuals match the
+corresponding rows of an all-component call whenever all components
+support the calculation. All selected active components must supply
+supported CDFs and probability limits for discrete or censored
+observations. Unsupported components give an error;
 [`appraise()`](https://gavinsimpson.github.io/gratia/reference/appraise.md)
 can instead select deviance residuals automatically. See
 [`appraise()`](https://gavinsimpson.github.io/gratia/reference/appraise.md)

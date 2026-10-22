@@ -21,10 +21,9 @@ plots](https://gavinsimpson.github.io/gratia/articles/custom-plotting.md).
 
 - [`draw(`*`<gamlss>`*`)`](https://gavinsimpson.github.io/gratia/reference/draw.gamlss.md)
   [`assemble(`*`<gamlss>`*`)`](https://gavinsimpson.github.io/gratia/reference/draw.gamlss.md)
-  :
-
-  Plot smooths of a GAMLSS model estimated by
-  [`GJRM::gamlss`](https://rdrr.io/pkg/GJRM/man/gamlss.html)
+  [`draw(`*`<gjrm>`*`)`](https://gavinsimpson.github.io/gratia/reference/draw.gamlss.md)
+  [`assemble(`*`<gjrm>`*`)`](https://gavinsimpson.github.io/gratia/reference/draw.gamlss.md)
+  : Plot smooths of models estimated by GJRM
 
 - [`qq_plot(`*`<glmmTMB>`*`)`](https://gavinsimpson.github.io/gratia/reference/glmmTMB-methods.md)
   [`worm_plot(`*`<glmmTMB>`*`)`](https://gavinsimpson.github.io/gratia/reference/glmmTMB-methods.md)

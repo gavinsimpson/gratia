@@ -9,7 +9,7 @@ from the approximate posterior predictive distribution of a fitted model."><meta
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-60</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-61</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -84,7 +84,8 @@ from the approximate posterior predictive distribution of a fitted model.</p>
 <span>  scalable <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  scalable_threshold <span class="op">=</span> <span class="fl">10000L</span>,</span>
 <span>  batch_size <span class="op">=</span> <span class="fl">10L</span>,</span>
-<span>  <span class="va">...</span></span>
+<span>  <span class="va">...</span>,</span>
+<span>  response <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -177,6 +178,13 @@ with more than 512 distinct response values aggregate probability into
 <code>unconditional</code> or <code>mvn_method</code>. For delta sdmTMB fits,
 <code>component = "response"</code>, <code>"binomial"</code>, or <code>"positive"</code> selects the
 complete response or a fitted component. Prediction at new data is not supported.</p></dd>
+
+
+<dt id="arg-response">response<a class="anchor" aria-label="anchor" href="#arg-response"></a></dt>
+<dd><p>For <code><a href="https://rdrr.io/pkg/mgcv/man/gfam.html" class="external-link">mgcv::gfam()</a></code> models, <code>NULL</code> uses all components; a
+single integer selects observations assigned to that family-list position.
+Repeated families retain distinct indices. Each selected component is
+displayed in its own facet.</p></dd>
 
 </dl></div>
     <div class="section level2">

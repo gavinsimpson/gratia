@@ -27,7 +27,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-60</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-61</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -334,6 +334,72 @@ patchwork</p>
 create a patchwork of plots from different models.</p>
 </div>
 <div class="section level2">
+<h2 id="grouping-factor-smooths-and-showing-their-intervals">Grouping factor smooths and showing their intervals<a class="anchor" aria-label="anchor" href="#grouping-factor-smooths-and-showing-their-intervals"></a>
+</h2>
+<p><code>grouped</code> selects which factor smooth types share a plot.
+Choose any of <code>"factor-by"</code>, <code>"sz"</code>, and
+<code>"fs"</code>. Types omitted from the vector are drawn separately
+for each level, or each evaluated combination of levels for
+<code>sz</code> terms with several factors. <code>show_ci</code>
+independently selects which of these types show interval ribbons. These
+controls apply to curves with one continuous covariate; ordinary smooths
+and surface plots retain their displays.</p>
+<p>The defaults, <code>grouped = c("sz", "fs")</code> and
+<code>show_ci = c("factor-by", "sz")</code>, retain the existing
+grouping and interval visibility. Use <code>FALSE</code> to select none.
+Separate curves use the usual univariate styling: a black fitted line
+and a translucent black interval. Here is a factor-by example:</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">factor_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/data_sim.html">data_sim</a></span><span class="op">(</span><span class="st">"eg4"</span>, n <span class="op">=</span> <span class="fl">400</span>, seed <span class="op">=</span> <span class="fl">244</span><span class="op">)</span></span>
+<span><span class="va">m_by</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="va">fac</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x2</span>, by <span class="op">=</span> <span class="va">fac</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">factor_data</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span>
+<span><span class="va">m_sz</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x2</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x2</span>, <span class="va">fac</span>, bs <span class="op">=</span> <span class="st">"sz"</span><span class="op">)</span>,</span>
+<span>  data <span class="op">=</span> <span class="va">factor_data</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span>
+<span><span class="va">m_fs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x2</span>, <span class="va">fac</span>, bs <span class="op">=</span> <span class="st">"fs"</span><span class="op">)</span>,</span>
+<span>  data <span class="op">=</span> <span class="va">factor_data</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span></code></pre></div>
+<p>Overlay the factor-by curves with intervals:</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">m_by</span>, grouped <span class="op">=</span> <span class="st">"factor-by"</span>, parametric <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<p><img src="custom-plotting_files/figure-html/factor-by-grouped-1.png" class="r-plt" alt="" width="700"></p>
+<p>Separate the <code>sz</code> deviations and hide their intervals. The
+ordinary smooth retains its interval:</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">m_sz</span>, grouped <span class="op">=</span> <span class="cn">FALSE</span>, show_ci <span class="op">=</span> <span class="st">"factor-by"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="custom-plotting_files/figure-html/sz-separate-no-intervals-1.png" class="r-plt" alt="" width="700"></p>
+<p><code>fs</code> terms represent a fitted curve for each factor level.
+Separate those curves and include their intervals with:</p>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">m_fs</span>, grouped <span class="op">=</span> <span class="cn">FALSE</span>, show_ci <span class="op">=</span> <span class="st">"fs"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="custom-plotting_files/figure-html/fs-separate-intervals-1.png" class="r-plt" alt="" width="700"></p>
+<p>The same controls work with saved estimates. Changing their display
+does not recalculate the estimates or interval bounds. Simultaneous
+bands keep their coverage over the original fitted smooth, including its
+evaluated factor levels:</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">sz_estimates</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/smooth_estimates.html">smooth_estimates</a></span><span class="op">(</span><span class="va">m_sz</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">sz_estimates</span>, grouped <span class="op">=</span> <span class="cn">FALSE</span>, show_ci <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<p><img src="custom-plotting_files/figure-html/factor-saved-estimates-1.png" class="r-plt" alt="" width="700"></p>
+<p>Ordered-factor <code>by</code> smooths use <code>"factor-by"</code>
+too. In the following model, <code>s(x2)</code> is the reference smooth
+and the ordered-factor terms describe deviations for the other levels.
+Grouping overlays only those deviations; the reference smooth remains a
+separate plot. No smooth is created for the ordered factor’s first
+level, and the displayed deviations do not have the reference smooth
+added to them.</p>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">factor_data</span><span class="op">$</span><span class="va">ordered_fac</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">ordered</a></span><span class="op">(</span><span class="va">factor_data</span><span class="op">$</span><span class="va">fac</span><span class="op">)</span></span>
+<span><span class="va">m_ordered</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="va">fac</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x2</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x2</span>, by <span class="op">=</span> <span class="va">ordered_fac</span><span class="op">)</span>,</span>
+<span>  data <span class="op">=</span> <span class="va">factor_data</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">m_ordered</span>, grouped <span class="op">=</span> <span class="st">"factor-by"</span>, parametric <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<p><img src="custom-plotting_files/figure-html/ordered-factor-grouping-1.png" class="r-plt" alt="" width="700"></p>
+<p><code>grouped_by</code> is deprecated. Replace
+<code>grouped_by = TRUE</code> with
+<code>grouped = c("factor-by", "sz", "fs")</code>; replace
+<code>grouped_by = FALSE</code> with
+<code>grouped = c("sz", "fs")</code>. During migration, an explicit
+<code>grouped_by</code> updates only <code>"factor-by"</code> membership
+in <code>grouped</code>.</p>
+</div>
+<div class="section level2">
 <h2 id="drawing-surfaces-in-3d">Drawing surfaces in 3D<a class="anchor" aria-label="anchor" href="#drawing-surfaces-in-3d"></a>
 </h2>
 <p>Numeric smooth and parametric surfaces can be displayed with
@@ -343,7 +409,7 @@ vector rectangles. The 3D display retains the current diverging RdBu
 palette, fill ranges, theme, and facet styling. Use
 <code>palette.fill.continuous</code> in <code><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme()</a></code> to choose
 another palette.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">eg2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/data_sim.html">data_sim</a></span><span class="op">(</span><span class="st">"eg2"</span>, n <span class="op">=</span> <span class="fl">400</span>, seed <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="va">m_surface</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/te.html" class="external-link">te</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">z</span>, k <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">5</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="va">x</span><span class="op">:</span><span class="va">z</span>,</span>
 <span>  data <span class="op">=</span> <span class="va">eg2</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span>
@@ -370,7 +436,7 @@ observations, boundaries, and contours share the surface’s depth
 ordering, so hidden parts are occluded by nearer faces.</p>
 <p>For a different view for each term, customize the named plots from
 <code><a href="../reference/assemble.html">assemble()</a></code>:</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">panels</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/assemble.html">assemble</a></span><span class="op">(</span><span class="va">m_surface</span>, surface <span class="op">=</span> <span class="st">"3d"</span>, n_2d <span class="op">=</span> <span class="fl">20</span><span class="op">)</span></span>
 <span><span class="co"># coord_3d() returns a coordinate and a theme; take just the coordinate.</span></span>
 <span><span class="va">panels</span><span class="op">[[</span><span class="st">"te(x,z)"</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">panels</span><span class="op">[[</span><span class="st">"te(x,z)"</span><span class="op">]</span><span class="op">]</span> <span class="op">+</span></span>
@@ -418,7 +484,7 @@ using these lower-level building blocks.</p>
 covariates. This is done using <code><a href="../reference/smooth_estimates.html">smooth_estimates()</a></code>. We also
 need to add a credible interval to the evaluations, which can be done
 <em>tidyverse</em>-style via <code><a href="../reference/add_confint.html">add_confint()</a></code></p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># evaluate the smooths</span></span>
 <span><span class="va">sm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/smooth_estimates.html">smooth_estimates</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/add_confint.html">add_confint</a></span><span class="op">(</span><span class="op">)</span></span>
@@ -442,7 +508,7 @@ need to add a credible interval to the evaluations, which can be done
 partial effects plots. To achieve the same effect, we need to add the
 partial residuals to the data used to fit the model. This can be done
 via <code><a href="../reference/add_partial_residuals.html">add_partial_residuals()</a></code></p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># add partial residuals to data</span></span>
 <span><span class="va">eg1</span> <span class="op">&lt;-</span> <span class="va">eg1</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/add_partial_residuals.html">add_partial_residuals</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span></span></code></pre></div>
@@ -451,7 +517,7 @@ convention as there’s nothing to indicate to the user that these are
 &lt;em&gt;partial residuals&lt;/em&gt; for the smooth with name matching the created
 variable name.&lt;/p&gt;"><sup>2</sup></a> add columns with names
 <code>"s(x0)"</code>. <code>"s(x1)"</code>, etc. to the data.</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">eg1</span><span class="op">)</span></span>
 <span><span class="co">#&gt;  [1] "y"     "x0"    "x1"    "x2"    "x3"    "f"     "f0"    "f1"    "f2"   </span></span>
 <span><span class="co">#&gt; [10] "f3"    "s(x0)" "s(x1)" "s(x2)" "s(x3)"</span></span></code></pre></div>
@@ -465,7 +531,7 @@ variable name.&lt;/p&gt;"><sup>2</sup></a> add columns with names
 <li>the estimated smooth as a line layer,</li>
 <li>some annotation</li>
 </ol>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">p_sx2</span> <span class="op">&lt;-</span> <span class="va">sm</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">.smooth</span> <span class="op">==</span> <span class="st">"s(x2)"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
@@ -487,7 +553,7 @@ variable name.&lt;/p&gt;"><sup>2</sup></a> add columns with names
 plot objects <code>p_sx0</code>, <code>p_sx1</code>, <code>p_sx2</code>,
 and <code>p_sx3</code> (code not shown), we can complete the plot by
 creating the patchwork with the desired number of rows and columns</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">p_sx0</span> <span class="op">+</span> <span class="va">p_sx1</span> <span class="op">+</span> <span class="va">p_sx2</span> <span class="op">+</span> <span class="va">p_sx3</span> <span class="op">+</span> <span class="fu"><a href="https://patchwork.data-imaginist.com/reference/plot_layout.html" class="external-link">plot_layout</a></span><span class="op">(</span>ncol <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
 <p><img src="custom-plotting_files/figure-html/custom-plot-final-1.png" class="r-plt" alt="" width="700"></p>
 <p>The real benefit of having complete control over how the data are
@@ -496,7 +562,7 @@ variables to plot aesthetics. As an example, let’s assume we have a
 factor variable in the original data and we want to colour the partial
 residuals according to the levels of this factor. Let’s create that
 factor</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">12</span><span class="op">)</span></span>
 <span><span class="va">eg1</span> <span class="op">&lt;-</span> <span class="va">eg1</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>fac <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="va">letters</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">]</span>, <span class="fu"><a href="https://dplyr.tidyverse.org/reference/context.html" class="external-link">n</a></span><span class="op">(</span><span class="op">)</span>, replace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
@@ -504,7 +570,7 @@ factor</p>
 colour aesthetic when we plot the partial residuals. To save some
 typing, we’ll reorder the layers in the plot and add the partial
 residuals last</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">plt</span> <span class="op">&lt;-</span> <span class="va">sm</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">.smooth</span> <span class="op">==</span> <span class="st">"s(x2)"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
@@ -533,7 +599,7 @@ could also do this by plotting the actual residuals against covariates).
 In the code chunk below, we map the covariate <code>x1</code> to both
 the <em>colour</em> and <em>size</em> aesthetics (note we deleted
 <code>size = 1.5</code> to allow the mapping to <em>size</em>)</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">plt</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span></span>

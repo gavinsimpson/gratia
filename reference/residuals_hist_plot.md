@@ -99,7 +99,10 @@ residuals_hist_plot(
 - ...:
 
   optional arguments passed to model preparation, such as the sdmTMB
-  `field_method`.
+  `field_method`. For grouped-family GAMs and joint GJRM models,
+  `response = NULL` uses every response and an integer selects one; see
+  [`appraise()`](https://gavinsimpson.github.io/gratia/reference/appraise.md).
+  Selection leaves `by_family` independent.
 
 - n_dharma:
 
