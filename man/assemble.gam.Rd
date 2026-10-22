@@ -27,7 +27,7 @@
   rug = TRUE,
   distinct_rug = TRUE,
   contour = TRUE,
-  grouped_by = FALSE,
+  grouped_by = deprecated(),
   ci_alpha = 0.2,
   ci_col = "black",
   smooth_col = "black",
@@ -73,7 +73,10 @@
   simultaneous_domain = NULL,
   tube_control = list(),
   cyclic = c("cartesian", "polar"),
-  polar_args = list()
+  polar_args = list(),
+  grouped = c("sz", "fs"),
+  show_ci = c("factor-by", "sz"),
+  time_varying_style = c("ribbon", "pointrange")
 )
 
 \method{assemble}{gamm}(object, ...)
@@ -185,9 +188,8 @@ the distinct values?}
 \item{contour}{logical; should contours be draw on the plot using
 \code{\link[ggplot2:geom_contour]{ggplot2::geom_contour()}}.}
 
-\item{grouped_by}{logical; should factor by smooths be drawn as one panel
-per level of the factor (\code{FALSE}, the default), or should the individual
-smooths be combined into a single panel containing all levels (\code{TRUE})?}
+\item{grouped_by}{Deprecated; use \code{grouped}. Explicit \code{TRUE} adds
+\code{"factor-by"} to \code{grouped}; \code{FALSE} removes it, retaining the other types.}
 
 \item{ci_alpha}{Deprecated; use \code{\link[=gratia_theme_get]{gratia_theme_get()}} theme
 settings instead. Numeric; alpha transparency for confidence or simultaneous
@@ -264,8 +266,9 @@ points, with a message, because they do not define surface cells. Incomplete
 observation rug coordinates are omitted. Grouped factor-by spherical
 surfaces use separate facets for each factor level.}
 
-\item{wrap}{logical; wrap plots as a patchwork? If \code{FALSE}, a list of
-ggplot objects is returned, 1 per term plotted.}
+\item{wrap}{logical; wrap plots as a patchwork? If \code{FALSE}, return a list
+of ggplot objects, one for each displayed panel. Separate factor levels
+can produce several plots for one smooth term.}
 
 \item{caption}{logical; show the smooth type in the caption of each plot?}
 
@@ -416,6 +419,30 @@ default (\code{r.axis.inside = TRUE}); supplied values override this default.
 Other options use their ggplot2 defaults. Requires
 \code{cyclic = "polar"} when nonempty. The angular variable, fitted cycle
 boundaries, full-circle extent and angular expansion are set by gratia.}
+
+\item{grouped}{character or \code{FALSE}; factor smooth types whose curves share
+a panel. Choose any of \code{"factor-by"}, \code{"sz"}, and \code{"fs"}, or \code{FALSE} to
+separate all their curves. The default, \code{c("sz", "fs")}, overlays \code{sz}
+and \code{fs} curves and separates factor-by curves. \code{"factor-by"} includes
+ordered factors. In reference-plus-deviation models the reference smooth
+remains separate; only fitted nonreference deviations are grouped.
+For \code{sz} terms with several factors, separate plots show each evaluated
+combination of levels. Applies to curves with one continuous covariate;
+existing surface displays are unchanged. Separate curves use the usual
+univariate styling: a black line and a translucent black interval by
+default, with colours and opacity controlled by the smooth theme settings.}
+
+\item{show_ci}{character or \code{FALSE}; factor smooth types whose curves show
+intervals. Choose any of \code{"factor-by"}, \code{"sz"}, and \code{"fs"}, or \code{FALSE} to
+hide all their ribbons. The default, \code{c("factor-by", "sz")}, retains
+existing interval visibility; including \code{"fs"} enables its intervals.
+Controls display only, independently of \code{interval} and \code{grouped}.
+Ordinary smooths and parametric effects retain their intervals.}
+
+\item{time_varying_style}{Display sdmTMB time-varying coefficients using
+a line, points and interval ribbon (\code{"ribbon"}, the default), or points
+and interval bars with a connecting line (\code{"pointrange"}). Other model
+terms keep their usual displays.}
 
 \item{centre}{character; for SCAM models, \code{"model"} retains each fitted
 smooth contribution. \code{"plot"} subtracts the evaluation-grid mean from

@@ -1592,7 +1592,7 @@ smooth_estimates.gjrm <- smooth_estimates.gamlss
                                     constant = NULL,
                                     fun = NULL,
                                     contour = TRUE,
-                                    grouped_by = FALSE,
+                                    grouped_by = deprecated(),
                                     contour_col = "black",
                                     n_contour = NULL,
                                     ci_alpha = 0.2,
@@ -1623,7 +1623,13 @@ smooth_estimates.gjrm <- smooth_estimates.gamlss
                                     interval = NULL,
                                     ..., variables = NULL,
                                     cyclic = c("cartesian", "polar"),
-                                    polar_args = list()) {
+                                    polar_args = list(),
+                                    grouped = c("sz", "fs"),
+                                    show_ci = c("factor-by", "sz")) {
+  factor_controls <- resolve_factor_plot_controls(grouped, show_ci, grouped_by,
+    "draw.smooth_estimates")
+  grouped <- factor_controls$grouped
+  show_ci <- factor_controls$show_ci
   gratia_plot_arguments(c("contour_col", "ci_alpha", "ci_col", "smooth_col", "resid_col", "decrease_col", "increase_col", "change_lwd", "ci_3d_alpha", "ci_3d_col"), environment())
   dots <- names(match.call(expand.dots = FALSE)$...)
   controls <- intersect(dots, c("interval_method", "shape_source", "frequentist",
@@ -1667,38 +1673,10 @@ smooth_estimates.gjrm <- smooth_estimates.gamlss
   # grab tensor term order if present, if not present it is NULL & that's OK
   tensor_term_order <- attr(object, "tensor_term_order")
 
-  # draw smooths
-  # the factor in group_split is to reorder to way the smooths entered the
-  # model
-  sm_levs <- unique(object$.smooth)
-
-  sm_l <- if (isTRUE(grouped_by)) {
-    levs <- unique(str_split_fixed(object$.smooth, ":", n = 2)[, 1])
-    # nest the object so we can reuse the code/ideas from draw.gam
-    sm_l <- object |>
-      nest(data = !any_of(c(".smooth", ".type", ".by", ".smooth_id", ".model"))) |>
-        mutate(
-          ..smooth.. = factor(.data$.smooth, levels = sm_levs),
-          .term = str_split_fixed(.data$.smooth, ":", n = 2)[, 1],
-          ..by.. = if_else(is.na(.data$.by), "..no_level..", .data$.by),
-          ..component.. = if (".smooth_id" %in% names(object)) {
-            .data$.smooth_id
-          } else match(.data$.type, unique(.data$.type)),
-          ..model.. = if (".model" %in% names(object)) {
-            factor(.data$.model, levels = unique(.data$.model))
-          } else factor(1L)
-        ) |>
-        relocate(".term", .before = 1L)
-    grp_by_levs <- unique(sm_l$"..by..")
-    sm_l |>
-      group_split(factor(.data$.term, levels = levs),
-        factor(.data$"..by..", levels = grp_by_levs),
-        factor(.data$..component.., levels = unique(.data$..component..)),
-        .data$..model..)
-  } else {
-    # the factor is to reorder to way the smooths entered the model
-    split_smooth_components(object)
-  }
+  sm_l <- prepare_factor_smooth_panels(object, grouped, show_ci,
+    tensor_term_order = tensor_term_order, tensor_plot_info = plot_info,
+    plot_variables = plot_variables,
+    coordinate_info = attr(object, "coordinate_info"))
   ## plot
   plts <- map(sm_l,
     draw_smooth_estimates,
@@ -1739,7 +1717,6 @@ smooth_estimates.gjrm <- smooth_estimates.gamlss
     scam_smooth_info = scam_info,
     back_transform = back_transform,
     caption = caption,
-    grouped_by = grouped_by,
     ...
   )
 
@@ -1795,6 +1772,8 @@ smooth_estimates.gjrm <- smooth_estimates.gamlss
                                     cyclic_info = NULL,
                                     variables = NULL,
                                     ...) {
+  factor_plot <- attr(object, "factor_plot")
+  if (!is.null(factor_plot)) grouped_by <- factor_plot$grouped_by
   check_shape_effect_transform(interval_info, constant, fun)
   surface <- match.arg(surface)
   validate_surface_3d(surface_3d)
@@ -1837,12 +1816,14 @@ smooth_estimates.gjrm <- smooth_estimates.gamlss
     obj_nms <- names(object)
     ## preserve partial residuals and rug data if present
     if ("rug_data" %in% obj_nms) {
-      rug_data <- if (identical(sm_type, "SOS") && isTRUE(grouped_by)) {
+      rug_data <- if (isTRUE(grouped_by)) {
         bind_rows(object[["rug_data"]])
       } else object[["rug_data"]][[1L]]
     }
     if ("partial_residual" %in% obj_nms) {
-      p_residuals <- object[["partial_residual"]][[1L]]
+      p_residuals <- if (isTRUE(grouped_by)) {
+        bind_rows(object[["partial_residual"]])
+      } else object[["partial_residual"]][[1L]]
     }
     ## remove partial residuals and rug data from object
     object <- select(object, !any_of(c("partial_residual", "rug_data")))
@@ -2024,6 +2005,8 @@ smooth_estimates.gjrm <- smooth_estimates.gamlss
   attr(object, "interval_info") <- interval_info
   attr(object, "shape_constraints") <- shape_constraints
   attr(object, "scam_smooth_info") <- scam_smooth_info
+  attr(object, "factor_panel_subtitle") <- factor_plot$subtitle
+  attr(object, "show_smooth_interval") <- factor_plot$interval
   plt <- plot_smooth(
     object,
     mrf_plot = mrf_plot,
@@ -2057,6 +2040,8 @@ smooth_estimates.gjrm <- smooth_estimates.gamlss
     lims_method = lims_method,
     caption = caption,
     grouped_by = grouped_by,
+    curve_interval = factor_plot$interval,
+    separate_factor = isTRUE(factor_plot$separate),
     ...
   )
   if (!is.null(polar_info)) {

@@ -1,5 +1,183 @@
 # Utilities involved in draw methods
 
+validate_factor_plot_types <- function(value, argument) {
+  choices <- c("factor-by", "sz", "fs")
+  if (identical(value, FALSE)) return(character(0))
+  if (!is.character(value) || anyNA(value) || any(!value %in% choices)) {
+    cli::cli_abort("{.arg {argument}} must be FALSE or a character vector containing only {.val {choices}}.")
+  }
+  unique(value)
+}
+
+resolve_factor_plot_controls <- function(grouped, show_ci, grouped_by,
+                                         caller) {
+  grouped <- validate_factor_plot_types(grouped, "grouped")
+  show_ci <- validate_factor_plot_types(show_ci, "show_ci")
+  if (lifecycle::is_present(grouped_by)) {
+    if (!is.logical(grouped_by) || length(grouped_by) != 1L ||
+        is.na(grouped_by)) {
+      cli::cli_abort("`grouped_by` must be a single TRUE or FALSE.")
+    }
+    lifecycle::deprecate_warn("0.11.2.59", paste0(caller, "(grouped_by)"),
+      paste0(caller, "(grouped)"), details =
+        'Use "factor-by" in `grouped` to overlay factor-by curves, or omit it to separate them.',
+      user_env = globalenv())
+    grouped <- if (grouped_by) union(grouped, "factor-by") else {
+      setdiff(grouped, "factor-by")
+    }
+  }
+  list(grouped = grouped, show_ci = show_ci)
+}
+
+factor_plot_term <- function(label, by) {
+  if (is.na(by)) return(label)
+  suffixes <- gregexpr(paste0(":", by), label, fixed = TRUE)[[1L]]
+  if (suffixes[1L] < 0L) return(label)
+  # A colon inside a quoted covariate expression is not the by suffix.
+  for (suffix in suffixes) {
+    term <- substr(label, 1L, suffix - 1L)
+    expression <- tryCatch(parse(text = term), error = function(e) NULL)
+    if (length(expression) == 1L) return(term)
+  }
+  substr(label, 1L, suffixes[1L] - 1L)
+}
+
+# Resolve variable roles in exactly the same way for models and saved estimates.
+factor_plot_spec <- function(object, tensor_term_order = NULL,
+                              tensor_plot_info = NULL, plot_variables = NULL,
+                              coordinate_info = NULL) {
+  label <- as.character(object$.smooth[1L])
+  by <- as.character(object$.by[1L])
+  term <- factor_plot_term(label, by)
+  values <- if ("data" %in% names(object)) {
+    dplyr::bind_rows(object$data)
+  } else object
+  variables <- plot_variables[[label]]
+  if (is.null(variables)) variables <- tensor_plot_info[[label]]$variables
+  if (is.null(variables)) variables <- tensor_term_order[[label]]
+  if (is.null(variables)) {
+    variables <- attr(coordinate_info, "smooth_variables")[[label]]
+  }
+  if (is.null(variables)) variables <- vars_from_label(term)
+  factors <- variables[vapply(values[variables], is.factor, logical(1))]
+  numeric <- variables[vapply(values[variables], is.numeric, logical(1))]
+  type <- as.character(object$.type[1L])
+  category <- if (!is.na(by) && is.factor(values[[by]])) "factor-by" else {
+    if (type == "Factor smooth") "fs" else {
+      if (type == "Constr. factor smooth") "sz" else NA_character_
+    }
+  }
+  curve <- length(numeric) == 1L &&
+    (identical(category, "factor-by") && length(variables) == 1L ||
+      category %in% c("fs", "sz") && length(factors) > 0L)
+  list(category = category, curve = curve, factors = factors, term = term,
+    by = by, type = type)
+}
+
+factor_panel_name <- function(object) {
+  name <- attr(object, "factor_plot")$name
+  if (is.null(name)) unique(object$.term) else name
+}
+
+# Plan one input per ggplot; renderers never need to return lists of plots.
+prepare_factor_smooth_panels <- function(object, grouped, show_ci,
+    tensor_term_order = attr(object, "tensor_term_order"),
+    tensor_plot_info = attr(object, "tensor_plot_info"),
+    plot_variables = attr(object, "plot_variables"),
+    coordinate_info = attr(object, "coordinate_info")) {
+  if (!"data" %in% names(object)) {
+    object <- tidyr::nest(object,
+      data = !tidyselect::any_of(c(".smooth", ".type", ".by", ".smooth_id", ".model")))
+  }
+  components <- split_smooth_components(object)
+  specs <- lapply(components, factor_plot_spec,
+    tensor_term_order = tensor_term_order, tensor_plot_info = tensor_plot_info,
+    plot_variables = plot_variables, coordinate_info = coordinate_info)
+  groups <- seq_along(components)
+  by_ids <- which(vapply(specs, function(x) {
+    identical(x$category, "factor-by") && "factor-by" %in% grouped
+  }, logical(1)))
+  if (length(by_ids)) {
+    keys <- dplyr::bind_rows(lapply(by_ids, function(i) {
+      x <- components[[i]]
+      tibble::tibble(term = specs[[i]]$term, type = specs[[i]]$type,
+        by = specs[[i]]$by, model = if (".model" %in% names(x)) {
+          as.character(x$.model[1L])
+        } else NA_character_, label = as.character(x$.smooth[1L]))
+    }))
+    # Repeated components with identical labels remain separate across levels.
+    identities <- vctrs::vec_group_id(keys)
+    keys$component <- stats::ave(seq_along(identities), identities, FUN = seq_along)
+    keys$label <- NULL
+    ids <- vctrs::vec_group_id(keys)
+    groups[by_ids] <- by_ids[match(ids, ids)]
+  }
+  panels <- list()
+  for (g in unique(groups)) {
+    ids <- which(groups == g)
+    entry <- dplyr::bind_rows(components[ids])
+    spec <- specs[[ids[1L]]]
+    entry$.term <- spec$term
+    settings <- list(grouped_by = identical(spec$category, "factor-by") &&
+        "factor-by" %in% grouped,
+      interval = if (spec$curve) spec$category %in% show_ci else NULL,
+      separate = spec$curve && spec$category %in% c("fs", "sz") &&
+        !spec$category %in% grouped,
+      subtitle = NULL, name = NULL)
+    if (!settings$separate) {
+      attr(entry, "factor_plot") <- settings
+      panels[[length(panels) + 1L]] <- entry
+      next
+    }
+    values <- dplyr::bind_rows(entry$data)
+    states <- vctrs::vec_unique(values[spec$factors])
+    states <- states[do.call(order, states), , drop = FALSE]
+    matches <- vctrs::vec_match(values[spec$factors], states)
+    for (i in seq_len(nrow(states))) {
+      panel <- entry[1L, , drop = FALSE]
+      panel$data <- list(values[matches == i, , drop = FALSE])
+      for (column in intersect(c("rug_data", "partial_residual"), names(panel))) {
+        observations <- dplyr::bind_rows(entry[[column]])
+        if (all(spec$factors %in% names(observations))) {
+          observations <- observations[
+            vctrs::vec_match(observations[spec$factors], states) %in% i, , drop = FALSE]
+        }
+        panel[[column]] <- list(observations)
+      }
+      settings$subtitle <- paste(vapply(spec$factors, function(v) {
+        paste0(v, " = ", encodeString(as.character(states[[v]][i]), quote = '"'))
+      }, character(1)), collapse = ", ")
+      settings$name <- paste0(spec$term, ": ", settings$subtitle)
+      attr(panel, "factor_plot") <- settings
+      panels[[length(panels) + 1L]] <- panel
+    }
+  }
+  panels
+}
+
+# Hidden ribbons must not determine the common range of curve plots.
+factor_smooth_plot_range <- function(object, show_ci, constant = NULL,
+    fun = NULL, transform = FALSE) {
+  specs <- split_smooth_components(object)
+  ranges <- lapply(specs, function(x) {
+    spec <- factor_plot_spec(x,
+      tensor_term_order = attr(object, "tensor_term_order"),
+      tensor_plot_info = attr(object, "tensor_plot_info"),
+      plot_variables = attr(object, "plot_variables"),
+      coordinate_info = attr(object, "coordinate_info"))
+    d <- dplyr::bind_rows(x$data)
+    columns <- if (spec$curve && !spec$category %in% show_ci) ".estimate" else {
+      c(".estimate", ".lower_ci", ".upper_ci")
+    }
+    if (transform) {
+      d <- add_constant(d, constant = constant, column = columns)
+      d <- transform_fun(d, fun = fun, column = columns)
+    }
+    unlist(d[intersect(columns, names(d))], use.names = FALSE)
+  })
+  unlist(ranges, use.names = FALSE)
+}
+
 # Keep one covariate order from grid generation through saved estimates.
 validate_plot_variables <- function(variables, expected) {
   if (is.null(variables)) return(expected)
@@ -152,9 +330,7 @@ plan_smooth_variables <- function(model, ids, variables = NULL) {
 # The boundary and wiggly soap components have the same mgcv smooth label.
 # Use fitted indices when labels and types both collide, retaining public labels.
 split_smooth_components <- function(data) {
-  identity <- if (".smooth_id" %in% names(data)) data$.smooth_id else {
-    paste(data$.smooth, data$.type, sep = "\r")
-  }
-  key <- match(identity, unique(identity))
+  columns <- intersect(c(".smooth", ".type", ".model", ".smooth_id"), names(data))
+  key <- vctrs::vec_group_id(data[columns])
   unname(split(data, key))
 }

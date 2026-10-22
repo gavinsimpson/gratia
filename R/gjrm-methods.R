@@ -120,7 +120,11 @@
 assemble.gamlss <- function(object, scales = c("free", "fixed"), ..., residuals = FALSE,
                             n = 100, envir = NULL, select = NULL,
                             parametric = NULL, terms = NULL,
-                            partial_match = FALSE) {
+                            partial_match = FALSE,
+                            grouped_by = deprecated(), grouped = c("sz", "fs"),
+                            show_ci = c("factor-by", "sz")) {
+  factor_controls <- resolve_factor_plot_controls(grouped, show_ci, grouped_by,
+    "assemble.gamlss")
   scales <- match.arg(scales)
   joint <- !isTRUE(object$univar.gamlss)
   dots <- list(...)
@@ -159,7 +163,9 @@ assemble.gamlss <- function(object, scales = c("free", "fixed"), ..., residuals 
       (is.null(terms) || length(local_terms) > 0L)
     if (any(local_select) || local_parametric) {
       panels <- assemble(m, select = local_select, parametric = local_parametric,
-        terms = local_terms, residuals = residuals, partial_match = FALSE, n = n, envir = envir,
+        terms = local_terms, residuals = residuals, partial_match = FALSE,
+        n = n, envir = envir, grouped = factor_controls$grouped,
+        show_ci = factor_controls$show_ci,
         ...)
       # Preserve familiar titles; names expose the unambiguous selection keys.
       panel_names <- names(panels)
@@ -171,13 +177,20 @@ assemble.gamlss <- function(object, scales = c("free", "fixed"), ..., residuals 
         if (length(positions)) {
           global <- labels[index[positions]]
           if (length(global) > 1L) {
-            global <- unique(sub(":.*", "", global))
+            global <- unique(vapply(global, factor_plot_term, character(1),
+              by = m$smooth[[positions[1L]]]$by))
             if (length(global) == 1L && global %in% labels) {
               global <- paste0(global, " (equation ",
                 attr(m, "gratia.gjrm_equation", exact = TRUE), ")")
             }
           }
-          if (length(global) == 1L) panel_names[j] <- global
+          if (length(global) == 1L) {
+            suffix <- if (length(positions) == 1L &&
+                startsWith(panel_names[j], local_labels[positions])) {
+              substring(panel_names[j], nchar(local_labels[positions]) + 1L)
+            } else ""
+            panel_names[j] <- paste0(global, suffix)
+          }
         }
       }
       if (joint) {

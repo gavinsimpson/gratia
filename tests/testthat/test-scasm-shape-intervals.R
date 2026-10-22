@@ -187,7 +187,7 @@ test_that("factor by smooths and multiple predictors retain component identity",
   for (label in unique(a$.smooth)) {
     expect_true(all(diff(a$.lower_ci[a$.smooth == label]) >= -1e-10))
   }
-  expect_silent(draw(a, grouped_by = TRUE))
+  expect_silent(draw(a, grouped = c("factor-by", "sz", "fs")))
   multi <- mgcv::scasm(list(y ~ s(x, bs = "sc", xt = "m+", k = 5),
     ~s(z, bs = "sc", xt = "m+", k = 5)), data = d, family = mgcv::gaulss())
   a <- smooth_estimates(multi, n = 12, interval = "simultaneous",

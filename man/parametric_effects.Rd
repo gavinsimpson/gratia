@@ -125,6 +125,13 @@ interaction. Components follow the model's contrast coding: with treatment
 contrasts, a numeric-by-factor interaction represents a departure from the
 reference-level slope, rather than a complete slope for each level.
 
+For sdmTMB time-varying coefficients, \code{.type = "time_varying"} identifies
+coefficient trajectories. In these rows, \code{.value} contains time, \code{.partial}
+contains the full coefficient, and \code{.se} includes the joint uncertainty of
+its ordinary coefficient and temporal deviation. Default selection omits
+ordinary terms already included in these trajectories; their usual selectors
+remain available for explicit requests. See \link{sdmTMB-methods} for details.
+
 A multi-column term such as \code{poly(x, 3)} is one component, whereas \code{x} and
 \code{I(x^2)} remain separate components. Scalar numeric transformations use model
 coordinates by default, including each axis of an interaction. Basis

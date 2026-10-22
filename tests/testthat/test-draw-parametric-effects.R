@@ -176,7 +176,7 @@ test_that("parametric effects works with missing data in model fit", {
 
   expect_silent(plt <- draw(m_rat,
     residuals = TRUE, rug = FALSE,
-    grouped_by = TRUE, parametric = TRUE,
+    grouped = c("factor-by", "sz", "fs"), parametric = TRUE,
     data = rats
   ))
 

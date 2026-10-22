@@ -49,9 +49,9 @@ test_that("model subtitles coexist with by labels and respect user labels", {
     c("Mean (mu); By: fac; a", "Mean (mu); By: fac; b",
       "Standard deviation (sigma)"))
   expected <- c("Mean (mu); By: fac", "Standard deviation (sigma)")
-  expect_identical(plot_subtitles(draw(m, grouped_by = TRUE,
+  expect_identical(plot_subtitles(draw(m, grouped = c("factor-by", "sz", "fs"),
     parametric = FALSE, wrap = FALSE)), expected)
-  p <- draw(smooth_estimates(m), grouped_by = TRUE)
+  p <- draw(smooth_estimates(m), grouped = c("factor-by", "sz", "fs"))
   expect_identical(vapply(seq_len(length(p)), function(i)
     p[[i]]$labels$subtitle, character(1)), expected)
   for (subtitle in list("Custom subtitle", "", expression(sigma))) {

@@ -40,6 +40,13 @@
 #' contrasts, a numeric-by-factor interaction represents a departure from the
 #' reference-level slope, rather than a complete slope for each level.
 #'
+#' For sdmTMB time-varying coefficients, `.type = "time_varying"` identifies
+#' coefficient trajectories. In these rows, `.value` contains time, `.partial`
+#' contains the full coefficient, and `.se` includes the joint uncertainty of
+#' its ordinary coefficient and temporal deviation. Default selection omits
+#' ordinary terms already included in these trajectories; their usual selectors
+#' remain available for explicit requests. See [sdmTMB-methods] for details.
+#'
 #' A multi-column term such as `poly(x, 3)` is one component, whereas `x` and
 #' `I(x^2)` remain separate components. Scalar numeric transformations use model
 #' coordinates by default, including each axis of an interaction. Basis
@@ -331,10 +338,13 @@ draw.parametric_effects <- function(object,
                                     ci_3d_alpha = 0.15, ci_3d_col = "grey60",
                                     continuous_fill = NULL,
                                     discrete_colour = NULL, discrete_fill = NULL,
-                                    back_transform = FALSE) {
+                                    back_transform = FALSE,
+                                    time_varying_style = c("ribbon", "pointrange")) {
   gratia_plot_arguments(c("ci_col", "ci_alpha", "line_col", "contour_col", "ci_3d_alpha", "ci_3d_col"), environment())
   check_back_transform(back_transform)
+  time_varying_style <- match.arg(time_varying_style)
   axis_info <- attr(object, "axis_info")
+  time_varying_info <- attr(object, "time_varying_info")
   from_raw <- isTRUE(attr(object, "back_transform"))
   if ("data" %in% names(object) && !".partial" %in% names(object)) {
     info <- attr(object, "term_info")
@@ -389,6 +399,8 @@ draw.parametric_effects <- function(object,
         angle = angle,
         factor_levels = f_levels, term_info = term_info,
         axis_info = axis_info, from_raw = from_raw,
+        time_varying_info = time_varying_info,
+        time_varying_style = time_varying_style,
         back_transform = back_transform,
         contour = contour, contour_col = contour_col, n_contour = n_contour,
         surface = surface, surface_3d = surface_3d,
@@ -425,6 +437,7 @@ draw.parametric_effects <- function(object,
 #' @param factor_levels list; a named list of factor levels
 #' @param axis_info Internal per-term mappings between model and raw coordinates.
 #' @param from_raw Internal logical; are the supplied coordinates on the raw scale?
+#' @param time_varying_info Internal per-term labels for time-varying coefficients.
 #'
 #' @inheritParams draw.gam
 #'
@@ -456,8 +469,18 @@ draw.parametric_effects <- function(object,
                                      discrete_colour = NULL, discrete_fill = NULL,
                                      axis_info = NULL, from_raw = FALSE,
                                      back_transform = FALSE,
+                                     time_varying_info = NULL,
+                                     time_varying_style = c("ribbon", "pointrange"),
                                      ...) {
   term <- unique(object$.term)
+  if (identical(unique(object$.type), "time_varying")) {
+    return(draw_time_varying_coefficient(object,
+      info = time_varying_info[[term]], style = time_varying_style,
+      ci_level = ci_level, ci_col = ci_col, ci_alpha = ci_alpha,
+      line_col = line_col, constant = constant, fun = fun,
+      xlab = xlab, ylab = ylab, title = title, subtitle = subtitle,
+      caption = caption, ylim = ylim, angle = angle))
+  }
   axes <- axis_info[[term]]
   displayed <- display_parametric_axes(object, axes, from_raw, back_transform)
   object <- displayed$data

@@ -93,6 +93,10 @@
 #'   Function `fun` will be applied after adding any `constant`, if
 #'   provided.
 #' @param ci_level numeric between 0 and 1; the coverage of credible interval.
+#' @param time_varying_style Display sdmTMB time-varying coefficients using
+#'   a line, points and interval ribbon (`"ribbon"`, the default), or points
+#'   and interval bars with a connecting line (`"pointrange"`). Other model
+#'   terms keep their usual displays.
 #' @param n numeric; the number of points over the range of the covariate at
 #'   which to evaluate a univariate smooth.
 #' @param n_2d numeric; the number of points along each of the first two axes
@@ -148,9 +152,25 @@
 #'   the distinct values?
 #' @param contour logical; should contours be draw on the plot using
 #'   [ggplot2::geom_contour()].
-#' @param grouped_by logical; should factor by smooths be drawn as one panel
-#'   per level of the factor (`FALSE`, the default), or should the individual
-#'   smooths be combined into a single panel containing all levels (`TRUE`)?
+#' @param grouped character or `FALSE`; factor smooth types whose curves share
+#'   a panel. Choose any of `"factor-by"`, `"sz"`, and `"fs"`, or `FALSE` to
+#'   separate all their curves. The default, `c("sz", "fs")`, overlays `sz`
+#'   and `fs` curves and separates factor-by curves. `"factor-by"` includes
+#'   ordered factors. In reference-plus-deviation models the reference smooth
+#'   remains separate; only fitted nonreference deviations are grouped.
+#'   For `sz` terms with several factors, separate plots show each evaluated
+#'   combination of levels. Applies to curves with one continuous covariate;
+#'   existing surface displays are unchanged. Separate curves use the usual
+#'   univariate styling: a black line and a translucent black interval by
+#'   default, with colours and opacity controlled by the smooth theme settings.
+#' @param show_ci character or `FALSE`; factor smooth types whose curves show
+#'   intervals. Choose any of `"factor-by"`, `"sz"`, and `"fs"`, or `FALSE` to
+#'   hide all their ribbons. The default, `c("factor-by", "sz")`, retains
+#'   existing interval visibility; including `"fs"` enables its intervals.
+#'   Controls display only, independently of `interval` and `grouped`.
+#'   Ordinary smooths and parametric effects retain their intervals.
+#' @param grouped_by Deprecated; use `grouped`. Explicit `TRUE` adds
+#'   `"factor-by"` to `grouped`; `FALSE` removes it, retaining the other types.
 #' @param ci_alpha Deprecated; use [gratia_theme_get()] theme
 #'   settings instead. Numeric; alpha transparency for confidence or simultaneous
 #'   interval.
@@ -237,8 +257,9 @@
 #'   points, with a message, because they do not define surface cells. Incomplete
 #'   observation rug coordinates are omitted. Grouped factor-by spherical
 #'   surfaces use separate facets for each factor level.
-#' @param wrap logical; wrap plots as a patchwork? If \code{FALSE}, a list of
-#'   ggplot objects is returned, 1 per term plotted.
+#' @param wrap logical; wrap plots as a patchwork? If `FALSE`, return a list
+#'   of ggplot objects, one for each displayed panel. Separate factor levels
+#'   can produce several plots for one smooth term.
 #' @param caption logical; show the smooth type in the caption of each plot?
 #' @param envir an optional environment for looking up data, functions and
 #'   constants. Defaults to the model's evaluation environment.
@@ -378,7 +399,7 @@
   rug = TRUE,
   distinct_rug = TRUE,
   contour = TRUE,
-  grouped_by = FALSE,
+  grouped_by = deprecated(),
   ci_alpha = 0.2,
   ci_col = "black",
   smooth_col = "black",
@@ -415,7 +436,9 @@
   ..., variables = NULL,
   simultaneous_method = c('simulation', 'tube'),
   simultaneous_domain = NULL, tube_control = list(),
-  cyclic = c("cartesian", "polar"), polar_args = list()
+  cyclic = c("cartesian", "polar"), polar_args = list(),
+  grouped = c("sz", "fs"), show_ci = c("factor-by", "sz"),
+  time_varying_style = c("ribbon", "pointrange")
 ) {
   .call <- match.call()
   .call[[1L]] <- if (is_scasm_model(object)) draw.scasm else draw_gam_impl
@@ -443,7 +466,7 @@ draw_gam_impl <- function(
   rug = TRUE,
   distinct_rug = TRUE,
   contour = TRUE,
-  grouped_by = FALSE,
+  grouped_by = deprecated(),
   ci_alpha = 0.2,
   ci_col = "black",
   smooth_col = "black",
@@ -480,8 +503,11 @@ draw_gam_impl <- function(
   ..., variables = NULL,
   simultaneous_method = c('simulation', 'tube'),
   simultaneous_domain = NULL, tube_control = list(),
-  cyclic = c("cartesian", "polar"), polar_args = list()
+  cyclic = c("cartesian", "polar"), polar_args = list(),
+  grouped = c("sz", "fs"), show_ci = c("factor-by", "sz"),
+  time_varying_style = c("ribbon", "pointrange")
 ) {
+  time_varying_style <- match.arg(time_varying_style)
   surface <- match.arg(surface)
   validate_surface_3d(surface_3d)
   validate_ci_3d(ci_3d, ci_3d_alpha, ci_3d_col)

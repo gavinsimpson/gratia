@@ -111,12 +111,23 @@ test_that("sz curves retain intervals, coloured rugs and interaction labels", {
     expect_equal(p$labels$fill, "f")
     d$g <- factor(rep(c("a", "b", "a"), n))
     p <- plot_smooth.sz_factor_smooth(d, variables = c("x", "f", "g"), rug = d)
-    expect_equal(p$data$.sz_var, interaction(d[c("f", "g")],
-      sep = ":", lex.order = TRUE))
-    expect_equal(p$labels$colour, c("f", "g"))
+    expect_equal(as.integer(p$data$.sz_var),
+      vctrs::vec_match(d[c("f", "g")], unique(d[c("f", "g")])))
+    expect_equal(p$labels$colour, "f:g")
     expect_equal(p$layers[[3]]$data$.sz_var, p$data$.sz_var)
     expect_silent(ggplot2::ggplot_build(p))
   }
+})
+
+test_that("sz grouping distinguishes factor levels containing separators", {
+  d <- curve_data(2)
+  d$f <- factor(rep(c("a:b", "a"), each = 3))
+  d$g <- factor(rep(c("c", "b:c"), each = 3))
+  p <- plot_univariate_sz_smooth(d, variables = c("x", "f", "g"), rug = d)
+  b <- ggplot2::ggplot_build(p)
+  expect_equal(length(unique(b$data[[2]]$group)), 2L)
+  expect_equal(nlevels(p$data$.sz_var), 2L)
+  expect_equal(length(unique(b$data[[3]]$colour)), 2L)
 })
 
 test_that("by labels, disabled grouping and caption switches are preserved", {
@@ -163,8 +174,8 @@ test_that("continuous by curves build through both draw entry points", {
   d$y <- sin(4 * d$x) * d$z + rnorm(60, sd = 0.1)
   m <- mgcv::gam(y ~ s(x, by = z, k = 5), data = d)
   sm <- smooth_estimates(m, n = 8)
-  for (p in list(draw(m, n = 8, rug = FALSE, grouped_by = TRUE),
-    draw(sm, grouped_by = TRUE))) {
+  for (p in list(draw(m, n = 8, rug = FALSE, grouped = "factor-by"),
+    draw(sm, grouped = "factor-by"))) {
     panel <- p[[1]]
     expect_equal(curve_geoms(panel), c("GeomRibbon", "GeomLine"))
     expect_equal(panel$labels$subtitle, "By: z")
@@ -185,7 +196,7 @@ test_that("curve methods preserve common label overrides and caption handling", 
     for (caption in list(NULL, TRUE, FALSE, "custom caption")) {
       p <- methods[[i]](d, variables = variables, title = "Custom: suffix",
         subtitle = "Custom subtitle", caption = caption, xlab = "X", ylab = "Y")
-      expect_equal(p$labels$title, "Custom")
+      expect_equal(p$labels$title, "Custom: suffix")
       expect_equal(p$labels$subtitle, "Custom subtitle")
       expect_equal(p$labels$x, "X")
       expect_equal(p$labels$y, "Y")

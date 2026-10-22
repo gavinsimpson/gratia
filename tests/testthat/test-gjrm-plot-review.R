@@ -32,8 +32,8 @@ test_that("saved factor-by smooth groups keep ordinary GAM terms separate", {
     d
   })
   m <- gam(y ~ f + s(x, by = f, k = 4) + s(z, by = f, k = 4), data = d)
-  direct <- draw(m, grouped_by = TRUE, parametric = FALSE, n = 8, rug = FALSE)
-  saved <- draw(smooth_estimates(m, n = 8), grouped_by = TRUE)
+  direct <- draw(m, grouped = c("factor-by", "sz", "fs"), parametric = FALSE, n = 8, rug = FALSE)
+  saved <- draw(smooth_estimates(m, n = 8), grouped = c("factor-by", "sz", "fs"))
   expect_length(direct, 2L)
   expect_length(saved, 2L)
   for (i in 1:2) {
@@ -47,8 +47,8 @@ test_that("saved factor-by smooth groups keep ordinary GAM terms separate", {
     list(formula = list(y ~ f + s(x, by = f, k = 4) +
       s(z, by = f, k = 4), y2 ~ 1), data = d,
       margins = c("N", "N"), model = "B")))
-  direct <- draw(joint, grouped_by = TRUE, parametric = FALSE, n = 8, rug = FALSE)
-  saved <- draw(smooth_estimates(joint, n = 8), grouped_by = TRUE)
+  direct <- draw(joint, grouped = c("factor-by", "sz", "fs"), parametric = FALSE, n = 8, rug = FALSE)
+  saved <- draw(smooth_estimates(joint, n = 8), grouped = c("factor-by", "sz", "fs"))
   expect_length(direct, 2L)
   expect_length(saved, 2L)
   for (i in 1:2) {
@@ -63,10 +63,10 @@ test_that("saved joint factor-by groups preserve response identity and order", {
   m <- gjrm_plot_review_fixture()
   expected <- c("Response 1: Mean (mu); By: f",
     "Response 2: Mean (mu); By: f", "Response 2: Mean (mu)")
-  direct <- draw(m, grouped_by = TRUE, parametric = FALSE, n = 8, rug = FALSE)
+  direct <- draw(m, grouped = c("factor-by", "sz", "fs"), parametric = FALSE, n = 8, rug = FALSE)
   expect_length(direct, 3L)
   for (unnest in c(TRUE, FALSE)) {
-    saved <- draw(smooth_estimates(m, n = 8, unnest = unnest), grouped_by = TRUE)
+    saved <- draw(smooth_estimates(m, n = 8, unnest = unnest), grouped = c("factor-by", "sz", "fs"))
     expect_length(saved, 3L)
     expect_identical(vapply(seq_len(length(saved)), function(i)
       saved[[i]]$labels$subtitle, character(1)), expected)
@@ -82,7 +82,7 @@ test_that("joint factor-by plot list names use discoverable model-wide labels", 
   m <- gjrm_plot_review_fixture()
   plots <- assemble(m, parametric = FALSE, n = 8, rug = FALSE)
   expect_identical(names(plots), smooths(m))
-  grouped <- assemble(m, grouped_by = TRUE, parametric = FALSE, n = 8, rug = FALSE)
+  grouped <- assemble(m, grouped = c("factor-by", "sz", "fs"), parametric = FALSE, n = 8, rug = FALSE)
   expect_identical(names(grouped), c("s(x)", "s.1(x)", "s(z)"))
   selected <- assemble(m, select = "s.1(x):fb", n = 8, rug = FALSE)
   expect_identical(names(selected), "s.1(x):fb")
@@ -281,14 +281,14 @@ test_that("joint grouped factor-by names reserve plain smooth selection labels",
     list(formula = list(y1 ~ f + s(x, by = f, k = 4), y2 ~ s(x, k = 4)),
       data = d, margins = c("N", "N"), model = "B")))
   expect_identical(smooths(m), c("s(x):fa", "s(x):fb", "s(x)"))
-  plots <- assemble(m, grouped_by = TRUE, parametric = FALSE, n = 8, rug = FALSE)
+  plots <- assemble(m, grouped = c("factor-by", "sz", "fs"), parametric = FALSE, n = 8, rug = FALSE)
   expect_identical(names(plots), c("s(x) (equation 1)", "s(x)"))
-  first <- assemble(m, select = 1:2, grouped_by = TRUE, n = 8, rug = FALSE)
+  first <- assemble(m, select = 1:2, grouped = c("factor-by", "sz", "fs"), n = 8, rug = FALSE)
   expect_identical(names(first), "s(x) (equation 1)")
-  second <- assemble(m, select = "s(x)", grouped_by = TRUE, n = 8, rug = FALSE)
+  second <- assemble(m, select = "s(x)", grouped = c("factor-by", "sz", "fs"), n = 8, rug = FALSE)
   expect_identical(names(second), "s(x)")
   expect_equal(second[[1]]$data, plots[[2]]$data)
-  saved <- draw(smooth_estimates(m, n = 8), grouped_by = TRUE)
+  saved <- draw(smooth_estimates(m, n = 8), grouped = c("factor-by", "sz", "fs"))
   expect_length(saved, 2L)
   expect_identical(vapply(seq_len(length(saved)), function(i)
     saved[[i]]$labels$subtitle, character(1)),
@@ -306,4 +306,57 @@ test_that("joint plots skip empty equations without reporting that all terms are
     expect_null(empty$value)
     expect_false(empty$visible)
   }
+})
+
+test_that("separate joint factor smooth curves retain their level names", {
+  withr::local_pdf(NULL)
+  s <- mgcv::s
+  d <- withr::with_seed(2122, {
+    d <- data.frame(x = runif(150), f = factor(rep(letters[1:3], 50)))
+    d$y1 <- sin(5 * d$x) + as.numeric(d$f) + rnorm(150)
+    d$y2 <- cos(5 * d$x) + as.numeric(d$f) + rnorm(150)
+    d
+  })
+  model <- withr::with_seed(2123, do.call(GJRM::gjrm,
+    list(formula = list(y1 ~ s(x, f, bs = "fs", k = 4),
+      y2 ~ s(x, f, bs = "fs", k = 4)), data = d,
+      margins = c("N", "N"), model = "B")))
+  separate <- assemble(model, grouped = FALSE, show_ci = "fs",
+    parametric = FALSE, n = 8, rug = FALSE)
+  expect_length(separate, 6L)
+  expect_equal(anyDuplicated(names(separate)), 0L)
+  expect_true(all(grepl('f = "[abc]"$', names(separate))))
+  expect_true(all(startsWith(names(separate)[1:3], smooths(model)[1L])))
+  expect_true(all(startsWith(names(separate)[4:6], smooths(model)[2L])))
+  saved <- draw(smooth_estimates(model, n = 8), grouped = FALSE, show_ci = "fs")
+  expect_length(saved, 6L)
+  for (i in seq_len(6L)) {
+    expect_equal(separate[[i]]$data$.estimate, saved[[i]]$data$.estimate)
+    expect_true(any(vapply(separate[[i]]$layers, function(layer)
+      inherits(layer$geom, "GeomRibbon"), logical(1))))
+  }
+  expect_silent(patchwork::patchworkGrob(saved))
+  grouped <- assemble(model, grouped = "fs", show_ci = FALSE,
+    parametric = FALSE, n = 8, rug = FALSE)
+  expect_length(grouped, 2L)
+  expect_identical(names(grouped), smooths(model))
+  expect_false(any(vapply(grouped[[1L]]$layers, function(layer)
+    inherits(layer$geom, "GeomRibbon"), logical(1))))
+})
+
+test_that("grouped joint factor-by names preserve colons in covariates", {
+  s <- mgcv::s
+  d <- withr::with_seed(2124, {
+    d <- data.frame(x = runif(120), f = factor(rep(c("a", "b"), 60)))
+    d$y1 <- sin(5 * d$x) + as.numeric(d$f) + rnorm(120)
+    d$y2 <- cos(5 * d$x) + rnorm(120)
+    d
+  })
+  model <- withr::with_seed(2125, do.call(GJRM::gjrm,
+    list(formula = list(y1 ~ f + s(I(x + nchar(":f")), by = f, k = 4),
+      y2 ~ s(x, k = 4)), data = d, margins = c("N", "N"), model = "B")))
+  plots <- assemble(model, grouped = "factor-by", n = 8, rug = FALSE,
+    parametric = FALSE)
+  expect_identical(names(plots), c('s(I(x + nchar(":f")))', "s(x)"))
+  expect_identical(plots[[1L]]$labels$title, 's(I(x + nchar(":f")))')
 })

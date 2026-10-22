@@ -93,7 +93,7 @@
   rug = TRUE,
   distinct_rug = TRUE,
   contour = TRUE,
-  grouped_by = FALSE,
+  grouped_by = deprecated(),
   ci_alpha = 0.2,
   ci_col = "black",
   smooth_col = "black",
@@ -130,8 +130,14 @@
   ..., variables = NULL,
   simultaneous_method = c('simulation', 'tube'),
   simultaneous_domain = NULL, tube_control = list(),
-  cyclic = c("cartesian", "polar"), polar_args = list()
+  cyclic = c("cartesian", "polar"), polar_args = list(),
+  grouped = c("sz", "fs"), show_ci = c("factor-by", "sz"),
+  time_varying_style = c("ribbon", "pointrange")
 ) {
+  factor_controls <- resolve_factor_plot_controls(grouped, show_ci, grouped_by,
+    "assemble.gam")
+  grouped <- factor_controls$grouped
+  show_ci <- factor_controls$show_ci
   gratia_plot_arguments(c("ci_alpha", "ci_col", "smooth_col", "resid_col", "contour_col", "ci_3d_alpha", "ci_3d_col"), environment())
   if (missing(overall_uncertainty) && is_scasm_model(object)) {
     overall_uncertainty <- FALSE
@@ -144,6 +150,7 @@
     simultaneous_domain, tube_control)
   if (simultaneous_method == 'simulation') validate_smooth_interval(interval, ci_level, n_sim, n_cores, seed)
   check_back_transform(back_transform)
+  time_varying_style <- match.arg(time_varying_style)
   surface <- match.arg(surface)
   validate_surface_3d(surface_3d)
   validate_ci_3d(ci_3d, ci_3d_alpha, ci_3d_col)
@@ -234,20 +241,11 @@
 
     # Take the range of the smooths & their confidence intervals now
     # before we put rug and residuals on
-    sm_rng <- unlist(lapply(sm_eval$data, function(d) {
-      surface_fill_limits(c(d$.estimate, d$.lower_ci, d$.upper_ci),
-        symmetric = FALSE)
-    }), use.names = FALSE)
+    sm_rng <- factor_smooth_plot_range(sm_eval, show_ci)
 
-    if (scales == "fixed" &&
-        (surface == "3d" || interval == "simultaneous")) {
-      sm_rng <- unlist(lapply(sm_eval$data, function(d) {
-        d <- add_constant(d, constant = constant,
-          column = c(".estimate", ".lower_ci", ".upper_ci"))
-        d <- transform_fun(d, fun = fun,
-          column = c(".estimate", ".lower_ci", ".upper_ci"))
-        c(d$.estimate, d$.lower_ci, d$.upper_ci)
-      }), use.names = FALSE)
+    if (scales == "fixed") {
+      sm_rng <- factor_smooth_plot_range(sm_eval, show_ci, constant, fun,
+        transform = TRUE)
       sm_rng <- sm_rng[is.finite(sm_rng)]
     }
 
@@ -347,40 +345,7 @@
       ylims <- surface_fill_limits(c(sm_rng, p_resids_rng), symmetric = FALSE)
     }
 
-    # draw smooths
-    sm_l <- if (isTRUE(grouped_by)) {
-      levs <- unique(str_split_fixed(sm_eval$.smooth, ":", n = 2)[, 1])
-      sm_l <- sm_eval |>
-        mutate(
-          ..smooth.. = factor(.data$.smooth, levels = unique(S[select])),
-          .term = str_split_fixed(.data$.smooth, ":", n = 2)[, 1],
-          ..by.. = if_else(is.na(.data$.by), "..no_level..", .data$.by),
-          ..component.. = if (".smooth_id" %in% names(sm_eval)) {
-            .data$.smooth_id
-          } else match(.data$.type, unique(.data$.type))
-        ) |>
-        relocate(".term", .before = 1L)
-      grp_by_levs <- unique(sm_l$"..by..")
-      sm_l <- sm_l |>
-        group_split(factor(.data$.term, levels = levs),
-          factor(.data$"..by..", levels = grp_by_levs),
-          factor(.data$..component.., levels = unique(.data$..component..)))
-      # sometimes the steps to get the order right above don't work
-      sm_l_levs <- vapply(sm_l, \(x) unique(x$.term), character(1L))
-      if (!identical(unique(sm_l_levs), levs)) {
-        names(sm_l) <- sm_l_levs
-        sm_l <- sm_l[levs]
-        names(sm_l) <- NULL
-      }
-      sm_l
-    } else {
-      # the factor is to reorder to way the smooths entered the model
-      sm_eval <- add_column(
-        sm_eval,
-        .term = str_split_fixed(sm_eval$.smooth, ":", n = 2)[, 1]
-      )
-      split_smooth_components(sm_eval)
-    }
+    sm_l <- prepare_factor_smooth_panels(sm_eval, grouped, show_ci)
     # Keep ggplot object creation serial: trials with mirai workers did not
     # improve performance.
     sm_plts <- map(sm_l,
@@ -419,7 +384,6 @@
       shape_constraints = shape_constraints,
       scam_smooth_info = scam_info,
       caption = caption,
-      grouped_by = grouped_by,
       ... # FIXME: temporary fix to allow captions to be suppressed-ish
     )
 
@@ -427,19 +391,10 @@
     no_plot <- map_lgl(sm_plts, is.null)
     sm_plts <- sm_plts[!no_plot]
     sm_l <- sm_l[!no_plot]
-    sm_plt_nms <- map_chr(sm_l, .f = \(x) unique(x$.term))
-    #sm_eval <- sm_eval |> add_column(
-    #  .term = sm_plt_nms, .before = 1L
-    #)
-    ## sm_eval <- sm_eval[!no_plot, ]
+    sm_plt_nms <- map_chr(sm_l, factor_panel_name)
     # set names on sm_plts
     if (length(sm_plts) > 0L) {
       sm_plts <- setNames(sm_plts, sm_plt_nms)
-      #sm_plts <- if (grouped_by) {
-      #  setNames(sm_plts, sm_plt_nms)
-      #} else {
-      #  setNames(sm_plts, sm_plt_nms)
-      #}
     }
   } # end stuff for smooths...
 
@@ -485,7 +440,8 @@
             .keep = TRUE,
             .f = ~ draw_parametric_effect(.x,
               ci_level = ci_level,
-              caption = if (isTRUE(caption) && interval == "simultaneous") {
+              caption = if (isTRUE(caption) && interval == "simultaneous" &&
+                  !identical(unique(.x$.type), "time_varying")) {
                 paste0(format(100 * ci_level), "% pointwise intervals (parametric effect)")
               } else if (identical(caption, FALSE)) FALSE else NULL,
               ci_col = ci_col,
@@ -499,6 +455,8 @@
               ylim = ylims,
               factor_levels = f_levels, term_info = attr(para, "term_info"),
               axis_info = attr(para, "axis_info"), from_raw = back_transform,
+              time_varying_info = attr(para, "time_varying_info"),
+              time_varying_style = time_varying_style,
               back_transform = back_transform,
               contour = contour, contour_col = contour_col, n_contour = n_contour,
               surface = surface, surface_3d = surface_3d,
@@ -510,23 +468,6 @@
       }
     }
   }
-
-  # filter out NULLs as those are types of smooths we can't plot (yet)
-  #no_plot <- map_lgl(sm_plts, is.null)
-  #sm_plts <- sm_plts[!no_plot]
-  #sm_eval <- sm_eval[!no_plot,]
-  #sm_l <- sm_l |> bind_rows()
-  #sm_l <- sm_l[!no_plot] |> bind_rows()
-
-  ## set names on sm_plts
-  #if (length(sm_plts) > 0L) {
-  #  sm_plts <- if (grouped_by) {
-  #    setNames(sm_plts, map_chr(sm_l, .f = \(x) unique(x$.term)))
-  #  } else {
-  #    # setNames(sm_plts, sm_eval$.smooth)
-  #    setNames(sm_plts, sm_l$.smooth)
-  #  }
-  #}
 
   if (isTRUE(parametric)) {
     para_nm <- dplyr::group_keys(dplyr::group_by(para, .data$.term))$.term

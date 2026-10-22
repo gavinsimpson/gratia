@@ -237,11 +237,11 @@ joint_by <- GJRM::gjrm(
     y2 ~ f + s(x, by = f, k = 7)),
   data = by_data, margins = c("N", "N"), model = "B"
 )
-names(assemble(joint_by, grouped_by = TRUE))
+names(assemble(joint_by, grouped = c("factor-by", "sz", "fs")))
 ```
 
 ```{r factor-by-smooths}
-draw(joint_by, grouped_by = TRUE, ncol = 2)
+draw(joint_by, grouped = c("factor-by", "sz", "fs"), ncol = 2)
 ```
 
 Saved estimates contain smooths only. Their grouped plots retain the response
@@ -249,7 +249,7 @@ identities and fitted term order.
 
 ```{r factor-by-saved, fig.width=12, fig.height=5}
 by_estimates <- smooth_estimates(joint_by)
-draw(by_estimates, grouped_by = TRUE, ncol = 2)
+draw(by_estimates, grouped = c("factor-by", "sz", "fs"), ncol = 2)
 ```
 
 ## A two-dimensional smooth

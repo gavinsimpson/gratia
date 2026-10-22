@@ -35,7 +35,10 @@
   select = NULL,
   parametric = NULL,
   terms = NULL,
-  partial_match = FALSE
+  partial_match = FALSE,
+  grouped_by = deprecated(),
+  grouped = c("sz", "fs"),
+  show_ci = c("factor-by", "sz")
 )
 
 \method{draw}{gjrm}(
@@ -66,7 +69,10 @@
   select = NULL,
   parametric = NULL,
   terms = NULL,
-  partial_match = FALSE
+  partial_match = FALSE,
+  grouped_by = deprecated(),
+  grouped = c("sz", "fs"),
+  show_ci = c("factor-by", "sz")
 )
 }
 \arguments{
@@ -131,6 +137,28 @@ or a flat named list of plots when \code{FALSE}.}
 Ignored for anything but a simple univariate smooth.
 If the model does not provide working residuals and working weights,
 warns once and draws the smooths without partial residuals.}
+
+\item{grouped_by}{Deprecated; use \code{grouped}. Explicit \code{TRUE} adds
+\code{"factor-by"} to \code{grouped}; \code{FALSE} removes it, retaining the other types.}
+
+\item{grouped}{character or \code{FALSE}; factor smooth types whose curves share
+a panel. Choose any of \code{"factor-by"}, \code{"sz"}, and \code{"fs"}, or \code{FALSE} to
+separate all their curves. The default, \code{c("sz", "fs")}, overlays \code{sz}
+and \code{fs} curves and separates factor-by curves. \code{"factor-by"} includes
+ordered factors. In reference-plus-deviation models the reference smooth
+remains separate; only fitted nonreference deviations are grouped.
+For \code{sz} terms with several factors, separate plots show each evaluated
+combination of levels. Applies to curves with one continuous covariate;
+existing surface displays are unchanged. Separate curves use the usual
+univariate styling: a black line and a translucent black interval by
+default, with colours and opacity controlled by the smooth theme settings.}
+
+\item{show_ci}{character or \code{FALSE}; factor smooth types whose curves show
+intervals. Choose any of \code{"factor-by"}, \code{"sz"}, and \code{"fs"}, or \code{FALSE} to
+hide all their ribbons. The default, \code{c("factor-by", "sz")}, retains
+existing interval visibility; including \code{"fs"} enables its intervals.
+Controls display only, independently of \code{interval} and \code{grouped}.
+Ordinary smooths and parametric effects retain their intervals.}
 }
 \value{
 \code{assemble()} and \code{draw(wrap = FALSE)} return a flat named list of

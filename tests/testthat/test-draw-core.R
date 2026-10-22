@@ -45,13 +45,13 @@ test_that("ordered factor labels and grouped panels survive drawing", {
   m <- gam(y ~ f + s(x, k = 4) + s(x, by = f, k = 4), data = d)
   sm <- smooth_estimates(m, n = 8)
   separate <- draw(sm)
-  grouped <- draw(sm, grouped_by = TRUE)
+  grouped <- draw(sm, grouped = c("factor-by", "sz", "fs"))
   expect_length(separate, 3L)
   expect_length(grouped, 2L)
   expect_match(separate[[2]]$labels$subtitle, "f.*b")
   expect_match(separate[[3]]$labels$subtitle, "f.*c")
   expect_draw_build(grouped)
-  expect_draw_build(draw(m, grouped_by = TRUE, n = 8, rug = FALSE))
+  expect_draw_build(draw(m, grouped = c("factor-by", "sz", "fs"), n = 8, rug = FALSE))
 })
 
 test_that("parametric drawing retains values and validation", {

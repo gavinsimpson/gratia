@@ -2,6 +2,12 @@
 
 ## User visible changes
 
+* `grouped_by` is deprecated in `draw()` and `assemble()`. Include
+  `"factor-by"` in the new `grouped` argument to overlay factor-by curves,
+  or omit it to draw them separately. Explicit uses of `grouped_by` still
+  update factor-by grouping, including ordered factors, while retaining
+  the requested grouping of `sz` and `fs` curves.
+
 * `draw.basis()` now draws contour lines on surface plots by default
   (`contour = TRUE`), matching `draw.gam()`. Use `contour = FALSE` to restore
   the previous appearance.
@@ -123,6 +129,20 @@
   matrices for smooths, random effects and parametric effects. Diagnostic
   functions support ordinary uncensored joint models whose predictors do not
   include modeled responses; `appraise()` facets each panel by response.
+
+* `draw()` and `assemble()` can separate `sz` and `fs` curves into individual
+  plots (#244). `grouped` names the types to overlay: `"factor-by"`, `"sz"`,
+  and `"fs"`. `show_ci` independently selects which types show intervals,
+  including optional intervals for `fs` curves. The defaults retain existing
+  grouping and interval visibility. Ordered-factor deviations use the
+  factor-by settings and keep their reference smooth separate. Saved smooth
+  estimates support the same controls. Common axis ranges use displayed
+  estimates and visible intervals. Grouped factor-by plots retain observations
+  from every plotted level and accept custom colour and fill scales. Smooth
+  and custom titles retain colons within their text. Separate curves use
+  the usual black line and translucent black interval. Set `grouped = FALSE`
+  to separate all factor-related curves, or `show_ci = FALSE` to hide their
+  intervals.
 
 * `assemble()` now supports models fitted by `mgcv::gamm()`, returning named
   plots of smooth and parametric contributions. It shares preparation of the
@@ -517,6 +537,14 @@
   with `terms` in `draw()` and `assemble()`. Their pointwise delta-method
   intervals include threshold parameter uncertainty and, by default,
   intercept uncertainty and its covariance with the threshold parameters.
+  Time-varying coefficients from `rw`, `rw0` and `ar1` models are also
+  available, with the ordinary coefficient and its temporal deviation
+  combined where appropriate. Their pointwise intervals use the joint
+  covariance of both parts. Select trajectories with labels such as
+  `time_varying(temperature)` in `terms`; the corresponding ordinary-effect
+  panels are omitted by default and remain available through explicit
+  selection. Use `time_varying_style = "pointrange"` for points and interval
+  bars instead of the default line, points and ribbon.
 
 * Smooth plot subtitles now identify the model part or distributional
   parameter for glmmTMB, mgcv and `GJRM::gamlss()` models with multiple linear

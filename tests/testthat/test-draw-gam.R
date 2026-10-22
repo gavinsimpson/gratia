@@ -242,9 +242,9 @@ test_that("draw.gam works for a parametric only model", {
 test_that("draw.gam works with grouped by option", {
   models <- secondary_models()
   expect_silent(plt1 <- draw(su_m_factor_by,
-    parametric = FALSE, grouped_by = TRUE, rug = FALSE))
+    parametric = FALSE, grouped = c("factor-by", "sz", "fs"), rug = FALSE))
   expect_silent(plt2 <- draw(models$m_ordered_by,
-    parametric = FALSE, grouped_by = TRUE, rug = FALSE))
+    parametric = FALSE, grouped = c("factor-by", "sz", "fs"), rug = FALSE))
   # skip_on_ci() # testing without as moved to mac os x
   skip_if_not_installed("ggplot2", "3.5.2.9002")
   expect_doppelganger("grouped by gam", plt1)
