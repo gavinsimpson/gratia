@@ -168,7 +168,7 @@ test_that("fitted inlaws mixtures, ordinal and censored families produce the int
       zinb = fitted(m)[, 1] * fitted(m)[, 2],
       zanb = fitted(m)[, 1] * fitted(m)[, 2] / (1 - dnbinom(0, mu = fitted(m)[, 1], size = fitted(m)[, 3])),
       gpd = fitted(m)[, 1] / (1 - fitted(m)[, 2]),
-      ordbeta = as.numeric(predict(m, type = "response")),
+      ordbeta = as.numeric(inlaws::predict_ordbeta(m, type = "response")),
       cumulative_link = 1 + rowSums(sapply(1:3, function(k)
         m$family$cdf(k, m$linear.predictors, lower.tail = FALSE))),
       cgamma = fitted(m))

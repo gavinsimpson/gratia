@@ -50,6 +50,7 @@ Suggests:
     lme4,
     nlme,
     testthat,
+    R6,
     pkgload,
     vdiffr,
     MASS,
