@@ -3,10 +3,14 @@
 #' @noRd
 `[.basis` <- function(x, i, j, drop = FALSE) {
   orders <- attr(x, "plot_variables")
+  groups <- attr(x, "factor_by_groups")
   x <- NextMethod()
   if (is.data.frame(x)) {
     attr(x, "plot_variables") <- if (".smooth" %in% names(x)) {
       orders[intersect(names(orders), unique(x$.smooth))]
+    } else NULL
+    attr(x, "factor_by_groups") <- if (".smooth" %in% names(x)) {
+      groups[intersect(names(groups), unique(x$.smooth))]
     } else NULL
   }
   x

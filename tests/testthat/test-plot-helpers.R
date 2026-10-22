@@ -125,7 +125,7 @@ test_that("other surfaces preserve facets, guides, grouping and theme inheritanc
   expect_true(all(is.na(q$layers[[2]]$data$fill)))
 })
 
-test_that("basis labels and factor facets retain family-specific defaults", {
+test_that("basis labels retain defaults and surfaces separate basis functions", {
   d <- reuse_surface_data()
   attr(d, "smooth_object") <- "stored smooth call"
   labels <- prepare_basis_labels(d, "x")
@@ -139,7 +139,9 @@ test_that("basis labels and factor facets retain family-specific defaults", {
   expect_equal(p$labels$title, "Custom")
   expect_equal(p$labels$caption, "Caption")
   expect_null(p$guides$guides$fill)
-  expect_true("f" %in% names(ggplot2::ggplot_build(p)$layout$layout))
+  layout <- ggplot2::ggplot_build(p)$layout$layout
+  expect_true(".bf" %in% names(layout))
+  expect_false("f" %in% names(layout))
 })
 
 test_that("spherical rendering preserves axes, captions and ordered-by labels", {

@@ -125,6 +125,12 @@
 
 ## New features
 
+* `basis()` accepts `unweighted = TRUE` for fitted GAM(M)s to return basis
+  functions without multiplying by fitted coefficients. `draw()` shows these
+  shared bases, and bases from factor-by smooth specifications, once per
+  factor-by set. Coefficient-weighted fitted bases remain separate by level
+  (#428).
+
 * `fitted_values()` and `fitted_samples()` accept `quantity` to select
   distribution parameters or expected responses. Parameter draws retain
   their joint coefficient uncertainty; coupled expectation intervals use
@@ -722,6 +728,9 @@
   recognised family name.
 
 ## Bug fixes
+
+* Bivariate factor-by basis plots now put each basis function in its own
+  panel, instead of drawing their surfaces on top of one another (#428).
 
 * Gumbel LSS fitted location estimates are no longer exponentiated. Natural
   location is computed separately from the scale-dependent expectation.

@@ -318,6 +318,13 @@
 #' Surface plots include contour lines by default, matching [draw.gam()].
 #' Use `contour = FALSE` to draw surfaces without contour lines.
 #'
+#' Factor-by bases from smooth specifications are drawn once for the whole
+#' factor-by set, using evaluations from all available levels. For fitted
+#' models, `basis(model)` returns coefficient-weighted contributions, which
+#' remain separate for each level. Use `basis(model, unweighted = TRUE)` to
+#' draw the shared basis once. Subsetting the basis before drawing restricts
+#' the plot to the retained evaluations and basis functions.
+#'
 #' @return A `patchwork` object.
 #'
 #' @author Gavin L. Simpson
@@ -337,6 +344,11 @@
 #'
 #' bf <- basis(m, "s(x2)")
 #' draw(bf)
+#'
+#' # A single shared basis for a factor-by set
+#' df_by <- data_sim("eg4", n = 400, seed = 42)
+#' m_by <- gam(y ~ fac + s(x2, by = fac), data = df_by)
+#' draw(basis(m_by, unweighted = TRUE))
 #'
 #' # A three-covariate basis, evaluated at two conditioning values
 #' m3 <- gam(y ~ s(x0, x1, x2, k = 12), data = df)
@@ -362,8 +374,7 @@
                          contour_col = "black",
                          ..., variables = NULL) {
   gratia_plot_arguments(c("contour_col"), environment())
-  sm <- unique(object[[".smooth"]])
-  sm_l <- lapply(sm, function(label) object[object$.smooth == label, ])
+  sm_l <- basis_plot_groups(object)
   sm_plts <- map(sm_l,
     plot_basis,
     legend = legend,
@@ -402,6 +413,31 @@
     byrow = TRUE, ncol = ncol, nrow = nrow,
     guides = guides, ...
   )
+}
+
+# Combine only bases marked as shared when they were constructed. Older
+# objects and fitted coefficient-weighted bases keep their separate smooths.
+basis_plot_groups <- function(object) {
+  labels <- unique(object$.smooth)
+  groups <- stats::setNames(labels, labels)
+  shared <- attr(object, "factor_by_groups")
+  take <- intersect(labels, names(shared))
+  groups[take] <- shared[take]
+  lapply(unique(unname(groups)), function(group) {
+    members <- names(groups)[groups == group]
+    data <- object[object$.smooth %in% members, ]
+    if (any(members %in% take)) {
+      order <- basis_plot_variables(object[object$.smooth == members[1L], ])
+      by_var <- unique(data$.by)
+      data[by_var] <- NULL
+      data$.by <- NA_character_
+      data$.smooth <- group
+      data <- unique(data)
+      attr(data, "plot_variables") <- stats::setNames(list(order), group)
+      attr(data, "factor_by_groups") <- NULL
+    }
+    data
+  })
 }
 
 #' @importFrom ggplot2 ggplot aes labs geom_line guides facet_wrap label_both
