@@ -90,12 +90,74 @@ test_that("factor plot controls are sets and reject invalid values", {
   expect_identical(names(actual), names(expected))
   expect_identical(vapply(actual, factor_control_ribbon, logical(1)),
     vapply(expected, factor_control_ribbon, logical(1)))
-  for (invalid in list(TRUE, FALSE, NA_character_, "ordered", NULL, 1)) {
+  for (invalid in list(TRUE, c(FALSE, FALSE), c(FALSE, TRUE),
+      NA_character_, "ordered", NULL, 1)) {
     expect_error(draw(m, grouped = invalid), "grouped.*character vector")
     expect_error(draw(m, show_ci = invalid), "show_ci.*character vector")
     sm <- smooth_estimates(m, n = 5)
     expect_error(draw(sm, grouped = invalid), "grouped.*character vector")
     expect_error(draw(sm, show_ci = invalid), "show_ci.*character vector")
+  }
+})
+
+test_that("FALSE separates factor smooths and hides their intervals", {
+  m <- factor_control_models()$mixed
+  sm <- smooth_estimates(m, n = 6)
+  entries <- list(
+    function(...) assemble(m, n = 6, rug = FALSE, parametric = FALSE, ...),
+    function(...) draw(sm, ...),
+    function(...) draw(smooth_estimates(m, n = 6, unnest = FALSE), ...))
+  for (entry in entries) {
+    p <- entry(grouped = FALSE, show_ci = FALSE)
+    expect_length(p, 10L)
+    for (i in seq_len(length(p))) {
+      panel <- p[[i]]
+      expect_identical(factor_control_ribbon(panel),
+        factor_control_type(panel) == "ordinary")
+      expect_silent(ggplot2::ggplot_build(panel))
+    }
+    empty <- entry(grouped = character(0), show_ci = character(0))
+    for (i in seq_len(length(p))) expect_equal(p[[i]]$data, empty[[i]]$data)
+  }
+})
+
+test_that("separate factor curves use ordinary smooth colours and themes", {
+  withr::local_options(gratia.plot.theme = NULL)
+  m <- factor_control_models()$mixed
+  sm <- smooth_estimates(m, n = 6)
+  types <- c("factor-by", "sz", "fs")
+  for (p in list(
+    assemble(m, n = 6, grouped = FALSE, show_ci = types, parametric = FALSE),
+    draw(sm, grouped = FALSE, show_ci = types),
+    draw(smooth_estimates(m, n = 6, unnest = FALSE),
+      grouped = FALSE, show_ci = types))) {
+    for (i in seq_len(length(p))) {
+      panel <- p[[i]]
+      lines <- which(vapply(panel$layers, function(l) inherits(l$geom, "GeomLine"), logical(1)))
+      ribbons <- which(vapply(panel$layers, function(l) inherits(l$geom, "GeomRibbon"), logical(1)))
+      rugs <- which(vapply(panel$layers, function(l) inherits(l$geom, "GeomRug"), logical(1)))
+      expect_null(panel$mapping$colour)
+      b <- ggplot2::ggplot_build(panel)$data
+      expect_equal(unique(b[[lines]]$colour), "black")
+      expect_equal(unique(b[[ribbons]]$fill), "black")
+      expect_equal(unique(b[[ribbons]]$alpha), 0.2)
+      for (rug in rugs) expect_equal(unique(b[[rug]]$colour), "black")
+      themed <- panel + ggplot2::theme(
+        geom.gratia.smooth = ggplot2::element_geom(colour = "navy"),
+        geom.gratia.interval = ggplot2::element_geom(fill = "grey40"),
+        gratia.alpha.interval = 0.15)
+      b <- ggplot2::ggplot_build(themed)$data
+      expect_equal(unique(b[[lines]]$colour), "navy")
+      expect_equal(unique(b[[ribbons]]$fill), "grey40")
+      expect_equal(unique(b[[ribbons]]$alpha), 0.15)
+    }
+  }
+  grouped <- assemble(m, n = 6, grouped = types, show_ci = types,
+    parametric = FALSE, rug = FALSE)
+  for (panel in grouped[-1L]) {
+    b <- ggplot2::ggplot_build(panel)$data
+    expect_equal(length(unique(b[[2]]$colour)), 3L)
+    expect_equal(length(unique(b[[1]]$fill)), 3L)
   }
 })
 

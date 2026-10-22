@@ -867,7 +867,10 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
   discrete_colour = NULL,
   discrete_fill = NULL,
   ci_alpha = 0.2,
+  ci_col = "black",
+  smooth_col = "black",
   curve_interval = NULL,
+  separate_factor = FALSE,
   angle = NULL,
   ...
 ) {
@@ -927,8 +930,10 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
 
   if (!all_factors) {
     return(prepare_smooth_plot(object,
-      x_var = variables[1], colour_var = variables[2],
+      x_var = variables[1],
+      colour_var = if (separate_factor) NULL else variables[2],
       interval = isTRUE(curve_interval), ci_alpha = ci_alpha,
+      ci_col = ci_col, smooth_col = smooth_col,
       rug = rug, constant = constant, fun = fun,
       discrete_colour = discrete_colour, discrete_fill = discrete_fill,
       legend = FALSE,
@@ -996,6 +1001,8 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
   constant = NULL,
   fun = NULL,
   ci_alpha = 0.2,
+  ci_col = "black",
+  smooth_col = "black",
   xlab = NULL,
   ylab = NULL,
   title = NULL,
@@ -1028,6 +1035,7 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
     plot_univariate_sz_smooth(object,
       variables = variables, rug = rug,
       constant = constant, fun = fun, ci_alpha = ci_alpha,
+      ci_col = ci_col, smooth_col = smooth_col,
       xlab = xlab, ylab = ylab, title = title, subtitle = subtitle,
       caption = caption, ylim = ylim, discrete_colour = discrete_colour,
       discrete_fill = discrete_fill, angle = angle,
@@ -1068,6 +1076,8 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
   constant = NULL,
   fun = NULL,
   ci_alpha = 0.2,
+  ci_col = "black",
+  smooth_col = "black",
   xlab = NULL,
   ylab = NULL,
   title = NULL,
@@ -1121,12 +1131,14 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
     xlab = xlab, ylab = ylab, title = title, subtitle = subtitle,
     caption = caption
   )
-  labels$colour <- labels$fill <- fac_var_lab
+  if (!separate_factor) labels$colour <- labels$fill <- fac_var_lab
 
   prepare_smooth_plot(object,
-    x_var = x_var, colour_var = fac_var, rug = rug, rug_colour_var = fac_var,
+    x_var = x_var, colour_var = if (separate_factor) NULL else fac_var,
+    rug = rug, rug_colour_var = if (separate_factor) NULL else fac_var,
     interval = !identical(curve_interval, FALSE), legend = !separate_factor,
     constant = constant, fun = fun, ci_alpha = ci_alpha,
+    ci_col = ci_col, smooth_col = smooth_col,
     discrete_colour = scales$colour, discrete_fill = scales$fill,
     ribbon_colour = NULL, angle = angle, ylim = ylim,
     labels = labels

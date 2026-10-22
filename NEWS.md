@@ -127,7 +127,10 @@
   estimates support the same controls. Common axis ranges use displayed
   estimates and visible intervals. Grouped factor-by plots retain observations
   from every plotted level and accept custom colour and fill scales. Smooth
-  and custom titles retain colons within their text.
+  and custom titles retain colons within their text. Separate curves use
+  the usual black line and translucent black interval. Set `grouped = FALSE`
+  to separate all factor-related curves, or `show_ci = FALSE` to hide their
+  intervals.
 
 * `assemble()` now supports models fitted by `mgcv::gamm()`, returning named
   plots of smooth and parametric contributions. It shares preparation of the

@@ -2,8 +2,9 @@
 
 validate_factor_plot_types <- function(value, argument) {
   choices <- c("factor-by", "sz", "fs")
+  if (identical(value, FALSE)) return(character(0))
   if (!is.character(value) || anyNA(value) || any(!value %in% choices)) {
-    cli::cli_abort("{.arg {argument}} must be a character vector containing only {.val {choices}}; use character(0) to select none.")
+    cli::cli_abort("{.arg {argument}} must be FALSE or a character vector containing only {.val {choices}}.")
   }
   unique(value)
 }

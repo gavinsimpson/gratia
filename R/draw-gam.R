@@ -148,17 +148,19 @@
 #'   the distinct values?
 #' @param contour logical; should contours be draw on the plot using
 #'   [ggplot2::geom_contour()].
-#' @param grouped character; factor smooth types whose curves share a panel.
-#'   Choose any of `"factor-by"`, `"sz"`, and `"fs"`, or `character(0)` to
+#' @param grouped character or `FALSE`; factor smooth types whose curves share
+#'   a panel. Choose any of `"factor-by"`, `"sz"`, and `"fs"`, or `FALSE` to
 #'   separate all their curves. The default, `c("sz", "fs")`, overlays `sz`
 #'   and `fs` curves and separates factor-by curves. `"factor-by"` includes
 #'   ordered factors. In reference-plus-deviation models the reference smooth
 #'   remains separate; only fitted nonreference deviations are grouped.
 #'   For `sz` terms with several factors, separate plots show each evaluated
 #'   combination of levels. Applies to curves with one continuous covariate;
-#'   existing surface displays are unchanged.
-#' @param show_ci character; factor smooth types whose curves show intervals.
-#'   Choose any of `"factor-by"`, `"sz"`, and `"fs"`, or `character(0)` to
+#'   existing surface displays are unchanged. Separate curves use the usual
+#'   univariate styling: a black line and a translucent black interval by
+#'   default, with colours and opacity controlled by the smooth theme settings.
+#' @param show_ci character or `FALSE`; factor smooth types whose curves show
+#'   intervals. Choose any of `"factor-by"`, `"sz"`, and `"fs"`, or `FALSE` to
 #'   hide all their ribbons. The default, `c("factor-by", "sz")`, retains
 #'   existing interval visibility; including `"fs"` enables its intervals.
 #'   Controls display only, independently of `interval` and `grouped`.

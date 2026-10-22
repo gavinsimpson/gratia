@@ -183,7 +183,9 @@ continuous covariate; ordinary smooths and surface plots retain their displays.
 
 The defaults, `grouped = c("sz", "fs")` and
 `show_ci = c("factor-by", "sz")`, retain the existing grouping and interval
-visibility. Use `character(0)` to select none. Here is a factor-by example:
+visibility. Use `FALSE` to select none. Separate curves use the usual
+univariate styling: a black fitted line and a translucent black interval.
+Here is a factor-by example:
 
 ```{r factor-plot-models}
 factor_data <- data_sim("eg4", n = 400, seed = 244)
@@ -204,14 +206,14 @@ Separate the `sz` deviations and hide their intervals. The ordinary smooth
 retains its interval:
 
 ```{r sz-separate-no-intervals}
-draw(m_sz, grouped = character(0), show_ci = "factor-by")
+draw(m_sz, grouped = FALSE, show_ci = "factor-by")
 ```
 
 `fs` terms represent a fitted curve for each factor level. Separate those
 curves and include their intervals with:
 
 ```{r fs-separate-intervals}
-draw(m_fs, grouped = character(0), show_ci = "fs")
+draw(m_fs, grouped = FALSE, show_ci = "fs")
 ```
 
 The same controls work with saved estimates. Changing their display does not
@@ -220,7 +222,7 @@ coverage over the original fitted smooth, including its evaluated factor levels:
 
 ```{r factor-saved-estimates}
 sz_estimates <- smooth_estimates(m_sz)
-draw(sz_estimates, grouped = character(0), show_ci = character(0))
+draw(sz_estimates, grouped = FALSE, show_ci = FALSE)
 ```
 
 Ordered-factor `by` smooths use `"factor-by"` too. In the following model,
