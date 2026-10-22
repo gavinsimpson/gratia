@@ -199,6 +199,7 @@ parametric_terms.gratia_mixed_smooth <- function(model, ...) {
   }
   labels <- attr(model$pterms, "term.labels")
   labels <- c(labels, model$threshold$label)
+  labels <- c(labels, model$time_varying$labels)
   if (!length(labels)) {
     return(stats::setNames(character(), character()))
   }
@@ -258,6 +259,9 @@ predict_parametric_effects.gratia_mixed_smooth <- function(
 #' @export
 parametric_effects.gratia_mixed_smooth <- function(object, terms = NULL, ...) {
   if (is.null(object$models)) {
+    if (!is.null(object$time_varying)) {
+      return(sdmtmb_time_varying_effects(object, terms = terms, ...))
+    }
     if (!is.null(object$threshold)) {
       return(sdmtmb_threshold_effects(object, terms = terms, ...))
     }
@@ -270,7 +274,7 @@ parametric_effects.gratia_mixed_smooth <- function(object, terms = NULL, ...) {
     warning("The model doesn't contain any parametric terms", call. = FALSE)
     return(NULL)
   }
-  if (is.null(terms)) terms <- available
+  if (is.null(terms)) terms <- mixed_default_parametric_terms(object)
   if (!all(terms %in% available)) {
     stop("Term is not in the parametric part of model: ",
       paste(setdiff(terms, available), collapse = ", "),
@@ -293,14 +297,29 @@ parametric_effects.gratia_mixed_smooth <- function(object, terms = NULL, ...) {
 }
 
 mixed_bind_parametric_effects <- function(results) {
+  results <- Filter(Negate(is.null), results)
+  if (!length(results)) return(NULL)
   out <- dplyr::bind_rows(results)
-  for (attribute in c("factor_levels", "term_info", "axis_info")) {
+  for (attribute in c("factor_levels", "term_info", "axis_info", "time_varying_info")) {
     # Predictor names must not prefix the term labels used by the renderer.
     attr(out, attribute) <- do.call(c, unname(lapply(results, attr, attribute)))
   }
   attr(out, "back_transform") <- attr(results[[1L]], "back_transform")
   class(out) <- unique(c("parametric_effects", class(out)))
   out
+}
+
+mixed_default_parametric_terms <- function(object) {
+  if (!is.null(object$models)) {
+    return(unlist(lapply(object$models, mixed_default_parametric_terms),
+      use.names = FALSE))
+  }
+  suffix <- if (is.null(object$predictor) || object$predictor == 1L) "" else
+    paste0(".", object$predictor - 1L)
+  consumed <- object$time_varying$consumed
+  setdiff(names(parametric_terms(object)), if (length(consumed)) {
+    paste0(consumed, suffix)
+  } else character())
 }
 
 

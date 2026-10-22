@@ -31,7 +31,8 @@
   continuous_fill = NULL,
   discrete_colour = NULL,
   discrete_fill = NULL,
-  back_transform = FALSE
+  back_transform = FALSE,
+  time_varying_style = c("ribbon", "pointrange")
 )
 }
 \arguments{
@@ -157,6 +158,11 @@ be drawn with \code{back_transform = FALSE}.
 Parametric estimates retain both scales; multi-column basis
 expansions retain raw axes on either setting. Does not transform estimated
 effects or their intervals; use \code{fun} for that.}
+
+\item{time_varying_style}{Display sdmTMB time-varying coefficients using
+a line, points and interval ribbon (\code{"ribbon"}, the default), or points
+and interval bars with a connecting line (\code{"pointrange"}). Other model
+terms keep their usual displays.}
 }
 \description{
 Plot estimated effects for model parametric terms

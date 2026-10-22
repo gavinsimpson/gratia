@@ -93,6 +93,10 @@
 #'   Function `fun` will be applied after adding any `constant`, if
 #'   provided.
 #' @param ci_level numeric between 0 and 1; the coverage of credible interval.
+#' @param time_varying_style Display sdmTMB time-varying coefficients using
+#'   a line, points and interval ribbon (`"ribbon"`, the default), or points
+#'   and interval bars with a connecting line (`"pointrange"`). Other model
+#'   terms keep their usual displays.
 #' @param n numeric; the number of points over the range of the covariate at
 #'   which to evaluate a univariate smooth.
 #' @param n_2d numeric; the number of points along each of the first two axes
@@ -433,7 +437,8 @@
   simultaneous_method = c('simulation', 'tube'),
   simultaneous_domain = NULL, tube_control = list(),
   cyclic = c("cartesian", "polar"), polar_args = list(),
-  grouped = c("sz", "fs"), show_ci = c("factor-by", "sz")
+  grouped = c("sz", "fs"), show_ci = c("factor-by", "sz"),
+  time_varying_style = c("ribbon", "pointrange")
 ) {
   .call <- match.call()
   .call[[1L]] <- if (is_scasm_model(object)) draw.scasm else draw_gam_impl
@@ -499,8 +504,10 @@ draw_gam_impl <- function(
   simultaneous_method = c('simulation', 'tube'),
   simultaneous_domain = NULL, tube_control = list(),
   cyclic = c("cartesian", "polar"), polar_args = list(),
-  grouped = c("sz", "fs"), show_ci = c("factor-by", "sz")
+  grouped = c("sz", "fs"), show_ci = c("factor-by", "sz"),
+  time_varying_style = c("ribbon", "pointrange")
 ) {
+  time_varying_style <- match.arg(time_varying_style)
   surface <- match.arg(surface)
   validate_surface_3d(surface_3d)
   validate_ci_3d(ci_3d, ci_3d_alpha, ci_3d_col)

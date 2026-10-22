@@ -76,6 +76,7 @@
   polar_args = list(),
   grouped = c("sz", "fs"),
   show_ci = c("factor-by", "sz")
+  time_varying_style = c("ribbon", "pointrange")
 )
 
 \method{assemble}{gamm}(object, ...)
@@ -437,6 +438,11 @@ hide all their ribbons. The default, \code{c("factor-by", "sz")}, retains
 existing interval visibility; including \code{"fs"} enables its intervals.
 Controls display only, independently of \code{interval} and \code{grouped}.
 Ordinary smooths and parametric effects retain their intervals.}
+
+\item{time_varying_style}{Display sdmTMB time-varying coefficients using
+a line, points and interval ribbon (\code{"ribbon"}, the default), or points
+and interval bars with a connecting line (\code{"pointrange"}). Other model
+terms keep their usual displays.}
 
 \item{centre}{character; for SCAM models, \code{"model"} retains each fitted
 smooth contribution. \code{"plot"} subtracts the evaluation-grid mean from

@@ -44,7 +44,8 @@
   residuals = FALSE,
   unconditional = FALSE,
   frequentist = FALSE,
-  envir = NULL
+  envir = NULL,
+  time_varying_style = c("ribbon", "pointrange")
 )
 
 \method{draw}{sdmTMB}(
@@ -54,7 +55,8 @@
   residuals = FALSE,
   unconditional = FALSE,
   frequentist = FALSE,
-  envir = NULL
+  envir = NULL,
+  time_varying_style = c("ribbon", "pointrange")
 )
 }
 \arguments{
@@ -81,12 +83,17 @@ RTMB covariance; mgcv-specific alternatives are unavailable.}
 
 \item{terms}{Parametric terms to evaluate or draw, as returned by
 \code{\link[=parametric_terms]{parametric_terms()}}, including \code{breakpt(x)} and \code{logistic(x)} threshold
-terms. Second-component selectors have a \code{.1} suffix.}
+terms and \code{time_varying(temperature)} coefficient trajectories.
+Second-component selectors have a \code{.1} suffix.}
 
 \item{parametric}{Include parametric effects? \code{NULL} includes them unless
 smooths are selected explicitly, as for \code{\link[=draw.gam]{draw.gam()}}.}
 
 \item{residuals}{Must be \code{FALSE}; partial residuals are not supported.}
+
+\item{time_varying_style}{Display time-varying coefficients with a line,
+points and uncertainty ribbon (\code{"ribbon"}, the default), or with points,
+interval bars and a faint connecting line (\code{"pointrange"}).}
 }
 \value{
 Smooth labels, smooth objects, coefficients, effect estimates, or
@@ -101,9 +108,10 @@ and unpenalized coefficients and their joint covariance are transformed
 back to the constrained mgcv basis.
 }
 \details{
-Estimates are partial contributions on each component's link scale. Spatial,
-spatiotemporal, IID random effects, offsets, and varying coefficients are
-not added to the effects. Their influence on coefficient uncertainty is
+Smooth, ordinary parametric and threshold estimates are partial contributions
+on each component's link scale. Spatial, spatiotemporal, IID random effects,
+offsets and varying coefficients are not added to these effects. Their
+influence on coefficient uncertainty is
 retained through the joint covariance. Smooth intervals include uncertainty
 in their component's overall mean by default; parametric intervals include
 the component's intercept. Use \code{overall_uncertainty = FALSE} for term-only
@@ -151,9 +159,34 @@ breakpoint, the derivative is taken from the constant side, matching native
 sdmTMB prediction. Threshold intervals remain pointwise when simultaneous
 smooth bands are requested. Rugs show fitting observations.
 
+Time-varying coefficients are plotted at their stored time steps, including
+\code{extra_time}; \code{n} does not add time steps. Select each fitted design column
+with a label such as \code{time_varying(temperature)} or
+\code{time_varying(Intercept)}. A covariate named \code{Intercept} is distinguished
+from the intercept by backticks: \code{time_varying(`Intercept`)}.
+Factor contrasts, transformations and interactions
+retain the fitted coefficient coding. For \code{rw}, estimates are the temporal
+coefficients. For \code{rw0} and \code{ar1}, the matching ordinary coefficient is added
+to its temporal deviation. Their joint covariance includes the variance of
+both parts and their covariance. An absent ordinary coefficient contributes
+zero. Matching columns must have compatible coding in the main and temporal
+designs. Default effects omit ordinary terms whose coefficients are already
+included in trajectories; their ordinary selectors remain available for
+explicit requests. \code{overall_uncertainty} governs ordinary partial effects;
+temporal panels always retain their complete coefficient covariance.
+Temporal intervals remain pointwise when simultaneous smooth bands are
+requested. Supplied \code{data} selects stored time steps if it contains the
+model's time column; otherwise all stored times are retained. Missing or
+unknown requested times give an error. sdmTMB 1.2.0 requires numeric time
+values for time-varying processes.
+
+Time-varying estimates from \code{\link[=parametric_effects]{parametric_effects()}} use \code{.type = "time_varying"}, \code{.value} for time, \code{.partial} for the full coefficient,
+and \code{.se} for its standard error. Both display styles are also available
+through \code{\link[=draw.parametric_effects]{draw.parametric_effects()}}, including nested saved estimates.
+
 Smooth extraction and effect plots do not support dispersion formulas,
 other multi-predictor families, or nonlocal effects.
-Random-effect plots are not provided.
+Spatial fields and group random effects are not plotted.
 }
 \examples{
 if (requireNamespace("sdmTMB", quietly = TRUE)) {

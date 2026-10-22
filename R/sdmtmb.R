@@ -111,6 +111,10 @@ sdmtmb_smooth_model <- function(
           local$threshold$covariance <- sdmtmb_joint_covariance(
             object, local$threshold$indices)
         }
+        if (!is.null(local$time_varying)) {
+          local$time_varying$covariance <- sdmtmb_joint_covariance(
+            object, local$time_varying$indices)
+        }
         local
       })
     }
@@ -239,6 +243,7 @@ sdmtmb_smooth_model <- function(
       component_labels = labels, predictor = i,
       pterms = tt, parametric = seq_along(fixed),
       threshold = sdmtmb_threshold(object, component, fixed, X, covariance),
+      time_varying = sdmtmb_time_varying(object, component, fixed, X, covariance),
       contrasts = object$contrasts[[i]], xlevels = object$xlevels[[i]],
       pred.formula = if (length(all.vars(stats::delete.response(tt)))) {
         stats::reformulate(all.vars(stats::delete.response(tt)),
@@ -275,7 +280,11 @@ sdmtmb_smooth_model <- function(
 #' @param id Integer positions of smooths across model components.
 #' @param terms Parametric terms to evaluate or draw, as returned by
 #'   [parametric_terms()], including `breakpt(x)` and `logistic(x)` threshold
-#'   terms. Second-component selectors have a `.1` suffix.
+#'   terms and `time_varying(temperature)` coefficient trajectories.
+#'   Second-component selectors have a `.1` suffix.
+#' @param time_varying_style Display time-varying coefficients with a line,
+#'   points and uncertainty ribbon (`"ribbon"`, the default), or with points,
+#'   interval bars and a faint connecting line (`"pointrange"`).
 #' @param parametric Include parametric effects? `NULL` includes them unless
 #'   smooths are selected explicitly, as for [draw.gam()].
 #' @param residuals Must be `FALSE`; partial residuals are not supported.
@@ -289,9 +298,10 @@ sdmtmb_smooth_model <- function(
 #'   range is also included. Supplied `data` determines evaluation locations.
 #'
 #' @details
-#' Estimates are partial contributions on each component's link scale. Spatial,
-#' spatiotemporal, IID random effects, offsets, and varying coefficients are
-#' not added to the effects. Their influence on coefficient uncertainty is
+#' Smooth, ordinary parametric and threshold estimates are partial contributions
+#' on each component's link scale. Spatial, spatiotemporal, IID random effects,
+#' offsets and varying coefficients are not added to these effects. Their
+#' influence on coefficient uncertainty is
 #' retained through the joint covariance. Smooth intervals include uncertainty
 #' in their component's overall mean by default; parametric intervals include
 #' the component's intercept. Use `overall_uncertainty = FALSE` for term-only
@@ -339,9 +349,35 @@ sdmtmb_smooth_model <- function(
 #' sdmTMB prediction. Threshold intervals remain pointwise when simultaneous
 #' smooth bands are requested. Rugs show fitting observations.
 #'
+#' Time-varying coefficients are plotted at their stored time steps, including
+#' `extra_time`; `n` does not add time steps. Select each fitted design column
+#' with a label such as `time_varying(temperature)` or
+#' `time_varying(Intercept)`. A covariate named `Intercept` is distinguished
+#' from the intercept by backticks: ``time_varying(`Intercept`)``.
+#' Factor contrasts, transformations and interactions
+#' retain the fitted coefficient coding. For `rw`, estimates are the temporal
+#' coefficients. For `rw0` and `ar1`, the matching ordinary coefficient is added
+#' to its temporal deviation. Their joint covariance includes the variance of
+#' both parts and their covariance. An absent ordinary coefficient contributes
+#' zero. Matching columns must have compatible coding in the main and temporal
+#' designs. Default effects omit ordinary terms whose coefficients are already
+#' included in trajectories; their ordinary selectors remain available for
+#' explicit requests. `overall_uncertainty` governs ordinary partial effects;
+#' temporal panels always retain their complete coefficient covariance.
+#' Temporal intervals remain pointwise when simultaneous smooth bands are
+#' requested. Supplied `data` selects stored time steps if it contains the
+#' model's time column; otherwise all stored times are retained. Missing or
+#' unknown requested times give an error. sdmTMB 1.2.0 requires numeric time
+#' values for time-varying processes.
+#'
+#' Time-varying estimates from [parametric_effects()] use `.type =
+#' "time_varying"`, `.value` for time, `.partial` for the full coefficient,
+#' and `.se` for its standard error. Both display styles are also available
+#' through [draw.parametric_effects()], including nested saved estimates.
+#'
 #' Smooth extraction and effect plots do not support dispersion formulas,
 #' other multi-predictor families, or nonlocal effects.
-#' Random-effect plots are not provided.
+#' Spatial fields and group random effects are not plotted.
 #'
 #' @return Smooth labels, smooth objects, coefficients, effect estimates, or
 #'   plots, as for the corresponding GAM methods. [draw()] returns a patchwork,
@@ -437,20 +473,24 @@ sdmtmb_plot_model <- function(object, residuals, unconditional, frequentist,
 #' @export
 assemble.sdmTMB <- function(
   object, ..., parametric = NULL, residuals = FALSE,
-  unconditional = FALSE, frequentist = FALSE, envir = NULL
+  unconditional = FALSE, frequentist = FALSE, envir = NULL,
+  time_varying_style = c("ribbon", "pointrange")
 ) {
   model <- sdmtmb_plot_model(object, residuals, unconditional, frequentist,
     envir)
-  assemble(model, ..., parametric = parametric, envir = envir)
+  assemble(model, ..., parametric = parametric, envir = envir,
+    time_varying_style = time_varying_style)
 }
 
 #' @rdname sdmTMB-methods
 #' @export
 draw.sdmTMB <- function(
   object, ..., parametric = NULL, residuals = FALSE,
-  unconditional = FALSE, frequentist = FALSE, envir = NULL
+  unconditional = FALSE, frequentist = FALSE, envir = NULL,
+  time_varying_style = c("ribbon", "pointrange")
 ) {
   model <- sdmtmb_plot_model(object, residuals, unconditional, frequentist,
     envir)
-  draw.gam(model, ..., parametric = parametric, envir = envir)
+  draw.gam(model, ..., parametric = parametric, envir = envir,
+    time_varying_style = time_varying_style)
 }
