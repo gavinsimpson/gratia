@@ -246,6 +246,10 @@ conditional_differences.gam <- function(model, by, condition = NULL, data = NULL
   fitted <- if (response && simultaneous) {
     difference_inverse_link(eta, fam)
   } else if (response) fam$linkinv(eta) else eta
+  if (response) {
+    fitted <- as.numeric(distribution_output(distribution_spec(model),
+      matrix(eta, ncol = 1L), "expectation", "response"))
+  }
   if (any(!is.finite(fitted))) cli::cli_abort("Non-finite predictions on the requested scale.")
   if (uncertainty == "delta") {
     X <- predict_model(model, newdata = pd, type = "lpmatrix", ...)

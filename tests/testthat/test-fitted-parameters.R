@@ -119,6 +119,13 @@ test_that("simultaneous intervals respect fixed finite-mean conditions", {
       quantity = "expectation", interval = interval, n_sim = 20, seed = 426),
       "expected response does not exist")
   }
+  m <- conditional_difference_fixture()$model
+  m$family <- mgcv::scat(theta = c(.8, 1), min.df = .1)
+  for (uncertainty in c("delta", "simulation")) {
+    expect_error(conditional_differences(m, by = "a", condition = "x",
+      uncertainty = uncertainty, n_vals = 2, n_sim = 20),
+      "expected response does not exist")
+  }
 })
 
 test_that("empty and missing rows retain parameter and category identities", {
@@ -163,6 +170,25 @@ test_that("category and response identity is separate from parameter meaning", {
 })
 
 test_that("family-specific bounds and native extractors are retained", {
+  eta <- rbind(c(.4, -.5, .2, -.1), c(.6, -.3, .1, .2))
+  families <- list(gaulss = mgcv::gaulss(b = .2),
+    gammals = mgcv::gammals(b = -2), gumbls = mgcv::gumbls(b = -2),
+    shash = mgcv::shash(b = .3))
+  for (name in names(families)) {
+    family <- families[[name]]
+    predictor <- eta[, seq_len(family$nlp), drop = FALSE]
+    expected <- predictor
+    if (name == "gaulss") expected[, 2L] <- .2 + exp(predictor[, 2L])
+    if (name == "gammals") expected[, 1L] <- exp(predictor[, 1L])
+    if (name %in% c("gammals", "gumbls"))
+      expected[, 2L] <- exp(-2 + log1p(exp(predictor[, 2L] + 2)))
+    if (name == "shash") {
+      expected[, 2L] <- .3 + exp(predictor[, 2L])
+      expected[, 4L] <- exp(predictor[, 4L])
+    }
+    expect_equal(unname(distribution_spec(family)$to_parameters(predictor)),
+      unname(expected), info = name)
+  }
   m <- lss_test_models("twlss")
   m$family <- mgcv::twlss(a = 1.2, b = 1.8)
   nd <- data.frame(x = c(.2, .8), o1 = 0, o2 = 0, o3 = 0)
@@ -259,4 +285,25 @@ test_that("grouped ordinal expectations use fitted thresholds and preserve missi
   expect_true(info$capabilities$expectation)
   expect_length(info$expectation_condition, 2L)
   expect_identical(info$se_scale, NULL)
+  for (data in list(nd[FALSE, ], nd[3L, , drop = FALSE])) {
+    v <- fitted_values(m, data = data, quantity = "expectation")
+    a <- fitted_samples(m, data = data, quantity = "expectation",
+      method = "user", draws = B)
+    expect_equal(v$.fitted, a$.fitted)
+    expect_true(all(is.na(a$.fitted)))
+    expect_identical(v$.category, a$.category)
+  }
+  data <- nd[1:2, ]
+  h <- 1e-4
+  plus <- minus <- data
+  plus$x <- plus$x + h
+  minus$x <- minus$x - h
+  eta_slope <- as.numeric((gfam_test_eta(m, plus, B) -
+    gfam_test_eta(m, minus, B)) / (2 * h))
+  derivative <- derivative_samples(m, data = data, focal = "x",
+    type = "central", eps = h, method = "user", draws = B)
+  expect_equal(derivative$.derivative[derivative$.row == 1L],
+    slope * eta_slope[1L], tolerance = 1e-7)
+  expect_equal(derivative$.derivative[derivative$.row == 2L],
+    exp(gfam_test_eta(m, data, B)[2L]) * eta_slope[2L], tolerance = 1e-7)
 })

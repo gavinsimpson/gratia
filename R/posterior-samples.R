@@ -84,8 +84,8 @@
 #' Every distribution parameter is computed from the same joint coefficient
 #' draw. Formula offsets and prescribed smooth contributions are retained.
 #' Evaluation data need predictors and formula-offset variables, but no
-#' observed response. In `gaulss()`, the second response parameter is inverse
-#' standard deviation: sampling uses its reciprocal, divided by the square
+#' observed response. mgcv natively represents the second `gaulss()` parameter
+#' as reciprocal standard deviation: response sampling uses SD, divided by the square
 #' root of the sampling weight. Other LSS generators currently ignore sampling
 #' weights, following their mgcv implementations. Parameters represented by
 #' coefficients vary jointly; other family parameters remain fixed.
@@ -1332,7 +1332,8 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
 #' For LSS models, each smooth is a contribution to its own linear predictor.
 #' Select its full smooth label to distinguish predictors, for example `s(x)`
 #' and `s.1(x)`. These are component draws on the predictor scale; use
-#' [fitted_samples()] for the expected response and [derivative_samples()] for
+#' [fitted_samples()] with `quantity = "expectation"` for the expected response
+#' and [derivative_samples()] for
 #' its derivative. Coefficients are drawn jointly across all predictors.
 #'
 #' @author Gavin L. Simpson

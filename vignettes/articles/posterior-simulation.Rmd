@@ -74,7 +74,7 @@ There are two additional functions available in gratia that do posterior simulat
 * `simulate()`, and
 * `derivative_samples()`.
 
-gratia provides `simulate()` methods for models estimated using `gam()`, `bam()`, and `gamm()`, as well as those fitted via `scam()` in the scam package. `simulate()` is a base R convention that does the same thing as `predicted_samples()`, just in a non-tidy way (that is not pejorative; it returns the simulated response values as a matrix, which is arguably more useful if you are doing math or further statistical computation.) `derivative_samples()` provides draws from the posterior distribution of the derivative of response variable for a small change in a focal covariate value. `derivative_samples()` is a less general version of `fitted_samples()`; you could achieve the same thing by two separate calls to `fitted_samples()`. We'll reserve discussion of `derivative_samples()` to a separate vignette focused on estimating derivatives from GAMs.
+gratia provides `simulate()` methods for models estimated using `gam()`, `bam()`, and `gamm()`, as well as those fitted via `scam()` in the scam package. `simulate()` is a base R convention that does the same thing as `predicted_samples()`, returning simulated responses as a matrix. `derivative_samples()` draws derivatives of the expected response with respect to a focal covariate. It evaluates expectations at neighbouring covariate values using the same coefficient draws, preserving their dependence. We'll reserve discussion of derivatives for a separate vignette focused on estimating derivatives from GAMs.
 
 In the following sections we'll look at each of the four main posterior simulation functions in turn.
 
