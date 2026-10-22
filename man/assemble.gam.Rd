@@ -75,7 +75,7 @@
   cyclic = c("cartesian", "polar"),
   polar_args = list(),
   grouped = c("sz", "fs"),
-  show_ci = c("factor-by", "sz")
+  show_ci = c("factor-by", "sz"),
   time_varying_style = c("ribbon", "pointrange")
 )
 
