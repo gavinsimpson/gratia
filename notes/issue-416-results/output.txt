@@ -1,0 +1,34 @@
+Loading required package: nlme
+This is mgcv 1.9-4. For overview type '?mgcv'.
+R: R version 4.6.1 (2026-06-24) 
+mgcv: 1.9.4 
+
+             model         p       phi
+ Generating values 1.1000000 5.0000000
+              tw() 1.1009168 4.9986497
+           twlss() 1.1008353 4.9971981
+
+Second and third intercepts, before transformation:
+(Intercept).1 (Intercept).2 
+   -2.2812340     1.6088774 
+
+Ranges across observations:
+         [,1]       [,2]
+mu  2.5756157 20.0682826
+p   1.1008353  1.1008353
+phi 4.9971981  4.9971981
+
+Checks of the parameter interpretation:
+                                     check difference
+ Family likelihood minus direct likelihood          0
+  Largest error in log probability of zero          0
+                         Range of fitted p          0
+                       Range of fitted phi          0
+
+Convergence:
+$tw
+[1] "full convergence"
+
+$twlss
+[1] "full convergence"
+

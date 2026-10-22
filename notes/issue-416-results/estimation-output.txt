@@ -1,0 +1,23 @@
+Loading required package: nlme
+This is mgcv 1.9-4. For overview type '?mgcv'.
+Ordinary likelihood derivatives at the smooth-model estimates:
+        model d_log_lik_d_theta  d_log_lik_d_rho
+    tw() REML  -7.812312076e-01 -4.641773901e+00
+ twlss() REML   5.147492987e-10  4.991663083e-09
+
+Optimizers:
+$tw
+[1] "outer"  "newton"
+
+$twlss
+[1] "outer"  "newton"
+
+
+Estimates without smooths:
+                model           p         phi
+ tw() REML, no smooth 1.100867660 4.997923784
+   tw() ML, no smooth 1.100849592 4.997610693
+   twlss(), no smooth 1.100849646 4.997609981
+
+Largest mean-coefficient difference between the ML fits:
+[1] 1.59388347e-09
