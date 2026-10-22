@@ -126,16 +126,16 @@ test_that("grouped cyclic curves require identical boundaries", {
   m <- mgcv::gam(y ~ f + s(x, by = f, bs = "cc", k = 6), data = d,
     knots = list(x = c(0, 1)), method = "REML")
   saved <- smooth_estimates(m, n = 11)
-  grouped <- draw(saved, cyclic = "polar", grouped_by = TRUE)
+  grouped <- draw(saved, cyclic = "polar", grouped = c("factor-by", "sz", "fs"))
   expect_length(grouped, 1L)
   expect_polar_build(grouped[[1L]])
   expect_equal(nrow(grouped[[1L]]$data), 22L)
-  expect_polar_build(assemble(m, cyclic = "polar", grouped_by = TRUE,
+  expect_polar_build(assemble(m, cyclic = "polar", grouped = c("factor-by", "sz", "fs"),
     n = 11, rug = FALSE)[[1L]])
   info <- attr(saved, "cyclic_info")
   info[[2L]]$boundaries <- c(0, 2)
   attr(saved, "cyclic_info") <- info
-  expect_error(draw(saved, cyclic = "polar", grouped_by = TRUE),
+  expect_error(draw(saved, cyclic = "polar", grouped = c("factor-by", "sz", "fs")),
     "boundar|cycle")
   separate <- draw(saved, cyclic = "polar")
   expect_length(separate, 2L)

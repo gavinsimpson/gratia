@@ -57,7 +57,7 @@ test_that("surface contours, labels and explicit range expansion are preserved",
     continuous_fill = ggplot2::scale_fill_viridis_c(),
     xlab = "X", ylab = "Y", title = "Custom: suffix")
   expect_equal(surface_plot_geoms(p), c("GeomRaster", "GeomContour", "GeomBlank"))
-  expect_equal(p$labels$title, "Custom")
+  expect_equal(p$labels$title, "Custom: suffix")
   expect_equal(p$labels$subtitle, "By: f; a")
   expect_equal(p$labels$x, "X")
   expect_equal(p$labels$y, "Y")

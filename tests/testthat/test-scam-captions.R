@@ -165,9 +165,9 @@ test_that("fitted SCAM captions survive saved estimates and smooth selection", {
 test_that("grouped factor-by SCAM captions describe their common basis once", {
   model <- scam_caption_models()$by
   estimates <- smooth_estimates(model, n = 20, overall_uncertainty = FALSE)
-  direct <- draw(model, n = 20, grouped_by = TRUE, parametric = FALSE,
+  direct <- draw(model, n = 20, grouped = c("factor-by", "sz", "fs"), parametric = FALSE,
     rug = FALSE, wrap = FALSE)
-  saved <- draw(estimates, grouped_by = TRUE)
+  saved <- draw(estimates, grouped = c("factor-by", "sz", "fs"))
   expect_length(direct, 1L)
   caption <- direct[[1L]]$labels$caption
   expect_identical(saved[[1L]]$labels$caption, caption)

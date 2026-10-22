@@ -1,0 +1,5 @@
+# Outputs recreated by render-examples.R
+/figures/
+/*.rds
+/gjrm-examples.html
+/gjrm-examples.R

@@ -64,7 +64,9 @@ uses the extracted GAM. Availability and defaults depend on the model; see
 \link{diagnostic_support}.}
 
 \item{...}{optional arguments passed to model preparation, such as the
-sdmTMB \code{field_method}.}
+sdmTMB \code{field_method}. For grouped-family GAMs and joint GJRM models,
+\code{response = NULL} uses every response and an integer selects one; see
+\code{\link[=appraise]{appraise()}}. Selection leaves \code{by_family} independent.}
 
 \item{n_dharma}{positive integer; number of response simulations for
 \code{type = "dharma"}. This is separate from \code{n_simulate}, which controls

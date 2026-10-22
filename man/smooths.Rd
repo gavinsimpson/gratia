@@ -3,12 +3,15 @@
 \name{smooths}
 \alias{smooths}
 \alias{smooths.gamlss}
+\alias{smooths.gjrm}
 \alias{smooths.default}
 \alias{smooths.gamm}
 \alias{smooths.gamm4}
 \title{Names of smooths in a GAM}
 \usage{
 \method{smooths}{gamlss}(object, ...)
+
+\method{smooths}{gjrm}(object, ...)
 
 smooths(object, ...)
 
@@ -28,7 +31,7 @@ to \code{\link[mgcv:gam]{mgcv::gam()}}, \code{\link[mgcv:bam]{mgcv::bam()}}, or 
 Names of smooths in a GAM
 }
 \details{
-For GJRM GAMLSS models, labels follow equation and smooth order.
+For GJRM models, labels follow equation and smooth order.
 Labels repeated in later equations receive suffixes such as \code{s.1(x)}.
 These labels can be supplied to \code{\link[=draw]{draw()}} or \code{\link[=smooth_estimates]{smooth_estimates()}} to select
 smooths across equations.

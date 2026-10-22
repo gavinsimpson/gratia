@@ -175,7 +175,7 @@ test_that("MRF descriptive QQ plots retain identity and expected quantiles", {
 
 test_that("grouped MRF panels keep area effects and QQ groups separate", {
   for (type in c("effects", "qq")) {
-    p <- assemble(mrf_models$by, parametric = FALSE, grouped_by = TRUE,
+    p <- assemble(mrf_models$by, parametric = FALSE, grouped = c("factor-by", "sz", "fs"),
       rug = FALSE, mrf_plot = type)[[1]]
     b <- ggplot_build(p)
     expect_equal(nrow(b$layout$layout), 2)
@@ -187,7 +187,7 @@ test_that("grouped MRF panels keep area effects and QQ groups separate", {
       expect_length(actual$y, 8)
       expect_equal(actual$y, unname(if (type == "qq") sort(expected) else expected))
     }
-    expect_s3_class(draw(smooth_estimates(mrf_models$by), grouped_by = TRUE,
+    expect_s3_class(draw(smooth_estimates(mrf_models$by), grouped = c("factor-by", "sz", "fs"),
       mrf_plot = type), "patchwork")
   }
 })
@@ -199,5 +199,5 @@ test_that("basic MRF plots have visual regression coverage", {
   vdiffr::expect_doppelganger("MRF descriptive QQ",
     draw(mrf_models$low, rug = FALSE, mrf_plot = "qq"))
   vdiffr::expect_doppelganger("MRF grouped area effects",
-    draw(mrf_models$by, parametric = FALSE, grouped_by = TRUE, rug = FALSE))
+    draw(mrf_models$by, parametric = FALSE, grouped = c("factor-by", "sz", "fs"), rug = FALSE))
 })

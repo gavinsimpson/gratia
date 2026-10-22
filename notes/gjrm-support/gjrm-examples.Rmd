@@ -1,0 +1,470 @@
+---
+title: "Joint GJRM models in gratia"
+output:
+  html_document:
+    toc: true
+    toc_depth: 2
+    self_contained: true
+    code_folding: show
+    theme: readable
+---
+
+These examples fit joint models and use gratia to draw their smooths and
+check each response distribution. Run
+`Rscript notes/gjrm-support/render-examples.R` from this package checkout
+to reproduce the HTML report, R examples, fitted models and PNG figures.
+
+```{r setup, include=FALSE}
+suppressPackageStartupMessages({
+  library("gratia")
+  library("mgcv")
+  library("ggplot2")
+  library("patchwork")
+})
+knitr::opts_chunk$set(
+  echo = TRUE, message = FALSE, warning = TRUE,
+  fig.width = 12, fig.height = 8, dpi = 140,
+  dev = "png", fig.path = "figures/"
+)
+options(width = 90)
+```
+
+## Two Gaussian responses, including random effects
+
+The first response has a smooth effect of `x` and a group effect. The second
+has a smooth effect of `z` and a standard deviation that changes with `x`.
+The dependence between the responses changes with `z`.
+
+```{r gaussian-data}
+set.seed(510)
+n <- 360
+d <- data.frame(
+  x = runif(n), z = runif(n),
+  group = factor(rep(letters[1:12], each = 30))
+)
+group_effect <- rnorm(12, sd = 0.35)
+mu1 <- sin(2 * pi * d$x) + group_effect[d$group]
+mu2 <- 0.5 + cos(2 * pi * d$z)
+sd1 <- 0.7
+sd2 <- exp(-0.3 + 0.4 * d$x)
+rho <- 0.2 + 0.45 * d$z
+e1 <- rnorm(n)
+e2 <- rho * e1 + sqrt(1 - rho^2) * rnorm(n)
+d$y1 <- mu1 + sd1 * e1
+d$y2 <- mu2 + sd2 * e2
+```
+
+The formulas describe the two means, two standard deviations and the
+dependence parameter, in that order.
+
+```{r gaussian-fit}
+set.seed(511)
+joint_normal <- GJRM::gjrm(
+  list(
+    y1 ~ s(x, k = 7) + s(group, bs = "re"),
+    y2 ~ s(z, k = 7), ~ 1,
+    ~ s(x, k = 5), ~ s(z, k = 5)
+  ),
+  data = d, margins = c("N", "N"), model = "B"
+)
+smooths(joint_normal)
+```
+
+`draw()` uses the same smooth and random-effect plots as it does for a GAM.
+
+```{r gaussian-smooths, fig.height=11}
+normal_smooth_plot <- draw(joint_normal, ncol = 2, n = 100)
+normal_smooth_plot
+```
+
+`assemble()` returns individual plots. Here is the random effect on its own.
+
+```{r gaussian-random-effect, fig.width=7, fig.height=5}
+normal_panels <- assemble(joint_normal, parametric = FALSE)
+normal_panels[[2]]
+```
+
+### Saved smooth estimates and selection
+
+Smooth labels identify terms across all equations. Repeated labels receive
+distinct suffixes. The last label below selects the dependence smooth.
+
+```{r saved-estimates}
+dependence_label <- tail(smooths(joint_normal), 1)
+dependence <- smooth_estimates(joint_normal, select = dependence_label, n = 80)
+head(dependence[c(".smooth", ".estimate", ".se", "z", ".model")])
+```
+
+```{r saved-estimate-plot, fig.width=8, fig.height=5}
+draw(dependence)
+```
+
+### Four diagnostic panels, each separated by response
+
+`appraise()` produces one QQ plot, residual-versus-predictor plot, histogram,
+and observed-versus-fitted plot. Every panel has a facet for each response.
+These diagnostics check each response distribution; they do not check the
+copula that links the responses.
+
+```{r gaussian-appraisal, fig.width=14, fig.height=10}
+normal_appraisal <- appraise(joint_normal, seed = 512, ncol = 2)
+normal_appraisal
+```
+
+Select a single response when its diagnostics need a closer look.
+
+```{r gaussian-response-two, fig.width=10, fig.height=8}
+appraise(joint_normal, response = 2, seed = 512, ncol = 2)
+```
+
+## A binary response and a lognormal response
+
+Both responses are observed for every row. The first is binary and uses a
+probit link. The second is positive and lognormal. Its observed-versus-fitted
+plot uses the expected response on its original scale, including the
+contribution of the lognormal standard deviation.
+
+```{r mixed-data}
+set.seed(520)
+mixed <- data.frame(x = runif(400), z = runif(400))
+a <- rnorm(nrow(mixed))
+b <- 0.45 * a + sqrt(1 - 0.45^2) * rnorm(nrow(mixed))
+mixed$present <- as.integer(0.1 + sin(2 * pi * mixed$x) + a > 0)
+mixed$duration <- exp(0.4 + 0.6 * cos(2 * pi * mixed$z) + 0.45 * b)
+```
+
+```{r mixed-fit}
+set.seed(521)
+joint_mixed <- GJRM::gjrm(
+  list(
+    present ~ s(x, k = 7), duration ~ s(z, k = 7),
+    ~ 1, ~ s(x, k = 5)
+  ),
+  data = mixed, margins = c("probit", "LN"), model = "B"
+)
+```
+
+```{r mixed-smooths}
+draw(joint_mixed, ncol = 2)
+```
+
+```{r mixed-appraisal, fig.width=14, fig.height=10}
+appraise(joint_mixed, seed = 522, ncol = 2)
+```
+
+Standalone diagnostics retain the same response grouping. A worm plot shows
+the departures from the QQ reference.
+
+```{r mixed-worm, fig.width=10, fig.height=5}
+worm_plot(joint_mixed, seed = 522)
+```
+
+PIT residuals are returned as a matrix with one column per response. Selecting
+one response returns a vector.
+
+```{r mixed-residuals}
+pit <- quantile_residuals(joint_mixed, type = "pit", seed = 522)
+head(pit)
+pit_duration <- quantile_residuals(
+  joint_mixed, type = "pit", response = 2, seed = 522
+)
+head(pit_duration)
+stopifnot(isTRUE(all.equal(unname(pit[, 2]), unname(pit_duration))))
+```
+
+## A count response and a Gaussian response
+
+The count has a negative-binomial margin. Here `NBI` uses
+\(\operatorname{Var}(Y)=\mu+\sigma\mu^2\).
+The two responses share correlated errors.
+
+```{r count-data}
+set.seed(530)
+counts <- data.frame(x = runif(360), z = runif(360))
+a <- rnorm(nrow(counts))
+b <- 0.4 * a + sqrt(1 - 0.4^2) * rnorm(nrow(counts))
+counts$count <- qnbinom(
+  pnorm(a), mu = exp(0.8 + 0.6 * sin(2 * pi * counts$x)), size = 3
+)
+counts$value <- cos(2 * pi * counts$z) + 0.8 * b
+```
+
+```{r count-fit}
+set.seed(531)
+joint_count <- GJRM::gjrm(
+  list(
+    count ~ s(x, k = 7), value ~ s(z, k = 7),
+    ~ 1, ~ 1, ~ s(x, k = 5)
+  ),
+  data = counts, margins = c("NBI", "N"), model = "B"
+)
+```
+
+```{r count-smooths}
+draw(joint_count, ncol = 2)
+```
+
+```{r count-appraisal, fig.width=14, fig.height=10}
+appraise(joint_count, seed = 532, ncol = 2)
+```
+
+The scalable version summarizes the point clouds while keeping the responses
+separate.
+
+```{r count-scalable, fig.width=14, fig.height=10}
+appraise(joint_count, seed = 532, scalable = TRUE, ncol = 2)
+```
+
+## Factor-by smooths in both responses
+
+Each response has a separate curve for each level of `f`. Grouped plots
+keep those curves together within their response. Parametric factor effects
+also identify which response they belong to.
+
+```{r factor-by-fit}
+set.seed(535)
+by_data <- data.frame(x = runif(360),
+  f = factor(rep(c("a", "b"), each = 180)))
+a <- rnorm(nrow(by_data))
+b <- 0.3 * a + sqrt(1 - 0.3^2) * rnorm(nrow(by_data))
+by_data$y1 <- ifelse(by_data$f == "a", 1, 0.5) *
+  sin(2 * pi * by_data$x) + 0.4 * (by_data$f == "b") + 0.45 * a
+by_data$y2 <- ifelse(by_data$f == "a", 1, -1) *
+  cos(2 * pi * by_data$x) + 0.2 * (by_data$f == "a") + 0.45 * b
+set.seed(536)
+joint_by <- GJRM::gjrm(
+  list(y1 ~ f + s(x, by = f, k = 7),
+    y2 ~ f + s(x, by = f, k = 7)),
+  data = by_data, margins = c("N", "N"), model = "B"
+)
+names(assemble(joint_by, grouped = c("factor-by", "sz", "fs")))
+```
+
+```{r factor-by-smooths}
+draw(joint_by, grouped = c("factor-by", "sz", "fs"), ncol = 2)
+```
+
+Saved estimates contain smooths only. Their grouped plots retain the response
+identities and fitted term order.
+
+```{r factor-by-saved, fig.width=12, fig.height=5}
+by_estimates <- smooth_estimates(joint_by)
+draw(by_estimates, grouped = c("factor-by", "sz", "fs"), ncol = 2)
+```
+
+## A two-dimensional smooth
+
+A joint-model tensor smooth uses the existing surface plotting methods.
+Estimates saved by `smooth_estimates()` retain the information needed to
+draw the surface later.
+
+```{r tensor-fit}
+set.seed(540)
+joint_tensor <- GJRM::gjrm(
+  list(
+    y1 ~ te(x, z, k = c(5, 5)) + s(group, bs = "re"),
+    y2 ~ s(z, k = 7)
+  ),
+  data = d, margins = c("N", "N"), model = "B"
+)
+tensor_values <- smooth_estimates(joint_tensor, select = 1, n_2d = 35)
+```
+
+```{r tensor-surface, fig.width=9, fig.height=7}
+draw(tensor_values)
+```
+
+Requesting `scales = "fixed"` gives the plotted effects a common range.
+The surface keeps its covariate axes; its fill scale shares the effect range
+used by the one-dimensional plots.
+
+```{r tensor-fixed-scales, fig.height=10}
+draw(joint_tensor, scales = "fixed", parametric = FALSE, ncol = 2)
+```
+
+## An ordinal response
+
+Ordinal models include cutpoints as well as regression coefficients.
+Smooth plots use the regression coefficients and exclude cutpoint uncertainty
+from the smooth intervals. Appraisal of ordinal margins is not yet supported.
+
+```{r ordinal-fit}
+ordinal <- d
+ordinal$category <- as.integer(cut(ordinal$y1, c(-Inf, -0.5, 0.5, Inf)))
+set.seed(550)
+joint_ordinal <- GJRM::gjrm(
+  list(
+    category ~ s(x, k = 7), y2 ~ s(z, k = 7),
+    ~ 1, ~ s(x, k = 5)
+  ),
+  data = ordinal, margins = c("ord.probit", "N"), model = "B"
+)
+```
+
+```{r ordinal-smooths}
+draw(joint_ordinal, ncol = 2)
+```
+
+## Fixed margins: draw the dependence equation
+
+When the marginal distributions are supplied as probabilities, only the
+dependence equation is estimated. `draw()` plots that equation.
+
+```{r fixed-fit}
+uniforms <- data.frame(
+  u1 = pnorm((d$y1 - mu1) / sd1),
+  u2 = pnorm((d$y2 - mu2) / sd2),
+  z = d$z
+)
+set.seed(560)
+joint_fixed <- GJRM::gjrm(
+  list(u1 ~ 1, u2 ~ 1, ~ s(z, k = 6)),
+  data = uniforms, margins = c("N", "N"), model = "B",
+  fixed.margins = TRUE
+)
+```
+
+```{r fixed-smooth, fig.width=8, fig.height=5}
+draw(joint_fixed)
+```
+
+## The same response selector for grouped-family GAMs
+
+For a model fitted with `mgcv::gfam()`, `response` refers to the integer
+position in its family list. Selecting a component retains its observations.
+The `by_family` argument continues to control pooling and faceting
+independently.
+
+```{r gfam-response-fit}
+set.seed(560)
+grouped_data <- data.frame(x = runif(240), family_id = rep(1:3, 80))
+grouped_data$component <- factor(grouped_data$family_id)
+grouped_data$y <- numeric(nrow(grouped_data))
+i <- grouped_data$family_id == 1L
+grouped_data$y[i] <- rbinom(sum(i), 1,
+  plogis(0.3 + sin(2 * pi * grouped_data$x[i])))
+i <- grouped_data$family_id == 2L
+grouped_data$y[i] <- 0.5 + cos(2 * pi * grouped_data$x[i]) +
+  rnorm(sum(i), sd = 0.4)
+i <- grouped_data$family_id == 3L
+grouped_data$y[i] <- rpois(sum(i),
+  exp(0.2 + 0.5 * sin(2 * pi * grouped_data$x[i])))
+grouped_fit <- gam(
+  cbind(y, family_id) ~ component + s(x, by = component, k = 6),
+  data = grouped_data, method = "REML",
+  family = gfam(list(binomial(), gaussian(), poisson()))
+)
+```
+
+The default `response = NULL` includes every indexed component. This call
+requests family facets for the residual panels.
+
+```{r gfam-all-responses, fig.width=15, fig.height=10}
+appraise(grouped_fit, by_family = TRUE, seed = 561, ncol = 2)
+```
+
+Index 2 selects the Gaussian component and its 80 observations.
+
+```{r gfam-selected-response, fig.width=10, fig.height=8}
+appraise(grouped_fit, response = 2, seed = 561, ncol = 2)
+```
+
+Selection and layout can also be combined in standalone plots. Both QQ plots
+below use component 3; only the second asks for a family facet.
+
+```{r gfam-independent-layout, fig.width=12, fig.height=5}
+qq_plot(grouped_fit, response = 3, by_family = FALSE, seed = 561) +
+  qq_plot(grouped_fit, response = 3, by_family = TRUE, seed = 561)
+```
+
+Scalable diagnostics accept the same selection.
+
+```{r gfam-selected-scalable, fig.width=8, fig.height=6}
+scalable_residuals_linpred_plot(grouped_fit, response = 2,
+  by_family = TRUE, seed = 561, density_bins = c(12, 40))
+```
+
+With the same seed, selected PIT residuals match the corresponding rows
+from an all-component call.
+
+```{r gfam-selected-residuals}
+grouped_pit <- quantile_residuals(grouped_fit, type = "pit", seed = 561)
+poisson_pit <- quantile_residuals(grouped_fit, type = "pit",
+  response = 3, seed = 561)
+stopifnot(length(poisson_pit) == sum(grouped_data$family_id == 3L),
+  isTRUE(all.equal(unname(poisson_pit),
+    unname(grouped_pit[grouped_data$family_id == 3L]))))
+head(poisson_pit)
+```
+
+```{r save-gfam-model, include=FALSE}
+saveRDS(grouped_fit, "gfam-example-model.rds")
+```
+
+## Fitted objects and versions
+
+The rendering script saves the seven joint fits in `gjrm-example-models.rds` so they
+can be inspected without refitting. The grouped-family fit is saved separately in `gfam-example-model.rds`.
+
+```{r save-models, include=FALSE}
+example_models <- list(
+  gaussian = joint_normal, binary_lognormal = joint_mixed,
+  count_gaussian = joint_count, factor_by = joint_by, tensor = joint_tensor,
+  ordinal = joint_ordinal, fixed_margins = joint_fixed
+)
+saveRDS(example_models, "gjrm-example-models.rds")
+```
+
+### Numerical checks of the example smooths
+
+The table compares smooth estimates and standard errors with direct products
+of the fitted basis matrices and the final joint coefficients and covariance.
+These checks use `overall_uncertainty = FALSE` to isolate each smooth's
+coefficient block. The plots above retain their usual interval defaults.
+
+```{r coefficient-checks, echo=FALSE, error=FALSE}
+withCallingHandlers({
+  source("check-smooths.R", local = TRUE)
+  expected_smooths <- c(gaussian = 5L, binary_lognormal = 3L,
+    count_gaussian = 3L, factor_by = 4L, tensor = 3L,
+    ordinal = 3L, fixed_margins = 1L)
+  coefficient_check_details <- do.call(rbind, Map(function(fit, name) {
+    cbind(model = name, check_example_smooths(fit))
+  }, example_models, names(example_models)))
+  rownames(coefficient_check_details) <- NULL
+  checked_counts <- table(factor(coefficient_check_details$model,
+    levels = names(expected_smooths)))
+  stopifnot(identical(as.integer(checked_counts), unname(expected_smooths)),
+    nrow(coefficient_check_details) == 22L,
+    all(coefficient_check_details$evaluation_rows > 0L))
+  coefficient_checks <- do.call(rbind, lapply(names(example_models), function(name) {
+    values <- coefficient_check_details[coefficient_check_details$model == name, ]
+    data.frame(smooths = nrow(values),
+      evaluation_rows = sum(values$evaluation_rows),
+      estimate_error = max(values$estimate_error),
+      standard_error_error = max(values$standard_error_error))
+  }))
+  rownames(coefficient_checks) <- names(example_models)
+  write.csv(coefficient_checks, "coefficient-checks.csv")
+  write.csv(coefficient_check_details, "coefficient-check-details.csv",
+    row.names = FALSE)
+  knitr::kable(coefficient_checks, digits = 14)
+}, warning = function(w) {
+  stop("Numerical checks raised a warning: ", conditionMessage(w), call. = FALSE)
+})
+```
+
+All **`r nrow(coefficient_check_details)` smooths** were checked across
+**`r format(sum(coefficient_check_details$evaluation_rows), big.mark = ",")`
+evaluation rows**. Each comparison requires nonempty results with matching
+dimensions and finite estimates and standard errors. An unexpected warning
+stops the report. The [individual comparisons](coefficient-check-details.csv)
+record the equation, smooth and evaluated row count.
+
+```{r versions}
+data.frame(
+  package = c("gratia", "GJRM", "mgcv"),
+  version = vapply(c("gratia", "GJRM", "mgcv"),
+    function(x) as.character(packageVersion(x)), character(1))
+)
+```

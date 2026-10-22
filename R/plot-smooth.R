@@ -34,6 +34,9 @@
   partial_residuals = NULL,
   ylim = NULL,
   grouped_by = FALSE,
+  curve_interval = NULL,
+  discrete_colour = NULL,
+  discrete_fill = NULL,
   ...
 ) {
   # do we have a grouped factor by?
@@ -52,7 +55,8 @@
   }
 
   scales <- if (grouped_by) {
-    prepare_smooth_scales(nlevels(object[[by_var]]))
+    prepare_smooth_scales(nlevels(object[[by_var]]),
+      discrete_colour = discrete_colour, discrete_fill = discrete_fill)
   } else {
     list(colour = NULL, fill = NULL)
   }
@@ -70,6 +74,7 @@
   prepare_smooth_plot(object,
     x_var = variables, colour_var = if (grouped_by) by_var else NULL,
     group_var = if (grouped_by) by_var else NULL,
+    interval = !identical(curve_interval, FALSE),
     rug = rug, constant = constant, fun = fun,
     ci_alpha = ci_alpha, ci_col = ci_col, smooth_col = smooth_col,
     partial_residuals = partial_residuals, resid_col = resid_col,
@@ -102,8 +107,9 @@
 #'   it, retaining the existing smooth plotting convention.
 #' @param grouped_by Logical; label a grouped factor by plot? Grouped plots keep
 #'   the full title and name only the by variable in the default subtitle.
-#'   Separate plots strip the title at the first colon and include the factor
-#'   level in the subtitle. Continuous by variables have no level suffix.
+#'   Separate plots remove the by suffix from the default title and include
+#'   the factor level in the subtitle. Custom titles are retained. Continuous
+#'   by variables have no level suffix.
 #' @param by_level Data classes for which an ungrouped subtitle includes the
 #'   by-variable level. Spherical plots include only unordered factors.
 #' @return A `ggplot2::labs()` object.
@@ -128,6 +134,7 @@
   default_caption <- scasm_shape_plot_caption(object, default_caption)
   default_caption <- scam_shape_plot_caption(object, default_caption)
   interval_info <- attr(object, "interval_info")
+  if (identical(attr(object, "show_smooth_interval"), FALSE)) interval_info <- NULL
   if (!identical(interval_info$method, "shape") &&
       !is.null(interval_info) && interval_info$interval == "simultaneous") {
     source <- if (identical(interval_info$method, "gaussian") &&
@@ -147,8 +154,8 @@
 
   if (all(!is.na(object[[".by"]]))) {
     by_var <- as.character(unique(object[[".by"]]))
-    if (!grouped_by) {
-      title <- strsplit(title, split = ":")[[1L]][[1L]]
+    if (!grouped_by && identical(title, unique(object[[".smooth"]]))) {
+      title <- factor_plot_term(title, by_var)
     }
     if (is.null(subtitle)) {
       subtitle <- paste0("By: ", by_var)
@@ -158,7 +165,10 @@
     }
   }
 
-  if (default_subtitle) subtitle <- smooth_plot_subtitle(object, subtitle)
+  if (default_subtitle) {
+    if (is.null(subtitle)) subtitle <- attr(object, "factor_panel_subtitle")
+    subtitle <- smooth_plot_subtitle(object, subtitle)
+  }
 
   labs(x = xlab, y = ylab, title = title, subtitle = subtitle, caption = caption)
 }
@@ -320,7 +330,9 @@
     ribbon_fill = if (is.null(colour_var)) ci_col else NULL,
     line_colour = if (is.null(colour_var)) smooth_col else NULL)
   if (!is.null(colour_var)) {
-    plt <- plt + discrete_colour + discrete_fill
+    plt <- plt + discrete_colour
+    if (interval) plt <- plt + discrete_fill
+    if (!interval) plt <- plt + guides(fill = "none")
   }
 
   if (any(do_sizer)) {
@@ -341,6 +353,7 @@
     }
   }
 
+  if (!interval) labels$fill <- NULL
   plt <- plt + labels
   if (!legend) {
     plt <- plt + theme(legend.position = "none")
@@ -852,6 +865,12 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
   caption = NULL,
   ylim = NULL,
   discrete_colour = NULL,
+  discrete_fill = NULL,
+  ci_alpha = 0.2,
+  ci_col = "black",
+  smooth_col = "black",
+  curve_interval = NULL,
+  separate_factor = FALSE,
   angle = NULL,
   ...
 ) {
@@ -911,9 +930,13 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
 
   if (!all_factors) {
     return(prepare_smooth_plot(object,
-      x_var = variables[1], colour_var = variables[2], interval = FALSE,
+      x_var = variables[1],
+      colour_var = if (separate_factor) NULL else variables[2],
+      interval = isTRUE(curve_interval), ci_alpha = ci_alpha,
+      ci_col = ci_col, smooth_col = smooth_col,
       rug = rug, constant = constant, fun = fun,
-      discrete_colour = discrete_colour, legend = FALSE,
+      discrete_colour = discrete_colour, discrete_fill = discrete_fill,
+      legend = FALSE,
       angle = angle, ylim = ylim,
       labels = labels
     ) + curve_facet)
@@ -978,6 +1001,8 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
   constant = NULL,
   fun = NULL,
   ci_alpha = 0.2,
+  ci_col = "black",
+  smooth_col = "black",
   xlab = NULL,
   ylab = NULL,
   title = NULL,
@@ -987,6 +1012,8 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
   discrete_colour = NULL,
   discrete_fill = NULL,
   angle = NULL,
+  curve_interval = NULL,
+  separate_factor = FALSE,
   ...
 ) {
   if (is.null(variables)) {
@@ -1008,9 +1035,11 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
     plot_univariate_sz_smooth(object,
       variables = variables, rug = rug,
       constant = constant, fun = fun, ci_alpha = ci_alpha,
+      ci_col = ci_col, smooth_col = smooth_col,
       xlab = xlab, ylab = ylab, title = title, subtitle = subtitle,
       caption = caption, ylim = ylim, discrete_colour = discrete_colour,
       discrete_fill = discrete_fill, angle = angle,
+      curve_interval = curve_interval, separate_factor = separate_factor,
       ...
     )
   }
@@ -1047,6 +1076,8 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
   constant = NULL,
   fun = NULL,
   ci_alpha = 0.2,
+  ci_col = "black",
+  smooth_col = "black",
   xlab = NULL,
   ylab = NULL,
   title = NULL,
@@ -1056,6 +1087,8 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
   discrete_colour = NULL,
   discrete_fill = NULL,
   angle = NULL,
+  curve_interval = NULL,
+  separate_factor = FALSE,
   ...
 ) {
   # variables will likely be length two, but it could be >2 if there are
@@ -1063,24 +1096,16 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
   # such as a TPRS or Duchon spline
   fs <- vapply(object[variables], is.factor, logical(1L))
   if (length(variables) > 2L) {
-    object <- mutate(object,
-      ".sz_var" = interaction(object[variables[fs]],
-        sep = ":",
-        lex.order = TRUE
-      )
-    )
-    fac_var <- ".sz_var"
-    fac_var_lab <- paste(variables[fs], sep = ":")
+    factors <- variables[fs]
+    groups <- tensor_plot_groups(object, rug, factors, factors)
+    fac_var <- utils::tail(make.unique(c(names(object), ".sz_var")), 1L)
+    object[[fac_var]] <- groups$group
+    fac_var_lab <- paste(factors, collapse = ":")
     x_var <- variables[!fs]
 
-    # need to repeat for the rug
+    rug <- groups$rug
     if (!is.null(rug)) {
-      rug <- mutate(rug,
-        ".sz_var" = interaction(rug[variables[fs]],
-          sep = ":",
-          lex.order = TRUE
-        )
-      )
+      rug[[fac_var]] <- groups$rug_group
     }
 
     if (length(x_var) > 1L) {
@@ -1106,11 +1131,14 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
     xlab = xlab, ylab = ylab, title = title, subtitle = subtitle,
     caption = caption
   )
-  labels$colour <- labels$fill <- fac_var_lab
+  if (!separate_factor) labels$colour <- labels$fill <- fac_var_lab
 
   prepare_smooth_plot(object,
-    x_var = x_var, colour_var = fac_var, rug = rug, rug_colour_var = fac_var,
+    x_var = x_var, colour_var = if (separate_factor) NULL else fac_var,
+    rug = rug, rug_colour_var = if (separate_factor) NULL else fac_var,
+    interval = !identical(curve_interval, FALSE), legend = !separate_factor,
     constant = constant, fun = fun, ci_alpha = ci_alpha,
+    ci_col = ci_col, smooth_col = smooth_col,
     discrete_colour = scales$colour, discrete_fill = scales$fill,
     ribbon_colour = NULL, angle = angle, ylim = ylim,
     labels = labels

@@ -2,6 +2,12 @@
 
 ## User visible changes
 
+* `grouped_by` is deprecated in `draw()` and `assemble()`. Include
+  `"factor-by"` in the new `grouped` argument to overlay factor-by curves,
+  or omit it to draw them separately. Explicit uses of `grouped_by` still
+  update factor-by grouping, including ordered factors, while retaining
+  the requested grouping of `sz` and `fs` curves.
+
 * `draw.basis()` now draws contour lines on surface plots by default
   (`contour = TRUE`), matching `draw.gam()`. Use `contour = FALSE` to restore
   the previous appearance.
@@ -128,6 +134,32 @@
   simulation, including when an expectation does not exist. Grouped ordinal
   expectations return category probabilities alongside scalar component means
   (#426).
+
+* Grouped-family diagnostics now accept `response = NULL` for all family
+  components or a single integer family-list index for one component.
+  This uses the same selection convention as joint GJRM diagnostics.
+  `by_family` independently controls the existing pooling and faceting
+  behaviour, and selected results retain their original component labels.
+
+* `assemble()`, `draw()` and `smooth_estimates()` now support joint models
+  fitted by `GJRM::gjrm()`, using the final joint coefficients and covariance
+  matrices for smooths, random effects and parametric effects. Diagnostic
+  functions support ordinary uncensored joint models whose predictors do not
+  include modeled responses; `appraise()` facets each panel by response.
+
+* `draw()` and `assemble()` can separate `sz` and `fs` curves into individual
+  plots (#244). `grouped` names the types to overlay: `"factor-by"`, `"sz"`,
+  and `"fs"`. `show_ci` independently selects which types show intervals,
+  including optional intervals for `fs` curves. The defaults retain existing
+  grouping and interval visibility. Ordered-factor deviations use the
+  factor-by settings and keep their reference smooth separate. Saved smooth
+  estimates support the same controls. Common axis ranges use displayed
+  estimates and visible intervals. Grouped factor-by plots retain observations
+  from every plotted level and accept custom colour and fill scales. Smooth
+  and custom titles retain colons within their text. Separate curves use
+  the usual black line and translucent black interval. Set `grouped = FALSE`
+  to separate all factor-related curves, or `show_ci = FALSE` to hide their
+  intervals.
 
 * `assemble()` now supports models fitted by `mgcv::gamm()`, returning named
   plots of smooth and parametric contributions. It shares preparation of the
@@ -694,6 +726,17 @@
 * Gumbel LSS fitted location estimates are no longer exponentiated. Natural
   location is computed separately from the scale-dependent expectation.
 
+* Grouped plots of factor-by smooths now keep different smooth terms and
+  linear predictors separate, including when drawing saved smooth estimates.
+  Models with several factor-by terms no longer fail during plot assembly.
+
+* For GJRM models, `scales = "fixed"` now shares effect ranges without
+  expanding the covariate axes of two-dimensional smooth plots.
+
+* `appraise(rank = TRUE)` now uses within-response or within-family predictor
+  ranks in ordinary diagnostic panels, matching the standalone and scalable
+  plots.
+
 * `partial_residuals()` and `add_partial_residuals()` now give an informative
   error for models without working residuals or working weights, including
   mgcv's location-scale families. `draw(residuals = TRUE)` warns once and draws
@@ -715,6 +758,9 @@
 
 * B-spline evaluation handles empty data and factor-by calls whose evaluation
   data omit fitted levels, including constrained tensor products.
+  `smooth_estimates()` retains estimate, standard error and predictor
+  columns and their types when no evaluation rows remain. Nested output
+  keeps each selected smooth with its empty data table.
 
 * MH acceptance rates are extracted from the correct mgcv return components.
 

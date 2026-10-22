@@ -147,7 +147,9 @@ supplied, a suitable label will be generated.}
 \item{ncol}{optional number of columns when composing several panels.}
 
 \item{...}{arguments used to prepare model diagnostics, such as sdmTMB
-\code{component} and \code{field_method}.}
+\code{component} and \code{field_method}. For grouped-family GAMs and joint GJRM
+models, \code{response = NULL} uses every response and an integer selects one;
+see \code{\link[=appraise]{appraise()}}. Selection leaves \code{by_family} independent.}
 
 \item{density_bins}{Positive integer or pair of integers giving the number
 of horizontal and vertical heatmap bins.}

@@ -343,9 +343,9 @@ test_that("plot has correct label with ordered factor by models", {
 test_that("grouped_by works", {
   models <- secondary_models()
   sm <- smooth_estimates(su_m_factor_by)
-  expect_silent(plt1 <- draw(sm, grouped_by = TRUE))
+  expect_silent(plt1 <- draw(sm, grouped = c("factor-by", "sz", "fs")))
   sm <- smooth_estimates(models$m_ordered_by)
-  expect_silent(plt2 <- draw(sm, grouped_by = TRUE))
+  expect_silent(plt2 <- draw(sm, grouped = c("factor-by", "sz", "fs")))
 
   skip_on_cran()
   skip_if_not_installed("ggplot2", "3.5.2.9002")

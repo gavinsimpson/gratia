@@ -73,6 +73,14 @@
 #'   aligned censoring bounds. Matrix censored responses rejected by `gfam()`
 #'   and upstream fitting failures are not repaired.
 #'
+#'   Use `response = NULL` to check every grouped-family component or a single
+#'   integer to select a component by its position in the [mgcv::gfam()] family
+#'   list. Repeated families remain distinct. Selection filters fitting
+#'   observations without refitting the model and retains original component
+#'   labels. `by_family` independently controls the layout of the selected data.
+#'   With an explicit seed, selected residuals match the corresponding rows of
+#'   an all-component calculation whenever all components support that calculation.
+#'
 #'   `by_family = NULL` pools quantile residuals with colours identifying indexed
 #'   family components, including repeated uses of the same family. Traditional
 #'   residuals use component facets with free axes by default. The pooled
@@ -99,6 +107,11 @@
 #'   because response units differ. Standalone [observed_fitted_plot()] allows
 #'   explicit pooling. Ordinal panels use expected category codes.
 #'
+#' @param response `NULL` uses all responses; a single integer selects one.
+#'   For [mgcv::gfam()] models, the integer indexes the family list and selects
+#'   observations assigned to that component, including when families repeat.
+#'   For joint GJRM models, it selects a response in model order.
+#'   Selection is independent of `by_family`.
 #' @param by_family logical or `NULL`; separate indexed grouped-family components
 #'   into facets. The default pools quantile residuals with component colours
 #'   and facets traditional residuals. `TRUE` and `FALSE` explicitly select the
@@ -226,6 +239,20 @@
 #' ## change the ggplot theme for all panels
 #' library("ggplot2")
 #' appraise(mod, seed = 42) & theme_minimal()
+#'
+#' ## Select a grouped-family component by its position in the family list
+#' set.seed(53)
+#' grouped <- data.frame(x = runif(160), family_id = rep(1:2, 80))
+#' grouped$component <- factor(grouped$family_id)
+#' grouped$y <- rnorm(160, sin(2 * pi * grouped$x), 0.4)
+#' is_count <- grouped$family_id == 2L
+#' grouped$y[is_count] <- rpois(sum(is_count), exp(grouped$x[is_count]))
+#' grouped_fit <- gam(cbind(y, family_id) ~ component +
+#'   s(x, by = component, k = 6), data = grouped,
+#'   family = gfam(list(gaussian(), poisson())), method = "REML")
+#' appraise(grouped_fit, response = 2, seed = 54)
+#' ## Layout remains a separate choice
+#' qq_plot(grouped_fit, response = 2, by_family = TRUE, seed = 54)
 `appraise` <- function(model, ...) {
   UseMethod("appraise")
 }
@@ -400,11 +427,14 @@
         by_family = TRUE
       )
     } else {
+      predictor_data <- diagnostic_predictor_data(d$data, d$source, by_family, rank)
+      predictor_label <- if (isTRUE(attr(predictor_data, "ranked")))
+        "Within-component linear predictor rank" else d$eta_label
       plt2 <- render_diagnostic_points(
-        d$data,
+        predictor_data,
         "eta",
         "residuals",
-        d$eta_label,
+        predictor_label,
         diagnostic_residual_label(type),
         "Residuals vs linear predictor",
         point_col,
@@ -432,6 +462,10 @@
         point_col,
         point_alpha
       )
+    }
+    if (!use_scalable && by_family && ".family" %in% names(d$data)) {
+      plt2 <- plt2 + ggplot2::facet_wrap(ggplot2::vars(.data$.family), scales = "free")
+      plt4 <- plt4 + ggplot2::facet_wrap(ggplot2::vars(.data$.family), scales = "free")
     }
     layout <- prepare_plot_layout(4L, ncol = ncol, nrow = nrow)
     return(wrap_diagnostic_appraisal(

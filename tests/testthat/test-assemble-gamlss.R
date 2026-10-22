@@ -49,6 +49,23 @@ test_that("assemble gamlss returns named plots using final model estimates", {
   }
 })
 
+test_that("gamlss resolves deprecated grouping once across its equations", {
+  withr::local_options(lifecycle_verbosity = "warning")
+  m <- assemble_gamlss_fixture()
+  for (entry in list(assemble, draw)) {
+    warnings <- character()
+    withCallingHandlers(entry(m, n = 5, rug = FALSE, grouped_by = TRUE),
+      warning = function(w) {
+        warnings <<- c(warnings, conditionMessage(w))
+        invokeRestart("muffleWarning")
+      })
+    expect_length(warnings, 1L)
+    expect_match(warnings, "grouped_by.*deprecated")
+    expect_error(entry(m, grouped = "other"), "grouped.*character vector")
+    expect_error(entry(m, show_ci = "other"), "show_ci.*character vector")
+  }
+})
+
 test_that("assemble gamlss selects smooth and parametric terms across equations", {
   m <- assemble_gamlss_fixture()
   for (selection in list("s.1(x)", 2, c(FALSE, TRUE))) {

@@ -372,8 +372,8 @@ test_that("factor by smooths share original coordinates in grouped displays", {
   m <- coordinate_gam(y ~ s(log(x), by = group, k = 6), data = d)
   sm <- smooth_estimates(m, n = 12, back_transform = TRUE)
   for (grouped in c(FALSE, TRUE)) {
-    direct <- draw(sm, back_transform = TRUE, grouped_by = grouped)
-    model <- draw(m, n = 12, back_transform = TRUE, grouped_by = grouped,
+    direct <- draw(sm, back_transform = TRUE, grouped = if (grouped) c("factor-by", "sz", "fs") else c("sz", "fs"))
+    model <- draw(m, n = 12, back_transform = TRUE, grouped = if (grouped) c("factor-by", "sz", "fs") else c("sz", "fs"),
       residuals = TRUE, wrap = FALSE)
     for (i in seq_along(model)) {
       expect_identical(model[[i]]$labels$x, "x")

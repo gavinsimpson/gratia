@@ -21,7 +21,8 @@ posterior_predictive_plot(
   scalable = NULL,
   scalable_threshold = 10000L,
   batch_size = 10L,
-  ...
+  ...,
+  response = NULL
 )
 }
 \arguments{
@@ -79,6 +80,11 @@ with more than 512 distinct response values aggregate probability into
 \code{unconditional} or \code{mvn_method}. For delta sdmTMB fits,
 \code{component = "response"}, \code{"binomial"}, or \code{"positive"} selects the
 complete response or a fitted component. Prediction at new data is not supported.}
+
+\item{response}{For \code{\link[mgcv:gfam]{mgcv::gfam()}} models, \code{NULL} uses all components; a
+single integer selects observations assigned to that family-list position.
+Repeated families retain distinct indices. Each selected component is
+displayed in its own facet.}
 }
 \value{
 A ggplot object. Its data contain the observed responses

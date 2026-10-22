@@ -85,7 +85,7 @@ diagnostic_posterior_sampler.gam <- function(
 ) {
   check_distribution_conditioning(conditioning)
   row_map <- model_row_map(model)
-  rows <- which(!is.na(row_map))
+  rows <- attr(model, "gratia.gfam.rows", exact = TRUE) %||% which(!is.na(row_map))
   model <- model_used_rows(model)
   fam <- stats::family(model)
   ft <- family_type(fam)
@@ -219,7 +219,9 @@ diagnostic_posterior_sampler.gam <- function(
   scale <- model$sig2 %||% summary(model)$dispersion %||% 1
   if (grouped) {
     context <- gfam_prediction_context(model)
-    generators <- lapply(context$components, function(component) {
+    generators <- lapply(seq_along(context$components), function(j) {
+      if (!any(context$index == j)) return(NULL)
+      component <- context$components[[j]]
       if (family_type(component$family) %in% c("cnorm", "clog", "cpois")) {
         stop(
           "Posterior predictive checks are not available for censored ",
@@ -365,7 +367,7 @@ diagnostic_posterior_observed.gam <- function(model, conditioning = NULL, ...) {
   if (!is.numeric(y) || (!multivariate && !is.null(dim(y)))) {
     stop("The model must have a numeric response on the sampling scale.", call. = FALSE)
   }
-  rows <- which(!is.na(model_row_map(original)))
+  rows <- attr(original, "gratia.gfam.rows", exact = TRUE) %||% which(!is.na(model_row_map(original)))
   parameter <- if (grouped) paste0("component", gfam_prediction_context(model)$index) else
     "response"
   out <- diagnostic_response_table(y, 0L, parameter, rows)

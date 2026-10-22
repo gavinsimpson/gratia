@@ -5,6 +5,7 @@
 \alias{quantile_residuals}
 \alias{quantile_residuals.gamm4}
 \alias{quantile_residuals.gamlss}
+\alias{quantile_residuals.gjrm}
 \alias{quantile_residuals.gamm}
 \alias{quantile_residuals.gratia_diagnostic_proxy}
 \alias{quantile_residuals.lme}
@@ -27,6 +28,14 @@
 )
 
 \method{quantile_residuals}{gamlss}(model, type = c("pit", "quantile"), seed = NULL, ...)
+
+\method{quantile_residuals}{gjrm}(
+  model,
+  type = c("pit", "quantile"),
+  seed = NULL,
+  response = NULL,
+  ...
+)
 
 \method{quantile_residuals}{gamm}(
   model,
@@ -60,14 +69,21 @@
   ...
 )
 
-quantile_residuals(model, type = c("pit", "quantile"), seed = NULL, ...)
+quantile_residuals(
+  model,
+  type = c("pit", "quantile"),
+  seed = NULL,
+  ...,
+  response = NULL
+)
 
 \method{quantile_residuals}{gam}(
   model,
   type = c("pit", "quantile"),
   seed = NULL,
   conditioning = NULL,
-  ...
+  ...,
+  response = NULL
 )
 
 \method{quantile_residuals}{glm}(model, type = c("pit", "quantile"), seed = NULL, ...)
@@ -124,6 +140,13 @@ extracted GAM (\code{"gam_component"}), where supported. See \link{diagnostic_su
 
 \item{...}{arguments passed to other methods.}
 
+\item{response}{\code{NULL} uses all responses; a single integer selects one.
+For \code{\link[mgcv:gfam]{mgcv::gfam()}} models, the integer indexes the family list and selects
+observations assigned to that component. For joint GJRM models, it selects
+a response in model order. All-response GJRM residuals form a matrix with
+one column per response; selecting one returns a vector. Grouped-family
+residuals are always vectors.}
+
 \item{component}{character; which delta sdmTMB component to check; see
 \code{\link[=appraise]{appraise()}}.}
 
@@ -165,7 +188,10 @@ Discrete observations require randomisation over their probability mass.
 }
 \details{
 With \code{na.exclude}, excluded observations are restored as \code{NA} residuals;
-with \code{na.omit}, only observations used for fitting are returned.
+with \code{na.omit}, only observations used for fitting are returned. Selecting a
+grouped-family component with \code{response} returns only its retained fitting
+observations, without placeholders for excluded rows whose component
+membership is unavailable.
 
 For \code{mgcv::cnorm()}, \code{mgcv::clog()} and \code{mgcv::cpois()} models, censored
 observations have PIT residuals sampled uniformly between \code{F(l)} and \code{F(u)}.
@@ -179,7 +205,11 @@ recommended by mgcv.
 
 For grouped-family GAMs fitted with \code{\link[mgcv:gfam]{mgcv::gfam()}}, each observation uses its
 component's CDF, fitted nuisance parameters, dispersion and weights. Residuals
-are returned in fitting order. All active components must supply supported
+are returned in fitting order. \code{response = NULL} uses all components; an
+integer selects observations assigned to that family-list position. Repeated
+families retain distinct indices. With an explicit seed, selected residuals
+match the corresponding rows of an all-component call whenever all
+components support the calculation. All selected active components must supply supported
 CDFs and probability limits for discrete or censored observations. Unsupported
 components give an error; \code{\link[=appraise]{appraise()}} can instead select deviance residuals
 automatically. See \code{\link[=appraise]{appraise()}} for supported families. Tweedie zeros have
