@@ -11,7 +11,7 @@ functions."><meta property="og:image" content="https://gavinsimpson.github.io/gr
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-61</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-62</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -290,7 +290,8 @@ that particular posterior draw.</p></li>
     <p>For LSS models, each smooth is a contribution to its own linear predictor.
 Select its full smooth label to distinguish predictors, for example <code>s(x)</code>
 and <code>s.1(x)</code>. These are component draws on the predictor scale; use
-<code><a href="fitted_samples.html">fitted_samples()</a></code> for the expected response and <code><a href="derivative_samples.html">derivative_samples()</a></code> for
+<code><a href="fitted_samples.html">fitted_samples()</a></code> with <code>quantity = "expectation"</code> for the expected response
+and <code><a href="derivative_samples.html">derivative_samples()</a></code> for
 its derivative. Coefficients are drawn jointly across all predictors.</p>
     </div>
     <div class="section level2">

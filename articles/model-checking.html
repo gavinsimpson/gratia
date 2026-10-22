@@ -27,7 +27,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-61</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-62</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -391,9 +391,9 @@ child, very detailed individual curves are not supported.</p>
 <span>  data <span class="op">=</span> <span class="va">growth</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">growth_fit</span><span class="op">)</span><span class="op">$</span><span class="va">tTable</span></span>
 <span><span class="co">#&gt;                      Value  Std.Error DF   t-value      p-value</span></span>
-<span><span class="co">#&gt; (Intercept)     24.9687500 0.48600071 79 51.375954 1.812711e-62</span></span>
-<span><span class="co">#&gt; SexFemale       -2.3210227 0.76141677 25 -3.048295 5.375052e-03</span></span>
-<span><span class="co">#&gt; age_c            0.7843750 0.08599951 79  9.120691 5.654752e-14</span></span>
+<span><span class="co">#&gt; (Intercept)     24.9687500 0.48600069 79 51.375956 1.812707e-62</span></span>
+<span><span class="co">#&gt; SexFemale       -2.3210227 0.76141675 25 -3.048295 5.375051e-03</span></span>
+<span><span class="co">#&gt; age_c            0.7843750 0.08599951 79  9.120692 5.654744e-14</span></span>
 <span><span class="co">#&gt; SexFemale:age_c -0.3048295 0.13473534 79 -2.262432 2.641752e-02</span></span></code></pre></div>
 <p>The age coefficient describes mean growth in the reference sex, and
 the interaction describes a difference in age slopes. The fitted random
@@ -478,15 +478,15 @@ missing interval bounds where the fit provides none.</p>
 <code class="sourceCode R"><span><span class="va">population_grid</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>age <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">8</span>, <span class="fl">14</span>, length.out <span class="op">=</span> <span class="fl">30</span><span class="op">)</span>,</span>
 <span>  Sex <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="st">"Female"</span>, levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/levels.html" class="external-link">levels</a></span><span class="op">(</span><span class="va">growth</span><span class="op">$</span><span class="va">Sex</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/fitted_values.html">fitted_values</a></span><span class="op">(</span><span class="va">growth_smooth</span>, data <span class="op">=</span> <span class="va">population_grid</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 7</span></span></span>
-<span><span class="co">#&gt;    .row   age Sex    .fitted   .se .lower_ci .upper_ci</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>     1  8    Female    20.7 0.615      19.5      21.9</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>     2  8.21 Female    20.8 0.611      19.6      22.0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>     3  8.41 Female    20.9 0.607      19.7      22.1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>     4  8.62 Female    21.1 0.604      19.9      22.3</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>     5  8.83 Female    21.2 0.601      20.0      22.4</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span>     6  9.03 Female    21.4 0.599      20.2      22.5</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 8</span></span></span>
+<span><span class="co">#&gt;    .row   age Sex    .parameter .fitted   .se .lower_ci .upper_ci</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>     1  8    Female mean          20.7 0.615      19.5      21.9</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>     2  8.21 Female mean          20.8 0.611      19.6      22.0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>     3  8.41 Female mean          20.9 0.607      19.7      22.1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>     4  8.62 Female mean          21.1 0.604      19.9      22.3</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>     5  8.83 Female mean          21.2 0.601      20.0      22.4</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span>     6  9.03 Female mean          21.4 0.599      20.2      22.5</span></span></code></pre></div>
 <p>Diagnostics and response simulations for <code>gamm4</code> now
 default to the full conditional mixed model, including fitted child and
 smooth effects. Posterior response draws default to uncertainty in those

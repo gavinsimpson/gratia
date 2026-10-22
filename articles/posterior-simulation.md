@@ -91,8 +91,9 @@ functions
     generates draws from the posterior distribution of single estimated
     smooth functions,
 2.  [`fitted_samples()`](https://gavinsimpson.github.io/gratia/reference/fitted_samples.md)
-    generates draws from the posterior distribution of \mathbb{E}(y_i \|
-    \mathbf{X}\_i = x_i), the expected value of the response,
+    generates joint draws of distribution parameters; use
+    `quantity = "expectation"` for draws of \mathbb{E}(y_i \|
+    \mathbf{X}\_i = x_i), the expected response,
 3.  [`predicted_samples()`](https://gavinsimpson.github.io/gratia/reference/predicted_samples.md)
     generates new response data given supplied values of covariates
     y^{\ast}\_i \| \mathbf{X}\_i = x^{\ast}\_i
@@ -100,21 +101,15 @@ functions
     generates draws from the posterior distribution of the model,
     including the uncertainty in the estimated parameters of that model.
 
-In simpler terms,
+With `quantity = "expectation"`,
 [`fitted_samples()`](https://gavinsimpson.github.io/gratia/reference/fitted_samples.md)
-generates predictions about the “average” or expected value of the
-response at values of the covariates. These predictions only include the
-uncertainty in the estimated values of the model coefficients. In
-contrast,
+describes uncertainty in the expected response at the supplied
+covariates. It adds no response noise.
 [`posterior_samples()`](https://gavinsimpson.github.io/gratia/reference/posterior_samples.md)
-generates predictions of the actual values of the response we might
-expect to observe (if the model is correct) given values of the
-covariates. These predicted values include the variance of the sampling
-distribution (error term).
+draws observations after drawing model coefficients, so it includes
+response variation as well as coefficient uncertainty.
 [`predicted_samples()`](https://gavinsimpson.github.io/gratia/reference/predicted_samples.md)
-lies somewhere in between these two; the predicted values only include
-the variation in the sampling distribution, and take the model as fixed,
-known.
+draws observations with the coefficients held at their fitted values.
 
 It is worth reminding ourselves that these posterior draws are all
 conditional upon the selected values of the smoothing parameter(s)
@@ -145,20 +140,13 @@ fitted via `scam()` in the scam package.
 [`simulate()`](https://gavinsimpson.github.io/gratia/reference/simulate.md)
 is a base R convention that does the same thing as
 [`predicted_samples()`](https://gavinsimpson.github.io/gratia/reference/predicted_samples.md),
-just in a non-tidy way (that is not pejorative; it returns the simulated
-response values as a matrix, which is arguably more useful if you are
-doing math or further statistical computation.)
+returning simulated responses as a matrix.
 [`derivative_samples()`](https://gavinsimpson.github.io/gratia/reference/derivative_samples.md)
-provides draws from the posterior distribution of the derivative of
-response variable for a small change in a focal covariate value.
-[`derivative_samples()`](https://gavinsimpson.github.io/gratia/reference/derivative_samples.md)
-is a less general version of
-[`fitted_samples()`](https://gavinsimpson.github.io/gratia/reference/fitted_samples.md);
-you could achieve the same thing by two separate calls to
-[`fitted_samples()`](https://gavinsimpson.github.io/gratia/reference/fitted_samples.md).
-We’ll reserve discussion of
-[`derivative_samples()`](https://gavinsimpson.github.io/gratia/reference/derivative_samples.md)
-to a separate vignette focused on estimating derivatives from GAMs.
+draws derivatives of the expected response with respect to a focal
+covariate. It evaluates expectations at neighbouring covariate values
+using the same coefficient draws, preserving their dependence. We’ll
+reserve discussion of derivatives for a separate vignette focused on
+estimating derivatives from GAMs.
 
 In the following sections we’ll look at each of the four main posterior
 simulation functions in turn.
@@ -264,15 +252,14 @@ be less than 95% and for other values greater than 95%.
 
 ## Posterior fitted values via `fitted_samples()`
 
-Posterior fitted values are draws from the posterior distribution of the
-mean or expected value of the response. These expectations are what is
-returned when you use
-[`predict()`](https://rdrr.io/r/stats/predict.html) on an estimated GAM,
-except
-[`fitted_samples()`](https://gavinsimpson.github.io/gratia/reference/fitted_samples.md)
-includes the uncertainty in the estimated model coefficients, whereas
-[`predict()`](https://rdrr.io/r/stats/predict.html) just uses the
-estimated coefficients.
+In this section we request `quantity = "expectation"` explicitly. For an
+ordinary mean-based GAM, these are draws of the same expected response
+estimated by [`predict()`](https://rdrr.io/r/stats/predict.html).
+Distributional models can have several predictors, and their first
+parameter need not be the expected response. The default
+`quantity = "parameters"` returns those parameters instead;
+[`family_parameters()`](https://gavinsimpson.github.io/gratia/reference/family_parameters.md)
+describes their meanings.
 
 In this example, using
 [`data_sim()`](https://gavinsimpson.github.io/gratia/reference/data_sim.md)
@@ -316,7 +303,7 @@ then we compute the fitted values for the new data
 
 ``` r
 
-fv <- fitted_values(m, data = new_df)
+fv <- fitted_values(m, quantity = "expectation", data = new_df)
 ```
 
 The posterior fitted values are drawn with
@@ -327,7 +314,7 @@ posterior draws with the data
 
 ``` r
 
-fs <- fitted_samples(m, data = new_df, n_draws = 10, seed = 4) |>
+fs <- fitted_samples(m, quantity = "expectation", data = new_df, n_draws = 10, seed = 4) |>
   left_join(new_df |> select(.row, x), by = join_by(.row == .row))
 ```
 
@@ -599,11 +586,11 @@ credible interval
 
 ``` r
 
-fitted_values(m, data = data.frame(x = 0.5))
-#> # A tibble: 1 × 6
-#>    .row     x .fitted   .se .lower_ci .upper_ci
-#>   <int> <dbl>   <dbl> <dbl>     <dbl>     <dbl>
-#> 1     1   0.5    2.92 0.161      2.60      3.23
+fitted_values(m, quantity = "expectation", data = data.frame(x = 0.5))
+#> # A tibble: 1 × 7
+#>    .row     x .parameter  .fitted   .se .lower_ci .upper_ci
+#>   <int> <dbl> <chr>         <dbl> <dbl>     <dbl>     <dbl>
+#> 1     1   0.5 expectation    2.92 0.161      2.60      3.23
 ```
 
 The `.se` column is the standard error (standard deviation) of the
@@ -639,7 +626,7 @@ compute the fitted values for these new observations using
 
 ``` r
 
-fv <- fitted_values(m, data = ds)
+fv <- fitted_values(m, quantity = "expectation", data = ds)
 ```
 
 That step isn’t required in order to do posterior simulation with
@@ -853,8 +840,8 @@ Metropolis Hastings sampler.
 
 ``` r
 
-fs_ga <- fitted_samples(m_logit, n_draws = 2000, seed = 2)
-fs_mh <- fitted_samples(m_logit,
+fs_ga <- fitted_samples(m_logit, quantity = "expectation", n_draws = 2000, seed = 2)
+fs_mh <- fitted_samples(m_logit, quantity = "expectation",
   n_draws = 2000, seed = 2, method = "mh", thin = 2,
   rw_scale = 0.4
 )

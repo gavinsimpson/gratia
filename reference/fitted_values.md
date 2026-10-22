@@ -20,7 +20,9 @@ fitted_values(
   n_cores = 1,
   seed = NULL,
   unconditional = FALSE,
-  interval_method = c("auto", "gaussian", "bootstrap")
+  interval_method = c("auto", "gaussian", "bootstrap"),
+  quantity = c("parameters", "expectation"),
+  family_index = NULL
 )
 
 # S3 method for class 'gamm'
@@ -58,7 +60,9 @@ fitted_values(object, ...)
 
   character; what scale should the fitted values be returned on?
   `"linear predictor"` is a synonym for `"link"` if you prefer that
-  terminology.
+  terminology. `"linear_predictor"` is also accepted. Expectations
+  require `"response"`; parameter predictions use natural values or
+  their predictors.
 
 - ci_level:
 
@@ -109,16 +113,34 @@ fitted_values(object, ...)
   Shape-enforced intervals are available for smooth components through
   [`smooth_estimates()`](https://gavinsimpson.github.io/gratia/reference/smooth_estimates.md).
 
+- quantity:
+
+  character; `"parameters"` (the default) returns all distribution
+  parameters represented by predictors, including intercept-only
+  predictors. `"expectation"` returns the expected response, using every
+  parameter on which it depends, on the response scale only.
+
+- family_index:
+
+  numeric; optional family-list positions for grouped family
+  ([`mgcv::gfam()`](https://rdrr.io/pkg/mgcv/man/gfam.html)) response
+  predictions, with one integer per requested row. By default membership
+  is recovered from the response/index expression in `data`, or the
+  fitted membership when `data` is omitted. This is useful when
+  predicting without responses or with a complex response expression. An
+  explicit index must agree with membership recoverable from `data`.
+
 ## Value
 
 A tibble (data frame) whose first *m* columns contain either the data
 used to fit the model (if `data` was `NULL`), or the variables supplied
-to `data`. Four further columns are added:
+to `data`. The result also includes:
 
-- `.fitted`: the fitted values on the specified scale,
+- `.parameter`: parameter name, or `"expectation"`,
 
-- `.se`: the standard error of the fitted values (always on the *link*
-  scale),
+- `.fitted`: the requested quantity on the specified scale,
+
+- `.se`: standard error; see `prediction_info` for its scale,
 
 - `.lower_ci`, `.upper_ci`: the limits of the credible interval on the
   fitted values, on the specified scale.
@@ -126,13 +148,38 @@ to `data`. Four further columns are added:
 Models fitted with certain families will include additional variables
 
 - [`mgcv::ocat()`](https://rdrr.io/pkg/mgcv/man/ocat.html) models: when
-  `scale = "response"`, the returned object will contain a `row` column
-  and a `category` column, which indicate to which row of the `data`
-  each row of the returned object belongs. Additionally, there will be
-  `nrow(data) * n_categories` rows in the returned object; each row is
-  the predicted probability for a single category of the response.
+  `quantity = "expectation"`, the returned object will contain a `.row`
+  column and a `.category` column, which indicate to which row of the
+  `data` each row of the returned object belongs. Additionally, there
+  will be `nrow(data) * n_categories` rows in the returned object; each
+  row is the predicted probability for a single category of the
+  response.
 
 ## Details
+
+`quantity = "parameters"` returns all distribution parameters
+represented by predictors, including intercept-only predictors. See
+[`family_parameters()`](https://gavinsimpson.github.io/gratia/reference/family_parameters.md)
+for their definitions. These are natural distribution parameters, which
+can differ from mgcv's native response predictions: Gaussian LSS returns
+standard deviation, GEV returns location rather than expectation, and
+sinh-arcsinh returns shape parameters rather than response moments.
+
+`quantity = "expectation"` returns the expected response on the response
+scale, labelled `"expectation"`. Categorical expectations are
+probabilities of category membership; multivariate models return a mean
+per response. `.category` and `.y` identify the category or response
+separately from `.parameter`. Global parameters are described but held
+fixed when calculating coefficient uncertainty. Coupled expectations use
+the full coefficient covariance and a delta-method Jacobian. Their
+intervals are pointwise.
+
+The `prediction_info` attribute records the quantity, scale,
+standard-error scale and parameter descriptions. Parameter standard
+errors retain their link-scale meaning; category-probability and
+expectation standard errors are on the response scale. Unsupported
+simultaneous or bootstrap transformations are rejected rather than
+combining marginal parameter intervals.
 
 Native scasm fits with stored bootstrap draws use mgcv's pointwise
 limits by default, including its `svar.only` correction for smoothing
@@ -218,11 +265,9 @@ treatment when selecting terms.
 
 ## Note
 
-For most families, regardless of the scale on which the fitted values
-are returned, the `se` component of the returned object is on the *link*
-(*linear predictor*) scale, not the response scale. An exception is the
-[`mgcv::ocat()`](https://rdrr.io/pkg/mgcv/man/ocat.html) family, for
-which the `se` is on the response scale if `scale = "response"`.
+For parameter output, the `.se` component is on the *link* (*linear
+predictor*) scale. Multinomial probabilities on the response scale and
+all expected responses have response-scale standard errors.
 
 ## See also
 
@@ -236,42 +281,42 @@ sim_df <- data_sim("eg1", n = 400, dist = "normal", scale = 2, seed = 2)
 m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = sim_df, method = "REML")
 fv <- fitted_values(m)
 fv
-#> # A tibble: 400 x 9
-#>     .row       x0        x1         x2       x3  .fitted      .se .lower_ci
-#>    <int>    <dbl>     <dbl>      <dbl>    <dbl>    <dbl>    <dbl>     <dbl>
-#>  1     1 0.184882 0.617142  0.415244   0.132410  8.73875 0.354677   8.04360
-#>  2     2 0.702374 0.569064  0.531439   0.365331  7.62581 0.337779   6.96378
-#>  3     3 0.573326 0.153970  0.00324621 0.454532  3.12106 0.591862   1.96103
-#>  4     4 0.168052 0.0348332 0.252100   0.537114 11.1124  0.402378  10.3237 
-#>  5     5 0.943839 0.997953  0.155229   0.185495 14.0533  0.452947  13.1655 
-#>  6     6 0.943475 0.835574  0.878840   0.449276  6.13080 0.364521   5.41635
-#>  7     7 0.129159 0.586562  0.203511   0.256527 12.4838  0.355808  11.7864 
-#>  8     8 0.833449 0.339117  0.583528   0.618458  6.25215 0.344700   5.57655
-#>  9     9 0.468019 0.166883  0.804473   0.880744  4.21463 0.372003   3.48552
-#> 10    10 0.549984 0.807410  0.264717   0.317747 15.5283  0.369999  14.8031 
+#> # A tibble: 400 x 10
+#>     .row       x0        x1         x2       x3 .parameter  .fitted      .se
+#>    <int>    <dbl>     <dbl>      <dbl>    <dbl> <chr>         <dbl>    <dbl>
+#>  1     1 0.184882 0.617142  0.415244   0.132410 mean        8.73875 0.354677
+#>  2     2 0.702374 0.569064  0.531439   0.365331 mean        7.62581 0.337779
+#>  3     3 0.573326 0.153970  0.00324621 0.454532 mean        3.12106 0.591862
+#>  4     4 0.168052 0.0348332 0.252100   0.537114 mean       11.1124  0.402378
+#>  5     5 0.943839 0.997953  0.155229   0.185495 mean       14.0533  0.452947
+#>  6     6 0.943475 0.835574  0.878840   0.449276 mean        6.13080 0.364521
+#>  7     7 0.129159 0.586562  0.203511   0.256527 mean       12.4838  0.355808
+#>  8     8 0.833449 0.339117  0.583528   0.618458 mean        6.25215 0.344700
+#>  9     9 0.468019 0.166883  0.804473   0.880744 mean        4.21463 0.372003
+#> 10    10 0.549984 0.807410  0.264717   0.317747 mean       15.5283  0.369999
 #> # i 390 more rows
-#> # i 1 more variable: .upper_ci <dbl>
+#> # i 2 more variables: .lower_ci <dbl>, .upper_ci <dbl>
 
 # Simultaneous intervals for two arbitrary covariate combinations
 fitted_values(m, data = sim_df[c(1, 20), ], interval = "simultaneous",
   n_sim = 1000, seed = 42)
-#> # A tibble: 2 x 15
+#> # A tibble: 2 x 16
 #>    .row       y        x0       x1       x2       x3       f       f0      f1
 #>   <int>   <dbl>     <dbl>    <dbl>    <dbl>    <dbl>   <dbl>    <dbl>   <dbl>
 #> 1     1 7.12834 0.184882  0.617142 0.415244 0.132410 8.38643 1.09743  3.43592
 #> 2     2 2.93507 0.0749794 0.797900 0.874521 0.203225 5.57766 0.466765 4.93227
-#> # i 6 more variables: f2 <dbl>, f3 <dbl>, .fitted <dbl>, .se <dbl>,
-#> #   .lower_ci <dbl>, .upper_ci <dbl>
+#> # i 7 more variables: f2 <dbl>, f3 <dbl>, .parameter <chr>, .fitted <dbl>,
+#> #   .se <dbl>, .lower_ci <dbl>, .upper_ci <dbl>
 
 # A selected sum of smooth contributions on the link scale
 fitted_values(m, data = sim_df[c(1, 20), ], scale = "link",
   terms = c("s(x2)", "s(x3)"), interval = "simultaneous",
   n_sim = 1000, seed = 42)
-#> # A tibble: 2 x 15
+#> # A tibble: 2 x 16
 #>    .row       y        x0       x1       x2       x3       f       f0      f1
 #>   <int>   <dbl>     <dbl>    <dbl>    <dbl>    <dbl>   <dbl>    <dbl>   <dbl>
 #> 1     1 7.12834 0.184882  0.617142 0.415244 0.132410 8.38643 1.09743  3.43592
 #> 2     2 2.93507 0.0749794 0.797900 0.874521 0.203225 5.57766 0.466765 4.93227
-#> # i 6 more variables: f2 <dbl>, f3 <dbl>, .fitted <dbl>, .se <dbl>,
-#> #   .lower_ci <dbl>, .upper_ci <dbl>
+#> # i 7 more variables: f2 <dbl>, f3 <dbl>, .parameter <chr>, .fitted <dbl>,
+#> #   .se <dbl>, .lower_ci <dbl>, .upper_ci <dbl>
 ```

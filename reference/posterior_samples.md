@@ -312,12 +312,13 @@ fitting observations, subsets and new covariates. Every distribution
 parameter is computed from the same joint coefficient draw. Formula
 offsets and prescribed smooth contributions are retained. Evaluation
 data need predictors and formula-offset variables, but no observed
-response. In [`gaulss()`](https://rdrr.io/pkg/mgcv/man/gaulss.html), the
-second response parameter is inverse standard deviation: sampling uses
-its reciprocal, divided by the square root of the sampling weight. Other
-LSS generators currently ignore sampling weights, following their mgcv
-implementations. Parameters represented by coefficients vary jointly;
-other family parameters remain fixed.
+response. mgcv natively represents the second
+[`gaulss()`](https://rdrr.io/pkg/mgcv/man/gaulss.html) parameter as
+reciprocal standard deviation: response sampling uses SD, divided by the
+square root of the sampling weight. Other LSS generators currently
+ignore sampling weights, following their mgcv implementations.
+Parameters represented by coefficients vary jointly; other family
+parameters remain fixed.
 
 Cox survival models require evaluation times and an observation process
 and do not have a response generator for this interface. Censored-family

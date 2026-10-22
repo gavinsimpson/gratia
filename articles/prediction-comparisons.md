@@ -517,10 +517,11 @@ fitted_values(m_uptake, data = hypothetical_grid, exclude = "s(Plant)")
 #> Prediction data contain 1 row with combinations of categorical predictor levels
 #> absent from the fitting data.
 #> ℹ Factors: `Type`, `Treatment`, and `Plant`. Input rows: 1.
-#> # A tibble: 1 × 9
-#>    .row  conc Type        Treatment Plant .fitted    .se .lower_ci .upper_ci
-#>   <int> <dbl> <fct>       <fct>     <fct>   <dbl>  <dbl>     <dbl>     <dbl>
-#> 1     1   500 Mississippi chilled   Qn1      17.1 0.0730      14.8      19.7
+#> # A tibble: 1 × 10
+#>    .row  conc Type        Treatment Plant .parameter .fitted    .se .lower_ci
+#>   <int> <dbl> <fct>       <fct>     <fct> <chr>        <dbl>  <dbl>     <dbl>
+#> 1     1   500 Mississippi chilled   Qn1   mean          17.1 0.0730      14.8
+#> # ℹ 1 more variable: .upper_ci <dbl>
 ```
 
 The message checks categorical combinations even when a responsible term

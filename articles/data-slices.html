@@ -27,7 +27,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-61</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-62</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -245,20 +245,21 @@ especially for non-Gaussian models</p>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Factors: `treatment`, `type`, `tt`, and `plant`. Input rows: 1, 2, 3, 4, 5,</span></span>
 <span><span class="co">#&gt;   6, 7, 8, 9, 10, ....</span></span>
 <span><span class="va">fv1</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 100 × 10</span></span></span>
-<span><span class="co">#&gt;     .row  conc treatment type   tt      plant .fitted    .se .lower_ci .upper_ci</span></span>
-<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>     1   95  chilled   Quebec chille… Qn1      13.0 0.078<span style="text-decoration: underline;">3</span>      11.2      15.2</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>     2  104. chilled   Quebec chille… Qn1      14.1 0.075<span style="text-decoration: underline;">7</span>      12.1      16.3</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>     3  113. chilled   Quebec chille… Qn1      15.2 0.073<span style="text-decoration: underline;">7</span>      13.1      17.5</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>     4  122. chilled   Quebec chille… Qn1      16.3 0.072<span style="text-decoration: underline;">2</span>      14.2      18.8</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>     5  132. chilled   Quebec chille… Qn1      17.6 0.071<span style="text-decoration: underline;">4</span>      15.3      20.2</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>     6  141. chilled   Quebec chille… Qn1      18.9 0.071<span style="text-decoration: underline;">1</span>      16.4      21.7</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>     7  150. chilled   Quebec chille… Qn1      20.2 0.071<span style="text-decoration: underline;">2</span>      17.6      23.3</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>     8  159. chilled   Quebec chille… Qn1      21.6 0.071<span style="text-decoration: underline;">6</span>      18.8      24.9</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>     9  168. chilled   Quebec chille… Qn1      23.0 0.072<span style="text-decoration: underline;">1</span>      20.0      26.5</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>    10  177. chilled   Quebec chille… Qn1      24.4 0.072<span style="text-decoration: underline;">6</span>      21.2      28.1</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 90 more rows</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 100 × 11</span></span></span>
+<span><span class="co">#&gt;     .row  conc treatment type   tt     plant .parameter .fitted    .se .lower_ci</span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>     1   95  chilled   Quebec chill… Qn1   mean          13.0 0.078<span style="text-decoration: underline;">3</span>      11.2</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>     2  104. chilled   Quebec chill… Qn1   mean          14.1 0.075<span style="text-decoration: underline;">7</span>      12.1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>     3  113. chilled   Quebec chill… Qn1   mean          15.2 0.073<span style="text-decoration: underline;">7</span>      13.1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>     4  122. chilled   Quebec chill… Qn1   mean          16.3 0.072<span style="text-decoration: underline;">2</span>      14.2</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>     5  132. chilled   Quebec chill… Qn1   mean          17.6 0.071<span style="text-decoration: underline;">4</span>      15.3</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>     6  141. chilled   Quebec chill… Qn1   mean          18.9 0.071<span style="text-decoration: underline;">1</span>      16.4</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>     7  150. chilled   Quebec chill… Qn1   mean          20.2 0.071<span style="text-decoration: underline;">2</span>      17.6</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>     8  159. chilled   Quebec chill… Qn1   mean          21.6 0.071<span style="text-decoration: underline;">6</span>      18.8</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>     9  168. chilled   Quebec chill… Qn1   mean          23.0 0.072<span style="text-decoration: underline;">1</span>      20.0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>    10  177. chilled   Quebec chill… Qn1   mean          24.4 0.072<span style="text-decoration: underline;">6</span>      21.2</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 90 more rows</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 1 more variable: .upper_ci &lt;dbl&gt;</span></span></span></code></pre></div>
 <p>Notice how we excluded the random effect term; even though we had to
 specify something for the <code>plant</code> covariate we can ignore
 this term in the model using the <code>exclude</code> argument.

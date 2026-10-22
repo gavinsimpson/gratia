@@ -1,8 +1,7 @@
 # Draw fitted values from the posterior distribution
 
-Expectations (fitted values) of the response drawn from the posterior
-distribution of fitted model using a Gaussian approximation to the
-posterior or a simple Metropolis Hastings sampler.
+Distribution parameters or expected responses drawn from the posterior
+distribution of a fitted model.
 
 ## Usage
 
@@ -36,7 +35,8 @@ fitted_samples(
   block_size = 10000L,
   dense_limit = 5e+06,
   scale = c("response", "linear_predictor"),
-  family_index = NULL
+  family_index = NULL,
+  quantity = c("parameters", "expectation")
 )
 
 # S3 method for class 'scam'
@@ -62,7 +62,8 @@ fitted_samples(
   mvn_method = c("mvnfast", "mgcv"),
   block_size = 10000L,
   dense_limit = 5e+06,
-  scale = c("response", "linear_predictor")
+  scale = c("response", "linear_predictor"),
+  quantity = c("parameters", "expectation")
 )
 ```
 
@@ -205,14 +206,9 @@ fitted_samples(
 
 - scale:
 
-  character; `"response"` returns the expected response;
-  `"linear_predictor"` returns the first linear predictor. For LSS
-  models, this is the predictor for location, which need not be the
-  expected response. For multinomial models both scales return every
-  category, labelled `response1`, `response2`, and so on. On the linear
-  predictor scale, `response1` is the reference category with predictor
-  zero; other values are log odds relative to it. Response-scale values
-  are probabilities.
+  character; `"response"` returns natural distribution parameters;
+  `"link"`, `"linear_predictor"` and `"linear predictor"` return their
+  predictors. Expectations require `"response"`.
 
 - family_index:
 
@@ -224,6 +220,13 @@ fitted_samples(
   predicting without responses or with a complex response expression. An
   explicit index must agree with membership recoverable from `data`.
 
+- quantity:
+
+  character; `"parameters"` (the default) returns all distribution
+  parameters represented by predictors, including intercept-only
+  predictors. `"expectation"` returns the expected response, using every
+  parameter on which it depends, on the response scale only.
+
 ## Value
 
 A tibble (data frame) in long format, with columns:
@@ -232,28 +235,45 @@ A tibble (data frame) in long format, with columns:
 
 - `.draw`: globally unique draw identifier;
 
-- `.parameter`: `"location"` for scalar fitted values, or a
-  response/category label for multivariate or multinomial models;
+- `.parameter`: the distribution parameter name, or `"expectation"`;
 
-- `.fitted`: expected response or linear predictor, as selected by
-  `scale`. Multiple-chain output also includes `.chain` and
-  `.iteration`. Attached coefficient diagnostics are available through
+- `.fitted`: the parameter, predictor or expected response requested.
+  Multiple-chain output also includes `.chain` and `.iteration`.
+  Attached coefficient diagnostics are available through
   [`sampling_diagnostics()`](https://gavinsimpson.github.io/gratia/reference/sampling_diagnostics.md).
 
 ## Details
 
-For LSS models, `scale = "response"` returns the expected response,
-using all parameters on which it depends. This includes the mean
-correction for Gumbel, GEV and sinh-arcsinh distributions and the hurdle
-probability for [`ziplss()`](https://rdrr.io/pkg/mgcv/man/ziplss.html).
-The Gamma LSS mean is the exponential of its first predictor.
-`scale = "linear_predictor"` returns only the first predictor
-(location); it is not a transformation of the expectation for these
-multi-parameter distributions. The existing `.parameter = "location"`
-label is retained on both scales. A GEV expectation does not exist at
-shape \>= 1: response-scale fitted and derivative sampling then fail
-explicitly, while response draws and location-predictor draws remain
-available.
+Parameter names and definitions are available through
+[`family_parameters()`](https://gavinsimpson.github.io/gratia/reference/family_parameters.md).
+Gaussian LSS returns `mean` and `sd`, GEV returns `location`, `scale`
+and `shape`, and sinh-arcsinh returns `location`, `scale`, `skewness`
+and `tailweight`. These shape parameters are not response moments.
+Natural parameters can differ from native mgcv predictions and
+[`inv_link()`](https://gavinsimpson.github.io/gratia/reference/link.md)
+values. Every parameter in one draw uses the same joint coefficient
+draw. Global parameters outside the coefficient vector remain fixed and
+are described in the metadata, rather than returned as fitted
+parameters.
+
+Use `quantity = "expectation"` for expected responses labelled
+`"expectation"`. This includes Gumbel, GEV and sinh-arcsinh mean
+adjustments and the zero-truncated Poisson adjustment in
+[`ziplss()`](https://rdrr.io/pkg/mgcv/man/ziplss.html). A GEV
+expectation does not exist at shape \>= 1; parameter and response draws
+remain available. Categorical expectations are category probabilities,
+not numeric category scores. `.category` identifies categories, and `.y`
+identifies multivariate responses. Multinomial link output includes a
+zero reference predictor. Ordinal parameter output is the latent
+location predictor; its thresholds are global parameters.
+
+The `prediction_info` attribute records the quantity, scale and resolved
+parameter descriptions. Unlike
+[`posterior_samples()`](https://gavinsimpson.github.io/gratia/reference/posterior_samples.md),
+these draws add no response noise.
+[`predicted_samples()`](https://gavinsimpson.github.io/gratia/reference/predicted_samples.md)
+instead simulates observations with coefficients held at their fitted
+values.
 
 For grouped families, coefficient draws preserve the joint model
 covariance; each row is then transformed using its own fitted component
@@ -265,15 +285,14 @@ expression can be supplied without `y`. Missing indices behave like
 missing required predictors. Link-scale draws do not require family
 membership.
 
-Grouped response-scale draws currently support scalar fitted means,
-including families with a scalar prediction transform such as
-[`mgcv::ziP()`](https://rdrr.io/pkg/mgcv/man/ziP.html). They do not
-support [`mgcv::ocat()`](https://rdrr.io/pkg/mgcv/man/ocat.html)
-category-probability output; use the link scale for grouped ordinal
-models. Distributional nuisance parameters are held at their fitted
-values. This does not add support for general/location-scale families
-that [`gfam()`](https://rdrr.io/pkg/mgcv/man/gfam.html) itself rejects,
-nor repair upstream fitting failures (including fixed-theta
+Grouped parameter output includes the latent location for ordinal
+components. Grouped expectations include scalar fitted means and ordinal
+category probabilities, with `.category` identifying the ordinal
+category and `NA` for scalar components. Distributional nuisance
+parameters are held at their fitted values. This does not add support
+for general/location-scale families that
+[`gfam()`](https://rdrr.io/pkg/mgcv/man/gfam.html) itself rejects, nor
+repair upstream fitting failures (including fixed-theta
 negative-binomial components and some
 [`ziP()`](https://rdrr.io/pkg/mgcv/man/ziP.html) fits in some mgcv
 versions).
@@ -322,16 +341,16 @@ fs
 #> # A tibble: 5,000 x 4
 #>     .row .draw .parameter .fitted
 #>    <int> <int> <chr>        <dbl>
-#>  1     1     1 location      6.34
-#>  2     2     1 location      5.08
-#>  3     3     1 location      6.84
-#>  4     4     1 location      7.71
-#>  5     5     1 location      9.23
-#>  6     6     1 location      8.03
-#>  7     7     1 location      6.19
-#>  8     8     1 location      7.28
-#>  9     9     1 location     14.0 
-#> 10    10     1 location     12.7 
+#>  1     1     1 mean          6.34
+#>  2     2     1 mean          5.08
+#>  3     3     1 mean          6.84
+#>  4     4     1 mean          7.71
+#>  5     5     1 mean          9.23
+#>  6     6     1 mean          8.03
+#>  7     7     1 mean          6.19
+#>  8     8     1 mean          7.28
+#>  9     9     1 mean         14.0 
+#> 10    10     1 mean         12.7 
 #> # i 4,990 more rows
 # }
 
@@ -343,16 +362,16 @@ fs2
 #> # A tibble: 2,000 x 4
 #>     .row .draw .parameter .fitted
 #>    <int> <int> <chr>        <dbl>
-#>  1     1     1 location      6.30
-#>  2     2     1 location      5.12
-#>  3     3     1 location      7.40
-#>  4     4     1 location      7.42
-#>  5     5     1 location      9.40
-#>  6     6     1 location      8.04
-#>  7     7     1 location      5.83
-#>  8     8     1 location      7.30
-#>  9     9     1 location     14.3 
-#> 10    10     1 location     13.1 
+#>  1     1     1 mean          6.30
+#>  2     2     1 mean          5.12
+#>  3     3     1 mean          7.40
+#>  4     4     1 mean          7.42
+#>  5     5     1 mean          9.40
+#>  6     6     1 mean          8.04
+#>  7     7     1 mean          5.83
+#>  8     8     1 mean          7.30
+#>  9     9     1 mean         14.3 
+#> 10    10     1 mean         13.1 
 #> # i 1,990 more rows
 # }
 ```

@@ -27,7 +27,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-61</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-62</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -124,17 +124,17 @@ unrelated predictors or the model offset.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">7</span> s(log(x)) TPRS  <span style="color: #BB0000;">NA</span>       0.245  0.048<span style="text-decoration: underline;">7</span>    1.46           4.29</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">8</span> s(log(x)) TPRS  <span style="color: #BB0000;">NA</span>       0.315  0.056<span style="text-decoration: underline;">1</span>    1.57           4.8</span></span>
 <span><span class="fu"><a href="../reference/fitted_values.html">fitted_values</a></span><span class="op">(</span><span class="va">m</span>, data <span class="op">=</span> <span class="va">nd</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 8 × 7</span></span></span>
-<span><span class="co">#&gt;    .row     x effort .fitted    .se .lower_ci .upper_ci</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>     1  1.2       2    2.51 0.107       2.03      3.09</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>     2  1.71      2    3.13 0.074<span style="text-decoration: underline;">8</span>      2.70      3.62</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>     3  2.23      2    3.68 0.054<span style="text-decoration: underline;">3</span>      3.31      4.09</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>     4  2.74      2    4.18 0.042<span style="text-decoration: underline;">8</span>      3.85      4.55</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>     5  3.26      2    4.65 0.039<span style="text-decoration: underline;">6</span>      4.31      5.03</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span>     6  3.77      2    5.10 0.042<span style="text-decoration: underline;">5</span>      4.69      5.54</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">7</span>     7  4.29      2    5.52 0.048<span style="text-decoration: underline;">7</span>      5.01      6.07</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">8</span>     8  4.8       2    5.92 0.056<span style="text-decoration: underline;">1</span>      5.30      6.61</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 8 × 8</span></span></span>
+<span><span class="co">#&gt;    .row     x effort .parameter .fitted    .se .lower_ci .upper_ci</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>     1  1.2       2 mean          2.51 0.107       2.03      3.09</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>     2  1.71      2 mean          3.13 0.074<span style="text-decoration: underline;">8</span>      2.70      3.62</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>     3  2.23      2 mean          3.68 0.054<span style="text-decoration: underline;">3</span>      3.31      4.09</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>     4  2.74      2 mean          4.18 0.042<span style="text-decoration: underline;">8</span>      3.85      4.55</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>     5  3.26      2 mean          4.65 0.039<span style="text-decoration: underline;">6</span>      4.31      5.03</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span>     6  3.77      2 mean          5.10 0.042<span style="text-decoration: underline;">5</span>      4.69      5.54</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">7</span>     7  4.29      2 mean          5.52 0.048<span style="text-decoration: underline;">7</span>      5.01      6.07</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">8</span>     8  4.8       2 mean          5.92 0.056<span style="text-decoration: underline;">1</span>      5.30      6.61</span></span></code></pre></div>
 <p>Automatic smooth grids are evenly spaced in the <strong>smooth
 coordinate</strong>, here <code>log(x)</code>, and the output and plot
 axes use that name. They use stored evaluated covariates, so they do not
@@ -307,17 +307,17 @@ observations.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">7</span> s(transform_x(x)) TPRS  <span style="color: #BB0000;">NA</span>       0.244  0.049<span style="text-decoration: underline;">7</span>            1.57           4.29</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">8</span> s(transform_x(x)) TPRS  <span style="color: #BB0000;">NA</span>       0.308  0.061<span style="text-decoration: underline;">9</span>            1.67           4.8</span></span>
 <span><span class="fu"><a href="../reference/fitted_values.html">fitted_values</a></span><span class="op">(</span><span class="va">bundle</span><span class="op">$</span><span class="va">model</span>, data <span class="op">=</span> <span class="va">nd</span>, envir <span class="op">=</span> <span class="va">bundle</span><span class="op">$</span><span class="va">envir</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 8 × 7</span></span></span>
-<span><span class="co">#&gt;    .row     x effort .fitted    .se .lower_ci .upper_ci</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>     1  1.2       2    2.51 0.113       2.01      3.13</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>     2  1.71      2    3.11 0.077<span style="text-decoration: underline;">2</span>      2.67      3.62</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>     3  2.23      2    3.67 0.060<span style="text-decoration: underline;">7</span>      3.26      4.13</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>     4  2.74      2    4.19 0.051<span style="text-decoration: underline;">1</span>      3.79      4.64</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>     5  3.26      2    4.68 0.045<span style="text-decoration: underline;">1</span>      4.28      5.11</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span>     6  3.77      2    5.12 0.044<span style="text-decoration: underline;">0</span>      4.70      5.58</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">7</span>     7  4.29      2    5.51 0.049<span style="text-decoration: underline;">7</span>      5.00      6.08</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">8</span>     8  4.8       2    5.88 0.061<span style="text-decoration: underline;">9</span>      5.21      6.64</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 8 × 8</span></span></span>
+<span><span class="co">#&gt;    .row     x effort .parameter .fitted    .se .lower_ci .upper_ci</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>     1  1.2       2 mean          2.51 0.113       2.01      3.13</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>     2  1.71      2 mean          3.11 0.077<span style="text-decoration: underline;">2</span>      2.67      3.62</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>     3  2.23      2 mean          3.67 0.060<span style="text-decoration: underline;">7</span>      3.26      4.13</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>     4  2.74      2 mean          4.19 0.051<span style="text-decoration: underline;">1</span>      3.79      4.64</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>     5  3.26      2 mean          4.68 0.045<span style="text-decoration: underline;">1</span>      4.28      5.11</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span>     6  3.77      2 mean          5.12 0.044<span style="text-decoration: underline;">0</span>      4.70      5.58</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">7</span>     7  4.29      2 mean          5.51 0.049<span style="text-decoration: underline;">7</span>      5.00      6.08</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">8</span>     8  4.8       2 mean          5.88 0.061<span style="text-decoration: underline;">9</span>      5.21      6.64</span></span></code></pre></div>
 <p>Automatic smooth plots can still use stored
 <code>transform_x(x)</code> values without this environment. New raw
 observations require the function. Evaluation errors identify the

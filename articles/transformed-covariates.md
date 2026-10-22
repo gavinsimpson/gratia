@@ -36,17 +36,17 @@ smooth_estimates(m, data = nd["x"])
 #> 7 s(log(x)) TPRS  NA       0.245  0.0487    1.46           4.29
 #> 8 s(log(x)) TPRS  NA       0.315  0.0561    1.57           4.8
 fitted_values(m, data = nd)
-#> # A tibble: 8 × 7
-#>    .row     x effort .fitted    .se .lower_ci .upper_ci
-#>   <int> <dbl>  <dbl>   <dbl>  <dbl>     <dbl>     <dbl>
-#> 1     1  1.2       2    2.51 0.107       2.03      3.09
-#> 2     2  1.71      2    3.13 0.0748      2.70      3.62
-#> 3     3  2.23      2    3.68 0.0543      3.31      4.09
-#> 4     4  2.74      2    4.18 0.0428      3.85      4.55
-#> 5     5  3.26      2    4.65 0.0396      4.31      5.03
-#> 6     6  3.77      2    5.10 0.0425      4.69      5.54
-#> 7     7  4.29      2    5.52 0.0487      5.01      6.07
-#> 8     8  4.8       2    5.92 0.0561      5.30      6.61
+#> # A tibble: 8 × 8
+#>    .row     x effort .parameter .fitted    .se .lower_ci .upper_ci
+#>   <int> <dbl>  <dbl> <chr>        <dbl>  <dbl>     <dbl>     <dbl>
+#> 1     1  1.2       2 mean          2.51 0.107       2.03      3.09
+#> 2     2  1.71      2 mean          3.13 0.0748      2.70      3.62
+#> 3     3  2.23      2 mean          3.68 0.0543      3.31      4.09
+#> 4     4  2.74      2 mean          4.18 0.0428      3.85      4.55
+#> 5     5  3.26      2 mean          4.65 0.0396      4.31      5.03
+#> 6     6  3.77      2 mean          5.10 0.0425      4.69      5.54
+#> 7     7  4.29      2 mean          5.52 0.0487      5.01      6.07
+#> 8     8  4.8       2 mean          5.92 0.0561      5.30      6.61
 ```
 
 Automatic smooth grids are evenly spaced in the **smooth coordinate**,
@@ -264,17 +264,17 @@ smooth_estimates(bundle$model, data = nd, envir = bundle$envir)
 #> 7 s(transform_x(x)) TPRS  NA       0.244  0.0497            1.57           4.29
 #> 8 s(transform_x(x)) TPRS  NA       0.308  0.0619            1.67           4.8
 fitted_values(bundle$model, data = nd, envir = bundle$envir)
-#> # A tibble: 8 × 7
-#>    .row     x effort .fitted    .se .lower_ci .upper_ci
-#>   <int> <dbl>  <dbl>   <dbl>  <dbl>     <dbl>     <dbl>
-#> 1     1  1.2       2    2.51 0.113       2.01      3.13
-#> 2     2  1.71      2    3.11 0.0772      2.67      3.62
-#> 3     3  2.23      2    3.67 0.0607      3.26      4.13
-#> 4     4  2.74      2    4.19 0.0511      3.79      4.64
-#> 5     5  3.26      2    4.68 0.0451      4.28      5.11
-#> 6     6  3.77      2    5.12 0.0440      4.70      5.58
-#> 7     7  4.29      2    5.51 0.0497      5.00      6.08
-#> 8     8  4.8       2    5.88 0.0619      5.21      6.64
+#> # A tibble: 8 × 8
+#>    .row     x effort .parameter .fitted    .se .lower_ci .upper_ci
+#>   <int> <dbl>  <dbl> <chr>        <dbl>  <dbl>     <dbl>     <dbl>
+#> 1     1  1.2       2 mean          2.51 0.113       2.01      3.13
+#> 2     2  1.71      2 mean          3.11 0.0772      2.67      3.62
+#> 3     3  2.23      2 mean          3.67 0.0607      3.26      4.13
+#> 4     4  2.74      2 mean          4.19 0.0511      3.79      4.64
+#> 5     5  3.26      2 mean          4.68 0.0451      4.28      5.11
+#> 6     6  3.77      2 mean          5.12 0.0440      4.70      5.58
+#> 7     7  4.29      2 mean          5.51 0.0497      5.00      6.08
+#> 8     8  4.8       2 mean          5.88 0.0619      5.21      6.64
 ```
 
 Automatic smooth plots can still use stored `transform_x(x)` values

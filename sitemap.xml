@@ -94,6 +94,7 @@
 <url><loc>https://gavinsimpson.github.io/gratia/reference/family.gam.html</loc></url>
 <url><loc>https://gavinsimpson.github.io/gratia/reference/family_diagnostics.html</loc></url>
 <url><loc>https://gavinsimpson.github.io/gratia/reference/family_name.html</loc></url>
+<url><loc>https://gavinsimpson.github.io/gratia/reference/family_parameters.html</loc></url>
 <url><loc>https://gavinsimpson.github.io/gratia/reference/family_type.html</loc></url>
 <url><loc>https://gavinsimpson.github.io/gratia/reference/fderiv.html</loc></url>
 <url><loc>https://gavinsimpson.github.io/gratia/reference/fitted_moments.html</loc></url>
@@ -146,7 +147,6 @@
 <url><loc>https://gavinsimpson.github.io/gratia/reference/partial_residuals.html</loc></url>
 <url><loc>https://gavinsimpson.github.io/gratia/reference/penalty.html</loc></url>
 <url><loc>https://gavinsimpson.github.io/gratia/reference/post_draws.html</loc></url>
-<url><loc>https://gavinsimpson.github.io/gratia/reference/post_link_funs.html</loc></url>
 <url><loc>https://gavinsimpson.github.io/gratia/reference/posterior_predictive_plot.html</loc></url>
 <url><loc>https://gavinsimpson.github.io/gratia/reference/posterior_samples.html</loc></url>
 <url><loc>https://gavinsimpson.github.io/gratia/reference/pp_check.html</loc></url>

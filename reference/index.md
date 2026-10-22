@@ -308,8 +308,9 @@ slices](https://gavinsimpson.github.io/gratia/articles/data-slices.md).
 
 Draw individual smooths with
 [`smooth_samples()`](https://gavinsimpson.github.io/gratia/reference/smooth_samples.md)
-or expected responses with
+or distribution parameters with
 [`fitted_samples()`](https://gavinsimpson.github.io/gratia/reference/fitted_samples.md);
+request `quantity = "expectation"` for expected responses.
 [`posterior_samples()`](https://gavinsimpson.github.io/gratia/reference/posterior_samples.md)
 generates new responses including coefficient uncertainty, while
 [`predicted_samples()`](https://gavinsimpson.github.io/gratia/reference/predicted_samples.md)
@@ -472,6 +473,8 @@ Inspect response distributions, link functions, and linear predictors.
   : Name of family used to fit model
 - [`family_type()`](https://gavinsimpson.github.io/gratia/reference/family_type.md)
   : Extracts the type of family in a consistent way
+- [`family_parameters()`](https://gavinsimpson.github.io/gratia/reference/family_parameters.md)
+  : Describe a model family's distribution parameters
 - [`link()`](https://gavinsimpson.github.io/gratia/reference/link.md)
   [`inv_link()`](https://gavinsimpson.github.io/gratia/reference/link.md)
   [`extract_link()`](https://gavinsimpson.github.io/gratia/reference/link.md)

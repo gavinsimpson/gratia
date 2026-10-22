@@ -248,7 +248,7 @@ predictor. Select its full smooth label to distinguish predictors, for
 example `s(x)` and `s.1(x)`. These are component draws on the predictor
 scale; use
 [`fitted_samples()`](https://gavinsimpson.github.io/gratia/reference/fitted_samples.md)
-for the expected response and
+with `quantity = "expectation"` for the expected response and
 [`derivative_samples()`](https://gavinsimpson.github.io/gratia/reference/derivative_samples.md)
 for its derivative. Coefficients are drawn jointly across all
 predictors.

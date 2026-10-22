@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-61</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-62</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -79,7 +79,9 @@
 <span>  n_cores <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  seed <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  unconditional <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  interval_method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"auto"</span>, <span class="st">"gaussian"</span>, <span class="st">"bootstrap"</span><span class="op">)</span></span>
+<span>  interval_method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"auto"</span>, <span class="st">"gaussian"</span>, <span class="st">"bootstrap"</span><span class="op">)</span>,</span>
+<span>  quantity <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"parameters"</span>, <span class="st">"expectation"</span><span class="op">)</span>,</span>
+<span>  family_index <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'gamm'</span></span>
@@ -115,7 +117,8 @@ are to be returned.</p></dd>
 <dt id="arg-scale">scale<a class="anchor" aria-label="anchor" href="#arg-scale"></a></dt>
 <dd><p>character; what scale should the fitted values be returned on?
 <code>"linear predictor"</code> is a synonym for <code>"link"</code> if you prefer that
-terminology.</p></dd>
+terminology. <code>"linear_predictor"</code> is also accepted. Expectations require
+<code>"response"</code>; parameter predictions use natural values or their predictors.</p></dd>
 
 
 <dt id="arg-ci-level">ci_level<a class="anchor" aria-label="anchor" href="#arg-ci-level"></a></dt>
@@ -164,24 +167,59 @@ for pointwise intervals when available and Gaussian intervals otherwise.
 stored draws. Simultaneous bootstrap bands are unsupported. Shape-enforced
 intervals are available for smooth components through <code><a href="smooth_estimates.html">smooth_estimates()</a></code>.</p></dd>
 
+
+<dt id="arg-quantity">quantity<a class="anchor" aria-label="anchor" href="#arg-quantity"></a></dt>
+<dd><p>character; <code>"parameters"</code> (the default) returns all
+distribution parameters represented by predictors, including intercept-only
+predictors. <code>"expectation"</code> returns the expected response, using every
+parameter on which it depends, on the response scale only.</p></dd>
+
+
+<dt id="arg-family-index">family_index<a class="anchor" aria-label="anchor" href="#arg-family-index"></a></dt>
+<dd><p>numeric; optional family-list positions for grouped
+family (<code><a href="https://rdrr.io/pkg/mgcv/man/gfam.html" class="external-link">mgcv::gfam()</a></code>) response predictions, with one integer per requested
+row. By default membership is recovered from the response/index expression
+in <code>data</code>, or the fitted membership when <code>data</code> is omitted. This is useful
+when predicting without responses or with a complex response expression.
+An explicit index must agree with membership recoverable from <code>data</code>.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A tibble (data frame) whose first <em>m</em> columns contain either the data
 used to fit the model (if <code>data</code> was <code>NULL</code>), or the variables supplied to
-<code>data</code>. Four further columns are added:</p><ul><li><p><code>.fitted</code>: the fitted values on the specified scale,</p></li>
-<li><p><code>.se</code>: the standard error of the fitted values (always on the <em>link</em> scale),</p></li>
+<code>data</code>. The result also includes:</p><ul><li><p><code>.parameter</code>: parameter name, or <code>"expectation"</code>,</p></li>
+<li><p><code>.fitted</code>: the requested quantity on the specified scale,</p></li>
+<li><p><code>.se</code>: standard error; see <code>prediction_info</code> for its scale,</p></li>
 <li><p><code>.lower_ci</code>, <code>.upper_ci</code>: the limits of the credible interval on the fitted values,
 on the specified scale.</p></li>
-</ul><p>Models fitted with certain families will include additional variables</p><ul><li><p><code><a href="https://rdrr.io/pkg/mgcv/man/ocat.html" class="external-link">mgcv::ocat()</a></code> models: when <code>scale = "response"</code>, the returned object will
-contain a <code>row</code> column and a <code>category</code> column, which indicate to which row
+</ul><p>Models fitted with certain families will include additional variables</p><ul><li><p><code><a href="https://rdrr.io/pkg/mgcv/man/ocat.html" class="external-link">mgcv::ocat()</a></code> models: when <code>quantity = "expectation"</code>, the returned object will
+contain a <code>.row</code> column and a <code>.category</code> column, which indicate to which row
 of the <code>data</code> each row of the returned object belongs. Additionally, there
 will be <code>nrow(data) * n_categories</code> rows in the returned object; each row
 is the predicted probability for a single category of the response.</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>Native scasm fits with stored bootstrap draws use mgcv's pointwise limits
+    <p><code>quantity = "parameters"</code> returns all distribution parameters represented
+by predictors, including intercept-only predictors. See <code><a href="family_parameters.html">family_parameters()</a></code>
+for their definitions. These are natural distribution parameters, which
+can differ from mgcv's native response predictions: Gaussian LSS returns
+standard deviation, GEV returns location rather than expectation, and
+sinh-arcsinh returns shape parameters rather than response moments.</p>
+<p><code>quantity = "expectation"</code> returns the expected response on the response
+scale, labelled <code>"expectation"</code>. Categorical expectations are probabilities
+of category membership; multivariate models return a mean per response.
+<code>.category</code> and <code>.y</code> identify the category or response separately from
+<code>.parameter</code>. Global parameters are described but held fixed when calculating
+coefficient uncertainty. Coupled expectations use the full coefficient
+covariance and a delta-method Jacobian. Their intervals are pointwise.</p>
+<p>The <code>prediction_info</code> attribute records the quantity, scale, standard-error
+scale and parameter descriptions. Parameter standard errors retain their
+link-scale meaning; category-probability and expectation standard errors are
+on the response scale. Unsupported simultaneous or bootstrap transformations
+are rejected rather than combining marginal parameter intervals.</p>
+<p>Native scasm fits with stored bootstrap draws use mgcv's pointwise limits
 by default, including its <code>svar.only</code> correction for smoothing bias.
 <code>interval_method = "gaussian"</code> restores covariance-based limits. <code>.se</code>
 retains its existing covariance-based meaning. No replicates are generated.
@@ -247,11 +285,9 @@ consider the intercept and offset treatment when selecting terms.</p>
     </div>
     <div class="section level2">
     <h2 id="note">Note<a class="anchor" aria-label="anchor" href="#note"></a></h2>
-    <p>For most families, regardless of the scale on which the fitted values
-are returned, the <code>se</code> component of the returned object is on the <em>link</em>
-(<em>linear predictor</em>) scale, not the response scale. An exception is the
-<code><a href="https://rdrr.io/pkg/mgcv/man/ocat.html" class="external-link">mgcv::ocat()</a></code> family, for which the <code>se</code> is on the response scale if
-<code>scale = "response"</code>.</p>
+    <p>For parameter output, the <code>.se</code> component is on the <em>link</em>
+(<em>linear predictor</em>) scale. Multinomial probabilities on the response scale
+and all expected responses have response-scale standard errors.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
@@ -265,44 +301,44 @@ are returned, the <code>se</code> component of the returned object is on the <em
 <span class="r-in"><span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x0</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x1</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x2</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x3</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">sim_df</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">fv</span> <span class="op">&lt;-</span> <span class="fu">fitted_values</span><span class="op">(</span><span class="va">m</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">fv</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 400 x 9</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     .row       x0        x1         x2       x3  .fitted      .se .lower_ci</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span>     1 0.184<span style="text-decoration: underline;">882</span> 0.617<span style="text-decoration: underline;">142</span>  0.415<span style="text-decoration: underline;">244</span>   0.132<span style="text-decoration: underline;">410</span>  8.738<span style="text-decoration: underline;">75</span> 0.354<span style="text-decoration: underline;">677</span>   8.043<span style="text-decoration: underline;">60</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span>     2 0.702<span style="text-decoration: underline;">374</span> 0.569<span style="text-decoration: underline;">064</span>  0.531<span style="text-decoration: underline;">439</span>   0.365<span style="text-decoration: underline;">331</span>  7.625<span style="text-decoration: underline;">81</span> 0.337<span style="text-decoration: underline;">779</span>   6.963<span style="text-decoration: underline;">78</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span>     3 0.573<span style="text-decoration: underline;">326</span> 0.153<span style="text-decoration: underline;">970</span>  0.003<span style="text-decoration: underline;">246</span>21 0.454<span style="text-decoration: underline;">532</span>  3.121<span style="text-decoration: underline;">06</span> 0.591<span style="text-decoration: underline;">862</span>   1.961<span style="text-decoration: underline;">03</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span>     4 0.168<span style="text-decoration: underline;">052</span> 0.034<span style="text-decoration: underline;">833</span>2 0.252<span style="text-decoration: underline;">100</span>   0.537<span style="text-decoration: underline;">114</span> 11.112<span style="text-decoration: underline;">4</span>  0.402<span style="text-decoration: underline;">378</span>  10.323<span style="text-decoration: underline;">7</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span>     5 0.943<span style="text-decoration: underline;">839</span> 0.997<span style="text-decoration: underline;">953</span>  0.155<span style="text-decoration: underline;">229</span>   0.185<span style="text-decoration: underline;">495</span> 14.053<span style="text-decoration: underline;">3</span>  0.452<span style="text-decoration: underline;">947</span>  13.165<span style="text-decoration: underline;">5</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span>     6 0.943<span style="text-decoration: underline;">475</span> 0.835<span style="text-decoration: underline;">574</span>  0.878<span style="text-decoration: underline;">840</span>   0.449<span style="text-decoration: underline;">276</span>  6.130<span style="text-decoration: underline;">80</span> 0.364<span style="text-decoration: underline;">521</span>   5.416<span style="text-decoration: underline;">35</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span>     7 0.129<span style="text-decoration: underline;">159</span> 0.586<span style="text-decoration: underline;">562</span>  0.203<span style="text-decoration: underline;">511</span>   0.256<span style="text-decoration: underline;">527</span> 12.483<span style="text-decoration: underline;">8</span>  0.355<span style="text-decoration: underline;">808</span>  11.786<span style="text-decoration: underline;">4</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span>     8 0.833<span style="text-decoration: underline;">449</span> 0.339<span style="text-decoration: underline;">117</span>  0.583<span style="text-decoration: underline;">528</span>   0.618<span style="text-decoration: underline;">458</span>  6.252<span style="text-decoration: underline;">15</span> 0.344<span style="text-decoration: underline;">700</span>   5.576<span style="text-decoration: underline;">55</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span>     9 0.468<span style="text-decoration: underline;">019</span> 0.166<span style="text-decoration: underline;">883</span>  0.804<span style="text-decoration: underline;">473</span>   0.880<span style="text-decoration: underline;">744</span>  4.214<span style="text-decoration: underline;">63</span> 0.372<span style="text-decoration: underline;">003</span>   3.485<span style="text-decoration: underline;">52</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span>    10 0.549<span style="text-decoration: underline;">984</span> 0.807<span style="text-decoration: underline;">410</span>  0.264<span style="text-decoration: underline;">717</span>   0.317<span style="text-decoration: underline;">747</span> 15.528<span style="text-decoration: underline;">3</span>  0.369<span style="text-decoration: underline;">999</span>  14.803<span style="text-decoration: underline;">1</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 400 x 10</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     .row       x0        x1         x2       x3 .parameter  .fitted      .se</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span>     1 0.184<span style="text-decoration: underline;">882</span> 0.617<span style="text-decoration: underline;">142</span>  0.415<span style="text-decoration: underline;">244</span>   0.132<span style="text-decoration: underline;">410</span> mean        8.738<span style="text-decoration: underline;">75</span> 0.354<span style="text-decoration: underline;">677</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span>     2 0.702<span style="text-decoration: underline;">374</span> 0.569<span style="text-decoration: underline;">064</span>  0.531<span style="text-decoration: underline;">439</span>   0.365<span style="text-decoration: underline;">331</span> mean        7.625<span style="text-decoration: underline;">81</span> 0.337<span style="text-decoration: underline;">779</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span>     3 0.573<span style="text-decoration: underline;">326</span> 0.153<span style="text-decoration: underline;">970</span>  0.003<span style="text-decoration: underline;">246</span>21 0.454<span style="text-decoration: underline;">532</span> mean        3.121<span style="text-decoration: underline;">06</span> 0.591<span style="text-decoration: underline;">862</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span>     4 0.168<span style="text-decoration: underline;">052</span> 0.034<span style="text-decoration: underline;">833</span>2 0.252<span style="text-decoration: underline;">100</span>   0.537<span style="text-decoration: underline;">114</span> mean       11.112<span style="text-decoration: underline;">4</span>  0.402<span style="text-decoration: underline;">378</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span>     5 0.943<span style="text-decoration: underline;">839</span> 0.997<span style="text-decoration: underline;">953</span>  0.155<span style="text-decoration: underline;">229</span>   0.185<span style="text-decoration: underline;">495</span> mean       14.053<span style="text-decoration: underline;">3</span>  0.452<span style="text-decoration: underline;">947</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span>     6 0.943<span style="text-decoration: underline;">475</span> 0.835<span style="text-decoration: underline;">574</span>  0.878<span style="text-decoration: underline;">840</span>   0.449<span style="text-decoration: underline;">276</span> mean        6.130<span style="text-decoration: underline;">80</span> 0.364<span style="text-decoration: underline;">521</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span>     7 0.129<span style="text-decoration: underline;">159</span> 0.586<span style="text-decoration: underline;">562</span>  0.203<span style="text-decoration: underline;">511</span>   0.256<span style="text-decoration: underline;">527</span> mean       12.483<span style="text-decoration: underline;">8</span>  0.355<span style="text-decoration: underline;">808</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span>     8 0.833<span style="text-decoration: underline;">449</span> 0.339<span style="text-decoration: underline;">117</span>  0.583<span style="text-decoration: underline;">528</span>   0.618<span style="text-decoration: underline;">458</span> mean        6.252<span style="text-decoration: underline;">15</span> 0.344<span style="text-decoration: underline;">700</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span>     9 0.468<span style="text-decoration: underline;">019</span> 0.166<span style="text-decoration: underline;">883</span>  0.804<span style="text-decoration: underline;">473</span>   0.880<span style="text-decoration: underline;">744</span> mean        4.214<span style="text-decoration: underline;">63</span> 0.372<span style="text-decoration: underline;">003</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span>    10 0.549<span style="text-decoration: underline;">984</span> 0.807<span style="text-decoration: underline;">410</span>  0.264<span style="text-decoration: underline;">717</span>   0.317<span style="text-decoration: underline;">747</span> mean       15.528<span style="text-decoration: underline;">3</span>  0.369<span style="text-decoration: underline;">999</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># i 390 more rows</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># i 1 more variable: .upper_ci &lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># i 2 more variables: .lower_ci &lt;dbl&gt;, .upper_ci &lt;dbl&gt;</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Simultaneous intervals for two arbitrary covariate combinations</span></span></span>
 <span class="r-in"><span><span class="fu">fitted_values</span><span class="op">(</span><span class="va">m</span>, data <span class="op">=</span> <span class="va">sim_df</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">20</span><span class="op">)</span>, <span class="op">]</span>, interval <span class="op">=</span> <span class="st">"simultaneous"</span>,</span></span>
 <span class="r-in"><span>  n_sim <span class="op">=</span> <span class="fl">1000</span>, seed <span class="op">=</span> <span class="fl">42</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 2 x 15</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 2 x 16</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    .row       y        x0       x1       x2       x3       f       f0      f1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>     1 7.128<span style="text-decoration: underline;">34</span> 0.184<span style="text-decoration: underline;">882</span>  0.617<span style="text-decoration: underline;">142</span> 0.415<span style="text-decoration: underline;">244</span> 0.132<span style="text-decoration: underline;">410</span> 8.386<span style="text-decoration: underline;">43</span> 1.097<span style="text-decoration: underline;">43</span>  3.435<span style="text-decoration: underline;">92</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span>     2 2.935<span style="text-decoration: underline;">07</span> 0.074<span style="text-decoration: underline;">979</span>4 0.797<span style="text-decoration: underline;">900</span> 0.874<span style="text-decoration: underline;">521</span> 0.203<span style="text-decoration: underline;">225</span> 5.577<span style="text-decoration: underline;">66</span> 0.466<span style="text-decoration: underline;">765</span> 4.932<span style="text-decoration: underline;">27</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># i 6 more variables: f2 &lt;dbl&gt;, f3 &lt;dbl&gt;, .fitted &lt;dbl&gt;, .se &lt;dbl&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   .lower_ci &lt;dbl&gt;, .upper_ci &lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># i 7 more variables: f2 &lt;dbl&gt;, f3 &lt;dbl&gt;, .parameter &lt;chr&gt;, .fitted &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   .se &lt;dbl&gt;, .lower_ci &lt;dbl&gt;, .upper_ci &lt;dbl&gt;</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># A selected sum of smooth contributions on the link scale</span></span></span>
 <span class="r-in"><span><span class="fu">fitted_values</span><span class="op">(</span><span class="va">m</span>, data <span class="op">=</span> <span class="va">sim_df</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">20</span><span class="op">)</span>, <span class="op">]</span>, scale <span class="op">=</span> <span class="st">"link"</span>,</span></span>
 <span class="r-in"><span>  terms <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"s(x2)"</span>, <span class="st">"s(x3)"</span><span class="op">)</span>, interval <span class="op">=</span> <span class="st">"simultaneous"</span>,</span></span>
 <span class="r-in"><span>  n_sim <span class="op">=</span> <span class="fl">1000</span>, seed <span class="op">=</span> <span class="fl">42</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 2 x 15</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 2 x 16</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    .row       y        x0       x1       x2       x3       f       f0      f1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>     1 7.128<span style="text-decoration: underline;">34</span> 0.184<span style="text-decoration: underline;">882</span>  0.617<span style="text-decoration: underline;">142</span> 0.415<span style="text-decoration: underline;">244</span> 0.132<span style="text-decoration: underline;">410</span> 8.386<span style="text-decoration: underline;">43</span> 1.097<span style="text-decoration: underline;">43</span>  3.435<span style="text-decoration: underline;">92</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span>     2 2.935<span style="text-decoration: underline;">07</span> 0.074<span style="text-decoration: underline;">979</span>4 0.797<span style="text-decoration: underline;">900</span> 0.874<span style="text-decoration: underline;">521</span> 0.203<span style="text-decoration: underline;">225</span> 5.577<span style="text-decoration: underline;">66</span> 0.466<span style="text-decoration: underline;">765</span> 4.932<span style="text-decoration: underline;">27</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># i 6 more variables: f2 &lt;dbl&gt;, f3 &lt;dbl&gt;, .fitted &lt;dbl&gt;, .se &lt;dbl&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   .lower_ci &lt;dbl&gt;, .upper_ci &lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># i 7 more variables: f2 &lt;dbl&gt;, f3 &lt;dbl&gt;, .parameter &lt;chr&gt;, .fitted &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   .se &lt;dbl&gt;, .lower_ci &lt;dbl&gt;, .upper_ci &lt;dbl&gt;</span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

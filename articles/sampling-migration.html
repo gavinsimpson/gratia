@@ -27,7 +27,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-61</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-62</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -329,9 +329,10 @@ bayesplot. Numerical summaries still use posterior.</p>
 <div class="section level2">
 <h2 id="which-response-sampling-function-to-use">Which response sampling function to use<a class="anchor" aria-label="anchor" href="#which-response-sampling-function-to-use"></a>
 </h2>
-<p><code><a href="../reference/fitted_samples.html">fitted_samples()</a></code> draws the expected response,
-<code><a href="../reference/smooth_samples.html">smooth_samples()</a></code> draws individual smooth contributions, and
-<code><a href="../reference/derivative_samples.html">derivative_samples()</a></code> draws derivatives.
+<p><code><a href="../reference/fitted_samples.html">fitted_samples()</a></code> draws distribution parameters by
+default; use <code>quantity = "expectation"</code> for expected
+responses. <code><a href="../reference/smooth_samples.html">smooth_samples()</a></code> draws individual smooth
+contributions, and <code><a href="../reference/derivative_samples.html">derivative_samples()</a></code> draws derivatives.
 <code><a href="../reference/posterior_samples.html">posterior_samples()</a></code> also simulates response variation for
 each coefficient draw. <code><a href="../reference/predicted_samples.html">predicted_samples()</a></code> simulates
 responses with fitted parameters held fixed. It uses
@@ -394,47 +395,50 @@ same joint coefficient draw. For example:</p>
 <tbody>
 <tr class="odd">
 <td align="left"><code>fitted_samples(scale = "response")</code></td>
-<td align="left">Expected response, including every distribution
-parameter that affects it</td>
+<td align="left">All natural distribution parameters represented by
+predictors</td>
 </tr>
 <tr class="even">
 <td align="left"><code>fitted_samples(scale = "linear_predictor")</code></td>
-<td align="left">First linear predictor, for location</td>
+<td align="left">All parameter predictors, in family order</td>
 </tr>
 <tr class="odd">
+<td align="left"><code>fitted_samples(quantity = "expectation")</code></td>
+<td align="left">Expected response, using every parameter on which it
+depends</td>
+</tr>
+<tr class="even">
 <td align="left"><code><a href="../reference/posterior_samples.html">posterior_samples()</a></code></td>
 <td align="left">Responses conditional on each joint coefficient
 draw</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left"><code><a href="../reference/predicted_samples.html">predicted_samples()</a></code></td>
 <td align="left">Responses conditional on the fixed fitted
 coefficients</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left"><code>derivative_samples(scale = "response")</code></td>
 <td align="left">Derivative of the expected response, retaining joint
 coefficient uncertainty</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left"><code>derivative_samples(scale = "linear_predictor")</code></td>
 <td align="left">Derivative of the first predictor</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left"><code><a href="../reference/smooth_samples.html">smooth_samples()</a></code></td>
 <td align="left">Selected smooth contribution to its own predictor</td>
 </tr>
 </tbody>
 </table>
-<p>The historical <code>.parameter = "location"</code> label in fitted
-samples remains on both scales. On the response scale,
-<code>.fitted</code> is E[Y]. In particular, Gumbel, GEV and
-sinh-arcsinh means generally differ from location; the Gamma LSS mean
-requires exponentiation and the hurdle Poisson mean uses both
-predictors. These calculations no longer emit the earlier warning about
-location needing to equal the mean. A GEV mean does not exist at shape
-&gt;= 1; requesting that mean or its derivative gives an error, while
-response draws remain available.</p>
+<p>The <code>.parameter</code> column labels each parameter by its
+meaning on both scales. Expectation output uses
+<code>.parameter = "expectation"</code>. Gumbel, GEV and sinh-arcsinh
+means generally differ from location; the hurdle Poisson mean uses both
+predictors and accounts for zero truncation. A GEV mean does not exist
+at shape &gt;= 1; requesting that mean or its derivative gives an error,
+while parameter and response draws remain available.</p>
 <p><code><a href="https://rdrr.io/pkg/mgcv/man/gaulss.html" class="external-link">gaulss()</a></code> represents its second response parameter as
 inverse SD. Sampling uses its reciprocal and divides SD by the square
 root of an explicit sampling weight. The native <code><a href="https://rdrr.io/pkg/mgcv/man/gaulss.html" class="external-link">gaulss()</a></code>
@@ -470,11 +474,11 @@ or sampling weights produce missing responses. Fitting rows excluded by
 predictor contributions, and response derivatives use each row’s
 component mean. For derivatives, membership must be recoverable from
 <code>data</code>; <code><a href="../reference/derivative_samples.html">derivative_samples()</a></code> does not accept
-<code>family_index</code>. Ordinal response-scale fitted values and
-their derivatives remain unsupported; response draws and predictor-scale
-calculations remain available. Censored grouped components require an
-observation process for posterior response sampling; use
-<code><a href="../reference/simulate.html">simulate()</a></code> for latent uncensored draws.</p>
+<code>family_index</code>. Ordinal expectations and their derivatives
+refer to category probabilities, identified by <code>.category</code>.
+Scalar components have <code>NA</code> in that column. Censored grouped
+components require an observation process for posterior response
+sampling; use <code><a href="../reference/simulate.html">simulate()</a></code> for latent uncensored draws.</p>
 <p>MH coefficient sampling rejects BAM fits with nonzero prescribed
 smooth contributions, such as a nonzero soap-film boundary. Native
 fitting and prediction can use different offsets for those fits.
@@ -489,6 +493,70 @@ posterior predictive checks need a censoring observation process. Cox
 survival models lack a response generator for this interface, and
 expected survival times cannot be obtained from a location parameter
 alone.</p>
+</div>
+<div class="section level2">
+<h2 id="distribution-parameters-and-expected-responses">Distribution parameters and expected responses<a class="anchor" aria-label="anchor" href="#distribution-parameters-and-expected-responses"></a>
+</h2>
+<p><code><a href="../reference/fitted_values.html">fitted_values()</a></code> and <code><a href="../reference/fitted_samples.html">fitted_samples()</a></code> now
+default to <code>quantity = "parameters"</code>. They return each
+parameter represented by a predictor, including an intercept-only
+predictor, with its natural meaning. Use
+<code>family_parameters(model)</code> to inspect the names, definitions,
+predictor order and native representation. Global parameters appear in
+that description but remain fixed during coefficient sampling.</p>
+<p>Use <code>quantity = "expectation"</code> to request the expected
+response. Expectations are available only on the response scale. Use
+<code>scale = "link"</code> with parameter output for the model
+predictors. Gaussian LSS returns <code>mean</code> and <code>sd</code>;
+GEV returns <code>location</code>, <code>scale</code> and
+<code>shape</code>. GEV location is generally not its expectation.
+Zero-inflated Poisson returns <code>rate</code> and
+<code>presence_probability</code>; its expectation includes the
+zero-truncation adjustment.</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/family_parameters.html">family_parameters</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/fitted_samples.html">fitted_samples</a></span><span class="op">(</span><span class="va">model</span>, n_draws <span class="op">=</span> <span class="fl">100</span>, quantity <span class="op">=</span> <span class="st">"parameters"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/fitted_samples.html">fitted_samples</a></span><span class="op">(</span><span class="va">model</span>, n_draws <span class="op">=</span> <span class="fl">100</span>, quantity <span class="op">=</span> <span class="st">"expectation"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/fitted_values.html">fitted_values</a></span><span class="op">(</span><span class="va">model</span>, quantity <span class="op">=</span> <span class="st">"expectation"</span><span class="op">)</span></span></code></pre></div>
+<p>For categorical models, expectation output contains category
+probabilities. Categories and multivariate responses use
+<code>.category</code> and <code>.y</code>, separately from
+<code>.parameter</code>. Expected responses use
+<code>.parameter = "expectation"</code>.
+<code><a href="../reference/posterior_samples.html">posterior_samples()</a></code> draws new observations after drawing
+coefficients; <code><a href="../reference/predicted_samples.html">predicted_samples()</a></code> draws observations with
+fitted coefficients held fixed. Neither is a substitute for draws of an
+expectation.</p>
+<div class="section level3">
+<h3 id="location-rate-and-expectation">Location, rate and expectation<a class="anchor" aria-label="anchor" href="#location-rate-and-expectation"></a>
+</h3>
+<p>The following models illustrate why the quantity must be
+explicit:</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st">"mgcv"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">426</span><span class="op">)</span></span>
+<span><span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">200</span><span class="op">)</span>, y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">200</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">gev_fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="va">x</span>, <span class="op">~</span><span class="fl">1</span>, <span class="op">~</span><span class="fl">1</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">d</span>, family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gevlss.html" class="external-link">gevlss</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/family_parameters.html">family_parameters</a></span><span class="op">(</span><span class="va">gev_fit</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/fitted_values.html">fitted_values</a></span><span class="op">(</span><span class="va">gev_fit</span><span class="op">)</span> <span class="co"># location, scale and shape</span></span>
+<span><span class="fu"><a href="../reference/fitted_values.html">fitted_values</a></span><span class="op">(</span><span class="va">gev_fit</span>, quantity <span class="op">=</span> <span class="st">"expectation"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">d</span><span class="op">$</span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Poisson.html" class="external-link">rpois</a></span><span class="op">(</span><span class="fl">200</span>, <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="fl">1</span> <span class="op">+</span> <span class="va">d</span><span class="op">$</span><span class="va">x</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">zip_fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="va">x</span>, <span class="op">~</span><span class="fl">1</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">d</span>, family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/ziplss.html" class="external-link">ziplss</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/fitted_samples.html">fitted_samples</a></span><span class="op">(</span><span class="va">zip_fit</span>, n_draws <span class="op">=</span> <span class="fl">5</span><span class="op">)</span> <span class="co"># rate and presence probability</span></span>
+<span><span class="fu"><a href="../reference/fitted_samples.html">fitted_samples</a></span><span class="op">(</span><span class="va">zip_fit</span>, n_draws <span class="op">=</span> <span class="fl">5</span>, quantity <span class="op">=</span> <span class="st">"expectation"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">tw_fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="va">x</span>, <span class="op">~</span><span class="fl">1</span>, <span class="op">~</span><span class="fl">1</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">d</span>, family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/twlss.html" class="external-link">twlss</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/fitted_values.html">fitted_values</a></span><span class="op">(</span><span class="va">tw_fit</span><span class="op">)</span> <span class="co"># mean, power and dispersion</span></span>
+<span><span class="fu"><a href="../reference/fitted_values.html">fitted_values</a></span><span class="op">(</span><span class="va">tw_fit</span>, quantity <span class="op">=</span> <span class="st">"expectation"</span><span class="op">)</span> <span class="co"># equals the mean parameter</span></span></code></pre></div>
+<p>For <code><a href="https://rdrr.io/pkg/mgcv/man/ziplss.html" class="external-link">ziplss()</a></code>, writing rate as lambda and presence
+probability as p, the expectation is
+<code>p * lambda / (1 - exp(-lambda))</code>. The denominator accounts
+for the zero-truncated Poisson distribution of positive counts. GEV
+location generally differs from its expectation. Tweedie’s mean
+parameter is already its expectation, but its power and dispersion are
+separate parameters.</p>
+</div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

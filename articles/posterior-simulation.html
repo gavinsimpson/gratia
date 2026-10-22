@@ -27,7 +27,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-61</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-62</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -180,9 +180,9 @@ functions</p>
 <code><a href="../reference/smooth_samples.html">smooth_samples()</a></code> generates draws from the posterior
 distribution of single estimated smooth functions,</li>
 <li>
-<code><a href="../reference/fitted_samples.html">fitted_samples()</a></code> generates draws from the posterior
-distribution of <span class="math inline">\mathbb{E}(y_i | \mathbf{X}_i
-= x_i)</span>, the expected value of the response,</li>
+<code><a href="../reference/fitted_samples.html">fitted_samples()</a></code> generates joint draws of distribution
+parameters; use <code>quantity = "expectation"</code> for draws of <span class="math inline">\mathbb{E}(y_i | \mathbf{X}_i = x_i)</span>, the
+expected response,</li>
 <li>
 <code><a href="../reference/predicted_samples.html">predicted_samples()</a></code> generates new response data given
 supplied values of covariates <span class="math inline">y^{\ast}_i |
@@ -193,17 +193,13 @@ supplied values of covariates <span class="math inline">y^{\ast}_i |
 distribution of the model, including the uncertainty in the estimated
 parameters of that model.</li>
 </ol>
-<p>In simpler terms, <code><a href="../reference/fitted_samples.html">fitted_samples()</a></code> generates predictions
-about the “average” or expected value of the response at values of the
-covariates. These predictions only include the uncertainty in the
-estimated values of the model coefficients. In contrast,
-<code><a href="../reference/posterior_samples.html">posterior_samples()</a></code> generates predictions of the actual
-values of the response we might expect to observe (if the model is
-correct) given values of the covariates. These predicted values include
-the variance of the sampling distribution (error term).
-<code><a href="../reference/predicted_samples.html">predicted_samples()</a></code> lies somewhere in between these two;
-the predicted values only include the variation in the sampling
-distribution, and take the model as fixed, known.</p>
+<p>With <code>quantity = "expectation"</code>,
+<code><a href="../reference/fitted_samples.html">fitted_samples()</a></code> describes uncertainty in the expected
+response at the supplied covariates. It adds no response noise.
+<code><a href="../reference/posterior_samples.html">posterior_samples()</a></code> draws observations after drawing model
+coefficients, so it includes response variation as well as coefficient
+uncertainty. <code><a href="../reference/predicted_samples.html">predicted_samples()</a></code> draws observations with
+the coefficients held at their fitted values.</p>
 <p>It is worth reminding ourselves that these posterior draws are all
 conditional upon the selected values of the smoothing parameter(s) <span class="math inline">\lambda_j</span>. We act as if the wiggliness of the
 estimated smooths was known, when in actual fact we estimated (selected
@@ -227,17 +223,13 @@ posterior simulation:</p>
 using <code><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam()</a></code>, <code><a href="https://rdrr.io/pkg/mgcv/man/bam.html" class="external-link">bam()</a></code>, and <code><a href="https://rdrr.io/pkg/mgcv/man/gamm.html" class="external-link">gamm()</a></code>,
 as well as those fitted via <code>scam()</code> in the scam package.
 <code><a href="../reference/simulate.html">simulate()</a></code> is a base R convention that does the same thing
-as <code><a href="../reference/predicted_samples.html">predicted_samples()</a></code>, just in a non-tidy way (that is not
-pejorative; it returns the simulated response values as a matrix, which
-is arguably more useful if you are doing math or further statistical
-computation.) <code><a href="../reference/derivative_samples.html">derivative_samples()</a></code> provides draws from the
-posterior distribution of the derivative of response variable for a
-small change in a focal covariate value.
-<code><a href="../reference/derivative_samples.html">derivative_samples()</a></code> is a less general version of
-<code><a href="../reference/fitted_samples.html">fitted_samples()</a></code>; you could achieve the same thing by two
-separate calls to <code><a href="../reference/fitted_samples.html">fitted_samples()</a></code>. We’ll reserve
-discussion of <code><a href="../reference/derivative_samples.html">derivative_samples()</a></code> to a separate vignette
-focused on estimating derivatives from GAMs.</p>
+as <code><a href="../reference/predicted_samples.html">predicted_samples()</a></code>, returning simulated responses as a
+matrix. <code><a href="../reference/derivative_samples.html">derivative_samples()</a></code> draws derivatives of the
+expected response with respect to a focal covariate. It evaluates
+expectations at neighbouring covariate values using the same coefficient
+draws, preserving their dependence. We’ll reserve discussion of
+derivatives for a separate vignette focused on estimating derivatives
+from GAMs.</p>
 <p>In the following sections we’ll look at each of the four main
 posterior simulation functions in turn.</p>
 </div>
@@ -317,12 +309,13 @@ less than 95% and for other values greater than 95%.</p>
 <div class="section level2">
 <h2 id="posterior-fitted-values-via-fitted_samples">Posterior fitted values via <code>fitted_samples()</code><a class="anchor" aria-label="anchor" href="#posterior-fitted-values-via-fitted_samples"></a>
 </h2>
-<p>Posterior fitted values are draws from the posterior distribution of
-the mean or expected value of the response. These expectations are what
-is returned when you use <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> on an estimated GAM,
-except <code><a href="../reference/fitted_samples.html">fitted_samples()</a></code> includes the uncertainty in the
-estimated model coefficients, whereas <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> just uses
-the estimated coefficients.</p>
+<p>In this section we request <code>quantity = "expectation"</code>
+explicitly. For an ordinary mean-based GAM, these are draws of the same
+expected response estimated by <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code>. Distributional
+models can have several predictors, and their first parameter need not
+be the expected response. The default
+<code>quantity = "parameters"</code> returns those parameters instead;
+<code><a href="../reference/family_parameters.html">family_parameters()</a></code> describes their meanings.</p>
 <p>In this example, using <code><a href="../reference/data_sim.html">data_sim()</a></code> we simulate data from
 example 6 of <span class="citation">Luo &amp; Wahba (1997)</span></p>
 <p><span class="math display">
@@ -350,14 +343,14 @@ for</p>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>.row <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/row_number.html" class="external-link">row_number</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>then we compute the fitted values for the new data</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">fv</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fitted_values.html">fitted_values</a></span><span class="op">(</span><span class="va">m</span>, data <span class="op">=</span> <span class="va">new_df</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">fv</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fitted_values.html">fitted_values</a></span><span class="op">(</span><span class="va">m</span>, quantity <span class="op">=</span> <span class="st">"expectation"</span>, data <span class="op">=</span> <span class="va">new_df</span><span class="op">)</span></span></code></pre></div>
 <p>The posterior fitted values are drawn with
 <code><a href="../reference/fitted_samples.html">fitted_samples()</a></code> using a Gaussian approximation to the
 posterior. Here we just take 10 draws from the posterior for each
 observation in <code>new_df</code> and merge the posterior draws with
 the data</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">fs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fitted_samples.html">fitted_samples</a></span><span class="op">(</span><span class="va">m</span>, data <span class="op">=</span> <span class="va">new_df</span>, n_draws <span class="op">=</span> <span class="fl">10</span>, seed <span class="op">=</span> <span class="fl">4</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<code class="sourceCode R"><span><span class="va">fs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fitted_samples.html">fitted_samples</a></span><span class="op">(</span><span class="va">m</span>, quantity <span class="op">=</span> <span class="st">"expectation"</span>, data <span class="op">=</span> <span class="va">new_df</span>, n_draws <span class="op">=</span> <span class="fl">10</span>, seed <span class="op">=</span> <span class="fl">4</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">new_df</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">.row</span>, <span class="va">x</span><span class="op">)</span>, by <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/join_by.html" class="external-link">join_by</a></span><span class="op">(</span><span class="va">.row</span> <span class="op">==</span> <span class="va">.row</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>Adding the posterior fitted samples to the plot of the data,
 superimposing the Bayesian credible interval on the fitted values</p>
@@ -561,11 +554,11 @@ account the variation about the expected value, plus the uncertainty in
 the expected value. <code><a href="../reference/fitted_values.html">fitted_values()</a></code> conveniently returns
 this uncertainty for us, which by default is a 95% credible interval</p>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/fitted_values.html">fitted_values</a></span><span class="op">(</span><span class="va">m</span>, data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 6</span></span></span>
-<span><span class="co">#&gt;    .row     x .fitted   .se .lower_ci .upper_ci</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>     1   0.5    2.92 0.161      2.60      3.23</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/fitted_values.html">fitted_values</a></span><span class="op">(</span><span class="va">m</span>, quantity <span class="op">=</span> <span class="st">"expectation"</span>, data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 7</span></span></span>
+<span><span class="co">#&gt;    .row     x .parameter  .fitted   .se .lower_ci .upper_ci</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>     1   0.5 expectation    2.92 0.161      2.60      3.23</span></span></code></pre></div>
 <p>The <code>.se</code> column is the standard error (standard
 deviation) of the estimated value (<code>.fitted</code>), while
 <code>.lower_ci</code> and <code>.upper_ci</code> are lower and upper
@@ -592,7 +585,7 @@ posterior simulated values to the row in the prediction data set
 <code>ds</code>. We also compute the fitted values for these new
 observations using <code><a href="../reference/fitted_values.html">fitted_values()</a></code>.</p>
 <div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">fv</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fitted_values.html">fitted_values</a></span><span class="op">(</span><span class="va">m</span>, data <span class="op">=</span> <span class="va">ds</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">fv</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fitted_values.html">fitted_values</a></span><span class="op">(</span><span class="va">m</span>, quantity <span class="op">=</span> <span class="st">"expectation"</span>, data <span class="op">=</span> <span class="va">ds</span><span class="op">)</span></span></code></pre></div>
 <p>That step isn’t required in order to do posterior simulation with
 gratia, but we’ll use the fitted values later to show the model
 estimated values and their uncertainty in contrast to the prediction
@@ -767,8 +760,8 @@ of the covariate space the response consists of only zeroes
 default Gaussian approximation and subsequently using the simpler
 Metropolis Hastings sampler.</p>
 <div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">fs_ga</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fitted_samples.html">fitted_samples</a></span><span class="op">(</span><span class="va">m_logit</span>, n_draws <span class="op">=</span> <span class="fl">2000</span>, seed <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
-<span><span class="va">fs_mh</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fitted_samples.html">fitted_samples</a></span><span class="op">(</span><span class="va">m_logit</span>,</span>
+<code class="sourceCode R"><span><span class="va">fs_ga</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fitted_samples.html">fitted_samples</a></span><span class="op">(</span><span class="va">m_logit</span>, quantity <span class="op">=</span> <span class="st">"expectation"</span>, n_draws <span class="op">=</span> <span class="fl">2000</span>, seed <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="va">fs_mh</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fitted_samples.html">fitted_samples</a></span><span class="op">(</span><span class="va">m_logit</span>, quantity <span class="op">=</span> <span class="st">"expectation"</span>,</span>
 <span>  n_draws <span class="op">=</span> <span class="fl">2000</span>, seed <span class="op">=</span> <span class="fl">2</span>, method <span class="op">=</span> <span class="st">"mh"</span>, thin <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  rw_scale <span class="op">=</span> <span class="fl">0.4</span></span>
 <span><span class="op">)</span></span></code></pre></div>

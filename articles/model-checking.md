@@ -337,9 +337,9 @@ growth_fit <- lme(distance ~ Sex * age_c, random = ~ age_c | Subject,
   data = growth, method = "REML")
 summary(growth_fit)$tTable
 #>                      Value  Std.Error DF   t-value      p-value
-#> (Intercept)     24.9687500 0.48600071 79 51.375954 1.812711e-62
-#> SexFemale       -2.3210227 0.76141677 25 -3.048295 5.375052e-03
-#> age_c            0.7843750 0.08599951 79  9.120691 5.654752e-14
+#> (Intercept)     24.9687500 0.48600069 79 51.375956 1.812707e-62
+#> SexFemale       -2.3210227 0.76141675 25 -3.048295 5.375051e-03
+#> age_c            0.7843750 0.08599951 79  9.120692 5.654744e-14
 #> SexFemale:age_c -0.3048295 0.13473534 79 -2.262432 2.641752e-02
 ```
 
@@ -470,15 +470,15 @@ posterior_predictive_plot(growth_smooth, n = 50, seed = 307)
 population_grid <- data.frame(age = seq(8, 14, length.out = 30),
   Sex = factor("Female", levels = levels(growth$Sex)))
 fitted_values(growth_smooth, data = population_grid) |> head()
-#> # A tibble: 6 × 7
-#>    .row   age Sex    .fitted   .se .lower_ci .upper_ci
-#>   <int> <dbl> <fct>    <dbl> <dbl>     <dbl>     <dbl>
-#> 1     1  8    Female    20.7 0.615      19.5      21.9
-#> 2     2  8.21 Female    20.8 0.611      19.6      22.0
-#> 3     3  8.41 Female    20.9 0.607      19.7      22.1
-#> 4     4  8.62 Female    21.1 0.604      19.9      22.3
-#> 5     5  8.83 Female    21.2 0.601      20.0      22.4
-#> 6     6  9.03 Female    21.4 0.599      20.2      22.5
+#> # A tibble: 6 × 8
+#>    .row   age Sex    .parameter .fitted   .se .lower_ci .upper_ci
+#>   <int> <dbl> <fct>  <chr>        <dbl> <dbl>     <dbl>     <dbl>
+#> 1     1  8    Female mean          20.7 0.615      19.5      21.9
+#> 2     2  8.21 Female mean          20.8 0.611      19.6      22.0
+#> 3     3  8.41 Female mean          20.9 0.607      19.7      22.1
+#> 4     4  8.62 Female mean          21.1 0.604      19.9      22.3
+#> 5     5  8.83 Female mean          21.2 0.601      20.0      22.4
+#> 6     6  9.03 Female mean          21.4 0.599      20.2      22.5
 ```
 
 Diagnostics and response simulations for `gamm4` now default to the full

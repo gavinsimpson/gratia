@@ -189,20 +189,21 @@ fv1 <- fitted_values(m_plant, data = ds1, scale = "response", exclude = "s(plant
 #> ℹ Factors: `treatment`, `type`, `tt`, and `plant`. Input rows: 1, 2, 3, 4, 5,
 #>   6, 7, 8, 9, 10, ....
 fv1
-#> # A tibble: 100 × 10
-#>     .row  conc treatment type   tt      plant .fitted    .se .lower_ci .upper_ci
-#>    <int> <dbl> <fct>     <fct>  <fct>   <fct>   <dbl>  <dbl>     <dbl>     <dbl>
-#>  1     1   95  chilled   Quebec chille… Qn1      13.0 0.0783      11.2      15.2
-#>  2     2  104. chilled   Quebec chille… Qn1      14.1 0.0757      12.1      16.3
-#>  3     3  113. chilled   Quebec chille… Qn1      15.2 0.0737      13.1      17.5
-#>  4     4  122. chilled   Quebec chille… Qn1      16.3 0.0722      14.2      18.8
-#>  5     5  132. chilled   Quebec chille… Qn1      17.6 0.0714      15.3      20.2
-#>  6     6  141. chilled   Quebec chille… Qn1      18.9 0.0711      16.4      21.7
-#>  7     7  150. chilled   Quebec chille… Qn1      20.2 0.0712      17.6      23.3
-#>  8     8  159. chilled   Quebec chille… Qn1      21.6 0.0716      18.8      24.9
-#>  9     9  168. chilled   Quebec chille… Qn1      23.0 0.0721      20.0      26.5
-#> 10    10  177. chilled   Quebec chille… Qn1      24.4 0.0726      21.2      28.1
+#> # A tibble: 100 × 11
+#>     .row  conc treatment type   tt     plant .parameter .fitted    .se .lower_ci
+#>    <int> <dbl> <fct>     <fct>  <fct>  <fct> <chr>        <dbl>  <dbl>     <dbl>
+#>  1     1   95  chilled   Quebec chill… Qn1   mean          13.0 0.0783      11.2
+#>  2     2  104. chilled   Quebec chill… Qn1   mean          14.1 0.0757      12.1
+#>  3     3  113. chilled   Quebec chill… Qn1   mean          15.2 0.0737      13.1
+#>  4     4  122. chilled   Quebec chill… Qn1   mean          16.3 0.0722      14.2
+#>  5     5  132. chilled   Quebec chill… Qn1   mean          17.6 0.0714      15.3
+#>  6     6  141. chilled   Quebec chill… Qn1   mean          18.9 0.0711      16.4
+#>  7     7  150. chilled   Quebec chill… Qn1   mean          20.2 0.0712      17.6
+#>  8     8  159. chilled   Quebec chill… Qn1   mean          21.6 0.0716      18.8
+#>  9     9  168. chilled   Quebec chill… Qn1   mean          23.0 0.0721      20.0
+#> 10    10  177. chilled   Quebec chill… Qn1   mean          24.4 0.0726      21.2
 #> # ℹ 90 more rows
+#> # ℹ 1 more variable: .upper_ci <dbl>
 ```
 
 Notice how we excluded the random effect term; even though we had to
