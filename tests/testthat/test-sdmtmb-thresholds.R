@@ -32,9 +32,12 @@ sdmtmb_threshold_fit <- local({
     control <- sdmTMB::sdmTMBcontrol(backend = "rtmb", newton_loops = 2,
       start = list(b_threshold = matrix(start,
         nrow = if (type == "breakpt") 2L else 3L)))
-    fits[[key]] <- suppressMessages(sdmTMB::sdmTMB(formula,
-      data = d, spatial = "off", control = control,
-      family = if (delta) sdmTMB::delta_lognormal() else gaussian()))
+    label <- sprintf("sdmTMB %s threshold fit (intercept=%s, delta=%s, mixed=%s)",
+      type, intercept, delta, mixed)
+    fits[[key]] <- builder_diagnostic_step(label,
+      suppressMessages(sdmTMB::sdmTMB(formula,
+        data = d, spatial = "off", control = control,
+        family = if (delta) sdmTMB::delta_lognormal() else gaussian())))
     fits[[key]]
   }
 })
@@ -57,8 +60,10 @@ test_that("threshold curves and intervals reproduce native predictions", {
         b[1L] + exp(b[2L]) * c(-3, 0, 1, 3)
       nd <- data.frame(x = x)
       e <- parametric_effects(m, data = nd)
-      native <- predict(m, newdata = nd, se_fit = TRUE,
-        re_form = NA, re_form_iid = NA)
+      native <- builder_diagnostic_step(
+        paste("sdmTMB threshold prediction", type, "intercept", intercept),
+        predict(m, newdata = nd, se_fit = TRUE,
+          re_form = NA, re_form_iid = NA))
       constant <- if (intercept) m$parlist$b_j[1L] else 0
       expect_equal(e$.value, x)
       expect_equal(e$.partial + constant, native$est, tolerance = 1e-7)
@@ -210,8 +215,10 @@ test_that("delta threshold plots retain separate components and uncertainty", {
     nd <- data.frame(x = c(.2, .5, 1.1, 1.8))
     for (i in 1:2) {
       e <- parametric_effects(m, terms = labels[i], data = nd)
-      native <- predict(m, newdata = nd, se_fit = TRUE, model = i,
-        re_form = NA, re_form_iid = NA)
+      native <- builder_diagnostic_step(
+        paste("sdmTMB delta threshold prediction", type, "component", i),
+        predict(m, newdata = nd, se_fit = TRUE, model = i,
+          re_form = NA, re_form_iid = NA))
       constant <- m$parlist[[if (i == 1L) "b_j" else "b_j2"]][1L]
       expect_equal(e$.partial + constant, native$est, tolerance = 1e-6)
       expect_equal(e$.se, native$est_se, tolerance = 1e-6)
