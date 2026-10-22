@@ -1,5 +1,5 @@
 Package: gratia
-Version: 0.11.2-63
+Version: 0.11.2-64
 Title: Graceful 'ggplot'-Based Graphics and Other Functions for GAMs Fitted Using 'mgcv'
 Authors@R: c(person(given = "Gavin L.", family = "Simpson",
                     email = "ucfagls@gmail.com",
@@ -33,7 +33,6 @@ Imports:
     lifecycle,
     pillar,
     cli,
-    ggokabeito,
     withr,
     scales,
     utils
@@ -66,13 +65,8 @@ Suggests:
     RTMB,
     TMB,
     Matrix,
-    ggdist,
-    distributional,
-    hexbin,
     gamair,
     sf (>= 1.0-0),
-    svglite (>= 2.0.0),
-    curl,
     marginaleffects,
     mirai,
     carrier
@@ -88,5 +82,5 @@ Language: en-GB
 VignetteBuilder: knitr
 Config/testthat/edition: 3
 Config/Needs/website: rmarkdown, ggdist, MASS, nlme, lme4, gamm4,
-    GJRM, glmmTMB, sdmTMB, sf, ggcube
+    GJRM, glmmTMB, sdmTMB, sf, ggcube, distributional, hexbin
 Config/roxygen2/version: 8.1.1

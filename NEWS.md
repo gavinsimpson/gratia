@@ -2,6 +2,11 @@
 
 ## User visible changes
 
+* gratia no longer requires ggokabeito; default plot colours and their ordering
+  are unchanged. Unused curl and svglite suggestions have been removed, and
+  ggdist, distributional and hexbin are now listed as website dependencies
+  because they are used only in a website article.
+
 * `grouped_by` is deprecated in `draw()` and `assemble()`. Include
   `"factor-by"` in the new `grouped` argument to overlay factor-by curves,
   or omit it to draw them separately. Explicit uses of `grouped_by` still

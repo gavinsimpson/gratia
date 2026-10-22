@@ -506,7 +506,6 @@ characters")
 #' @importFrom stats as.formula
 #' @importFrom ggplot2 facet_grid facet_wrap ggplot geom_ribbon geom_line labs
 #'   position_dodge geom_pointrange
-#' @importFrom ggokabeito scale_colour_okabe_ito scale_fill_okabe_ito
 #' @importFrom tidyselect where any_of
 #' @export
 `draw.conditional_values` <- function(

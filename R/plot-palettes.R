@@ -50,7 +50,7 @@ gratia_palette <- function(name = "default", reverse = FALSE) {
     }
     if (is.null(colours)) {
       values <- if (n > 9L) scales::pal_hue()(n) else
-        unname(ggokabeito::palette_okabe_ito()[seq_len(n)])
+        gratia_okabe_ito()[seq_len(n)]
       if (reverse) values <- rev(values)
       return(values)
     }
@@ -59,6 +59,28 @@ gratia_palette <- function(name = "default", reverse = FALSE) {
     }
     colours[seq_len(n)]
   }
+}
+
+# Keep the established plotting order: orange first and black last.
+gratia_okabe_ito <- function() {
+  unname(grDevices::palette.colors(n = 9, palette = "Okabe-Ito")[c(2:9, 1)])
+}
+
+gratia_okabe_ito_palette <- function(n) {
+  values <- gratia_okabe_ito()
+  if (n > length(values)) {
+    stop("Insufficient values in manual scale. ", n,
+      " needed but only ", length(values), " provided.", call. = FALSE)
+  }
+  values
+}
+
+scale_colour_okabe_ito <- function(...) {
+  ggplot2::discrete_scale("colour", palette = gratia_okabe_ito_palette, ...)
+}
+
+scale_fill_okabe_ito <- function(...) {
+  ggplot2::discrete_scale("fill", palette = gratia_okabe_ito_palette, ...)
 }
 
 # Colour data, in the published default order, from Paul Tol's Notes.

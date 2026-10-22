@@ -668,7 +668,7 @@ qq_uniform <- function(model, n = 10,
   if (coloured) {
     plt <- plt + geom_gratia_diagnostic_point(aes(colour = .data$.family), alpha = point_alpha,
       data = function(d) d[stats::complete.cases(d), , drop = FALSE]) +
-      gratia_default_scale(ggokabeito::scale_colour_okabe_ito(limits = gfam_diagnostic_labels(original),
+      gratia_default_scale(scale_colour_okabe_ito(limits = gfam_diagnostic_labels(original),
         drop = FALSE))
   } else {
     plt <- plt + geom_gratia_diagnostic_point(colour = point_col, alpha = point_alpha,
@@ -878,9 +878,9 @@ qq_uniform <- function(model, n = 10,
         data = function(d) d[is.finite(d$residuals), , drop = FALSE],
         stat = "bin", breaks = breaks, pad = TRUE, position = "identity",
         direction = "mid", linewidth = .6, alpha = 1) +
-      gratia_default_scale(ggokabeito::scale_fill_okabe_ito(limits = gfam_diagnostic_labels(original),
+      gratia_default_scale(scale_fill_okabe_ito(limits = gfam_diagnostic_labels(original),
         drop = FALSE)) +
-      gratia_default_scale(ggokabeito::scale_colour_okabe_ito(limits = gfam_diagnostic_labels(original),
+      gratia_default_scale(scale_colour_okabe_ito(limits = gfam_diagnostic_labels(original),
         drop = FALSE)) +
       labs(fill = "Family component", colour = "Family component")
   } else {

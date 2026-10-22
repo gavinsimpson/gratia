@@ -873,10 +873,6 @@ importFrom(dplyr,
   ungroup,
   vars
 )
-importFrom(ggokabeito,
-  scale_colour_okabe_ito,
-  scale_fill_okabe_ito
-)
 importFrom(ggplot2,
   aes,
   continuous_scale,

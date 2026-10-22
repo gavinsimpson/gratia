@@ -332,7 +332,7 @@ calibrated_qq_plot <- function(model, method, level, detrend, by_family,
     ggplot2::aes(ymin = .data$lower, ymax = .data$upper), fill = ci_col, alpha = ci_alpha)
   if (".family" %in% names(data) && !by_family) {
     plt <- plt + geom_gratia_diagnostic_point(ggplot2::aes(colour = .data$.family), alpha = point_alpha) +
-      gratia_default_scale(ggokabeito::scale_colour_okabe_ito(limits = gfam_diagnostic_labels(model),
+      gratia_default_scale(scale_colour_okabe_ito(limits = gfam_diagnostic_labels(model),
         drop = FALSE))
   } else plt <- plt + geom_gratia_diagnostic_point(colour = point_col, alpha = point_alpha)
   plt <- plt + ggplot2::labs(x = xlab %||% calibrated_reference_axis(type),

@@ -86,9 +86,12 @@ test_that("explicit deprecated arguments override themes, even at old defaults",
 })
 
 test_that("discrete palettes preserve defaults and match grouped fills", {
-  for (n in c(1, 8, 9, 10)) {
-    expected <- if (n <= 9) unname(ggokabeito::palette_okabe_ito()[seq_len(n)]) else scales::pal_hue()(n)
+  okabe_ito <- c("#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2",
+    "#D55E00", "#CC79A7", "#999999", "#000000")
+  for (n in 0:10) {
+    expected <- if (n <= 9) okabe_ito[seq_len(n)] else scales::pal_hue()(n)
     expect_identical(gratia_palette()(n), expected)
+    expect_identical(gratia_palette(reverse = TRUE)(n), rev(expected))
   }
   for (name in names(gratia_tol_palettes())) {
     values <- gratia_tol_palettes()[[name]]
@@ -116,6 +119,18 @@ test_that("discrete palettes preserve defaults and match grouped fills", {
     d$f <- factor(d$f, levels = letters[seq_len(n)])
     q <- gratia_plot(d, ggplot2::aes(x, y, colour = f)) + geom_gratia_smooth_line() + x$colour
     expect_silent(ggplot2::ggplot_build(q))
+  }
+})
+
+test_that("Okabe-Ito scales preserve missing values and fixed component colours", {
+  colours <- c("#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2",
+    "#D55E00", "#CC79A7", "#999999", "#000000")
+  for (constructor in list(scale_colour_okabe_ito, scale_fill_okabe_ito)) {
+    scale <- constructor(limits = letters[1:9], drop = FALSE)
+    scale$train(factor(c("b", "i")))
+    expect_identical(scale$map(c(letters[1:9], NA_character_)), c(colours, NA_character_))
+    expect_identical(scale$get_limits(), letters[1:9])
+    expect_error(scale$palette(10), "10 needed but only 9 provided", fixed = TRUE)
   }
 })
 
