@@ -1,0 +1,77 @@
+name: Weekly checks
+
+on:
+  schedule:
+    - cron: '17 4 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: weekly-checks-${{ github.ref }}
+
+jobs:
+  changes:
+    name: Check whether the weekly suite is needed
+    runs-on: ubuntu-latest
+    outputs:
+      run: ${{ steps.changes.outputs.run }}
+    steps:
+      - uses: actions/github-script@v8
+        id: changes
+        with:
+          script: |
+            // Manual runs always exercise the full suite on the selected ref.
+            if (context.eventName === 'workflow_dispatch') {
+              core.setOutput('run', 'true');
+              core.info('Running the weekly suite by request.');
+              return;
+            }
+            const { data } = await github.rest.actions.listWorkflowRuns({
+              ...context.repo,
+              workflow_id: 'weekly-checks.yaml',
+              branch: context.payload.repository.default_branch,
+              event: 'schedule',
+              status: 'success',
+              per_page: 1
+            });
+            const previous = data.workflow_runs[0];
+            const changed = !previous || previous.head_sha !== context.sha;
+            core.setOutput('run', String(changed));
+            core.info(changed
+              ? 'Running: main has not passed the weekly suite at this commit.'
+              : 'Skipping: main is unchanged since the last successful weekly run.');
+
+  package-checks:
+    needs: changes
+    if: needs.changes.outputs.run == 'true'
+    uses: ./.github/workflows/R-CMD-check.yaml
+    with:
+      config: >-
+        [
+          {"os": "macOS-latest", "r": "release", "tests": "full", "not_cran": "true"},
+          {"os": "macOS-latest", "r": "oldrel", "tests": "CRAN core", "not_cran": "false"},
+          {"os": "windows-latest", "r": "release", "tests": "full", "not_cran": "true"},
+          {"os": "windows-11-arm", "r": "release", "tests": "full", "not_cran": "true"},
+          {"os": "ubuntu-latest", "r": "devel", "http-user-agent": "release", "tests": "full", "not_cran": "true"},
+          {"os": "ubuntu-latest", "r": "release", "tests": "full", "not_cran": "true"},
+          {"os": "ubuntu-latest", "r": "release", "tests": "full", "not_cran": "true", "glmmtmb": "development"}
+        ]
+
+  secondary:
+    needs: changes
+    if: needs.changes.outputs.run == 'true'
+    uses: ./.github/workflows/test-secondary.yaml
+
+  sdmtmb:
+    needs: changes
+    if: needs.changes.outputs.run == 'true'
+    uses: ./.github/workflows/test-sdmtmb.yaml
+
+  coverage:
+    needs: changes
+    if: needs.changes.outputs.run == 'true'
+    uses: ./.github/workflows/test-coverage.yaml
+    secrets: inherit

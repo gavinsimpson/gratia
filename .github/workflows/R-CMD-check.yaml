@@ -5,8 +5,19 @@ on:
     branches: [main, master]
   pull_request:
     branches: [main, master]
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      config:
+        description: R and platform combinations for package checks
+        required: true
+        type: string
 
 name: R-CMD-check
+
+concurrency:
+  group: R-CMD-check-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   R-CMD-check:
@@ -17,15 +28,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        config:
-          - {os: macOS-latest,   r: 'release', tests: 'full', not_cran: 'true'}
-          - {os: macOS-latest,   r: 'oldrel', tests: 'CRAN core', not_cran: 'false'}
-          - {os: windows-latest, r: 'release', tests: 'full', not_cran: 'true'}
-          - {os: windows-11-arm, r: 'release', tests: 'full', not_cran: 'true'}
-          - {os: ubuntu-latest,   r: 'devel', http-user-agent: 'release', tests: 'full', not_cran: 'true'}
-          - {os: ubuntu-latest,   r: 'release', tests: 'full', not_cran: 'true'}
-          - {os: ubuntu-latest,   r: 'release', tests: 'CRAN core', not_cran: 'false'}
-          - {os: ubuntu-latest,   r: 'release', tests: 'full', not_cran: 'true', glmmtmb: 'development'}
+        # The weekly workflow supplies the broader compatibility matrix.
+        config: >-
+          ${{ fromJSON(inputs.config || '[
+            {"os": "macOS-latest", "r": "release", "tests": "CRAN core", "not_cran": "false"},
+            {"os": "windows-latest", "r": "release", "tests": "CRAN core", "not_cran": "false"},
+            {"os": "ubuntu-latest", "r": "release", "tests": "CRAN core", "not_cran": "false"}
+          ]') }}
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
@@ -81,24 +90,25 @@ jobs:
         run: Rscript --vanilla tools/test-sdmtmb-thresholds.R
         shell: bash
 
-      - name: Check optional inlaws diagnostic integration
-        if: runner.os == 'Linux' && matrix.config.r == 'release' && matrix.config.tests == 'full' && matrix.config.glmmtmb != 'development'
-        shell: Rscript {0}
-        run: |
-          pak::pkg_install("gam-mafia/inlaws")
-          source("tools/test-inlaws-diagnostics.R")
-
-      - name: Check optional bayesplot and loo integration
-        if: runner.os == 'Linux' && matrix.config.r == 'release' && matrix.config.tests == 'full' && matrix.config.glmmtmb != 'development'
-        run: Rscript --vanilla inst/validation/optional-bayesplot-loo.R
-        shell: bash
-
       - uses: r-lib/actions/check-r-package@v2
         env:
           GRATIA_TEST_PROGRESS: ${{ runner.os == 'macOS' && matrix.config.r == 'oldrel' && format('{0}/check-test-progress.log', runner.temp) || '' }}
         with:
           upload-snapshots: true
           build_args: 'c("--no-manual","--compact-vignettes=gs+qpdf")'
+
+      # Optional integrations run weekly, after the package check has finished.
+      - name: Check optional inlaws diagnostic integration
+        if: ${{ !cancelled() && runner.os == 'Linux' && matrix.config.r == 'release' && matrix.config.tests == 'full' && matrix.config.glmmtmb != 'development' }}
+        shell: Rscript {0}
+        run: |
+          pak::pkg_install("gam-mafia/inlaws")
+          source("tools/test-inlaws-diagnostics.R")
+
+      - name: Check optional bayesplot and loo integration
+        if: ${{ !cancelled() && runner.os == 'Linux' && matrix.config.r == 'release' && matrix.config.tests == 'full' && matrix.config.glmmtmb != 'development' }}
+        run: Rscript --vanilla inst/validation/optional-bayesplot-loo.R
+        shell: bash
 
       - name: Show macOS oldrel test output
         if: always() && runner.os == 'macOS' && matrix.config.r == 'oldrel'

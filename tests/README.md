@@ -28,13 +28,29 @@ Actions summary, plus an `hgam-test-timings` CSV artifact retained for 90 days.
 Per-test times include work performed before a visual snapshot skip; the total
 also includes shared setup and runner overhead.
 
-The R-CMD-check matrix runs the broader suite on its release/development
-platforms and CRAN-core checks on Linux and macOS oldrel. Coverage uses the
-broader suite. A separate
-macOS job runs visual comparisons with a fixed R version and Apple Accelerate
-BLAS, matching the local baseline environment; image differences
-should be reviewed, not automatically accepted. Existing platform restrictions
-on legacy numerical snapshots remain in place.
+Every push and pull request to main runs the CRAN-core package checks on Linux,
+macOS and Windows with R release. Visual comparisons and the paper-sized HGAM
+examples are disabled in these checks. The complete pkgdown website also builds
+on every push and pull request; pushes update the development website.
+
+The weekly workflow runs on Mondays at 04:17 UTC. It checks main against the
+last successful scheduled run and skips the expensive jobs when the commit has
+not changed. A failed suite is retried the following week. A manual weekly run
+always runs the full suite on the selected ref.
+
+The weekly suite includes broader package checks on Linux, macOS and Windows,
+Windows ARM, R devel, macOS oldrel, development glmmTMB, the separate sdmTMB
+compatibility jobs, coverage, visual comparisons and the paper-sized HGAM
+examples. The oldrel job uses the CRAN-core tests; the other package checks and
+coverage use the broader suite. Optional inlaws, bayesplot and loo integration
+checks run after the weekly Linux R-release package check, so their failures
+cannot prevent that package check from running. The individual secondary,
+sdmTMB and coverage workflows can also be run manually.
+
+The weekly macOS visual job uses a fixed R version and Apple Accelerate BLAS,
+matching the local baseline environment; image differences should be reviewed,
+not automatically accepted. Existing platform restrictions on legacy numerical
+snapshots remain in place.
 
 ## Fixtures and assertions
 
@@ -81,7 +97,7 @@ NOT_CRAN=false VDIFFR_RUN_TESTS=false GRATIA_TEST_DIAGNOSTICS=true \
 The report includes dependency versions, per-test times, and total elapsed time.
 An unfinished fitting or prediction call leaves a START checkpoint without DONE.
 
-The full Windows ARM R-release check runs alongside the Windows x64 check,
+The weekly full Windows ARM R-release check runs alongside the Windows x64 check,
 verifies that R is native ARM, and retains the repositories provided by the
 ARM R installation.
 
