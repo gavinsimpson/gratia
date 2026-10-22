@@ -127,13 +127,13 @@ prepare_basis_labels <- function(object, variables, xlab = NULL, ylab = NULL,
   labels
 }
 
-#' Resolve the existing basis-plot facet convention
+#' Resolve facets for basis functions and conditioning covariates
 #'
 #' @param object Basis evaluations containing `.by` and `.bf` metadata.
 #' @param variables Up to four covariate names, in plotting order.
 #' @param labeller Facet labeller; `NULL` uses `prefix_label_both`.
-#' @return A facet specification or `NULL`. Factor/character by variables take
-#'   precedence over basis-function facets, preserving the existing convention.
+#' @return A facet specification or `NULL`. Surface plots separate basis
+#'   functions; higher-dimensional plots facet on conditioning covariates.
 #' @keywords internal
 #' @noRd
 prepare_basis_facet <- function(object, variables, labeller = NULL) {
@@ -146,12 +146,7 @@ prepare_basis_facet <- function(object, variables, labeller = NULL) {
       cols = vars(.data[[variables[4L]]]), labeller = labeller,
       as.table = is.factor(object[[variables[3L]]])))
   }
-  if (all(!is.na(object[[".by"]]))) {
-    by_var <- unique(object[[".by"]])
-    if (is.character(object[[by_var]]) || is.factor(object[[by_var]])) {
-      return(facet_wrap(by_var, labeller = labeller))
-    }
-  } else if (length(variables) == 2L) {
+  if (length(variables) == 2L) {
     return(facet_wrap(vars(.data[[".bf"]]), labeller = labeller))
   }
   NULL

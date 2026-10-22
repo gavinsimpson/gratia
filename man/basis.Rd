@@ -23,7 +23,8 @@ basis(object, ...)
   partial_match = FALSE,
   envir = NULL,
   ...,
-  variables = NULL
+  variables = NULL,
+  unweighted = FALSE
 )
 
 \method{basis}{scam}(
@@ -37,7 +38,8 @@ basis(object, ...)
   n_4d = 4,
   partial_match = FALSE,
   ...,
-  variables = NULL
+  variables = NULL,
+  unweighted = FALSE
 )
 
 \method{basis}{gamm}(
@@ -51,7 +53,8 @@ basis(object, ...)
   n_4d = 4,
   partial_match = FALSE,
   ...,
-  variables = NULL
+  variables = NULL,
+  unweighted = FALSE
 )
 
 \method{basis}{gamm4}(
@@ -65,7 +68,8 @@ basis(object, ...)
   n_4d = 4,
   partial_match = FALSE,
   ...,
-  variables = NULL
+  variables = NULL,
+  unweighted = FALSE
 )
 
 \method{basis}{default}(
@@ -125,6 +129,11 @@ covariate exactly once. The first two define surface axes and the remaining
 covariates define conditioning facets. Selected smooths must have the same
 covariates. If \code{NULL}, use the usual smooth plotting order.}
 
+\item{unweighted}{logical; for fitted models, return basis functions without
+multiplying by fitted coefficients? The default, \code{FALSE}, returns the
+coefficient-weighted contributions. With \code{TRUE}, \code{\link[=draw]{draw()}} shows the shared
+basis once for each factor-by set.}
+
 \item{knots}{a list or data frame with named components containing
 knots locations. Names must match the covariates for which the basis
 is required. See \code{\link[mgcv:smoothCon]{mgcv::smoothCon()}}.}
@@ -145,7 +154,9 @@ basis functions.}
 }
 \value{
 A tibble with class \code{basis}. Its \code{plot_variables} attribute stores
-covariate orders by smooth label for subsequent plotting.
+covariate orders by smooth label for subsequent plotting. When the basis
+is shared across factor levels, \code{factor_by_groups} records the smooth
+labels that \code{\link[=draw]{draw()}} combines. The returned rows retain each level.
 }
 \description{
 Basis expansions from a definition of a smoother using the syntax of \emph{mgcv}'s

@@ -91,6 +91,13 @@ each smooth. Use \code{variables} in \code{\link[=basis]{basis()}} to choose the
 generation, or here to rearrange existing evaluations without resampling.
 Surface plots include contour lines by default, matching \code{\link[=draw.gam]{draw.gam()}}.
 Use \code{contour = FALSE} to draw surfaces without contour lines.
+
+Factor-by bases from smooth specifications are drawn once for the whole
+factor-by set, using evaluations from all available levels. For fitted
+models, \code{basis(model)} returns coefficient-weighted contributions, which
+remain separate for each level. Use \code{basis(model, unweighted = TRUE)} to
+draw the shared basis once. Subsetting the basis before drawing restricts
+the plot to the retained evaluations and basis functions.
 }
 \examples{
 load_mgcv()
@@ -102,6 +109,11 @@ draw(bf)
 
 bf <- basis(m, "s(x2)")
 draw(bf)
+
+# A single shared basis for a factor-by set
+df_by <- data_sim("eg4", n = 400, seed = 42)
+m_by <- gam(y ~ fac + s(x2, by = fac), data = df_by)
+draw(basis(m_by, unweighted = TRUE))
 
 # A three-covariate basis, evaluated at two conditioning values
 m3 <- gam(y ~ s(x0, x1, x2, k = 12), data = df)

@@ -37,6 +37,10 @@
 #'   the penalty null space.
 #' @param coefficients numeric; vector of values for the coefficients of the
 #'   basis functions.
+#' @param unweighted logical; for fitted models, return basis functions without
+#'   multiplying by fitted coefficients? The default, `FALSE`, returns the
+#'   coefficient-weighted contributions. With `TRUE`, [draw()] shows the shared
+#'   basis once for each factor-by set.
 #' @param variables character; smooth covariates in plotting order. Supply every
 #'   covariate exactly once. The first two define surface axes and the remaining
 #'   covariates define conditioning facets. Selected smooths must have the same
@@ -46,7 +50,9 @@
 #' @inheritParams smooth_estimates
 #'
 #' @return A tibble with class `basis`. Its `plot_variables` attribute stores
-#'   covariate orders by smooth label for subsequent plotting.
+#'   covariate orders by smooth label for subsequent plotting. When the basis
+#'   is shared across factor levels, `factor_by_groups` records the smooth
+#'   labels that [draw()] combines. The returned rows retain each level.
 #'
 #' @author Gavin L. Simpson
 #'
@@ -98,8 +104,11 @@
   n_4d = 4,
   partial_match = FALSE,
   envir = NULL,
-  ..., variables = NULL
+  ..., variables = NULL, unweighted = FALSE
 ) {
+  if (!is.logical(unweighted) || length(unweighted) != 1L || is.na(unweighted)) {
+    cli::cli_abort("`unweighted` must be TRUE or FALSE.")
+  }
   model_name <- expr_label(substitute(object))
   object <- with_model_envir(object, envir)
   if (lifecycle::is_present(term)) {
@@ -142,11 +151,13 @@
         \(i) {
           tidy_basis_wrapper(
             i, ids = ids, data = data, smooths = smooths, model = object, n = n,
-            n_2d = n_2d, n_3d = n_3d, n_4d = n_4d, offset = NULL
+            n_2d = n_2d, n_3d = n_3d, n_4d = n_4d, offset = NULL,
+            unweighted = unweighted
           )
         },
         ids = ids, data = data, smooths = smooths, object = object,
         n = n, n_2d = n_2d, n_3d = n_3d, n_4d = n_4d,
+        unweighted = unweighted,
         tidy_basis_wrapper = tidy_basis_wrapper
       )
     )
@@ -156,7 +167,8 @@
       seq_along(smooths),
       tidy_basis_wrapper,
       ids = ids, data = data, smooths = smooths, model = object, n = n,
-      n_2d = n_2d, n_3d = n_3d, n_4d = n_4d, offset = NULL
+      n_2d = n_2d, n_3d = n_3d, n_4d = n_4d, offset = NULL,
+      unweighted = unweighted
     )
   }
 
@@ -167,6 +179,9 @@
   attr(bfuns, "plot_variables") <- stats::setNames(
     lapply(ids, smooth_plot_variables, model = object), sms[ids]
   )
+  if (unweighted) {
+    attr(bfuns, "factor_by_groups") <- factor_by_basis_groups(smooths)
+  }
 
   bfuns # return
 }
@@ -180,7 +195,7 @@
   data = NULL,
   n = 100, n_2d = 50, n_3d = 16, n_4d = 4,
   partial_match = FALSE,
-  ..., variables = NULL
+  ..., variables = NULL, unweighted = FALSE
 ) {
   if (lifecycle::is_present(term)) {
     lifecycle::deprecate_warn("0.8.9.9", "basis(term)", "basis(select)")
@@ -190,7 +205,7 @@
   bfuns <- basis.gam(
     object, select = select, data = data, n = n,
     n_2d = n_2d, n_3d = n_3d, n_4d = n_4d, partial_match = partial_match,
-    ..., variables = variables
+    ..., variables = variables, unweighted = unweighted
   )
   bfuns
 }
@@ -207,7 +222,7 @@
   n_3d = 16,
   n_4d = 4,
   partial_match = FALSE,
-  ..., variables = NULL
+  ..., variables = NULL, unweighted = FALSE
 ) {
   if (lifecycle::is_present(term)) {
     lifecycle::deprecate_warn("0.8.9.9", "basis(term)", "basis(select)")
@@ -216,7 +231,7 @@
   basis(object[["gam"]],
     select = select, data = data, n = n,
     n_2d = n_2d, n_3d = n_3d, n_4d = n_4d, partial_match = partial_match,
-    ..., variables = variables
+    ..., variables = variables, unweighted = unweighted
   )
 }
 
@@ -232,7 +247,7 @@
   n_3d = 16,
   n_4d = 4,
   partial_match = FALSE,
-  ..., variables = NULL
+  ..., variables = NULL, unweighted = FALSE
 ) {
   if (lifecycle::is_present(term)) {
     lifecycle::deprecate_warn("0.8.9.9", "basis(term)", "basis(select)")
@@ -241,18 +256,18 @@
   basis(gamm4_gam(object),
     select = select, data = data, n = n,
     n_2d = n_2d, n_3d = n_3d, n_4d = n_4d, partial_match = partial_match,
-    ..., variables = variables
+    ..., variables = variables, unweighted = unweighted
   )
 }
 
 # wrapper for calling tidy_basis
 `tidy_basis_wrapper` <- function(
   i, smooths, ids, data = NULL, model, n = 100, n_2d = NULL, n_3d = NULL,
-  n_4d = NULL, offset = NULL
+  n_4d = NULL, offset = NULL, unweighted = FALSE
 ) {
   # which coefs belong to this smooth
   take <- smooth_coef_indices(smooths[[i]])
-  betas <- coef(model)[take]
+  betas <- if (unweighted) NULL else coef(model)[take]
   if (is.null(data)) {
     data <- smooth_data(
       model, ids[i],
@@ -368,9 +383,24 @@
   attr(bfuns, "plot_variables") <- stats::setNames(
     orders, vapply(sm, smooth_label, character(1))
   )
+  attr(bfuns, "factor_by_groups") <- factor_by_basis_groups(sm)
 
   ## return
   bfuns
+}
+
+# A factor-by construction repeats the same basis for each factor level.
+# Keep the level-specific rows in basis(); only drawing combines these groups.
+factor_by_basis_groups <- function(smooths) {
+  groups <- lapply(smooths, function(sm) {
+    if (!is_factor_by_smooth(sm)) return(NULL)
+    if (by_variable(sm) %in% smooth_variable(sm)) return(NULL)
+    label <- smooth_label(sm)
+    level <- as.character(by_level(sm))
+    if (!endsWith(label, level)) return(NULL)
+    stats::setNames(substr(label, 1L, nchar(label) - nchar(level)), label)
+  })
+  unlist(groups, use.names = TRUE)
 }
 
 #' A tidy basis representation of a smooth object
