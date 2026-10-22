@@ -513,7 +513,7 @@ render_diagnostic_qq <- function(
         ggplot2::aes(colour = .data$.family),
         alpha = point_alpha
       ) +
-      gratia_default_scale(ggokabeito::scale_colour_okabe_ito(
+      gratia_default_scale(scale_colour_okabe_ito(
         limits = levels(df$.family),
         drop = FALSE
       )) +
@@ -1379,11 +1379,11 @@ render_grouped_histogram <- function(
         linewidth = .6,
         alpha = 1
       ) +
-      gratia_default_scale(ggokabeito::scale_fill_okabe_ito(
+      gratia_default_scale(scale_fill_okabe_ito(
         limits = levels(df$.family),
         drop = FALSE
       )) +
-      gratia_default_scale(ggokabeito::scale_colour_okabe_ito(
+      gratia_default_scale(scale_colour_okabe_ito(
         limits = levels(df$.family),
         drop = FALSE
       )) +

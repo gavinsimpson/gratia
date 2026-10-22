@@ -991,7 +991,6 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
 #' @importFrom rlang .data
 #' @importFrom ggplot2 ggplot geom_point geom_line expand_limits theme aes
 #'   labs scale_fill_hue scale_colour_hue
-#' @importFrom ggokabeito scale_colour_okabe_ito scale_fill_okabe_ito
 #' @keywords internal
 #' @noRd
 `plot_smooth.sz_factor_smooth` <- function(

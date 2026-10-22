@@ -82,7 +82,8 @@ test_that("component identity follows QQ sorting and indexed colours distinguish
 test_that("grouped diagnostics share stable Okabe-Ito component colours and fills", {
   for (model in list(gfam_model, gfam_gaussian_model, gfam_missing_model)) {
     labels <- gfam_diagnostic_labels(model)
-    expected <- ggokabeito::palette_okabe_ito()[seq_along(labels)]
+    expected <- c("#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2",
+      "#D55E00", "#CC79A7", "#999999", "#000000")[seq_along(labels)]
     plots <- list(qq_plot(model, seed = 267), worm_plot(model, seed = 267),
       residuals_linpred_plot(model, seed = 267), residuals_hist_plot(model, seed = 267),
       residuals_linpred_plot(model, type = "deviance", by_family = FALSE),

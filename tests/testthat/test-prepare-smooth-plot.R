@@ -61,9 +61,9 @@ test_that("grouped by curves preserve palettes, rugs and change legends", {
     p <- plot_smooth.mgcv_smooth(d, variables = "x", grouped_by = TRUE, rug = d)
     b <- ggplot2::ggplot_build(p)$data
     expect_equal(length(unique(b[[2]]$group)), n)
-    pal <- if (n > 9L) ggplot2::scale_colour_hue() else
-      ggokabeito::scale_colour_okabe_ito()
-    expect_equal(unique(b[[2]]$colour), pal$palette(n)[seq_len(n)])
+    expected <- if (n > 9L) scales::pal_hue()(n) else
+      c("#E69F00", "#56B4E9", "#009E73")[seq_len(n)]
+    expect_equal(unique(b[[2]]$colour), expected)
     expect_equal(unique(b[[4]]$colour), "black")
     expect_true(is.na(p$layers[[3]]$show.legend))
     expect_equal(p$labels$subtitle, "By: f")
