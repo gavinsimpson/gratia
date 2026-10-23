@@ -27,23 +27,22 @@
 
 - **Plot appearance and theme migration**
 
-  - Plot aesthetic arguments for colours, opacity and line widths are
-    deprecated in favour of ggplot2 component themes
-    ([\#215](https://github.com/gavinsimpson/gratia/issues/215)).
-    Existing default appearances are unchanged, and explicitly supplied
-    arguments remain fixed overrides during migration.
+  Plot aesthetic arguments for colours, opacity and line widths are
+  deprecated in favour of ggplot2 component themes
+  ([\#215](https://github.com/gavinsimpson/gratia/issues/215)). Existing
+  default appearances are unchanged, and explicitly supplied arguments
+  remain fixed overrides during migration.
 
-  - Apply
-    [`theme()`](https://ggplot2.tidyverse.org/reference/theme.html) with
-    `&` to every panel in a patchwork, or with `+` to a single plot. For
-    example, replace `smooth_col` with
-    `geom.gratia.smooth = element_geom(colour = ...)` and `ci_alpha`
-    with `gratia.alpha.interval` inside
-    [`theme()`](https://ggplot2.tidyverse.org/reference/theme.html). See
-    [`gratia_theme_get()`](https://gavinsimpson.github.io/gratia/reference/gratia_theme_get.md)
-    and the Customizing plots article for migration examples.
+  Apply [`theme()`](https://ggplot2.tidyverse.org/reference/theme.html)
+  with `&` to every panel in a patchwork, or with `+` to a single plot.
+  For example, replace `smooth_col` with
+  `geom.gratia.smooth = element_geom(colour = ...)` and `ci_alpha` with
+  `gratia.alpha.interval` inside
+  [`theme()`](https://ggplot2.tidyverse.org/reference/theme.html). See
+  [`gratia_theme_get()`](https://gavinsimpson.github.io/gratia/reference/gratia_theme_get.md)
+  and the Customizing plots article for migration examples.
 
-  - gratia now requires ggplot2 \>= 4.0.3 and patchwork \>= 1.3.2.
+  gratia now requires ggplot2 \>= 4.0.3 and patchwork \>= 1.3.2.
 
 - Native [`mgcv::scasm()`](https://rdrr.io/pkg/mgcv/man/scasm.html)
   smooth estimation, drawing and
@@ -55,50 +54,50 @@
 
 - **Sampling arguments (breaking changes)**
 
-  - **Breaking change:** Sampling functions now use `n_draws` for the
-    total retained draw count and `n_grid` for automatically constructed
-    evaluation grids. Sampling controls must be named. Obsolete names,
-    including `n`, `n_sim`, `n_vals`, `freq`, `newdata`, and `ncores`,
-    produce migration errors.
+  **Breaking change:** Sampling functions now use `n_draws` for the
+  total retained draw count and `n_grid` for automatically constructed
+  evaluation grids. Sampling controls must be named. Obsolete names,
+  including `n`, `n_sim`, `n_vals`, `freq`, `newdata`, and `ncores`,
+  produce migration errors.
 
-  - [`derivative_samples()`](https://gavinsimpson.github.io/gratia/reference/derivative_samples.md)
-    takes `model` rather than `object`; `add_*()` sampling helpers take
-    `data` rather than `object`. See
-    [`vignette("sampling-migration")`](https://gavinsimpson.github.io/gratia/articles/sampling-migration.md).
+  [`derivative_samples()`](https://gavinsimpson.github.io/gratia/reference/derivative_samples.md)
+  takes `model` rather than `object`; `add_*()` sampling helpers take
+  `data` rather than `object`. See
+  [`vignette("sampling-migration")`](https://gavinsimpson.github.io/gratia/articles/sampling-migration.md).
 
-  - Coefficient and `*_samples()` functions require an explicit
-    `n_draws` when generating draws; supplied coefficient draws
-    determine their own count and chains. Likelihood, LOO, WAIC and
-    bayesplot wrappers use `n_draws` with their documented defaults.
+  Coefficient and `*_samples()` functions require an explicit `n_draws`
+  when generating draws; supplied coefficient draws determine their own
+  count and chains. Likelihood, LOO, WAIC and bayesplot wrappers use
+  `n_draws` with their documented defaults.
 
-  - Derivative sampling now defaults to a grid resolution of 200,
-    matching smooth sampling; supply `n_grid = 100` for the previous
-    derivative resolution.
+  Derivative sampling now defaults to a grid resolution of 200, matching
+  smooth sampling; supply `n_grid = 100` for the previous derivative
+  resolution.
 
-  - Gaussian threads use `n_threads`, while `n_cores` limits concurrent
-    MH chains. Explicit controls that do not apply to the selected
-    sampler are rejected.
+  Gaussian threads use `n_threads`, while `n_cores` limits concurrent MH
+  chains. Explicit controls that do not apply to the selected sampler
+  are rejected.
 
 - **Fitted quantities (breaking changes)**
 
-  - **Breaking change:**
-    [`fitted_samples()`](https://gavinsimpson.github.io/gratia/reference/fitted_samples.md)
-    now defaults to all distribution parameters represented by
-    predictors, matching
-    [`fitted_values()`](https://gavinsimpson.github.io/gratia/reference/fitted_values.md).
-    Request `quantity = "expectation"` for the expected response, on the
-    response scale only. Both functions use explicit parameter names,
-    including for scalar models.
+  **Breaking change:**
+  [`fitted_samples()`](https://gavinsimpson.github.io/gratia/reference/fitted_samples.md)
+  now defaults to all distribution parameters represented by predictors,
+  matching
+  [`fitted_values()`](https://gavinsimpson.github.io/gratia/reference/fitted_values.md).
+  Request `quantity = "expectation"` for the expected response, on the
+  response scale only. Both functions use explicit parameter names,
+  including for scalar models.
 
-  - Gaussian LSS returns standard deviation rather than reciprocal
-    standard deviation; GEV location is labelled separately from
-    expectation. Multivariate responses and categories have separate
-    `.y` and `.category` identifiers.
+  Gaussian LSS returns standard deviation rather than reciprocal
+  standard deviation; GEV location is labelled separately from
+  expectation. Multivariate responses and categories have separate `.y`
+  and `.category` identifiers.
 
-  - Global family parameters remain fixed during coefficient sampling.
-    Unknown general families require a natural-parameter or expectation
-    specification; their first predictor remains available on the link
-    scale ([\#426](https://github.com/gavinsimpson/gratia/issues/426)).
+  Global family parameters remain fixed during coefficient sampling.
+  Unknown general families require a natural-parameter or expectation
+  specification; their first predictor remains available on the link
+  scale ([\#426](https://github.com/gavinsimpson/gratia/issues/426)).
 
 - Gaussian coefficient sampling for
   [`mgcv::scasm()`](https://rdrr.io/pkg/mgcv/man/scasm.html) fits with
@@ -112,25 +111,25 @@
 
 - **Covariate scales in plots**
 
-  - **Breaking change:** Parametric plots now use covariates as
-    evaluated in the model: `log(x)` is plotted against `log(x)`, with a
-    matching axis label. Use `back_transform = TRUE` in
-    [`draw.gam()`](https://gavinsimpson.github.io/gratia/reference/draw.gam.md),
-    [`assemble.gam()`](https://gavinsimpson.github.io/gratia/reference/assemble.gam.md),
-    [`draw.parametric_effects()`](https://gavinsimpson.github.io/gratia/reference/draw.parametric_effects.md)
-    or
-    [`draw.smooth_estimates()`](https://gavinsimpson.github.io/gratia/reference/draw.smooth_estimates.md)
-    to use original covariates for interaction axes, tensor products,
-    rugs and conditioning facets
-    ([\#412](https://github.com/gavinsimpson/gratia/issues/412)).
-    Multi-column basis expansions retain their original covariate axes,
-    and changing the coordinate scale leaves effects and their intervals
-    unchanged.
+  **Breaking change:** Parametric plots now use covariates as evaluated
+  in the model: `log(x)` is plotted against `log(x)`, with a matching
+  axis label. Use `back_transform = TRUE` in
+  [`draw.gam()`](https://gavinsimpson.github.io/gratia/reference/draw.gam.md),
+  [`assemble.gam()`](https://gavinsimpson.github.io/gratia/reference/assemble.gam.md),
+  [`draw.parametric_effects()`](https://gavinsimpson.github.io/gratia/reference/draw.parametric_effects.md)
+  or
+  [`draw.smooth_estimates()`](https://gavinsimpson.github.io/gratia/reference/draw.smooth_estimates.md)
+  to use original covariates for interaction axes, tensor products, rugs
+  and conditioning facets
+  ([\#412](https://github.com/gavinsimpson/gratia/issues/412)).
+  Multi-column basis expansions retain their original covariate axes,
+  and changing the coordinate scale leaves effects and their intervals
+  unchanged.
 
-  - The `transform` argument of
-    [`parametric_effects()`](https://gavinsimpson.github.io/gratia/reference/parametric_effects.md)
-    is deprecated. Replace it with `back_transform = !transform`
-    ([\#412](https://github.com/gavinsimpson/gratia/issues/412)).
+  The `transform` argument of
+  [`parametric_effects()`](https://gavinsimpson.github.io/gratia/reference/parametric_effects.md)
+  is deprecated. Replace it with `back_transform = !transform`
+  ([\#412](https://github.com/gavinsimpson/gratia/issues/412)).
 
 - **Breaking change:**
   [`draw.gam()`](https://gavinsimpson.github.io/gratia/reference/draw.gam.md)
@@ -172,15 +171,15 @@
 
 - **Tweedie distribution calculations**
 
-  - Tweedie cumulative distribution functions now use fast Poisson-Gamma
-    mixtures for `1 < p < 2` instead of requiring the tweedie package
-    ([\#410](https://github.com/gavinsimpson/gratia/issues/410)). The
-    Gamma case (`p = 2`) uses native R distribution functions.
+  Tweedie cumulative distribution functions now use fast Poisson-Gamma
+  mixtures for `1 < p < 2` instead of requiring the tweedie package
+  ([\#410](https://github.com/gavinsimpson/gratia/issues/410)). The
+  Gamma case (`p = 2`) uses native R distribution functions.
 
-  - Mixture calculations warn and return available approximations when
-    their work or accuracy limits are reached. The tweedie package is
-    now optional, in Suggests, and is needed only for numerical
-    inversion requested with `fallback = TRUE`.
+  Mixture calculations warn and return available approximations when
+  their work or accuracy limits are reached. The tweedie package is now
+  optional, in Suggests, and is needed only for numerical inversion
+  requested with `fallback = TRUE`.
 
 - [`posterior_samples()`](https://gavinsimpson.github.io/gratia/reference/posterior_samples.md)
   now uses separate random-number streams for coefficient and response
@@ -207,35 +206,35 @@
 
 - **Conditional prediction surfaces**
 
-  - [`conditional_values()`](https://gavinsimpson.github.io/gratia/reference/conditional_values.md)
-    accepts two numeric covariates grouped in the first condition, such
-    as `condition = list(c("x1", "x2"), "treatment")`, to evaluate and
-    draw prediction surfaces. Remaining conditions supply facets.
+  [`conditional_values()`](https://gavinsimpson.github.io/gratia/reference/conditional_values.md)
+  accepts two numeric covariates grouped in the first condition, such as
+  `condition = list(c("x1", "x2"), "treatment")`, to evaluate and draw
+  prediction surfaces. Remaining conditions supply facets.
 
-  - Its
-    [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)
-    method supports raster, tile and optional ggcube 3D surfaces,
-    including interval surfaces via `ci_3d = TRUE`. The default
-    `n_vals = NULL` uses 100 values for curves and 50 along each surface
-    axis.
+  Its
+  [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)
+  method supports raster, tile and optional ggcube 3D surfaces,
+  including interval surfaces via `ci_3d = TRUE`. The default
+  `n_vals = NULL` uses 100 values for curves and 50 along each surface
+  axis.
 
 - **Random-effect sampling and marginal predictions**
 
-  - [`random_effect_samples()`](https://gavinsimpson.github.io/gratia/reference/random_effect_samples.md)
-    draws new random intercepts, slopes and factor-smooth curves from
-    their estimated Gaussian distributions.
+  [`random_effect_samples()`](https://gavinsimpson.github.io/gratia/reference/random_effect_samples.md)
+  draws new random intercepts, slopes and factor-smooth curves from
+  their estimated Gaussian distributions.
 
-  - `marginalise` integrates response means in fitted predictions using
-    Gaussian quadrature or Monte Carlo, and generates new-group effects
-    in response simulations. Smoothing parameters and dispersion remain
-    fixed at their fitted estimates.
+  `marginalise` integrates response means in fitted predictions using
+  Gaussian quadrature or Monte Carlo, and generates new-group effects in
+  response simulations. Smoothing parameters and dispersion remain fixed
+  at their fitted estimates.
 
-  - Factor-by curves retain their by-level selection when other random
-    terms are marginalised. Identity, log and probit links use
-    closed-form integrals; other links check quadrature with interlaced
-    nodes and an independent adaptive rule to detect unresolved link
-    transitions. Fits using `min.sp` are rejected because their fitted
-    lower bounds are not retained for covariance reconstruction.
+  Factor-by curves retain their by-level selection when other random
+  terms are marginalised. Identity, log and probit links use closed-form
+  integrals; other links check quadrature with interlaced nodes and an
+  independent adaptive rule to detect unresolved link transitions. Fits
+  using `min.sp` are rejected because their fitted lower bounds are not
+  retained for covariance reconstruction.
 
 - [`variance_comp()`](https://gavinsimpson.github.io/gratia/reference/variance_comp.md)
   has expanded support for variance components in
@@ -260,22 +259,22 @@
 
 - **Fitted quantities and family parameters**
 
-  - [`fitted_values()`](https://gavinsimpson.github.io/gratia/reference/fitted_values.md)
-    and
-    [`fitted_samples()`](https://gavinsimpson.github.io/gratia/reference/fitted_samples.md)
-    accept `quantity` to select distribution parameters or expected
-    responses. Parameter draws retain their joint coefficient
-    uncertainty; coupled expectation intervals use the full covariance.
+  [`fitted_values()`](https://gavinsimpson.github.io/gratia/reference/fitted_values.md)
+  and
+  [`fitted_samples()`](https://gavinsimpson.github.io/gratia/reference/fitted_samples.md)
+  accept `quantity` to select distribution parameters or expected
+  responses. Parameter draws retain their joint coefficient uncertainty;
+  coupled expectation intervals use the full covariance.
 
-  - [`family_parameters()`](https://gavinsimpson.github.io/gratia/reference/family_parameters.md)
-    describes natural parameters, native representations, predictor
-    order and fixed global parameters. These shared descriptions also
-    provide parameters for posterior response simulation, including when
-    an expectation does not exist.
+  [`family_parameters()`](https://gavinsimpson.github.io/gratia/reference/family_parameters.md)
+  describes natural parameters, native representations, predictor order
+  and fixed global parameters. These shared descriptions also provide
+  parameters for posterior response simulation, including when an
+  expectation does not exist.
 
-  - Grouped ordinal expectations return category probabilities alongside
-    scalar component means
-    ([\#426](https://github.com/gavinsimpson/gratia/issues/426)).
+  Grouped ordinal expectations return category probabilities alongside
+  scalar component means
+  ([\#426](https://github.com/gavinsimpson/gratia/issues/426)).
 
 - Grouped-family diagnostics now accept `response = NULL` for all family
   components or a single integer family-list index for one component.
@@ -299,29 +298,29 @@
 
 - **Grouping and drawing factor-related curves**
 
-  - [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)
-    and
-    [`assemble()`](https://gavinsimpson.github.io/gratia/reference/assemble.md)
-    can separate `sz` and `fs` curves into individual plots
-    ([\#244](https://github.com/gavinsimpson/gratia/issues/244)).
-    `grouped` names the types to overlay: `"factor-by"`, `"sz"`, and
-    `"fs"`. `show_ci` independently selects which types show intervals,
-    including optional intervals for `fs` curves.
+  [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)
+  and
+  [`assemble()`](https://gavinsimpson.github.io/gratia/reference/assemble.md)
+  can separate `sz` and `fs` curves into individual plots
+  ([\#244](https://github.com/gavinsimpson/gratia/issues/244)).
+  `grouped` names the types to overlay: `"factor-by"`, `"sz"`, and
+  `"fs"`. `show_ci` independently selects which types show intervals,
+  including optional intervals for `fs` curves.
 
-  - The defaults retain existing grouping and interval visibility.
-    Ordered-factor deviations use the factor-by settings and keep their
-    reference smooth separate. Saved smooth estimates support the same
-    controls.
+  The defaults retain existing grouping and interval visibility.
+  Ordered-factor deviations use the factor-by settings and keep their
+  reference smooth separate. Saved smooth estimates support the same
+  controls.
 
-  - Common axis ranges use displayed estimates and visible intervals.
-    Grouped factor-by plots retain observations from every plotted level
-    and accept custom colour and fill scales.
+  Common axis ranges use displayed estimates and visible intervals.
+  Grouped factor-by plots retain observations from every plotted level
+  and accept custom colour and fill scales.
 
-  - Smooth and custom titles retain colons within their text.
+  Smooth and custom titles retain colons within their text.
 
-  - Separate curves use the usual black line and translucent black
-    interval. Set `grouped = FALSE` to separate all factor-related
-    curves, or `show_ci = FALSE` to hide their intervals.
+  Separate curves use the usual black line and translucent black
+  interval. Set `grouped = FALSE` to separate all factor-related curves,
+  or `show_ci = FALSE` to hide their intervals.
 
 - [`assemble()`](https://gavinsimpson.github.io/gratia/reference/assemble.md)
   now supports models fitted by
@@ -346,20 +345,20 @@
 
 - **Polar plots of cyclic smooths**
 
-  - [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)
-    and
-    [`assemble()`](https://gavinsimpson.github.io/gratia/reference/assemble.md)
-    can draw one-dimensional cyclic smooths with `cyclic = "polar"`,
-    including factor-by and one-dimensional tensor smooths across
-    supported model classes. Fitted cycle boundaries configure the
-    angular axis and automatic evaluation grids span a complete cycle.
-    Saved smooth estimates retain these boundaries; supplied evaluation
-    points are unchanged.
+  [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)
+  and
+  [`assemble()`](https://gavinsimpson.github.io/gratia/reference/assemble.md)
+  can draw one-dimensional cyclic smooths with `cyclic = "polar"`,
+  including factor-by and one-dimensional tensor smooths across
+  supported model classes. Fitted cycle boundaries configure the angular
+  axis and automatic evaluation grids span a complete cycle. Saved
+  smooth estimates retain these boundaries; supplied evaluation points
+  are unchanged.
 
-  - `polar_args` customizes the polar coordinate display. Radial padding
-    separates interval bands from the outer observation rug. Radial axes
-    appear inside the circle by default; override their position through
-    `polar_args`.
+  `polar_args` customizes the polar coordinate display. Radial padding
+  separates interval bands from the outer observation rug. Radial axes
+  appear inside the circle by default; override their position through
+  `polar_args`.
 
 - [`draw.basis()`](https://gavinsimpson.github.io/gratia/reference/draw.basis.md)
   now plots basis functions of three- and four-covariate smooths as
@@ -375,23 +374,23 @@
 
 - **Response moments**
 
-  - [`fitted_moments()`](https://gavinsimpson.github.io/gratia/reference/fitted_moments.md)
-    and
-    [`conditional_moments()`](https://gavinsimpson.github.io/gratia/reference/conditional_moments.md)
-    estimate response means, variances, SDs, coefficients of variation,
-    skewness and kurtosis. Standard, distributional, categorical,
-    multivariate-normal, grouped and latent censored response families
-    are supported where their moments exist. Conditional moments can be
-    drawn with
-    [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md).
+  [`fitted_moments()`](https://gavinsimpson.github.io/gratia/reference/fitted_moments.md)
+  and
+  [`conditional_moments()`](https://gavinsimpson.github.io/gratia/reference/conditional_moments.md)
+  estimate response means, variances, SDs, coefficients of variation,
+  skewness and kurtosis. Standard, distributional, categorical,
+  multivariate-normal, grouped and latent censored response families are
+  supported where their moments exist. Conditional moments can be drawn
+  with
+  [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md).
 
-  - Delta-method intervals and joint Gaussian simulation propagate
-    covariance between distribution parameters. Supported ML/REML fits
-    also propagate estimated global family parameters and dispersion;
-    `nuisance = "fixed"` explicitly conditions on their fitted values.
-    Dispersion and coefficient covariance use the same ML/REML scale
-    estimate as the saved fitting curvature, including models with
-    linked or fixed smoothing parameters.
+  Delta-method intervals and joint Gaussian simulation propagate
+  covariance between distribution parameters. Supported ML/REML fits
+  also propagate estimated global family parameters and dispersion;
+  `nuisance = "fixed"` explicitly conditions on their fitted values.
+  Dispersion and coefficient covariance use the same ML/REML scale
+  estimate as the saved fitting curvature, including models with linked
+  or fixed smoothing parameters.
 
 - [`smooth_estimates()`](https://gavinsimpson.github.io/gratia/reference/smooth_estimates.md),
   [`derivatives()`](https://gavinsimpson.github.io/gratia/reference/derivatives.md),
@@ -409,46 +408,44 @@
 
 - **Axes and conditioning facets**
 
-  - Surface plotting and related evaluation functions now accept `n_2d`,
-    with a default of 50 points along each surface axis
-    ([\#153](https://github.com/gavinsimpson/gratia/issues/153)).
-    Default surface grids therefore shrink from 10,000 to 2,500 points
-    per panel. Curve and conditioning slice resolutions can be
-    controlled separately.
+  Surface plotting and related evaluation functions now accept `n_2d`,
+  with a default of 50 points along each surface axis
+  ([\#153](https://github.com/gavinsimpson/gratia/issues/153)). Default
+  surface grids therefore shrink from 10,000 to 2,500 points per panel.
+  Curve and conditioning slice resolutions can be controlled separately.
 
-  - Smooth estimation and drawing, including
-    [`difference_smooths()`](https://gavinsimpson.github.io/gratia/reference/difference_smooths.md),
-    now accept `variables` to choose x and y axes and the order of
-    conditioning facets. Differences between 3D and 4D smooths can now
-    be drawn as faceted surfaces
-    ([\#256](https://github.com/gavinsimpson/gratia/issues/256),
-    [\#257](https://github.com/gavinsimpson/gratia/issues/257)).
+  Smooth estimation and drawing, including
+  [`difference_smooths()`](https://gavinsimpson.github.io/gratia/reference/difference_smooths.md),
+  now accept `variables` to choose x and y axes and the order of
+  conditioning facets. Differences between 3D and 4D smooths can now be
+  drawn as faceted surfaces
+  ([\#256](https://github.com/gavinsimpson/gratia/issues/256),
+  [\#257](https://github.com/gavinsimpson/gratia/issues/257)).
 
-  - Their automatic grids use `n_3d = 16` and `n_4d = 4`, matching
-    individual smooths; use `NULL` to use `n` for those dimensions.
-    Resolved covariate orders are retained when drawing saved estimates.
-    Supply `data` to choose explicit conditioning values.
+  Their automatic grids use `n_3d = 16` and `n_4d = 4`, matching
+  individual smooths; use `NULL` to use `n` for those dimensions.
+  Resolved covariate orders are retained when drawing saved estimates.
+  Supply `data` to choose explicit conditioning values.
 
 - **Surrogate residuals**
 
-  - Surrogate residuals are available for
-    [`mgcv::ocat()`](https://rdrr.io/pkg/mgcv/man/ocat.html) and
-    [`mgcv::multinom()`](https://rdrr.io/pkg/mgcv/man/multinom.html)
-    GAMs through
-    [`surrogate_residuals()`](https://gavinsimpson.github.io/gratia/reference/surrogate_residuals.md),
-    `type = "surrogate"` in ordinary and scalable residual diagnostic
-    plots, and
-    [`add_residuals()`](https://gavinsimpson.github.io/gratia/reference/add_residuals.md).
-    Ordinal residuals follow Liu and Zhang (2018), with logistic
-    references
-    ([\#359](https://github.com/gavinsimpson/gratia/issues/359)).
-    Nominal residuals follow Cheng, Wang and Zhang (2021), retaining a
-    centred Gumbel utility component for every category, including
-    category 0.
+  Surrogate residuals are available for
+  [`mgcv::ocat()`](https://rdrr.io/pkg/mgcv/man/ocat.html) and
+  [`mgcv::multinom()`](https://rdrr.io/pkg/mgcv/man/multinom.html) GAMs
+  through
+  [`surrogate_residuals()`](https://gavinsimpson.github.io/gratia/reference/surrogate_residuals.md),
+  `type = "surrogate"` in ordinary and scalable residual diagnostic
+  plots, and
+  [`add_residuals()`](https://gavinsimpson.github.io/gratia/reference/add_residuals.md).
+  Ordinal residuals follow Liu and Zhang (2018), with logistic
+  references
+  ([\#359](https://github.com/gavinsimpson/gratia/issues/359)). Nominal
+  residuals follow Cheng, Wang and Zhang (2021), retaining a centred
+  Gumbel utility component for every category, including category 0.
 
-  - All appraisal panels share one draw, and categories have separate
-    panels. Both methods require no additional package and preserve
-    accuracy in extreme tails.
+  All appraisal panels share one draw, and categories have separate
+  panels. Both methods require no additional package and preserve
+  accuracy in extreme tails.
 
 - [`derivatives()`](https://gavinsimpson.github.io/gratia/reference/derivatives.md),
   [`partial_derivatives()`](https://gavinsimpson.github.io/gratia/reference/partial_derivatives.md),
@@ -466,103 +463,102 @@
 
 - **Plot themes and palettes**
 
-  - Plots now support native ggplot2 theme settings for smooths,
-    intervals, residuals, diagnostics and other components, including
-    completed patchwork figures.
-    [`gratia_theme_get()`](https://gavinsimpson.github.io/gratia/reference/gratia_theme_get.md),
-    [`gratia_theme_set()`](https://gavinsimpson.github.io/gratia/reference/gratia_theme_get.md)
-    and
-    [`gratia_theme_update()`](https://gavinsimpson.github.io/gratia/reference/gratia_theme_get.md)
-    manage the optional `gratia.plot.theme` override.
+  Plots now support native ggplot2 theme settings for smooths,
+  intervals, residuals, diagnostics and other components, including
+  completed patchwork figures.
+  [`gratia_theme_get()`](https://gavinsimpson.github.io/gratia/reference/gratia_theme_get.md),
+  [`gratia_theme_set()`](https://gavinsimpson.github.io/gratia/reference/gratia_theme_get.md)
+  and
+  [`gratia_theme_update()`](https://gavinsimpson.github.io/gratia/reference/gratia_theme_get.md)
+  manage the optional `gratia.plot.theme` override.
 
-  - [`gratia_palette()`](https://gavinsimpson.github.io/gratia/reference/gratia_palette.md)
-    provides optional Paul Tol palettes. Current default appearances are
-    retained, including group legends without symbols for fixed-colour
-    partial residuals
-    ([\#215](https://github.com/gavinsimpson/gratia/issues/215)).
+  [`gratia_palette()`](https://gavinsimpson.github.io/gratia/reference/gratia_palette.md)
+  provides optional Paul Tol palettes. Current default appearances are
+  retained, including group legends without symbols for fixed-colour
+  partial residuals
+  ([\#215](https://github.com/gavinsimpson/gratia/issues/215)).
 
 - **SCAM model support**
 
-  - All 43 smooth constructors in scam 1.2-23 are supported for smooth
-    estimates, bases, sampling and plots, including bivariate smooths,
-    cyclic margins, interactions and explicit `By` classes. This
-    includes `tedi` and `teid` surfaces that increase along one
-    covariate and decrease along the other.
+  All 43 smooth constructors in scam 1.2-23 are supported for smooth
+  estimates, bases, sampling and plots, including bivariate smooths,
+  cyclic margins, interactions and explicit `By` classes. This includes
+  `tedi` and `teid` surfaces that increase along one covariate and
+  decrease along the other.
 
-  - [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)
-    and
-    [`assemble()`](https://gavinsimpson.github.io/gratia/reference/assemble.md)
-    accept `centre = "plot"` to match scam’s centring of bivariate
-    displays; the default retains the fitted function.
+  [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)
+  and
+  [`assemble()`](https://gavinsimpson.github.io/gratia/reference/assemble.md)
+  accept `centre = "plot"` to match scam’s centring of bivariate
+  displays; the default retains the fitted function.
 
-  - SCAM
-    [`smooth_type()`](https://gavinsimpson.github.io/gratia/reference/smooth_type.md)
-    labels use compact descriptions such as `P spline (inc)` and
-    `Tensor (inc, free)`. Saved estimates with earlier type labels
-    remain drawable.
+  SCAM
+  [`smooth_type()`](https://gavinsimpson.github.io/gratia/reference/smooth_type.md)
+  labels use compact descriptions such as `P spline (inc)` and
+  `Tensor (inc, free)`. Saved estimates with earlier type labels remain
+  drawable.
 
-  - Plot captions describe the basis and constraints separately, using
-    arrows for monotonicity, covariate names for tensor constraints and
-    fitted change points for local constraints. Saved smooth estimates
-    retain these captions.
+  Plot captions describe the basis and constraints separately, using
+  arrows for monotonicity, covariate names for tensor constraints and
+  fitted change points for local constraints. Saved smooth estimates
+  retain these captions.
 
-  - SCAM models gain conditional simultaneous smooth bands, derivatives,
-    contrasts, conditional predictions, parametric effects, residual
-    helpers, model summaries, concurvity, penalties and
-    variance-component ratios. Independent-response likelihoods,
-    LOO/WAIC, supplied coefficient draws and scalable posterior
-    predictive plots are also supported. See the SCAM support article
-    for supported combinations and uncertainty calculations.
+  SCAM models gain conditional simultaneous smooth bands, derivatives,
+  contrasts, conditional predictions, parametric effects, residual
+  helpers, model summaries, concurvity, penalties and variance-component
+  ratios. Independent-response likelihoods, LOO/WAIC, supplied
+  coefficient draws and scalable posterior predictive plots are also
+  supported. See the SCAM support article for supported combinations and
+  uncertainty calculations.
 
 - **Shape-constrained intervals**
 
-  - [`shape_intervals()`](https://gavinsimpson.github.io/gratia/reference/shape_intervals.md)
-    applies monotone rearrangement and convex or concave envelopes to
-    existing interval endpoints on a finite grid. Supported scasm
-    smooths expose this through `interval_method = "shape"` and an
-    explicit Gaussian or stored-bootstrap initial source. The
-    transformation preserves whole-grid containment events; it does not
-    establish nominal coverage or preserve marginal coverage of
-    pointwise limits.
+  [`shape_intervals()`](https://gavinsimpson.github.io/gratia/reference/shape_intervals.md)
+  applies monotone rearrangement and convex or concave envelopes to
+  existing interval endpoints on a finite grid. Supported scasm smooths
+  expose this through `interval_method = "shape"` and an explicit
+  Gaussian or stored-bootstrap initial source. The transformation
+  preserves whole-grid containment events; it does not establish nominal
+  coverage or preserve marginal coverage of pointwise limits.
 
-  - [`shape_confidence_set()`](https://gavinsimpson.github.io/gratia/reference/shape_confidence_set.md)
-    and
-    [`in_shape_set()`](https://gavinsimpson.github.io/gratia/reference/shape_confidence_set.md)
-    represent and inspect intersections with coefficient inequalities
-    and equalities. See the shape-constrained intervals article for
-    supported combinations, tensor requirements and examples
-    ([\#372](https://github.com/gavinsimpson/gratia/issues/372),
-    [\#373](https://github.com/gavinsimpson/gratia/issues/373)).
+  [`shape_confidence_set()`](https://gavinsimpson.github.io/gratia/reference/shape_confidence_set.md)
+  and
+  [`in_shape_set()`](https://gavinsimpson.github.io/gratia/reference/shape_confidence_set.md)
+  represent and inspect intersections with coefficient inequalities and
+  equalities. See the shape-constrained intervals article for supported
+  combinations, tensor requirements and examples
+  ([\#372](https://github.com/gavinsimpson/gratia/issues/372),
+  [\#373](https://github.com/gavinsimpson/gratia/issues/373)).
 
-  - [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)
-    and
-    [`assemble()`](https://gavinsimpson.github.io/gratia/reference/assemble.md)
-    also accept `frequentist` for the initial smooth covariance
-    calculation.
+  [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)
+  and
+  [`assemble()`](https://gavinsimpson.github.io/gratia/reference/assemble.md)
+  also accept `frequentist` for the initial smooth covariance
+  calculation.
 
-  - General `pc` replacements and derivative bases are rejected when
-    they do not justify the named function shape. Curvature requires
-    equally spaced fitted knots to rounding precision, and extrapolation
-    is rejected.
+  General `pc` replacements and derivative bases are rejected when they
+  do not justify the named function shape. Curvature requires equally
+  spaced fitted knots to rounding precision, and extrapolation is
+  rejected.
 
-  - Convex envelope interpolation preserves exactly flat segments. Saved
-    estimates reject interval computation controls that require the
-    fitted model.
+  Convex envelope interpolation preserves exactly flat segments. Saved
+  estimates reject interval computation controls that require the fitted
+  model.
 
-  - `interval_method` selects native scasm bootstrap or Gaussian
-    pointwise intervals for smooths, fitted values, smooth derivatives
-    and [`confint()`](https://rdrr.io/r/stats/confint.html).
+  `interval_method` selects native scasm bootstrap or Gaussian pointwise
+  intervals for smooths, fitted values, smooth derivatives and
+  [`confint()`](https://rdrr.io/r/stats/confint.html).
 
-  - Shifting or transforming smooth confidence intervals retains
-    asymmetric limits. Replacing saved intervals with
-    [`add_confint()`](https://gavinsimpson.github.io/gratia/reference/add_confint.md)
-    records their Gaussian source.
+  Shifting or transforming smooth confidence intervals retains
+  asymmetric limits. Replacing saved intervals with
+  [`add_confint()`](https://gavinsimpson.github.io/gratia/reference/add_confint.md)
+  records their Gaussian source.
 
-  - Automatic selection uses stored bootstrap draws, including mgcv’s
-    smoothing-bias correction. Simultaneous bootstrap bands remain
-    unsupported
-    ([\#372](https://github.com/gavinsimpson/gratia/issues/372),
-    [\#373](https://github.com/gavinsimpson/gratia/issues/373)).
+  Automatic selection uses stored bootstrap draws, including mgcv’s
+  smoothing-bias correction. Simultaneous bootstrap bands remain
+  unsupported
+  ([\#372](https://github.com/gavinsimpson/gratia/issues/372),
+  [\#373](https://github.com/gavinsimpson/gratia/issues/373)).
 
 - Scasm captions show retained shape constraints with portable
   mathematical arrows. Saved estimates retain constraint metadata for
@@ -584,113 +580,110 @@
 
 - **Posterior sampling and diagnostics**
 
-  - Posterior sampling supports multiple chains, including parallel MH
-    chains using mirai. `n_draws = 1000, chains = 4` retains 250 draws
-    per chain after separate burn-in. Chain identities are preserved
-    through fitted, response, smooth, and derivative samples.
+  Posterior sampling supports multiple chains, including parallel MH
+  chains using mirai. `n_draws = 1000, chains = 4` retains 250 draws per
+  chain after separate burn-in. Chain identities are preserved through
+  fitted, response, smooth, and derivative samples.
 
-  - [`as_mcmc_draws()`](https://gavinsimpson.github.io/gratia/reference/as_mcmc_draws.md)
-    converts draws for posterior, coda, and bayesplot;
-    `diagnostics = TRUE` and
-    [`sampling_diagnostics()`](https://gavinsimpson.github.io/gratia/reference/sampling_diagnostics.md)
-    provide coefficient convergence summaries and acceptance rates
-    ([\#281](https://github.com/gavinsimpson/gratia/issues/281)).
-    `draw(sampling_diagnostics(x))` plots native coefficient traces or
-    pooled-rank histogram outlines by chain. Sampling with
-    `diagnostics = TRUE` retains the coefficient draws for these plots
-    through fitted, response, smooth and derivative sampling.
+  [`as_mcmc_draws()`](https://gavinsimpson.github.io/gratia/reference/as_mcmc_draws.md)
+  converts draws for posterior, coda, and bayesplot;
+  `diagnostics = TRUE` and
+  [`sampling_diagnostics()`](https://gavinsimpson.github.io/gratia/reference/sampling_diagnostics.md)
+  provide coefficient convergence summaries and acceptance rates
+  ([\#281](https://github.com/gavinsimpson/gratia/issues/281)).
+  `draw(sampling_diagnostics(x))` plots native coefficient traces or
+  pooled-rank histogram outlines by chain. Sampling with
+  `diagnostics = TRUE` retains the coefficient draws for these plots
+  through fitted, response, smooth and derivative sampling.
 
-  - LSS sampling supports fitting rows, subsets and new covariates
-    without observed responses. All distribution parameters use the same
-    coefficient draw. Fitted response samples and their derivatives
-    evaluate the expected response, including means that depend on
-    scale, shape or hurdle probabilities.
+  LSS sampling supports fitting rows, subsets and new covariates without
+  observed responses. All distribution parameters use the same
+  coefficient draw. Fitted response samples and their derivatives
+  evaluate the expected response, including means that depend on scale,
+  shape or hurdle probabilities.
 
-  - Fixed-coefficient response sampling uses the same parameter
-    transformations. Missing predictors or explicit sampling weights
-    produce `NA` response draws consistently.
+  Fixed-coefficient response sampling uses the same parameter
+  transformations. Missing predictors or explicit sampling weights
+  produce `NA` response draws consistently.
 
-  - LSS response generation now reuses model-matrix blocks and
-    constructs the output table once, preserving seeded responses and
-    chain identities.
+  LSS response generation now reuses model-matrix blocks and constructs
+  the output table once, preserving seeded responses and chain
+  identities.
 
 - **Metropolis–Hastings backends**
 
-  - `mh_backend = "gratia"` adds a compiled MH evaluator for common
-    response families in ordinary gam and bam fits with independent
-    observations. Large designs can be evaluated in blocks.
+  `mh_backend = "gratia"` adds a compiled MH evaluator for common
+  response families in ordinary gam and bam fits with independent
+  observations. Large designs can be evaluated in blocks.
 
-  - `mh_backend = "family"` uses the compiled MH loop with the fitted
-    family’s likelihood functions, including compatible extended,
-    grouped, and multiple-predictor families. It prepares and reuses a
-    full design matrix, smoothing penalty, and proposal factorisation
-    across chains.
+  `mh_backend = "family"` uses the compiled MH loop with the fitted
+  family’s likelihood functions, including compatible extended, grouped,
+  and multiple-predictor families. It prepares and reuses a full design
+  matrix, smoothing penalty, and proposal factorisation across chains.
 
-  - Smoothing parameters and parameters outside the coefficient vector
-    remain fixed; LSS scale and shape coefficients vary jointly with
-    location. The default backend remains
-    [`mgcv::gam.mh()`](https://rdrr.io/pkg/mgcv/man/gam.mh.html). The
-    new backends reject BAM fits with nonzero prescribed smooth
-    contributions, where native fitting and prediction use different
-    offsets.
+  Smoothing parameters and parameters outside the coefficient vector
+  remain fixed; LSS scale and shape coefficients vary jointly with
+  location. The default backend remains
+  [`mgcv::gam.mh()`](https://rdrr.io/pkg/mgcv/man/gam.mh.html). The new
+  backends reject BAM fits with nonzero prescribed smooth contributions,
+  where native fitting and prediction use different offsets.
 
 - **Simulated data**
 
-  - [`data_sim()`](https://gavinsimpson.github.io/gratia/reference/data_sim.md)
-    accepts descriptive aliases for the original example models,
-    including `"additive"`, `"bivariate_surface"`, `"gu_wahba_f2"` and
-    `"luo_wahba_f6"`. All existing names remain supported and produce
-    identical seeded output.
+  [`data_sim()`](https://gavinsimpson.github.io/gratia/reference/data_sim.md)
+  accepts descriptive aliases for the original example models, including
+  `"additive"`, `"bivariate_surface"`, `"gu_wahba_f2"` and
+  `"luo_wahba_f6"`. All existing names remain supported and produce
+  identical seeded output.
 
-  - [`data_sim()`](https://gavinsimpson.github.io/gratia/reference/data_sim.md)
-    now accepts family objects, explicit predictors and generating
-    parameters for scalar, location-scale, categorical, multivariate and
-    Cox models. Censored families can return observed intervals while
-    retaining complete responses and true distribution parameters.
-    Grouped families can use repeated distributions with separate
-    parameters.
+  [`data_sim()`](https://gavinsimpson.github.io/gratia/reference/data_sim.md)
+  now accepts family objects, explicit predictors and generating
+  parameters for scalar, location-scale, categorical, multivariate and
+  Cox models. Censored families can return observed intervals while
+  retaining complete responses and true distribution parameters. Grouped
+  families can use repeated distributions with separate parameters.
 
-  - [`data_sim()`](https://gavinsimpson.github.io/gratia/reference/data_sim.md)
-    gains analytic shape reference functions and fitting recipes for
-    [`mgcv::scasm()`](https://rdrr.io/pkg/mgcv/man/scasm.html),
-    including combined shape constraints, tensor surfaces and Gamma
-    models with constraints on the log mean and log dispersion. The
-    additive Poisson recipe uses 240 observations and `k = 6` for each
-    smooth to avoid fitting errors with mgcv 1.9-4.
+  [`data_sim()`](https://gavinsimpson.github.io/gratia/reference/data_sim.md)
+  gains analytic shape reference functions and fitting recipes for
+  [`mgcv::scasm()`](https://rdrr.io/pkg/mgcv/man/scasm.html), including
+  combined shape constraints, tensor surfaces and Gamma models with
+  constraints on the log mean and log dispersion. The additive Poisson
+  recipe uses 240 observations and `k = 6` for each smooth to avoid
+  fitting errors with mgcv 1.9-4.
 
 - **Accumulated local effects**
 
-  - [`ale()`](https://gavinsimpson.github.io/gratia/reference/ale.md)
-    computes accumulated local effects for numeric covariates in
-    [`mgcv::gam()`](https://rdrr.io/pkg/mgcv/man/gam.html) and
-    [`mgcv::bam()`](https://rdrr.io/pkg/mgcv/man/bam.html) fits, with
-    link and response scales, distribution parameters, and pointwise or
-    simultaneous intervals.
-    [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)
-    plots saved results with parameter labels and a scale caption.
+  [`ale()`](https://gavinsimpson.github.io/gratia/reference/ale.md)
+  computes accumulated local effects for numeric covariates in
+  [`mgcv::gam()`](https://rdrr.io/pkg/mgcv/man/gam.html) and
+  [`mgcv::bam()`](https://rdrr.io/pkg/mgcv/man/bam.html) fits, with link
+  and response scales, distribution parameters, and pointwise or
+  simultaneous intervals.
+  [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)
+  plots saved results with parameter labels and a scale caption.
 
-  - Prediction blocks can use workers configured by
-    [`mirai::daemons()`](https://mirai.r-lib.org/reference/daemons.html).
-    Block accumulation order, shared interval draws and caller RNG
-    handling are preserved.
+  Prediction blocks can use workers configured by
+  [`mirai::daemons()`](https://mirai.r-lib.org/reference/daemons.html).
+  Block accumulation order, shared interval draws and caller RNG
+  handling are preserved.
 
-  - Custom prediction methods and transformations that require caller
-    functions or S3 methods retain serial prediction. Method checks do
-    not invoke active or lazy caller bindings.
+  Custom prediction methods and transformations that require caller
+  functions or S3 methods retain serial prediction. Method checks do not
+  invoke active or lazy caller bindings.
 
 - **Residuals against covariates**
 
-  - [`residuals_covariate_plot()`](https://gavinsimpson.github.io/gratia/reference/residuals_covariate_plot.md)
-    and
-    [`scalable_residuals_covariate_plot()`](https://gavinsimpson.github.io/gratia/reference/residuals_covariate_plot.md)
-    plot complete-model residuals against numeric or categorical
-    covariates and pairs of numeric covariates. Exact mgcv smooth labels
-    can select their constituent covariates.
+  [`residuals_covariate_plot()`](https://gavinsimpson.github.io/gratia/reference/residuals_covariate_plot.md)
+  and
+  [`scalable_residuals_covariate_plot()`](https://gavinsimpson.github.io/gratia/reference/residuals_covariate_plot.md)
+  plot complete-model residuals against numeric or categorical
+  covariates and pairs of numeric covariates. Exact mgcv smooth labels
+  can select their constituent covariates.
 
-  - Grouped displays, mean trends and joint maps help identify remaining
-    mean structure or changes in residual spread. By default, mean
-    trends are fitted only for groups with at most 20,000 observations;
-    `smooth = TRUE` or `FALSE` overrides this limit.
+  Grouped displays, mean trends and joint maps help identify remaining
+  mean structure or changes in residual spread. By default, mean trends
+  are fitted only for groups with at most 20,000 observations;
+  `smooth = TRUE` or `FALSE` overrides this limit.
 
 - Optional
   [`bayesplot::pp_check()`](https://mc-stan.org/bayesplot/reference/pp_check.html)
@@ -717,20 +710,20 @@
 
 - **Diagnostics supplied by response families**
 
-  - Diagnostic plots now support native inlaws families through their
-    supplied `gratia_diagnostics` functions, including grouped-family
-    fits and models with multiple response columns.
+  Diagnostic plots now support native inlaws families through their
+  supplied `gratia_diagnostics` functions, including grouped-family fits
+  and models with multiple response columns.
 
-  - mgcv-compatible families can now supply a `gratia_diagnostics`
-    function for response means, variances, probability bounds and
-    distribution functions. This allows diagnostics for additional
-    count, ordinal, mixture and censored families without adding
-    family-name checks to gratia.
+  mgcv-compatible families can now supply a `gratia_diagnostics`
+  function for response means, variances, probability bounds and
+  distribution functions. This allows diagnostics for additional count,
+  ordinal, mixture and censored families without adding family-name
+  checks to gratia.
 
-  - Traditional simulated reference residuals can apply a supplied
-    observation process. See
-    [`?family_diagnostics`](https://gavinsimpson.github.io/gratia/reference/family_diagnostics.md)
-    for the interface.
+  Traditional simulated reference residuals can apply a supplied
+  observation process. See
+  [`?family_diagnostics`](https://gavinsimpson.github.io/gratia/reference/family_diagnostics.md)
+  for the interface.
 
 - [`dharma_residuals()`](https://gavinsimpson.github.io/gratia/reference/dharma_residuals.md)
   and `type = "dharma"` in diagnostics calculate simulation-based PIT
@@ -750,201 +743,196 @@
 
 - **Residual diagnostics and posterior predictive checks**
 
-  - Residual diagnostics and posterior predictive checks now cover `lm`,
-    `glm`, `gam`/`bam`, `gamm`/`gamm4`, glmmTMB, univariate GJRM and
-    sdmTMB models using their fitted response distributions. See
-    [`?diagnostic_support`](https://gavinsimpson.github.io/gratia/reference/diagnostic_support.md)
-    for supported families, conditioning choices and limitations.
+  Residual diagnostics and posterior predictive checks now cover `lm`,
+  `glm`, `gam`/`bam`, `gamm`/`gamm4`, glmmTMB, univariate GJRM and
+  sdmTMB models using their fitted response distributions. See
+  [`?diagnostic_support`](https://gavinsimpson.github.io/gratia/reference/diagnostic_support.md)
+  for supported families, conditioning choices and limitations.
 
-  - Probability integral transform (PIT) residuals map observations to
-    fitted probabilities, randomising over probability mass for discrete
-    responses. Quantile residuals convert those probabilities to
-    standard-normal scores.
+  Probability integral transform (PIT) residuals map observations to
+  fitted probabilities, randomising over probability mass for discrete
+  responses. Quantile residuals convert those probabilities to
+  standard-normal scores.
 
-  - Prepared diagnostic objects carry the selected conditioning and
-    sdmTMB field choices through residual and plotting methods.
+  Prepared diagnostic objects carry the selected conditioning and sdmTMB
+  field choices through residual and plotting methods.
 
 - **Mixed-model diagnostics**
 
-  - Mixed-model diagnostics can hold fitted random effects fixed or
-    average over their fitted distribution. Joint response simulations
-    use the fitting packages’ generators to retain temporal and spatial
-    covariance and shared random effects. Marginal residuals can use
-    means, variances and ranks from these simulations.
+  Mixed-model diagnostics can hold fitted random effects fixed or
+  average over their fitted distribution. Joint response simulations use
+  the fitting packages’ generators to retain temporal and spatial
+  covariance and shared random effects. Marginal residuals can use
+  means, variances and ranks from these simulations.
 
-  - Direct [`nlme::lme()`](https://rdrr.io/pkg/nlme/man/lme.html) and
-    [`lme4::merMod`](https://rdrr.io/pkg/lme4/man/merMod-class.html)
-    fits also support residual and posterior predictive checks.
-    Non-Gaussian `gamm` fits estimated by penalized quasi-likelihood
-    (PQL) support approximate checks when they have no residual working
-    correlation. nlme calculations retain covariance between random
-    effects in block designs, fitted factor contrasts and observation
-    order after subsetting or missing-value removal.
+  Direct [`nlme::lme()`](https://rdrr.io/pkg/nlme/man/lme.html) and
+  [`lme4::merMod`](https://rdrr.io/pkg/lme4/man/merMod-class.html) fits
+  also support residual and posterior predictive checks. Non-Gaussian
+  `gamm` fits estimated by penalized quasi-likelihood (PQL) support
+  approximate checks when they have no residual working correlation.
+  nlme calculations retain covariance between random effects in block
+  designs, fitted factor contrasts and observation order after
+  subsetting or missing-value removal.
 
 - **sdmTMB diagnostics**
 
-  - sdmTMB residual diagnostics now offer four ways to treat random
-    fields: draw fitted fields once from their approximate posterior and
-    hold them fixed (`field_method = "mle-mvn"`, the default), hold
-    field estimates fixed (`field_method = "mle-eb"`), average over
-    fitted-field uncertainty (`field_method = "mle-mvn-integrated"`), or
-    simulate new fields (`conditioning = "marginal"`). Plot labels
-    identify the choice.
+  sdmTMB residual diagnostics now offer four ways to treat random
+  fields: draw fitted fields once from their approximate posterior and
+  hold them fixed (`field_method = "mle-mvn"`, the default), hold field
+  estimates fixed (`field_method = "mle-eb"`), average over fitted-field
+  uncertainty (`field_method = "mle-mvn-integrated"`), or simulate new
+  fields (`conditioning = "marginal"`). Plot labels identify the choice.
 
-  - Posterior predictive checks separately include approximate parameter
-    uncertainty. See
-    [`?diagnostic_support`](https://gavinsimpson.github.io/gratia/reference/diagnostic_support.md)
-    for what these checks assess and their limitations.
+  Posterior predictive checks separately include approximate parameter
+  uncertainty. See
+  [`?diagnostic_support`](https://gavinsimpson.github.io/gratia/reference/diagnostic_support.md)
+  for what these checks assess and their limitations.
 
-  - Delta-model diagnostics use the response family’s dispersion
-    parameter. Fits with a dispersion formula give an explicit error
-    because observation-specific dispersion is not yet supported by
-    these diagnostics.
+  Delta-model diagnostics use the response family’s dispersion
+  parameter. Fits with a dispersion formula give an explicit error
+  because observation-specific dispersion is not yet supported by these
+  diagnostics.
 
-  - Student-t sdmTMB models now support residual diagnostics and
-    posterior predictive plots with fixed or estimated degrees of
-    freedom. Pearson residuals require degrees of freedom above two.
-    Quantile residuals and predictive checks remain available with
-    infinite variance.
+  Student-t sdmTMB models now support residual diagnostics and posterior
+  predictive plots with fixed or estimated degrees of freedom. Pearson
+  residuals require degrees of freedom above two. Quantile residuals and
+  predictive checks remain available with infinite variance.
 
-  - Predictive plots also work for additional native sdmTMB families
-    without requiring an analytic residual distribution.
+  Predictive plots also work for additional native sdmTMB families
+  without requiring an analytic residual distribution.
 
 - **GJRM diagnostics**
 
-  - Diagnostic plots now support uncensored univariate
-    [`GJRM::gamlss()`](https://rdrr.io/pkg/GJRM/man/gamlss.html) models
-    with N, LN, GA, GAi, P, NBI, NBII, BE, LO, WEI, IG, GU and rGU
-    families. Residual plots, response simulation and ordinary and
-    scalable posterior predictive checks use the final fitted
-    distribution.
+  Diagnostic plots now support uncensored univariate
+  [`GJRM::gamlss()`](https://rdrr.io/pkg/GJRM/man/gamlss.html) models
+  with N, LN, GA, GAi, P, NBI, NBII, BE, LO, WEI, IG, GU and rGU
+  families. Residual plots, response simulation and ordinary and
+  scalable posterior predictive checks use the final fitted
+  distribution.
 
-  - Posterior draws retain covariance between distributional equations,
-    including beta’s logit-linked scale. They use randomised quantile
-    residuals with a standard-normal reference.
+  Posterior draws retain covariance between distributional equations,
+  including beta’s logit-linked scale. They use randomised quantile
+  residuals with a standard-normal reference.
 
-  - Observed-versus-fitted panels show response means calculated from
-    the final distribution parameters, including lognormal, Weibull and
-    Gumbel mean corrections. NBII probabilities are calculated from the
-    final fitted likelihood parameters, rather than relying on stored
-    probabilities that can use a Poisson distribution.
+  Observed-versus-fitted panels show response means calculated from the
+  final distribution parameters, including lognormal, Weibull and Gumbel
+  mean corrections. NBII probabilities are calculated from the final
+  fitted likelihood parameters, rather than relying on stored
+  probabilities that can use a Poisson distribution.
 
 - **glmmTMB diagnostics**
 
-  - [`appraise()`](https://gavinsimpson.github.io/gratia/reference/appraise.md),
-    [`qq_plot()`](https://gavinsimpson.github.io/gratia/reference/qq_plot.md)
-    and
-    [`worm_plot()`](https://gavinsimpson.github.io/gratia/reference/worm_plot.md)
-    now support native glmmTMB residuals, with conditional response
-    simulation for QQ reference bands. See
-    [`?'glmmTMB-methods'`](https://gavinsimpson.github.io/gratia/reference/glmmTMB-methods.md)
-    for supported families and current limitations.
+  [`appraise()`](https://gavinsimpson.github.io/gratia/reference/appraise.md),
+  [`qq_plot()`](https://gavinsimpson.github.io/gratia/reference/qq_plot.md)
+  and
+  [`worm_plot()`](https://gavinsimpson.github.io/gratia/reference/worm_plot.md)
+  now support native glmmTMB residuals, with conditional response
+  simulation for QQ reference bands. See
+  [`?'glmmTMB-methods'`](https://gavinsimpson.github.io/gratia/reference/glmmTMB-methods.md)
+  for supported families and current limitations.
 
-  - Gaussian predictive draws use glmmTMB’s standard-deviation
-    parameterisation. Variances for truncated count distributions are
-    calculated accurately even with tiny means.
+  Gaussian predictive draws use glmmTMB’s standard-deviation
+  parameterisation. Variances for truncated count distributions are
+  calculated accurately even with tiny means.
 
 - **Grouped-family residual plots**
 
-  - Grouped-family diagnostics now support quantile residuals with
-    appropriate standard-normal references and consistent component
-    colours. Traditional residuals use separate facets for each
-    component
-    ([\#267](https://github.com/gavinsimpson/gratia/issues/267)).
+  Grouped-family diagnostics now support quantile residuals with
+  appropriate standard-normal references and consistent component
+  colours. Traditional residuals use separate facets for each component
+  ([\#267](https://github.com/gavinsimpson/gratia/issues/267)).
 
-  - Pooled histograms use pale fills and solid step outlines in each
-    component’s colour, so overlapping distributions remain visible.
-    Ordinary and scalable plots use the same bin edges and calculate
-    each component’s density separately.
+  Pooled histograms use pale fills and solid step outlines in each
+  component’s colour, so overlapping distributions remain visible.
+  Ordinary and scalable plots use the same bin edges and calculate each
+  component’s density separately.
 
 - **Distribution functions and checks**
 
-  - Distribution checks now cover more mgcv families, including
-    [`shash()`](https://rdrr.io/pkg/mgcv/man/shash.html),
-    [`twlss()`](https://rdrr.io/pkg/mgcv/man/twlss.html), ordinal,
-    [`ziP()`](https://rdrr.io/pkg/mgcv/man/ziP.html) and grouped
-    families. The internal `fix_family_qf()` extends mgcv’s
-    [`fix.family.qf()`](https://rdrr.io/pkg/mgcv/man/fix.family.link.html)
-    with experimental support for
-    [`scat()`](https://rdrr.io/pkg/mgcv/man/scat.html),
-    [`tw()`](https://rdrr.io/pkg/mgcv/man/Tweedie.html),
-    [`Tweedie()`](https://rdrr.io/pkg/mgcv/man/Tweedie.html),
-    [`gaulss()`](https://rdrr.io/pkg/mgcv/man/gaulss.html),
-    [`gevlss()`](https://rdrr.io/pkg/mgcv/man/gevlss.html),
-    [`gumbls()`](https://rdrr.io/pkg/mgcv/man/gumbls.html),
-    [`gammals()`](https://rdrr.io/pkg/mgcv/man/gammals.html),
-    [`ziplss()`](https://rdrr.io/pkg/mgcv/man/ziplss.html) and
-    [`mvn()`](https://rdrr.io/pkg/mgcv/man/mvn.html). `fix_family_cdf()`
-    adds cumulative distribution functions for
-    [`gaulss()`](https://rdrr.io/pkg/mgcv/man/gaulss.html),
-    [`gevlss()`](https://rdrr.io/pkg/mgcv/man/gevlss.html),
-    [`gumbls()`](https://rdrr.io/pkg/mgcv/man/gumbls.html),
-    [`gammals()`](https://rdrr.io/pkg/mgcv/man/gammals.html),
-    [`ziplss()`](https://rdrr.io/pkg/mgcv/man/ziplss.html) and
-    [`mvn()`](https://rdrr.io/pkg/mgcv/man/mvn.html), making quantile
-    residuals available.
+  Distribution checks now cover more mgcv families, including
+  [`shash()`](https://rdrr.io/pkg/mgcv/man/shash.html),
+  [`twlss()`](https://rdrr.io/pkg/mgcv/man/twlss.html), ordinal,
+  [`ziP()`](https://rdrr.io/pkg/mgcv/man/ziP.html) and grouped families.
+  The internal `fix_family_qf()` extends mgcv’s
+  [`fix.family.qf()`](https://rdrr.io/pkg/mgcv/man/fix.family.link.html)
+  with experimental support for
+  [`scat()`](https://rdrr.io/pkg/mgcv/man/scat.html),
+  [`tw()`](https://rdrr.io/pkg/mgcv/man/Tweedie.html),
+  [`Tweedie()`](https://rdrr.io/pkg/mgcv/man/Tweedie.html),
+  [`gaulss()`](https://rdrr.io/pkg/mgcv/man/gaulss.html),
+  [`gevlss()`](https://rdrr.io/pkg/mgcv/man/gevlss.html),
+  [`gumbls()`](https://rdrr.io/pkg/mgcv/man/gumbls.html),
+  [`gammals()`](https://rdrr.io/pkg/mgcv/man/gammals.html),
+  [`ziplss()`](https://rdrr.io/pkg/mgcv/man/ziplss.html) and
+  [`mvn()`](https://rdrr.io/pkg/mgcv/man/mvn.html). `fix_family_cdf()`
+  adds cumulative distribution functions for
+  [`gaulss()`](https://rdrr.io/pkg/mgcv/man/gaulss.html),
+  [`gevlss()`](https://rdrr.io/pkg/mgcv/man/gevlss.html),
+  [`gumbls()`](https://rdrr.io/pkg/mgcv/man/gumbls.html),
+  [`gammals()`](https://rdrr.io/pkg/mgcv/man/gammals.html),
+  [`ziplss()`](https://rdrr.io/pkg/mgcv/man/ziplss.html) and
+  [`mvn()`](https://rdrr.io/pkg/mgcv/man/mvn.html), making quantile
+  residuals available.
 
-  - For [`mvn()`](https://rdrr.io/pkg/mgcv/man/mvn.html), both helpers
-    use each response’s marginal Gaussian distribution with its fitted
-    variance
-    ([\#183](https://github.com/gavinsimpson/gratia/issues/183)).
-    Categorical CDFs and quantiles for
-    [`multinom()`](https://rdrr.io/pkg/mgcv/man/multinom.html) use
-    mgcv’s category codes `0, ..., K` as the accumulation order,
-    enabling randomised PIT/quantile residuals and inverse-CDF
-    diagnostic references
-    ([\#183](https://github.com/gavinsimpson/gratia/issues/183)).
+  For [`mvn()`](https://rdrr.io/pkg/mgcv/man/mvn.html), both helpers use
+  each response’s marginal Gaussian distribution with its fitted
+  variance ([\#183](https://github.com/gavinsimpson/gratia/issues/183)).
+  Categorical CDFs and quantiles for
+  [`multinom()`](https://rdrr.io/pkg/mgcv/man/multinom.html) use mgcv’s
+  category codes `0, ..., K` as the accumulation order, enabling
+  randomised PIT/quantile residuals and inverse-CDF diagnostic
+  references
+  ([\#183](https://github.com/gavinsimpson/gratia/issues/183)).
 
-  - These helpers and `fix_family_rd()` preserve distribution functions
-    supplied by callers.
+  These helpers and `fix_family_rd()` preserve distribution functions
+  supplied by callers.
 
-  - [`ziplss()`](https://rdrr.io/pkg/mgcv/man/ziplss.html) quantile
-    residuals randomise over the probability mass of each observed count
-    (GRA-007). Quantile helpers retain log probabilities where
-    supported; conversions that cannot represent an extreme probability
-    give an explanatory error rather than a false infinite quantile.
+  [`ziplss()`](https://rdrr.io/pkg/mgcv/man/ziplss.html) quantile
+  residuals randomise over the probability mass of each observed count
+  (GRA-007). Quantile helpers retain log probabilities where supported;
+  conversions that cannot represent an extreme probability give an
+  explanatory error rather than a false infinite quantile.
 
 - **Tweedie quantiles and QQ references**
 
-  - New Tweedie quantile helpers support uniform QQ diagnostics
-    ([\#410](https://github.com/gavinsimpson/gratia/issues/410)). They
-    use fast Poisson-Gamma mixtures for `1 < p < 2` and native R
-    distribution functions for the Gamma case (`p = 2`). Expensive
-    numerical inversion is available with `fallback = TRUE` and the
-    optional tweedie package.
+  New Tweedie quantile helpers support uniform QQ diagnostics
+  ([\#410](https://github.com/gavinsimpson/gratia/issues/410)). They use
+  fast Poisson-Gamma mixtures for `1 < p < 2` and native R distribution
+  functions for the Gamma case (`p = 2`). Expensive numerical inversion
+  is available with `fallback = TRUE` and the optional tweedie package.
 
-  - Mixture calculations warn and return available approximations when
-    their work or accuracy limits are reached.
+  Mixture calculations warn and return available approximations when
+  their work or accuracy limits are reached.
 
-  - With `method = NULL`,
-    [`appraise()`](https://gavinsimpson.github.io/gratia/reference/appraise.md),
-    [`qq_plot()`](https://gavinsimpson.github.io/gratia/reference/qq_plot.md)
-    and
-    [`worm_plot()`](https://gavinsimpson.github.io/gratia/reference/worm_plot.md)
-    automatically select simulation for
-    [`tw()`](https://rdrr.io/pkg/mgcv/man/Tweedie.html) and
-    [`Tweedie()`](https://rdrr.io/pkg/mgcv/man/Tweedie.html) models,
-    avoiding numerical quantiles. Other ordinary GAM families prefer
-    `"uniform"`, with fallbacks when a method is unavailable. An
-    explicit method overrides the automatic choice.
+  With `method = NULL`,
+  [`appraise()`](https://gavinsimpson.github.io/gratia/reference/appraise.md),
+  [`qq_plot()`](https://gavinsimpson.github.io/gratia/reference/qq_plot.md)
+  and
+  [`worm_plot()`](https://gavinsimpson.github.io/gratia/reference/worm_plot.md)
+  automatically select simulation for
+  [`tw()`](https://rdrr.io/pkg/mgcv/man/Tweedie.html) and
+  [`Tweedie()`](https://rdrr.io/pkg/mgcv/man/Tweedie.html) models,
+  avoiding numerical quantiles. Other ordinary GAM families prefer
+  `"uniform"`, with fallbacks when a method is unavailable. An explicit
+  method overrides the automatic choice.
 
 - **Censored-model residuals and distribution functions**
 
-  - [`quantile_residuals()`](https://gavinsimpson.github.io/gratia/reference/quantile_residuals.md)
-    now supports censored
-    [`cnorm()`](https://rdrr.io/pkg/mgcv/man/cnorm.html),
-    [`cpois()`](https://rdrr.io/pkg/mgcv/man/cpois.html) and
-    [`clog()`](https://rdrr.io/pkg/mgcv/man/clog.html) models,
-    randomising over censoring intervals for PIT and quantile residuals.
+  [`quantile_residuals()`](https://gavinsimpson.github.io/gratia/reference/quantile_residuals.md)
+  now supports censored
+  [`cnorm()`](https://rdrr.io/pkg/mgcv/man/cnorm.html),
+  [`cpois()`](https://rdrr.io/pkg/mgcv/man/cpois.html) and
+  [`clog()`](https://rdrr.io/pkg/mgcv/man/clog.html) models, randomising
+  over censoring intervals for PIT and quantile residuals.
 
-  - These families also gain cumulative distribution and quantile
-    helpers, and `fix_family_rd()` provides random generation for their
-    latent, uncensored responses. The
-    [`cnorm()`](https://rdrr.io/pkg/mgcv/man/cnorm.html) and
-    [`clog()`](https://rdrr.io/pkg/mgcv/man/clog.html) generators use
-    the fitted family scale and prior weights. Tail probabilities are
-    calculated on the logarithmic scale where supported to avoid
-    numerical infinities.
+  These families also gain cumulative distribution and quantile helpers,
+  and `fix_family_rd()` provides random generation for their latent,
+  uncensored responses. The
+  [`cnorm()`](https://rdrr.io/pkg/mgcv/man/cnorm.html) and
+  [`clog()`](https://rdrr.io/pkg/mgcv/man/clog.html) generators use the
+  fitted family scale and prior weights. Tail probabilities are
+  calculated on the logarithmic scale where supported to avoid numerical
+  infinities.
 
 - Inverse Gaussian distribution functions now support PIT/quantile
   residuals and inverse-CDF QQ/worm plots without additional
@@ -963,20 +951,20 @@
 
 - **Scalable diagnostic plots**
 
-  - Five new `scalable_*_plot()` functions provide binned QQ/worm plots,
-    residual-density heatmaps, histograms and observed-versus-fitted
-    heatmaps. They use all observations while keeping plotting data
-    compact. Plot objects store the grid rather than all observations.
+  Five new `scalable_*_plot()` functions provide binned QQ/worm plots,
+  residual-density heatmaps, histograms and observed-versus-fitted
+  heatmaps. They use all observations while keeping plotting data
+  compact. Plot objects store the grid rather than all observations.
 
-  - Residual heatmaps estimate the density at each predictor value with
-    [`KernSmooth::bkde2D()`](https://rdrr.io/pkg/KernSmooth/man/bkde2D.html)
-    by default. A square-root colour scale makes low-density regions
-    easier to see. Use `density_method = "histogram"` for unsmoothed
-    bins, or `bandwidth` to control smoothing on both axes.
+  Residual heatmaps estimate the density at each predictor value with
+  [`KernSmooth::bkde2D()`](https://rdrr.io/pkg/KernSmooth/man/bkde2D.html)
+  by default. A square-root colour scale makes low-density regions
+  easier to see. Use `density_method = "histogram"` for unsmoothed bins,
+  or `bandwidth` to control smoothing on both axes.
 
-  - Heatmaps of counts remain unsmoothed.
+  Heatmaps of counts remain unsmoothed.
 
-  - KernSmooth is an imported dependency.
+  KernSmooth is an imported dependency.
 
 - QQ reference calculations now average draws as they are generated, or
   use temporary files for exact simulated quantiles above the configured
@@ -993,80 +981,80 @@
 
 - **glmmTMB effects and plots**
 
-  - [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md),
-    [`smooth_estimates()`](https://gavinsimpson.github.io/gratia/reference/smooth_estimates.md)
-    and smooth coefficient extraction now support glmmTMB models,
-    including conditional, zero-inflation and dispersion smooths where
-    glmmTMB supports them. All smooths are plotted by default, with
-    mgcv-style predictor labels (`s(x)`, `s.1(x)`, etc.) and `select`
-    applying across the model.
+  [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md),
+  [`smooth_estimates()`](https://gavinsimpson.github.io/gratia/reference/smooth_estimates.md)
+  and smooth coefficient extraction now support glmmTMB models,
+  including conditional, zero-inflation and dispersion smooths where
+  glmmTMB supports them. All smooths are plotted by default, with
+  mgcv-style predictor labels (`s(x)`, `s.1(x)`, etc.) and `select`
+  applying across the model.
 
-  - Parametric effects and native random effects are also plotted,
-    including for models without smooths. Native random intercepts and
-    slopes use separate Gaussian QQ panels. Set `ranef_lines = TRUE` to
-    replace a simple `(1 + x | g)` pair with lines showing its random
-    contribution only; more complex terms retain QQ panels.
+  Parametric effects and native random effects are also plotted,
+  including for models without smooths. Native random intercepts and
+  slopes use separate Gaussian QQ panels. Set `ranef_lines = TRUE` to
+  replace a simple `(1 + x | g)` pair with lines showing its random
+  contribution only; more complex terms retain QQ panels.
 
-  - Effect intervals use TMB joint covariance. See
-    [`?'glmmTMB-methods'`](https://gavinsimpson.github.io/gratia/reference/glmmTMB-methods.md)
-    for current limitations.
+  Effect intervals use TMB joint covariance. See
+  [`?'glmmTMB-methods'`](https://gavinsimpson.github.io/gratia/reference/glmmTMB-methods.md)
+  for current limitations.
 
 - **sdmTMB effects and plots**
 
-  - [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)
-    and
-    [`assemble()`](https://gavinsimpson.github.io/gratia/reference/assemble.md)
-    support formula smooths and parametric effects from sdmTMB models,
-    including both predictors of delta models, with companion methods
-    for smooth labels, coefficients and effect estimates. Support
-    requires sdmTMB \>= 1.2.0 models fitted with the RTMB backend.
-    Smooths use joint RTMB covariance, including tensor smooths with
-    multiple penalties.
+  [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)
+  and
+  [`assemble()`](https://gavinsimpson.github.io/gratia/reference/assemble.md)
+  support formula smooths and parametric effects from sdmTMB models,
+  including both predictors of delta models, with companion methods for
+  smooth labels, coefficients and effect estimates. Support requires
+  sdmTMB \>= 1.2.0 models fitted with the RTMB backend. Smooths use
+  joint RTMB covariance, including tensor smooths with multiple
+  penalties.
 
-  - Breakpoint (`breakpt()`) and logistic (`logistic()`) curves are
-    available through
-    [`parametric_terms()`](https://gavinsimpson.github.io/gratia/reference/parametric_terms.md)
-    and
-    [`parametric_effects()`](https://gavinsimpson.github.io/gratia/reference/parametric_effects.md),
-    and are selected with `terms` in
-    [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)
-    and
-    [`assemble()`](https://gavinsimpson.github.io/gratia/reference/assemble.md).
-    Their pointwise delta-method intervals include threshold parameter
-    uncertainty and, by default, intercept uncertainty and its
-    covariance with the threshold parameters.
+  Breakpoint (`breakpt()`) and logistic (`logistic()`) curves are
+  available through
+  [`parametric_terms()`](https://gavinsimpson.github.io/gratia/reference/parametric_terms.md)
+  and
+  [`parametric_effects()`](https://gavinsimpson.github.io/gratia/reference/parametric_effects.md),
+  and are selected with `terms` in
+  [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)
+  and
+  [`assemble()`](https://gavinsimpson.github.io/gratia/reference/assemble.md).
+  Their pointwise delta-method intervals include threshold parameter
+  uncertainty and, by default, intercept uncertainty and its covariance
+  with the threshold parameters.
 
-  - Time-varying coefficients from `rw`, `rw0` and `ar1` models combine
-    the ordinary coefficient and its temporal deviation where
-    appropriate, with pointwise intervals using their joint covariance.
-    Select trajectories with labels such as `time_varying(temperature)`
-    in `terms`; the corresponding ordinary-effect panels are omitted by
-    default but remain available through explicit selection. Use
-    `time_varying_style = "pointrange"` for points and interval bars
-    instead of the default line, points and ribbon.
+  Time-varying coefficients from `rw`, `rw0` and `ar1` models combine
+  the ordinary coefficient and its temporal deviation where appropriate,
+  with pointwise intervals using their joint covariance. Select
+  trajectories with labels such as `time_varying(temperature)` in
+  `terms`; the corresponding ordinary-effect panels are omitted by
+  default but remain available through explicit selection. Use
+  `time_varying_style = "pointrange"` for points and interval bars
+  instead of the default line, points and ribbon.
 
 - **Model parts in plot subtitles**
 
-  - Smooth and parametric plot subtitles now identify the model part or
-    distributional parameter for glmmTMB, sdmTMB, mgcv,
-    [`GJRM::gamlss()`](https://rdrr.io/pkg/GJRM/man/gamlss.html) and
-    [`GJRM::gjrm()`](https://rdrr.io/pkg/GJRM/man/gjrm.html) models with
-    multiple linear predictors. Single-predictor models omit these
-    labels, and constant glmmTMB dispersion alone does not trigger them.
+  Smooth and parametric plot subtitles now identify the model part or
+  distributional parameter for glmmTMB, sdmTMB, mgcv,
+  [`GJRM::gamlss()`](https://rdrr.io/pkg/GJRM/man/gamlss.html) and
+  [`GJRM::gjrm()`](https://rdrr.io/pkg/GJRM/man/gjrm.html) models with
+  multiple linear predictors. Single-predictor models omit these labels,
+  and constant glmmTMB dispersion alone does not trigger them.
 
-  - Information about `by` variables, smooth titles, selection and the
-    default of plotting all smooths are retained. Shared terms name
-    every predictor to which they contribute.
+  Information about `by` variables, smooth titles, selection and the
+  default of plotting all smooths are retained. Shared terms name every
+  predictor to which they contribute.
 
-  - Saved
-    [`smooth_estimates()`](https://gavinsimpson.github.io/gratia/reference/smooth_estimates.md)
-    and
-    [`parametric_effects()`](https://gavinsimpson.github.io/gratia/reference/parametric_effects.md)
-    retain the labels in an optional `.model` column. Supply `subtitle`
-    to replace the labels, or `subtitle = ""` to suppress them,
-    including on parametric panels. Repeated parametric plot names
-    include equation numbers for GJRM models
-    ([\#430](https://github.com/gavinsimpson/gratia/issues/430)).
+  Saved
+  [`smooth_estimates()`](https://gavinsimpson.github.io/gratia/reference/smooth_estimates.md)
+  and
+  [`parametric_effects()`](https://gavinsimpson.github.io/gratia/reference/parametric_effects.md)
+  retain the labels in an optional `.model` column. Supply `subtitle` to
+  replace the labels, or `subtitle = ""` to suppress them, including on
+  parametric panels. Repeated parametric plot names include equation
+  numbers for GJRM models
+  ([\#430](https://github.com/gavinsimpson/gratia/issues/430)).
 
 - Soap-film boundary (`bs = "sf"`) and wiggly (`bs = "sw"`) components
   are now supported, with distinct component types and boundary-aware
@@ -1074,49 +1062,49 @@
 
 - **Grouped-family sampling**
 
-  - Grouped-family models fitted with
-    [`mgcv::gfam()`](https://rdrr.io/pkg/mgcv/man/gfam.html) now support
-    response-scale
-    [`fitted_samples()`](https://gavinsimpson.github.io/gratia/reference/fitted_samples.md)
-    with component-specific mean transforms
-    ([\#269](https://github.com/gavinsimpson/gratia/issues/269)), and
-    [`simulate()`](https://gavinsimpson.github.io/gratia/reference/simulate.md)
-    with component-specific distributions and parameters
-    ([\#272](https://github.com/gavinsimpson/gratia/issues/272)). These
-    functions and
-    [`posterior_samples()`](https://gavinsimpson.github.io/gratia/reference/posterior_samples.md)
-    accept supplied data and `family_index` for component membership
-    without observed responses. Posterior responses preserve joint
-    coefficient draws, component labels, offsets and sampling weights;
-    ordinal response-scale fitted draws remain unsupported.
+  Grouped-family models fitted with
+  [`mgcv::gfam()`](https://rdrr.io/pkg/mgcv/man/gfam.html) now support
+  response-scale
+  [`fitted_samples()`](https://gavinsimpson.github.io/gratia/reference/fitted_samples.md)
+  with component-specific mean transforms
+  ([\#269](https://github.com/gavinsimpson/gratia/issues/269)), and
+  [`simulate()`](https://gavinsimpson.github.io/gratia/reference/simulate.md)
+  with component-specific distributions and parameters
+  ([\#272](https://github.com/gavinsimpson/gratia/issues/272)). These
+  functions and
+  [`posterior_samples()`](https://gavinsimpson.github.io/gratia/reference/posterior_samples.md)
+  accept supplied data and `family_index` for component membership
+  without observed responses. Posterior responses preserve joint
+  coefficient draws, component labels, offsets and sampling weights;
+  ordinal response-scale fitted draws remain unsupported.
 
-  - Derivative sampling retains family membership when shifting supplied
-    covariates.
+  Derivative sampling retains family membership when shifting supplied
+  covariates.
 
 - **gamm4 model support**
 
-  - Support for classed gamm4 models now covers smooths, parametric
-    effects, predictions, derivatives, simulations, posterior draws and
-    variance components. Smooth and prediction methods describe the
-    population GAM component and exclude additional terms supplied
-    through `random`. Models require gamm4 \>= 0.2-7; historical
-    unclassed lists are unsupported.
+  Support for classed gamm4 models now covers smooths, parametric
+  effects, predictions, derivatives, simulations, posterior draws and
+  variance components. Smooth and prediction methods describe the
+  population GAM component and exclude additional terms supplied through
+  `random`. Models require gamm4 \>= 0.2-7; historical unclassed lists
+  are unsupported.
 
-  - See
-    [`?gamm4_support`](https://gavinsimpson.github.io/gratia/reference/gamm4_support.md)
-    for covariance and sampling limitations, and for the full-model
-    conditioning options used by diagnostics and response draws.
-    Diagnostics, response simulations and posterior predictive checks
-    use the full fitted mixed model with `conditioning = "conditional"`
-    by default. Response references hold fitted smooth and grouping
-    effects fixed; posterior predictive checks include uncertainty in
-    those fitted effects.
+  See
+  [`?gamm4_support`](https://gavinsimpson.github.io/gratia/reference/gamm4_support.md)
+  for covariance and sampling limitations, and for the full-model
+  conditioning options used by diagnostics and response draws.
+  Diagnostics, response simulations and posterior predictive checks use
+  the full fitted mixed model with `conditioning = "conditional"` by
+  default. Response references hold fitted smooth and grouping effects
+  fixed; posterior predictive checks include uncertainty in those fitted
+  effects.
 
-  - Select `conditioning = "gam_component"` to use only the extracted
-    GAM component. This choice is required when supplying coefficient
-    draws or prediction data to
-    [`posterior_samples()`](https://gavinsimpson.github.io/gratia/reference/posterior_samples.md);
-    full-model draws use fitting observations only.
+  Select `conditioning = "gam_component"` to use only the extracted GAM
+  component. This choice is required when supplying coefficient draws or
+  prediction data to
+  [`posterior_samples()`](https://gavinsimpson.github.io/gratia/reference/posterior_samples.md);
+  full-model draws use fitting observations only.
 
 - [`parametric_effects()`](https://gavinsimpson.github.io/gratia/reference/parametric_effects.md)
   and
@@ -1131,55 +1119,54 @@
 
 - **Functions of covariates**
 
-  - Smooth evaluation, plotting, bases, sampling and prediction now
-    support functions of covariates such as `s(log(x))`, including
-    transformed offsets and an `envir` argument for local functions and
-    constants. Stored evaluated covariates allow smooth plotting when
-    the original data or functions are unavailable. See
-    [`vignette("transformed-covariates", package = "gratia")`](https://gavinsimpson.github.io/gratia/articles/transformed-covariates.md)
-    for examples.
+  Smooth evaluation, plotting, bases, sampling and prediction now
+  support functions of covariates such as `s(log(x))`, including
+  transformed offsets and an `envir` argument for local functions and
+  constants. Stored evaluated covariates allow smooth plotting when the
+  original data or functions are unavailable. See
+  [`vignette("transformed-covariates", package = "gratia")`](https://gavinsimpson.github.io/gratia/articles/transformed-covariates.md)
+  for examples.
 
-  - Automatic smooth grids retain transformed coordinates, and
-    [`derivatives()`](https://gavinsimpson.github.io/gratia/reference/derivatives.md)
-    and
-    [`partial_derivatives()`](https://gavinsimpson.github.io/gratia/reference/partial_derivatives.md)
-    can differentiate with respect to raw covariates using
-    `wrt = "covariate"`. Evaluation failures at new data produce
-    actionable errors. Parametric effects and data slices recover raw
-    covariates consistently.
+  Automatic smooth grids retain transformed coordinates, and
+  [`derivatives()`](https://gavinsimpson.github.io/gratia/reference/derivatives.md)
+  and
+  [`partial_derivatives()`](https://gavinsimpson.github.io/gratia/reference/partial_derivatives.md)
+  can differentiate with respect to raw covariates using
+  `wrt = "covariate"`. Evaluation failures at new data produce
+  actionable errors. Parametric effects and data slices recover raw
+  covariates consistently.
 
-  - [`simulate()`](https://gavinsimpson.github.io/gratia/reference/simulate.md)
-    and
-    [`add_fitted()`](https://gavinsimpson.github.io/gratia/reference/add_fitted.md)
-    also accept `envir` for local functions in offsets and smooth
-    expressions.
+  [`simulate()`](https://gavinsimpson.github.io/gratia/reference/simulate.md)
+  and
+  [`add_fitted()`](https://gavinsimpson.github.io/gratia/reference/add_fitted.md)
+  also accept `envir` for local functions in offsets and smooth
+  expressions.
 
 - **Recovering original covariate scales**
 
-  - `smooth_estimates(..., back_transform = TRUE)` now recovers raw
-    fitting covariates, generates grids on their original scale and
-    evaluates model expressions on those grids
-    ([\#412](https://github.com/gavinsimpson/gratia/issues/412)). This
-    supports custom functions such as `foo(x)` and tensor products
-    without needing inverse functions. Smooth grids retain their
-    existing model-scale defaults.
+  `smooth_estimates(..., back_transform = TRUE)` now recovers raw
+  fitting covariates, generates grids on their original scale and
+  evaluates model expressions on those grids
+  ([\#412](https://github.com/gavinsimpson/gratia/issues/412)). This
+  supports custom functions such as `foo(x)` and tensor products without
+  needing inverse functions. Smooth grids retain their existing
+  model-scale defaults.
 
-  - Drawing precomputed estimates on the original scale requires
-    retained raw coordinates; estimates with only transformed
-    coordinates give an informative error. Parametric effects retain
-    both scales by row, including for many-to-one transformations.
-    Coordinate columns survive confidence-interval calculation and
-    subsetting.
+  Drawing precomputed estimates on the original scale requires retained
+  raw coordinates; estimates with only transformed coordinates give an
+  informative error. Parametric effects retain both scales by row,
+  including for many-to-one transformations. Coordinate columns survive
+  confidence-interval calculation and subsetting.
 
-  - Typical values of other covariates are not treated as raw axes, and
-    numeric `by` multipliers can share a raw axis name. Drawing uses
-    `envir` to recover observations. Supplied prediction data remain
-    usable when raw observations for rugs or residuals are unavailable.
+  Typical values of other covariates are not treated as raw axes, and
+  numeric `by` multipliers can share a raw axis name. Drawing uses
+  `envir` to recover observations. Supplied prediction data remain
+  usable when raw observations for rugs or residuals are unavailable.
 
-  - Transformed soap-film boundaries cannot be drawn on the original
-    scale and give an explicit error. Irregularly spaced surfaces use
-    rectangles to preserve covariate positions
-    ([\#412](https://github.com/gavinsimpson/gratia/issues/412)).
+  Transformed soap-film boundaries cannot be drawn on the original scale
+  and give an explicit error. Irregularly spaced surfaces use rectangles
+  to preserve covariate positions
+  ([\#412](https://github.com/gavinsimpson/gratia/issues/412)).
 
 - Full and reduced-rank Markov random field (MRF) smooths now support
   area effect estimates and interval plots
@@ -1197,24 +1184,23 @@
 
 - **3D surface plots**
 
-  - Numeric smooth and parametric surfaces can now be drawn in 3D with
-    `surface = "3d"`, using the optional ggcube package
-    ([\#393](https://github.com/gavinsimpson/gratia/issues/393)). The
-    existing RdBu fill palette, theme, conditioning facets, contours and
-    masking are retained. `surface_3d = list(...)` controls the view
-    without applying ggcube’s theme.
+  Numeric smooth and parametric surfaces can now be drawn in 3D with
+  `surface = "3d"`, using the optional ggcube package
+  ([\#393](https://github.com/gavinsimpson/gratia/issues/393)). The
+  existing RdBu fill palette, theme, conditioning facets, contours and
+  masking are retained. `surface_3d = list(...)` controls the view
+  without applying ggcube’s theme.
 
-  - Lighting defaults to `backface_scale = 1`; supply a custom `light`
-    through `surface_3d` to override it. Opaque faces, contours and
-    floor observations share depth ordering so hidden features are
-    occluded.
+  Lighting defaults to `backface_scale = 1`; supply a custom `light`
+  through `surface_3d` to override it. Opaque faces, contours and floor
+  observations share depth ordering so hidden features are occluded.
 
-  - Set `ci_3d = TRUE` to add translucent lower and upper interval
-    surfaces to smooths and numeric parametric interactions across
-    supported model classes. `ci_3d_alpha` and `ci_3d_col` style the
-    bounds independently of curve ribbons. Interval surfaces retain the
-    estimate’s mesh and masking; their heights expand the vertical range
-    without training the continuous fill scale.
+  Set `ci_3d = TRUE` to add translucent lower and upper interval
+  surfaces to smooths and numeric parametric interactions across
+  supported model classes. `ci_3d_alpha` and `ci_3d_col` style the
+  bounds independently of curve ribbons. Interval surfaces retain the
+  estimate’s mesh and masking; their heights expand the vertical range
+  without training the continuous fill scale.
 
 - [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)
   and
@@ -1242,22 +1228,22 @@
 
 - **Conditional differences**
 
-  - [`conditional_differences()`](https://gavinsimpson.github.io/gratia/reference/conditional_differences.md)
-    compares conditional fitted values between factor levels or joint
-    factor combinations on the link or response scale, with pointwise or
-    simultaneous intervals using the delta method or shared posterior
-    simulations. Simultaneous bands can cover each comparison separately
-    or all comparisons jointly via `simultaneous_scope`.
-    [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)
-    plots the differences and their intervals
-    ([\#143](https://github.com/gavinsimpson/gratia/issues/143),
-    [\#145](https://github.com/gavinsimpson/gratia/issues/145)).
+  [`conditional_differences()`](https://gavinsimpson.github.io/gratia/reference/conditional_differences.md)
+  compares conditional fitted values between factor levels or joint
+  factor combinations on the link or response scale, with pointwise or
+  simultaneous intervals using the delta method or shared posterior
+  simulations. Simultaneous bands can cover each comparison separately
+  or all comparisons jointly via `simultaneous_scope`.
+  [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)
+  plots the differences and their intervals
+  ([\#143](https://github.com/gavinsimpson/gratia/issues/143),
+  [\#145](https://github.com/gavinsimpson/gratia/issues/145)).
 
-  - Grouping two numeric covariates in the first non-comparison
-    condition evaluates difference surfaces, drawn as raster, tile or
-    optional ggcube 3D surfaces. Further conditions supply facets;
-    `ci_3d = TRUE` adds interval surfaces. The default `n_vals = NULL`
-    uses 100 values for curves and 50 along each surface axis.
+  Grouping two numeric covariates in the first non-comparison condition
+  evaluates difference surfaces, drawn as raster, tile or optional
+  ggcube 3D surfaces. Further conditions supply facets; `ci_3d = TRUE`
+  adds interval surfaces. The default `n_vals = NULL` uses 100 values
+  for curves and 50 along each surface axis.
 
 - [`difference_smooths()`](https://gavinsimpson.github.io/gratia/reference/difference_smooths.md)
   now offers simultaneous intervals for differences of smooths at
@@ -1268,20 +1254,20 @@
 
 - **Fitted-value intervals and diagnostics**
 
-  - [`fitted_values()`](https://gavinsimpson.github.io/gratia/reference/fitted_values.md)
-    now offers simultaneous intervals for fitted values at supplied
-    covariate combinations via `interval = "simultaneous"`
-    ([\#4](https://github.com/gavinsimpson/gratia/issues/4)). Pointwise
-    intervals remain the default. Simulation size, parallel sampling and
-    seeds can be controlled, as in
-    [`derivatives()`](https://gavinsimpson.github.io/gratia/reference/derivatives.md)
-    and
-    [`partial_derivatives()`](https://gavinsimpson.github.io/gratia/reference/partial_derivatives.md).
+  [`fitted_values()`](https://gavinsimpson.github.io/gratia/reference/fitted_values.md)
+  now offers simultaneous intervals for fitted values at supplied
+  covariate combinations via `interval = "simultaneous"`
+  ([\#4](https://github.com/gavinsimpson/gratia/issues/4)). Pointwise
+  intervals remain the default. Simulation size, parallel sampling and
+  seeds can be controlled, as in
+  [`derivatives()`](https://gavinsimpson.github.io/gratia/reference/derivatives.md)
+  and
+  [`partial_derivatives()`](https://gavinsimpson.github.io/gratia/reference/partial_derivatives.md).
 
-  - [`fitted_values()`](https://gavinsimpson.github.io/gratia/reference/fitted_values.md)
-    now emits a message identifying prediction rows with unobserved
-    combinations of known categorical predictor levels
-    ([\#164](https://github.com/gavinsimpson/gratia/issues/164)).
+  [`fitted_values()`](https://gavinsimpson.github.io/gratia/reference/fitted_values.md)
+  now emits a message identifying prediction rows with unobserved
+  combinations of known categorical predictor levels
+  ([\#164](https://github.com/gavinsimpson/gratia/issues/164)).
 
 - [`all_levels()`](https://gavinsimpson.github.io/gratia/reference/evenly.md)
   is now an alias of
@@ -1385,69 +1371,69 @@
 
 - **Sampling diagnostics and workers**
 
-  - MH acceptance rates are extracted from the correct mgcv return
-    components.
+  MH acceptance rates are extracted from the correct mgcv return
+  components.
 
-  - Workers started for sampling exit cleanly so coverage data can be
-    written completely.
+  Workers started for sampling exit cleanly so coverage data can be
+  written completely.
 
 - **Simulated data**
 
-  - [`data_sim()`](https://gavinsimpson.github.io/gratia/reference/data_sim.md)
-    now transforms the `eg6` predictor once and returns the predictor
-    used for sampling. The `eg5` and `eg6` examples accept sample sizes
-    not divisible by four.
+  [`data_sim()`](https://gavinsimpson.github.io/gratia/reference/data_sim.md)
+  now transforms the `eg6` predictor once and returns the predictor used
+  for sampling. The `eg5` and `eg6` examples accept sample sizes not
+  divisible by four.
 
-  - Grouped-family simulations respect seeds, parameters, ordinal
-    aliases and repeated family positions; `dist` is ignored throughout
-    that legacy example.
+  Grouped-family simulations respect seeds, parameters, ordinal aliases
+  and repeated family positions; `dist` is ignored throughout that
+  legacy example.
 
-  - Explicit seeds restore an absent RNG state, and reference generation
-    forwards the requested Tweedie power. Vector Tweedie parameters now
-    use the correct compound Poisson-Gamma law.
+  Explicit seeds restore an absent RNG state, and reference generation
+  forwards the requested Tweedie power. Vector Tweedie parameters now
+  use the correct compound Poisson-Gamma law.
 
 - Large QQ reference simulations now close their file connections before
   removing temporary files, allowing cleanup to complete on Windows.
 
 - **SCAM estimates, predictions and sampling**
 
-  - SCAM smooth estimates and standard errors no longer depend on the
-    other rows in the evaluation grid. Single-row and short-grid
-    evaluations are supported.
+  SCAM smooth estimates and standard errors no longer depend on the
+  other rows in the evaluation grid. Single-row and short-grid
+  evaluations are supported.
 
-  - `overall_uncertainty = TRUE` includes intercept variance and its
-    covariance with the smooth; `FALSE` includes smooth uncertainty
-    alone. `unconditional = TRUE` now gives an explicit error because
-    SCAM calculations do not support smoothing-parameter uncertainty.
+  `overall_uncertainty = TRUE` includes intercept variance and its
+  covariance with the smooth; `FALSE` includes smooth uncertainty alone.
+  `unconditional = TRUE` now gives an explicit error because SCAM
+  calculations do not support smoothing-parameter uncertainty.
 
-  - Smooth and full-model predictions now share coefficient mappings,
-    including endpoint and local constraints. Formula transformations,
-    offsets and missing training rows retain their fitted meaning.
+  Smooth and full-model predictions now share coefficient mappings,
+  including endpoint and local constraints. Formula transformations,
+  offsets and missing training rows retain their fitted meaning.
 
-  - The `mifo` smooth is rendered.
+  The `mifo` smooth is rendered.
 
-  - SCAM coefficient draws now sample unrestricted fitting parameters
-    and apply the fitted positivity transformation, preserving the
-    smooth constraints. Singular positive semidefinite covariance
-    matrices are supported; invalid covariance matrices and non-finite
-    transformed draws give explicit errors.
+  SCAM coefficient draws now sample unrestricted fitting parameters and
+  apply the fitted positivity transformation, preserving the smooth
+  constraints. Singular positive semidefinite covariance matrices are
+  supported; invalid covariance matrices and non-finite transformed
+  draws give explicit errors.
 
-  - Gaussian AR1 response simulation now uses fitted correlation and
-    series boundaries instead of drawing independent responses.
+  Gaussian AR1 response simulation now uses fitted correlation and
+  series boundaries instead of drawing independent responses.
 
-  - Concurvity excludes basis columns whose coefficients are fixed to
-    zero, restoring the correct calculation for curves that become flat.
+  Concurvity excludes basis columns whose coefficients are fixed to
+  zero, restoring the correct calculation for curves that become flat.
 
 - **Soap-film derivatives and sampling**
 
-  - Partial derivatives, fitted samples and smooth samples of soap-film
-    smooths include the contribution from known boundary values.
-    Complete-predictor derivative samples also differentiate those fixed
-    values, without adding coefficient uncertainty. Term exclusions
-    retain only the appropriate fixed contributions.
+  Partial derivatives, fitted samples and smooth samples of soap-film
+  smooths include the contribution from known boundary values.
+  Complete-predictor derivative samples also differentiate those fixed
+  values, without adding coefficient uncertainty. Term exclusions retain
+  only the appropriate fixed contributions.
 
-  - Separate sampling per smooth now correctly subsets supplied
-    coefficient draws.
+  Separate sampling per smooth now correctly subsets supplied
+  coefficient draws.
 
 - Multinomial fitted samples now honour `scale = "linear_predictor"`,
   returning log odds relative to the reference category instead of
@@ -1523,23 +1509,22 @@
 
 - **Missing observations and prediction rows**
 
-  - For models fitted with `na.exclude`, default fitted values, partial
-    residuals, fitted and posterior samples, simulations and
-    [`quantile_residuals()`](https://gavinsimpson.github.io/gratia/reference/quantile_residuals.md)
-    now restore excluded rows as `NA`. Diagnostics align retained
-    observations with predictors, and histogram bin selection handles
-    missing residuals
-    ([\#349](https://github.com/gavinsimpson/gratia/issues/349),
-    [\#402](https://github.com/gavinsimpson/gratia/issues/402)).
+  For models fitted with `na.exclude`, default fitted values, partial
+  residuals, fitted and posterior samples, simulations and
+  [`quantile_residuals()`](https://gavinsimpson.github.io/gratia/reference/quantile_residuals.md)
+  now restore excluded rows as `NA`. Diagnostics align retained
+  observations with predictors, and histogram bin selection handles
+  missing residuals
+  ([\#349](https://github.com/gavinsimpson/gratia/issues/349),
+  [\#402](https://github.com/gavinsimpson/gratia/issues/402)).
 
-  - Explicit prediction data preserve row positions by default: missing
-    required predictors yield `NA`, while missing responses alone do not
-    prevent prediction.
+  Explicit prediction data preserve row positions by default: missing
+  required predictors yield `NA`, while missing responses alone do not
+  prevent prediction.
 
-  - Discrete [`bam()`](https://rdrr.io/pkg/mgcv/man/bam.html)
-    fitted-value intervals restore exclusions once and accept stored
-    fitting frames without relying on tibble subsetting in native
-    prediction.
+  Discrete [`bam()`](https://rdrr.io/pkg/mgcv/man/bam.html) fitted-value
+  intervals restore exclusions once and accept stored fitting frames
+  without relying on tibble subsetting in native prediction.
 
 - [`link()`](https://gavinsimpson.github.io/gratia/reference/link.md),
   [`inv_link()`](https://gavinsimpson.github.io/gratia/reference/link.md)
@@ -1572,21 +1557,20 @@
 
 - **Random-effect tensor-product plots**
 
-  - Random-effect tensor products now plot curves, categorical estimates
-    and faceted surfaces consistently across
-    [`te()`](https://rdrr.io/pkg/mgcv/man/te.html),
-    [`ti()`](https://rdrr.io/pkg/mgcv/man/te.html) and
-    [`t2()`](https://rdrr.io/pkg/mgcv/man/t2.html)
-    ([\#169](https://github.com/gavinsimpson/gratia/issues/169)).
-    Two-factor products use points with confidence intervals, faceted by
-    the second factor, rather than empty line plots. Products with one
-    factor use the continuous covariate on the x axis regardless of
-    margin order
-    ([\#395](https://github.com/gavinsimpson/gratia/issues/395)).
+  Random-effect tensor products now plot curves, categorical estimates
+  and faceted surfaces consistently across
+  [`te()`](https://rdrr.io/pkg/mgcv/man/te.html),
+  [`ti()`](https://rdrr.io/pkg/mgcv/man/te.html) and
+  [`t2()`](https://rdrr.io/pkg/mgcv/man/t2.html)
+  ([\#169](https://github.com/gavinsimpson/gratia/issues/169)).
+  Two-factor products use points with confidence intervals, faceted by
+  the second factor, rather than empty line plots. Products with one
+  factor use the continuous covariate on the x axis regardless of margin
+  order ([\#395](https://github.com/gavinsimpson/gratia/issues/395)).
 
-  - Three- and four-variable
-    [`t2()`](https://rdrr.io/pkg/mgcv/man/t2.html) smooths with factor
-    margins produce faceted surfaces.
+  Three- and four-variable
+  [`t2()`](https://rdrr.io/pkg/mgcv/man/t2.html) smooths with factor
+  margins produce faceted surfaces.
 
 - Spline-on-the-sphere plots now use valid cells at the poles and date
   line, with orthographic clipping and separate factor-by panels

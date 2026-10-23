@@ -31,6 +31,8 @@ Keep each individual `NEWS.md` entry to 1–3 sentences, including each
 entry within a group. Group related changes under a shared banner naming
 the function or topic, with a separate entry for each change. Separate
 individual entries with a blank line, including entries within a group.
+Use multiple paragraphs within one bullet for grouped entries. Do not
+use nested bullets.
 
 ## R output in documentation
 
