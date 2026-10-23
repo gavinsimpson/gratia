@@ -23,7 +23,9 @@ run_tests <- function() {
   }
   options(Ncpus = as.integer(cpu_count))
   options(device = function(...) grDevices::pdf(file = NULL))
-  testthat::test_package(package, reporter = "summary",
+  filter <- Sys.getenv("GRATIA_TEST_FILTER")
+  if (!nzchar(filter)) filter <- NULL
+  testthat::test_package(package, filter = filter, reporter = "summary",
     stop_on_failure = TRUE, stop_on_warning = TRUE)
 }
 
