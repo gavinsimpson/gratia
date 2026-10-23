@@ -1,7 +1,7 @@
-# The paper examples need a dedicated integration job rather than every PR.
+# Run the paper examples only when explicitly enabled, locally or in CI.
 skip_on_cran()
-skip_if(nzchar(Sys.getenv("CI")) && Sys.getenv("GRATIA_RUN_HGAM") != "true",
-  "Paper examples run in the integration workflow")
+skip_if(Sys.getenv("GRATIA_RUN_HGAM") != "true",
+  "Paper examples require GRATIA_RUN_HGAM=true")
 
 ## Tests for models in the HGAM paper
 

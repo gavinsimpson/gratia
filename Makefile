@@ -1,5 +1,5 @@
 # Get the version info for later
-.PHONY: docs test test-full
+.PHONY: docs test test-full test-hgam-paper
 PKGVERS := $(shell sed -n "s/Version: *\([^ ]*\)/\1/p" DESCRIPTION)
 TEST_CPUS ?= 4
 
@@ -7,11 +7,15 @@ all: docs check clean
 
 # Routine local runs use the tests selected for CRAN, with local parallelism.
 test:
-	NOT_CRAN=false TESTTHAT_PARALLEL=true TESTTHAT_CPUS=$(TEST_CPUS) Rscript --vanilla tools/run-tests.R
+	NOT_CRAN=false GRATIA_RUN_HGAM=false TESTTHAT_PARALLEL=true TESTTHAT_CPUS=$(TEST_CPUS) Rscript --vanilla tools/run-tests.R
 
-# Include visual snapshots and the paper-sized integration examples.
+# Include visual snapshots, keeping the paper examples separate.
 test-full:
-	NOT_CRAN=true GRATIA_RUN_HGAM=true VDIFFR_RUN_TESTS=true TESTTHAT_PARALLEL=true TESTTHAT_CPUS=$(TEST_CPUS) Rscript --vanilla tools/run-tests.R
+	NOT_CRAN=true GRATIA_RUN_HGAM=false VDIFFR_RUN_TESTS=true TESTTHAT_PARALLEL=true TESTTHAT_CPUS=$(TEST_CPUS) Rscript --vanilla tools/run-tests.R
+
+# Run only the paper examples when explicitly requested.
+test-hgam-paper:
+	NOT_CRAN=true GRATIA_RUN_HGAM=true GRATIA_TEST_FILTER='^hgam-paper$$' VDIFFR_RUN_TESTS=false TESTTHAT_PARALLEL=false TESTTHAT_CPUS=1 Rscript --vanilla tools/run-tests.R
 
 docs:
 	R -q -e 'library("roxygen2"); roxygenise(".")'
