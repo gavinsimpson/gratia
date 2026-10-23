@@ -23,7 +23,8 @@
   ...,
   newdata = NULL,
   family_index = NULL,
-  envir = NULL
+  envir = NULL,
+  marginalise = NULL
 )
 
 \method{simulate}{gamm}(
@@ -92,6 +93,13 @@ index per requested prediction row. See Details.}
 \item{envir}{environment or \code{NULL}; functions and constants needed to
 evaluate model expressions in prediction data. With \code{NULL}, use the
 model's formula environment. Supply raw covariates in \code{data}.}
+
+\item{marginalise}{\code{NULL} retains the usual predictions. \code{TRUE} selects all
+supported \code{re} and \code{fs} terms; character vectors select exact smooth labels.
+Fitted predictions integrate response means over new zero-mean Gaussian
+effects. Response samplers draw new effects before sampling responses.
+Smoothing parameters and dispersion remain fixed. Only ordinary \code{gam()}
+and \code{bam()} fits with a scalar response mean are supported.}
 }
 \value{
 (Currently) A data frame with \code{nsim} columns.
@@ -105,6 +113,13 @@ See \link{diagnostic_support}.
 For \code{simulate.gam()} to function, the \code{family} component of the fitted
 model must contain, or be updatable to contain, the required random
 number generator. See \code{\link[mgcv:fix.family.rd]{mgcv::fix.family.rd()}}.
+
+With \code{marginalise}, each replicate draws new coefficients for selected
+\code{re} and \code{fs} terms before drawing responses. Other coefficients and all
+variance parameters stay fixed. Supply grouping columns for new data;
+repeated group labels share effects within a replicate. Unfamiliar labels
+are allowed only when those factors occur exclusively in selected terms.
+The \code{random_effect_info} attribute records the fixed covariance estimates.
 
 With \code{data = NULL}, \code{na.exclude} restores excluded observations as \code{NA} in
 every simulation; \code{na.omit} returns retained observations only. Positions

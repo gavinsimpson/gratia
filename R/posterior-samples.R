@@ -17,6 +17,12 @@
 #'   the model will be used for `data`, if available in `model`.
 #' @inheritParams post_draws n_draws
 #' @inheritParams post_draws
+#' @param marginalise `NULL` retains the usual predictions. `TRUE` selects all
+#'   supported `re` and `fs` terms; character vectors select exact smooth labels.
+#'   Fitted predictions integrate response means over new zero-mean Gaussian
+#'   effects. Response samplers draw new effects before sampling responses.
+#'   Smoothing parameters and dispersion remain fixed. Only ordinary `gam()`
+#'   and `bam()` fits with a scalar response mean are supported.
 #' @param seed numeric; a random seed for the simulations.
 #' @param frequentist logical; `TRUE` to use the frequentist covariance matrix of
 #'   the parameter estimators, `FALSE` to use the Bayesian posterior
@@ -100,6 +106,10 @@
 #' Censored grouped components require an observation process; use `simulate()`
 #' for their latent, uncensored responses.
 #'
+#' With `marginalise`, selected random effects are drawn for new groups in
+#' each response replicate. Group labels must be supplied for new data.
+#' See [random_effect_samples()] for the estimated Gaussian distributions.
+#'
 #' # Note
 #'
 #' With `data = NULL`, fitting offsets are retained, including offsets
@@ -175,7 +185,8 @@
   block_size = 10000L,
   dense_limit = 5e6,
   weights = NULL,
-  family_index = NULL
+  family_index = NULL,
+  marginalise = NULL
 ) {
   sampling_check_names(substitute(list(...)), derivative = FALSE)
   sampling_check_extra(substitute(list(...)), prediction = TRUE)
@@ -224,6 +235,7 @@
     unconditional = unconditional,
     weights = weights,
     family_index = family_index,
+    marginalise = marginalise,
     draws = draws,
     mvn_method = mvn_method,
     ...
@@ -320,6 +332,7 @@
   unconditional = FALSE,
   weights = NULL,
   family_index = NULL,
+  marginalise = NULL,
   draws = NULL,
   mvn_method = c("mvnfast", "mgcv"),
   envir = NULL,
@@ -341,6 +354,8 @@
   grouped <- is_gfam_family(fam)
   if (!grouped && !is.null(family_index)) stop(
     "'family_index' is only supported for grouped-family models.", call. = FALSE)
+  marginal <- if (!is.null(marginalise))
+    marginal_context(model, data, marginalise, response = TRUE, ...) else NULL
   joint_distribution <- NULL
   correlated <- !is.null(model$AR1.rho) && model$AR1.rho != 0
   if (correlated) {
@@ -431,6 +446,18 @@
     NULL
   } else {
     sample.int(.Machine$integer.max, 1L)
+  }
+  if (!is.null(marginal)) {
+    betas <- sampling_call(post_draws, list(model = marginal$model,
+      n_draws = n, seed = coefficient_seed, method = method,
+      n_threads = n_threads, n_cores = n_cores, chains = chains,
+      diagnostics = diagnostics, mh_backend = mh_backend, block_size = block_size,
+      dense_limit = dense_limit, burnin = burnin, thin = thin, t_df = t_df,
+      rw_scale = rw_scale, frequentist = freq, unconditional = unconditional,
+      draws = draws, mvn_method = mvn_method))
+    out <- marginal_response_table(marginal, betas, weights)
+    class(out) <- c("posterior_samples", class(out))
+    return(attach_sampling(out, betas, draw_index = TRUE))
   }
   if (grouped) {
     context <- grouped_posterior_context(model, data, family_index = family_index, ...)
@@ -651,6 +678,36 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
 #' Distribution parameters or expected responses drawn from the posterior
 #' distribution of a fitted model.
 #'
+#' @details
+#' With `marginalise`, fitted samples contain posterior draws of the integrated
+#' mean, rather than the variation among new groups. Selected fitted effects
+#' are removed before integration. `exclude` cannot name a selected term and
+#' `terms` is unsupported. Only response-scale means and links defined over
+#' the whole Gaussian predictor distribution are supported. Grouping columns
+#' can be omitted if they occur exclusively in the selected terms. A factor
+#' also used as a selected smooth's `by` variable must still be supplied with
+#' a fitted level, because it selects the relevant curve distribution. Fits
+#' using `min.sp` are unsupported; see [random_effect_samples()].
+#' The `integration_info` attribute records fixed variance estimates, the
+#' integration method, point or draw counts, and numerical error estimates.
+#' For Monte Carlo these errors are standard errors of integration, separate
+#' from uncertainty in model predictions. `unconditional` can adjust the
+#' coefficient covariance; it does not draw random-effect variance parameters.
+#'
+#' @param integration Integration method when `marginalise` is supplied:
+#'   `"quadrature"` (the default) or `"monte_carlo"`. Both integrate
+#'   over the Gaussian distribution of the selected effects at each row.
+#' @param n_quad Initial Gauss-Hermite point count, between 2 and 1000.
+#'   Successive doubled orders, up to four times this count, and an interlaced
+#'   rule with one fewer point must agree within
+#'   `1e-8 + 1e-6 * abs(value)` for means and derivatives. Where the random-effect
+#'   variance exceeds one, an independent adaptive rule also checks agreement.
+#'   Failure to agree reports an error.
+#'   Identity, log and probit links use their closed-form Gaussian integrals;
+#'   their metadata records zero quadrature points and zero integration error.
+#' @param n_integrate Number of Monte Carlo integration draws, at least two.
+#'   These are shared across rows and posterior coefficient draws. This count
+#'   is separate from `n_draws`. Ignored for quadrature.
 #' @param quantity character; `"parameters"` (the default) returns all
 #'   distribution parameters represented by predictors, including intercept-only
 #'   predictors. `"expectation"` returns the expected response, using every
@@ -770,6 +827,7 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
   model,
   ...
 ) {
+  marginal_not_supported(list(...), "fitted_samples.gamm()")
   sampling_check_names(substitute(list(...)), derivative = FALSE)
 
   fitted_samples(model$gam, ...)
@@ -831,7 +889,10 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
   dense_limit = 5e6,
   scale = c("response", "linear_predictor"),
   family_index = NULL,
-  quantity = c("parameters", "expectation")
+  quantity = c("parameters", "expectation"),
+  marginalise = NULL,
+  integration = c("quadrature", "monte_carlo"),
+  n_quad = 40L, n_integrate = 5000L
 ) {
   sampling_check_names(substitute(list(...)), derivative = FALSE)
   sampling_check_extra(substitute(list(...)), prediction = TRUE)
@@ -876,6 +937,8 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
     mvn_method = mvn_method,
     family_index = family_index,
     quantity = quantity,
+    marginalise = marginalise, integration = integration,
+    n_quad = n_quad, n_integrate = n_integrate,
     ...
   )
 }
@@ -974,6 +1037,9 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
   envir = NULL,
   family_index = NULL,
   quantity = c("parameters", "expectation"),
+  marginalise = NULL,
+  integration = c("quadrature", "monte_carlo"),
+  n_quad = 40L, n_integrate = 5000L,
   chains = 1L,
   diagnostics = FALSE,
   mh_backend = c("mgcv", "gratia", "family"),
@@ -983,21 +1049,35 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
 ) {
   training <- is.null(data)
   model <- with_model_envir(model, envir)
-  if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
-    runif(1)
-  }
-  if (is.null(seed)) {
-    RNGstate <- get(".Random.seed", envir = .GlobalEnv)
-  } else {
-    R.seed <- get(".Random.seed", envir = .GlobalEnv)
+  if (is.null(marginalise) &&
+      !exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) runif(1)
+  had_seed <- exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)
+  if (!is.null(seed)) {
+    if (had_seed) old_seed <- get(".Random.seed", envir = .GlobalEnv)
+    on.exit({
+      if (had_seed) assign(".Random.seed", old_seed, envir = .GlobalEnv) else
+        if (exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE))
+          rm(".Random.seed", envir = .GlobalEnv)
+    }, add = TRUE)
     set.seed(seed)
     RNGstate <- structure(seed, kind = as.list(RNGkind()))
-    on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
+  } else {
+    deterministic <- !is.null(marginalise) && match.arg(method) == "user" &&
+      match.arg(integration) == "quadrature"
+    if (!had_seed && !deterministic) runif(1)
+    RNGstate <- if (exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE))
+      get(".Random.seed", envir = .GlobalEnv) else NULL
   }
 
   choice <- prediction_choice(quantity[1L], scale[1L])
   quantity <- choice$quantity
   scale <- if (choice$scale == "link") "linear_predictor" else "response"
+  marginal <- NULL
+  if (!is.null(marginalise)) {
+    if (scale != "response") stop("'marginalise' requires response-scale fitted means.", call. = FALSE)
+    if (!is.null(family_index)) stop("'family_index' is unsupported with marginalisation.", call. = FALSE)
+    marginal <- marginal_context(model, data, marginalise, ...)
+  }
   fn <- family_type(model)
   gen_fam <- inherits(family(model), "general.family")
   if (gen_fam && scale == "response" &&
@@ -1024,7 +1104,7 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
   } else {
     NULL
   }
-  layout <- if (is.null(context)) {
+  layout <- if (!is.null(marginal)) marginal$layout else if (is.null(context)) {
     prediction_layout(
       model,
       data,
@@ -1060,11 +1140,19 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
       frequentist = freq,
       unconditional = unconditional,
       draws = draws,
-      seed = seed,
+      seed = if (is.null(marginal)) seed else if (method == "user") NULL else
+        sample.int(.Machine$integer.max, 1L),
       mvn_method = mvn_method
     )
   )
   sampling <- attr(betas, "sampling")
+  if (!is.null(marginal)) {
+    sims <- marginal_fitted_samples(marginal, betas, quantity, integration,
+      n_quad, n_integrate)
+    attr(sims, "seed") <- RNGstate
+    class(sims) <- c("fitted_samples", class(sims))
+    return(attach_sampling(sims, sampling, draw_index = TRUE))
+  }
   if (!grouped) {
     context <- lss_prediction_context(model, layout = layout, ...)
     sims <- distribution_fitted_draws(context, betas, quantity, choice$scale)
@@ -1214,7 +1302,8 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
   data = NULL,
   n_draws = NULL,
   seed = NULL,
-  weights = NULL
+  weights = NULL,
+  marginalise = NULL
 ) {
   sampling_check_names(substitute(list(...)), derivative = FALSE)
   sampling_check_extra(substitute(list(...)), prediction = TRUE)
@@ -1233,6 +1322,7 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
     data = data,
     seed = seed,
     weights = weights,
+    marginalise = marginalise,
     ...
   )
 }
@@ -1283,6 +1373,7 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
   sims <- simulate_fun(
     model, nsim = n, seed = seed, data = data, weights = weights, ...
   )
+  random_effect_info <- attr(sims, "random_effect_info")
   RNGstate <- attr(sims, "seed")
   row_ids <- attr(sims, "row_ids")
   class(sims) <- class(sims)[-1] # remove the "simulate_gratia" class
@@ -1315,6 +1406,7 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
   }
 
   attr(sims, "seed") <- RNGstate
+  if (!is.null(random_effect_info)) attr(sims, "random_effect_info") <- random_effect_info
   ## add classes
   class(sims) <- c("predicted_samples", class(sims))
   sims

@@ -39,10 +39,18 @@
 #' @param envir environment or `NULL`; functions and constants needed to
 #'   evaluate model expressions in prediction data. With `NULL`, use the
 #'   model's formula environment. Supply raw covariates in `data`.
+#' @inheritParams posterior_samples marginalise
 #' @param family_index numeric; for grouped-family models, one integer family
 #'   index per requested prediction row. See Details.
 #'
 #' @details
+#' With `marginalise`, each replicate draws new coefficients for selected
+#' `re` and `fs` terms before drawing responses. Other coefficients and all
+#' variance parameters stay fixed. Supply grouping columns for new data;
+#' repeated group labels share effects within a replicate. Unfamiliar labels
+#' are allowed only when those factors occur exclusively in selected terms.
+#' The `random_effect_info` attribute records the fixed covariance estimates.
+#'
 #' With `data = NULL`, `na.exclude` restores excluded observations as `NA` in
 #' every simulation; `na.omit` returns retained observations only. Positions
 #' refer to the fitting data after any `subset`. Explicit `data` are evaluated
@@ -95,19 +103,38 @@
 #' head(sims)
 `simulate.gam` <- function(object, nsim = 1, seed = NULL, data = newdata,
                            weights = NULL, ..., newdata = NULL,
-                           family_index = NULL, envir = NULL) {
+                           family_index = NULL, envir = NULL, marginalise = NULL) {
   object <- with_model_envir(object, envir)
   training <- is.null(data)
-  if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
-    runif(1)
-  }
-  if (is.null(seed)) {
-    RNGstate <- get(".Random.seed", envir = .GlobalEnv)
-  } else {
-    R.seed <- get(".Random.seed", envir = .GlobalEnv)
+  if (is.null(marginalise) &&
+      !exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) runif(1)
+  had_seed <- exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)
+  if (!is.null(seed)) {
+    if (had_seed) old_seed <- get(".Random.seed", envir = .GlobalEnv)
+    on.exit({
+      if (had_seed) assign(".Random.seed", old_seed, envir = .GlobalEnv) else
+        if (exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE))
+          rm(".Random.seed", envir = .GlobalEnv)
+    }, add = TRUE)
     set.seed(seed)
     RNGstate <- structure(seed, kind = as.list(RNGkind()))
-    on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
+  } else {
+    if (!had_seed) runif(1)
+    RNGstate <- get(".Random.seed", envir = .GlobalEnv)
+  }
+  if (!is.null(marginalise)) {
+    nsim <- sampling_count(nsim, "nsim")
+    if (!is.null(family_index)) stop("'family_index' is unsupported with marginalisation.", call. = FALSE)
+    context <- marginal_context(object, data, marginalise, response = TRUE, ...)
+    betas <- matrix(rep(stats::coef(context$model), each = nsim), nrow = nsim)
+    values <- marginal_response_values(context, betas, weights)
+    values <- slice_observations(values, context$layout$map)
+    sims <- as.data.frame(values)
+    attr(sims, "seed") <- RNGstate
+    attr(sims, "row_ids") <- context$layout$rows
+    attr(sims, "random_effect_info") <- context$random_effect_info
+    class(sims) <- c("simulate_gratia", class(sims))
+    return(sims)
   }
   if (is_gfam_family(family(object))) {
     if (!is.null(newdata)) newdata_deprecated()
@@ -241,6 +268,7 @@
 #' @export
 simulate.gamm <- function(object, nsim = 1, seed = NULL, data = newdata,
     weights = NULL, ..., newdata = NULL, conditioning = NULL, envir = NULL) {
+  marginal_not_supported(list(...), "simulate.gamm()")
   if (is.null(conditioning) || identical(conditioning, "gam_component")) {
     if (!is.null(newdata)) newdata_deprecated()
     return(simulate.gam(object$gam, nsim = nsim, seed = seed, data = data,

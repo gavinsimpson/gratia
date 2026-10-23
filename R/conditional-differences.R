@@ -178,6 +178,7 @@ conditional_differences.gam <- function(model, by, condition = NULL, data = NULL
   }
   if (!is.logical(unconditional) || length(unconditional) != 1L ||
       is.na(unconditional)) cli::cli_abort("{.arg unconditional} must be TRUE or FALSE.")
+  marginal_not_supported(list(...), "conditional_differences.gam()")
   dots <- list(...)
   if (length(dots) && (is.null(names(dots)) || any(!nzchar(names(dots))))) {
     cli::cli_abort("Arguments in {.arg ...} must be named.")

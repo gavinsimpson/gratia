@@ -20,7 +20,8 @@ predicted_samples(model, ...)
   data = NULL,
   n_draws = NULL,
   seed = NULL,
-  weights = NULL
+  weights = NULL,
+  marginalise = NULL
 )
 
 \method{predicted_samples}{scam}(
@@ -61,6 +62,13 @@ For ordinary Gaussian and Gamma responses, larger weights reduce response
 variance (precision weights). For binomial responses, weights give integer
 trial counts. They do not alter the fitted coefficient covariance. Include
 positions restored by \code{na.exclude} when supplying weights for fitting rows.}
+
+\item{marginalise}{\code{NULL} retains the usual predictions. \code{TRUE} selects all
+supported \code{re} and \code{fs} terms; character vectors select exact smooth labels.
+Fitted predictions integrate response means over new zero-mean Gaussian
+effects. Response samplers draw new effects before sampling responses.
+Smoothing parameters and dispersion remain fixed. Only ordinary \code{gam()}
+and \code{bam()} fits with a scalar response mean are supported.}
 }
 \value{
 A tibble (data frame) with 3 columns containing the posterior

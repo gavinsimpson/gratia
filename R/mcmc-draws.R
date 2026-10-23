@@ -54,6 +54,10 @@ sampling_finish <- function(betas, ids, info = NULL, diagnostics = FALSE,
 }
 
 attach_sampling <- function(x, source, draw_index = FALSE) {
+  for (nm in c("integration_info", "random_effect_info")) {
+    info <- attr(source, nm, exact = TRUE)
+    if (!is.null(info)) attr(x, nm) <- info
+  }
   meta <- if (is.list(source) && "draw_ids" %in% names(source)) source else
     attr(source, "sampling")
   if (is.null(meta)) return(x)

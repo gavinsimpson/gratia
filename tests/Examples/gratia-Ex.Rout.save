@@ -3228,6 +3228,88 @@ detaching ‘package:mgcv’
 
 detaching ‘package:mgcv’
 
+> nameEx("random_effect_samples")
+> ### * random_effect_samples
+>
+> flush(stderr()); flush(stdout())
+>
+> ### Name: random_effect_samples
+> ### Title: Draw new random effects from an estimated GAM
+> ### Aliases: random_effect_samples
+>
+> ### ** Examples
+>
+> library("mgcv")
+Loading required package: nlme
+This is mgcv 1.9-4. For overview type '?mgcv'.
+> m <- gam(travel ~ s(Rail, bs = "re"), data = nlme::Rail,
++   method = "REML")
+> random_effect_samples(m, n_draws = 3, seed = 42)
+# A tibble: 54 x 6
+    .row .draw .smooth .value travel Rail
+   <int> <int> <chr>    <dbl>  <dbl> <ord>
+ 1     1     1 s(Rail)  34.0      55 1
+ 2     2     1 s(Rail)  34.0      53 1
+ 3     3     1 s(Rail)  34.0      54 1
+ 4     4     1 s(Rail)  15.7      26 2
+ 5     5     1 s(Rail)  15.7      37 2
+ 6     6     1 s(Rail)  15.7      32 2
+ 7     7     1 s(Rail)  37.5      78 3
+ 8     8     1 s(Rail)  37.5      91 3
+ 9     9     1 s(Rail)  37.5      85 3
+10    10     1 s(Rail)  -1.56     92 4
+# i 44 more rows
+>
+> # Compare zero random effects with response means averaged over groups.
+> set.seed(2)
+> d <- expand.grid(x = seq(0, 1, length.out = 15), id = factor(1:12))
+> d$y <- rpois(nrow(d), exp(0.3 + d$x + rnorm(12, sd = 0.6)[d$id]))
+> p <- gam(y ~ x + s(id, bs = "re"), data = d, family = poisson(),
++   method = "REML")
+> nd <- data.frame(x = c(0, 0.5, 1), id = d$id[1])
+> fitted_values(p, data = nd, exclude = "s(id)")
+# A tibble: 3 x 8
+   .row     x id    .parameter .fitted   .se .lower_ci .upper_ci
+  <int> <dbl> <fct> <chr>        <dbl> <dbl>     <dbl>     <dbl>
+1     1   0   1     mean          1.73 0.209      1.15      2.61
+2     2   0.5 1     mean          2.61 0.194      1.79      3.82
+3     3   1   1     mean          3.93 0.202      2.64      5.84
+> fitted_values(p, data = nd, marginalise = TRUE)
+# A tibble: 3 x 8
+      x id     .row .parameter .fitted   .se .lower_ci .upper_ci
+  <dbl> <fct> <int> <chr>        <dbl> <dbl>     <dbl>     <dbl>
+1   0   1         1 mean          2.14 0.447      1.26      3.02
+2   0.5 1         2 mean          3.22 0.624      2.00      4.44
+3   1   1         3 mean          4.85 0.979      2.93      6.77
+> fitted_values(p, data = nd, marginalise = TRUE,
++   integration = "monte_carlo", seed = 42)
+# A tibble: 3 x 8
+      x id     .row .parameter .fitted   .se .lower_ci .upper_ci
+  <dbl> <fct> <int> <chr>        <dbl> <dbl>     <dbl>     <dbl>
+1   0   1         1 mean          2.12 0.444      1.25      2.99
+2   0.5 1         2 mean          3.20 0.619      1.98      4.41
+3   1   1         3 mean          4.81 0.971      2.91      6.71
+> nd$id <- c("new", "new", "other")
+> predicted_samples(p, data = nd, marginalise = TRUE, n_draws = 3, seed = 42)
+# A tibble: 9 x 3
+   .row .draw .response
+  <int> <int>     <dbl>
+1     1     1         5
+2     2     1         6
+3     3     1         4
+4     1     2         1
+5     2     2         3
+6     3     2         4
+7     1     3         1
+8     2     3         3
+9     3     3        19
+>
+>
+>
+> cleanEx()
+
+detaching ‘package:mgcv’, ‘package:nlme’
+
 > nameEx("ref_level")
 > ### * ref_level
 > 

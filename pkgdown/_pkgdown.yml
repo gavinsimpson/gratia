@@ -201,6 +201,7 @@ reference:
       - smooth_samples
       - draw.smooth_samples
       - fitted_samples
+      - random_effect_samples
       - predicted_samples
       - derivative_samples
       - as_mcmc_draws

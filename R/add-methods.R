@@ -18,6 +18,8 @@
 
 #' Add fitted values from a GAM to a data frame
 #'
+#' @inheritParams fitted_samples marginalise integration n_quad n_integrate
+#' @inheritParams random_effect_samples seed
 #' @param type character; the type of predictions to return. See
 #'   [mgcv::predict.gam()] for options.
 #' @param ... additional arguments passed to [mgcv::predict.gam()].
@@ -55,8 +57,20 @@
 #' options(op)
 #' }
 `add_fitted.gam` <- function(data, model, value = ".fitted", type = "response",
-                             ..., envir = NULL) {
+                             ..., envir = NULL, marginalise = NULL,
+                             integration = c("quadrature", "monte_carlo"),
+                             n_quad = 40L, n_integrate = 5000L, seed = NULL) {
   model <- with_model_envir(model, envir)
+  if (!is.null(marginalise)) {
+    if (type != "response") stop("Marginal add_fitted() requires type = 'response'.", call. = FALSE)
+    fit <- fitted_values(model, data = data, marginalise = marginalise,
+      integration = integration, n_quad = n_quad, n_integrate = n_integrate,
+      seed = seed, ...)
+    out <- tibble::as_tibble(data[fit$.row, , drop = FALSE])
+    out[[value]] <- fit$.fitted
+    attr(out, "integration_info") <- attr(fit, "integration_info")
+    return(out)
+  }
   ## coerce to tibble
   layout <- prediction_layout(model, data, na.action = list(...)$na.action %||% stats::na.pass)
   data <- as_tibble(layout$data)

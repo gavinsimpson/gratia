@@ -35,7 +35,11 @@ fitted_samples(model, ...)
   dense_limit = 5e+06,
   scale = c("response", "linear_predictor"),
   family_index = NULL,
-  quantity = c("parameters", "expectation")
+  quantity = c("parameters", "expectation"),
+  marginalise = NULL,
+  integration = c("quadrature", "monte_carlo"),
+  n_quad = 40L,
+  n_integrate = 5000L
 )
 
 \method{fitted_samples}{scam}(
@@ -164,6 +168,30 @@ An explicit index must agree with membership recoverable from \code{data}.}
 distribution parameters represented by predictors, including intercept-only
 predictors. \code{"expectation"} returns the expected response, using every
 parameter on which it depends, on the response scale only.}
+
+\item{marginalise}{\code{NULL} retains the usual predictions. \code{TRUE} selects all
+supported \code{re} and \code{fs} terms; character vectors select exact smooth labels.
+Fitted predictions integrate response means over new zero-mean Gaussian
+effects. Response samplers draw new effects before sampling responses.
+Smoothing parameters and dispersion remain fixed. Only ordinary \code{gam()}
+and \code{bam()} fits with a scalar response mean are supported.}
+
+\item{integration}{Integration method when \code{marginalise} is supplied:
+\code{"quadrature"} (the default) or \code{"monte_carlo"}. Both integrate
+over the Gaussian distribution of the selected effects at each row.}
+
+\item{n_quad}{Initial Gauss-Hermite point count, between 2 and 1000.
+Successive doubled orders, up to four times this count, and an interlaced
+rule with one fewer point must agree within
+\code{1e-8 + 1e-6 * abs(value)} for means and derivatives. Where the random-effect
+variance exceeds one, an independent adaptive rule also checks agreement.
+Failure to agree reports an error.
+Identity, log and probit links use their closed-form Gaussian integrals;
+their metadata records zero quadrature points and zero integration error.}
+
+\item{n_integrate}{Number of Monte Carlo integration draws, at least two.
+These are shared across rows and posterior coefficient draws. This count
+is separate from \code{n_draws}. Ignored for quadrature.}
 }
 \value{
 A tibble (data frame) in long format, with columns:
@@ -181,6 +209,21 @@ Distribution parameters or expected responses drawn from the posterior
 distribution of a fitted model.
 }
 \details{
+With \code{marginalise}, fitted samples contain posterior draws of the integrated
+mean, rather than the variation among new groups. Selected fitted effects
+are removed before integration. \code{exclude} cannot name a selected term and
+\code{terms} is unsupported. Only response-scale means and links defined over
+the whole Gaussian predictor distribution are supported. Grouping columns
+can be omitted if they occur exclusively in the selected terms. A factor
+also used as a selected smooth's \code{by} variable must still be supplied with
+a fitted level, because it selects the relevant curve distribution. Fits
+using \code{min.sp} are unsupported; see \code{\link[=random_effect_samples]{random_effect_samples()}}.
+The \code{integration_info} attribute records fixed variance estimates, the
+integration method, point or draw counts, and numerical error estimates.
+For Monte Carlo these errors are standard errors of integration, separate
+from uncertainty in model predictions. \code{unconditional} can adjust the
+coefficient covariance; it does not draw random-effect variance parameters.
+
 Parameter names and definitions are available through \code{\link[=family_parameters]{family_parameters()}}.
 Gaussian LSS returns \code{mean} and \code{sd}, GEV returns \code{location}, \code{scale} and
 \code{shape}, and sinh-arcsinh returns \code{location}, \code{scale}, \code{skewness} and
