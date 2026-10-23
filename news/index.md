@@ -178,6 +178,75 @@
 
 ### New features
 
+- [`random_effect_samples()`](https://gavinsimpson.github.io/gratia/reference/random_effect_samples.md)
+  draws new random intercepts, slopes and factor-smooth curves from
+  their estimated Gaussian distributions. `marginalise` integrates
+  response means in fitted predictions using Gaussian quadrature or
+  Monte Carlo, and generates new-group effects in response simulations.
+  Smoothing parameters and dispersion remain fixed at their fitted
+  estimates. Factor-by curves retain their by-level selection when other
+  random terms are marginalised. Identity, log and probit links use
+  closed-form integrals; other links check quadrature with interlaced
+  nodes and an independent adaptive rule to detect unresolved link
+  transitions. Fits using `min.sp` are rejected because their fitted
+  lower bounds are not retained for covariance reconstruction.
+
+- [`variance_comp()`](https://gavinsimpson.github.io/gratia/reference/variance_comp.md)
+  now computes variance components directly for
+  [`gam()`](https://rdrr.io/pkg/mgcv/man/gam.html) and
+  [`bam()`](https://rdrr.io/pkg/mgcv/man/bam.html) fits, including fixed
+  smoothing parameters and a row for every penalty sharing a smoothing
+  parameter. Parametric penalties supplied through `paraPen` are
+  included. Confidence intervals retain uncertainty from shared
+  parameters and from the estimated scale when smoothing parameters are
+  fixed. Both interval bounds remain on the standard deviation scale.
+  Models fitted by [`gamm()`](https://rdrr.io/pkg/mgcv/man/gamm.html)
+  are also supported: components are extracted from `lme`, smooth
+  components use the same penalty scale, and additional random
+  intercepts and slopes retain their mixed-model variances. Available
+  `nlme` intervals are returned on the standard deviation scale;
+  intervals are `NA` when unavailable, including fits with `pdTens`
+  tensor-product blocks. Smooth components from
+  [`gamm4()`](https://rdrr.io/pkg/gamm4/man/gamm4.html) now use this
+  penalty scale too, with one labelled row per penalty. Its confidence
+  intervals use likelihood profiles by default, with
+  `interval_method = "none"` available for estimates only. Gaussian
+  profiles use maximum likelihood even when the point estimates were
+  fitted by REML; failed profiles warn and leave the affected bounds
+  `NA`. `type = "terms"` now returns sample variances of fitted term
+  contributions, including parametric terms and additional fitted random
+  effects. The `covariance` attribute contains their covariance matrix,
+  calculated over the fitting observations on the linear predictor
+  scale. Term intervals use joint posterior coefficient draws,
+  preserving dependence between GAM terms and additional fitted random
+  effects. `n_draws`, `seed` and `unconditional` control these draws;
+  `n_draws = 0` returns point estimates only. Paired posterior term
+  variances are returned in the `variance_draws` attribute. A final
+  `total` row reports the variance of the summed term contributions,
+  including covariance between terms, with intervals calculated from the
+  same joint draws. Models with several linear predictors have separate
+  totals for each predictor. The covariance matrix contains individual
+  terms only; the posterior draws also include the totals.
+  `include_total = FALSE` omits total rows and their draw columns while
+  retaining the individual term estimates, proportions and intervals.
+  Term results also include proportions of total variance, allocating
+  each term its variance and its covariance with the other terms so that
+  the individual contributions sum to one. Proportion intervals use the
+  same joint draws, available in the `proportion_draws` attribute.
+  Separate columns are returned for each linear predictor. Proportions
+  can be negative or greater than one; they are `NA` when the total
+  variance is zero.
+  [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)
+  plots variance components, standard deviations or proportions with
+  their stored intervals. Proportions from different linear predictors
+  have separate panels. Component selection and optional omission of
+  total rows are supported, and signed proportions retain their full
+  range. Components appear on the x-axis by default; `n_dodge` staggers
+  labels, `angle` rotates them, and `flip = TRUE` puts components on the
+  y-axis. A short article works through penalty and term variances,
+  covariance in totals and proportions, and plotting the results. The
+  default `type = "penalty"` retains variance-parameter output.
+
 - [`basis()`](https://gavinsimpson.github.io/gratia/reference/basis.md)
   accepts `unweighted = TRUE` for fitted GAM(M)s to return basis
   functions without multiplying by fitted coefficients.
@@ -830,15 +899,23 @@
   `time_varying_style = "pointrange"` for points and interval bars
   instead of the default line, points and ribbon.
 
-- Smooth plot subtitles now identify the model part or distributional
-  parameter for glmmTMB, mgcv and
-  [`GJRM::gamlss()`](https://rdrr.io/pkg/GJRM/man/gamlss.html) models
-  with multiple linear predictors. Single-predictor models omit these
-  labels, and constant glmmTMB dispersion alone does not trigger them.
+- Smooth and parametric plot subtitles now identify the model part or
+  distributional parameter for glmmTMB, sdmTMB, mgcv,
+  [`GJRM::gamlss()`](https://rdrr.io/pkg/GJRM/man/gamlss.html) and
+  [`GJRM::gjrm()`](https://rdrr.io/pkg/GJRM/man/gjrm.html) models with
+  multiple linear predictors. Single-predictor models omit these labels,
+  and constant glmmTMB dispersion alone does not trigger them.
   Information about `by` variables, smooth titles, selection and the
-  default of plotting all smooths are retained. Saved
+  default of plotting all smooths are retained. Shared terms name every
+  predictor to which they contribute. Saved
   [`smooth_estimates()`](https://gavinsimpson.github.io/gratia/reference/smooth_estimates.md)
-  retain the labels in an optional `.model` column.
+  and
+  [`parametric_effects()`](https://gavinsimpson.github.io/gratia/reference/parametric_effects.md)
+  retain the labels in an optional `.model` column. Supply `subtitle` to
+  replace the labels, or `subtitle = ""` to suppress them, including on
+  parametric panels. Repeated parametric plot names include equation
+  numbers for GJRM models
+  ([\#430](https://github.com/gavinsimpson/gratia/issues/430)).
 
 - Soap-film boundary (`bs = "sf"`) and wiggly (`bs = "sw"`) components
   are now supported, with distinct component types and boundary-aware

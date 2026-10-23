@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-64</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-66</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -30,6 +30,7 @@
     <li><h6 class="dropdown-header" data-toc-skip>Workflows</h6></li>
     <li><a class="dropdown-item" href="../articles/prediction-comparisons.html">Comparing treatments and finding rates of change</a></li>
     <li><a class="dropdown-item" href="../articles/smooth-effects.html">Read smooth effects, interactions and surfaces</a></li>
+    <li><a class="dropdown-item" href="../articles/variance-components.html">Variance components in GAMs</a></li>
     <li><a class="dropdown-item" href="../articles/shape-constrained-intervals.html">Intervals for shape-constrained smooths</a></li>
     <li><a class="dropdown-item" href="../articles/spatial-smooths.html">Choose a smooth for the spatial question</a></li>
     <li><a class="dropdown-item" href="../articles/response-distributions.html">Checking different response distributions</a></li>
@@ -81,7 +82,11 @@
 <span>  unconditional <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  interval_method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"auto"</span>, <span class="st">"gaussian"</span>, <span class="st">"bootstrap"</span><span class="op">)</span>,</span>
 <span>  quantity <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"parameters"</span>, <span class="st">"expectation"</span><span class="op">)</span>,</span>
-<span>  family_index <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  family_index <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  marginalise <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  integration <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"quadrature"</span>, <span class="st">"monte_carlo"</span><span class="op">)</span>,</span>
+<span>  n_quad <span class="op">=</span> <span class="fl">40L</span>,</span>
+<span>  n_integrate <span class="op">=</span> <span class="fl">5000L</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'gamm'</span></span>
@@ -183,6 +188,38 @@ in <code>data</code>, or the fitted membership when <code>data</code> is omitted
 when predicting without responses or with a complex response expression.
 An explicit index must agree with membership recoverable from <code>data</code>.</p></dd>
 
+
+<dt id="arg-marginalise">marginalise<a class="anchor" aria-label="anchor" href="#arg-marginalise"></a></dt>
+<dd><p><code>NULL</code> retains the usual predictions. <code>TRUE</code> selects all
+supported <code>re</code> and <code>fs</code> terms; character vectors select exact smooth labels.
+Fitted predictions integrate response means over new zero-mean Gaussian
+effects. Response samplers draw new effects before sampling responses.
+Smoothing parameters and dispersion remain fixed. Only ordinary <code><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam()</a></code>
+and <code><a href="https://rdrr.io/pkg/mgcv/man/bam.html" class="external-link">bam()</a></code> fits with a scalar response mean are supported.</p></dd>
+
+
+<dt id="arg-integration">integration<a class="anchor" aria-label="anchor" href="#arg-integration"></a></dt>
+<dd><p>Integration method when <code>marginalise</code> is supplied:
+<code>"quadrature"</code> (the default) or <code>"monte_carlo"</code>. Both integrate
+over the Gaussian distribution of the selected effects at each row.</p></dd>
+
+
+<dt id="arg-n-quad">n_quad<a class="anchor" aria-label="anchor" href="#arg-n-quad"></a></dt>
+<dd><p>Initial Gauss-Hermite point count, between 2 and 1000.
+Successive doubled orders, up to four times this count, and an interlaced
+rule with one fewer point must agree within
+<code>1e-8 + 1e-6 * abs(value)</code> for means and derivatives. Where the random-effect
+variance exceeds one, an independent adaptive rule also checks agreement.
+Failure to agree reports an error.
+Identity, log and probit links use their closed-form Gaussian integrals;
+their metadata records zero quadrature points and zero integration error.</p></dd>
+
+
+<dt id="arg-n-integrate">n_integrate<a class="anchor" aria-label="anchor" href="#arg-n-integrate"></a></dt>
+<dd><p>Number of Monte Carlo integration draws, at least two.
+These are shared across rows and posterior coefficient draws. This count
+is separate from <code>n_draws</code>. Ignored for quadrature.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -201,7 +238,15 @@ is the predicted probability for a single category of the response.</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p><code>quantity = "parameters"</code> returns all distribution parameters represented
+    <p>With <code>marginalise</code>, predictions are response means averaged over the selected
+random-effect distributions, using the methods described in <code><a href="fitted_samples.html">fitted_samples()</a></code>.
+The point estimate uses fitted coefficients; pointwise intervals use the
+derivative of the integrated mean and the coefficient covariance. <code>.se</code> is
+on the response scale. These normal intervals are not clipped to the response
+range. Simultaneous and bootstrap marginal intervals are not yet supported.
+The <code>integration_info</code> attribute records numerical accuracy and fixed
+variance estimates.</p>
+<p><code>quantity = "parameters"</code> returns all distribution parameters represented
 by predictors, including intercept-only predictors. See <code><a href="family_parameters.html">family_parameters()</a></code>
 for their definitions. These are natural distribution parameters, which
 can differ from mgcv's native response predictions: Gaussian LSS returns

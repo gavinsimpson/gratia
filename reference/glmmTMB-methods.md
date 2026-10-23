@@ -156,11 +156,14 @@ Smooths in later linear predictors use mgcv-style labels such as
 `s.1(x)` and `s.2(x)`. Predictor order is conditional, zero-inflation
 (if present), then dispersion (if present). Use `smooths(object)` and
 `select` to select individual smooths. For models with multiple linear
-predictors, smooth subtitles identify the "Conditional model",
-"Zero-inflation model" or "Dispersion model", consistently with native
-random-effect panels. Constant dispersion alone does not trigger these
-subtitles. `names(assemble(object, parametric = FALSE))` also lists
-native random-effect coefficient panels.
+predictors, smooth and parametric subtitles identify the "Conditional
+model", "Zero-inflation model" or "Dispersion model", consistently with
+native random-effect panels. Constant dispersion alone does not trigger
+these subtitles. Saved
+[`parametric_effects()`](https://gavinsimpson.github.io/gratia/reference/parametric_effects.md)
+retain the labels in an optional `.model` column.
+`names(assemble(object, parametric = FALSE))` also lists native
+random-effect coefficient panels.
 
 ## Details
 

@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-64</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-66</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -30,6 +30,7 @@
     <li><h6 class="dropdown-header" data-toc-skip>Workflows</h6></li>
     <li><a class="dropdown-item" href="../articles/prediction-comparisons.html">Comparing treatments and finding rates of change</a></li>
     <li><a class="dropdown-item" href="../articles/smooth-effects.html">Read smooth effects, interactions and surfaces</a></li>
+    <li><a class="dropdown-item" href="../articles/variance-components.html">Variance components in GAMs</a></li>
     <li><a class="dropdown-item" href="../articles/shape-constrained-intervals.html">Intervals for shape-constrained smooths</a></li>
     <li><a class="dropdown-item" href="../articles/spatial-smooths.html">Choose a smooth for the spatial question</a></li>
     <li><a class="dropdown-item" href="../articles/response-distributions.html">Checking different response distributions</a></li>
@@ -117,7 +118,8 @@
 <span>  block_size <span class="op">=</span> <span class="fl">10000L</span>,</span>
 <span>  dense_limit <span class="op">=</span> <span class="fl">5e+06</span>,</span>
 <span>  weights <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  family_index <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  family_index <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  marginalise <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'scam'</span></span>
@@ -304,6 +306,15 @@ family (<code><a href="https://rdrr.io/pkg/mgcv/man/gfam.html" class="external-l
 Membership can instead be recovered from the response-index expression
 in <code>data</code>; observed response values are not required.</p></dd>
 
+
+<dt id="arg-marginalise">marginalise<a class="anchor" aria-label="anchor" href="#arg-marginalise"></a></dt>
+<dd><p><code>NULL</code> retains the usual predictions. <code>TRUE</code> selects all
+supported <code>re</code> and <code>fs</code> terms; character vectors select exact smooth labels.
+Fitted predictions integrate response means over new zero-mean Gaussian
+effects. Response samplers draw new effects before sampling responses.
+Smoothing parameters and dispersion remain fixed. Only ordinary <code><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam()</a></code>
+and <code><a href="https://rdrr.io/pkg/mgcv/man/bam.html" class="external-link">bam()</a></code> fits with a scalar response mean are supported.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -355,6 +366,9 @@ supplied data with known family membership. Component nuisance parameters
 remain fixed. <code>.parameter</code> identifies the component used for each row.
 Censored grouped components require an observation process; use <code><a href="simulate.html">simulate()</a></code>
 for their latent, uncensored responses.</p>
+<p>With <code>marginalise</code>, selected random effects are drawn for new groups in
+each response replicate. Group labels must be supplied for new data.
+See <code><a href="random_effect_samples.html">random_effect_samples()</a></code> for the estimated Gaussian distributions.</p>
     </div>
     <div class="section level2">
     <h2 id="note">Note<a class="anchor" aria-label="anchor" href="#note"></a></h2>

@@ -52,7 +52,18 @@ likelihood does not include the additional random effects. Smoothness
 uncertainty-corrected covariance matrices and alternative EDF are
 unavailable from gamm4; requested corrections warn and fall back to the
 available covariance matrix or EDF. Variance components are extracted
-from the mixed-model component, with smooth labels and random-effect
-term names (separate penalties on a tensor smooth retain their grouping
-suffix); interval bounds are `NA` because they are not supplied by the
-fit.
+from the mixed-model component. Smooth components use the same penalty
+scale and labels as [`gam()`](https://rdrr.io/pkg/mgcv/man/gam.html) and
+[`bam()`](https://rdrr.io/pkg/mgcv/man/bam.html), with a separate row
+for each penalty of a tensor or factor smooth. Additional random effects
+retain their mixed-model variances. Confidence intervals use likelihood
+profiles by default; use `interval_method = "none"` to obtain estimates
+only. Gaussian profiles use a maximum-likelihood refit even when the
+reported estimates were fitted by REML. See
+[variance_comp](https://gavinsimpson.github.io/gratia/reference/variance_comp.md)
+for interval details. With `type = "terms"`, variances describe fitted
+term contributions, including the additional random effects. Their
+covariance matrix is returned in the `covariance` attribute. Term
+intervals use joint posterior coefficient draws, retaining covariance
+with the additional fitted random effects. Use `n_draws = 0` for term
+estimates without intervals.

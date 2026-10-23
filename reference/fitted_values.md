@@ -22,7 +22,11 @@ fitted_values(
   unconditional = FALSE,
   interval_method = c("auto", "gaussian", "bootstrap"),
   quantity = c("parameters", "expectation"),
-  family_index = NULL
+  family_index = NULL,
+  marginalise = NULL,
+  integration = c("quadrature", "monte_carlo"),
+  n_quad = 40L,
+  n_integrate = 5000L
 )
 
 # S3 method for class 'gamm'
@@ -130,6 +134,40 @@ fitted_values(object, ...)
   predicting without responses or with a complex response expression. An
   explicit index must agree with membership recoverable from `data`.
 
+- marginalise:
+
+  `NULL` retains the usual predictions. `TRUE` selects all supported
+  `re` and `fs` terms; character vectors select exact smooth labels.
+  Fitted predictions integrate response means over new zero-mean
+  Gaussian effects. Response samplers draw new effects before sampling
+  responses. Smoothing parameters and dispersion remain fixed. Only
+  ordinary [`gam()`](https://rdrr.io/pkg/mgcv/man/gam.html) and
+  [`bam()`](https://rdrr.io/pkg/mgcv/man/bam.html) fits with a scalar
+  response mean are supported.
+
+- integration:
+
+  Integration method when `marginalise` is supplied: `"quadrature"` (the
+  default) or `"monte_carlo"`. Both integrate over the Gaussian
+  distribution of the selected effects at each row.
+
+- n_quad:
+
+  Initial Gauss-Hermite point count, between 2 and 1000. Successive
+  doubled orders, up to four times this count, and an interlaced rule
+  with one fewer point must agree within `1e-8 + 1e-6 * abs(value)` for
+  means and derivatives. Where the random-effect variance exceeds one,
+  an independent adaptive rule also checks agreement. Failure to agree
+  reports an error. Identity, log and probit links use their closed-form
+  Gaussian integrals; their metadata records zero quadrature points and
+  zero integration error.
+
+- n_integrate:
+
+  Number of Monte Carlo integration draws, at least two. These are
+  shared across rows and posterior coefficient draws. This count is
+  separate from `n_draws`. Ignored for quadrature.
+
 ## Value
 
 A tibble (data frame) whose first *m* columns contain either the data
@@ -156,6 +194,16 @@ Models fitted with certain families will include additional variables
   response.
 
 ## Details
+
+With `marginalise`, predictions are response means averaged over the
+selected random-effect distributions, using the methods described in
+[`fitted_samples()`](https://gavinsimpson.github.io/gratia/reference/fitted_samples.md).
+The point estimate uses fitted coefficients; pointwise intervals use the
+derivative of the integrated mean and the coefficient covariance. `.se`
+is on the response scale. These normal intervals are not clipped to the
+response range. Simultaneous and bootstrap marginal intervals are not
+yet supported. The `integration_info` attribute records numerical
+accuracy and fixed variance estimates.
 
 `quantity = "parameters"` returns all distribution parameters
 represented by predictors, including intercept-only predictors. See

@@ -25,6 +25,28 @@ When reviewing a qualification, ask: “What misunderstanding does this
 sentence prevent, and has the surrounding text given the reader a reason
 to have it?” If there is no concrete answer, delete it.
 
+## R output in documentation
+
+In documentation, vignettes, articles and examples, show the R
+function’s normal printed output. Readers should see what they would see
+if they ran the example code in an R session. Do not subset output
+columns unless absolutely necessary. Do not replace the output with
+formatted tables using
+[`knitr::kable()`](https://rdrr.io/pkg/knitr/man/kable.html) or similar
+tools. Use a formatted table only when preparing output for a journal
+and the user explicitly requests a tabular format.
+
+Introduce every displayed code chunk with narrative explaining what it
+will do or show. Readers should know its purpose before reading the
+code; a section heading alone is not enough. Broader explanations can
+follow the chunk.
+
+For simulations, explain what the data are designed to represent and
+what the example is intended to demonstrate. Describe the roles of the
+covariates, response components, group structure and noise where
+relevant. Separate data generation from model fitting with narrative so
+readers can follow each step.
+
 ## Plot annotations
 
 Keep default plots free of implementation and methodological commentary.

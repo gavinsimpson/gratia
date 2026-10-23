@@ -334,6 +334,8 @@ guide](https://gavinsimpson.github.io/gratia/articles/sampling-migration.md).
   : Plot posterior smooths
 - [`fitted_samples()`](https://gavinsimpson.github.io/gratia/reference/fitted_samples.md)
   : Draw fitted values from the posterior distribution
+- [`random_effect_samples()`](https://gavinsimpson.github.io/gratia/reference/random_effect_samples.md)
+  : Draw new random effects from an estimated GAM
 - [`predicted_samples()`](https://gavinsimpson.github.io/gratia/reference/predicted_samples.md)
   : Draw new response values from the conditional distribution of the
   response
@@ -379,7 +381,10 @@ parameters.
   : Effective degrees of freedom for smooths and GAMs
 
 - [`variance_comp()`](https://gavinsimpson.github.io/gratia/reference/variance_comp.md)
-  : Variance components of smooths from smoothness estimates
+  : Variance components and fitted term variances for GAMs
+
+- [`draw(`*`<variance_comp>`*`)`](https://gavinsimpson.github.io/gratia/reference/draw.variance_comp.md)
+  : Plot variance components and proportions of term variance
 
 - [`fixed_effects()`](https://gavinsimpson.github.io/gratia/reference/fixed_effects.gam.md)
   : Extract fixed effects estimates from a fitted model

@@ -13,7 +13,7 @@ they are not mgcv frequentist or smoothness-corrected intervals."><meta property
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-64</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-66</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -36,6 +36,7 @@ they are not mgcv frequentist or smoothness-corrected intervals."><meta property
     <li><h6 class="dropdown-header" data-toc-skip>Workflows</h6></li>
     <li><a class="dropdown-item" href="../articles/prediction-comparisons.html">Comparing treatments and finding rates of change</a></li>
     <li><a class="dropdown-item" href="../articles/smooth-effects.html">Read smooth effects, interactions and surfaces</a></li>
+    <li><a class="dropdown-item" href="../articles/variance-components.html">Variance components in GAMs</a></li>
     <li><a class="dropdown-item" href="../articles/shape-constrained-intervals.html">Intervals for shape-constrained smooths</a></li>
     <li><a class="dropdown-item" href="../articles/spatial-smooths.html">Choose a smooth for the spatial question</a></li>
     <li><a class="dropdown-item" href="../articles/response-distributions.html">Checking different response distributions</a></li>
@@ -213,10 +214,11 @@ default, as for <code><a href="draw.gam.html">draw.gam()</a></code>. Smooths in 
 linear predictors use mgcv-style labels such as <code>s.1(x)</code> and <code>s.2(x)</code>.
 Predictor order is conditional, zero-inflation (if present), then dispersion
 (if present). Use <code>smooths(object)</code> and <code>select</code> to select individual smooths.
-For models with multiple linear predictors, smooth subtitles identify the
-"Conditional model", "Zero-inflation model" or "Dispersion model",
+For models with multiple linear predictors, smooth and parametric subtitles
+identify the "Conditional model", "Zero-inflation model" or "Dispersion model",
 consistently with native random-effect panels. Constant dispersion alone
 does not trigger these subtitles.
+Saved <code><a href="parametric_effects.html">parametric_effects()</a></code> retain the labels in an optional <code>.model</code> column.
 <code>names(assemble(object, parametric = FALSE))</code> also lists native
 random-effect coefficient panels.</p>
     </div>

@@ -34,7 +34,8 @@ draw(
   discrete_colour = NULL,
   discrete_fill = NULL,
   back_transform = FALSE,
-  time_varying_style = c("ribbon", "pointrange")
+  time_varying_style = c("ribbon", "pointrange"),
+  subtitle = NULL
 )
 ```
 
@@ -236,3 +237,8 @@ draw(
   interval ribbon (`"ribbon"`, the default), or points and interval bars
   with a connecting line (`"pointrange"`). Other model terms keep their
   usual displays.
+
+- subtitle:
+
+  Character or expression; replace the automatic predictor subtitle on
+  every panel. `NULL` uses the automatic label and `""` suppresses it.

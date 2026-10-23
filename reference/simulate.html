@@ -11,7 +11,7 @@ See diagnostic_support."><meta property="og:image" content="https://gavinsimpson
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-64</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-66</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -34,6 +34,7 @@ See diagnostic_support."><meta property="og:image" content="https://gavinsimpson
     <li><h6 class="dropdown-header" data-toc-skip>Workflows</h6></li>
     <li><a class="dropdown-item" href="../articles/prediction-comparisons.html">Comparing treatments and finding rates of change</a></li>
     <li><a class="dropdown-item" href="../articles/smooth-effects.html">Read smooth effects, interactions and surfaces</a></li>
+    <li><a class="dropdown-item" href="../articles/variance-components.html">Variance components in GAMs</a></li>
     <li><a class="dropdown-item" href="../articles/shape-constrained-intervals.html">Intervals for shape-constrained smooths</a></li>
     <li><a class="dropdown-item" href="../articles/spatial-smooths.html">Choose a smooth for the spatial question</a></li>
     <li><a class="dropdown-item" href="../articles/response-distributions.html">Checking different response distributions</a></li>
@@ -86,7 +87,8 @@ See <a href="diagnostic_support.html">diagnostic_support</a>.</p>
 <span>  <span class="va">...</span>,</span>
 <span>  newdata <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  family_index <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  envir <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  envir <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  marginalise <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'gamm'</span></span>
@@ -181,6 +183,15 @@ index per requested prediction row. See Details.</p></dd>
 evaluate model expressions in prediction data. With <code>NULL</code>, use the
 model's formula environment. Supply raw covariates in <code>data</code>.</p></dd>
 
+
+<dt id="arg-marginalise">marginalise<a class="anchor" aria-label="anchor" href="#arg-marginalise"></a></dt>
+<dd><p><code>NULL</code> retains the usual predictions. <code>TRUE</code> selects all
+supported <code>re</code> and <code>fs</code> terms; character vectors select exact smooth labels.
+Fitted predictions integrate response means over new zero-mean Gaussian
+effects. Response samplers draw new effects before sampling responses.
+Smoothing parameters and dispersion remain fixed. Only ordinary <code><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam()</a></code>
+and <code><a href="https://rdrr.io/pkg/mgcv/man/bam.html" class="external-link">bam()</a></code> fits with a scalar response mean are supported.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -191,6 +202,12 @@ model's formula environment. Supply raw covariates in <code>data</code>.</p></dd
     <p>For <code>simulate.gam()</code> to function, the <code>family</code> component of the fitted
 model must contain, or be updatable to contain, the required random
 number generator. See <code><a href="https://rdrr.io/pkg/mgcv/man/fix.family.link.html" class="external-link">mgcv::fix.family.rd()</a></code>.</p>
+<p>With <code>marginalise</code>, each replicate draws new coefficients for selected
+<code>re</code> and <code>fs</code> terms before drawing responses. Other coefficients and all
+variance parameters stay fixed. Supply grouping columns for new data;
+repeated group labels share effects within a replicate. Unfamiliar labels
+are allowed only when those factors occur exclusively in selected terms.
+The <code>random_effect_info</code> attribute records the fixed covariance estimates.</p>
 <p>With <code>data = NULL</code>, <code>na.exclude</code> restores excluded observations as <code>NA</code> in
 every simulation; <code>na.omit</code> returns retained observations only. Positions
 refer to the fitting data after any <code>subset</code>. Explicit <code>data</code> are evaluated

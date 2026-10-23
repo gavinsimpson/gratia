@@ -24,7 +24,8 @@ simulate(
   ...,
   newdata = NULL,
   family_index = NULL,
-  envir = NULL
+  envir = NULL,
+  marginalise = NULL
 )
 
 # S3 method for class 'gamm'
@@ -124,6 +125,17 @@ simulate(
   model expressions in prediction data. With `NULL`, use the model's
   formula environment. Supply raw covariates in `data`.
 
+- marginalise:
+
+  `NULL` retains the usual predictions. `TRUE` selects all supported
+  `re` and `fs` terms; character vectors select exact smooth labels.
+  Fitted predictions integrate response means over new zero-mean
+  Gaussian effects. Response samplers draw new effects before sampling
+  responses. Smoothing parameters and dispersion remain fixed. Only
+  ordinary [`gam()`](https://rdrr.io/pkg/mgcv/man/gam.html) and
+  [`bam()`](https://rdrr.io/pkg/mgcv/man/bam.html) fits with a scalar
+  response mean are supported.
+
 ## Value
 
 (Currently) A data frame with `nsim` columns.
@@ -134,6 +146,14 @@ For `simulate.gam()` to function, the `family` component of the fitted
 model must contain, or be updatable to contain, the required random
 number generator. See
 [`mgcv::fix.family.rd()`](https://rdrr.io/pkg/mgcv/man/fix.family.link.html).
+
+With `marginalise`, each replicate draws new coefficients for selected
+`re` and `fs` terms before drawing responses. Other coefficients and all
+variance parameters stay fixed. Supply grouping columns for new data;
+repeated group labels share effects within a replicate. Unfamiliar
+labels are allowed only when those factors occur exclusively in selected
+terms. The `random_effect_info` attribute records the fixed covariance
+estimates.
 
 With `data = NULL`, `na.exclude` restores excluded observations as `NA`
 in every simulation; `na.omit` returns retained observations only.

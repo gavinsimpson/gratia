@@ -11,7 +11,7 @@ unclassed lists are not supported.'><meta property="og:image" content="https://g
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-64</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-66</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -34,6 +34,7 @@ unclassed lists are not supported.'><meta property="og:image" content="https://g
     <li><h6 class="dropdown-header" data-toc-skip>Workflows</h6></li>
     <li><a class="dropdown-item" href="../articles/prediction-comparisons.html">Comparing treatments and finding rates of change</a></li>
     <li><a class="dropdown-item" href="../articles/smooth-effects.html">Read smooth effects, interactions and surfaces</a></li>
+    <li><a class="dropdown-item" href="../articles/variance-components.html">Variance components in GAMs</a></li>
     <li><a class="dropdown-item" href="../articles/shape-constrained-intervals.html">Intervals for shape-constrained smooths</a></li>
     <li><a class="dropdown-item" href="../articles/spatial-smooths.html">Choose a smooth for the spatial question</a></li>
     <li><a class="dropdown-item" href="../articles/response-distributions.html">Checking different response distributions</a></li>
@@ -102,9 +103,18 @@ the GAM likelihood does not include the additional random effects.
 Smoothness uncertainty-corrected covariance matrices and alternative EDF
 are unavailable from gamm4; requested corrections warn and fall back to
 the available covariance matrix or EDF. Variance components are extracted
-from the mixed-model component, with smooth labels and random-effect term
-names (separate penalties on a tensor smooth retain their grouping suffix);
-interval bounds are <code>NA</code> because they are not supplied by the fit.</p>
+from the mixed-model component. Smooth components use the same penalty
+scale and labels as <code><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam()</a></code> and <code><a href="https://rdrr.io/pkg/mgcv/man/bam.html" class="external-link">bam()</a></code>, with a separate row for each
+penalty of a tensor or factor smooth. Additional random effects retain
+their mixed-model variances. Confidence intervals use likelihood profiles
+by default; use <code>interval_method = "none"</code> to obtain estimates only.
+Gaussian profiles use a maximum-likelihood refit even when the reported
+estimates were fitted by REML. See <a href="variance_comp.html">variance_comp</a> for interval details.
+With <code>type = "terms"</code>, variances describe fitted term contributions,
+including the additional random effects. Their covariance matrix is
+returned in the <code>covariance</code> attribute. Term intervals use joint posterior
+coefficient draws, retaining covariance with the additional fitted random
+effects. Use <code>n_draws = 0</code> for term estimates without intervals.</p>
     </div>
 
   </main></div>

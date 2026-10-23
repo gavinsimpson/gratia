@@ -27,7 +27,8 @@ predicted_samples(
   data = NULL,
   n_draws = NULL,
   seed = NULL,
-  weights = NULL
+  weights = NULL,
+  marginalise = NULL
 )
 
 # S3 method for class 'scam'
@@ -93,6 +94,17 @@ predicted_samples(
   give integer trial counts. They do not alter the fitted coefficient
   covariance. Include positions restored by `na.exclude` when supplying
   weights for fitting rows.
+
+- marginalise:
+
+  `NULL` retains the usual predictions. `TRUE` selects all supported
+  `re` and `fs` terms; character vectors select exact smooth labels.
+  Fitted predictions integrate response means over new zero-mean
+  Gaussian effects. Response samplers draw new effects before sampling
+  responses. Smoothing parameters and dispersion remain fixed. Only
+  ordinary [`gam()`](https://rdrr.io/pkg/mgcv/man/gam.html) and
+  [`bam()`](https://rdrr.io/pkg/mgcv/man/bam.html) fits with a scalar
+  response mean are supported.
 
 ## Value
 

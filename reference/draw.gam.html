@@ -13,7 +13,7 @@ fitted gam component."><meta property="og:image" content="https://gavinsimpson.g
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-64</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-66</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -36,6 +36,7 @@ fitted gam component."><meta property="og:image" content="https://gavinsimpson.g
     <li><h6 class="dropdown-header" data-toc-skip>Workflows</h6></li>
     <li><a class="dropdown-item" href="../articles/prediction-comparisons.html">Comparing treatments and finding rates of change</a></li>
     <li><a class="dropdown-item" href="../articles/smooth-effects.html">Read smooth effects, interactions and surfaces</a></li>
+    <li><a class="dropdown-item" href="../articles/variance-components.html">Variance components in GAMs</a></li>
     <li><a class="dropdown-item" href="../articles/shape-constrained-intervals.html">Intervals for shape-constrained smooths</a></li>
     <li><a class="dropdown-item" href="../articles/spatial-smooths.html">Choose a smooth for the spatial question</a></li>
     <li><a class="dropdown-item" href="../articles/response-distributions.html">Checking different response distributions</a></li>
@@ -672,10 +673,11 @@ transformation is applied to its covariance. Univariate curves and
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>For models with multiple linear predictors, smooth plot subtitles identify
-the model part for glmmTMB models or the distributional parameter for mgcv
-models. Single-predictor models omit these automatic labels; by-variable
-information and custom subtitles are still shown. Constant glmmTMB dispersion
+    <p>For models with multiple linear predictors, smooth and parametric plot
+subtitles identify the model part for glmmTMB models or the distributional
+parameter for mgcv models. Single-predictor models omit these automatic
+labels; by-variable information and custom subtitles are still shown.
+Constant glmmTMB dispersion
 alone does not count as an additional predictor.
 For example, <code><a href="https://rdrr.io/pkg/mgcv/man/gaulss.html" class="external-link">gaulss()</a></code> uses "Mean (mu)" and "Standard deviation (sigma)",
 while <code><a href="https://rdrr.io/pkg/mgcv/man/twlss.html" class="external-link">twlss()</a></code> uses "Mean (mu)", "Power (p)" and "Dispersion (phi)".
@@ -685,7 +687,8 @@ titles and <code>select</code> values are unchanged, and all smooths are drawn b
 By-variable information is appended to the default subtitle. Supply <code>subtitle</code>
 through <code>...</code> to replace it, or <code>subtitle = ""</code> to suppress it; <code>NULL</code> uses the
 default. Custom <code>title</code>, <code>xlab</code> and <code>ylab</code> can also be supplied through <code>...</code>.
-These labels apply to smooth panels.</p>
+Parametric terms use the same predictor labels, including terms shared
+across predictors. Saved <code><a href="parametric_effects.html">parametric_effects()</a></code> retain these labels.</p>
 <p>Polar plots support cyclic cubic and cyclic P splines, including positive
 cyclic P splines from scam, factor-by smooths and one-dimensional tensor
 smooths with a cyclic margin. The covariate forms the angular axis and the

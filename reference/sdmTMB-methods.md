@@ -161,7 +161,11 @@ are drawn separately, with component subtitles. Upstream sdmTMB
 restrictions on supported bases and delta formulas still apply. Tensor
 smooths with multiple penalties are supported. Fits require stored
 smooth metadata; mapping or profiling required coefficients and
-non-positive-definite Hessians give errors.
+non-positive-definite Hessians give errors. Parametric subtitles also
+identify the component for threshold curves and time-varying
+coefficients. Saved
+[`parametric_effects()`](https://gavinsimpson.github.io/gratia/reference/parametric_effects.md)
+retain the labels in an optional `.model` column.
 
 Support requires sdmTMB \>= 1.2.0 models fitted with the RTMB backend.
 Refit older models or TMB fits with

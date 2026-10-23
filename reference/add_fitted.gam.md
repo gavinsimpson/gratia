@@ -12,7 +12,12 @@ add_fitted(
   value = ".fitted",
   type = "response",
   ...,
-  envir = NULL
+  envir = NULL,
+  marginalise = NULL,
+  integration = c("quadrature", "monte_carlo"),
+  n_quad = 40L,
+  n_integrate = 5000L,
+  seed = NULL
 )
 ```
 
@@ -52,6 +57,44 @@ add_fitted(
   environment or `NULL`; functions and constants needed to evaluate
   model expressions in prediction data. With `NULL`, use the model's
   formula environment. Supply raw covariates in `data`.
+
+- marginalise:
+
+  `NULL` retains the usual predictions. `TRUE` selects all supported
+  `re` and `fs` terms; character vectors select exact smooth labels.
+  Fitted predictions integrate response means over new zero-mean
+  Gaussian effects. Response samplers draw new effects before sampling
+  responses. Smoothing parameters and dispersion remain fixed. Only
+  ordinary `gam()` and `bam()` fits with a scalar response mean are
+  supported.
+
+- integration:
+
+  Integration method when `marginalise` is supplied: `"quadrature"` (the
+  default) or `"monte_carlo"`. Both integrate over the Gaussian
+  distribution of the selected effects at each row.
+
+- n_quad:
+
+  Initial Gauss-Hermite point count, between 2 and 1000. Successive
+  doubled orders, up to four times this count, and an interlaced rule
+  with one fewer point must agree within `1e-8 + 1e-6 * abs(value)` for
+  means and derivatives. Where the random-effect variance exceeds one,
+  an independent adaptive rule also checks agreement. Failure to agree
+  reports an error. Identity, log and probit links use their closed-form
+  Gaussian integrals; their metadata records zero quadrature points and
+  zero integration error.
+
+- n_integrate:
+
+  Number of Monte Carlo integration draws, at least two. These are
+  shared across rows and posterior coefficient draws. This count is
+  separate from `n_draws`. Ignored for quadrature.
+
+- seed:
+
+  Optional integer seed. An explicit seed preserves the caller's
+  random-number state; `NULL` advances the current state.
 
 ## Value
 

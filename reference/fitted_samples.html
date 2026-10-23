@@ -9,7 +9,7 @@ distribution of a fitted model."><meta property="og:image" content="https://gavi
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-64</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-66</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -32,6 +32,7 @@ distribution of a fitted model."><meta property="og:image" content="https://gavi
     <li><h6 class="dropdown-header" data-toc-skip>Workflows</h6></li>
     <li><a class="dropdown-item" href="../articles/prediction-comparisons.html">Comparing treatments and finding rates of change</a></li>
     <li><a class="dropdown-item" href="../articles/smooth-effects.html">Read smooth effects, interactions and surfaces</a></li>
+    <li><a class="dropdown-item" href="../articles/variance-components.html">Variance components in GAMs</a></li>
     <li><a class="dropdown-item" href="../articles/shape-constrained-intervals.html">Intervals for shape-constrained smooths</a></li>
     <li><a class="dropdown-item" href="../articles/spatial-smooths.html">Choose a smooth for the spatial question</a></li>
     <li><a class="dropdown-item" href="../articles/response-distributions.html">Checking different response distributions</a></li>
@@ -97,7 +98,11 @@ distribution of a fitted model.</p>
 <span>  dense_limit <span class="op">=</span> <span class="fl">5e+06</span>,</span>
 <span>  scale <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"response"</span>, <span class="st">"linear_predictor"</span><span class="op">)</span>,</span>
 <span>  family_index <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  quantity <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"parameters"</span>, <span class="st">"expectation"</span><span class="op">)</span></span>
+<span>  quantity <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"parameters"</span>, <span class="st">"expectation"</span><span class="op">)</span>,</span>
+<span>  marginalise <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  integration <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"quadrature"</span>, <span class="st">"monte_carlo"</span><span class="op">)</span>,</span>
+<span>  n_quad <span class="op">=</span> <span class="fl">40L</span>,</span>
+<span>  n_integrate <span class="op">=</span> <span class="fl">5000L</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'scam'</span></span>
@@ -279,6 +284,38 @@ distribution parameters represented by predictors, including intercept-only
 predictors. <code>"expectation"</code> returns the expected response, using every
 parameter on which it depends, on the response scale only.</p></dd>
 
+
+<dt id="arg-marginalise">marginalise<a class="anchor" aria-label="anchor" href="#arg-marginalise"></a></dt>
+<dd><p><code>NULL</code> retains the usual predictions. <code>TRUE</code> selects all
+supported <code>re</code> and <code>fs</code> terms; character vectors select exact smooth labels.
+Fitted predictions integrate response means over new zero-mean Gaussian
+effects. Response samplers draw new effects before sampling responses.
+Smoothing parameters and dispersion remain fixed. Only ordinary <code><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam()</a></code>
+and <code><a href="https://rdrr.io/pkg/mgcv/man/bam.html" class="external-link">bam()</a></code> fits with a scalar response mean are supported.</p></dd>
+
+
+<dt id="arg-integration">integration<a class="anchor" aria-label="anchor" href="#arg-integration"></a></dt>
+<dd><p>Integration method when <code>marginalise</code> is supplied:
+<code>"quadrature"</code> (the default) or <code>"monte_carlo"</code>. Both integrate
+over the Gaussian distribution of the selected effects at each row.</p></dd>
+
+
+<dt id="arg-n-quad">n_quad<a class="anchor" aria-label="anchor" href="#arg-n-quad"></a></dt>
+<dd><p>Initial Gauss-Hermite point count, between 2 and 1000.
+Successive doubled orders, up to four times this count, and an interlaced
+rule with one fewer point must agree within
+<code>1e-8 + 1e-6 * abs(value)</code> for means and derivatives. Where the random-effect
+variance exceeds one, an independent adaptive rule also checks agreement.
+Failure to agree reports an error.
+Identity, log and probit links use their closed-form Gaussian integrals;
+their metadata records zero quadrature points and zero integration error.</p></dd>
+
+
+<dt id="arg-n-integrate">n_integrate<a class="anchor" aria-label="anchor" href="#arg-n-integrate"></a></dt>
+<dd><p>Number of Monte Carlo integration draws, at least two.
+These are shared across rows and posterior coefficient draws. This count
+is separate from <code>n_draws</code>. Ignored for quadrature.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -291,7 +328,21 @@ coefficient diagnostics are available through <code><a href="sampling_diagnostic
 </ul></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>Parameter names and definitions are available through <code><a href="family_parameters.html">family_parameters()</a></code>.
+    <p>With <code>marginalise</code>, fitted samples contain posterior draws of the integrated
+mean, rather than the variation among new groups. Selected fitted effects
+are removed before integration. <code>exclude</code> cannot name a selected term and
+<code>terms</code> is unsupported. Only response-scale means and links defined over
+the whole Gaussian predictor distribution are supported. Grouping columns
+can be omitted if they occur exclusively in the selected terms. A factor
+also used as a selected smooth's <code>by</code> variable must still be supplied with
+a fitted level, because it selects the relevant curve distribution. Fits
+using <code>min.sp</code> are unsupported; see <code><a href="random_effect_samples.html">random_effect_samples()</a></code>.
+The <code>integration_info</code> attribute records fixed variance estimates, the
+integration method, point or draw counts, and numerical error estimates.
+For Monte Carlo these errors are standard errors of integration, separate
+from uncertainty in model predictions. <code>unconditional</code> can adjust the
+coefficient covariance; it does not draw random-effect variance parameters.</p>
+<p>Parameter names and definitions are available through <code><a href="family_parameters.html">family_parameters()</a></code>.
 Gaussian LSS returns <code>mean</code> and <code>sd</code>, GEV returns <code>location</code>, <code>scale</code> and
 <code>shape</code>, and sinh-arcsinh returns <code>location</code>, <code>scale</code>, <code>skewness</code> and
 <code>tailweight</code>. These shape parameters are not response moments. Natural

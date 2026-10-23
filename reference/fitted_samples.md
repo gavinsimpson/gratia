@@ -36,7 +36,11 @@ fitted_samples(
   dense_limit = 5e+06,
   scale = c("response", "linear_predictor"),
   family_index = NULL,
-  quantity = c("parameters", "expectation")
+  quantity = c("parameters", "expectation"),
+  marginalise = NULL,
+  integration = c("quadrature", "monte_carlo"),
+  n_quad = 40L,
+  n_integrate = 5000L
 )
 
 # S3 method for class 'scam'
@@ -227,6 +231,40 @@ fitted_samples(
   predictors. `"expectation"` returns the expected response, using every
   parameter on which it depends, on the response scale only.
 
+- marginalise:
+
+  `NULL` retains the usual predictions. `TRUE` selects all supported
+  `re` and `fs` terms; character vectors select exact smooth labels.
+  Fitted predictions integrate response means over new zero-mean
+  Gaussian effects. Response samplers draw new effects before sampling
+  responses. Smoothing parameters and dispersion remain fixed. Only
+  ordinary [`gam()`](https://rdrr.io/pkg/mgcv/man/gam.html) and
+  [`bam()`](https://rdrr.io/pkg/mgcv/man/bam.html) fits with a scalar
+  response mean are supported.
+
+- integration:
+
+  Integration method when `marginalise` is supplied: `"quadrature"` (the
+  default) or `"monte_carlo"`. Both integrate over the Gaussian
+  distribution of the selected effects at each row.
+
+- n_quad:
+
+  Initial Gauss-Hermite point count, between 2 and 1000. Successive
+  doubled orders, up to four times this count, and an interlaced rule
+  with one fewer point must agree within `1e-8 + 1e-6 * abs(value)` for
+  means and derivatives. Where the random-effect variance exceeds one,
+  an independent adaptive rule also checks agreement. Failure to agree
+  reports an error. Identity, log and probit links use their closed-form
+  Gaussian integrals; their metadata records zero quadrature points and
+  zero integration error.
+
+- n_integrate:
+
+  Number of Monte Carlo integration draws, at least two. These are
+  shared across rows and posterior coefficient draws. This count is
+  separate from `n_draws`. Ignored for quadrature.
+
 ## Value
 
 A tibble (data frame) in long format, with columns:
@@ -243,6 +281,24 @@ A tibble (data frame) in long format, with columns:
   [`sampling_diagnostics()`](https://gavinsimpson.github.io/gratia/reference/sampling_diagnostics.md).
 
 ## Details
+
+With `marginalise`, fitted samples contain posterior draws of the
+integrated mean, rather than the variation among new groups. Selected
+fitted effects are removed before integration. `exclude` cannot name a
+selected term and `terms` is unsupported. Only response-scale means and
+links defined over the whole Gaussian predictor distribution are
+supported. Grouping columns can be omitted if they occur exclusively in
+the selected terms. A factor also used as a selected smooth's `by`
+variable must still be supplied with a fitted level, because it selects
+the relevant curve distribution. Fits using `min.sp` are unsupported;
+see
+[`random_effect_samples()`](https://gavinsimpson.github.io/gratia/reference/random_effect_samples.md).
+The `integration_info` attribute records fixed variance estimates, the
+integration method, point or draw counts, and numerical error estimates.
+For Monte Carlo these errors are standard errors of integration,
+separate from uncertainty in model predictions. `unconditional` can
+adjust the coefficient covariance; it does not draw random-effect
+variance parameters.
 
 Parameter names and definitions are available through
 [`family_parameters()`](https://gavinsimpson.github.io/gratia/reference/family_parameters.md).

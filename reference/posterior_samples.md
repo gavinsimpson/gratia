@@ -58,7 +58,8 @@ posterior_samples(
   block_size = 10000L,
   dense_limit = 5e+06,
   weights = NULL,
-  family_index = NULL
+  family_index = NULL,
+  marginalise = NULL
 )
 
 # S3 method for class 'scam'
@@ -257,6 +258,17 @@ posterior_samples(
   recovered from the response-index expression in `data`; observed
   response values are not required.
 
+- marginalise:
+
+  `NULL` retains the usual predictions. `TRUE` selects all supported
+  `re` and `fs` terms; character vectors select exact smooth labels.
+  Fitted predictions integrate response means over new zero-mean
+  Gaussian effects. Response samplers draw new effects before sampling
+  responses. Smoothing parameters and dispersion remain fixed. Only
+  ordinary [`gam()`](https://rdrr.io/pkg/mgcv/man/gam.html) and
+  [`bam()`](https://rdrr.io/pkg/mgcv/man/bam.html) fits with a scalar
+  response mean are supported.
+
 ## Value
 
 A tibble (data frame) in long format, with columns:
@@ -331,6 +343,11 @@ component used for each row. Censored grouped components require an
 observation process; use
 [`simulate()`](https://gavinsimpson.github.io/gratia/reference/simulate.md)
 for their latent, uncensored responses.
+
+With `marginalise`, selected random effects are drawn for new groups in
+each response replicate. Group labels must be supplied for new data. See
+[`random_effect_samples()`](https://gavinsimpson.github.io/gratia/reference/random_effect_samples.md)
+for the estimated Gaussian distributions.
 
 ## Note
 

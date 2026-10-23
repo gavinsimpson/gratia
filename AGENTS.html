@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-64</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-66</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -30,6 +30,7 @@
     <li><h6 class="dropdown-header" data-toc-skip>Workflows</h6></li>
     <li><a class="dropdown-item" href="articles/prediction-comparisons.html">Comparing treatments and finding rates of change</a></li>
     <li><a class="dropdown-item" href="articles/smooth-effects.html">Read smooth effects, interactions and surfaces</a></li>
+    <li><a class="dropdown-item" href="articles/variance-components.html">Variance components in GAMs</a></li>
     <li><a class="dropdown-item" href="articles/shape-constrained-intervals.html">Intervals for shape-constrained smooths</a></li>
     <li><a class="dropdown-item" href="articles/spatial-smooths.html">Choose a smooth for the spatial question</a></li>
     <li><a class="dropdown-item" href="articles/response-distributions.html">Checking different response distributions</a></li>
@@ -64,6 +65,12 @@
 <p>Use plain English in explanations, progress updates, commit messages, documentation, package vignettes and articles, <code>NEWS.md</code> entries, GitHub issues and pull requests, and comments in code. Describe what happens, what causes it, and why it matters. Avoid compressed jargon and invented compound labels. Introduce a technical term only when it helps, and explain its meaning first. Preserve scientific precision through concrete descriptions, equations or examples—not unexplained terminology. Assume the reader understands statistics but should not have to decode your shorthand. Before sending or saving text, replace any phrase that would reasonably prompt “What does that mean?” with a direct explanation.</p>
 <p>State what the evidence shows. Add a limitation only when it materially changes how the reader should interpret or use that result. Connect it to a specific claim or decision in the surrounding text, and explain its practical consequence. Do not introduce an unasked alternative claim merely to disclaim it. Omit generic cautions about causality, uncertainty or generalisation when they add no useful information.</p>
 <p>When reviewing a qualification, ask: “What misunderstanding does this sentence prevent, and has the surrounding text given the reader a reason to have it?” If there is no concrete answer, delete it.</p>
+</div>
+<div class="section level2">
+<h2 id="r-output-in-documentation">R output in documentation<a class="anchor" aria-label="anchor" href="#r-output-in-documentation"></a></h2>
+<p>In documentation, vignettes, articles and examples, show the R function’s normal printed output. Readers should see what they would see if they ran the example code in an R session. Do not subset output columns unless absolutely necessary. Do not replace the output with formatted tables using <code><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">knitr::kable()</a></code> or similar tools. Use a formatted table only when preparing output for a journal and the user explicitly requests a tabular format.</p>
+<p>Introduce every displayed code chunk with narrative explaining what it will do or show. Readers should know its purpose before reading the code; a section heading alone is not enough. Broader explanations can follow the chunk.</p>
+<p>For simulations, explain what the data are designed to represent and what the example is intended to demonstrate. Describe the roles of the covariates, response components, group structure and noise where relevant. Separate data generation from model fitting with narrative so readers can follow each step.</p>
 </div>
 <div class="section level2">
 <h2 id="plot-annotations">Plot annotations<a class="anchor" aria-label="anchor" href="#plot-annotations"></a></h2>

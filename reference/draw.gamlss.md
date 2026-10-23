@@ -228,33 +228,35 @@ when there are no plots to draw.
 
 ## Note
 
-For models with multiple linear predictors, smooth plot subtitles
-identify the distributional parameter using the parent model's margin
-and equation order, rather than the working family of the embedded GAMs.
-Univariate GAMLSS models with one predictor omit these automatic labels.
-Joint models retain equation labels even when only dependence is
-estimated. Existing smooth labels, selection, by-variable information
-and custom subtitles are retained. Pass `surface = "3d", ci_3d = TRUE`
-through `...` to add interval surfaces to smooths and numeric parametric
-interactions in any equation. `ci_3d_alpha` and `ci_3d_col` control
-their opacity and fill colour. Pass `cyclic = "polar"` and optional
-`polar_args` through `...` for polar plots of supported one-dimensional
-cyclic smooths in any equation; see
+For models with multiple linear predictors, smooth and parametric plot
+subtitles identify the distributional parameter using the parent model's
+margin and equation order, rather than the working family of the
+embedded GAMs. Univariate GAMLSS models with one predictor omit these
+automatic labels. Joint models retain equation labels even when only
+dependence is estimated. Existing smooth labels, selection, by-variable
+information and custom subtitles are retained. Pass
+`surface = "3d", ci_3d = TRUE` through `...` to add interval surfaces to
+smooths and numeric parametric interactions in any equation.
+`ci_3d_alpha` and `ci_3d_col` control their opacity and fill colour.
+Pass `cyclic = "polar"` and optional `polar_args` through `...` for
+polar plots of supported one-dimensional cyclic smooths in any equation;
+see
 [`draw.gam()`](https://gavinsimpson.github.io/gratia/reference/draw.gam.md)
 for the coordinate options.
 
 Joint models use the final joint coefficients and covariance for every
 embedded GAM, including dependence equations and random-effect smooths.
-Parametric plot subtitles also identify their response and parameter. A
-parametric term repeated across equations has list names such as
-`x (equation 1)` and `x (equation 2)`; unique terms keep their original
-names. Grouped factor-by panels also receive an equation suffix when
-their base name would hide another smooth's selection label. Ordinal
-cutpoints are excluded from smooth and intercept uncertainty.
-Fixed-margin fits plot their estimated dependence equation only.
-Flexible survival equations fitted using SCAM are not yet supported.
-Working residuals from preliminary GAM fits are unavailable for joint
-models; requesting partial residuals warns and draws the smooths alone.
+Parametric plot subtitles also identify their response and parameter.
+For both univariate and joint models, a parametric term repeated across
+equations has list names such as `x (equation 1)` and `x (equation 2)`;
+unique terms keep their original names. Grouped factor-by panels also
+receive an equation suffix when their base name would hide another
+smooth's selection label. Ordinal cutpoints are excluded from smooth and
+intercept uncertainty. Fixed-margin fits plot their estimated dependence
+equation only. Flexible survival equations fitted using SCAM are not yet
+supported. Working residuals from preliminary GAM fits are unavailable
+for joint models; requesting partial residuals warns and draws the
+smooths alone.
 
 ## Examples
 

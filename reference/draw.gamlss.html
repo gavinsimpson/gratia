@@ -11,7 +11,7 @@ individual plots; draw() arranges them using patchwork::wrap_plots()."><meta pro
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-64</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-66</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -34,6 +34,7 @@ individual plots; draw() arranges them using patchwork::wrap_plots()."><meta pro
     <li><h6 class="dropdown-header" data-toc-skip>Workflows</h6></li>
     <li><a class="dropdown-item" href="../articles/prediction-comparisons.html">Comparing treatments and finding rates of change</a></li>
     <li><a class="dropdown-item" href="../articles/smooth-effects.html">Read smooth effects, interactions and surfaces</a></li>
+    <li><a class="dropdown-item" href="../articles/variance-components.html">Variance components in GAMs</a></li>
     <li><a class="dropdown-item" href="../articles/shape-constrained-intervals.html">Intervals for shape-constrained smooths</a></li>
     <li><a class="dropdown-item" href="../articles/spatial-smooths.html">Choose a smooth for the spatial question</a></li>
     <li><a class="dropdown-item" href="../articles/response-distributions.html">Checking different response distributions</a></li>
@@ -274,9 +275,10 @@ are no plots to draw.</p>
     </div>
     <div class="section level2">
     <h2 id="note">Note<a class="anchor" aria-label="anchor" href="#note"></a></h2>
-    <p>For models with multiple linear predictors, smooth plot subtitles
-identify the distributional parameter using the parent model's margin and
-equation order, rather than the working family of the embedded GAMs.
+    <p>For models with multiple linear predictors, smooth and parametric
+plot subtitles identify the distributional parameter using the parent
+model's margin and equation order, rather than the working family of
+the embedded GAMs.
 Univariate GAMLSS models with one predictor omit these automatic labels.
 Joint models retain equation labels even when only dependence is estimated.
 Existing smooth labels, selection, by-variable information and custom
@@ -290,8 +292,9 @@ see <code><a href="draw.gam.html">draw.gam()</a></code> for the coordinate optio
 <p>Joint models use the final joint coefficients and covariance for every
 embedded GAM, including dependence equations and random-effect smooths.
 Parametric plot subtitles also identify their response and parameter.
-A parametric term repeated across equations has list names such as
-<code>x (equation 1)</code> and <code>x (equation 2)</code>; unique terms keep their original names.
+For both univariate and joint models, a parametric term repeated across
+equations has list names such as <code>x (equation 1)</code> and <code>x (equation 2)</code>;
+unique terms keep their original names.
 Grouped factor-by panels also receive an equation suffix when their
 base name would hide another smooth's selection label.
 Ordinal cutpoints are excluded from smooth and intercept uncertainty.

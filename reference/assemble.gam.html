@@ -13,7 +13,7 @@ fitted gam component."><meta property="og:image" content="https://gavinsimpson.g
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-64</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-66</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -36,6 +36,7 @@ fitted gam component."><meta property="og:image" content="https://gavinsimpson.g
     <li><h6 class="dropdown-header" data-toc-skip>Workflows</h6></li>
     <li><a class="dropdown-item" href="../articles/prediction-comparisons.html">Comparing treatments and finding rates of change</a></li>
     <li><a class="dropdown-item" href="../articles/smooth-effects.html">Read smooth effects, interactions and surfaces</a></li>
+    <li><a class="dropdown-item" href="../articles/variance-components.html">Variance components in GAMs</a></li>
     <li><a class="dropdown-item" href="../articles/shape-constrained-intervals.html">Intervals for shape-constrained smooths</a></li>
     <li><a class="dropdown-item" href="../articles/spatial-smooths.html">Choose a smooth for the spatial question</a></li>
     <li><a class="dropdown-item" href="../articles/response-distributions.html">Checking different response distributions</a></li>
@@ -565,7 +566,8 @@ limits. Bootstrap sources require <code>frequentist = FALSE</code> and
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>Additional smooth plotting arguments, including <code>title</code>,
-<code>subtitle</code>, <code>xlab</code> and <code>ylab</code>.</p></dd>
+<code>subtitle</code>, <code>xlab</code> and <code>ylab</code>. <code>subtitle</code> also applies to parametric panels;
+use <code>NULL</code> for automatic predictor labels or <code>""</code> to suppress them.</p></dd>
 
 
 <dt id="arg-variables">variables<a class="anchor" aria-label="anchor" href="#arg-variables"></a></dt>
@@ -665,8 +667,8 @@ transformation is applied to its covariance. Univariate curves and
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>Smooth plot subtitles identify the model part or distributional
-parameter as described in <code><a href="draw.gam.html">draw.gam()</a></code>. Custom smooth labels, including
+    <p>Smooth and parametric plot subtitles identify the model part or
+distributional parameter as described in <code><a href="draw.gam.html">draw.gam()</a></code>. Custom labels, including
 <code>subtitle</code>, can be passed through <code>...</code>. Use <code>cyclic = "polar"</code> to draw
 one-dimensional cyclic smooths with polar coordinates; <code>polar_args</code>
 customizes the coordinate display as described in <code><a href="draw.gam.html">draw.gam()</a></code>.</p>

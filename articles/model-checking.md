@@ -433,9 +433,9 @@ variance_comp(growth_smooth)
 #> # A tibble: 3 × 5
 #>   .component          .variance .std_dev .lower_ci .upper_ci
 #>   <chr>                   <dbl>    <dbl>     <dbl>     <dbl>
-#> 1 Subject:(Intercept)      3.27     1.81        NA        NA
-#> 2 s(age)                   0        0           NA        NA
-#> 3 scale                    2.05     1.43        NA        NA
+#> 1 s(age)                   0        0         0        0.386
+#> 2 Subject:(Intercept)      3.27     1.81      1.28     2.40 
+#> 3 scale                    2.05     1.43      1.23     1.67
 ```
 
 The direct [`lmer()`](https://rdrr.io/pkg/lme4/man/lmer.html) fit

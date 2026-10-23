@@ -535,7 +535,8 @@ assemble(object, ..., overall_uncertainty = FALSE, centre = c("model", "plot"))
 - ...:
 
   Additional smooth plotting arguments, including `title`, `subtitle`,
-  `xlab` and `ylab`.
+  `xlab` and `ylab`. `subtitle` also applies to parametric panels; use
+  `NULL` for automatic predictor labels or `""` to suppress them.
 
 - variables:
 
@@ -643,11 +644,11 @@ objects.
 
 ## Details
 
-Smooth plot subtitles identify the model part or distributional
-parameter as described in
+Smooth and parametric plot subtitles identify the model part or
+distributional parameter as described in
 [`draw.gam()`](https://gavinsimpson.github.io/gratia/reference/draw.gam.md).
-Custom smooth labels, including `subtitle`, can be passed through `...`.
-Use `cyclic = "polar"` to draw one-dimensional cyclic smooths with polar
+Custom labels, including `subtitle`, can be passed through `...`. Use
+`cyclic = "polar"` to draw one-dimensional cyclic smooths with polar
 coordinates; `polar_args` customizes the coordinate display as described
 in
 [`draw.gam()`](https://gavinsimpson.github.io/gratia/reference/draw.gam.md).

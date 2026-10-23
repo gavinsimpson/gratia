@@ -648,12 +648,12 @@ The object returned is created by
 
 ## Details
 
-For models with multiple linear predictors, smooth plot subtitles
-identify the model part for glmmTMB models or the distributional
-parameter for mgcv models. Single-predictor models omit these automatic
-labels; by-variable information and custom subtitles are still shown.
-Constant glmmTMB dispersion alone does not count as an additional
-predictor. For example,
+For models with multiple linear predictors, smooth and parametric plot
+subtitles identify the model part for glmmTMB models or the
+distributional parameter for mgcv models. Single-predictor models omit
+these automatic labels; by-variable information and custom subtitles are
+still shown. Constant glmmTMB dispersion alone does not count as an
+additional predictor. For example,
 [`gaulss()`](https://rdrr.io/pkg/mgcv/man/gaulss.html) uses "Mean (mu)"
 and "Standard deviation (sigma)", while
 [`twlss()`](https://rdrr.io/pkg/mgcv/man/twlss.html) uses "Mean (mu)",
@@ -664,7 +664,10 @@ values are unchanged, and all smooths are drawn by default. By-variable
 information is appended to the default subtitle. Supply `subtitle`
 through `...` to replace it, or `subtitle = ""` to suppress it; `NULL`
 uses the default. Custom `title`, `xlab` and `ylab` can also be supplied
-through `...`. These labels apply to smooth panels.
+through `...`. Parametric terms use the same predictor labels, including
+terms shared across predictors. Saved
+[`parametric_effects()`](https://gavinsimpson.github.io/gratia/reference/parametric_effects.md)
+retain these labels.
 
 Polar plots support cyclic cubic and cyclic P splines, including
 positive cyclic P splines from scam, factor-by smooths and
