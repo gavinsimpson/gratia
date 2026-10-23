@@ -222,14 +222,23 @@ penalty.scam <- function(object, ...) {
 }
 
 #' @rdname variance_comp
-#' @details For SCAM fits, `.variance` is the fitted response scale divided by
+#' @details For SCAM fits with `type = "penalty"`, `.variance` is the fitted
+#'   response scale divided by
 #'   the smoothing parameter, optionally undoing penalty rescaling. This ratio
 #'   describes the Gaussian penalty on unrestricted fitting parameters; it is
 #'   not a Gaussian variance for the transformed smooth coefficients. SCAM's
 #'   GCV and UBRE fits do not supply the likelihood-based smoothing-parameter
 #'   covariance needed for confidence limits, so both limit columns are `NA`.
 #' @export
-variance_comp.scam <- function(object, rescale = TRUE, coverage = 0.95, ...) {
+variance_comp.scam <- function(object, rescale = TRUE, coverage = 0.95,
+    type = c("penalty", "terms"), n_draws = 1000L, seed = NULL,
+    unconditional = FALSE, include_total = TRUE, ...) {
+  type <- match.arg(type)
+  if (type == "terms") {
+    variance_terms_check_dots(...)
+    return(variance_comp_terms(object, coverage = coverage, n_draws = n_draws,
+      seed = seed, unconditional = unconditional, include_total = include_total))
+  }
   # SCAM's penalty is Gaussian on the unrestricted fitting parameters.
   # This scale ratio does not describe Gaussian transformed smooth coefficients.
   object <- scam_gam_adapter(object)

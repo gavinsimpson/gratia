@@ -1708,6 +1708,34 @@ detaching ‘package:mgcv’
 
 detaching ‘package:mgcv’
 
+> nameEx("draw.variance_comp")
+> ### * draw.variance_comp
+>
+> flush(stderr()); flush(stdout())
+>
+> ### Name: draw.variance_comp
+> ### Title: Plot variance components and proportions of term variance
+> ### Aliases: draw.variance_comp
+>
+> ### ** Examples
+>
+> load_mgcv()
+> dat <- data_sim("eg1", n = 100, seed = 42)
+> model <- gam(y ~ x0 + s(x1, k = 6), data = dat, method = "REML")
+> components <- variance_comp(model)
+> draw(components)
+> draw(components, type = "std_dev")
+>
+> terms <- variance_comp(model, type = "terms", n_draws = 200, seed = 42)
+> draw(terms)
+> draw(terms, type = "proportion", include_total = FALSE)
+>
+>
+>
+> cleanEx()
+
+detaching ‘package:mgcv’
+
 > nameEx("edf")
 > ### * edf
 > 

@@ -47,6 +47,7 @@ articles:
     contents:
       - articles/prediction-comparisons
       - articles/smooth-effects
+      - articles/variance-components
       - articles/shape-constrained-intervals
       - articles/spatial-smooths
       - articles/response-distributions
@@ -220,6 +221,7 @@ reference:
       - gamm4_support
       - edf
       - variance_comp
+      - draw.variance_comp
       - fixed_effects
       - coef.scam
       - get_vcov

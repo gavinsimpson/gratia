@@ -42,7 +42,16 @@ the GAM likelihood does not include the additional random effects.
 Smoothness uncertainty-corrected covariance matrices and alternative EDF
 are unavailable from gamm4; requested corrections warn and fall back to
 the available covariance matrix or EDF. Variance components are extracted
-from the mixed-model component, with smooth labels and random-effect term
-names (separate penalties on a tensor smooth retain their grouping suffix);
-interval bounds are \code{NA} because they are not supplied by the fit.
+from the mixed-model component. Smooth components use the same penalty
+scale and labels as \code{gam()} and \code{bam()}, with a separate row for each
+penalty of a tensor or factor smooth. Additional random effects retain
+their mixed-model variances. Confidence intervals use likelihood profiles
+by default; use \code{interval_method = "none"} to obtain estimates only.
+Gaussian profiles use a maximum-likelihood refit even when the reported
+estimates were fitted by REML. See \link{variance_comp} for interval details.
+With \code{type = "terms"}, variances describe fitted term contributions,
+including the additional random effects. Their covariance matrix is
+returned in the \code{covariance} attribute. Term intervals use joint posterior
+coefficient draws, retaining covariance with the additional fitted random
+effects. Use \code{n_draws = 0} for term estimates without intervals.
 }

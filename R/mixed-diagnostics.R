@@ -662,7 +662,7 @@ worm_plot.merMod <- function(model, conditioning = NULL, ...) {
 # preserve the fitted contrasts. Match design columns to covariance names before
 # calculating variances, drawing responses or forming the inverse posterior
 # covariance.
-lme_random_terms <- function(model, data = lme_fitting_data(model)) {
+lme_random_predictors <- function(model, data = lme_fitting_data(model)) {
   rs <- model$modelStruct$reStruct
   contrasts <- model$contrasts
   direct <- intersect(names(contrasts), names(data))
@@ -677,10 +677,21 @@ lme_random_terms <- function(model, data = lme_fitting_data(model)) {
     stop("Native lme random design blocks are not aligned.", call. = FALSE)
   ends <- cumsum(counts)
   starts <- ends - counts + 1L
-  lapply(seq_along(rs), function(i) {
+  out <- lapply(seq_along(rs), function(i) {
     nm <- names(rs)[i]
     z <- design[, seq.int(starts[i], ends[i]), drop = FALSE]
     colnames(z) <- labels[[i]]
+    list(z = z, group = as.character(model$groups[[nm]]))
+  })
+  names(out) <- names(rs)
+  out
+}
+
+lme_random_terms <- function(model, data = lme_fitting_data(model)) {
+  rs <- model$modelStruct$reStruct
+  predictors <- lme_random_predictors(model, data)
+  lapply(seq_along(rs), function(i) {
+    z <- predictors[[i]]$z
     covariance <- nlme::pdMatrix(rs[[i]]) * model$sigma^2
     columns <- match(colnames(covariance), colnames(z))
     if (ncol(z) != ncol(covariance) || anyNA(columns) ||
@@ -690,6 +701,6 @@ lme_random_terms <- function(model, data = lme_fitting_data(model)) {
     }
     z <- z[, columns, drop = FALSE]
     list(z = z, covariance = covariance, factor = t(chol(covariance)),
-      group = as.character(model$groups[[nm]]))
+      group = predictors[[i]]$group)
   })
 }
