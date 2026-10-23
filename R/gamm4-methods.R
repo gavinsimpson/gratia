@@ -341,6 +341,7 @@ posterior_samples.gamm4 <- function(
     n_draws = NULL,
     seed = NULL,
     conditioning = NULL) {
+  marginal_not_supported(list(...), "posterior_samples.gamm4()")
   sampling_check_names(substitute(list(...)), derivative = FALSE)
   conditioning <- mixed_conditioning(model, conditioning)
   if (conditioning == "gam_component")
@@ -595,6 +596,7 @@ is_factor_term.gamm4 <- function(object, term, ...) {
 #' @aliases simulate.gamm4
 simulate.gamm4 <- function(object, nsim = 1, seed = NULL,
     conditioning = NULL, ...) {
+  marginal_not_supported(list(...), "simulate.gamm4()")
   conditioning <- mixed_conditioning(object, conditioning)
   if (conditioning == "gam_component") {
     return(simulate.gam(gamm4_gam(object), nsim = nsim, seed = seed, ...))

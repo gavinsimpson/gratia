@@ -105,6 +105,14 @@ spread the plots}
 \description{
 Plot posterior smooths
 }
+\section{Label layout}{
+
+Pass \code{label_control = draw_label_control(...)} to \code{draw()} to wrap discrete
+axis labels and legend text, stagger discrete tick labels, or adjust legend
+and colour-bar layout. Settings apply to each panel, including unwrapped
+plot lists. See \code{\link[=draw_label_control]{draw_label_control()}} for the available settings.
+}
+
 \examples{
 load_mgcv()
 dat1 <- data_sim("eg1", n = 400, dist = "normal", scale = 1, seed = 1)

@@ -239,6 +239,7 @@
 #'
 #' # change the type of rootogram
 #' draw(rg, type = "suspended")
+#' @inheritSection draw Label layout
 `draw.rootogram` <- function(object,
                              type = c("hanging", "standing", "suspended"),
                              sqrt = TRUE,

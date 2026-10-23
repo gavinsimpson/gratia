@@ -59,7 +59,8 @@ posterior_samples(model, ...)
   block_size = 10000L,
   dense_limit = 5e+06,
   weights = NULL,
-  family_index = NULL
+  family_index = NULL,
+  marginalise = NULL
 )
 
 \method{posterior_samples}{scam}(
@@ -193,6 +194,13 @@ positions restored by \code{na.exclude} when supplying weights for fitting rows.
 family (\code{\link[mgcv:gfam]{mgcv::gfam()}}) response draws, one integer per evaluation row.
 Membership can instead be recovered from the response-index expression
 in \code{data}; observed response values are not required.}
+
+\item{marginalise}{\code{NULL} retains the usual predictions. \code{TRUE} selects all
+supported \code{re} and \code{fs} terms; character vectors select exact smooth labels.
+Fitted predictions integrate response means over new zero-mean Gaussian
+effects. Response samplers draw new effects before sampling responses.
+Smoothing parameters and dispersion remain fixed. Only ordinary \code{gam()}
+and \code{bam()} fits with a scalar response mean are supported.}
 }
 \value{
 A tibble (data frame) in long format, with columns:
@@ -252,6 +260,10 @@ supplied data with known family membership. Component nuisance parameters
 remain fixed. \code{.parameter} identifies the component used for each row.
 Censored grouped components require an observation process; use \code{simulate()}
 for their latent, uncensored responses.
+
+With \code{marginalise}, selected random effects are drawn for new groups in
+each response replicate. Group labels must be supplied for new data.
+See \code{\link[=random_effect_samples]{random_effect_samples()}} for the estimated Gaussian distributions.
 }
 \section{Note}{
 With \code{data = NULL}, fitting offsets are retained, including offsets

@@ -76,6 +76,14 @@ and is displayed without points or intervals.
 Points use the \code{geom.gratia.effect} theme element and intervals use
 \code{geom.gratia.interval}; see \code{\link[=gratia_theme_get]{gratia_theme_get()}}.
 }
+\section{Label layout}{
+
+Pass \code{label_control = draw_label_control(...)} to \code{draw()} to wrap discrete
+axis labels and legend text, stagger discrete tick labels, or adjust legend
+and colour-bar layout. Settings apply to each panel, including unwrapped
+plot lists. See \code{\link[=draw_label_control]{draw_label_control()}} for the available settings.
+}
+
 \examples{
 load_mgcv()
 dat <- data_sim("eg1", n = 100, seed = 42)

@@ -150,6 +150,40 @@
 
 ## New features
 
+* `draw_label_control()` provides optional label layout settings across
+  `draw()` and `assemble()` methods. Wrap discrete axis labels, legend
+  entries and guide titles, stagger discrete tick labels, arrange legend
+  keys, and adjust colour-bar dimensions and label angles. Existing
+  defaults, scale labels and palettes are retained (#430).
+
+* **Conditional prediction surfaces**
+
+  * `conditional_values()` accepts two numeric covariates grouped in the
+    first condition, such as `condition = list(c("x1", "x2"), "treatment")`, to
+    evaluate and draw prediction surfaces. Remaining conditions supply
+    facets.
+
+  * Its `draw()` method supports raster, tile and optional ggcube 3D
+    surfaces, including interval surfaces via `ci_3d = TRUE`. The default
+    `n_vals = NULL` uses 100 values for curves and 50 along each surface axis.
+
+* **Random-effect sampling and marginal predictions**
+
+  * `random_effect_samples()` draws new random intercepts, slopes and
+    factor-smooth curves from their estimated Gaussian distributions.
+
+  * `marginalise` integrates response means in fitted predictions using
+    Gaussian quadrature or Monte Carlo, and generates new-group effects in
+    response simulations. Smoothing parameters and dispersion remain fixed
+    at their fitted estimates.
+
+  * Factor-by curves retain their by-level selection when other random terms
+    are marginalised. Identity, log and probit links use closed-form
+    integrals; other links check quadrature with interlaced nodes and an
+    independent adaptive rule to detect unresolved link transitions. Fits
+    using `min.sp` are rejected because their fitted lower bounds are not
+    retained for covariance reconstruction.
+
 * `variance_comp()` has expanded support for variance components in `gam()`,
   `bam()`, `gamm()` and `gamm4()` models, and the new `type = "terms"` returns
   fitted term variances and proportions of total variance, accounting for
@@ -760,12 +794,23 @@
     `time_varying_style = "pointrange"` for points and interval bars instead
     of the default line, points and ribbon.
 
-* Smooth plot subtitles now identify the model part or distributional
-  parameter for glmmTMB, mgcv and `GJRM::gamlss()` models with multiple
-  linear predictors. Single-predictor models omit these labels, and constant
-  glmmTMB dispersion alone does not trigger them. Saved `smooth_estimates()`
-  retain the labels in an optional `.model` column alongside the existing
-  smooth and `by`-variable information.
+* **Model parts in plot subtitles**
+
+  * Smooth and parametric plot subtitles now identify the model part or
+    distributional parameter for glmmTMB, sdmTMB, mgcv, `GJRM::gamlss()` and
+    `GJRM::gjrm()` models with multiple linear predictors. Single-predictor
+    models omit these labels, and constant glmmTMB dispersion alone does not
+    trigger them.
+
+  * Information about `by` variables, smooth titles, selection and the
+    default of plotting all smooths are retained. Shared terms name every
+    predictor to which they contribute.
+
+  * Saved `smooth_estimates()` and `parametric_effects()` retain the labels
+    in an optional `.model` column. Supply `subtitle` to replace the labels,
+    or `subtitle = ""` to suppress them, including on parametric panels.
+    Repeated parametric plot names include equation numbers for GJRM models
+    (#430).
 
 * Soap-film boundary (`bs = "sf"`) and wiggly (`bs = "sw"`) components are now
   supported, with distinct component types and boundary-aware plots (#375).
@@ -897,12 +942,21 @@
   pointwise intervals via `uncertainty = "delta"`. Both uncertainty methods
   return `.se`; posterior simulation remains the default.
 
-* `conditional_differences()` compares conditional fitted values between
-  factor levels or joint factor combinations on the link or response scale,
-  with pointwise or simultaneous intervals using the delta method or shared
-  posterior simulations. Simultaneous bands can cover each comparison
-  separately or all comparisons jointly via `simultaneous_scope`. `draw()`
-  plots the differences and their intervals (#143, #145).
+* **Conditional differences**
+
+  * `conditional_differences()` compares conditional fitted values between
+    factor levels or joint factor combinations on the link or response
+    scale, with pointwise or simultaneous intervals using the delta method
+    or shared posterior simulations. Simultaneous bands can cover each
+    comparison separately or all comparisons jointly via
+    `simultaneous_scope`. `draw()` plots the differences and their intervals
+    (#143, #145).
+
+  * Grouping two numeric covariates in the first non-comparison condition
+    evaluates difference surfaces, drawn as raster, tile or optional ggcube
+    3D surfaces. Further conditions supply facets; `ci_3d = TRUE` adds
+    interval surfaces. The default `n_vals = NULL` uses 100 values for curves
+    and 50 along each surface axis.
 
 * `difference_smooths()` now offers simultaneous intervals for differences of
   smooths at supplied covariate combinations, separately for each pair of

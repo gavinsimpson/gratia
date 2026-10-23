@@ -275,6 +275,14 @@ Recompute older saved estimates with \code{\link[=smooth_estimates]{smooth_estim
 fitted cycle boundaries are unavailable. See \code{\link[=draw.gam]{draw.gam()}} for supported
 smooths and coordinate options.
 }
+\section{Label layout}{
+
+Pass \code{label_control = draw_label_control(...)} to \code{draw()} to wrap discrete
+axis labels and legend text, stagger discrete tick labels, or adjust legend
+and colour-bar layout. Settings apply to each panel, including unwrapped
+plot lists. See \code{\link[=draw_label_control]{draw_label_control()}} for the available settings.
+}
+
 \examples{
 load_mgcv()
 # example data

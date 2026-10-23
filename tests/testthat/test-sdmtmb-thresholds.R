@@ -211,6 +211,18 @@ test_that("delta threshold plots retain separate components and uncertainty", {
     labels <- paste0(type, "(x)", c("", ".1"))
     expect_identical(names(parametric_terms(m)), labels)
     expect_setequal(names(assemble(m, n = 12)), labels)
+    for (unnest in c(TRUE, FALSE)) {
+      e <- parametric_effects(m, n = 12, unnest = unnest)
+      plots <- draw(e)
+      direct <- assemble(m, n = 12)
+      for (i in 1:2) {
+        expect_identical(unique(e$.model[e$.term == labels[i]]),
+          paste("Delta component", i))
+        expect_identical(plots[[i]]$labels$subtitle, paste("Delta component", i))
+        expect_identical(direct[[labels[i]]]$labels$subtitle,
+          paste("Delta component", i))
+      }
+    }
     expect_named(draw(m, terms = labels[2L], wrap = FALSE, n = 12), labels[2L])
     nd <- data.frame(x = c(.2, .5, 1.1, 1.8))
     for (i in 1:2) {

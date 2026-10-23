@@ -68,6 +68,7 @@ reference:
       `assemble()`; see [Customizing plots](../articles/custom-plotting.html).
   - contents:
       - draw
+      - draw_label_control
       - draw.gam
       - draw.gamlss
       - glmmTMB-methods
@@ -202,6 +203,7 @@ reference:
       - smooth_samples
       - draw.smooth_samples
       - fitted_samples
+      - random_effect_samples
       - predicted_samples
       - derivative_samples
       - as_mcmc_draws

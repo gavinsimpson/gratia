@@ -173,9 +173,10 @@ and joint models fitted by \code{\link[GJRM:gamlss]{GJRM::gamlss()}} or \code{\l
 individual plots; \code{draw()} arranges them using \code{\link[patchwork:wrap_plots]{patchwork::wrap_plots()}}.
 }
 \note{
-For models with multiple linear predictors, smooth plot subtitles
-identify the distributional parameter using the parent model's margin and
-equation order, rather than the working family of the embedded GAMs.
+For models with multiple linear predictors, smooth and parametric
+plot subtitles identify the distributional parameter using the parent
+model's margin and equation order, rather than the working family of
+the embedded GAMs.
 Univariate GAMLSS models with one predictor omit these automatic labels.
 Joint models retain equation labels even when only dependence is estimated.
 Existing smooth labels, selection, by-variable information and custom
@@ -190,8 +191,9 @@ see \code{\link[=draw.gam]{draw.gam()}} for the coordinate options.
 Joint models use the final joint coefficients and covariance for every
 embedded GAM, including dependence equations and random-effect smooths.
 Parametric plot subtitles also identify their response and parameter.
-A parametric term repeated across equations has list names such as
-\verb{x (equation 1)} and \verb{x (equation 2)}; unique terms keep their original names.
+For both univariate and joint models, a parametric term repeated across
+equations has list names such as \verb{x (equation 1)} and \verb{x (equation 2)};
+unique terms keep their original names.
 Grouped factor-by panels also receive an equation suffix when their
 base name would hide another smooth's selection label.
 Ordinal cutpoints are excluded from smooth and intercept uncertainty.
@@ -200,6 +202,14 @@ Flexible survival equations fitted using SCAM are not yet supported.
 Working residuals from preliminary GAM fits are unavailable for joint
 models; requesting partial residuals warns and draws the smooths alone.
 }
+\section{Label layout}{
+
+Pass \code{label_control = draw_label_control(...)} to \code{draw()} to wrap discrete
+axis labels and legend text, stagger discrete tick labels, or adjust legend
+and colour-bar layout. Settings apply to each panel, including unwrapped
+plot lists. See \code{\link[=draw_label_control]{draw_label_control()}} for the available settings.
+}
+
 \examples{
 if (suppressPackageStartupMessages(require("GJRM", quietly = TRUE))) {
   # follow example from ?GJRM::gamlss

@@ -118,6 +118,7 @@ sdmtmb_time_varying_effects <- function(
         .term = labels[j], .type = "time_varying", .value = times[keep],
         .partial = unname(estimate[rows]), .se = unname(sqrt(pmax(0, variance[rows])))
       )
+      effect <- add_parametric_model_labels(effect, object)
       if (!is.numeric(times) && !inherits(times, "Date") && !inherits(times, "POSIXt")) {
         effect$.value <- factor(effect$.value, levels = unique(times), ordered = TRUE)
       }

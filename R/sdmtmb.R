@@ -319,6 +319,9 @@ sdmtmb_smooth_model <- function(
 #' penalties are supported. Fits require stored smooth metadata; mapping or
 #' profiling required coefficients and non-positive-definite Hessians
 #' give errors.
+#' Parametric subtitles also identify the component for threshold curves and
+#' time-varying coefficients. Saved [parametric_effects()] retain the labels
+#' in an optional `.model` column.
 #'
 #' Support requires sdmTMB >= 1.2.0 models fitted with the RTMB backend.
 #' Refit older models or TMB fits with
@@ -484,6 +487,7 @@ assemble.sdmTMB <- function(
 
 #' @rdname sdmTMB-methods
 #' @export
+#' @inheritSection draw Label layout
 draw.sdmTMB <- function(
   object, ..., parametric = NULL, residuals = FALSE,
   unconditional = FALSE, frequentist = FALSE, envir = NULL,

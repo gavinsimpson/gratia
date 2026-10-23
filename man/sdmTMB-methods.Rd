@@ -129,6 +129,9 @@ supported bases and delta formulas still apply. Tensor smooths with multiple
 penalties are supported. Fits require stored smooth metadata; mapping or
 profiling required coefficients and non-positive-definite Hessians
 give errors.
+Parametric subtitles also identify the component for threshold curves and
+time-varying coefficients. Saved \code{\link[=parametric_effects]{parametric_effects()}} retain the labels
+in an optional \code{.model} column.
 
 Support requires sdmTMB >= 1.2.0 models fitted with the RTMB backend.
 Refit older models or TMB fits with
@@ -188,6 +191,14 @@ Smooth extraction and effect plots do not support dispersion formulas,
 other multi-predictor families, or nonlocal effects.
 Spatial fields and group random effects are not plotted.
 }
+\section{Label layout}{
+
+Pass \code{label_control = draw_label_control(...)} to \code{draw()} to wrap discrete
+axis labels and legend text, stagger discrete tick labels, or adjust legend
+and colour-bar layout. Settings apply to each panel, including unwrapped
+plot lists. See \code{\link[=draw_label_control]{draw_label_control()}} for the available settings.
+}
+
 \examples{
 if (requireNamespace("sdmTMB", quietly = TRUE)) {
   library("mgcv")

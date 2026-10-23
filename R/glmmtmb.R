@@ -252,10 +252,11 @@ glmmtmb_smooth_model <- function(object, component = NULL, covariance = TRUE) {
 #'   linear predictors use mgcv-style labels such as `s.1(x)` and `s.2(x)`.
 #'   Predictor order is conditional, zero-inflation (if present), then dispersion
 #'   (if present). Use `smooths(object)` and `select` to select individual smooths.
-#'   For models with multiple linear predictors, smooth subtitles identify the
-#'   "Conditional model", "Zero-inflation model" or "Dispersion model",
+#'   For models with multiple linear predictors, smooth and parametric subtitles
+#'   identify the "Conditional model", "Zero-inflation model" or "Dispersion model",
 #'   consistently with native random-effect panels. Constant dispersion alone
 #'   does not trigger these subtitles.
+#'   Saved [parametric_effects()] retain the labels in an optional `.model` column.
 #'   `names(assemble(object, parametric = FALSE))` also lists native
 #'   random-effect coefficient panels.
 #' @name glmmTMB-methods
@@ -341,6 +342,7 @@ assemble.glmmTMB <- function(object, ..., parametric = NULL,
 
 #' @rdname glmmTMB-methods
 #' @export
+#' @inheritSection draw Label layout
 draw.glmmTMB <- function(object, ..., parametric = NULL,
     residuals = FALSE, unconditional = FALSE, frequentist = FALSE,
     ranef_lines = FALSE, envir = NULL) {

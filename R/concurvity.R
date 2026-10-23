@@ -139,6 +139,7 @@
 #' @export
 #' @importFrom ggplot2 ggplot aes geom_tile facet_wrap coord_equal labs
 #'   scale_fill_viridis_c
+#' @inheritSection draw Label layout
 `draw.pairwise_concurvity` <- function(object,
                                        title = "Smooth-wise concurvity",
                                        subtitle = NULL, caption = NULL,

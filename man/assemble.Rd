@@ -5,7 +5,7 @@
 \alias{assemble.gamm4}
 \title{Prepare plots via \code{ggplot2} and assembles them as a list}
 \usage{
-assemble(object, ...)
+assemble(object, ..., label_control = NULL)
 
 \method{assemble}{gamm4}(object, ...)
 }
@@ -13,6 +13,10 @@ assemble(object, ...)
 \item{object}{and R object to plot.}
 
 \item{...}{arguments passed to other methods.}
+
+\item{label_control}{Optional layout settings created by
+\code{\link[=draw_label_control]{draw_label_control()}}. These apply across drawing methods without
+changing their default appearance.}
 }
 \value{
 A list of \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}} objects.
@@ -21,6 +25,14 @@ A list of \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}} objects.
 Generic function for assembling plot objects created from R objects, using
 the \code{ggplot2} package.
 }
+\section{Label layout}{
+
+Pass \code{label_control = draw_label_control(...)} to \code{draw()} to wrap discrete
+axis labels and legend text, stagger discrete tick labels, or adjust legend
+and colour-bar layout. Settings apply to each panel, including unwrapped
+plot lists. See \code{\link[=draw_label_control]{draw_label_control()}} for the available settings.
+}
+
 \seealso{
 \link{gamm4_support}
 }

@@ -4,12 +4,16 @@
 \alias{draw}
 \title{Generic plotting via \code{ggplot2}}
 \usage{
-draw(object, ...)
+draw(object, ..., label_control = NULL)
 }
 \arguments{
 \item{object}{and R object to plot.}
 
 \item{...}{arguments passed to other methods.}
+
+\item{label_control}{Optional layout settings created by
+\code{\link[=draw_label_control]{draw_label_control()}}. These apply across drawing methods without
+changing their default appearance.}
 }
 \value{
 A \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}} object.
@@ -20,6 +24,14 @@ Generic plotting via \code{ggplot2}
 \details{
 Generic function for plotting of R objects that uses the \code{ggplot2} package.
 }
+\section{Label layout}{
+
+Pass \code{label_control = draw_label_control(...)} to \code{draw()} to wrap discrete
+axis labels and legend text, stagger discrete tick labels, or adjust legend
+and colour-bar layout. Settings apply to each panel, including unwrapped
+plot lists. See \code{\link[=draw_label_control]{draw_label_control()}} for the available settings.
+}
+
 \author{
 Gavin L. Simpson
 }

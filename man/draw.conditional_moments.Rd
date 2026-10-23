@@ -29,7 +29,7 @@ discrete variables.}
 
 \item{xlab}{character; label for the x axis of the plot.}
 
-\item{ylab}{character; label for the y axis of the plot.}
+\item{ylab}{Character; label for the response moment axis.}
 
 \item{...}{Additional arguments passed to \code{\link[patchwork:wrap_plots]{patchwork::wrap_plots()}}.}
 }
@@ -38,4 +38,11 @@ A patchwork containing one plot per moment and response/category.
 }
 \description{
 Draw conditional response moments
+}
+\section{Label layout}{
+
+Pass \code{label_control = draw_label_control(...)} to \code{draw()} to wrap discrete
+axis labels and legend text, stagger discrete tick labels, or adjust legend
+and colour-bar layout. Settings apply to each panel, including unwrapped
+plot lists. See \code{\link[=draw_label_control]{draw_label_control()}} for the available settings.
 }

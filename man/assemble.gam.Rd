@@ -377,7 +377,8 @@ limits. Bootstrap sources require \code{frequentist = FALSE} and
 \code{unconditional = FALSE} because the stored draws hold smoothing fixed.}
 
 \item{...}{Additional smooth plotting arguments, including \code{title},
-\code{subtitle}, \code{xlab} and \code{ylab}.}
+\code{subtitle}, \code{xlab} and \code{ylab}. \code{subtitle} also applies to parametric panels;
+use \code{NULL} for automatic predictor labels or \code{""} to suppress them.}
 
 \item{variables}{Character vector giving every covariate of the selected
 smooths exactly once, in plotting order: x, y, then the conditioning
@@ -460,8 +461,8 @@ For models fitted by \code{\link[mgcv:gamm]{mgcv::gamm()}}, \code{assemble()} an
 fitted \code{gam} component.
 }
 \details{
-Smooth plot subtitles identify the model part or distributional
-parameter as described in \code{\link[=draw.gam]{draw.gam()}}. Custom smooth labels, including
+Smooth and parametric plot subtitles identify the model part or
+distributional parameter as described in \code{\link[=draw.gam]{draw.gam()}}. Custom labels, including
 \code{subtitle}, can be passed through \code{...}. Use \code{cyclic = "polar"} to draw
 one-dimensional cyclic smooths with polar coordinates; \code{polar_args}
 customizes the coordinate display as described in \code{\link[=draw.gam]{draw.gam()}}.
@@ -473,6 +474,14 @@ result, it is not possible to use \code{+} to add to the plots in the way one
 might typically work with \code{ggplot()} plots. Instead, use the \code{&} operator;
 see the examples.
 }
+\section{Label layout}{
+
+Pass \code{label_control = draw_label_control(...)} to \code{draw()} to wrap discrete
+axis labels and legend text, stagger discrete tick labels, or adjust legend
+and colour-bar layout. Settings apply to each panel, including unwrapped
+plot lists. See \code{\link[=draw_label_control]{draw_label_control()}} for the available settings.
+}
+
 \examples{
 load_mgcv()
 

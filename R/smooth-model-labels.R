@@ -32,6 +32,48 @@ smooth_model_labels <- function(object, smooths) {
   }, character(1))
 }
 
+# Parametric formula blocks can share coefficients across predictors. Their
+# public suffixes identify blocks, which need not correspond to predictors.
+parametric_model_labels <- function(object, terms) {
+  out <- stats::setNames(rep(NA_character_, length(terms)), terms)
+  if (!has_multiple_predictors(object)) return(out)
+  override <- attr(object, "gratia.model_label", exact = TRUE)
+  if (!is.null(override)) {
+    out[] <- override
+    return(out)
+  }
+  if (inherits(object, "gratia_mixed_smooth")) {
+    out[] <- mixed_model_label(object, object$component)
+    return(out)
+  }
+  multiple <- is.list(object$pterms)
+  pterms <- if (multiple) object$pterms else list(object$pterms)
+  assignments <- if (multiple) object$assign else list(object$assign)
+  starts <- if (multiple) attr(object$nsdf, "pstart") else 1L
+  lpi <- lss_eta_index(object)
+  labels <- mgcv_predictor_labels(family(object), length(lpi))
+  for (j in seq_along(pterms)) {
+    term_labels <- attr(pterms[[j]], "term.labels")
+    if (!length(term_labels)) next
+    if (j > 1L) term_labels <- paste0(term_labels, ".", j - 1L)
+    for (i in seq_along(term_labels)) {
+      term <- term_labels[i]
+      if (!term %in% terms) next
+      columns <- which(assignments[[j]] == i) + starts[j] - 1L
+      if (!length(columns)) next
+      belongs <- vapply(lpi, function(index) all(columns %in% index), logical(1))
+      if (any(belongs)) out[term] <- paste(labels[belongs], collapse = "; ")
+    }
+  }
+  out
+}
+
+add_parametric_model_labels <- function(effects, object) {
+  labels <- parametric_model_labels(object, unique(effects$.term))
+  if (any(!is.na(labels))) effects$.model <- unname(labels[effects$.term])
+  effects
+}
+
 mgcv_predictor_labels <- function(family, n) {
   labels <- switch(family_name(family),
     gaulss = c("Mean (mu)", "Standard deviation (sigma)"),

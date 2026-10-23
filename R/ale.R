@@ -652,6 +652,7 @@ ale_endpoint <- function(data, target, p, predict_at) {
 #' df <- data_sim("eg1", n = 100, seed = 2)
 #' m <- gam(y ~ s(x2), data = df, method = "REML")
 #' ale(m, "x2") |> draw()
+#' @inheritSection draw Label layout
 draw.ale <- function(
   object,
   ci = TRUE,

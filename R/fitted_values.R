@@ -35,6 +35,15 @@
 #'   intervals are available for smooth components through [smooth_estimates()].
 #'
 #' @details
+#' With `marginalise`, predictions are response means averaged over the selected
+#' random-effect distributions, using the methods described in [fitted_samples()].
+#' The point estimate uses fitted coefficients; pointwise intervals use the
+#' derivative of the integrated mean and the coefficient covariance. `.se` is
+#' on the response scale. These normal intervals are not clipped to the response
+#' range. Simultaneous and bootstrap marginal intervals are not yet supported.
+#' The `integration_info` attribute records numerical accuracy and fixed
+#' variance estimates.
+#'
 #' `quantity = "parameters"` returns all distribution parameters represented
 #' by predictors, including intercept-only predictors. See [family_parameters()]
 #' for their definitions. These are natural distribution parameters, which
@@ -194,12 +203,20 @@
                                 unconditional = FALSE,
                                 interval_method = c("auto", "gaussian", "bootstrap"),
                                 quantity = c("parameters", "expectation"),
-                                family_index = NULL) {
+                                family_index = NULL, marginalise = NULL,
+                                integration = c("quadrature", "monte_carlo"),
+                                n_quad = 40L, n_integrate = 5000L) {
   interval <- match.arg(interval)
   object <- with_model_envir(object, envir)
   choice <- prediction_choice(quantity[1L], scale[1L])
   quantity <- choice$quantity
   scale <- choice$scale
+  if (!is.null(marginalise)) {
+    if (!is.null(family_index)) stop("'family_index' is unsupported with marginalisation.", call. = FALSE)
+    return(marginal_fitted_values(object, data, marginalise, quantity, scale,
+      ci_level, interval, interval_method, unconditional, seed, integration,
+      n_quad, n_integrate, ...))
+  }
   spec <- distribution_spec(object)
 
   grouped <- is_gfam_family(stats::family(object))
@@ -285,6 +302,7 @@
 #' @export
 #' @rdname fitted_values
 `fitted_values.gamm` <- function(object, ...) {
+  marginal_not_supported(list(...), "fitted_values.gamm()")
   fitted_values(object$gam, ...)
 }
 

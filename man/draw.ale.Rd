@@ -37,6 +37,14 @@ A \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}} object.
 \description{
 Plot saved ALE estimates and intervals, without recomputing predictions.
 }
+\section{Label layout}{
+
+Pass \code{label_control = draw_label_control(...)} to \code{draw()} to wrap discrete
+axis labels and legend text, stagger discrete tick labels, or adjust legend
+and colour-bar layout. Settings apply to each panel, including unwrapped
+plot lists. See \code{\link[=draw_label_control]{draw_label_control()}} for the available settings.
+}
+
 \examples{
 library("mgcv")
 df <- data_sim("eg1", n = 100, seed = 2)

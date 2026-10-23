@@ -66,6 +66,13 @@
 #' Logical covariates are discrete. Surface plots show estimates; uncertainty
 #' is retained in the returned data rather than drawn as additional surfaces.
 #'
+#' For models with multiple linear predictors, plot subtitles identify each
+#' term's distributional parameter or model component, as for smooth plots.
+#' Shared terms name every predictor to which they contribute. The optional
+#' `.model` column retains these labels, including with `unnest = FALSE`.
+#' Single-predictor models omit automatic subtitles. Older saved estimates
+#' remain drawable when predictor labels are absent.
+#'
 #' @return A tibble of class `parametric_effects`, with `.term`, `.type`,
 #'   `.partial` and `.se`. Single-variable terms retain `.value` or `.level`;
 #'   multivariate terms use columns named for their raw covariates, containing
@@ -187,7 +194,7 @@
     intersect(all.vars(str2lang(x)), names(data))
   })
   all_raw <- unique(unlist(raw_vars, use.names = FALSE))
-  reserved <- c(".term", ".type", ".level", ".value", ".partial", ".se",
+  reserved <- c(".term", ".type", ".model", ".level", ".value", ".partial", ".se",
     ".lower_ci", ".upper_ci", "data")
   columns <- setNames(utils::tail(make.unique(c(reserved, all_raw)), length(all_raw)),
     all_raw)
@@ -282,6 +289,7 @@
   axis_info <- lapply(effects, function(x) attr(x, "axis_info"))
   names(axis_info) <- valid_terms
   effects <- effects |> bind_rows()
+  effects <- add_parametric_model_labels(effects, object)
 
   if (unnest) {
     effects <- unnest(effects, cols = "data") |>
@@ -308,6 +316,9 @@
 #' @param object A `parametric_effects` object, optionally nested.
 #' @param scales Use a common effect-axis range for curves and points (`fixed`),
 #'   or separate ranges (`free`). Surface covariate axes are not affected.
+#' @param subtitle Character or expression; replace the automatic predictor
+#'   subtitle on every panel. `NULL` uses the automatic label and `""`
+#'   suppresses it.
 #'
 #' @export
 #' @importFrom patchwork wrap_plots
@@ -316,6 +327,7 @@
 #' @importFrom tidyr nest
 #' @importFrom tidyselect any_of
 #' @importFrom rlang .data
+#' @inheritSection draw Label layout
 draw.parametric_effects <- function(object,
                                     scales = c("free", "fixed"),
                                     ci_level = 0.95,
@@ -339,7 +351,8 @@ draw.parametric_effects <- function(object,
                                     continuous_fill = NULL,
                                     discrete_colour = NULL, discrete_fill = NULL,
                                     back_transform = FALSE,
-                                    time_varying_style = c("ribbon", "pointrange")) {
+                                    time_varying_style = c("ribbon", "pointrange"),
+                                    subtitle = NULL) {
   gratia_plot_arguments(c("ci_col", "ci_alpha", "line_col", "contour_col", "ci_3d_alpha", "ci_3d_col"), environment())
   check_back_transform(back_transform)
   time_varying_style <- match.arg(time_varying_style)
@@ -387,6 +400,7 @@ draw.parametric_effects <- function(object,
     group_map(
       .keep = TRUE,
       .f = ~ draw_parametric_effect(.x,
+        subtitle = subtitle,
         ci_level = ci_level,
         ci_col = ci_col,
         ci_alpha = ci_alpha,
@@ -473,6 +487,11 @@ draw.parametric_effects <- function(object,
                                      time_varying_style = c("ribbon", "pointrange"),
                                      ...) {
   term <- unique(object$.term)
+  info <- term_info[[term]]
+  # Older saved interactions can use `.model` as a covariate column.
+  if (is.null(subtitle) && !".model" %in% info$columns) {
+    subtitle <- smooth_plot_subtitle(object)
+  }
   if (identical(unique(object$.type), "time_varying")) {
     return(draw_time_varying_coefficient(object,
       info = time_varying_info[[term]], style = time_varying_style,
@@ -484,7 +503,6 @@ draw.parametric_effects <- function(object,
   axes <- axis_info[[term]]
   displayed <- display_parametric_axes(object, axes, from_raw, back_transform)
   object <- displayed$data
-  info <- term_info[[unique(object$.term)]]
   if (!is.null(info)) {
     info$axis_labels <- displayed$labels
     info$observed <- display_parametric_axes(info$observed, axes,

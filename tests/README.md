@@ -19,9 +19,20 @@ testthat::test_local()
 ```
 
 For visual comparisons, set `VDIFFR_RUN_TESTS = "true"`. The paper-sized HGAM
-examples also run by default locally. Ordinary CI skips those paper examples;
-its weekly/manual integration job enables them with `GRATIA_RUN_HGAM=true`.
-To reproduce ordinary CI locally, also set `CI=true` for that R session.
+examples are excluded by default, locally and in CI. Both `make test` and
+`make test-full` explicitly keep them disabled. Their weekly/manual integration
+job enables them with `GRATIA_RUN_HGAM=true` to periodically check that the
+paper's code still runs.
+
+Run only the paper examples locally when that check is specifically needed:
+
+```sh
+make test-hgam-paper
+```
+
+The target uses the installed-package test runner with
+`GRATIA_TEST_FILTER='^hgam-paper$'`, so it does not rerun the rest of the suite.
+As in the weekly paper check, visual snapshot comparisons are disabled.
 
 The weekly/manual job publishes total and per-test elapsed times in its GitHub
 Actions summary, plus an `hgam-test-timings` CSV artifact retained for 90 days.

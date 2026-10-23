@@ -161,6 +161,7 @@ fitted_moments.gam <- function(object, data = NULL,
       !(identical(moments, "all") || all(moments %in% moment_names())))
     stop("'moments' must select distinct moment names, or 'all'.", call. = FALSE)
   if (identical(moments, "all")) moments <- moment_names()
+  marginal_not_supported(list(...), "fitted_moments.gam()")
   dots <- list(...)
   if (length(dots) && (is.null(names(dots)) || any(!nzchar(names(dots)))))
     stop("Arguments in '...' must be named.", call. = FALSE)
@@ -314,6 +315,12 @@ moment_grouped_context <- function(model, data, family_index, ...) {
 #' held at typical values; observations are not averaged over those covariates.
 #'
 #' @inheritParams conditional_values
+#' @param condition Character vector or list specifying covariates and optional
+#'   values. The first covariate supplies the plotting axis, followed by colour,
+#'   facet columns and facet rows. Grouped surface conditions are not supported.
+#' @param n_vals Positive integer; number of values to generate along a numeric
+#'   plotting axis. Defaults to 100. Explicit condition values or helpers override
+#'   generated values; other numeric conditions use five-number summaries.
 #' @inheritParams fitted_moments
 #' @param ... Arguments to [fitted_moments()], including `uncertainty`,
 #'   `nuisance`, `n_draws`, `seed`, `scores`, and `exclude`.
@@ -351,10 +358,12 @@ conditional_moments.gam <- function(model, condition = NULL, data = NULL,
 #' Draw conditional response moments
 #'
 #' @inheritParams draw.conditional_values
+#' @param ylab Character; label for the response moment axis.
 #' @param object A tibble returned by [conditional_moments()].
 #' @param ... Additional arguments passed to [patchwork::wrap_plots()].
 #' @return A patchwork containing one plot per moment and response/category.
 #' @export
+#' @inheritSection draw Label layout
 draw.conditional_moments <- function(object, facet_scales = "fixed",
     discrete_colour = NULL, discrete_fill = NULL, xlab = NULL, ylab = NULL, ...) {
   keys <- intersect(c(".parameter", ".category", ".y"), names(object))

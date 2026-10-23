@@ -5,13 +5,29 @@
 #' @title Generic plotting via `ggplot2`
 #' @param object and R object to plot.
 #' @param ... arguments passed to other methods.
+#' @param label_control Optional layout settings created by
+#'   [draw_label_control()]. These apply across drawing methods without
+#'   changing their default appearance.
+#'
+#' @section Label layout:
+#' Pass `label_control = draw_label_control(...)` to `draw()` to wrap discrete
+#' axis labels and legend text, stagger discrete tick labels, or adjust legend
+#' and colour-bar layout. Settings apply to each panel, including unwrapped
+#' plot lists. See [draw_label_control()] for the available settings.
 #'
 #' @return A [ggplot2::ggplot()] object.
 #'
 #' @author Gavin L. Simpson
 #'
 #' @export
-`draw` <- function(object, ...) {
+`draw` <- function(object, ..., label_control = NULL) {
+  if (!is.null(label_control)) {
+    control <- validate_draw_label_control(label_control)
+    value <- withVisible(draw(object, ...))
+    result <- apply_draw_label_control(value$value, control)
+    if (!value$visible) return(invisible(result))
+    return(result)
+  }
   UseMethod("draw")
 }
 
@@ -56,6 +72,7 @@
 #' draw(df)
 #' ## fixed axis scales
 #' draw(df, scales = "fixed")
+#' @inheritSection draw Label layout
 `draw.derivatives` <- function(
   object,
   select = NULL,
@@ -220,6 +237,7 @@
 #'
 #' bf <- basis(s(x2, by = fac, bs = "bs"), data = df)
 #' draw(bf)
+#' @inheritSection draw Label layout
 `draw.mgcv_smooth` <- function(object,
                                legend = FALSE,
                                use_facets = TRUE,
@@ -360,6 +378,7 @@
 #' m4 <- gam(y ~ s(x0, x1, x2, x3, k = 20), data = df)
 #' bf4 <- basis(m4, n_2d = 15, n_4d = 2)
 #' draw(bf4, ncol = 3)
+#' @inheritSection draw Label layout
 `draw.basis` <- function(object,
                          legend = FALSE,
                          labeller = NULL,
@@ -672,6 +691,7 @@ plot_multivariate_basis <- function(object, variables, subtitle = NULL, ...) {
 #' ## plot just 6 of the draws, with contour line overlays
 #' draw(sm3, n_samples = 6, contour = TRUE, seed = 42)
 #' }
+#' @inheritSection draw Label layout
 `draw.smooth_samples` <- function(object,
                                   select = NULL,
                                   n_samples = NULL, seed = NULL,
@@ -980,6 +1000,7 @@ plot_multivariate_basis <- function(object, variables, subtitle = NULL, ...) {
 #' # calculate the differences between pairs of smooths the f_j(x2) term
 #' diffs <- difference_smooths(m, select = "s(x2)")
 #' draw(diffs)
+#' @inheritSection draw Label layout
 `draw.difference_smooth` <- function(object,
                                      select = NULL,
                                      rug = FALSE,
@@ -1325,6 +1346,7 @@ difference_plot_variables <- function(object, label) {
 #'
 #' # draw individual vector cells
 #' draw(penalty(m), geom = "tile")
+#' @inheritSection draw Label layout
 `draw.penalty_df` <- function(object,
                               normalize = FALSE,
                               as_matrix = TRUE,

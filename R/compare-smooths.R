@@ -123,6 +123,7 @@
 #' @importFrom dplyr group_split
 #' @importFrom purrr map
 #' @importFrom patchwork wrap_plots
+#' @inheritSection draw Label layout
 `draw.compare_smooths` <- function(object,
                                    ncol = NULL, nrow = NULL,
                                    guides = "collect",

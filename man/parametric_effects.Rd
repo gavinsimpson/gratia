@@ -150,6 +150,13 @@ define facets: one wraps, two or more use the first as rows and the rest as
 columns. Formula order is retained within numeric and discrete covariates.
 Logical covariates are discrete. Surface plots show estimates; uncertainty
 is retained in the returned data rather than drawn as additional surfaces.
+
+For models with multiple linear predictors, plot subtitles identify each
+term's distributional parameter or model component, as for smooth plots.
+Shared terms name every predictor to which they contribute. The optional
+\code{.model} column retains these labels, including with \code{unnest = FALSE}.
+Single-predictor models omit automatic subtitles. Older saved estimates
+remain drawable when predictor labels are absent.
 }
 \examples{
 load_mgcv()
