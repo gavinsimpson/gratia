@@ -1034,6 +1034,7 @@
 <text x='340.39' y='537.26' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='17.13px' lengthAdjust='spacingAndGlyphs'>1.00</text>
 <text x='199.08' y='549.40' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='11.62px' lengthAdjust='spacingAndGlyphs'>x1</text>
 <text transform='translate(18.53,430.52) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='61.14px' lengthAdjust='spacingAndGlyphs'>Partial effect</text>
+<text x='43.65' y='327.01' style='font-size: 11.00px; font-family: sans;' textLength='53.19px' lengthAdjust='spacingAndGlyphs'>Mean (mu)</text>
 <text x='43.65' y='311.22' style='font-size: 13.20px; font-family: sans;' textLength='13.95px' lengthAdjust='spacingAndGlyphs'>x1</text>
 <text x='354.52' y='563.21' text-anchor='end' style='font-size: 8.80px; font-family: sans;' textLength='32.77px' lengthAdjust='spacingAndGlyphs'>Numeric</text>
 </g>

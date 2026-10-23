@@ -25,13 +25,14 @@
 #' fitted `gam` component.
 #'
 #' @inheritParams draw.gam
-#' @details Smooth plot subtitles identify the model part or distributional
-#'   parameter as described in [draw.gam()]. Custom smooth labels, including
+#' @details Smooth and parametric plot subtitles identify the model part or
+#'   distributional parameter as described in [draw.gam()]. Custom labels, including
 #'   `subtitle`, can be passed through `...`. Use `cyclic = "polar"` to draw
 #'   one-dimensional cyclic smooths with polar coordinates; `polar_args`
 #'   customizes the coordinate display as described in [draw.gam()].
 #' @param ... Additional smooth plotting arguments, including `title`,
-#'   `subtitle`, `xlab` and `ylab`.
+#'   `subtitle`, `xlab` and `ylab`. `subtitle` also applies to parametric panels;
+#'   use `NULL` for automatic predictor labels or `""` to suppress them.
 #'
 #' @note Internally, plots of each smooth are created using [ggplot2::ggplot()]
 #'   and composed into a single plot using [patchwork::wrap_plots()]. As a
@@ -157,6 +158,7 @@
   check_surface_dots(match.call(expand.dots = FALSE))
 
   .call <- match.call()
+  parametric_subtitle <- list(...)[["subtitle"]]
 
   # fixed or free scale?
   scales <- match.arg(scales)
@@ -439,6 +441,7 @@
           group_map(
             .keep = TRUE,
             .f = ~ draw_parametric_effect(.x,
+              subtitle = parametric_subtitle,
               ci_level = ci_level,
               caption = if (isTRUE(caption) && interval == "simultaneous" &&
                   !identical(unique(.x$.type), "time_varying")) {

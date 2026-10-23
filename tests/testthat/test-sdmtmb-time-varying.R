@@ -213,6 +213,17 @@ test_that("delta trajectories retain complete component-specific coefficients", 
     labels <- c("time_varying(x)", "time_varying(x).1")
     expect_setequal(unique(parametric_effects(m)$.term), labels)
     expect_setequal(names(assemble(m)), labels)
+    for (unnest in c(TRUE, FALSE)) {
+      e <- parametric_effects(m, unnest = unnest)
+      plots <- draw(e)
+      for (component in 1:2) {
+        expect_identical(unique(e$.model[e$.term == labels[component]]),
+          paste("Delta component", component))
+        expect_identical(plots[[component]]$labels$subtitle,
+          paste("Delta component", component))
+      }
+      expect_identical(draw(e, subtitle = "")[[2]]$labels$subtitle, "")
+    }
     for (component in 1:2) {
       e <- sdmtmb_tvc_expect_covariance(m, "x", component)
       nd <- data.frame(year = e$.value, x = 1)

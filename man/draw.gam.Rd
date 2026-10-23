@@ -467,10 +467,11 @@ For models fitted by \code{\link[mgcv:gamm]{mgcv::gamm()}}, \code{draw()} and \c
 fitted \code{gam} component.
 }
 \details{
-For models with multiple linear predictors, smooth plot subtitles identify
-the model part for glmmTMB models or the distributional parameter for mgcv
-models. Single-predictor models omit these automatic labels; by-variable
-information and custom subtitles are still shown. Constant glmmTMB dispersion
+For models with multiple linear predictors, smooth and parametric plot
+subtitles identify the model part for glmmTMB models or the distributional
+parameter for mgcv models. Single-predictor models omit these automatic
+labels; by-variable information and custom subtitles are still shown.
+Constant glmmTMB dispersion
 alone does not count as an additional predictor.
 For example, \code{gaulss()} uses "Mean (mu)" and "Standard deviation (sigma)",
 while \code{twlss()} uses "Mean (mu)", "Power (p)" and "Dispersion (phi)".
@@ -480,7 +481,8 @@ titles and \code{select} values are unchanged, and all smooths are drawn by defa
 By-variable information is appended to the default subtitle. Supply \code{subtitle}
 through \code{...} to replace it, or \code{subtitle = ""} to suppress it; \code{NULL} uses the
 default. Custom \code{title}, \code{xlab} and \code{ylab} can also be supplied through \code{...}.
-These labels apply to smooth panels.
+Parametric terms use the same predictor labels, including terms shared
+across predictors. Saved \code{\link[=parametric_effects]{parametric_effects()}} retain these labels.
 
 Polar plots support cyclic cubic and cyclic P splines, including positive
 cyclic P splines from scam, factor-by smooths and one-dimensional tensor

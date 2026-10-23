@@ -114,10 +114,11 @@ default, as for \code{draw.gam()}. Smooths in later
 linear predictors use mgcv-style labels such as \code{s.1(x)} and \code{s.2(x)}.
 Predictor order is conditional, zero-inflation (if present), then dispersion
 (if present). Use \code{smooths(object)} and \code{select} to select individual smooths.
-For models with multiple linear predictors, smooth subtitles identify the
-"Conditional model", "Zero-inflation model" or "Dispersion model",
+For models with multiple linear predictors, smooth and parametric subtitles
+identify the "Conditional model", "Zero-inflation model" or "Dispersion model",
 consistently with native random-effect panels. Constant dispersion alone
 does not trigger these subtitles.
+Saved \code{\link[=parametric_effects]{parametric_effects()}} retain the labels in an optional \code{.model} column.
 \code{names(assemble(object, parametric = FALSE))} also lists native
 random-effect coefficient panels.
 }
