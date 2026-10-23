@@ -67,6 +67,10 @@
 <p>When reviewing a qualification, ask: “What misunderstanding does this sentence prevent, and has the surrounding text given the reader a reason to have it?” If there is no concrete answer, delete it.</p>
 </div>
 <div class="section level2">
+<h2 id="release-notes">Release notes<a class="anchor" aria-label="anchor" href="#release-notes"></a></h2>
+<p>Keep each individual <code>NEWS.md</code> entry to 1–3 sentences, including each entry within a group. Group related changes under a shared banner naming the function or topic, with a separate entry for each change. Separate individual entries with a blank line, including entries within a group.</p>
+</div>
+<div class="section level2">
 <h2 id="r-output-in-documentation">R output in documentation<a class="anchor" aria-label="anchor" href="#r-output-in-documentation"></a></h2>
 <p>In documentation, vignettes, articles and examples, show the R function’s normal printed output. Readers should see what they would see if they ran the example code in an R session. Do not subset output columns unless absolutely necessary. Do not replace the output with formatted tables using <code><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">knitr::kable()</a></code> or similar tools. Use a formatted table only when preparing output for a journal and the user explicitly requests a tabular format.</p>
 <p>Introduce every displayed code chunk with narrative explaining what it will do or show. Readers should know its purpose before reading the code; a section heading alone is not enough. Broader explanations can follow the chunk.</p>
