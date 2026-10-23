@@ -112,6 +112,7 @@ sdmtmb_threshold_effects <- function(
       .term = label, .type = "numeric", .value = x,
       .partial = unname(curve$estimate), .se = unname(se)
     )
+    effect <- add_parametric_model_labels(effect, object)
     axes <- parametric_axes(object, paste(deparse(as.name(variable)), collapse = ""),
       stats::setNames(data.frame(x), variable), stats::setNames(".value", variable))
     axes <- parametric_axis_info(axes)

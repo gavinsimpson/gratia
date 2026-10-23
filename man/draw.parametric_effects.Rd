@@ -32,7 +32,8 @@
   discrete_colour = NULL,
   discrete_fill = NULL,
   back_transform = FALSE,
-  time_varying_style = c("ribbon", "pointrange")
+  time_varying_style = c("ribbon", "pointrange"),
+  subtitle = NULL
 )
 }
 \arguments{
@@ -163,6 +164,10 @@ effects or their intervals; use \code{fun} for that.}
 a line, points and interval ribbon (\code{"ribbon"}, the default), or points
 and interval bars with a connecting line (\code{"pointrange"}). Other model
 terms keep their usual displays.}
+
+\item{subtitle}{Character or expression; replace the automatic predictor
+subtitle on every panel. \code{NULL} uses the automatic label and \code{""}
+suppresses it.}
 }
 \description{
 Plot estimated effects for model parametric terms

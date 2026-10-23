@@ -26,9 +26,10 @@
 #' @importFrom patchwork wrap_plots
 #' @export
 #'
-#' @note For models with multiple linear predictors, smooth plot subtitles
-#'   identify the distributional parameter using the parent model's margin and
-#'   equation order, rather than the working family of the embedded GAMs.
+#' @note For models with multiple linear predictors, smooth and parametric
+#'   plot subtitles identify the distributional parameter using the parent
+#'   model's margin and equation order, rather than the working family of
+#'   the embedded GAMs.
 #'   Univariate GAMLSS models with one predictor omit these automatic labels.
 #'   Joint models retain equation labels even when only dependence is estimated.
 #'   Existing smooth labels, selection, by-variable information and custom
@@ -43,8 +44,9 @@
 #'   Joint models use the final joint coefficients and covariance for every
 #'   embedded GAM, including dependence equations and random-effect smooths.
 #'   Parametric plot subtitles also identify their response and parameter.
-#'   A parametric term repeated across equations has list names such as
-#'   `x (equation 1)` and `x (equation 2)`; unique terms keep their original names.
+#'   For both univariate and joint models, a parametric term repeated across
+#'   equations has list names such as `x (equation 1)` and `x (equation 2)`;
+#'   unique terms keep their original names.
 #'   Grouped factor-by panels also receive an equation suffix when their
 #'   base name would hide another smooth's selection label.
 #'   Ordinal cutpoints are excluded from smooth and intercept uncertainty.
@@ -127,7 +129,6 @@ assemble.gamlss <- function(object, scales = c("free", "fixed"), ..., residuals 
     "assemble.gamlss")
   scales <- match.arg(scales)
   joint <- !isTRUE(object$univar.gamlss)
-  dots <- list(...)
   components <- gjrm_gamlss_components(object)
   labels <- gjrm_gamlss_smooth_labels(components)
   parametric_labels <- unlist(lapply(components, parametric_terms), use.names = FALSE)
@@ -193,16 +194,12 @@ assemble.gamlss <- function(object, scales = c("free", "fixed"), ..., residuals 
           }
         }
       }
-      if (joint) {
-        parameter_panels <- which(names(panels) %in% parametric_terms(m) &
-          !vapply(panels, function(p) ".smooth" %in% names(p$data), logical(1)))
-        for (j in parameter_panels) {
-          subtitle <- dots$subtitle %||% attr(m, "gratia.model_label", exact = TRUE)
-          panels[[j]] <- panels[[j]] + ggplot2::labs(subtitle = subtitle)
-          if (names(panels)[j] %in% repeated_parametric) {
-            panel_names[j] <- paste0(names(panels)[j], " (equation ",
-              attr(m, "gratia.gjrm_equation", exact = TRUE), ")")
-          }
+      parameter_panels <- which(names(panels) %in% parametric_terms(m) &
+        !vapply(panels, function(p) ".smooth" %in% names(p$data), logical(1)))
+      for (j in parameter_panels) {
+        if (names(panels)[j] %in% repeated_parametric) {
+          panel_names[j] <- paste0(names(panels)[j], " (equation ",
+            attr(m, "gratia.gjrm_equation", exact = TRUE), ")")
         }
       }
       names(panels) <- panel_names

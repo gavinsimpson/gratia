@@ -574,13 +574,17 @@
   selection. Use `time_varying_style = "pointrange"` for points and interval
   bars instead of the default line, points and ribbon.
 
-* Smooth plot subtitles now identify the model part or distributional
-  parameter for glmmTMB, mgcv and `GJRM::gamlss()` models with multiple linear
+* Smooth and parametric plot subtitles now identify the model part or
+  distributional parameter for glmmTMB, sdmTMB, mgcv, `GJRM::gamlss()` and
+  `GJRM::gjrm()` models with multiple linear
   predictors. Single-predictor models omit these labels, and constant glmmTMB
   dispersion alone does not trigger them. Information about `by` variables,
   smooth titles, selection and the default of plotting all smooths are
-  retained. Saved `smooth_estimates()` retain the labels in an optional
-  `.model` column.
+  retained. Shared terms name every predictor to which they contribute.
+  Saved `smooth_estimates()` and `parametric_effects()` retain the labels in
+  an optional `.model` column. Supply `subtitle` to replace the labels, or
+  `subtitle = ""` to suppress them, including on parametric panels. Repeated
+  parametric plot names include equation numbers for GJRM models (#430).
 
 * Soap-film boundary (`bs = "sf"`) and wiggly (`bs = "sw"`) components are now
   supported, with distinct component types and boundary-aware plots (#375).
