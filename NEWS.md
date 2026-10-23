@@ -142,6 +142,53 @@
   Fits using `min.sp` are rejected because their fitted lower bounds are
   not retained for covariance reconstruction.
 
+* `variance_comp()` now computes variance components directly for `gam()` and
+  `bam()` fits, including fixed smoothing parameters and a row for every
+  penalty sharing a smoothing parameter. Parametric penalties supplied through
+  `paraPen` are included. Confidence intervals retain uncertainty from shared
+  parameters and from the estimated scale when smoothing parameters are fixed.
+  Both interval bounds remain on the standard deviation scale.
+  Models fitted by `gamm()` are also supported: components are extracted from
+  `lme`, smooth components use the same penalty scale, and additional random
+  intercepts and slopes retain their mixed-model variances. Available `nlme`
+  intervals are returned on the standard deviation scale; intervals are `NA`
+  when unavailable, including fits with `pdTens` tensor-product blocks.
+  Smooth components from `gamm4()` now use this penalty scale too, with one
+  labelled row per penalty. Its confidence intervals use likelihood profiles
+  by default, with `interval_method = "none"` available for estimates only.
+  Gaussian profiles use maximum likelihood even when the point estimates
+  were fitted by REML; failed profiles warn and leave the affected bounds `NA`.
+  `type = "terms"` now returns sample variances of fitted term contributions,
+  including parametric terms and additional fitted random effects. The
+  `covariance` attribute contains their covariance matrix, calculated over
+  the fitting observations on the linear predictor scale. Term intervals use
+  joint posterior coefficient draws, preserving dependence between GAM terms
+  and additional fitted random effects. `n_draws`, `seed` and `unconditional`
+  control these draws; `n_draws = 0` returns point estimates only. Paired
+  posterior term variances are returned in the `variance_draws` attribute.
+  A final `total` row reports the variance of the summed term contributions,
+  including covariance between terms, with intervals calculated from the
+  same joint draws. Models with several linear predictors have separate totals
+  for each predictor. The covariance matrix contains individual terms only;
+  the posterior draws also include the totals. `include_total = FALSE` omits
+  total rows and their draw columns while retaining the individual term
+  estimates, proportions and intervals.
+  Term results also include proportions of total variance, allocating each
+  term its variance and its covariance with the other terms so that the
+  individual contributions sum to one. Proportion intervals use the same
+  joint draws, available in the `proportion_draws` attribute. Separate columns
+  are returned for each linear predictor. Proportions can be negative or
+  greater than one; they are `NA` when the total variance is zero.
+  `draw()` plots variance components, standard deviations or proportions with
+  their stored intervals. Proportions from different linear predictors have
+  separate panels. Component selection and optional omission of total rows
+  are supported, and signed proportions retain their full range.
+  Components appear on the x-axis by default; `n_dodge` staggers labels,
+  `angle` rotates them, and `flip = TRUE` puts components on the y-axis.
+  A short article works through penalty and term variances, covariance in
+  totals and proportions, and plotting the results.
+  The default `type = "penalty"` retains variance-parameter output.
+
 * `basis()` accepts `unweighted = TRUE` for fitted GAM(M)s to return basis
   functions without multiplying by fitted coefficients. `draw()` shows these
   shared bases, and bases from factor-by smooth specifications, once per

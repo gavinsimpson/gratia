@@ -67,9 +67,18 @@ gamm4_gam <- function(object) {
 #' Smoothness uncertainty-corrected covariance matrices and alternative EDF
 #' are unavailable from gamm4; requested corrections warn and fall back to
 #' the available covariance matrix or EDF. Variance components are extracted
-#' from the mixed-model component, with smooth labels and random-effect term
-#' names (separate penalties on a tensor smooth retain their grouping suffix);
-#' interval bounds are `NA` because they are not supplied by the fit.
+#' from the mixed-model component. Smooth components use the same penalty
+#' scale and labels as `gam()` and `bam()`, with a separate row for each
+#' penalty of a tensor or factor smooth. Additional random effects retain
+#' their mixed-model variances. Confidence intervals use likelihood profiles
+#' by default; use `interval_method = "none"` to obtain estimates only.
+#' Gaussian profiles use a maximum-likelihood refit even when the reported
+#' estimates were fitted by REML. See [variance_comp] for interval details.
+#' With `type = "terms"`, variances describe fitted term contributions,
+#' including the additional random effects. Their covariance matrix is
+#' returned in the `covariance` attribute. Term intervals use joint posterior
+#' coefficient draws, retaining covariance with the additional fitted random
+#' effects. Use `n_draws = 0` for term estimates without intervals.
 #'
 #' @name gamm4_support
 NULL
@@ -618,31 +627,103 @@ mh_draws.gamm4 <- function(
 #' @rdname variance_comp
 #' @name variance_comp
 #' @aliases variance_comp.gamm4
-variance_comp.gamm4 <- function(object, rescale = TRUE, coverage = 0.95, ...) {
-  gamm4_gam(object) # validate before accessing the mixed-model component
-  if (length(coverage) != 1L || !is.finite(coverage) ||
+variance_comp.gamm4 <- function(object, rescale = TRUE, coverage = 0.95,
+    interval_method = c("profile", "none"), type = c("penalty", "terms"),
+    n_draws = 1000L, seed = NULL, unconditional = FALSE, include_total = TRUE, ...) {
+  gam <- gamm4_gam(object)
+  type <- match.arg(type)
+  if (type == "terms") {
+    variance_terms_check_dots(...)
+    gam <- model_used_rows(gam)
+    return(variance_comp_terms(gam, gamm4_fitted_random_terms(object, gam),
+      coverage = coverage, n_draws = n_draws, seed = seed,
+      unconditional = unconditional, mixed = object, include_total = include_total))
+  }
+  if (!is.numeric(coverage) || length(coverage) != 1L || !is.finite(coverage) ||
       coverage <= 0 || coverage >= 1) {
     stop("'coverage' must be between zero and one.", call. = FALSE)
   }
-  # VarCorr is on the original mixed-model scale; rescale is unnecessary.
-  vc <- as.data.frame(lme4::VarCorr(object[["mer"]]))
-  cnms <- lme4::getME(object[["mer"]], "cnms")
-  labels <- vapply(cnms, function(x) {
-    if (length(x) == 1L && x %in% smooths(object)) x else NA_character_
-  }, character(1))
-  component <- ifelse(vc$grp == "Residual", "scale",
-    paste(vc$grp, vc$var1, sep = ":"))
-  sm <- labels[match(vc$grp, names(labels))]
-  component[!is.na(sm)] <- sm[!is.na(sm)]
-  repeated <- !is.na(sm) & (duplicated(sm) | duplicated(sm, fromLast = TRUE))
-  component[repeated] <- paste(sm[repeated], vc$grp[repeated], sep = ":")
-  # Off-diagonal entries are correlations, not variance components.
-  take <- is.na(vc$var2)
-  tbl <- tibble::tibble(.component = component[take],
-    .variance = vc$vcov[take], .std_dev = vc$sdcor[take],
-    .lower_ci = NA_real_, .upper_ci = NA_real_)
+  if (!is.logical(rescale) || length(rescale) != 1L || is.na(rescale)) {
+    stop("'rescale' must be TRUE or FALSE.", call. = FALSE)
+  }
+  interval_method <- match.arg(interval_method)
+  dots <- list(...)
+  fixed_controls <- intersect(names(dots), c("which", "signames", "prof.scale",
+    "fitted"))
+  if (length(fixed_controls)) {
+    stop("Profile parameters and scale are set by variance_comp(); do not ",
+      "supply ", paste(shQuote(fixed_controls), collapse = ", "), ".",
+      call. = FALSE)
+  }
+  if (interval_method == "none" && length(dots)) {
+    stop("Profile controls require 'interval_method = \"profile\"'.",
+      call. = FALSE)
+  }
+  mer <- object[["mer"]]
+  blocks <- lme4::VarCorr(mer)
+  vc <- as.data.frame(blocks)
+  vc <- vc[is.na(vc$var2), , drop = FALSE]
+  cnms <- lme4::getME(mer, "cnms")
+  scale <- vc$grp == "Residual" & is.na(vc$var1)
+  component <- ifelse(scale, "scale", paste(vc$grp, vc$var1, sep = ":"))
+  # VarCorr gives repeated grouping factors unique suffixes. Profile names
+  # instead retain the original grouping-factor names from cnms.
+  group <- names(cnms)[match(vc$grp, names(blocks))]
+  parameter <- ifelse(scale, "sigma", paste0("sd_", vc$var1, "|", group))
+  scaling <- rep(1, nrow(vc))
+  smooth_rows <- integer()
+  for (sm in gam$smooth) {
+    n <- length(sm$S)
+    if (!n) next
+    index <- match(sm$lmer.name, vc$grp)
+    if (length(index) != n || anyNA(index) ||
+        any(lengths(blocks[sm$lmer.name]) != 1L) || length(sm$S.scale) != n) {
+      stop("Smooth penalties do not match the fitted gamm4 blocks.",
+        call. = FALSE)
+    }
+    component[index] <- names(gam$sp)[seq.int(sm$first.sp, sm$last.sp)]
+    if (rescale) scaling[index] <- sm$S.scale
+    smooth_rows <- c(smooth_rows, index)
+  }
+  order <- c(smooth_rows, setdiff(which(!scale), smooth_rows), which(scale))
+  bounds <- if (interval_method == "profile") {
+    gamm4_variance_intervals(mer, parameter, component, coverage, ...)
+  } else matrix(NA_real_, nrow(vc), 2L)
+  tbl <- tibble::tibble(.component = component[order],
+    .variance = (vc$vcov * scaling)[order],
+    .std_dev = (vc$sdcor * sqrt(scaling))[order],
+    .lower_ci = (bounds[, 1L] * sqrt(scaling))[order],
+    .upper_ci = (bounds[, 2L] * sqrt(scaling))[order])
   class(tbl) <- c("variance_comp", class(tbl))
   tbl
+}
+
+gamm4_variance_intervals <- function(mer, parameter, component, coverage, ...) {
+  bounds <- matrix(NA_real_, length(parameter), 2L)
+  if (lme4::isGLMM(mer) &&
+      as.logical(lme4::getME(mer, "devcomp")$dims[["useSc"]])) {
+    warning("Profile intervals are unavailable for generalized gamm4 fits ",
+      "with an estimated scale.", call. = FALSE)
+    return(bounds)
+  }
+  repeated <- duplicated(parameter) | duplicated(parameter, fromLast = TRUE)
+  if (any(repeated)) {
+    warning("Profile intervals are unavailable for repeated covariance ",
+      "parameter names: ", paste(unique(parameter[repeated]), collapse = ", "),
+      ".", call. = FALSE)
+  }
+  for (i in which(!repeated)) {
+    bounds[i, ] <- tryCatch({
+      profile <- stats::profile(mer, which = parameter[i], signames = FALSE, ...)
+      interval <- stats::confint(profile, level = coverage)
+      unname(interval[parameter[i], , drop = TRUE])
+    }, error = function(e) {
+      warning("Could not compute a profile interval for '", component[i],
+        "': ", conditionMessage(e), call. = FALSE)
+      c(NA_real_, NA_real_)
+    })
+  }
+  bounds
 }
 
 #' @seealso [gamm4_support]

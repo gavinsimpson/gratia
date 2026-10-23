@@ -224,6 +224,7 @@ S3method(draw,scasm)
 S3method(draw,sdmTMB)
 S3method(draw,smooth_estimates)
 S3method(draw,smooth_samples)
+S3method(draw,variance_comp)
 S3method(edf,gam)
 S3method(edf,gamm4)
 S3method(edf,scam)
@@ -646,6 +647,7 @@ S3method(user_draws,gam)
 S3method(user_draws,gamm4)
 S3method(user_draws,scam)
 S3method(variance_comp,gam)
+S3method(variance_comp,gamm)
 S3method(variance_comp,gamm4)
 S3method(variance_comp,scam)
 S3method(vcov,scam)
@@ -935,7 +937,6 @@ importFrom(mgcv,
   fix.family.qf,
   fix.family.rd,
   gam.mh,
-  gam.vcomp,
   rTweedie,
   smoothCon
 )
@@ -1076,7 +1077,6 @@ importFrom(tidyselect,
   where
 )
 importFrom(utils,
-  capture.output,
   combn,
   getFromNamespace,
   packageVersion

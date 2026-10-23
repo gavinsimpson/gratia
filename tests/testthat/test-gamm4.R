@@ -178,17 +178,19 @@ test_that("gamm4 diagnostics and simulations retain family-specific behavior", {
 
 test_that("gamm4 variance components include smooths and genuine random effects", {
   for (m in list(gamm4_gaussian, gamm4_binomial, gamm4_poisson, gamm4_surface)) {
-    v <- variance_comp(m)
+    v <- variance_comp(m, rescale = FALSE, interval_method = "none")
     expected <- as.data.frame(lme4::VarCorr(m$mer))
     take <- is.na(expected$var2)
     expect_s3_class(v, "variance_comp")
-    expect_equal(v$.variance, expected$vcov[take])
-    expect_equal(v$.std_dev, expected$sdcor[take])
+    expect_equal(sort(v$.variance), sort(expected$vcov[take]))
+    expect_equal(sort(v$.std_dev), sort(expected$sdcor[take]))
     expect_true(all(is.na(v$.lower_ci)))
     expect_true(all(is.na(v$.upper_ci)))
     expect_true("group:(Intercept)" %in% v$.component)
     expect_true(any(grepl("s\\(x\\)|t2\\(x,z\\)", v$.component)))
-    expect_equal(variance_comp(m, rescale = FALSE), v)
+    rescaled <- variance_comp(m, interval_method = "none")
+    native <- !grepl("^s\\(|^t2\\(", v$.component)
+    expect_equal(rescaled$.variance[native], v$.variance[native])
     expect_error(variance_comp(m, coverage = 1), "between zero and one")
   }
   expect_warning(v <- get_vcov(gamm4_binomial, unconditional = TRUE),
