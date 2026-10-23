@@ -23,7 +23,7 @@ conditional_differences(
   condition = NULL,
   data = NULL,
   scale = c("response", "link", "linear_predictor"),
-  n_vals = 100,
+  n_vals = NULL,
   ci_level = 0.95,
   complete = TRUE,
   unconditional = FALSE,
@@ -61,7 +61,12 @@ as in \code{\link[=conditional_values]{conditional_values()}}. The first non-com
 the plotting axis. Up to four non-comparison conditions are supported.
 Named elements for factors in \code{by} restrict their comparison levels, e.g.
 \code{list("x", treatment = c("control", "high"))}. Other covariates are held
-at \code{\link[=typical_values]{typical_values()}}. At least one non-comparison condition is required.}
+at \code{\link[=typical_values]{typical_values()}}. At least one non-comparison condition is required.
+Group two numeric covariates in the first non-comparison element to request
+a surface, for example \code{list(c("x1", "x2"), "stratum")}. A nested list
+can supply explicit axis values or helpers, as in \code{\link[=conditional_values]{conditional_values()}}.
+Both axes count towards the four-covariate limit. Remaining conditions
+supply facets, skipping categorical colour.}
 
 \item{data}{optional data frame used to generate condition values and
 determine covariate classes. Explicit values in \code{condition} take precedence.
@@ -73,8 +78,12 @@ are not used directly as a prediction grid.}
 \item{...}{arguments passed to prediction, such as \code{exclude}. Arguments
 \code{type}, \code{newdata}, \code{se.fit}, and \code{terms} are not supported here.}
 
-\item{n_vals}{numeric; number of values to generate for numeric variables
-named in \code{condition}.}
+\item{n_vals}{positive integer or \code{NULL}; number of values to generate along
+each numeric axis. For \code{\link[=conditional_values]{conditional_values()}} and
+\code{\link[=conditional_differences]{conditional_differences()}}, \code{NULL} (the default) uses 100 for curves and
+50 per axis for surfaces. Explicit values or helpers in \code{condition}
+override generated values. Other numeric conditions use their five-number
+summaries unless explicit values or helpers are supplied.}
 
 \item{ci_level}{numeric; a number on interval (0,1) giving the coverage for
 credible intervals.}
@@ -207,6 +216,12 @@ df <- data_sim("eg4", seed = 2)
 m <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = df, method = "REML")
 cd <- conditional_differences(m, by = "fac", condition = "x2")
 draw(cd)
+
+# Compare treatment levels over both numeric covariates. Each comparison
+# is drawn in a separate surface panel.
+cd_surface <- conditional_differences(m, by = "fac",
+  condition = list(c("x2", "x0")))
+draw(cd_surface, surface = "tile")
 
 # Restrict comparisons and fix a further covariate
 conditional_differences(m, by = "fac",

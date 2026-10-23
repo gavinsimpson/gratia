@@ -92,6 +92,7 @@ website build to fail.
 
 ## Running tests
 
+Do not run the `hgam-paper` tests unless the user specifically asks for them.
 Keep the HGAM paper tests out of routine validation, including full-suite runs.
 Use `make test-hgam-paper` only when specifically checking the paper code;
 the existing weekly/manual CI job also runs this check. Do not enable

@@ -28,14 +28,9 @@ conditional_moments(
 \arguments{
 \item{model}{a fitted GAM object.}
 
-\item{condition}{either a character vector or a list supplying the names of
-covariates, and possibly their values, to condition up. The order of the
-values determines how these are plotted via the \code{\link[=draw.conditional_values]{draw.conditional_values()}}
-method; the first element is mapped to the \emph{x} channel, the second element
-to the \emph{colour} channel, the third to \code{\link[ggplot2:facet_wrap]{ggplot2::facet_wrap()}} \strong{if no
-fourth element is present}, if present, the fourth element is mapped to
-the rows and the third element is mapped to the columns of
-\code{\link[ggplot2:facet_grid]{ggplot2::facet_grid()}}.}
+\item{condition}{Character vector or list specifying covariates and optional
+values. The first covariate supplies the plotting axis, followed by colour,
+facet columns and facet rows. Grouped surface conditions are not supported.}
 
 \item{data}{optional data frame used to generate condition values and
 determine covariate classes. Explicit values in \code{condition} take precedence.
@@ -47,8 +42,9 @@ are not used directly as a prediction grid.}
 requests all seven. CV is SD divided by a strictly positive mean;
 kurtosis is the fourth central moment divided by squared variance.}
 
-\item{n_vals}{numeric; number of values to generate for numeric variables
-named in \code{condition}.}
+\item{n_vals}{Positive integer; number of values to generate along a numeric
+plotting axis. Defaults to 100. Explicit condition values or helpers override
+generated values; other numeric conditions use five-number summaries.}
 
 \item{complete}{logical; if \code{TRUE} (the default), retain all combinations of
 conditions. If \code{FALSE}, retain only combinations of factor levels among

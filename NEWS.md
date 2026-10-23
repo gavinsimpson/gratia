@@ -136,6 +136,13 @@
   adjust colour-bar dimensions and label angles. Existing defaults, scale
   labels and palettes are retained (#430).
 
+* `conditional_values()` accepts two numeric covariates grouped in the first
+  condition, such as `condition = list(c("x1", "x2"), "treatment")`, to
+  evaluate and draw prediction surfaces. Remaining conditions supply facets.
+  Its `draw()` method supports raster, tile and optional ggcube 3D surfaces,
+  including interval surfaces via `ci_3d = TRUE`. The default `n_vals = NULL`
+  uses 100 values for curves and 50 along each surface axis.
+
 * `random_effect_samples()` draws new random intercepts, slopes and factor-smooth
   curves from their estimated Gaussian distributions. `marginalise` integrates
   response means in fitted predictions using Gaussian quadrature or Monte Carlo,
@@ -759,7 +766,11 @@
   with pointwise or simultaneous intervals using the delta method or shared
   posterior simulations. Simultaneous bands can cover each comparison
   separately or all comparisons jointly via `simultaneous_scope`. `draw()`
-  plots the differences and their intervals (#143, #145).
+  plots the differences and their intervals (#143, #145). Grouping two numeric
+  covariates in the first non-comparison condition evaluates difference
+  surfaces, drawn as raster, tile or optional ggcube 3D surfaces. Further
+  conditions supply facets; `ci_3d = TRUE` adds interval surfaces. The default
+  `n_vals = NULL` uses 100 values for curves and 50 along each surface axis.
 
 * `difference_smooths()` now offers simultaneous intervals for differences of
   smooths at supplied covariate combinations, separately for each pair of
