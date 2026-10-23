@@ -508,6 +508,7 @@ characters")
 #'   position_dodge geom_pointrange
 #' @importFrom tidyselect where any_of
 #' @export
+#' @inheritSection draw Label layout
 `draw.conditional_values` <- function(
     object,
     facet_scales = "fixed",

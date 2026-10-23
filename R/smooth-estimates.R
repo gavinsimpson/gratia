@@ -1588,6 +1588,7 @@ smooth_estimates.gjrm <- smooth_estimates.gamlss
 #' draw(estimates)
 #' # A redraw changes roles using the points already evaluated
 #' draw(estimates, variables = c("x2", "x1", "x0"))
+#' @inheritSection draw Label layout
 `draw.smooth_estimates` <- function(object,
                                     constant = NULL,
                                     fun = NULL,

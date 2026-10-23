@@ -202,6 +202,14 @@ Flexible survival equations fitted using SCAM are not yet supported.
 Working residuals from preliminary GAM fits are unavailable for joint
 models; requesting partial residuals warns and draws the smooths alone.
 }
+\section{Label layout}{
+
+Pass \code{label_control = draw_label_control(...)} to \code{draw()} to wrap discrete
+axis labels and legend text, stagger discrete tick labels, or adjust legend
+and colour-bar layout. Settings apply to each panel, including unwrapped
+plot lists. See \code{\link[=draw_label_control]{draw_label_control()}} for the available settings.
+}
+
 \examples{
 if (suppressPackageStartupMessages(require("GJRM", quietly = TRUE))) {
   # follow example from ?GJRM::gamlss

@@ -54,6 +54,14 @@ are obtained by grouping the data into bins. The rootogram is drawn using
 \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}} graphics. The design closely follows Kleiber & Zeileis
 (2016).
 }
+\section{Label layout}{
+
+Pass \code{label_control = draw_label_control(...)} to \code{draw()} to wrap discrete
+axis labels and legend text, stagger discrete tick labels, or adjust legend
+and colour-bar layout. Settings apply to each panel, including unwrapped
+plot lists. See \code{\link[=draw_label_control]{draw_label_control()}} for the available settings.
+}
+
 \examples{
 load_mgcv()
 df <- data_sim("eg1", n = 1000, dist = "poisson", scale = 0.1, seed = 6)

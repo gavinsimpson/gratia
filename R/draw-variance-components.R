@@ -58,6 +58,7 @@
 #' terms <- variance_comp(model, type = "terms", n_draws = 200, seed = 42)
 #' draw(terms)
 #' draw(terms, type = "proportion", include_total = FALSE)
+#' @inheritSection draw Label layout
 draw.variance_comp <- function(object, type = c("variance", "std_dev", "proportion"),
     select = NULL, include_total = TRUE, predictor = NULL, ncol = NULL,
     nrow = NULL, angle = NULL, n_dodge = 1L, flip = FALSE, ...) {

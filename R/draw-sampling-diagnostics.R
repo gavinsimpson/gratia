@@ -58,6 +58,7 @@
 #' diagnostics <- sampling_diagnostics(b)
 #' draw(diagnostics, select = 1:2)
 #' draw(diagnostics, type = "rank", select = 1:2, n_bins = 10)
+#' @inheritSection draw Label layout
 draw.sampling_diagnostics <- function(object, type = c("trace", "rank"),
     select = NULL, n_bins = 20L, scales = NULL, ncol = NULL, nrow = NULL,
     alpha = 0.7, linewidth = 0.4, discrete_colour = NULL, ...) {

@@ -487,6 +487,7 @@ assemble.sdmTMB <- function(
 
 #' @rdname sdmTMB-methods
 #' @export
+#' @inheritSection draw Label layout
 draw.sdmTMB <- function(
   object, ..., parametric = NULL, residuals = FALSE,
   unconditional = FALSE, frequentist = FALSE, envir = NULL,

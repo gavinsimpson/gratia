@@ -38,6 +38,14 @@ Display conditional differences with pointwise or simultaneous intervals and a
 zero reference line. Each comparison is shown in a separate facet; additional
 conditioning variables use colour and facets as in \code{\link[=draw.conditional_values]{draw.conditional_values()}}.
 }
+\section{Label layout}{
+
+Pass \code{label_control = draw_label_control(...)} to \code{draw()} to wrap discrete
+axis labels and legend text, stagger discrete tick labels, or adjust legend
+and colour-bar layout. Settings apply to each panel, including unwrapped
+plot lists. See \code{\link[=draw_label_control]{draw_label_control()}} for the available settings.
+}
+
 \examples{
 load_mgcv()
 df <- data_sim("eg4", seed = 2)

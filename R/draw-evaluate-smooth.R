@@ -45,6 +45,7 @@
 #'
 #' @export
 #' @name draw.evaluated_parametric_term
+#' @inheritSection draw Label layout
 `draw.evaluated_parametric_term` <- function(object,
                                              ci_level = 0.95,
                                              constant = NULL,

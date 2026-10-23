@@ -7,13 +7,22 @@
 #'
 #' @param object and R object to plot.
 #' @param ... arguments passed to other methods.
+#' @inheritParams draw
+#' @inheritSection draw Label layout
 #'
 #' @return A list of [ggplot2::ggplot()] objects.
 #'
 #' @author Gavin L. Simpson
 #'
 #' @export
-`assemble` <- function(object, ...) {
+`assemble` <- function(object, ..., label_control = NULL) {
+  if (!is.null(label_control)) {
+    control <- validate_draw_label_control(label_control)
+    value <- withVisible(assemble(object, ...))
+    result <- apply_draw_label_control(value$value, control)
+    if (!value$visible) return(invisible(result))
+    return(result)
+  }
   UseMethod("assemble")
 }
 
@@ -73,6 +82,7 @@
 #' m2 <- gamm(y ~ s(x0) + x1, data = df1, method = "REML")
 #' gamm_plots <- assemble(m2)
 #' gamm_plots[[1]]
+#' @inheritSection draw Label layout
 `assemble.gam` <- function(
   object,
   data = NULL,

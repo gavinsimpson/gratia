@@ -125,6 +125,81 @@ MRF interval lines use `geom.gratia.smooth.interval`, independently of the
 points controlled by `geom.gratia.smooth`. Diagnostic boxplots use
 `geom.gratia.diagnostic.boxplot`.
 
+## Laying out labels, legends and colour bars
+
+Long labels can overlap when several plots share a figure. Use
+`draw_label_control()` to choose wrapping widths and guide layouts, then pass
+the result as `label_control` to `draw()` or `assemble()`. The configuration
+works across drawing methods. Omitted settings retain the existing appearance.
+
+For a discrete axis, wrapping breaks long labels into lines and `n_dodge`
+staggers labels across rows. This example uses three fishing categories with
+different mean responses. The continuous covariate controls a curved response
+component, and independent Gaussian noise represents variation among
+observations within each category.
+
+```{r label-layout-data}
+set.seed(430)
+fishing <- data.frame(
+  day = runif(150, 0, 300),
+  angler_type = factor(rep(c("Boat (guided)", "Boat (unguided)", "Shore"), 50))
+)
+fishing$y <- sin(fishing$day / 60) +
+  c(0, -0.8, -0.3)[as.integer(fishing$angler_type)] + rnorm(150, sd = 0.3)
+```
+
+Fit a GAM with a smooth effect of day and a parametric effect of fishing
+category. Only the categorical tick labels will wrap or stagger; the day and
+partial-effect axes retain their numeric labels.
+
+```{r label-layout-axes}
+fishing_model <- gam(y ~ angler_type + s(day, k = 8),
+  data = fishing, method = "REML")
+axis_layout <- draw_label_control(axes = list(wrap = 12, n_dodge = 2))
+draw(fishing_model, label_control = axis_layout, ncol = 2)
+```
+
+Legends have their own wrapping width and can arrange their keys into rows or
+columns. Compare the fitted day smooth with a model allowing less curvature
+in day. The descriptive model names become legend entries; the layout
+wraps those entries and keeps them in one column.
+
+```{r label-layout-legend}
+linear_fishing <- gam(y ~ angler_type + s(day, k = 3, fx = TRUE),
+  data = fishing, method = "REML")
+comparison <- compare_smooths(fishing_model, linear_fishing, n = 50)
+comparison$.model <- factor(comparison$.model,
+  levels = c("fishing_model", "linear_fishing"),
+  labels = c("Flexible seasonal pattern by day", "Low complexity seasonal pattern by day"))
+legend_layout <- draw_label_control(
+  legend = list(wrap = 22, title_wrap = 18, ncol = 1)
+)
+draw(comparison, label_control = legend_layout)
+```
+
+Colour bars can wrap their titles, rotate their tick labels, and change their
+displayed dimensions. The following concurvity plot compares the terms in the
+four-smooth model fitted earlier. Its fill scale supplies the descriptive title;
+the label control wraps the title and sets the bar height. The scale continues
+to control the palette, breaks and numeric labels.
+
+```{r label-layout-colourbar}
+bar_layout <- draw_label_control(
+  axes = list(wrap = 15),
+  colourbar = list(title_wrap = 18, height = grid::unit(35, "mm"))
+)
+draw(model_concurvity(m, pairwise = TRUE),
+  continuous_colour = scale_fill_viridis_c(name = "Concurvity between model terms"),
+  label_control = bar_layout)
+```
+
+Wrapping happens after scale labels have been formatted, preserving custom
+label mappings and mathematical expressions. Explicit line breaks are retained;
+long words without spaces are left intact. Axis-title wrapping uses
+`axes = list(title_wrap = ...)`; tick wrapping and staggering apply only to
+discrete axes. Settings for guides absent from a plot have no effect.
+Later ggplot2 scale and guide additions follow their normal precedence.
+
 ## Optional discrete palettes
 
 Grouped curves and ribbons retain the current Okabe–Ito palette and hue
