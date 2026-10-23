@@ -130,6 +130,12 @@
 
 ## New features
 
+* `draw_label_control()` provides optional label layout settings across
+  `draw()` and `assemble()` methods. Wrap discrete axis labels, legend entries
+  and guide titles, stagger discrete tick labels, arrange legend keys, and
+  adjust colour-bar dimensions and label angles. Existing defaults, scale
+  labels and palettes are retained (#430).
+
 * `random_effect_samples()` draws new random intercepts, slopes and factor-smooth
   curves from their estimated Gaussian distributions. `marginalise` integrates
   response means in fitted predictions using Gaussian quadrature or Monte Carlo,

@@ -356,6 +356,7 @@ conditional_moments.gam <- function(model, condition = NULL, data = NULL,
 #' @param ... Additional arguments passed to [patchwork::wrap_plots()].
 #' @return A patchwork containing one plot per moment and response/category.
 #' @export
+#' @inheritSection draw Label layout
 draw.conditional_moments <- function(object, facet_scales = "fixed",
     discrete_colour = NULL, discrete_fill = NULL, xlab = NULL, ylab = NULL, ...) {
   keys <- intersect(c(".parameter", ".category", ".y"), names(object))

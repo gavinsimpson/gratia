@@ -363,6 +363,7 @@ conditional_differences.gam <- function(model, by, condition = NULL, data = NULL
 #' df <- data_sim("eg4", seed = 2)
 #' m <- gam(y ~ fac + s(x2, by = fac), data = df, method = "REML")
 #' draw(conditional_differences(m, by = "fac", condition = "x2"))
+#' @inheritSection draw Label layout
 draw.conditional_differences <- function(object, facet_scales = "fixed",
     discrete_colour = NULL, discrete_fill = NULL, xlab = NULL, ylab = NULL, ...) {
   channels <- attr(object, "channels")

@@ -68,6 +68,7 @@ reference:
       `assemble()`; see [Customizing plots](../articles/custom-plotting.html).
   - contents:
       - draw
+      - draw_label_control
       - draw.gam
       - draw.gamlss
       - glmmTMB-methods

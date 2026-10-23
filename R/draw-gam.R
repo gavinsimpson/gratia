@@ -380,6 +380,7 @@
 #'
 #' # See https://gavinsimpson.github.io/gratia/articles/custom-plotting.html
 #' # for more examples. Use the & operator to modify the theme of all panels.
+#' @inheritSection draw Label layout
 `draw.gam` <- function(
   object,
   data = NULL,

@@ -474,6 +474,14 @@ result, it is not possible to use \code{+} to add to the plots in the way one
 might typically work with \code{ggplot()} plots. Instead, use the \code{&} operator;
 see the examples.
 }
+\section{Label layout}{
+
+Pass \code{label_control = draw_label_control(...)} to \code{draw()} to wrap discrete
+axis labels and legend text, stagger discrete tick labels, or adjust legend
+and colour-bar layout. Settings apply to each panel, including unwrapped
+plot lists. See \code{\link[=draw_label_control]{draw_label_control()}} for the available settings.
+}
+
 \examples{
 load_mgcv()
 

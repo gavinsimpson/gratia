@@ -342,6 +342,7 @@ assemble.glmmTMB <- function(object, ..., parametric = NULL,
 
 #' @rdname glmmTMB-methods
 #' @export
+#' @inheritSection draw Label layout
 draw.glmmTMB <- function(object, ..., parametric = NULL,
     residuals = FALSE, unconditional = FALSE, frequentist = FALSE,
     ranef_lines = FALSE, envir = NULL) {

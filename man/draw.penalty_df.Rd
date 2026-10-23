@@ -64,6 +64,14 @@ cells in PDF and SVG output, but can increase file size for large matrices.}
 \description{
 Displays the penalty matrices of smooths as a heatmap using \code{ggplot}
 }
+\section{Label layout}{
+
+Pass \code{label_control = draw_label_control(...)} to \code{draw()} to wrap discrete
+axis labels and legend text, stagger discrete tick labels, or adjust legend
+and colour-bar layout. Settings apply to each panel, including unwrapped
+plot lists. See \code{\link[=draw_label_control]{draw_label_control()}} for the available settings.
+}
+
 \examples{
 load_mgcv()
 dat <- data_sim("eg4", n = 400, seed = 42)

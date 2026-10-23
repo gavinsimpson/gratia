@@ -97,6 +97,7 @@
 #'   draw(joint, parametric = FALSE)
 #'   smooth_estimates(joint, select = smooths(joint)[3])
 #' }
+#' @inheritSection draw Label layout
 `draw.gamlss` <- function(object,
                           scales = c("free", "fixed"),
                           ncol = NULL, nrow = NULL, guides = "keep",

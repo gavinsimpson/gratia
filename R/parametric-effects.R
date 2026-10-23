@@ -327,6 +327,7 @@
 #' @importFrom tidyr nest
 #' @importFrom tidyselect any_of
 #' @importFrom rlang .data
+#' @inheritSection draw Label layout
 draw.parametric_effects <- function(object,
                                     scales = c("free", "fixed"),
                                     ci_level = 0.95,

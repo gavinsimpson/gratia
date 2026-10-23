@@ -191,6 +191,14 @@ Smooth extraction and effect plots do not support dispersion formulas,
 other multi-predictor families, or nonlocal effects.
 Spatial fields and group random effects are not plotted.
 }
+\section{Label layout}{
+
+Pass \code{label_control = draw_label_control(...)} to \code{draw()} to wrap discrete
+axis labels and legend text, stagger discrete tick labels, or adjust legend
+and colour-bar layout. Settings apply to each panel, including unwrapped
+plot lists. See \code{\link[=draw_label_control]{draw_label_control()}} for the available settings.
+}
+
 \examples{
 if (requireNamespace("sdmTMB", quietly = TRUE)) {
   library("mgcv")
