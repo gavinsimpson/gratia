@@ -223,6 +223,9 @@ plots](https://gavinsimpson.github.io/gratia/articles/custom-plotting.md).
 
   Generic plotting via `ggplot2`
 
+- [`draw_label_control()`](https://gavinsimpson.github.io/gratia/reference/draw_label_control.md)
+  : Control label layout in gratia plots
+
 - [`draw(`*`<gam>`*`)`](https://gavinsimpson.github.io/gratia/reference/draw.gam.md)
   [`draw(`*`<gamm>`*`)`](https://gavinsimpson.github.io/gratia/reference/draw.gam.md)
   [`draw(`*`<scam>`*`)`](https://gavinsimpson.github.io/gratia/reference/draw.gam.md)

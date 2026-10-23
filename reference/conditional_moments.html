@@ -102,14 +102,9 @@ held at typical values; observations are not averaged over those covariates.</p>
 
 
 <dt id="arg-condition">condition<a class="anchor" aria-label="anchor" href="#arg-condition"></a></dt>
-<dd><p>either a character vector or a list supplying the names of
-covariates, and possibly their values, to condition up. The order of the
-values determines how these are plotted via the <code><a href="draw.conditional_values.html">draw.conditional_values()</a></code>
-method; the first element is mapped to the <em>x</em> channel, the second element
-to the <em>colour</em> channel, the third to <code><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">ggplot2::facet_wrap()</a></code> <strong>if no
-fourth element is present</strong>, if present, the fourth element is mapped to
-the rows and the third element is mapped to the columns of
-<code><a href="https://ggplot2.tidyverse.org/reference/facet_grid.html" class="external-link">ggplot2::facet_grid()</a></code>.</p></dd>
+<dd><p>Character vector or list specifying covariates and optional
+values. The first covariate supplies the plotting axis, followed by colour,
+facet columns and facet rows. Grouped surface conditions are not supported.</p></dd>
 
 
 <dt id="arg-data">data<a class="anchor" aria-label="anchor" href="#arg-data"></a></dt>
@@ -127,8 +122,9 @@ kurtosis is the fourth central moment divided by squared variance.</p></dd>
 
 
 <dt id="arg-n-vals">n_vals<a class="anchor" aria-label="anchor" href="#arg-n-vals"></a></dt>
-<dd><p>numeric; number of values to generate for numeric variables
-named in <code>condition</code>.</p></dd>
+<dd><p>Positive integer; number of values to generate along a numeric
+plotting axis. Defaults to 100. Explicit condition values or helpers override
+generated values; other numeric conditions use five-number summaries.</p></dd>
 
 
 <dt id="arg-complete">complete<a class="anchor" aria-label="anchor" href="#arg-complete"></a></dt>

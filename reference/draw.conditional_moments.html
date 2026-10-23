@@ -106,7 +106,7 @@ discrete variables.</p></dd>
 
 
 <dt id="arg-ylab">ylab<a class="anchor" aria-label="anchor" href="#arg-ylab"></a></dt>
-<dd><p>character; label for the y axis of the plot.</p></dd>
+<dd><p>Character; label for the response moment axis.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
@@ -116,6 +116,15 @@ discrete variables.</p></dd>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A patchwork containing one plot per moment and response/category.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="label-layout">Label layout<a class="anchor" aria-label="anchor" href="#label-layout"></a></h2>
+
+
+<p>Pass <code>label_control = draw_label_control(...)</code> to <code><a href="draw.html">draw()</a></code> to wrap discrete
+axis labels and legend text, stagger discrete tick labels, or adjust legend
+and colour-bar layout. Settings apply to each panel, including unwrapped
+plot lists. See <code><a href="draw_label_control.html">draw_label_control()</a></code> for the available settings.</p>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

@@ -178,6 +178,27 @@
 
 ### New features
 
+- [`draw_label_control()`](https://gavinsimpson.github.io/gratia/reference/draw_label_control.md)
+  provides optional label layout settings across
+  [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)
+  and
+  [`assemble()`](https://gavinsimpson.github.io/gratia/reference/assemble.md)
+  methods. Wrap discrete axis labels, legend entries and guide titles,
+  stagger discrete tick labels, arrange legend keys, and adjust
+  colour-bar dimensions and label angles. Existing defaults, scale
+  labels and palettes are retained
+  ([\#430](https://github.com/gavinsimpson/gratia/issues/430)).
+
+- [`conditional_values()`](https://gavinsimpson.github.io/gratia/reference/conditional_values.md)
+  accepts two numeric covariates grouped in the first condition, such as
+  `condition = list(c("x1", "x2"), "treatment")`, to evaluate and draw
+  prediction surfaces. Remaining conditions supply facets. Its
+  [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)
+  method supports raster, tile and optional ggcube 3D surfaces,
+  including interval surfaces via `ci_3d = TRUE`. The default
+  `n_vals = NULL` uses 100 values for curves and 50 along each surface
+  axis.
+
 - [`random_effect_samples()`](https://gavinsimpson.github.io/gratia/reference/random_effect_samples.md)
   draws new random intercepts, slopes and factor-smooth curves from
   their estimated Gaussian distributions. `marginalise` integrates
@@ -1072,7 +1093,12 @@
   [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)
   plots the differences and their intervals
   ([\#143](https://github.com/gavinsimpson/gratia/issues/143),
-  [\#145](https://github.com/gavinsimpson/gratia/issues/145)).
+  [\#145](https://github.com/gavinsimpson/gratia/issues/145)). Grouping
+  two numeric covariates in the first non-comparison condition evaluates
+  difference surfaces, drawn as raster, tile or optional ggcube 3D
+  surfaces. Further conditions supply facets; `ci_3d = TRUE` adds
+  interval surfaces. The default `n_vals = NULL` uses 100 values for
+  curves and 50 along each surface axis.
 
 - [`difference_smooths()`](https://gavinsimpson.github.io/gratia/reference/difference_smooths.md)
   now offers simultaneous intervals for differences of smooths at

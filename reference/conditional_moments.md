@@ -40,16 +40,10 @@ conditional_moments(
 
 - condition:
 
-  either a character vector or a list supplying the names of covariates,
-  and possibly their values, to condition up. The order of the values
-  determines how these are plotted via the
-  [`draw.conditional_values()`](https://gavinsimpson.github.io/gratia/reference/draw.conditional_values.md)
-  method; the first element is mapped to the *x* channel, the second
-  element to the *colour* channel, the third to
-  [`ggplot2::facet_wrap()`](https://ggplot2.tidyverse.org/reference/facet_wrap.html)
-  **if no fourth element is present**, if present, the fourth element is
-  mapped to the rows and the third element is mapped to the columns of
-  [`ggplot2::facet_grid()`](https://ggplot2.tidyverse.org/reference/facet_grid.html).
+  Character vector or list specifying covariates and optional values.
+  The first covariate supplies the plotting axis, followed by colour,
+  facet columns and facet rows. Grouped surface conditions are not
+  supported.
 
 - data:
 
@@ -67,8 +61,10 @@ conditional_moments(
 
 - n_vals:
 
-  numeric; number of values to generate for numeric variables named in
-  `condition`.
+  Positive integer; number of values to generate along a numeric
+  plotting axis. Defaults to 100. Explicit condition values or helpers
+  override generated values; other numeric conditions use five-number
+  summaries.
 
 - complete:
 

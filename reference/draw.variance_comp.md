@@ -108,6 +108,16 @@ Points use the `geom.gratia.effect` theme element and intervals use
 `geom.gratia.interval`; see
 [`gratia_theme_get()`](https://gavinsimpson.github.io/gratia/reference/gratia_theme_get.md).
 
+## Label layout
+
+Pass `label_control = draw_label_control(...)` to
+[`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md) to
+wrap discrete axis labels and legend text, stagger discrete tick labels,
+or adjust legend and colour-bar layout. Settings apply to each panel,
+including unwrapped plot lists. See
+[`draw_label_control()`](https://gavinsimpson.github.io/gratia/reference/draw_label_control.md)
+for the available settings.
+
 ## See also
 
 [`variance_comp()`](https://gavinsimpson.github.io/gratia/reference/variance_comp.md),

@@ -146,6 +146,16 @@ draw(
   defines facet columns. `NULL` uses the order saved with the estimates.
   Drawing rearranges evaluated points without generating a new grid.
 
+## Label layout
+
+Pass `label_control = draw_label_control(...)` to
+[`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md) to
+wrap discrete axis labels and legend text, stagger discrete tick labels,
+or adjust legend and colour-bar layout. Settings apply to each panel,
+including unwrapped plot lists. See
+[`draw_label_control()`](https://gavinsimpson.github.io/gratia/reference/draw_label_control.md)
+for the available settings.
+
 ## Examples
 
 ``` r

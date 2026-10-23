@@ -130,6 +130,16 @@ draw(
   additional arguments passed to
   [`patchwork::wrap_plots()`](https://patchwork.data-imaginist.com/reference/wrap_plots.html).
 
+## Label layout
+
+Pass `label_control = draw_label_control(...)` to
+[`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md) to
+wrap discrete axis labels and legend text, stagger discrete tick labels,
+or adjust legend and colour-bar layout. Settings apply to each panel,
+including unwrapped plot lists. See
+[`draw_label_control()`](https://gavinsimpson.github.io/gratia/reference/draw_label_control.md)
+for the available settings.
+
 ## Examples
 
 ``` r

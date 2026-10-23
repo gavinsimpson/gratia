@@ -101,6 +101,13 @@ causes the website build to fail.
 
 ## Running tests
 
+Do not run the `hgam-paper` tests unless the user specifically asks for
+them. Keep the HGAM paper tests out of routine validation, including
+full-suite runs. Use `make test-hgam-paper` only when specifically
+checking the paper code; the existing weekly/manual CI job also runs
+this check. Do not enable `GRATIA_RUN_HGAM` for ordinary package
+changes.
+
 Run all package tests and checks outside the sandbox from the outset,
 including targeted tests and the full test suite. Request elevated
 execution with `sandbox_permissions="require_escalated"` for test

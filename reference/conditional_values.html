@@ -97,7 +97,7 @@ more complex model predictions, you are strongly encouraged to use
 <span>  condition <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  data <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  scale <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"response"</span>, <span class="st">"link"</span>, <span class="st">"linear_predictor"</span><span class="op">)</span>,</span>
-<span>  n_vals <span class="op">=</span> <span class="fl">100</span>,</span>
+<span>  n_vals <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  ci_level <span class="op">=</span> <span class="fl">0.95</span>,</span>
 <span>  complete <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  <span class="va">...</span></span>
@@ -120,13 +120,20 @@ more complex model predictions, you are strongly encouraged to use
 
 <dt id="arg-condition">condition<a class="anchor" aria-label="anchor" href="#arg-condition"></a></dt>
 <dd><p>either a character vector or a list supplying the names of
-covariates, and possibly their values, to condition up. The order of the
+covariates, and possibly their values, to condition on. The order of the
 values determines how these are plotted via the <code><a href="draw.conditional_values.html">draw.conditional_values()</a></code>
 method; the first element is mapped to the <em>x</em> channel, the second element
 to the <em>colour</em> channel, the third to <code><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">ggplot2::facet_wrap()</a></code> <strong>if no
 fourth element is present</strong>, if present, the fourth element is mapped to
 the rows and the third element is mapped to the columns of
-<code><a href="https://ggplot2.tidyverse.org/reference/facet_grid.html" class="external-link">ggplot2::facet_grid()</a></code>.</p></dd>
+<code><a href="https://ggplot2.tidyverse.org/reference/facet_grid.html" class="external-link">ggplot2::facet_grid()</a></code>.
+To request a surface, group two numeric covariates in the first element,
+for example <code>list(c("x1", "x2"), "treatment")</code>. The grouped covariates
+supply the horizontal and vertical axes, in that order. The remaining
+elements supply facet columns and rows; there is no categorical colour
+channel. Use a nested list to supply axis values or helpers, for example
+<code>list(list(x1 = c(0, 0.5, 1), x2 = "quartile"), "treatment")</code>.
+At most four covariates are allowed, counting both surface axes.</p></dd>
 
 
 <dt id="arg-data">data<a class="anchor" aria-label="anchor" href="#arg-data"></a></dt>
@@ -145,8 +152,12 @@ are not used directly as a prediction grid.</p></dd>
 
 
 <dt id="arg-n-vals">n_vals<a class="anchor" aria-label="anchor" href="#arg-n-vals"></a></dt>
-<dd><p>numeric; number of values to generate for numeric variables
-named in <code>condition</code>.</p></dd>
+<dd><p>positive integer or <code>NULL</code>; number of values to generate along
+each numeric axis. For <code>conditional_values()</code> and
+<code><a href="conditional_differences.html">conditional_differences()</a></code>, <code>NULL</code> (the default) uses 100 for curves and
+50 per axis for surfaces. Explicit values or helpers in <code>condition</code>
+override generated values. Other numeric conditions use their five-number
+summaries unless explicit values or helpers are supplied.</p></dd>
 
 
 <dt id="arg-ci-level">ci_level<a class="anchor" aria-label="anchor" href="#arg-ci-level"></a></dt>
@@ -199,6 +210,14 @@ issued and the uncorrected covariance is used.</p></dd>
 <span class="r-in"><span><span class="va">cv</span> <span class="op">|&gt;</span> <span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="conditional_values-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Grouping x2 and x1 creates a surface over both covariates, with</span></span></span>
+<span class="r-in"><span><span class="co"># 50 generated values along each axis by default.</span></span></span>
+<span class="r-in"><span><span class="va">cv_surface</span> <span class="op">&lt;-</span> <span class="fu">conditional_values</span><span class="op">(</span><span class="va">m1</span>, condition <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"x2"</span>, <span class="st">"x1"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="va">cv_surface</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="conditional_values-2.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="va">cv_surface</span>, surface <span class="op">=</span> <span class="st">"tile"</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="conditional_values-3.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># as above but condition on `x1` also. When plotted, `x1` is mapped to the</span></span></span>
 <span class="r-in"><span><span class="co"># colour channel, noting that it has been summarised using fivenum()</span></span></span>
 <span class="r-in"><span><span class="va">cv</span> <span class="op">&lt;-</span> <span class="fu">conditional_values</span><span class="op">(</span></span></span>
@@ -207,7 +226,7 @@ issued and the uncorrected covariance is used.</p></dd>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># plot</span></span></span>
 <span class="r-in"><span><span class="va">cv</span> <span class="op">|&gt;</span> <span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="conditional_values-2.png" alt="" width="700" height="433"></span>
+<span class="r-plt img"><img src="conditional_values-4.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># can pass `condition` a list, allowing for greater flexibility</span></span></span>
 <span class="r-in"><span><span class="co"># For example, here we condition on all four variables in the model,</span></span></span>
@@ -221,7 +240,7 @@ issued and the uncorrected covariance is used.</p></dd>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># plot</span></span></span>
 <span class="r-in"><span><span class="va">cv</span> <span class="op">|&gt;</span> <span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="conditional_values-3.png" alt="" width="700" height="433"></span>
+<span class="r-plt img"><img src="conditional_values-5.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># some model terms can be exclude from the conditional predictions using the</span></span></span>
 <span class="r-in"><span><span class="co"># `exclude` mechanism of `predict.gam`. Here we exclude the effects of</span></span></span>
@@ -236,7 +255,7 @@ issued and the uncorrected covariance is used.</p></dd>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># plot</span></span></span>
 <span class="r-in"><span><span class="va">cv</span> <span class="op">|&gt;</span> <span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="conditional_values-4.png" alt="" width="700" height="433"></span>
+<span class="r-plt img"><img src="conditional_values-6.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># categorical conditions are also handled</span></span></span>
 <span class="r-in"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="data_sim.html">data_sim</a></span><span class="op">(</span><span class="st">"eg4"</span>, seed <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
@@ -247,7 +266,7 @@ issued and the uncorrected covariance is used.</p></dd>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># plot - we see a discrete x axis</span></span></span>
 <span class="r-in"><span><span class="va">cv</span> <span class="op">|&gt;</span> <span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="conditional_values-5.png" alt="" width="700" height="433"></span>
+<span class="r-plt img"><img src="conditional_values-7.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># in this example we condition on `x2` and `fac %in% c(2,3)`</span></span></span>
 <span class="r-in"><span><span class="va">cv</span> <span class="op">&lt;-</span> <span class="fu">conditional_values</span><span class="op">(</span></span></span>
@@ -256,7 +275,7 @@ issued and the uncorrected covariance is used.</p></dd>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># plot - smooths of `x2` for `fac == 2` and `fac == 3`</span></span></span>
 <span class="r-in"><span><span class="va">cv</span> <span class="op">|&gt;</span> <span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="conditional_values-6.png" alt="" width="700" height="433"></span>
+<span class="r-plt img"><img src="conditional_values-8.png" alt="" width="700" height="433"></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

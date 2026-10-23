@@ -26,7 +26,7 @@ conditional_values(
   condition = NULL,
   data = NULL,
   scale = c("response", "link", "linear_predictor"),
-  n_vals = 100,
+  n_vals = NULL,
   ci_level = 0.95,
   complete = TRUE,
   ...
@@ -48,7 +48,7 @@ conditional_values(model, ..., unconditional = FALSE)
 - condition:
 
   either a character vector or a list supplying the names of covariates,
-  and possibly their values, to condition up. The order of the values
+  and possibly their values, to condition on. The order of the values
   determines how these are plotted via the
   [`draw.conditional_values()`](https://gavinsimpson.github.io/gratia/reference/draw.conditional_values.md)
   method; the first element is mapped to the *x* channel, the second
@@ -57,6 +57,14 @@ conditional_values(model, ..., unconditional = FALSE)
   **if no fourth element is present**, if present, the fourth element is
   mapped to the rows and the third element is mapped to the columns of
   [`ggplot2::facet_grid()`](https://ggplot2.tidyverse.org/reference/facet_grid.html).
+  To request a surface, group two numeric covariates in the first
+  element, for example `list(c("x1", "x2"), "treatment")`. The grouped
+  covariates supply the horizontal and vertical axes, in that order. The
+  remaining elements supply facet columns and rows; there is no
+  categorical colour channel. Use a nested list to supply axis values or
+  helpers, for example
+  `list(list(x1 = c(0, 0.5, 1), x2 = "quartile"), "treatment")`. At most
+  four covariates are allowed, counting both surface axes.
 
 - data:
 
@@ -76,8 +84,13 @@ conditional_values(model, ..., unconditional = FALSE)
 
 - n_vals:
 
-  numeric; number of values to generate for numeric variables named in
-  `condition`.
+  positive integer or `NULL`; number of values to generate along each
+  numeric axis. For `conditional_values()` and
+  [`conditional_differences()`](https://gavinsimpson.github.io/gratia/reference/conditional_differences.md),
+  `NULL` (the default) uses 100 for curves and 50 per axis for surfaces.
+  Explicit values or helpers in `condition` override generated values.
+  Other numeric conditions use their five-number summaries unless
+  explicit values or helpers are supplied.
 
 - ci_level:
 
@@ -127,6 +140,14 @@ cv <- conditional_values(
 )
 # plot
 cv |> draw()
+
+
+# Grouping x2 and x1 creates a surface over both covariates, with
+# 50 generated values along each axis by default.
+cv_surface <- conditional_values(m1, condition = list(c("x2", "x1")))
+draw(cv_surface)
+
+draw(cv_surface, surface = "tile")
 
 
 # as above but condition on `x1` also. When plotted, `x1` is mapped to the
