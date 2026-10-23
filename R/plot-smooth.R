@@ -458,6 +458,8 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
 #' @param contour_data Optional data for contour layers only, for example to
 #'   omit constant interaction panels. `NULL` inherits the surface data.
 #' @param contour_na_rm Logical; remove missing contour values silently?
+#' @param irregular_cells Logical; use midpoint-bounded rectangles for irregular
+#'   coordinate grids even without a covariate scale change?
 #' @param axis_guide X-axis guide; defaults to `guide_axis(angle = angle)`.
 #' @param fill_guide Fill guide; `NULL` leaves ggplot2's guide unchanged.
 #' @param legend_position Legend position; `NULL` preserves the theme setting.
@@ -480,7 +482,7 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
   fill_guide = guide_colourbar(title = fill_title, direction = "vertical"),
   legend_position = "right", tile_colour = NA,
   facet_vars = character(), surface_support = NULL, isotropic = FALSE,
-  z_limits = fill_limits, contour_stat = "contour"
+  z_limits = fill_limits, contour_stat = "contour", irregular_cells = FALSE
 ) {
   surface <- match.arg(surface)
   validate_surface_3d(surface_3d)
@@ -512,7 +514,7 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
     length(gaps) > 1L && !isTRUE(all.equal(gaps, rep(gaps[[1L]], length(gaps)),
       tolerance = 1e-7))
   }
-  changed <- isTRUE(attr(object, "gratia.coordinate_display"))
+  changed <- isTRUE(irregular_cells) || isTRUE(attr(object, "gratia.coordinate_display"))
   if (changed && (irregular(object[[x_var]]) || irregular(object[[y_var]]))) {
     bounds <- function(x) {
       values <- sort(unique(x[is.finite(x)]))

@@ -29,7 +29,7 @@ discrete variables.}
 
 \item{xlab}{character; label for the x axis of the plot.}
 
-\item{ylab}{character; label for the y axis of the plot.}
+\item{ylab}{Character; label for the response moment axis.}
 
 \item{...}{Additional arguments passed to \code{\link[patchwork:wrap_plots]{patchwork::wrap_plots()}}.}
 }

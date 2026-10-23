@@ -21,7 +21,7 @@ conditional_values(
   condition = NULL,
   data = NULL,
   scale = c("response", "link", "linear_predictor"),
-  n_vals = 100,
+  n_vals = NULL,
   ci_level = 0.95,
   complete = TRUE,
   ...
@@ -35,13 +35,20 @@ conditional_values(
 \item{model}{a fitted GAM object.}
 
 \item{condition}{either a character vector or a list supplying the names of
-covariates, and possibly their values, to condition up. The order of the
+covariates, and possibly their values, to condition on. The order of the
 values determines how these are plotted via the \code{\link[=draw.conditional_values]{draw.conditional_values()}}
 method; the first element is mapped to the \emph{x} channel, the second element
 to the \emph{colour} channel, the third to \code{\link[ggplot2:facet_wrap]{ggplot2::facet_wrap()}} \strong{if no
 fourth element is present}, if present, the fourth element is mapped to
 the rows and the third element is mapped to the columns of
-\code{\link[ggplot2:facet_grid]{ggplot2::facet_grid()}}.}
+\code{\link[ggplot2:facet_grid]{ggplot2::facet_grid()}}.
+To request a surface, group two numeric covariates in the first element,
+for example \code{list(c("x1", "x2"), "treatment")}. The grouped covariates
+supply the horizontal and vertical axes, in that order. The remaining
+elements supply facet columns and rows; there is no categorical colour
+channel. Use a nested list to supply axis values or helpers, for example
+\code{list(list(x1 = c(0, 0.5, 1), x2 = "quartile"), "treatment")}.
+At most four covariates are allowed, counting both surface axes.}
 
 \item{data}{optional data frame used to generate condition values and
 determine covariate classes. Explicit values in \code{condition} take precedence.
@@ -52,8 +59,12 @@ are not used directly as a prediction grid.}
 
 \item{...}{arguments passed to \code{\link[=fitted_values]{fitted_values()}}.}
 
-\item{n_vals}{numeric; number of values to generate for numeric variables
-named in \code{condition}.}
+\item{n_vals}{positive integer or \code{NULL}; number of values to generate along
+each numeric axis. For \code{\link[=conditional_values]{conditional_values()}} and
+\code{\link[=conditional_differences]{conditional_differences()}}, \code{NULL} (the default) uses 100 for curves and
+50 per axis for surfaces. Explicit values or helpers in \code{condition}
+override generated values. Other numeric conditions use their five-number
+summaries unless explicit values or helpers are supplied.}
 
 \item{ci_level}{numeric; a number on interval (0,1) giving the coverage for
 credible intervals.}
@@ -95,6 +106,12 @@ cv <- conditional_values(
 )
 # plot
 cv |> draw()
+
+# Grouping x2 and x1 creates a surface over both covariates, with
+# 50 generated values along each axis by default.
+cv_surface <- conditional_values(m1, condition = list(c("x2", "x1")))
+draw(cv_surface)
+draw(cv_surface, surface = "tile")
 
 # as above but condition on `x1` also. When plotted, `x1` is mapped to the
 # colour channel, noting that it has been summarised using fivenum()

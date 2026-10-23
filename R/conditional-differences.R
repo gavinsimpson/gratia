@@ -15,6 +15,11 @@
 #'   Named elements for factors in `by` restrict their comparison levels, e.g.
 #'   `list("x", treatment = c("control", "high"))`. Other covariates are held
 #'   at [typical_values()]. At least one non-comparison condition is required.
+#'   Group two numeric covariates in the first non-comparison element to request
+#'   a surface, for example `list(c("x1", "x2"), "stratum")`. A nested list
+#'   can supply explicit axis values or helpers, as in [conditional_values()].
+#'   Both axes count towards the four-covariate limit. Remaining conditions
+#'   supply facets, skipping categorical colour.
 #' @param complete logical; include all combinations of comparison and
 #'   conditioning factors? With `FALSE`, retain only combinations observed in
 #'   the fitted data, and compare groups only within shared conditioning strata.
@@ -112,6 +117,12 @@
 #' cd <- conditional_differences(m, by = "fac", condition = "x2")
 #' draw(cd)
 #'
+#' # Compare treatment levels over both numeric covariates. Each comparison
+#' # is drawn in a separate surface panel.
+#' cd_surface <- conditional_differences(m, by = "fac",
+#'   condition = list(c("x2", "x0")))
+#' draw(cd_surface, surface = "tile")
+#'
 #' # Restrict comparisons and fix a further covariate
 #' conditional_differences(m, by = "fac",
 #'   condition = list("x2", fac = c("1", "3"), x0 = 0.5))
@@ -142,7 +153,7 @@ conditional_differences <- function(model, by, condition = NULL, data = NULL,
 #' @export
 #' @rdname conditional_differences
 conditional_differences.gam <- function(model, by, condition = NULL, data = NULL,
-    scale = c("response", "link", "linear_predictor"), n_vals = 100,
+    scale = c("response", "link", "linear_predictor"), n_vals = NULL,
     ci_level = 0.95, complete = TRUE, unconditional = FALSE,
     uncertainty = c("delta", "simulation"), n_sim = 10000, seed = NULL,
     n_cores = 1, method = c("gaussian", "mh", "inla", "user"), draws = NULL,
@@ -171,7 +182,6 @@ conditional_differences.gam <- function(model, by, condition = NULL, data = NULL
   }
   positive_integer <- function(x) is.numeric(x) && length(x) == 1L &&
     is.finite(x) && x >= 1 && x <= .Machine$integer.max && x == trunc(x)
-  if (!positive_integer(n_vals)) cli::cli_abort("{.arg n_vals} must be a positive integer.")
   if (!is.numeric(ci_level) || length(ci_level) != 1L || !is.finite(ci_level) ||
       ci_level <= 0 || ci_level >= 1) {
     cli::cli_abort("{.arg ci_level} must be strictly between 0 and 1.")
@@ -206,7 +216,7 @@ conditional_differences.gam <- function(model, by, condition = NULL, data = NULL
     }
   }
   grid <- conditional_prediction_grid(model, condition, data, n_vals, complete,
-    by = by)
+    by = by, surfaces = TRUE)
   pd <- grid$data
   if (!nrow(pd) || anyNA(pd)) {
     cli::cli_abort("The conditional prediction grid must be non-empty and contain no missing values.")
@@ -334,9 +344,7 @@ conditional_differences.gam <- function(model, by, condition = NULL, data = NULL
     }
   }
   out <- dplyr::bind_rows(out)
-  channels <- setNames(rep(list(NULL), 4L), c("x", "colour", "f_col", "f_row"))
-  channels[seq_along(grid$condition)] <- grid$condition
-  attr(out, "channels") <- channels
+  attr(out, "channels") <- grid$channels
   attr(out, "by") <- by
   attr(out, "condition") <- condition
   attr(out, "scale") <- scale
@@ -351,9 +359,12 @@ conditional_differences.gam <- function(model, by, condition = NULL, data = NULL
 
 #' Plot conditional differences
 #'
-#' Display conditional differences with pointwise or simultaneous intervals and a
-#' zero reference line. Each comparison is shown in a separate facet; additional
-#' conditioning variables use colour and facets as in [draw.conditional_values()].
+#' Display conditional differences as curves with pointwise or simultaneous
+#' intervals and a zero reference line, or as surfaces over two grouped numeric
+#' covariates. Each comparison is shown in a separate facet. Surfaces map the
+#' difference to fill and, in 3D, height, with a fill range symmetric around zero.
+#' Additional conditions supply facets for surfaces, or colour and facets for
+#' curves, as in [draw.conditional_values()].
 #' @param object an object returned by [conditional_differences()].
 #' @inheritParams draw.conditional_values
 #' @param ... arguments passed to [draw.conditional_values()].
@@ -365,7 +376,10 @@ conditional_differences.gam <- function(model, by, condition = NULL, data = NULL
 #' draw(conditional_differences(m, by = "fac", condition = "x2"))
 #' @inheritSection draw Label layout
 draw.conditional_differences <- function(object, facet_scales = "fixed",
-    discrete_colour = NULL, discrete_fill = NULL, xlab = NULL, ylab = NULL, ...) {
+    discrete_colour = NULL, discrete_fill = NULL, xlab = NULL, ylab = NULL, ...,
+    surface = c("raster", "tile", "3d"), surface_3d = list(),
+    continuous_fill = NULL, contour = TRUE, n_contour = NULL,
+    ci_3d = FALSE, zlab = NULL) {
   channels <- attr(object, "channels")
   by <- attr(object, "by")
   labels <- lapply(by, function(nm) {
@@ -378,6 +392,14 @@ draw.conditional_differences <- function(object, facet_scales = "fixed",
   object$.comparison <- paste0(object$.contrast, ". ",
     do.call(paste, c(labels, sep = "; ")))
   object$.comparison <- factor(object$.comparison, levels = unique(object$.comparison))
+  surface <- match.arg(surface)
+  if (length(channels$x) == 2L) {
+    return(draw_conditional_surface(object, channels,
+      facet_scales = facet_scales, xlab = xlab, ylab = ylab, zlab = zlab,
+      surface = surface, surface_3d = surface_3d,
+      continuous_fill = continuous_fill, contour = contour,
+      n_contour = n_contour, ci_3d = ci_3d))
+  }
   facets <- c(".comparison", channels$f_col, channels$f_row)
   channels$f_col <- channels$f_row <- NULL
   attr(object, "channels") <- channels

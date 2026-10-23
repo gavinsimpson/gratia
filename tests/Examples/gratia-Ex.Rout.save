@@ -548,6 +548,12 @@ detaching ‘package:mgcv’
 > cd <- conditional_differences(m, by = "fac", condition = "x2")
 > draw(cd)
 > 
+> # Compare treatment levels over both numeric covariates. Each comparison
+> # is drawn in a separate surface panel.
+> cd_surface <- conditional_differences(m, by = "fac",
++   condition = list(c("x2", "x0")))
+> draw(cd_surface, surface = "tile")
+>
 > # Restrict comparisons and fix a further covariate
 > conditional_differences(m, by = "fac",
 +   condition = list("x2", fac = c("1", "3"), x0 = 0.5))
@@ -668,6 +674,12 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > # plot
 > cv |> draw()
 > 
+> # Grouping x2 and x1 creates a surface over both covariates, with
+> # 50 generated values along each axis by default.
+> cv_surface <- conditional_values(m1, condition = list(c("x2", "x1")))
+> draw(cv_surface)
+> draw(cv_surface, surface = "tile")
+>
 > # as above but condition on `x1` also. When plotted, `x1` is mapped to the
 > # colour channel, noting that it has been summarised using fivenum()
 > cv <- conditional_values(
