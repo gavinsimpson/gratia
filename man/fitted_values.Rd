@@ -24,7 +24,11 @@ fitted_values(object, ...)
   unconditional = FALSE,
   interval_method = c("auto", "gaussian", "bootstrap"),
   quantity = c("parameters", "expectation"),
-  family_index = NULL
+  family_index = NULL,
+  marginalise = NULL,
+  integration = c("quadrature", "monte_carlo"),
+  n_quad = 40L,
+  n_integrate = 5000L
 )
 
 \method{fitted_values}{gamm}(object, ...)
@@ -91,6 +95,30 @@ row. By default membership is recovered from the response/index expression
 in \code{data}, or the fitted membership when \code{data} is omitted. This is useful
 when predicting without responses or with a complex response expression.
 An explicit index must agree with membership recoverable from \code{data}.}
+
+\item{marginalise}{\code{NULL} retains the usual predictions. \code{TRUE} selects all
+supported \code{re} and \code{fs} terms; character vectors select exact smooth labels.
+Fitted predictions integrate response means over new zero-mean Gaussian
+effects. Response samplers draw new effects before sampling responses.
+Smoothing parameters and dispersion remain fixed. Only ordinary \code{gam()}
+and \code{bam()} fits with a scalar response mean are supported.}
+
+\item{integration}{Integration method when \code{marginalise} is supplied:
+\code{"quadrature"} (the default) or \code{"monte_carlo"}. Both integrate
+over the Gaussian distribution of the selected effects at each row.}
+
+\item{n_quad}{Initial Gauss-Hermite point count, between 2 and 1000.
+Successive doubled orders, up to four times this count, and an interlaced
+rule with one fewer point must agree within
+\code{1e-8 + 1e-6 * abs(value)} for means and derivatives. Where the random-effect
+variance exceeds one, an independent adaptive rule also checks agreement.
+Failure to agree reports an error.
+Identity, log and probit links use their closed-form Gaussian integrals;
+their metadata records zero quadrature points and zero integration error.}
+
+\item{n_integrate}{Number of Monte Carlo integration draws, at least two.
+These are shared across rows and posterior coefficient draws. This count
+is separate from \code{n_draws}. Ignored for quadrature.}
 }
 \value{
 A tibble (data frame) whose first \emph{m} columns contain either the data
@@ -117,6 +145,15 @@ is the predicted probability for a single category of the response.
 Generate fitted values from a estimated GAM
 }
 \details{
+With \code{marginalise}, predictions are response means averaged over the selected
+random-effect distributions, using the methods described in \code{\link[=fitted_samples]{fitted_samples()}}.
+The point estimate uses fitted coefficients; pointwise intervals use the
+derivative of the integrated mean and the coefficient covariance. \code{.se} is
+on the response scale. These normal intervals are not clipped to the response
+range. Simultaneous and bootstrap marginal intervals are not yet supported.
+The \code{integration_info} attribute records numerical accuracy and fixed
+variance estimates.
+
 \code{quantity = "parameters"} returns all distribution parameters represented
 by predictors, including intercept-only predictors. See \code{\link[=family_parameters]{family_parameters()}}
 for their definitions. These are natural distribution parameters, which

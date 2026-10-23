@@ -161,6 +161,7 @@ fitted_moments.gam <- function(object, data = NULL,
       !(identical(moments, "all") || all(moments %in% moment_names())))
     stop("'moments' must select distinct moment names, or 'all'.", call. = FALSE)
   if (identical(moments, "all")) moments <- moment_names()
+  marginal_not_supported(list(...), "fitted_moments.gam()")
   dots <- list(...)
   if (length(dots) && (is.null(names(dots)) || any(!nzchar(names(dots)))))
     stop("Arguments in '...' must be named.", call. = FALSE)

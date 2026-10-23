@@ -130,6 +130,18 @@
 
 ## New features
 
+* `random_effect_samples()` draws new random intercepts, slopes and factor-smooth
+  curves from their estimated Gaussian distributions. `marginalise` integrates
+  response means in fitted predictions using Gaussian quadrature or Monte Carlo,
+  and generates new-group effects in response simulations. Smoothing parameters
+  and dispersion remain fixed at their fitted estimates. Factor-by curves
+  retain their by-level selection when other random terms are marginalised.
+  Identity, log and probit links use closed-form integrals; other links check
+  quadrature with interlaced nodes and an independent adaptive rule to detect
+  unresolved link transitions.
+  Fits using `min.sp` are rejected because their fitted lower bounds are
+  not retained for covariance reconstruction.
+
 * `basis()` accepts `unweighted = TRUE` for fitted GAM(M)s to return basis
   functions without multiplying by fitted coefficients. `draw()` shows these
   shared bases, and bases from factor-by smooth specifications, once per

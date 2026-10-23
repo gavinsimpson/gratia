@@ -877,6 +877,7 @@ posterior_samples.gamm <- function(
   seed = NULL,
   conditioning = NULL
 ) {
+  marginal_not_supported(list(...), "posterior_samples.gamm()")
   sampling_check_names(substitute(list(...)), derivative = FALSE)
   conditioning <- mixed_conditioning(model, conditioning)
   if (conditioning == "gam_component") return(posterior_samples(
