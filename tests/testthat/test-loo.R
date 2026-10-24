@@ -156,3 +156,34 @@ test_that("multivariate likelihoods honour explicit family hooks", {
     dnorm(d$y2, mu[, 2], 2, log = TRUE)
   expect_equal(as.numeric(ll), expected)
 })
+
+test_that("weighted Gamma and inverse Gaussian LOO and WAIC use native densities", {
+  skip_if_not_installed("loo")
+  for (name in c("Gamma", "inverse.gaussian")) {
+    m <- log_lik_ordinary_fixture(name)
+    # Small deterministic coefficient changes keep these integration checks stable.
+    B <- outer(seq(-.02, .02, length.out = 100), c(1, -.5))
+    B <- sweep(B, 2, coef(m), "+")
+    X <- predict(m, type = "lpmatrix")
+    expected <- t(vapply(seq_len(nrow(B)), function(j) {
+      mu <- m$family$linkinv(drop(X %*% B[j, ]) + m$offset)
+      vapply(seq_along(m$y), function(i) {
+        mgcv::fix.family.ls(m$family)$ls(m$y[i], m$prior.weights[i], 1, m$sig2)[1] -
+          m$family$dev.resids(m$y[i], mu[i], m$prior.weights[i]) / (2 * m$sig2)
+      }, numeric(1))
+    }, numeric(length(m$y))))
+    colnames(expected) <- rownames(m$model)
+    args <- list(method = "user", draws = B)
+    direct <- suppressWarnings(loo::loo(expected, r_eff = 1,
+      save_psis = TRUE, cores = 1))
+    actual <- suppressWarnings(loo::loo(m, sampling_args = args, r_eff = 1,
+      save_psis = TRUE, cores = 1))
+    expect_equal(actual$estimates, direct$estimates, info = name)
+    expect_equal(actual$pointwise, direct$pointwise, info = name)
+    expect_equal(stats::weights(actual$psis_object),
+      stats::weights(direct$psis_object), info = name)
+    waic <- suppressWarnings(loo::waic(m, sampling_args = args))
+    expect_equal(waic$pointwise, suppressWarnings(loo::waic(expected))$pointwise,
+      info = name)
+  }
+})
