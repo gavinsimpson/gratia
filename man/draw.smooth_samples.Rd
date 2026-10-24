@@ -115,36 +115,14 @@ plot lists. See \code{\link[=draw_label_control]{draw_label_control()}} for the 
 
 \examples{
 load_mgcv()
-dat1 <- data_sim("eg1", n = 400, dist = "normal", scale = 1, seed = 1)
-## a single smooth GAM
-m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat1, method = "REML")
-## posterior smooths from m1
-sm1 <- smooth_samples(m1, n_draws = 15, seed = 23478)
-## plot
-draw(sm1) & ggplot2::theme(gratia.alpha.sample = 0.7)
-## plot only 5 randomly smapled draws
-draw(sm1, n_samples = 5) & ggplot2::theme(gratia.alpha.sample = 0.7)
+# Simulate an additive Gaussian response and fit a GAM
+dat <- data_sim("eg1", n = 200, scale = 1, seed = 1)
+m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 
-## A factor-by smooth example
-dat2 <- data_sim("eg4", n = 400, dist = "normal", scale = 1, seed = 1)
-## a multi-smooth GAM with a factor-by smooth
-m2 <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = dat2, method = "REML")
-## posterior smooths from m1
-sm2 <- smooth_samples(m2, n_draws = 15, seed = 23478)
-## plot, this time selecting only the factor-by smooth
-draw(sm2, select = "s(x2)", partial_match = TRUE) &
-  ggplot2::theme(gratia.alpha.sample = 0.7)
-
-\donttest{
-## A 2D smooth example
-dat3 <- data_sim("eg2", n = 400, dist = "normal", scale = 1, seed = 1)
-## fit a 2D smooth
-m3 <- gam(y ~ te(x, z), data = dat3, method = "REML")
-## get samples
-sm3 <- smooth_samples(m3, n_draws = 10)
-## plot just 6 of the draws, with contour line overlays
-draw(sm3, n_samples = 6, contour = TRUE, seed = 42)
-}
+# Draw 15 possible curves for the smooth of x2 on a 100-point grid
+sm <- smooth_samples(m, select = "s(x2)", n_grid = 100,
+  n_draws = 15, seed = 23478)
+draw(sm)
 }
 \author{
 Gavin L. Simpson

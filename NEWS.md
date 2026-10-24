@@ -2,6 +2,9 @@
 
 ## User visible changes
 
+* Help examples use fewer model fits and repeated plots to focus on each
+  function's main use and reduce execution time.
+
 * gratia no longer requires ggokabeito; default plot colours and their ordering
   are unchanged. Unused curl and svglite suggestions have been removed, and
   ggdist, distributional and hexbin are now listed as website dependencies

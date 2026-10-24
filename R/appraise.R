@@ -225,34 +225,12 @@
 #'
 #' @examples
 #' load_mgcv()
-#' ## simulate some data...
-#' dat <- data_sim("eg1", n = 400, dist = "normal", scale = 2, seed = 2)
-#' mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat)
-#' ## run some basic model checks
-#' appraise(mod) & ggplot2::theme(
-#'   geom.gratia.diagnostic.point = ggplot2::element_geom(colour = "steelblue"),
-#'   gratia.alpha.diagnostic.point = 0.4)
-#' ## replace the residual histogram with a posterior predictive check
-#' appraise(mod, ppcheck = TRUE, n_ppc = 20, seed = 42)
+#' # Simulate an additive Gaussian response and fit a GAM
+#' dat <- data_sim("eg1", n = 200, scale = 2, seed = 2)
+#' mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 #'
-#' ## To change the theme for all panels use the & operator, for example to
-#' ## change the ggplot theme for all panels
-#' library("ggplot2")
-#' appraise(mod, seed = 42) & theme_minimal()
-#'
-#' ## Select a grouped-family component by its position in the family list
-#' set.seed(53)
-#' grouped <- data.frame(x = runif(160), family_id = rep(1:2, 80))
-#' grouped$component <- factor(grouped$family_id)
-#' grouped$y <- rnorm(160, sin(2 * pi * grouped$x), 0.4)
-#' is_count <- grouped$family_id == 2L
-#' grouped$y[is_count] <- rpois(sum(is_count), exp(grouped$x[is_count]))
-#' grouped_fit <- gam(cbind(y, family_id) ~ component +
-#'   s(x, by = component, k = 6), data = grouped,
-#'   family = gfam(list(gaussian(), poisson())), method = "REML")
-#' appraise(grouped_fit, response = 2, seed = 54)
-#' ## Layout remains a separate choice
-#' qq_plot(grouped_fit, response = 2, by_family = TRUE, seed = 54)
+#' # Inspect residuals, fitted values and the residual distribution
+#' appraise(mod, seed = 42)
 `appraise` <- function(model, ...) {
   UseMethod("appraise")
 }

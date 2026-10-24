@@ -263,29 +263,15 @@ glmmtmb_smooth_model <- function(object, component = NULL, covariance = TRUE) {
 #' @examples
 #' if (requireNamespace("glmmTMB", quietly = TRUE)) {
 #'   load_mgcv()
+#'   # Simulate a nonlinear mean with Gaussian noise
 #'   set.seed(42)
 #'   d <- data.frame(x = runif(150))
 #'   d$y <- sin(6 * d$x) + rnorm(150, sd = 0.2)
-#'   m <- glmmTMB::glmmTMB(y ~ s(x, k = 8), data = d, REML = TRUE)
-#'   n_smooths(m) # one smooth term
-#'   draw(m)
-#'   # Get individual ggplot objects for further customization
-#'   panels <- assemble(m)
-#'   panels[["s(x)"]]
-#'   appraise(m, seed = 42)
 #'
-#'   # Parametric terms and native random intercepts and slopes
-#'   d$z <- rnorm(150)
-#'   d$g <- factor(rep(seq_len(10), each = 15))
-#'   d$y <- d$y + 0.5 * d$z + rnorm(10)[d$g] + rnorm(10)[d$g] * d$z
-#'   mixed <- glmmTMB::glmmTMB(y ~ z + s(x, k = 8) + (1 + z | g),
-#'     data = d, REML = TRUE)
-#'   draw(mixed) # separate QQ panels for intercepts and slopes
-#'   draw(mixed, ranef_lines = TRUE) # random contributions only
-#'   if (requireNamespace("ggcube", quietly = TRUE)) {
-#'     interaction <- glmmTMB::glmmTMB(y ~ x:z, data = d)
-#'     draw(interaction, surface = "3d", ci_3d = TRUE, n_2d = 15)
-#'   }
+#'   # Fit and draw a smooth using glmmTMB
+#'   m <- glmmTMB::glmmTMB(y ~ s(x, k = 8), data = d, REML = TRUE)
+#'   n_smooths(m)
+#'   draw(m)
 #' }
 NULL
 
