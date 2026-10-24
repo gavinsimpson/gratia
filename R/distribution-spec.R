@@ -276,8 +276,8 @@ distribution_spec.family <- function(object, ...) {
     expectation_size = if (categorical) length(f$getTheta(TRUE)) + 1L else
       if (multinom || mvn) length(names) else 1L,
     to_parameters = to_parameters, to_native = to_native, expectation = expectation,
-    category_transform = if (categorical) function(eta)
-      ordinal_probability_transform(eta[, 1L], f$getTheta(TRUE)) else
+    category_transform = if (categorical) function(eta, gradient = FALSE)
+      ordinal_probability_transform(eta[, 1L], f$getTheta(TRUE), gradient) else
       if (multinom) multinomial_probability_transform else NULL,
     categorical = categorical || multinom, multivariate = mvn,
     coupled = multinom, unknown = unknown,

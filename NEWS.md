@@ -1011,7 +1011,8 @@
 * `fitted_values()` retains small ordinal category probabilities and their
   standard errors at extreme predictor values. Ordinal and multinomial
   intervals remain defined when probabilities round to zero or one, including
-  for grouped ordinal models (#434).
+  for grouped ordinal models (#434). Closely spaced ordinal thresholds and
+  large multinomial predictors retain valid category probabilities.
 
 * `log_lik()` now divides the dispersion by each observation's weight for
   Gamma and inverse Gaussian densities, including grouped-family components

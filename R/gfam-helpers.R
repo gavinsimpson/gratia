@@ -162,9 +162,8 @@ gfam_expectation_table <- function(table, context, ci_level = NULL) {
       step <- .Machine$double.eps^(1 / 3) * pmax(1, abs(eta))
       critical <- coverage_normal(ci_level)
       if (spec$categorical) {
-        transform <- spec$category_transform(eta)
-        slope <- (spec$category_transform(eta + step)$logit -
-          spec$category_transform(eta - step)$logit) / (2 * as.numeric(step))
+        transform <- spec$category_transform(eta, gradient = TRUE)
+        slope <- transform$logit_gradient[[1L]]
         limits <- categorical_probability_limits(transform,
           abs(slope) * table$.se[rows], critical)
         se <- limits$se

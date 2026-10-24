@@ -188,3 +188,56 @@ test_that("multinomial uncertainty agrees with independent log odds gradients", 
     }
   }
 })
+
+test_that("narrow ordinal categories retain probabilities and gradients", {
+  m <- ordinal_tail_model()
+  m$family <- mgcv::ocat(theta = 1e-15)
+  m$coefficients[] <- c(0, 1)
+  thresholds <- m$family$getTheta(TRUE)
+  width <- diff(thresholds)
+  for (x in list(c(-100, 0, 100), 0)) {
+    nd <- data.frame(x = x)
+    # Integrate over a unit interval so subtracting eta from the bounds cannot
+    # round the category width away before the density is evaluated.
+    probability <- vapply(x, function(eta) integrate(function(u)
+      dlogis(thresholds[1L] + width * u - eta), 0, 1)$value * width, numeric(1L))
+    slope <- vapply(x, function(eta) integrate(function(u) {
+      z <- thresholds[1L] + width * u - eta
+      dlogis(z) * (2 * plogis(z) - 1)
+    }, 0, 1)$value * width, numeric(1L))
+    fit <- fitted_values(m, data = nd, quantity = "expectation")
+    sel <- fit$.category == "category2"
+    se_eta <- as.numeric(predict(m, nd, type = "link", se.fit = TRUE)$se.fit)
+    expect_equal(fit$.fitted[sel] / probability, rep(1, length(x)), tolerance = 1e-10)
+    expect_equal(fit$.se[sel] / (abs(slope) * se_eta), rep(1, length(x)), tolerance = 1e-7)
+    expect_true(all(is.finite(fit$.lower_ci)))
+    expect_true(all(is.finite(fit$.upper_ci)))
+  }
+  # Finite predictors can be too large to retain distinct shifted thresholds.
+  fit <- fitted_values(m, data = data.frame(x = c(-1e16, 1e16)), quantity = "expectation")
+  expect_true(all(is.finite(fit$.se)))
+  expect_true(all(is.finite(fit$.lower_ci)))
+  expect_true(all(is.finite(fit$.upper_ci)))
+})
+
+test_that("equal large multinomial predictors retain normalization and gradients", {
+  m <- m_multinom
+  nd <- m$model[1:2, , drop = FALSE]
+  X <- predict(m, nd, type = "lpmatrix")
+  indices <- attr(X, "lpi")
+  m$coefficients[] <- 0
+  m$coefficients[indices[[1L]][1L]] <- 1e16
+  m$coefficients[indices[[2L]][1L]] <- 1e16
+  fit <- fitted_values(m, data = nd)
+  expect_equal(fit$.fitted, c(0, 0, .5, .5, .5, .5))
+  expect_equal(as.numeric(tapply(fit$.fitted, fit$.row, sum)), c(1, 1))
+  # The two equally likely non-reference categories form a binary contrast.
+  J <- matrix(0, 2L, length(coef(m)))
+  J[, indices[[1L]]] <- X[, indices[[1L]], drop = FALSE]
+  J[, indices[[2L]]] <- J[, indices[[2L]], drop = FALSE] - X[, indices[[2L]], drop = FALSE]
+  logit_se <- sqrt(rowSums((J %*% vcov(m)) * J))
+  sel <- fit$.category != "category1"
+  expect_equal(fit$.se[sel], rep(.25 * logit_se, 2L), tolerance = 1e-7)
+  expect_equal(fit$.lower_ci[sel], rep(plogis(-qnorm(.975) * logit_se), 2L), tolerance = 1e-7)
+  expect_equal(fit$.upper_ci[sel], rep(plogis(qnorm(.975) * logit_se), 2L), tolerance = 1e-7)
+})

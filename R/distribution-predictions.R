@@ -61,14 +61,14 @@ fit_vals_distribution <- function(object, data, spec, quantity, scale,
   } else {
     context <- lss_prediction_context(object, data = data, ...)
     categorical <- spec$categorical && scale == "response"
-    transform <- if (categorical) spec$category_transform(eta) else NULL
-    evaluate <- function(beta) {
-      predictors <- lss_predictors(context, beta)
-      as.numeric(if (categorical) spec$category_transform(predictors)$logit else
-        distribution_output(spec, predictors, quantity, scale))
+    if (categorical) {
+      transform <- spec$category_transform(eta, gradient = TRUE)
+      J <- categorical_coefficient_gradient(context, transform)
+    } else {
+      evaluate <- function(beta) as.numeric(distribution_output(spec,
+        lss_predictors(context, beta), quantity, scale))
+      J <- moment_gradient(evaluate, stats::coef(object), as.numeric(value))
     }
-    J <- moment_gradient(evaluate, stats::coef(object),
-      if (categorical) as.numeric(transform$logit) else as.numeric(value))
     std_err <- matrix(sqrt(pmax(0, rowSums((J %*% V) * J))), nrow(value))
     if (categorical) {
       limits <- categorical_probability_limits(transform, std_err, crit)
