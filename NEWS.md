@@ -72,8 +72,9 @@
   response scale only. Both functions use explicit parameter names,
   including for scalar models.
 
-  Gaussian LSS returns standard deviation rather than reciprocal standard
-  deviation; GEV location is labelled separately from expectation.
+  Gaussian location-scale models return standard deviation rather than
+  reciprocal standard deviation; GEV location is labelled separately from
+  expectation.
   Multivariate responses and categories have separate `.y` and `.category`
   identifiers.
 
@@ -459,23 +460,28 @@
   `as_mcmc_draws()` converts draws for posterior, coda, and bayesplot;
   `diagnostics = TRUE` and `sampling_diagnostics()` provide coefficient
   convergence summaries and acceptance rates (#281).
+
   `draw(sampling_diagnostics(x))` plots native coefficient traces or
   pooled-rank histogram outlines by chain. Sampling with
   `diagnostics = TRUE` retains the coefficient draws for these plots through
   fitted, response, smooth and derivative sampling.
 
-  LSS sampling supports fitting rows, subsets and new covariates without
-  observed responses. All distribution parameters use the same coefficient
-  draw. Fitted response samples and their derivatives evaluate the
-  expected response, including means that depend on scale, shape or hurdle
-  probabilities.
+  Sampling for models with several distribution parameters supports fitting
+  rows, subsets and new covariates without observed responses. Parameters
+  represented by predictors use the same joint coefficient draw.
+
+  `fitted_samples()` defaults to distribution parameters; use
+  `quantity = "expectation"` for expected responses. On the response scale,
+  `derivative_samples()` differentiates the expected response, including
+  means that depend on scale, shape or hurdle probabilities.
 
   Fixed-coefficient response sampling uses the same parameter
   transformations. Missing predictors or explicit sampling weights produce
   `NA` response draws consistently.
 
-  LSS response generation now reuses model-matrix blocks and constructs
-  the output table once, preserving seeded responses and chain identities.
+  For models with several distribution parameters, response generation now
+  reuses model-matrix blocks and constructs the output table once, preserving
+  seeded responses and chain identities.
 
 * **Metropolis–Hastings backends**
 
@@ -1368,9 +1374,13 @@
   comparisons at a single location also work (GRA-004).
 
 * `confint.gam()` now uses consistent covariance and standard errors for
-  simultaneous intervals, respecting `unconditional`. These intervals exclude
-  overall-mean uncertainty, as documented (GRA-005). Requesting multiple
-  smooths no longer causes an error (GRA-006).
+  simultaneous intervals: `unconditional = TRUE` includes uncertainty from
+  estimating smoothing parameters in the Bayesian covariance when available,
+  while `frequentist = TRUE` selects the frequentist covariance (GRA-005).
+  Both pointwise and simultaneous intervals respect `overall_uncertainty`,
+  including uncertainty in the overall mean by default for ordinary GAMs;
+  native scasm fits default to `FALSE`. Requesting multiple smooths no longer
+  causes an error (GRA-006).
 
 * `simulate.gamm()` now respects the supplied `data` argument.
   `smooth_samples.gamm()` and `overview.gamm()` now forward additional
