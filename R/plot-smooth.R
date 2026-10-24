@@ -11,6 +11,7 @@
 #' @importFrom rlang .data
 #' @keywords internal
 #' @noRd
+#' @export
 `plot_smooth.mgcv_smooth` <- function(
   object,
   variables = NULL,
@@ -588,6 +589,7 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
 #' @importFrom rlang .data
 #' @keywords internal
 #' @noRd
+#' @export
 `plot_smooth.bivariate_smooth` <- function(
   object,
   variables = NULL,
@@ -643,6 +645,7 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
 #' @importFrom grid unit
 #' @keywords internal
 #' @noRd
+#' @export
 `plot_smooth.trivariate_smooth` <- function(
   object,
   variables = NULL,
@@ -706,6 +709,7 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
 #' @importFrom grid unit
 #' @keywords internal
 #' @noRd
+#' @export
 `plot_smooth.quadvariate_smooth` <- function(
   object,
   variables = NULL,
@@ -764,6 +768,9 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
 }
 
 #' @importFrom ggplot2 coord_equal
+#' @keywords internal
+#' @noRd
+#' @export
 `plot_smooth.isotropic_smooth` <- function(
   object,
   surface = c("raster", "tile", "3d"),
@@ -794,6 +801,7 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
 #'   labs
 #' @keywords internal
 #' @noRd
+#' @export
 `plot_smooth.random_effect` <- function(
   object,
   variables = NULL,
@@ -854,6 +862,7 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
 #'   labs
 #' @keywords internal
 #' @noRd
+#' @export
 `plot_smooth.factor_smooth` <- function(
   object,
   variables = NULL,
@@ -995,6 +1004,7 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
 #'   labs scale_fill_hue scale_colour_hue
 #' @keywords internal
 #' @noRd
+#' @export
 `plot_smooth.sz_factor_smooth` <- function(
   object,
   variables = NULL,
@@ -1149,6 +1159,9 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
 #' @importFrom ggplot2 coord_sf geom_tile guide_colourbar geom_contour aes
 #'   expand_limits guides guide_axis geom_point theme labs
 #' @importFrom grid unit
+#' @keywords internal
+#' @noRd
+#' @export
 `plot_smooth.sos` <- function(
   object,
   variables = NULL,
@@ -1316,6 +1329,7 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
 #' @importFrom vctrs vec_slice
 #' @keywords internal
 #' @noRd
+#' @export
 `plot_smooth.soap_film` <- function(
   object,
   variables = NULL,

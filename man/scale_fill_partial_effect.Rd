@@ -24,7 +24,7 @@ legend title will be omitted.}
 \code{\link[ggplot2:guides]{ggplot2::guides()}} for more information.}
 
 \item{direction}{Sets the order of colours in the scale. If \code{1}, the
-default, colours are as output by \code{\link[RColorBrewer:ColorBrewer]{RColorBrewer::brewer.pal()}}. If \code{-1},
+default, colours are as output by \code{\link[RColorBrewer:brewer.pal]{RColorBrewer::brewer.pal()}}. If \code{-1},
 the order of colours is reversed.}
 }
 \description{

@@ -23,6 +23,7 @@ prepare_mrf_data <- function(smooth, data, model) {
 
 #' @keywords internal
 #' @noRd
+#' @export
 plot_smooth.mrf_smooth <- function(object, variables = NULL,
   mrf_plot = c("effects", "qq"), qq_line = TRUE,
   constant = NULL, fun = NULL, ci_col = "black", smooth_col = "black",

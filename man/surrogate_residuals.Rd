@@ -100,7 +100,8 @@ combining display summaries; observations, rather than utility components,
 determine automatic dispatch thresholds. Changing sampler chunk sizes does
 not change the draw. QQ binning and density grids change only the display.
 
-Each call draws one residual vector per observation. Set \code{seed} for reproducibility;
+Each call draws one residual vector per observation. Set \code{seed} for
+reproducibility;
 repeating plots with different seeds helps assess whether a pattern persists
 across residual draws. An explicit seed preserves the caller's random-number
 state. With \code{seed = NULL}, sampling uses and advances the current state.
