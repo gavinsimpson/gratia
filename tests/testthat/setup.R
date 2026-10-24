@@ -1708,6 +1708,16 @@ intercept_test_model <- function(type = "gaulss") {
         data = tiny_eg1, family = gaulss(), method = "REML"),
       gaulss_no_scale = gam(list(y ~ s(x0, k = 5), ~ 0 + s(x1, k = 5)),
         data = tiny_eg1, family = gaulss(), method = "REML"),
+      # The shared block adds an intercept to both predictors. mgcv drops
+      # one redundant column; the scale predictor retains two contributions.
+      gaulss_shared = withCallingHandlers(
+        gam(list(y ~ x0, ~ s(x2, k = 5), 1 + 2 ~ s(x1, k = 5)),
+          data = tiny_eg1, family = gaulss(), method = "REML"),
+        warning = function(w) {
+          if (grepl("^dropping unidentifiable parametric terms", conditionMessage(w))) {
+            invokeRestart("muffleWarning")
+          }
+        }),
       gam = gam(y ~ 0 + x0 + s(x1, k = 5), data = tiny_eg1, method = "REML"),
       gam_linear = gam(y ~ 0 + x0, data = tiny_eg1, method = "REML"),
       glm = glm(y ~ 0 + x0, data = tiny_eg1))

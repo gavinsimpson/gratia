@@ -102,3 +102,34 @@ test_that("shared GAM utilities retain BAM and gamm4 intercepts", {
     }
   }
 })
+
+test_that("shared formula intercepts agree with native predictor constants", {
+  m <- intercept_test_model("gaulss_shared")
+  nd <- tiny_eg1[1:5, ]
+  nd$x0 <- 0
+  # Excluding all smooths and setting the slope covariate to zero leaves
+  # each predictor's constant, including contributions from the shared block.
+  native <- predict(m, newdata = nd, type = "link", exclude = smooths(m))
+  for (lp in list(1L, 2L, 1:2, 2:1)) {
+    expected <- unname(native[1L, lp])
+    attr(expected, "par_names") <- c("location", "scale")[lp]
+    expect_equal(model_constant(m, lp = lp), expected)
+  }
+
+  # This smooth belongs only to the scale predictor, whose intercept has
+  # contributions from its own formula and the shared formula.
+  for (type in c("confidence", "simultaneous")) {
+    for (overall in c(FALSE, TRUE)) {
+      ci <- confint(m, parm = "s.1(x2)", data = nd, type = type,
+        nsim = 100, seed = 433, overall_uncertainty = overall)
+      shifted <- confint(m, parm = "s.1(x2)", data = nd, type = type,
+        nsim = 100, seed = 433, overall_uncertainty = overall, shift = TRUE)
+      for (column in c(".estimate", ".lower_ci", ".upper_ci")) {
+        expect_equal(shifted[[column]], ci[[column]] + unname(native[, 2L]))
+      }
+      expect_equal(shifted$.se, ci$.se)
+      expect_equal(shifted$.crit, ci$.crit)
+      expect_equal(attr(shifted, "interval_info"), attr(ci, "interval_info"))
+    }
+  }
+})

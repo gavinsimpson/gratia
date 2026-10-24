@@ -128,7 +128,8 @@
   intercepts <- grep("^\\(Intercept\\)(\\.[0-9]+)?$", names(beta))
   b <- vapply(lss_idx, function(idx) {
     idx <- intersect(idx, intercepts)
-    if (length(idx)) unname(beta[idx[1L]]) else 0
+    # Shared formula blocks can contribute more than one intercept.
+    sum(beta[idx])
   }, numeric(1))
   attr(b, "par_names") <- lss_parameters(model)[lp]
   b

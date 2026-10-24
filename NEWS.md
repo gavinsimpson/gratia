@@ -1008,8 +1008,9 @@
 
 ## Bug fixes
 
-* `confint(shift = TRUE)` now adds the intercept of each smooth's own linear
-  predictor. `model_constant()` returns zero for predictors without an intercept
+* `confint(shift = TRUE)` now adds the full intercept of each smooth's own
+  linear predictor, including contributions from shared formula blocks.
+  `model_constant()` returns zero for predictors without an intercept
   and keeps selected predictor names aligned; `add_fitted()` uses native
   prediction constants for term predictions (#433).
 
