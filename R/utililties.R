@@ -268,21 +268,14 @@ stop_if_not_mgcv_smooth <- function(smooth) {
 #' @title Extract an mgcv smooth by name
 #'
 #' @param object a fitted GAM model object.
-#' @param term character; the name of a smooth term to extract
+#' @param term character; the exact name of a smooth term to extract
 #'
 #' @return A single smooth object, or a list of smooths if several match the
 #'   named term.
 #'
 #' @export
 `get_smooth` <- function(object, term) {
-  if (is.gamm(object) || is.gamm4(object)) {
-    object <- object[["gam"]]
-  }
-  smooth <- if (inherits(object, "glmmTMB")) {
-    get_smooths_by_id(object, which_smooth(object, term))
-  } else {
-    object[["smooth"]][which_smooth(object, term)]
-  }
+  smooth <- get_smooths_by_id(object, which_smooth(object, term))
   if (identical(length(smooth), 1L)) {
     smooth <- smooth[[1L]]
   }

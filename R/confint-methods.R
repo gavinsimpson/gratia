@@ -9,7 +9,8 @@
 #'   vector of terms. If missing, all parameters are considered.
 #' @param level numeric, `0 < level < 1`; the confidence level of the
 #'   point-wise or simultaneous interval. The default is `0.95` for a 95%
-#'   interval.
+#'   interval. It must be finite. If a vector is supplied, the first value is
+#'   used with a warning.
 #' @param type character; the type of interval to compute. One of `"confidence"`
 #'   for point-wise intervals, or `"simultaneous"` for simultaneous intervals.
 #' @param nsim integer; the number of simulations used in computing the
@@ -102,14 +103,10 @@
     ))
     level <- rep(level, length.out = 1L)
   }
-  if (!is.numeric(level)) {
-    stop(paste("`level` should be numeric, but supplied:", level))
-  }
-  if (!(0 < level) && (level < 1)) {
-    stop(paste(
-      "`level` should lie in interval [0,1], but supplied:",
-      level
-    ))
+  if (length(level) != 1L || !is.numeric(level) || is.complex(level) ||
+      !is.finite(level) || level <= 0 || level >= 1) {
+    stop("`level` must be a finite number strictly between 0 and 1.",
+      call. = FALSE)
   }
 
   ## which type of interval is required

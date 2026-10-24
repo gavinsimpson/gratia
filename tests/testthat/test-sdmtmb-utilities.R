@@ -1,0 +1,27 @@
+test_that("sdmTMB utilities extract and count smooths without covariance", {
+  skip_if_not_installed("sdmTMB", minimum_version = "1.2.0")
+  model <- sdmtmb_utility_fixture()
+  plain <- sdmtmb_utility_fixture(smooth = FALSE)
+  local_mocked_bindings(sdmtmb_joint_covariance = function(...) {
+    stop("covariance calculation reached")
+  })
+  expect_identical(smooths(model), c("s(x0)", "s(x1)"))
+  expect_identical(n_smooths(model), 2L)
+  indexed <- get_smooths_by_id(model, c(2, 1))
+  expect_identical(vapply(indexed, `[[`, character(1), "label"),
+    c("s(x1)", "s(x0)"))
+  expect_identical(get_smooth(model, "s(x1)"), indexed[[1]])
+  expect_identical(get_smooth(model, "s(x0)"), indexed[[2]])
+  expect_s3_class(get_smooth(model, "s(x0)"), "mgcv.smooth")
+  expect_identical(get_smooth(model, "x0"), list())
+  expect_identical(get_smooth(model, "s(x)"), list())
+  expect_identical(smooths(plain), character())
+  expect_identical(n_smooths(plain), 0L)
+  expect_length(get_smooth(plain, "s(x0)"), 0L)
+  expect_length(get_smooths_by_id(plain, integer()), 0L)
+  local_mocked_bindings(sdmtmb_smooth_model = function(...) {
+    stop("coefficient extraction reached")
+  })
+  expect_identical(n_smooths(model), 2L)
+  expect_identical(n_smooths(plain), 0L)
+})

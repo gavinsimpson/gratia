@@ -17,7 +17,8 @@ be extracted.}
 \code{level()}.}
 }
 \value{
-A length 1 factor with the same levels as the supplied factor \code{fct}.
+A factor with the selected values and the same levels, level order
+and ordered status as \code{fct}. \code{ref_level()} returns the first level.
 }
 \description{
 Extracts the reference or a specific level the supplied factor,

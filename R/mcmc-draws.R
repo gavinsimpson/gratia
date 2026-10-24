@@ -1,6 +1,6 @@
 # Validate counts before starting workers or evaluating a model matrix.
 sampling_count <- function(x, name, zero = FALSE) {
-  if (length(x) != 1L || !is.numeric(x) || !is.finite(x) ||
+  if (length(x) != 1L || !is.numeric(x) || is.complex(x) || !is.finite(x) ||
       x != floor(x) || x < (if (zero) 0 else 1) || x > .Machine$integer.max) {
     stop("'", name, "' must be a ", if (zero) "non-negative" else "positive",
       " integer.", call. = FALSE)

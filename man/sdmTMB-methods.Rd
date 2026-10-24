@@ -3,6 +3,7 @@
 \name{sdmTMB-methods}
 \alias{sdmTMB-methods}
 \alias{smooths.sdmTMB}
+\alias{n_smooths.sdmTMB}
 \alias{get_smooths_by_id.sdmTMB}
 \alias{smooth_coefs.sdmTMB}
 \alias{smooth_estimates.sdmTMB}
@@ -13,6 +14,8 @@
 \title{Formula effects for sdmTMB models}
 \usage{
 \method{smooths}{sdmTMB}(object, ...)
+
+\method{n_smooths}{sdmTMB}(object)
 
 \method{get_smooths_by_id}{sdmTMB}(object, id, ...)
 
@@ -108,6 +111,11 @@ and unpenalized coefficients and their joint covariance are transformed
 back to the constrained mgcv basis.
 }
 \details{
+Use \code{\link[=smooths]{smooths()}} to list smooth names, \code{\link[=get_smooth]{get_smooth()}} to extract an exact
+name, \code{\link[=get_smooths_by_id]{get_smooths_by_id()}} to extract by position, and \code{\link[=n_smooths]{n_smooths()}} to
+count smooths, including both predictors of a delta model. These utilities
+do not calculate coefficient covariances.
+
 Smooth, ordinary parametric and threshold estimates are partial contributions
 on each component's link scale. Spatial, spatiotemporal, IID random effects,
 offsets and varying coefficients are not added to these effects. Their

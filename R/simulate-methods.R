@@ -10,8 +10,12 @@
 #'
 #' @param object a fitted GAM, typically the result of a call to [mgcv::gam()],
 #'   [mgcv::gamm()], or [gamm4::gamm4()].
-#' @param nsim numeric; number of response simulations to return.
-#' @param seed numeric; a random seed for the simulations.
+#' @param nsim numeric; number of response simulations to return. Supply one
+#'   finite positive whole number, no larger than `.Machine$integer.max`.
+#' @param seed numeric or `NULL`; a random seed for the simulations. An explicit
+#'   seed restores the previous random-number state, including its absence,
+#'   when simulation finishes or fails. With `NULL`, simulation advances or
+#'   initializes the random-number state.
 #' @param data data frame; new observations at which the posterior draws
 #'   from the model should be evaluated. If not supplied, the data used to fit
 #'   the model will be used for `newdata`, if available in `object`.
@@ -104,10 +108,9 @@
 `simulate.gam` <- function(object, nsim = 1, seed = NULL, data = newdata,
                            weights = NULL, ..., newdata = NULL,
                            family_index = NULL, envir = NULL, marginalise = NULL) {
+  nsim <- sampling_count(nsim, "nsim")
   object <- with_model_envir(object, envir)
   training <- is.null(data)
-  if (is.null(marginalise) &&
-      !exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) runif(1)
   had_seed <- exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)
   if (!is.null(seed)) {
     if (had_seed) old_seed <- get(".Random.seed", envir = .GlobalEnv)
@@ -123,7 +126,6 @@
     RNGstate <- get(".Random.seed", envir = .GlobalEnv)
   }
   if (!is.null(marginalise)) {
-    nsim <- sampling_count(nsim, "nsim")
     if (!is.null(family_index)) stop("'family_index' is unsupported with marginalisation.", call. = FALSE)
     context <- marginal_context(object, data, marginalise, response = TRUE, ...)
     betas <- matrix(rep(stats::coef(context$model), each = nsim), nrow = nsim)
@@ -268,6 +270,7 @@
 #' @export
 simulate.gamm <- function(object, nsim = 1, seed = NULL, data = newdata,
     weights = NULL, ..., newdata = NULL, conditioning = NULL, envir = NULL) {
+  nsim <- sampling_count(nsim, "nsim")
   marginal_not_supported(list(...), "simulate.gamm()")
   if (is.null(conditioning) || identical(conditioning, "gam_component")) {
     if (!is.null(newdata)) newdata_deprecated()
@@ -285,6 +288,7 @@ simulate.gamm <- function(object, nsim = 1, seed = NULL, data = newdata,
 #' @export
 `simulate.scam` <- function(object, nsim = 1, seed = NULL, data = newdata,
                             weights = NULL, ..., newdata = NULL, envir = NULL) {
+  nsim <- sampling_count(nsim, "nsim")
   if (!is.null(object$AR1.rho) && object$AR1.rho != 0 && !is.null(data)) {
     stop("AR1 response draws require fitting observations; a joint correlation structure for new data is not defined.",
       call. = FALSE)

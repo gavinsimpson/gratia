@@ -54,9 +54,13 @@
 \item{object}{a fitted GAM, typically the result of a call to \code{\link[mgcv:gam]{mgcv::gam()}},
 \code{\link[mgcv:gamm]{mgcv::gamm()}}, or \code{\link[gamm4:gamm4]{gamm4::gamm4()}}.}
 
-\item{nsim}{numeric; number of response simulations to return.}
+\item{nsim}{numeric; number of response simulations to return. Supply one
+finite positive whole number, no larger than \code{.Machine$integer.max}.}
 
-\item{seed}{numeric; a random seed for the simulations.}
+\item{seed}{numeric or \code{NULL}; a random seed for the simulations. An explicit
+seed restores the previous random-number state, including its absence,
+when simulation finishes or fails. With \code{NULL}, simulation advances or
+initializes the random-number state.}
 
 \item{conditioning}{character or \code{NULL}; optional mixed-model conditioning
 mode. gamm4 defaults to \code{"conditional"}, holding all fitted effects fixed.

@@ -36,20 +36,17 @@ test_that("simulate() works with a scam", {
 })
 
 test_that("simulate() works with no .Random.seed", {
-  rm(".Random.seed", envir = globalenv())
-  sims <- simulate(m_gam, nsim = 5, seed = 42)
-  expect_identical(nrow(sims), 1000L)
-  expect_identical(ncol(sims), 5L)
-
-  rm(".Random.seed", envir = globalenv())
-  sims <- simulate(m_gamm, nsim = 5, seed = 42)
-  expect_identical(nrow(sims), 1000L)
-  expect_identical(ncol(sims), 5L)
-
-  rm(".Random.seed", envir = globalenv())
-  sims <- simulate(sw, nsim = 5, seed = 42)
-  expect_identical(nrow(sims), 12L)
-  expect_identical(ncol(sims), 5L)
+  withr::local_preserve_seed()
+  models <- list(m_gam, m_gamm, sw)
+  for (model in models) {
+    if (exists(".Random.seed", .GlobalEnv, inherits = FALSE)) {
+      rm(".Random.seed", envir = .GlobalEnv)
+    }
+    sims <- simulate(model, nsim = 5, seed = 42)
+    expect_identical(nrow(sims), if (inherits(model, "scam")) 12L else 1000L)
+    expect_identical(ncol(sims), 5L)
+    expect_false(exists(".Random.seed", .GlobalEnv, inherits = FALSE))
+  }
 })
 
 test_that("simulate() works with out a seed", {
