@@ -24,8 +24,8 @@ the comparison of fitting packages needs the optional GJRM package. Each
 simulation describes its measurement protocol and response distribution.
 
 ```{r packages}
-library("mgcv")
 library("gratia")
+load_mgcv()
 library("ggplot2")
 ```
 

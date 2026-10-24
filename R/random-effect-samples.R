@@ -41,7 +41,7 @@
 #'   `random_effect_info` attribute describes the fixed covariance estimates.
 #' @export
 #' @examples
-#' library("mgcv")
+#' load_mgcv()
 #' m <- gam(travel ~ s(Rail, bs = "re"), data = nlme::Rail,
 #'   method = "REML")
 #' random_effect_samples(m, n_draws = 3, seed = 42)

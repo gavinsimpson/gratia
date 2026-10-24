@@ -35,7 +35,7 @@ We start by simulating some data and fitting a GAM with four smooth functions
 
 ```{r setup-chunk}
 library("gratia")
-library("mgcv")
+load_mgcv()
 library("ggplot2")
 library("dplyr")
 library("patchwork")

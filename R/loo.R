@@ -41,7 +41,7 @@
 #'   posterior sampling assumptions and `observation` identifying fitting rows.
 #' @examples
 #' if (requireNamespace("loo", quietly = TRUE)) {
-#'   library("mgcv")
+#'   load_mgcv()
 #'   m <- gam(mpg ~ s(wt, k = 5), data = mtcars, method = "REML")
 #'   loo::loo(m, n_draws = 500, seed = 42)
 #' }

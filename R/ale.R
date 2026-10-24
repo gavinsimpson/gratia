@@ -127,7 +127,7 @@
 #' @seealso [draw.ale()], [conditional_values()], [response_derivatives()]
 #' @export
 #' @examples
-#' library("mgcv")
+#' load_mgcv()
 #' df <- data_sim("eg1", n = 200, seed = 42)
 #' m <- gam(y ~ s(x0) + te(x1, x2, k = c(5, 5)) + s(x3),
 #'   data = df, method = "REML")
@@ -648,7 +648,7 @@ ale_endpoint <- function(data, target, p, predict_at) {
 #' @seealso [ale()]
 #' @export
 #' @examples
-#' library("mgcv")
+#' load_mgcv()
 #' df <- data_sim("eg1", n = 100, seed = 2)
 #' m <- gam(y ~ s(x2), data = df, method = "REML")
 #' ale(m, "x2") |> draw()

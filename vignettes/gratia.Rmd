@@ -22,7 +22,7 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library("gratia")
-library("mgcv")
+load_mgcv()
 ```
 
 gratia is a package to make working with generalized additive models (GAMs) in R

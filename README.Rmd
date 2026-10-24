@@ -14,8 +14,8 @@ knitr::opts_chunk$set(
   dpi = 96
 )
 options(tibble.print_min = 5, tibble.print_max = 5)
-library("mgcv")
 library("gratia")
+load_mgcv()
 ```
 
 # gratia <img src="man/figures/logo.png" align="right" width="140" height="140" alt="gratia neon hex logo" />

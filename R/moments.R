@@ -121,7 +121,7 @@
 #' @seealso [conditional_moments()], [fitted_values()], [fitted_samples()]
 #' @export
 #' @examples
-#' library("mgcv")
+#' load_mgcv()
 #' m <- gam(mpg ~ s(wt, k = 5), data = mtcars, method = "REML")
 #' fitted_moments(m, data = mtcars[1:3, ], moments = c("mean", "variance"))
 #' fitted_moments(m, data = mtcars[1:3, ], moments = "variance",
@@ -328,7 +328,7 @@ moment_grouped_context <- function(model, data, family_index, ...) {
 #'   by [fitted_moments()] and the plotting channels of [conditional_values()].
 #' @export
 #' @examples
-#' library("mgcv")
+#' load_mgcv()
 #' m <- gam(mpg ~ s(wt, k = 5), data = mtcars, method = "REML")
 #' conditional_moments(m, condition = "wt", moments = c("mean", "variance")) |>
 #'   draw()

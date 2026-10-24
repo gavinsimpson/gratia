@@ -643,7 +643,7 @@ render_diagnostic_qq <- function(
 #' @seealso [appraise()], [qq_plot()], [worm_plot()]
 #' @export
 #' @examples
-#' library("mgcv")
+#' load_mgcv()
 #' dat <- data_sim("eg1", n = 400, seed = 2)
 #' m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat)
 #' scalable_qq_plot(m, seed = 42)

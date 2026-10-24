@@ -43,8 +43,8 @@ needed to estimate a marginal distribution. Use more
 and check stability before interpreting small tail departures.
 
 ```{r packages}
-library("mgcv")
 library("gratia")
+load_mgcv()
 library("dplyr")
 library("ggplot2")
 ```

@@ -24,8 +24,8 @@ glmmTMB](glmmTMB-support.html) to explore flexible individual curves, then daily
 air quality measurements to read interaction surfaces.
 
 ```{r packages, message = FALSE}
-library("mgcv")
 library("gratia")
+load_mgcv()
 library("ggplot2")
 ```
 

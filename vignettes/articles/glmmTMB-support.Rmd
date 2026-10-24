@@ -32,9 +32,9 @@ mgcv, rather than replacing the smooth with an unpenalised spline basis.
 The smoothing penalty is estimated during fitting.
 
 ```{r packages, message = FALSE}
-library("mgcv")
-library("glmmTMB")
 library("gratia")
+load_mgcv()
+library("glmmTMB")
 library("ggplot2")
 ```
 

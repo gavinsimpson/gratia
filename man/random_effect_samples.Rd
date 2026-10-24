@@ -54,7 +54,7 @@ response means over these distributions. Use it in \code{\link[=predicted_sample
 \code{\link[=posterior_samples]{posterior_samples()}} or \code{\link[=simulate.gam]{simulate.gam()}} to simulate new-group responses.
 }
 \examples{
-library("mgcv")
+load_mgcv()
 m <- gam(travel ~ s(Rail, bs = "re"), data = nlme::Rail,
   method = "REML")
 random_effect_samples(m, n_draws = 3, seed = 42)

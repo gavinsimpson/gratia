@@ -30,8 +30,8 @@ If a conclusion depends on an interval limit, increase this count and check
 that the limit is stable.
 
 ```{r packages, message=FALSE}
-library("mgcv")
 library("gratia")
+load_mgcv()
 library("dplyr")
 library("ggplot2")
 ```

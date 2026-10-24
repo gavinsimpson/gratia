@@ -95,7 +95,7 @@
 #' @seealso [quantile_residuals()], [appraise()], [diagnostic_support]
 #' @export
 #' @examples
-#' library("mgcv")
+#' load_mgcv()
 #' set.seed(359)
 #' dat <- data.frame(x = runif(200, -2, 2))
 #' latent <- sin(dat$x) + rlogis(nrow(dat))

@@ -67,7 +67,7 @@ then estimate response moments with \code{\link[=fitted_moments]{fitted_moments(
 held at typical values; observations are not averaged over those covariates.
 }
 \examples{
-library("mgcv")
+load_mgcv()
 m <- gam(mpg ~ s(wt, k = 5), data = mtcars, method = "REML")
 conditional_moments(m, condition = "wt", moments = c("mean", "variance")) |>
   draw()

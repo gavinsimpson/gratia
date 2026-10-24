@@ -107,7 +107,7 @@ across residual draws. An explicit seed preserves the caller's random-number
 state. With \code{seed = NULL}, sampling uses and advances the current state.
 }
 \examples{
-library("mgcv")
+load_mgcv()
 set.seed(359)
 dat <- data.frame(x = runif(200, -2, 2))
 latent <- sin(dat$x) + rlogis(nrow(dat))

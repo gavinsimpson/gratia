@@ -38,8 +38,8 @@ All are gratia dependencies. The example has 600 observations and uses 200
 coefficient draws; increase the latter for final interval estimates.
 
 ```{r packages}
-library("mgcv")
 library("gratia")
+load_mgcv()
 library("dplyr")
 library("ggplot2")
 ```
