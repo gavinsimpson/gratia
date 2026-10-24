@@ -160,14 +160,19 @@ gfam_expectation_table <- function(table, context, ci_level = NULL) {
     out$.category <- if (".category" %in% names(labels)) labels$.category else NA_character_
     if (!is.null(ci_level)) {
       step <- .Machine$double.eps^(1 / 3) * pmax(1, abs(eta))
-      slope <- (evaluate(eta + step) - evaluate(eta - step)) / (2 * as.numeric(step))
-      se <- abs(slope) * table$.se[rows]
       critical <- coverage_normal(ci_level)
       if (spec$categorical) {
-        link_se <- se / (value * (1 - value))
-        lower <- plogis(qlogis(value) - critical * link_se)
-        upper <- plogis(qlogis(value) + critical * link_se)
+        transform <- spec$category_transform(eta)
+        slope <- (spec$category_transform(eta + step)$logit -
+          spec$category_transform(eta - step)$logit) / (2 * as.numeric(step))
+        limits <- categorical_probability_limits(transform,
+          abs(slope) * table$.se[rows], critical)
+        se <- limits$se
+        lower <- limits$lower
+        upper <- limits$upper
       } else {
+        slope <- (evaluate(eta + step) - evaluate(eta - step)) / (2 * as.numeric(step))
+        se <- abs(slope) * table$.se[rows]
         lower <- evaluate(eta - critical * table$.se[rows])
         upper <- evaluate(eta + critical * table$.se[rows])
       }

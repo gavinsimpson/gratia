@@ -1008,6 +1008,11 @@
 
 ## Bug fixes
 
+* `fitted_values()` retains small ordinal category probabilities and their
+  standard errors at extreme predictor values. Ordinal and multinomial
+  intervals remain defined when probabilities round to zero or one, including
+  for grouped ordinal models (#434).
+
 * `log_lik()` now divides the dispersion by each observation's weight for
   Gamma and inverse Gaussian densities, including grouped-family components
   (#432). This corrects their normalising constants and the LOO and WAIC

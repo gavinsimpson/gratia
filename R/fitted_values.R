@@ -58,6 +58,10 @@
 #' `.parameter`. Global parameters are described but held fixed when calculating
 #' coefficient uncertainty. Coupled expectations use the full coefficient
 #' covariance and a delta-method Jacobian. Their intervals are pointwise.
+#' Ordinal and multinomial probability intervals use a normal approximation to
+#' log odds, transformed back to probabilities. Log odds and their uncertainty
+#' are computed before rounding probabilities, so valid probabilities rounded
+#' to zero or one retain defined intervals.
 #'
 #' The `prediction_info` attribute records the quantity, scale, standard-error
 #' scale and parameter descriptions. Parameter standard errors retain their

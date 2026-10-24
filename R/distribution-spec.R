@@ -189,7 +189,7 @@ distribution_spec.family <- function(object, ...) {
     eta <- as.matrix(eta)
     if (unknown) stop("Natural distribution parameters are not implemented for family <",
       family_name(f), ">; use scale = 'link' for its first predictor.", call. = FALSE)
-    if (multinom) return(as.matrix(f$predict(f, eta = eta)[[1L]]))
+    if (multinom) return(multinomial_probability_transform(eta)$probability)
     if (mvn || categorical) return(eta)
     if (!lss) return(matrix(if (zip) exp(eta[, 1L]) else f$linkinv(eta[, 1L]), ncol = 1L))
     p <- do.call(cbind, lapply(seq_len(ncol(eta)), function(j) f$linfo[[j]]$linkinv(eta[, j])))
@@ -239,9 +239,7 @@ distribution_spec.family <- function(object, ...) {
     if (unknown) stop("The expected response is not implemented for family <", family_name(f), ">.", call. = FALSE)
     if (multinom || mvn) return(p)
     if (categorical) {
-      cuts <- c(-Inf, f$getTheta(TRUE), Inf)
-      return(vapply(seq_len(length(cuts) - 1L), function(i)
-        plogis(cuts[i + 1L] - p[, 1L]) - plogis(cuts[i] - p[, 1L]), numeric(nrow(p))))
+      return(ordinal_probability_transform(p[, 1L], f$getTheta(TRUE))$probability)
     }
     if (lss) return(matrix(lss_expectation(f, to_native(p)), ncol = 1L))
     if (ft == "bcg") {
@@ -278,6 +276,9 @@ distribution_spec.family <- function(object, ...) {
     expectation_size = if (categorical) length(f$getTheta(TRUE)) + 1L else
       if (multinom || mvn) length(names) else 1L,
     to_parameters = to_parameters, to_native = to_native, expectation = expectation,
+    category_transform = if (categorical) function(eta)
+      ordinal_probability_transform(eta[, 1L], f$getTheta(TRUE)) else
+      if (multinom) multinomial_probability_transform else NULL,
     categorical = categorical || multinom, multivariate = mvn,
     coupled = multinom, unknown = unknown,
     expectation_predictor = if (ft %in% c("gaulss", "gammals", "twlss") ||
