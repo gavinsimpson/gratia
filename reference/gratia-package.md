@@ -19,6 +19,11 @@ Useful links:
 **Maintainer**: Gavin L. Simpson <ucfagls@gmail.com>
 ([ORCID](https://orcid.org/0000-0002-9084-8413)) \[copyright holder\]
 
+Authors:
+
+- Gavin L. Simpson <ucfagls@gmail.com>
+  ([ORCID](https://orcid.org/0000-0002-9084-8413)) \[copyright holder\]
+
 Other contributors:
 
 - Henrik Singmann ([ORCID](https://orcid.org/0000-0002-4842-3657))
