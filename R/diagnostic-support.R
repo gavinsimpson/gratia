@@ -56,8 +56,8 @@
 #'   Nominal multinomial GAMs also support utility surrogate residuals in
 #'   ordinary and scalable plots. Utility residuals need no ordering of
 #'   categories. Traditional residual checks and PPCs remain available.
-#' * SCAM models support ordinary posterior predictive plots. Scalable posterior
-#'   predictive plots are not currently available; use `scalable = FALSE`.
+#' * SCAM models support ordinary and scalable posterior predictive plots for
+#'   supported response families.
 #'   Smoothing-parameter uncertainty is not currently supported for SCAM models;
 #'   use `unconditional = FALSE`.
 #' * `gamm`/`gamm4` and direct `lme`/`merMod` fits use their full predictors.
