@@ -1434,28 +1434,29 @@
   ))
 
   qq <- (1 - level) / 2
+  quantity_id <- intersect(
+    c(".row", ".focal", ".category", ".y", ".family"), names(yd)
+  )
 
   yd <- yd |>
-    group_by(pick(matches(".row"))) |>
+    group_by(pick(all_of(quantity_id))) |>
     mutate(
       .se = stats::sd(.data[[".derivative"]]),
       .lower_ci = quantile(.data[[".derivative"]], probs = qq),
       .upper_ci = quantile(.data[[".derivative"]], probs = 1 - qq),
       .derivative = median(.data[[".derivative"]])
     ) |>
-    distinct(pick(all_of(c(
-      ".focal", ".row", ".derivative", ".lower_ci",
-      ".upper_ci"
-    ))), .keep_all = TRUE) |>
-    select(!all_of(c(".draw"))) |>
+    distinct(pick(all_of(quantity_id)), .keep_all = TRUE) |>
+    ungroup() |>
+    select(!any_of(c(".draw", ".chain", ".iteration"))) |>
+    arrange(.data[[".row"]]) |>
     relocate(all_of(c(
       ".row", ".focal", ".derivative", ".se", ".lower_ci",
       ".upper_ci"
     )))
 
-  cls <- class(yd)
-  cls[1] <- "response_derivatives"
-  class(yd) <- cls
+  class(yd) <- c("response_derivatives", class(yd))
+  attr(yd, "sampling") <- NULL
   attr(yd, "uncertainty") <- uncertainty
   yd
 }
