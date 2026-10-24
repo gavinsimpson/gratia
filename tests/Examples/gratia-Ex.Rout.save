@@ -330,18 +330,18 @@ detaching ‘package:mgcv’, ‘package:nlme’
 
 > nameEx("appraise")
 > ### * appraise
->
+> 
 > flush(stderr()); flush(stdout())
->
+> 
 > ### Name: appraise
 > ### Title: Model diagnostic plots
 > ### Aliases: appraise appraise.gam appraise.lm appraise.gamlss
 > ###   appraise.default appraise.gamm4 appraise.gjrm appraise.gamm
 > ###   appraise.gratia_diagnostic_proxy appraise.lme appraise.merMod
 > ###   appraise.sdmTMB
->
+> 
 > ### ** Examples
->
+> 
 > load_mgcv()
 > ## simulate some data...
 > dat <- data_sim("eg1", n = 400, dist = "normal", scale = 2, seed = 2)
@@ -352,12 +352,12 @@ detaching ‘package:mgcv’, ‘package:nlme’
 +   gratia.alpha.diagnostic.point = 0.4)
 > ## replace the residual histogram with a posterior predictive check
 > appraise(mod, ppcheck = TRUE, n_ppc = 20, seed = 42)
->
+> 
 > ## To change the theme for all panels use the & operator, for example to
 > ## change the ggplot theme for all panels
 > library("ggplot2")
 > appraise(mod, seed = 42) & theme_minimal()
->
+> 
 > ## Select a grouped-family component by its position in the family list
 > set.seed(53)
 > grouped <- data.frame(x = runif(160), family_id = rep(1:2, 80))
@@ -371,9 +371,9 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > appraise(grouped_fit, response = 2, seed = 54)
 > ## Layout remains a separate choice
 > qq_plot(grouped_fit, response = 2, by_family = TRUE, seed = 54)
->
->
->
+> 
+> 
+> 
 > cleanEx()
 
 detaching ‘package:ggplot2’, ‘package:mgcv’
@@ -410,7 +410,7 @@ detaching ‘package:ggplot2’, ‘package:mgcv’
 > # can be passed to patchwork::wrap_plots()
 > suppressPackageStartupMessages(library("patchwork"))
 > assemble(m1) |> wrap_plots(ncol = 2, nrow = 2)
->
+> 
 > # Prepare individual plots from a GAMM
 > m2 <- gamm(y ~ s(x0) + x1, data = df1, method = "REML")
 > gamm_plots <- assemble(m2)
@@ -553,7 +553,7 @@ detaching ‘package:mgcv’
 > cd_surface <- conditional_differences(m, by = "fac",
 +   condition = list(c("x2", "x0")))
 > draw(cd_surface, surface = "tile")
->
+> 
 > # Restrict comparisons and fix a further covariate
 > conditional_differences(m, by = "fac",
 +   condition = list("x2", fac = c("1", "3"), x0 = 0.5))
@@ -627,24 +627,24 @@ detaching ‘package:mgcv’
 
 > nameEx("conditional_moments")
 > ### * conditional_moments
->
+> 
 > flush(stderr()); flush(stdout())
->
+> 
 > ### Name: conditional_moments
 > ### Title: Conditional moments of a GAM response distribution
 > ### Aliases: conditional_moments conditional_moments.gam
->
+> 
 > ### ** Examples
->
+> 
 > library("mgcv")
 Loading required package: nlme
 This is mgcv 1.9-4. For overview type '?mgcv'.
 > m <- gam(mpg ~ s(wt, k = 5), data = mtcars, method = "REML")
 > conditional_moments(m, condition = "wt", moments = c("mean", "variance")) |>
 +   draw()
->
->
->
+> 
+> 
+> 
 > cleanEx()
 
 detaching ‘package:mgcv’, ‘package:nlme’
@@ -679,7 +679,7 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > cv_surface <- conditional_values(m1, condition = list(c("x2", "x1")))
 > draw(cv_surface)
 > draw(cv_surface, surface = "tile")
->
+> 
 > # as above but condition on `x1` also. When plotted, `x1` is mapped to the
 > # colour channel, noting that it has been summarised using fivenum()
 > cv <- conditional_values(
@@ -1116,7 +1116,7 @@ detaching ‘package:ggplot2’, ‘package:mgcv’
 # i 390 more rows
 # i 2 more variables: x2 <dbl>, x3 <dbl>
 > 
->
+> 
 > ## derivatives for a selected smooth
 > derivatives(mod, type = "central", select = "s(x1)")
 # A tibble: 100 x 9
@@ -1231,7 +1231,7 @@ detaching ‘package:mgcv’
 > sm_dif3 <- difference_smooths(m,
 +   select = c("s(x2):fac1", "s(x2):fac2"), partial_match = FALSE
 + )
->
+> 
 > # Choose two axes and condition on the third covariate
 > m3 <- gam(y ~ fac + te(x0, x1, x2, by = fac, k = c(3, 3, 3)),
 +   data = df, method = "REML")
@@ -1240,7 +1240,7 @@ detaching ‘package:mgcv’
 > draw(sm_dif_3d)
 > # Redraw the evaluated points with the axes exchanged
 > draw(sm_dif_3d, variables = c("x2", "x1", "x0"))
->
+> 
 > # Supply particular conditioning values using a prediction grid
 > grid <- data_slice(m3, x1 = evenly(x1, n = 20),
 +   x2 = evenly(x2, n = 20), x0 = c(0.2, 0.8), fac = levels(fac))
@@ -1301,13 +1301,18 @@ detaching ‘package:mgcv’, ‘package:nlme’
 > 
 > bf <- basis(m, "s(x2)")
 > draw(bf)
->
+> 
+> # A single shared basis for a factor-by set
+> df_by <- data_sim("eg4", n = 400, seed = 42)
+> m_by <- gam(y ~ fac + s(x2, by = fac), data = df_by)
+> draw(basis(m_by, unweighted = TRUE))
+> 
 > # A three-covariate basis, evaluated at two conditioning values
 > m3 <- gam(y ~ s(x0, x1, x2, k = 12), data = df)
 > bf3 <- basis(m3, variables = c("x1", "x2", "x0"),
 +   n_2d = 15, n_3d = 2)
 > draw(bf3, ncol = 3)
->
+> 
 > # Four covariates: conditioning values form facet rows and columns
 > m4 <- gam(y ~ s(x0, x1, x2, x3, k = 20), data = df)
 > bf4 <- basis(m4, n_2d = 15, n_4d = 2)
@@ -1399,36 +1404,36 @@ detaching ‘package:mgcv’
 
 > nameEx("draw.gam")
 > ### * draw.gam
->
+> 
 > flush(stderr()); flush(stdout())
->
+> 
 > ### Name: draw.gam
 > ### Title: Plot smooth and parametric terms from a fitted GAM
 > ### Aliases: draw.gam draw.gamm draw.scam draw.scasm
->
+> 
 > ### ** Examples
->
+> 
 > load_mgcv()
->
+> 
 > # Simulate data and fit a GAM
 > df1 <- data_sim("eg1", n = 200, dist = "normal", scale = 2, seed = 2)
 > m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df1, method = "REML")
->
+> 
 > # Plot all smooths
 > draw(m1)
->
+> 
 > # Draw a complete cycle in polar coordinates, using fitted knot boundaries
 > m_cycle <- gam(y ~ s(x0, bs = "cc", k = 10), data = df1,
 +   knots = list(x0 = c(0, 1)), method = "REML")
 > draw(m_cycle, cyclic = "polar")
 > draw(m_cycle, cyclic = "polar",
 +   polar_args = list(start = -pi / 2, reverse = "theta"))
->
+> 
 > # See https://gavinsimpson.github.io/gratia/articles/custom-plotting.html
 > # for more examples. Use the & operator to modify the theme of all panels.
->
->
->
+> 
+> 
+> 
 > cleanEx()
 
 detaching ‘package:mgcv’
@@ -1486,8 +1491,8 @@ detaching ‘package:mgcv’
 +   smooth_estimates(joint, select = smooths(joint)[3])
 + }
 # A tibble: 100 x 7
-   .smooth .type .by   .estimate   .se       x .model
-   <chr>   <chr> <chr>     <dbl> <dbl>   <dbl> <chr>
+   .smooth .type .by   .estimate   .se       x .model            
+   <chr>   <chr> <chr>     <dbl> <dbl>   <dbl> <chr>             
  1 s.4(x)  TPRS  <NA>    -0.155  0.307 0.00832 Dependence (theta)
  2 s.4(x)  TPRS  <NA>    -0.146  0.294 0.0181  Dependence (theta)
  3 s.4(x)  TPRS  <NA>    -0.138  0.282 0.0280  Dependence (theta)
@@ -1501,7 +1506,7 @@ detaching ‘package:mgcv’
 # i 90 more rows
 > 
 > 
->
+> 
 > cleanEx()
 
 detaching ‘package:mgcv’, ‘package:GJRM’
@@ -1597,15 +1602,15 @@ detaching ‘package:mgcv’
 
 > nameEx("draw.sampling_diagnostics")
 > ### * draw.sampling_diagnostics
->
+> 
 > flush(stderr()); flush(stdout())
->
+> 
 > ### Name: draw.sampling_diagnostics
 > ### Title: Plot coefficient-chain diagnostics
 > ### Aliases: draw.sampling_diagnostics
->
+> 
 > ### ** Examples
->
+> 
 > load_mgcv()
 > dat <- data_sim("eg1", n = 100, seed = 42)
 > model <- gam(y ~ s(x0, k = 5), data = dat, method = "REML")
@@ -1614,24 +1619,24 @@ detaching ‘package:mgcv’
 > diagnostics <- sampling_diagnostics(b)
 > draw(diagnostics, select = 1:2)
 > draw(diagnostics, type = "rank", select = 1:2, n_bins = 10)
->
->
->
+> 
+> 
+> 
 > cleanEx()
 
 detaching ‘package:mgcv’
 
 > nameEx("draw.smooth_estimates")
 > ### * draw.smooth_estimates
->
+> 
 > flush(stderr()); flush(stdout())
->
+> 
 > ### Name: draw.smooth_estimates
 > ### Title: Plot the result of a call to 'smooth_estimates()'
 > ### Aliases: draw.smooth_estimates
->
+> 
 > ### ** Examples
->
+> 
 > load_mgcv()
 > # example data
 > df <- data_sim("eg1", seed = 21)
@@ -1646,27 +1651,27 @@ detaching ‘package:mgcv’
 > sm <- smooth_estimates(m, select = "s(x2)")
 > # plot it
 > draw(sm)
->
+> 
 > # customising some plot elements
 > draw(sm) & ggplot2::theme(
 +   geom.gratia.interval = ggplot2::element_geom(fill = "steelblue"),
 +   geom.gratia.smooth = ggplot2::element_geom(colour = "forestgreen"),
 +   gratia.alpha.interval = 0.3)
->
+> 
 > # Add a constant to the plotted smooth
 > draw(sm, constant = coef(m)[1])
->
+> 
 > # Adding change indicators to smooths based on derivatives of the smooth
 > d <- derivatives(m, n = 100) # n to match smooth_estimates()
->
+> 
 > smooth_estimates(m) |>
 +   add_sizer(derivatives = d, type = "sizer") |>
 +   draw()
->
+> 
 > # Render a bivariate smooth as vector tiles
 > m_surface <- gam(y ~ s(x0, x1), data = df, method = "REML")
 > draw(smooth_estimates(m_surface, n_2d = 20), surface = "tile")
->
+> 
 > # Choose the axes before generating the evaluation grid
 > m_slices <- gam(y ~ s(x0, x1, x2), data = df, method = "REML")
 > estimates <- smooth_estimates(m_slices,
@@ -1674,24 +1679,24 @@ detaching ‘package:mgcv’
 > draw(estimates)
 > # A redraw changes roles using the points already evaluated
 > draw(estimates, variables = c("x2", "x1", "x0"))
->
->
->
+> 
+> 
+> 
 > cleanEx()
 
 detaching ‘package:mgcv’
 
 > nameEx("draw.smooth_samples")
 > ### * draw.smooth_samples
->
+> 
 > flush(stderr()); flush(stdout())
->
+> 
 > ### Name: draw.smooth_samples
 > ### Title: Plot posterior smooths
 > ### Aliases: draw.smooth_samples
->
+> 
 > ### ** Examples
->
+> 
 > load_mgcv()
 > dat1 <- data_sim("eg1", n = 400, dist = "normal", scale = 1, seed = 1)
 > ## a single smooth GAM
@@ -1702,7 +1707,7 @@ detaching ‘package:mgcv’
 > draw(sm1) & ggplot2::theme(gratia.alpha.sample = 0.7)
 > ## plot only 5 randomly smapled draws
 > draw(sm1, n_samples = 5) & ggplot2::theme(gratia.alpha.sample = 0.7)
->
+> 
 > ## A factor-by smooth example
 > dat2 <- data_sim("eg4", n = 400, dist = "normal", scale = 1, seed = 1)
 > ## a multi-smooth GAM with a factor-by smooth
@@ -1712,71 +1717,71 @@ detaching ‘package:mgcv’
 > ## plot, this time selecting only the factor-by smooth
 > draw(sm2, select = "s(x2)", partial_match = TRUE) &
 +   ggplot2::theme(gratia.alpha.sample = 0.7)
->
->
->
->
+> 
+> 
+> 
+> 
 > cleanEx()
 
 detaching ‘package:mgcv’
 
 > nameEx("draw.variance_comp")
 > ### * draw.variance_comp
->
+> 
 > flush(stderr()); flush(stdout())
->
+> 
 > ### Name: draw.variance_comp
 > ### Title: Plot variance components and proportions of term variance
 > ### Aliases: draw.variance_comp
->
+> 
 > ### ** Examples
->
+> 
 > load_mgcv()
 > dat <- data_sim("eg1", n = 100, seed = 42)
 > model <- gam(y ~ x0 + s(x1, k = 6), data = dat, method = "REML")
 > components <- variance_comp(model)
 > draw(components)
 > draw(components, type = "std_dev")
->
+> 
 > terms <- variance_comp(model, type = "terms", n_draws = 200, seed = 42)
 > draw(terms)
 > draw(terms, type = "proportion", include_total = FALSE)
->
->
->
+> 
+> 
+> 
 > cleanEx()
 
 detaching ‘package:mgcv’
 
 > nameEx("draw_label_control")
 > ### * draw_label_control
->
+> 
 > flush(stderr()); flush(stdout())
->
+> 
 > ### Name: draw_label_control
 > ### Title: Control label layout in gratia plots
 > ### Aliases: draw_label_control
->
+> 
 > ### ** Examples
->
+> 
 > # Wrap categorical tick labels and stagger them across two rows.
 > layout <- draw_label_control(axes = list(wrap = 12, n_dodge = 2))
->
+> 
 > # Reuse one configuration for legend text and colour-bar layout.
 > layout <- draw_label_control(
 +   axes = list(wrap = 12),
 +   legend = list(wrap = 20, title_wrap = 20, ncol = 2),
 +   colourbar = list(title_wrap = 20, height = grid::unit(35, "mm"))
 + )
->
+> 
 > # Draw a model with the requested layout.
 > load_mgcv()
 > dat <- data_sim("eg4", n = 100, seed = 42)
 > model <- gam(y ~ fac + s(x2, by = fac, k = 5), data = dat, method = "REML")
 > draw(model, label_control = layout)
->
->
->
+> 
+> 
+> 
 > cleanEx()
 
 detaching ‘package:mgcv’
@@ -1890,15 +1895,15 @@ detaching ‘package:mgcv’
 > cleanEx()
 > nameEx("family_diagnostics")
 > ### * family_diagnostics
->
+> 
 > flush(stderr()); flush(stdout())
->
+> 
 > ### Name: family_diagnostics
 > ### Title: Extend diagnostics for an mgcv-compatible family
 > ### Aliases: family_diagnostics
->
+> 
 > ### ** Examples
->
+> 
 > load_mgcv()
 > f <- poisson()
 > f$gratia_diagnostics <- function(mu, wt, scale, y, eta) {
@@ -1915,9 +1920,9 @@ detaching ‘package:mgcv’
 > f$cdf <- function(q, mu, wt, scale) ppois(q, mu)
 > fit <- gam(y ~ x, data = dat, family = f, method = "REML")
 > qq_plot(fit, type = "quantile", seed = 1)
->
->
->
+> 
+> 
+> 
 > cleanEx()
 
 detaching ‘package:mgcv’
@@ -2010,15 +2015,15 @@ detaching ‘package:mgcv’
 
 > nameEx("fitted_moments")
 > ### * fitted_moments
->
+> 
 > flush(stderr()); flush(stdout())
->
+> 
 > ### Name: fitted_moments
 > ### Title: Estimate moments of the conditional response distribution
 > ### Aliases: fitted_moments fitted_moments.gam
->
+> 
 > ### ** Examples
->
+> 
 > library("mgcv")
 Loading required package: nlme
 This is mgcv 1.9-4. For overview type '?mgcv'.
@@ -2040,14 +2045,14 @@ This is mgcv 1.9-4. For overview type '?mgcv'.
 # A tibble: 3 x 19
    .row .parameter .fitted   .se .lower_ci .upper_ci .status .p_defined   mpg
   <int> <chr>        <dbl> <dbl>     <dbl>     <dbl> <chr>        <dbl> <dbl>
-1     1 variance      7.12  1.91      4.14      11.1 ok               1  21
-2     2 variance      7.12  1.91      4.14      11.1 ok               1  21
+1     1 variance      7.12  1.91      4.14      11.1 ok               1  21  
+2     2 variance      7.12  1.91      4.14      11.1 ok               1  21  
 3     3 variance      7.12  1.91      4.14      11.1 ok               1  22.8
 # i 10 more variables: cyl <dbl>, disp <dbl>, hp <dbl>, drat <dbl>, wt <dbl>,
 #   qsec <dbl>, vs <dbl>, am <dbl>, gear <dbl>, carb <dbl>
->
->
->
+> 
+> 
+> 
 > cleanEx()
 
 detaching ‘package:mgcv’, ‘package:nlme’
@@ -2266,15 +2271,15 @@ detaching ‘package:mgcv’, ‘package:nlme’
 
 > nameEx("gratia_palette")
 > ### * gratia_palette
->
+> 
 > flush(stderr()); flush(stdout())
->
+> 
 > ### Name: gratia_palette
 > ### Title: Discrete palettes for gratia plots
 > ### Aliases: gratia_palette
->
+> 
 > ### ** Examples
->
+> 
 > pal <- gratia_palette("tol_muted")
 > pal(5)
 [1] "#CC6677" "#332288" "#DDCC77" "#117733" "#88CCEE"
@@ -2283,25 +2288,25 @@ detaching ‘package:mgcv’, ‘package:nlme’
 +   palette.fill.discrete = pal
 + )
 <theme> List of 2
- $ palette.colour.discrete:function (n)
- $ palette.fill.discrete  :function (n)
+ $ palette.colour.discrete:function (n)  
+ $ palette.fill.discrete  :function (n)  
  @ complete: logi FALSE
  @ validate: logi TRUE
->
->
->
+> 
+> 
+> 
 > cleanEx()
 > nameEx("gratia_theme_get")
 > ### * gratia_theme_get
->
+> 
 > flush(stderr()); flush(stdout())
->
+> 
 > ### Name: gratia_theme_get
 > ### Title: Native themes for gratia plots
 > ### Aliases: gratia_theme_get gratia_theme_set gratia_theme_update
->
+> 
 > ### ** Examples
->
+> 
 > library("ggplot2")
 > old <- gratia_theme_set(theme(
 +   geom.gratia.smooth = element_geom(colour = "navy"),
@@ -2309,17 +2314,17 @@ detaching ‘package:mgcv’, ‘package:nlme’
 + ))
 > gratia_theme_update(geom.gratia.contour = element_geom(colour = "grey40"))
 > gratia_theme_set(old)
->
+> 
 > pal <- gratia_palette("tol_banded_16")
 > theme(palette.colour.discrete = pal, palette.fill.discrete = pal)
 <theme> List of 2
- $ palette.colour.discrete:function (n)
- $ palette.fill.discrete  :function (n)
+ $ palette.colour.discrete:function (n)  
+ $ palette.fill.discrete  :function (n)  
  @ complete: logi FALSE
  @ validate: logi TRUE
->
->
->
+> 
+> 
+> 
 > cleanEx()
 
 detaching ‘package:ggplot2’
@@ -2446,11 +2451,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0xc62a9eee8>
+<environment: 0xaf6f4c698>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0xc62a9eee8>
+<environment: 0xaf6f4c698>
 > 
 > ## Works with `family` objects too
 > link(shash(), parameter = "skewness")
@@ -2825,18 +2830,18 @@ detaching ‘package:mgcv’
 
 > nameEx("parametric_effects")
 > ### * parametric_effects
->
+> 
 > flush(stderr()); flush(stdout())
->
+> 
 > ### Name: parametric_effects
 > ### Title: Estimated values for parametric model terms
 > ### Aliases: parametric_effects parametric_effects.gamm4
 > ###   parametric_effects.gam parametric_effects.scam
->
+> 
 > ### ** Examples
->
+> 
 > load_mgcv()
->
+> 
 > # Simulate numeric and factor effects
 > set.seed(42)
 > d <- data.frame(
@@ -2845,7 +2850,7 @@ detaching ‘package:mgcv’
 + )
 > d$y <- with(d, 2 * x + (group == "B") + rnorm(100, sd = 0.25))
 > m <- gam(y ~ x + group, data = d, method = "REML")
->
+> 
 > # Estimate and draw the contribution of each parametric term
 > pe <- parametric_effects(m)
 > pe
@@ -2864,10 +2869,10 @@ detaching ‘package:mgcv’
 10 x     numeric  0.705 <NA>      1.47  0.0338
 # i 92 more rows
 > draw(pe)
->
->
->
->
+> 
+> 
+> 
+> 
 > cleanEx()
 
 detaching ‘package:mgcv’
@@ -3303,15 +3308,15 @@ detaching ‘package:mgcv’
 
 > nameEx("random_effect_samples")
 > ### * random_effect_samples
->
+> 
 > flush(stderr()); flush(stdout())
->
+> 
 > ### Name: random_effect_samples
 > ### Title: Draw new random effects from an estimated GAM
 > ### Aliases: random_effect_samples
->
+> 
 > ### ** Examples
->
+> 
 > library("mgcv")
 Loading required package: nlme
 This is mgcv 1.9-4. For overview type '?mgcv'.
@@ -3319,20 +3324,20 @@ This is mgcv 1.9-4. For overview type '?mgcv'.
 +   method = "REML")
 > random_effect_samples(m, n_draws = 3, seed = 42)
 # A tibble: 54 x 6
-    .row .draw .smooth .value travel Rail
+    .row .draw .smooth .value travel Rail 
    <int> <int> <chr>    <dbl>  <dbl> <ord>
- 1     1     1 s(Rail)  34.0      55 1
- 2     2     1 s(Rail)  34.0      53 1
- 3     3     1 s(Rail)  34.0      54 1
- 4     4     1 s(Rail)  15.7      26 2
- 5     5     1 s(Rail)  15.7      37 2
- 6     6     1 s(Rail)  15.7      32 2
- 7     7     1 s(Rail)  37.5      78 3
- 8     8     1 s(Rail)  37.5      91 3
- 9     9     1 s(Rail)  37.5      85 3
-10    10     1 s(Rail)  -1.56     92 4
+ 1     1     1 s(Rail)  34.0      55 1    
+ 2     2     1 s(Rail)  34.0      53 1    
+ 3     3     1 s(Rail)  34.0      54 1    
+ 4     4     1 s(Rail)  15.7      26 2    
+ 5     5     1 s(Rail)  15.7      37 2    
+ 6     6     1 s(Rail)  15.7      32 2    
+ 7     7     1 s(Rail)  37.5      78 3    
+ 8     8     1 s(Rail)  37.5      91 3    
+ 9     9     1 s(Rail)  37.5      85 3    
+10    10     1 s(Rail)  -1.56     92 4    
 # i 44 more rows
->
+> 
 > # Compare zero random effects with response means averaged over groups.
 > set.seed(2)
 > d <- expand.grid(x = seq(0, 1, length.out = 15), id = factor(1:12))
@@ -3376,9 +3381,9 @@ This is mgcv 1.9-4. For overview type '?mgcv'.
 7     1     3         1
 8     2     3         3
 9     3     3        19
->
->
->
+> 
+> 
+> 
 > cleanEx()
 
 detaching ‘package:mgcv’, ‘package:nlme’
@@ -3420,15 +3425,15 @@ Levels: a b c d e
 > cleanEx()
 > nameEx("residuals_covariate_plot")
 > ### * residuals_covariate_plot
->
+> 
 > flush(stderr()); flush(stdout())
->
+> 
 > ### Name: residuals_covariate_plot
 > ### Title: Plot residuals against covariates
 > ### Aliases: residuals_covariate_plot scalable_residuals_covariate_plot
->
+> 
 > ### ** Examples
->
+> 
 > library("mgcv")
 Loading required package: nlme
 This is mgcv 1.9-4. For overview type '?mgcv'.
@@ -3441,9 +3446,9 @@ This is mgcv 1.9-4. For overview type '?mgcv'.
 > # Inspect individual covariates and possible remaining interaction structure.
 > scalable_residuals_covariate_plot(m, covariates = c("x0", "x2"),
 +   pairs = list(c("x0", "x2")), bins = 6, type = "quantile", seed = 42)
->
->
->
+> 
+> 
+> 
 > cleanEx()
 
 detaching ‘package:mgcv’, ‘package:nlme’
@@ -3653,15 +3658,15 @@ detaching ‘package:mgcv’, ‘package:nlme’
 
 > nameEx("shape_confidence_set")
 > ### * shape_confidence_set
->
+> 
 > flush(stderr()); flush(stdout())
->
+> 
 > ### Name: shape_confidence_set
 > ### Title: Intersect a band with linear restrictions on coefficients
 > ### Aliases: shape_confidence_set in_shape_set
->
+> 
 > ### ** Examples
->
+> 
 > # Two non-negative masses whose sum is one.
 > region <- shape_confidence_set(
 +   X = diag(2), lower = c(0.1, 0.2), upper = c(0.8, 0.9),
@@ -3672,21 +3677,21 @@ detaching ‘package:mgcv’, ‘package:nlme’
 [1] TRUE
 > in_shape_set(region, c(0.4, 0.7))
 [1] FALSE
->
->
->
+> 
+> 
+> 
 > cleanEx()
 > nameEx("shape_intervals")
 > ### * shape_intervals
->
+> 
 > flush(stderr()); flush(stdout())
->
+> 
 > ### Name: shape_intervals
 > ### Title: Enforce named shapes on estimates and interval endpoints
 > ### Aliases: shape_intervals
->
+> 
 > ### ** Examples
->
+> 
 > x <- c(0, 0.1, 0.4, 0.8, 1)
 > f <- c(0.1, 0.4, 0.2, 0.9, 0.7)
 > shape_intervals(f, f - 0.3, f + 0.3, data.frame(x = x),
@@ -3697,11 +3702,11 @@ detaching ‘package:mgcv’, ‘package:nlme’
 1   0         0.1       0         0.4
 2   0.1       0.2       0         0.5
 3   0.4       0.4       0.1       0.7
-4   0.8       0.7       0.4       1
+4   0.8       0.7       0.4       1  
 5   1         0.9       0.6       1.2
->
->
->
+> 
+> 
+> 
 > cleanEx()
 > nameEx("simulate")
 > ### * simulate
@@ -3737,16 +3742,16 @@ detaching ‘package:mgcv’
 
 > nameEx("simultaneous_bands")
 > ### * simultaneous_bands
->
+> 
 > flush(stderr()); flush(stdout())
->
+> 
 > ### Name: simultaneous_bands
 > ### Title: Simultaneous bands on an evaluation grid or a continuous
 > ###   interval
 > ### Aliases: simultaneous_bands
->
+> 
 > ### ** Examples
->
+> 
 > library("mgcv")
 Loading required package: nlme
 This is mgcv 1.9-4. For overview type '?mgcv'.
@@ -3765,9 +3770,9 @@ This is mgcv 1.9-4. For overview type '?mgcv'.
 + )
 > attr(rate, "interval_info")$curves[[1]]$critical
 [1] 3.015127
->
->
->
+> 
+> 
+> 
 > cleanEx()
 
 detaching ‘package:mgcv’, ‘package:nlme’
@@ -3934,7 +3939,7 @@ detaching ‘package:mgcv’
 +   estimates <- smooth_estimates(m, n = 50)
 +   draw(estimates)
 + }
->
+> 
 > # parallel processing of smooths
 > if (requireNamespace("mirai") && requireNamespace("carrier")) {
 +   library("mirai")
@@ -4041,16 +4046,16 @@ detaching ‘package:mgcv’
 
 > nameEx("surrogate_residuals")
 > ### * surrogate_residuals
->
+> 
 > flush(stderr()); flush(stdout())
->
+> 
 > ### Name: surrogate_residuals
 > ### Title: Surrogate residuals for categorical GAMs
 > ### Aliases: surrogate_residuals surrogate_residuals.gam
 > ###   surrogate_residuals.default
->
+> 
 > ### ** Examples
->
+> 
 > library("mgcv")
 Loading required package: nlme
 This is mgcv 1.9-4. For overview type '?mgcv'.
@@ -4062,9 +4067,9 @@ This is mgcv 1.9-4. For overview type '?mgcv'.
 > head(surrogate_residuals(fit, seed = 42))
 [1]  3.8326093  0.8855870 -0.3476107  0.1092911 -0.4888706  1.4880031
 > appraise(fit, type = "surrogate", seed = 42)
->
->
->
+> 
+> 
+> 
 > cleanEx()
 
 detaching ‘package:mgcv’, ‘package:nlme’
@@ -4201,7 +4206,7 @@ detaching ‘package:mgcv’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  27.168 0.675 29.53 0.004 0.005 
+Time elapsed:  36.579 0.589 38.478 0.003 0.004 
 > grDevices::dev.off()
 null device 
           1 
