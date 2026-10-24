@@ -362,3 +362,23 @@ test_that("SCAM likelihood and predictive-check external generics dispatch", {
     expect_s3_class(bayesplot::pp_check(m, n_draws = 5, seed = 52), "ggplot")
   }
 })
+
+test_that("SCAM shifts and added terms use zero when the intercept is absent", {
+  d <- scam_api_fixture$data[1:5, ]
+  for (m in scam_api_fixture[c("model", "no_intercept")]) {
+    intercept <- if ("(Intercept)" %in% names(coef(m))) unname(coef(m)["(Intercept)"]) else 0
+    ci <- confint(m, parm = "s(x)", data = d)
+    shifted <- confint(m, parm = "s(x)", data = d, shift = TRUE)
+    for (column in c(".estimate", ".lower_ci", ".upper_ci")) {
+      expect_equal(shifted[[column]], ci[[column]] + intercept)
+    }
+    expect_equal(shifted$.se, ci$.se)
+    for (type in c("terms", "iterms")) {
+      added <- add_fitted(d, m, type = type)
+      expect_equal(added$.constant, rep(intercept, nrow(d)))
+      native <- predict(m, newdata = d, type = type)
+      expect_equal(as.matrix(added[, ncol(d) + 1L + seq_len(ncol(native)), drop = FALSE]),
+        native, ignore_attr = TRUE)
+    }
+  }
+})

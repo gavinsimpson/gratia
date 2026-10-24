@@ -1008,6 +1008,12 @@
 
 ## Bug fixes
 
+* `confint(shift = TRUE)` now adds the full intercept of each smooth's own
+  linear predictor, including contributions from shared formula blocks.
+  `model_constant()` returns zero for predictors without an intercept
+  and keeps selected predictor names aligned; `add_fitted()` uses native
+  prediction constants for term predictions (#433).
+
 * `log_lik()` now divides the dispersion by each observation's weight for
   Gamma and inverse Gaussian densities, including grouped-family components
   (#432). This corrects their normalising constants and the LOO and WAIC

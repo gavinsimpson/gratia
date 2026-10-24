@@ -85,11 +85,12 @@
 
   ## having pruned off any standard errors, process the result
   if (is.array(pred_vals) && length(dim(pred_vals)) > 1L) {
+    constant <- attr(pred_vals, "constant", exact = TRUE) %||% 0
     pred_vals <- as_tibble(pred_vals)
     if (type %in% c("terms", "iterms")) {
       pred_vals <-
         add_column(pred_vals,
-          !!(".constant") := coef(model)[1],
+          !!(".constant") := unname(constant),
           .before = 1L
         )
     }

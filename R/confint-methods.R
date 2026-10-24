@@ -214,7 +214,8 @@
 #'   intervals using the default covariance.
 #' @param nsim integer; the number of simulations used in computing the
 #'   simultaneous intervals.
-#' @param shift logical; should the model intercept be added to the smooth?
+#' @param shift logical; should the intercept of the smooth's linear predictor
+#'   be added to the smooth? Predictors without an intercept are shifted by zero.
 #'   Only the intercept is added; other parametric effects, including factor
 #'   effects associated with a factor `by` smooth, are excluded. For full fitted
 #'   values and their confidence intervals, use [fitted_values()].
@@ -357,15 +358,6 @@
     if (isTRUE(transform)) family(object)$linkinv else identity
   } else if (!is.null(transform)) match.fun(transform)
 
-  if (shift) {
-    const <- coef(object)
-    nms <- names(const)
-    test <- grep("Intercept", nms)
-    const <- ifelse(length(test) == 0L, 0, const[test])
-  } else {
-    const <- 0
-  }
-
   ## simplify to a data frame for return
   metadata <- lapply(out, attr, "coordinate_info")
   smooth_variables <- do.call("c", lapply(metadata, attr, "smooth_variables"))
@@ -386,6 +378,19 @@
   # Note needed, it seems now that NextMethod() is used but extending tibbles
   # is not currently well documented.
   # class(out) <- class(out)[-(1:2)]
+
+  const <- 0
+  if (shift) {
+    constants <- model_constant(object)
+    eta_idx <- lss_eta_index(object)
+    smooth_constants <- vapply(get_smooths_by_id(object, which(select)), function(sm) {
+      belongs <- vapply(eta_idx, function(idx) {
+        all(smooth_coef_indices(sm) %in% idx)
+      }, logical(1))
+      constants[which(belongs)[1L]]
+    }, numeric(1))
+    const <- smooth_constants[match(out$.smooth, S[select])]
+  }
 
   # Shift the stored limits directly: bootstrap limits need not be symmetric.
   out <- mutate(out,
