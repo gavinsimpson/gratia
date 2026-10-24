@@ -76,9 +76,10 @@
 #' standardized deviation over the selected coverage set. They are symmetric
 #' about `.diff`, with half-width `.crit * .se`. For `uncertainty = "delta"`,
 #' one shared batch of zero-mean Gaussian coefficient deviations is generated
-#' from the Bayesian covariance matrix using [mvnfast::rmvn()]. Response-scale
+#' from the Bayesian covariance matrix. Response-scale
 #' differences use a first-order Taylor approximation. The covariance must be
-#' positive definite. Sampler arguments `method`, `draws`, `mvn_method`, `burnin`,
+#' positive semidefinite; singular covariance matrices are supported.
+#' Sampler arguments `method`, `draws`, `mvn_method`, `burnin`,
 #' `thin`, `t_df`, and `rw_scale` apply only to `uncertainty = "simulation"`.
 #'
 #' For `uncertainty = "simulation"`, deviations are posterior difference draws

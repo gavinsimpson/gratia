@@ -1053,10 +1053,10 @@
   at the default coverage (#436).
 
 * Corrected the posterior simulation article's coefficient-posterior and interval
-  explanations, matched its smooth draws and intervals, and updated obsolete
-  sampling argument names. Documentation now reflects SCAM predictive-plot and
-  conditional-comparison support and the uncertainty included in data-slice
-  examples (#439).
+  explanations, matched uncertainty settings for its smooth and prediction
+  intervals, and updated obsolete sampling argument names. Documentation now
+  reflects SCAM predictive-plot and conditional-comparison support and the
+  uncertainty included in data-slice examples (#439).
 
 * `fitted_values()` retains small ordinal category probabilities and their
   standard errors at extreme predictor values. Ordinal and multinomial
