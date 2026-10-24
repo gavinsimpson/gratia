@@ -111,7 +111,9 @@ for second central differences they are each \code{eps} from the target.}
 user-supplied draws.}
 
 \item{level}{numeric; \verb{0 < level < 1}; the coverage level of the
-credible interval. The default is \code{0.95} for a 95\% interval.}
+credible interval. The default is \code{0.95} for a 95\% interval.
+Supply one finite numeric value. Use \code{level} for both uncertainty methods;
+\code{ci_level} and \code{coverage} are not accepted, even when \code{level} is also supplied.}
 
 \item{seed}{numeric; a random seed for the simulations.}
 
