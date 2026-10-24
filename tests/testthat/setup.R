@@ -1779,3 +1779,21 @@ ordinal_tail_model <- function() {
     mgcv::gam(y ~ x, data = d, family = mgcv::ocat(R = 3), method = "REML")
   })
 }
+
+# Mixed curve and surface terms, with different formula order in the second fit.
+comparison_mixed_fixture <- function() {
+  shared_test_fixture("comparison_mixed", {
+    list(
+      first = gam(y ~ s(x0, x1, k = 10) + s(x2, k = 5),
+        data = quick_eg1, method = "REML"),
+      second = gam(y ~ s(x2, k = 5) + s(x0, x1, k = 15),
+        data = quick_eg1, method = "REML")
+    )
+  })
+}
+
+comparison_transformed_fixture <- function() {
+  shared_test_fixture("comparison_transformed", {
+    gam(y ~ s(log(x0 + 1), x1, k = 10), data = quick_eg1, method = "REML")
+  })
+}

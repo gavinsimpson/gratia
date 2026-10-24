@@ -15,7 +15,8 @@ compare_smooths(
   unconditional = FALSE,
   overall_uncertainty = TRUE,
   partial_match = FALSE,
-  envir = NULL
+  envir = NULL,
+  dist = NULL
 )
 }
 \arguments{
@@ -61,9 +62,35 @@ against.}
 \item{envir}{an optional environment supplying functions and constants used
 in model expressions. The available model formula environment is used when
 \code{NULL}. Covariate observations should be supplied in \code{data}.}
+
+\item{dist}{numeric; if greater than 0, this is used to determine when
+a location is too far from data to be plotted when plotting 2-D smooths.
+The data are scaled into the unit square before deciding what to exclude,
+and \code{dist} is a distance within the unit square. See
+\code{\link[mgcv:exclude.too.far]{mgcv::exclude.too.far()}} for further details.}
 }
 \description{
 Compare smooths across models
+}
+\details{
+Two-variable smooths are evaluated at common locations. Automatic grids span
+the intersection of the models' observed covariate ranges; factor levels must
+overlap. Supplied \code{data} are evaluated as given, without filling gaps.
+Each selected smooth label must occur exactly once in every model and use
+the same covariates, including any \code{by} variable. Numeric and logical \code{select}
+refer to the primary model; matching labels are then used in every model.
+
+Estimates are contributions of individual smooths to the linear predictor,
+on its link scale, with the centring constraints used in each fitted model.
+They exclude the intercept and other model terms. Different fitting data can
+change the centring, so a surface difference can include a constant shift.
+It is the difference between these fitted smooth contributions, rather than
+a difference between fitted responses.
+
+The result retains one row per model and smooth, with estimates in the \code{data}
+list column. Use \code{\link[=draw.compare_smooths]{draw.compare_smooths()}} for faceted surface comparisons or
+estimated surface differences. Smooths with more than two covariates can be
+evaluated but cannot be drawn by this method.
 }
 \examples{
 \dontshow{
@@ -85,6 +112,17 @@ comp
 ## notice that the result is a nested tibble
 
 draw(comp)
+
+# Simulate a noisy response over two continuous covariates, x and z
+surf <- data_sim("eg2", n = 100, seed = 7)
+# Fit two small bases to the same surface data
+coarse <- gam(y ~ s(x, z, k = 10), data = surf, method = "REML")
+fine <- gam(y ~ s(x, z, k = 15), data = surf, method = "REML")
+# Compare surfaces on shared axes and a shared colour scale
+surfaces <- compare_smooths(coarse, fine, n_2d = 20)
+draw(surfaces)
+# Show coarse minus fine, with a colour scale centred on zero
+draw(surfaces, show = "difference", pair = c("coarse", "fine"))
 \dontshow{
 options(op)
 }
