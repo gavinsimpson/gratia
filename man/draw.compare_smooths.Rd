@@ -44,7 +44,10 @@ selected two-variable smooths, using a fill scale centred on zero.}
 mode, subtract the second model from the first. With exactly two models,
 the default uses their input order; with more models, supply \code{pair}.}
 
-\item{ci_level}{numeric; coverage for one-variable smooth intervals.}
+\item{ci_level}{numeric; one finite value strictly between 0 and 1, giving
+the coverage of the pointwise normal intervals for one-variable smooths.
+The default is \code{0.95}. Use \code{ci_level} to change the interval level;
+\code{coverage} and \code{level} are not accepted, even when \code{ci_level} is also supplied.}
 
 \item{surface}{character; \code{"raster"} or \code{"tile"} for surface displays.
 Irregular numeric grids use rectangles bounded by coordinate midpoints.}

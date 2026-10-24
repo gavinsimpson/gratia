@@ -176,7 +176,10 @@
 #' @param pair two model names or integer indices in input order. In difference
 #'   mode, subtract the second model from the first. With exactly two models,
 #'   the default uses their input order; with more models, supply `pair`.
-#' @param ci_level numeric; coverage for one-variable smooth intervals.
+#' @param ci_level numeric; one finite value strictly between 0 and 1, giving
+#'   the coverage of the pointwise normal intervals for one-variable smooths.
+#'   The default is `0.95`. Use `ci_level` to change the interval level;
+#'   `coverage` and `level` are not accepted, even when `ci_level` is also supplied.
 #' @param contour logical; add contour lines? These require two numeric axes
 #'   and at least one grid cell with four finite corner values that are not all equal.
 #' @param surface character; `"raster"` or `"tile"` for surface displays.
@@ -211,6 +214,7 @@
                                    contour = TRUE, n_contour = NULL,
                                    continuous_fill = NULL,
                                    ...) {
+  check_interval_level(ci_level, "ci_level", ...names())
   show <- match.arg(show)
   surface <- match.arg(surface)
   labels <- unique(object$.smooth)

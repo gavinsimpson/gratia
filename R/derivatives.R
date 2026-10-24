@@ -1185,6 +1185,8 @@
 #'   `newdata`, `se.fit`, and `terms` are not supported; use `data` and `exclude`.
 #' @param level numeric; `0 < level < 1`; the coverage level of the
 #'   credible interval. The default is `0.95` for a 95% interval.
+#'   Supply one finite numeric value. Use `level` for both uncertainty methods;
+#'   `ci_level` and `coverage` are not accepted, even when `level` is also supplied.
 #' @param seed numeric; a random seed for the simulations.
 #' @param mvn_method character; one of `"mvnfast"` or `"mgcv"`. The default is
 #'   uses `mvnfast::rmvn()`, which can be considerably faster at generate large
@@ -1369,13 +1371,10 @@
   uncertainty = c("simulation", "delta"),
   unconditional = FALSE
 ) {
+  check_interval_level(level, "level", ...names())
   uncertainty <- match.arg(uncertainty)
   type <- match.arg(type)
   scale <- match.arg(scale)
-  if (!is.numeric(level) || length(level) != 1L || !is.finite(level) ||
-      level <= 0 || level >= 1) {
-    cli::cli_abort("{.arg level} must be strictly between 0 and 1.")
-  }
   if (!is.logical(unconditional) || length(unconditional) != 1L ||
       is.na(unconditional)) {
     cli::cli_abort("{.arg unconditional} must be {.val TRUE} or {.val FALSE}.")
