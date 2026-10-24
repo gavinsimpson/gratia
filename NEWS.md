@@ -1008,6 +1008,11 @@
 
 ## Bug fixes
 
+* `log_lik()` now divides the dispersion by each observation's weight for
+  Gamma and inverse Gaussian densities, including grouped-family components
+  (#432). This corrects their normalising constants and the LOO and WAIC
+  scores calculated from them.
+
 * Bivariate factor-by basis plots now put each basis function in its own
   panel, instead of drawing their surfaces on top of one another (#428).
 

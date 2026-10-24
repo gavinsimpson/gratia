@@ -2,27 +2,12 @@
 # likelihood helpers. They check normalising constants as well as predictors.
 log_lik_values <- function(x) matrix(as.numeric(x), nrow = nrow(x))
 
-log_lik_test_data <- function() {
-  withr::with_seed(278, {
-    d <- data.frame(x = seq(-1, 1, length.out = 72),
-      off = rep(c(-.2, .1, .3), 24), w = rep(c(1, 2, 3), 24))
-    d$y <- 1 + .4 * d$x + d$off + rnorm(nrow(d), sd = .6)
-    d
-  })
-}
-
 test_that("ordinary likelihoods retain native weights, scale and offsets", {
   d <- log_lik_test_data()
   for (name in c("gaussian", "poisson", "Gamma", "inverse.gaussian")) {
-    f <- get(name, asNamespace("stats"))(
-      link = if (name == "gaussian") "identity" else "log")
-    d$y <- switch(name,
-      gaussian = d$y,
-      poisson = withr::with_seed(1, rpois(nrow(d), exp(.5 + d$x))),
-      Gamma = withr::with_seed(2, rgamma(nrow(d), 3, scale = exp(d$x) / 3)),
-      inverse.gaussian = withr::with_seed(5, rlnorm(nrow(d), .5 + d$x, .4)))
-    m <- mgcv::gam(y ~ x + offset(off), data = d, family = f,
-      weights = w, method = "REML")
+    m <- log_lik_ordinary_fixture(name)
+    f <- m$family
+    d$y <- m$y
     B <- rbind(coef(m), coef(m) + c(.1, -.05))
     ll <- log_lik(m, method = "user", draws = B)
     expect_equal(dim(ll), c(2L, nrow(d)))
@@ -32,10 +17,10 @@ test_that("ordinary likelihoods retain native weights, scale and offsets", {
       switch(name,
         gaussian = dnorm(d$y, mu, sqrt(phi / d$w), log = TRUE),
         poisson = d$w * dpois(d$y, mu, log = TRUE),
-        Gamma = d$w * dgamma(d$y, shape = 1 / phi,
-          scale = mu * phi, log = TRUE),
-        inverse.gaussian = d$w * (-.5 * log(2 * pi * phi * d$y^3) -
-          (d$y - mu)^2 / (2 * phi * mu^2 * d$y)))
+        Gamma = dgamma(d$y, shape = d$w / phi,
+          scale = mu * phi / d$w, log = TRUE),
+        inverse.gaussian = -.5 * log(2 * pi * (phi / d$w) * d$y^3) -
+          (d$y - mu)^2 / (2 * (phi / d$w) * mu^2 * d$y))
     }, numeric(nrow(d))))
     expect_equal(log_lik_values(ll), unname(expected), info = name)
   }
@@ -214,6 +199,12 @@ test_that("fixed-power Tweedie likelihoods retain fitted dispersion and weights"
   m <- mgcv::gam(y ~ x + offset(off), data = d, weights = w,
     family = mgcv::Tweedie(p = 1.5), method = "REML")
   B <- rbind(coef(m), coef(m) + c(.1, -.05))
+  native <- vapply(seq_len(nrow(B)), function(j) {
+    mu <- exp(B[j, 1] + B[j, 2] * d$x + d$off)
+    mgcv::fix.family.ls(m$family)$ls(m$y, m$prior.weights, length(m$y), m$sig2)[1] -
+      sum(m$family$dev.resids(m$y, mu, m$prior.weights)) / (2 * m$sig2)
+  }, numeric(1))
+  expect_equal(unname(rowSums(log_lik(m, method = "user", draws = B))), native)
   expected <- t(vapply(seq_len(nrow(B)), function(j) {
     mu <- exp(B[j, 1] + B[j, 2] * d$x + d$off)
     d$w * mgcv::ldTweedie(d$y, mu, p = 1.5, phi = m$sig2)[, 1]
@@ -445,5 +436,73 @@ test_that("one-observation callbacks agree with matrix extraction for every fami
       expect_equal(dim(single), c(2L, 1L), info = m$family$family)
       expect_equal(as.numeric(single), as.numeric(full[, i]), info = m$family$family)
     }
+  }
+})
+
+test_that("Gamma and inverse Gaussian likelihoods agree with native totals", {
+  for (unit_weights in c(FALSE, TRUE)) {
+    for (name in c("Gamma", "inverse.gaussian")) {
+      m <- log_lik_ordinary_fixture(name, unit_weights)
+      B <- rbind(coef(m), coef(m) + c(.1, -.05))
+      ll <- log_lik(m, method = "user", draws = B)
+      X <- predict(m, type = "lpmatrix")
+      for (j in seq_len(nrow(B))) {
+        mu <- m$family$linkinv(drop(X %*% B[j, ]) + m$offset)
+        native <- mgcv::fix.family.ls(m$family)$ls(m$y, m$prior.weights,
+          length(m$y), m$sig2)[1] -
+          sum(m$family$dev.resids(m$y, mu, m$prior.weights)) / (2 * m$sig2)
+        expect_equal(sum(ll[j, ]), unname(native), info = name)
+        density <- if (name == "Gamma") {
+          dgamma(m$y, shape = m$prior.weights / m$sig2,
+            scale = mu * m$sig2 / m$prior.weights, log = TRUE)
+        } else {
+          dnorm((m$y - mu) / (mu * sqrt(m$y * m$sig2 / m$prior.weights)),
+            log = TRUE) - .5 * log(m$sig2 * m$y^3 / m$prior.weights)
+        }
+        expect_equal(as.numeric(ll[j, ]), unname(density), info = name)
+      }
+    }
+  }
+})
+
+test_that("grouped Gamma and inverse Gaussian likelihoods retain their densities", {
+  for (unit_weights in c(FALSE, TRUE)) {
+    m <- log_lik_grouped_fixture(unit_weights)
+    B <- rbind(coef(m), coef(m) + c(.1, -.03, .05))
+    ll <- log_lik(m, method = "user", draws = B)
+    X <- predict(m, type = "lpmatrix")
+    families <- m$family$getfl()
+    index <- attr(families, "fi")
+    # This fixture has two ordinary families, each with an estimated log scale.
+    scales <- exp(m$family$getTheta())
+    for (j in seq_len(nrow(B))) {
+      eta <- drop(X %*% B[j, ]) + m$offset
+      for (i in seq_along(families)) {
+        rows <- which(index == i)
+        f <- families[[i]]
+        y <- m$y[rows]
+        wt <- m$prior.weights[rows]
+        mu <- f$linkinv(eta[rows])
+        phi <- scales[i]
+        native <- mgcv::fix.family.ls(f)$ls(y, wt, length(y), phi)[1] -
+          sum(f$dev.resids(y, mu, wt)) / (2 * phi)
+        expect_equal(sum(ll[j, rows]), unname(native), info = f$family)
+        density <- if (i == 1L) dgamma(y, shape = wt / phi,
+          scale = mu * phi / wt, log = TRUE) else
+          dnorm((y - mu) / (mu * sqrt(y * phi / wt)), log = TRUE) -
+            .5 * log(phi * y^3 / wt)
+        expect_equal(as.numeric(ll[j, rows]), unname(density), info = f$family)
+      }
+    }
+  }
+})
+
+test_that("zero weights omit Gamma and inverse Gaussian observations", {
+  for (f in list(Gamma(link = "log"), inverse.gaussian(link = "log"))) {
+    # Omitted rows must not evaluate a density at undefined response values.
+    expect_equal(posterior_likelihood_family(f, c(NA_real_, 1),
+      matrix(c(NA_real_, 0), ncol = 1L), c(0, 2), .5),
+      c(0, if (f$family == "Gamma") dgamma(1, 4, scale = .25, log = TRUE) else
+        dnorm(0, log = TRUE) - .5 * log(.25)))
   }
 })

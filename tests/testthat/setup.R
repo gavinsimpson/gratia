@@ -1697,3 +1697,48 @@ glmmtmb_gaussian_fixture <- function() {
     )
   })
 }
+
+log_lik_test_data <- function() {
+  withr::with_seed(278, {
+    d <- data.frame(x = seq(-1, 1, length.out = 72),
+      off = rep(c(-.2, .1, .3), 24), w = rep(c(1, 2, 3), 24))
+    d$y <- 1 + .4 * d$x + d$off + rnorm(nrow(d), sd = .6)
+    d
+  })
+}
+
+log_lik_ordinary_fixture <- function(name, unit_weights = FALSE) {
+  shared_test_fixture(paste("log-lik-ordinary", name, unit_weights, sep = ":"), {
+    d <- log_lik_test_data()
+    f <- get(name, asNamespace("stats"))(
+      link = if (name == "gaussian") "identity" else "log")
+    d$y <- switch(name,
+      gaussian = d$y,
+      poisson = withr::with_seed(1, rpois(nrow(d), exp(.5 + d$x))),
+      Gamma = withr::with_seed(2, rgamma(nrow(d), 3, scale = exp(d$x) / 3)),
+      inverse.gaussian = withr::with_seed(5, rlnorm(nrow(d), .5 + d$x, .4)))
+    mgcv::gam(y ~ x + offset(off), data = d, family = f,
+      weights = if (unit_weights) rep(1, nrow(d)) else w, method = "REML")
+  })
+}
+
+log_lik_grouped_fixture <- function(unit_weights = FALSE) {
+  shared_test_fixture(paste("log-lik-grouped", unit_weights, sep = ":"), {
+    d <- log_lik_test_data()
+    d$family_id <- rep(1:2, nrow(d) / 2)
+    d <- withr::with_seed(15, {
+      mu <- exp(.2 + .4 * d$x + d$off)
+      d$y <- rgamma(nrow(d), 4, scale = mu / 4)
+      i <- d$family_id == 2L
+      v <- rnorm(sum(i))^2
+      a <- mu[i] + mu[i]^2 * v / 20 -
+        mu[i] / 20 * sqrt(40 * mu[i] * v + mu[i]^2 * v^2)
+      d$y[i] <- ifelse(runif(sum(i)) <= mu[i] / (mu[i] + a), a, mu[i]^2 / a)
+      d
+    })
+    mgcv::gam(cbind(y, family_id) ~ factor(family_id) + x + offset(off),
+      data = d, weights = if (unit_weights) rep(1, nrow(d)) else w,
+      family = mgcv::gfam(list(Gamma(link = "log"), inverse.gaussian(link = "log"))),
+      method = "REML")
+  })
+}

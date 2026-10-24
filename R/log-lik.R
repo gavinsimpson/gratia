@@ -375,9 +375,21 @@ posterior_likelihood_family <- function(f, y, eta, wt, scale) {
       value[wt == 0] <- 0
       return(value)
     },
-    gamma = stats::dgamma(y, shape = 1 / scale, scale = mu * scale, log = TRUE),
-    inverse_gaussian = -.5 * (log(2 * pi * scale) + 3 * log(y)) -
-      (y - mu)^2 / (2 * scale * mu^2 * y),
+    gamma = {
+      ans <- numeric(length(y))
+      take <- wt > 0
+      ans[take] <- stats::dgamma(y[take], shape = wt[take] / scale,
+        scale = mu[take] * scale / wt[take], log = TRUE)
+      return(ans)
+    },
+    inverse_gaussian = {
+      ans <- numeric(length(y))
+      take <- wt > 0
+      dispersion <- scale / wt[take]
+      ans[take] <- -.5 * (log(2 * pi * dispersion) + 3 * log(y[take])) -
+        (y[take] - mu[take])^2 / (2 * dispersion * mu[take]^2 * y[take])
+      return(ans)
+    },
     negative_binomial = stats::dnbinom(y, mu = mu, size = theta(f), log = TRUE),
     beta_regression = {
       precision <- theta(f)
