@@ -31,7 +31,12 @@ difference_smooths(model, ...)
   n_4d = 4,
   simultaneous_method = c("simulation", "tube"),
   simultaneous_domain = NULL,
-  tube_control = list()
+  tube_control = list(),
+  order = 0L,
+  focal = NULL,
+  type = c("central", "forward", "backward"),
+  eps = NULL,
+  wrt = c("smooth", "covariate")
 )
 
 \method{difference_smooths}{scam}(model, ..., unconditional = FALSE)
@@ -72,7 +77,7 @@ are retained, and curves with only one continuous covariate use \code{n}.}
 between smooths.}
 
 \item{group_means}{logical; should the group means be included in the
-difference?}
+difference? Must be \code{FALSE} when \code{order > 0}.}
 
 \item{partial_match}{logical; should \code{smooth} match partially against
 \code{smooths}? If \code{partial_match = TRUE}, \code{smooth} must only be a single
@@ -135,12 +140,50 @@ lie inside the fitted spline support. Requires tube calibration.}
 \code{rel_tol} (default \code{1e-6}), \code{abs_tol} (\code{1e-8}), \code{subdivisions} (\code{1000L}),
 and \code{root_tol} (\code{1e-8}). Requires tube calibration. Simulation controls
 \code{n_sim}, \code{n_cores} (or \code{ncores}), and \code{seed} are ignored by tube calibration.}
+
+\item{order}{numeric; \code{0} (the default) estimates smooth differences;
+\code{1} and \code{2} estimate their first and second derivatives.}
+
+\item{focal}{character; one differentiation coordinate shared by all
+compared smooths. Inferred for univariate smooths; required for
+multivariate smooths when \code{order > 0}.}
+
+\item{type}{character; finite-difference scheme for derivatives. One of
+\code{"central"} (the default), \code{"forward"}, or \code{"backward"}.}
+
+\item{eps}{a positive finite number giving the absolute finite-difference
+step, or \code{NULL} (the default) to choose it automatically. The automatic
+step is the fitted range of the differentiation coordinate multiplied by
+\code{.Machine$double.eps^(1 / (order + p))}, where \code{p = 2} for central
+differences and \code{p = 1} for forward or backward differences. A constant
+coordinate uses its absolute value (or one if zero) instead of its range.
+The step is rounded upwards and bounded below so that adding it to the
+coordinates produces a representable change. Stored transformed values
+or raw covariate summaries supply the range; supplied \code{data} are used if
+neither is available. This is a scale-aware heuristic, not an error bound;
+unusual function scales or domain boundaries may require explicit \code{eps}.
+For first central differences the two points are separated by \code{eps};
+for second central differences they are each \code{eps} from the target.}
+
+\item{wrt}{differentiation coordinate: \code{"smooth"} (the default) uses the
+smooth expression, such as \code{log(x)}; \code{"covariate"} uses a raw covariate,
+such as \code{x}, and reevaluates expressions at each finite-difference point.}
+}
+\value{
+A tibble of class \code{"difference_smooth"}. Columns \code{.smooth}, \code{.by},
+\code{.level_1}, and \code{.level_2} identify each comparison; \code{.diff} contains the
+estimate for level 1 minus level 2, with \code{.se}, \code{.lower_ci}, \code{.upper_ci},
+and evaluation covariates. For \code{order > 0}, \code{.diff} contains the derivative
+difference and \code{.focal} names its coordinate. The \code{derivative_info}
+attribute records \code{order}, \code{focal}, \code{wrt}, \code{type}, and the resolved step
+\code{eps}. The \code{plot_variables} attribute records the plotting axes.
 }
 \description{
 Estimates pairwise differences (comparisons) between factor smooth
 interactions (smooths with a factor \code{by} argument) for pairs of groups
 defined by the factor. The group means can be optionally included in the
-difference.
+difference. First and second derivatives of these differences, including
+partial derivatives across smooth surfaces, can also be estimated.
 }
 \details{
 With the default simulation calibration, simultaneous intervals cover smooth differences at
@@ -170,6 +213,32 @@ pointwise intervals. An explicit seed scopes the entire call: each pair uses
 a new batch of coefficient draws, and the caller's random number state is
 restored on exit. With \code{seed = NULL}, the current random number state is
 used and advanced.
+
+With \code{order > 0}, the estimate is the difference between the derivatives
+of the selected smooths, on the linear predictor scale. Equivalently, it is
+the derivative of their difference. The estimate and its uncertainty are
+computed from the difference of the derivative matrices, retaining covariance
+between the smooths. Group means are excluded, and tube intervals are
+unavailable for derivatives; use simulation for simultaneous intervals.
+
+For a multivariate smooth, \code{focal} identifies the coordinate to differentiate.
+All other independent coordinates are fixed at their value in each evaluation
+row. They can vary between rows, so \code{data} may describe a full surface or
+several slices. \code{order = 2} differentiates twice with respect to \code{focal};
+mixed partial derivatives are not supported. Generated grids adjust the
+focal range for the finite-difference scheme; supplied evaluation locations
+are preserved.
+
+With \code{wrt = "covariate"}, model expressions are reevaluated after changing
+the raw focal covariate. Generated raw grids use \code{\link[=smooth_data]{smooth_data()}} and require
+each axis to depend on one distinct original covariate. Supply raw \code{data}
+for other transformations. With \code{wrt = "smooth"}, only the named smooth
+coordinate is changed. Derivative controls are ignored when \code{order = 0}.
+Raw-coordinate comparisons match the same original covariates, excluding
+the comparison factor. Evaluated smooth coordinates may differ between
+factor levels when a transformation involves that factor. The finite-difference
+step must fit within the fitted focal range for generated grids, including
+grids with only one focal value.
 }
 \section{Parallel calculation}{
 
@@ -230,6 +299,29 @@ sm_dif3 <- difference_smooths(m,
   select = c("s(x2):fac1", "s(x2):fac2"), partial_match = FALSE
 )
 
+# Compare slopes of the factor-by smooths, retaining their joint uncertainty
+slope_dif <- difference_smooths(m, select = "s(x2)", order = 1)
+slope_dif
+draw(slope_dif)
+
+# Fit a surface for each factor level to compare rates of change in x2
+m2 <- gam(y ~ fac + te(x2, x0, by = fac, k = c(4, 4)),
+  data = df, method = "REML")
+
+# Evaluate partial derivatives of the differences across both covariates
+partial_dif <- difference_smooths(m2, select = "te(x2,x0)",
+  order = 1, focal = "x2", n_2d = 20)
+partial_dif
+draw(partial_dif)
+
+# Choose a surface grid and calibrate simultaneous intervals for each pair
+derivative_grid <- data_slice(m2, x2 = evenly(x2, n = 15),
+  x0 = evenly(x0, n = 10), fac = levels(fac))
+partial_sim <- difference_smooths(m2, select = "te(x2,x0)",
+  data = derivative_grid, order = 1, focal = "x2",
+  interval = "simultaneous", n_sim = 1000, seed = 42)
+partial_sim
+
 # Choose two axes and condition on the third covariate
 m3 <- gam(y ~ fac + te(x0, x1, x2, by = fac, k = c(3, 3, 3)),
   data = df, method = "REML")
@@ -248,4 +340,7 @@ draw(sm_dif_at)
 \dontshow{
 options(op)
 }
+}
+\seealso{
+\code{\link[=derivatives]{derivatives()}}, \code{\link[=partial_derivatives]{partial_derivatives()}}
 }

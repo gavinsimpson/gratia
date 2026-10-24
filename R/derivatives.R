@@ -115,6 +115,9 @@
 #'   when a smooth depends on multiple raw inputs. A single name can be used
 #'   for all selected univariate smooths.
 #'
+#' @seealso [difference_smooths()] to compute derivatives of differences
+#'   between factor-by smooths with `order = 1` or `order = 2`.
+#'
 #' @section Parallel calculation:
 #' With mirai and carrier installed, configure workers with
 #' `mirai::daemons()` to distribute calculations across selected smooths.
@@ -849,6 +852,9 @@
 #'   For soap-film smooths with known boundary values, derivatives include the
 #'   fixed boundary contribution. This shifts the estimates and interval limits
 #'   without adding uncertainty from fitted coefficients.
+#'
+#' @seealso [difference_smooths()] with `order > 0` and `focal` to compute
+#'   partial derivatives of differences across full smooth surfaces.
 #'
 #' @export
 #'

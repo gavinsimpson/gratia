@@ -1096,6 +1096,13 @@ difference_plot_variables <- function(object, label) {
   variables
 }
 
+difference_value_label <- function(object) {
+  info <- attr(object, "derivative_info", exact = TRUE)
+  if (is.null(info)) return("Difference")
+  paste0(if (info$order == 1L) "First" else "Second",
+    " derivative of difference\nwith respect to ", info$focal)
+}
+
 `draw_difference` <- function(object,
                               rug = NULL,
                               ref_line = NULL,
@@ -1180,7 +1187,7 @@ difference_plot_variables <- function(object, label) {
     subtitle
   }
   y_label <- if (is.null(ylab)) {
-    "Difference"
+    difference_value_label(object)
   } else {
     ylab
   }
@@ -1254,7 +1261,7 @@ difference_plot_variables <- function(object, label) {
   prepare_surface_plot(object,
     x_var = xvars[1], y_var = xvars[2], fill_var = ".diff",
     fill_limits = fill_limits,
-    fill_title = "Difference",
+    fill_title = difference_value_label(object),
     labels = labs(title = plt_title, x = xlab, y = ylab,
       subtitle = plt_subtitle, caption = caption),
     contour = contour, contour_col = contour_col, n_contour = n_contour,

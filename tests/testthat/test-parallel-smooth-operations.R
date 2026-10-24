@@ -229,6 +229,23 @@ test_that("comparison workers preserve pair order, alignment and uncertainty", {
     c("1 2", "1 3", "2 3"))
 })
 
+test_that("comparison workers preserve derivative differences and surface grids", {
+  model <- su_m_factor_by
+  nd <- expand.grid(x2 = c(.8, .2, .5), fac = levels(su_eg4$fac), x0 = .4)
+  surface <- mgcv::gam(y ~ fac + te(x0, x2, by = fac, k = c(3, 3)),
+    data = su_eg4, method = "REML")
+  grid <- expand.grid(x0 = c(.2, .8), x2 = c(.3, .6), fac = levels(su_eg4$fac))
+  expect_smooth_workers(function() list(
+    difference_smooths(model, select = "s(x2)", data = nd, order = 1),
+    difference_smooths(model, select = "s(x2)", order = 2, n = 5,
+      interval = "simultaneous", n_sim = 100, seed = 264),
+    difference_smooths(surface, select = "te(x0,x2)", data = grid,
+      order = 1, focal = "x2", interval = "simultaneous", n_sim = 100),
+    difference_smooths(surface, select = "te(x0,x2)", n_2d = 3,
+      order = 2, focal = "x0")
+  ))
+})
+
 test_that("term calculations run in worker processes and failures propagate", {
   withr::defer(mirai::daemons(0))
   gratia_test_workers(1L)

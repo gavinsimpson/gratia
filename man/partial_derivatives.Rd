@@ -260,6 +260,9 @@ options(op)
 }
 }
 \seealso{
+\code{\link[=difference_smooths]{difference_smooths()}} with \code{order > 0} and \code{focal} to compute
+partial derivatives of differences across full smooth surfaces.
+
 \link{gamm4_support}
 }
 \author{
