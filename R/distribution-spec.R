@@ -248,8 +248,7 @@ distribution_spec.family <- function(object, ...) {
       return(matrix(exp(p[, 1L] + th[2L]^2 / 2), ncol = 1L))
     }
     if (ft == "elf") stop("An expected response is not implemented for this quantile family.", call. = FALSE)
-    if (ft == "scaled_t" && f$getTheta(TRUE)[1L] <= 1) stop(
-      "The expected response does not exist for scaled t with df <= 1.", call. = FALSE)
+    check_family_expectation(f)
     if (is.function(f$predict)) {
       value <- f$predict(f, se = FALSE, eta = f$linkfun(to_native(p)))[[1L]]
       if (!is.numeric(value) || length(value) != nrow(p) ||
@@ -373,4 +372,13 @@ distribution_fitted_draws <- function(context, betas, quantity, scale) {
   out <- restore_prediction_table(out, context$layout)
   out <- dplyr::relocate(out, dplyr::any_of(c(".row", ".draw", ".parameter")))
   attach_prediction_spec(out, spec, quantity, scale)
+}
+
+# These fitted family parameters are fixed across coefficient draws.
+check_family_expectation <- function(family) {
+  if (family_type(family) == "scaled_t" && family$getTheta(TRUE)[1L] <= 1) {
+    stop("The expected response does not exist for scaled t with df <= 1.",
+      call. = FALSE)
+  }
+  invisible(NULL)
 }

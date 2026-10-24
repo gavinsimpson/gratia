@@ -101,6 +101,7 @@ response_derivatives_delta <- function(object, focal, data, order, type,
       "Delta-method response derivatives are not supported for this model family or class."
     )
   }
+  if (scale == "response") check_family_expectation(fam)
   dots <- list(...)
   # These controls concern posterior draws only, as in conditional_differences().
   dots[c("draws", "n_cores", "burnin", "thin", "t_df", "rw_scale")] <- NULL
@@ -119,14 +120,16 @@ response_derivatives_delta <- function(object, focal, data, order, type,
   grid <- prepare_response_derivative_data(object, focal, data, n, eps,
     order, type)
   fd <- grid$fd_data
+  layout <- prediction_layout(object, fd,
+    na.action = dots$na.action %||% stats::na.pass)
   predict_at <- function(type) {
-    do.call(predict_model, c(list(object = object, newdata = fd,
+    do.call(predict_model, c(list(object = object, newdata = layout$data,
       type = type), dots))
   }
   # Link predictions include formula offsets; the lpmatrix does not.
   eta <- as.numeric(predict_at("link"))
   X <- predict_at("lpmatrix")
-  if (length(eta) != nrow(fd) || nrow(X) != nrow(fd) ||
+  if (length(eta) != nrow(layout$data) || nrow(X) != nrow(layout$data) ||
       any(!is.finite(eta)) || any(!is.finite(X))) {
     cli::cli_abort(
       "Predictions must be finite and retain every derivative-grid row."
@@ -137,6 +140,11 @@ response_derivatives_delta <- function(object, focal, data, order, type,
   if (any(!is.finite(fitted)) || any(!is.finite(G))) {
     cli::cli_abort("Non-finite response predictions or coefficient gradients.")
   }
+  # Restore shifted rows before differencing, using the prediction row map.
+  map <- rep(NA_integer_, nrow(fd))
+  map[layout$rows] <- layout$map
+  fitted <- fitted[map]
+  G <- G[map, , drop = FALSE]
   estimate <- apply_response_fdiff(fitted, fd, order, type, grid$eps)
   J <- apply_response_fdiff(G, fd, order, type, grid$eps)
   V <- get_vcov(object, unconditional = unconditional, frequentist = freq)
@@ -150,6 +158,9 @@ response_derivatives_delta <- function(object, focal, data, order, type,
       .lower_ci = as.numeric(estimate - crit * se),
       .upper_ci = as.numeric(estimate + crit * se)),
     select(covariates, -all_of(".row")))
+  # na.omit drops a derivative row if any required shifted row was omitted.
+  omitted <- setdiff(seq_len(nrow(fd)), layout$rows)
+  out <- out[!out$.row %in% fd$..orig[omitted], , drop = FALSE]
   class(out) <- c("response_derivatives", class(out))
   attr(out, "uncertainty") <- "delta"
   out

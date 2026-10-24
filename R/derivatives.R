@@ -1231,6 +1231,21 @@
 #' support delta uncertainty; their existing simulation support is unchanged.
 #' The `uncertainty` attribute records the selected method.
 #'
+#' By default, all supplied prediction rows are returned in their original
+#' order. Rows with missing or non-finite required covariates have `NA`
+#' derivatives, standard errors and interval limits. Category, response and
+#' family identifiers are retained. An explicit `na.action` follows the
+#' prediction convention: `na.omit` drops unavailable rows with missing
+#' covariates, `na.exclude` and `na.pass` retain them, and `na.fail` reports
+#' missing covariates as an error. Undefined calculations at available rows,
+#' including in only some coefficient draws, raise an error; draws are never
+#' removed to form a summary.
+#'
+#' Response-scale derivatives require the expected response to exist. For a
+#' scaled t family, fitted degrees of freedom must exceed one, whether fixed
+#' or estimated. A finite response variance is not required. Linear-predictor
+#' derivatives remain available when the response mean does not exist.
+#'
 #' @examples
 #'
 #' library("ggplot2")
@@ -1398,12 +1413,16 @@
     c(".row", ".focal", ".category", ".y", ".family"), names(yd)
   )
 
+  # derivative_samples() rejects non-finite calculations at available rows;
+  # an all-missing group therefore represents unavailable predictions.
   yd <- yd |>
     group_by(pick(all_of(quantity_id))) |>
     mutate(
       .se = stats::sd(.data[[".derivative"]]),
-      .lower_ci = quantile(.data[[".derivative"]], probs = qq),
-      .upper_ci = quantile(.data[[".derivative"]], probs = 1 - qq),
+      .lower_ci = if (all(is.na(.data[[".derivative"]]))) NA_real_ else
+        quantile(.data[[".derivative"]], probs = qq),
+      .upper_ci = if (all(is.na(.data[[".derivative"]]))) NA_real_ else
+        quantile(.data[[".derivative"]], probs = 1 - qq),
       .derivative = median(.data[[".derivative"]])
     ) |>
     distinct(pick(all_of(quantity_id)), .keep_all = TRUE) |>
@@ -1503,6 +1522,11 @@
 }
 
 `compute_y_fdiff` <- function(samples, order, type, eps = 1e-7) {
+  if (!nrow(samples)) {
+    return(samples |>
+      select(any_of(c("..orig", ".draw", ".category", ".y", ".family"))) |>
+      mutate(..fd = numeric()))
+  }
   y_fd <- if (isTRUE(identical(as.integer(order), 1L))) {
     compute_y_fdiff_1(samples = samples, eps = eps, type = type)
   } else {

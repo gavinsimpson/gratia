@@ -168,6 +168,21 @@ component. SCAM models use transformed-coefficient covariance conditional on
 the fitted smoothing parameters. General multi-predictor families do not
 support delta uncertainty; their existing simulation support is unchanged.
 The \code{uncertainty} attribute records the selected method.
+
+By default, all supplied prediction rows are returned in their original
+order. Rows with missing or non-finite required covariates have \code{NA}
+derivatives, standard errors and interval limits. Category, response and
+family identifiers are retained. An explicit \code{na.action} follows the
+prediction convention: \code{na.omit} drops unavailable rows with missing
+covariates, \code{na.exclude} and \code{na.pass} retain them, and \code{na.fail} reports
+missing covariates as an error. Undefined calculations at available rows,
+including in only some coefficient draws, raise an error; draws are never
+removed to form a summary.
+
+Response-scale derivatives require the expected response to exist. For a
+scaled t family, fitted degrees of freedom must exceed one, whether fixed
+or estimated. A finite response variance is not required. Linear-predictor
+derivatives remain available when the response mean does not exist.
 }
 \examples{
 

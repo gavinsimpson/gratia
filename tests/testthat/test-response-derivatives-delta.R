@@ -113,8 +113,6 @@ test_that("delta validates inputs and does not use the RNG or sampling controls"
     order = 3), "Only 1st or 2nd")
   expect_error(response_derivatives(m, focal = "x", uncertainty = "delta",
     se.fit = TRUE), "se.fit")
-  expect_error(response_derivatives(m, focal = "x", uncertainty = "delta",
-    data = data.frame(x = c(0, NA))), "finite.*retain")
   class(m$family) <- c("general.family", class(m$family))
   expect_error(response_derivatives(m, focal = "x", uncertainty = "delta"),
     "not supported")
