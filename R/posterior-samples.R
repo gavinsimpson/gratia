@@ -1927,6 +1927,13 @@ calculate_smooth_samples <- function(sm, data, model, betas, label, Xp = NULL) {
 #' to the first linear predictor. Smooth-component derivatives and derivatives
 #' of the response expectation are different quantities.
 #'
+#' Rows with unavailable required covariates retain `NA` derivatives by
+#' default; explicit `na.action` requests follow [response_derivatives()].
+#' Non-finite derivative calculations at available rows raise an error,
+#' including when only some coefficient draws are affected. Response-scale
+#' derivatives require an existing response mean; scaled t families need
+#' fitted degrees of freedom greater than one.
+#'
 #' @param model a fitted model to compute derivative samples for
 #' @param ... arguments passed to other methods and on to `fitted_samples()`
 #'
@@ -2233,6 +2240,12 @@ calculate_smooth_samples <- function(sm, data, model, betas, label, Xp = NULL) {
   data <- grid$data
   fd_data <- grid$fd_data
   eps <- grid$eps
+  if (scale == "response") check_family_expectation(stats::family(object))
+  layout <- prediction_layout(object, fd_data,
+    na.action = list(...)$na.action %||% stats::na.pass)
+  available <- rep(FALSE, nrow(fd_data))
+  available[layout$rows] <- !is.na(layout$map)
+  unavailable <- unique(fd_data$..orig[!available])
 
   ## compute posterior draws of E(y) (on response scale)
   fs <- sampling_call(
@@ -2268,6 +2281,10 @@ calculate_smooth_samples <- function(sm, data, model, betas, label, Xp = NULL) {
       by = ".row"
     )
 
+  # A derivative needs every shifted prediction row. Drop incomplete
+  # differences before pivoting when na.omit has removed any of those rows.
+  omitted <- setdiff(seq_len(nrow(fd_data)), layout$rows)
+  fs <- fs[!fs$..orig %in% fd_data$..orig[omitted], , drop = FALSE]
   yd <- compute_y_fdiff(fs, order = order, type = type, eps = eps)
 
   yd <- yd |>
@@ -2277,6 +2294,11 @@ calculate_smooth_samples <- function(sm, data, model, betas, label, Xp = NULL) {
     add_column(.focal = focal, .before = 1L) |>
     relocate(".row", .before = 1L)
 
+  # Missing covariates make whole prediction rows unavailable. Non-finite
+  # calculations at available rows must not be silently removed from draws.
+  if (any(!is.finite(yd$.derivative) & !yd$.row %in% unavailable)) {
+    cli::cli_abort("Non-finite derivative calculations for available prediction rows.")
+  }
   class(yd) <- append(class(yd), "derivative_samples", after = 0L)
   attach_sampling(yd, sampling)
 }

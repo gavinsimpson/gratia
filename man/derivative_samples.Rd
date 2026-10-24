@@ -213,6 +213,13 @@ returned by \code{\link[=fitted_samples]{fitted_samples()}}, retaining the joint
 parameter that affects that expectation. Predictor-scale derivatives refer
 to the first linear predictor. Smooth-component derivatives and derivatives
 of the response expectation are different quantities.
+
+Rows with unavailable required covariates retain \code{NA} derivatives by
+default; explicit \code{na.action} requests follow \code{\link[=response_derivatives]{response_derivatives()}}.
+Non-finite derivative calculations at available rows raise an error,
+including when only some coefficient draws are affected. Response-scale
+derivatives require an existing response mean; scaled t families need
+fitted degrees of freedom greater than one.
 }
 \examples{
 

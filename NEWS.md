@@ -1029,6 +1029,18 @@
 
 ## Bug fixes
 
+* **Response derivatives**
+
+  `response_derivatives()` now retains unavailable prediction rows with
+  missing estimates, standard errors and intervals under both uncertainty
+  methods, while respecting explicit `na.action` requests (#437).
+  Original row order and response identifiers are preserved.
+
+  Delta uncertainty now rejects response-mean derivatives for scaled t
+  families with fitted degrees of freedom at or below one, matching simulation
+  (#437). Means with degrees of freedom between one and two and
+  linear-predictor derivatives remain supported.
+
 * `overview()` now returns the parametric coefficients for GAMs without
   smooth terms, or an empty overview when `parametric = FALSE` (#438).
 

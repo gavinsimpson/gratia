@@ -1822,3 +1822,13 @@ comparison_distributional_surface_fixture <- function() {
       family = gaulss(), method = "REML")
   })
 }
+
+response_scat_fixture <- function(df, estimated = FALSE) {
+  shared_test_fixture(paste("response-scat", df, estimated, sep = ":"), {
+    d <- model.frame(response_delta_fixture(gaussian()))[1:80, ]
+    d$y <- withr::with_seed(437, .5 + .4 * d$x + .3 * rt(nrow(d), df = .7))
+    mgcv::gam(y ~ x, data = d, method = "REML",
+      family = mgcv::scat(theta = c(if (estimated) -df else df, 1),
+        min.df = .1))
+  })
+}
