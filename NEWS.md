@@ -1008,6 +1008,11 @@
 
 ## Bug fixes
 
+* `confint(shift = TRUE)` now adds the intercept of each smooth's own linear
+  predictor. `model_constant()` returns zero for predictors without an intercept
+  and keeps selected predictor names aligned; `add_fitted()` uses native
+  prediction constants for term predictions (#433).
+
 * Bivariate factor-by basis plots now put each basis function in its own
   panel, instead of drawing their surfaces on top of one another (#428).
 

@@ -76,7 +76,8 @@
 #' Extract the model constant term
 #'
 #' `r lifecycle::badge("experimental")` Extracts the model constant term(s),
-#' the model intercept, from a fitted model object.
+#' the model intercept, from a fitted model object. Predictors without an
+#' intercept return zero.
 #'
 #' @param model a fitted model for which a `coef()` method exists.
 #' @param lp numeric; which linear predictors to extract constant terms for.
@@ -123,10 +124,13 @@
     lp <- seq_len(n_lp)
   }
   lss_idx <- lss_idx[lp]
-  idx <- vapply(lss_idx, FUN = `[`, FUN.VALUE = numeric(1), 1)
-  b <- coef(model)[idx] |>
-    unname()
-  attr(b, "par_names") <- lss_parameters(model)
+  beta <- coef(model)
+  intercepts <- grep("^\\(Intercept\\)(\\.[0-9]+)?$", names(beta))
+  b <- vapply(lss_idx, function(idx) {
+    idx <- intersect(idx, intercepts)
+    if (length(idx)) unname(beta[idx[1L]]) else 0
+  }, numeric(1))
+  attr(b, "par_names") <- lss_parameters(model)[lp]
   b
 }
 
@@ -140,7 +144,8 @@
 #' @rdname model_constant
 #' @importFrom stats coef
 `model_constant.glm` <- function(model, ...) {
-  coef(model)[1L]
+  beta <- coef(model)
+  if ("(Intercept)" %in% names(beta)) beta["(Intercept)"] else 0
 }
 
 #' List the variables involved in a model fitted with a formula

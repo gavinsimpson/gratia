@@ -61,7 +61,8 @@ intervals using the default covariance.}
 \item{nsim}{integer; the number of simulations used in computing the
 simultaneous intervals.}
 
-\item{shift}{logical; should the model intercept be added to the smooth?
+\item{shift}{logical; should the intercept of the smooth's linear predictor
+be added to the smooth? Predictors without an intercept are shifted by zero.
 Only the intercept is added; other parametric effects, including factor
 effects associated with a factor \code{by} smooth, are excluded. For full fitted
 values and their confidence intervals, use \code{\link[=fitted_values]{fitted_values()}}.}

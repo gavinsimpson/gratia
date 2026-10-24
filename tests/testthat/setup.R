@@ -1697,3 +1697,19 @@ glmmtmb_gaussian_fixture <- function() {
     )
   })
 }
+
+# Small models needed to distinguish missing intercepts from first coefficients.
+intercept_test_model <- function(type = "gaulss") {
+  shared_test_fixture(paste0("intercept-", type), {
+    switch(type,
+      gaulss = gam(list(y ~ s(x0, k = 5), ~ s(x1, k = 5)),
+        data = tiny_eg1, family = gaulss(), method = "REML"),
+      gaulss_no_location = gam(list(y ~ 0 + s(x0, k = 5), ~ s(x1, k = 5)),
+        data = tiny_eg1, family = gaulss(), method = "REML"),
+      gaulss_no_scale = gam(list(y ~ s(x0, k = 5), ~ 0 + s(x1, k = 5)),
+        data = tiny_eg1, family = gaulss(), method = "REML"),
+      gam = gam(y ~ 0 + x0 + s(x1, k = 5), data = tiny_eg1, method = "REML"),
+      gam_linear = gam(y ~ 0 + x0, data = tiny_eg1, method = "REML"),
+      glm = glm(y ~ 0 + x0, data = tiny_eg1))
+  })
+}

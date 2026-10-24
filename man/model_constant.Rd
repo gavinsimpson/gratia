@@ -31,7 +31,8 @@ model_constant(model, ...)
 }
 \description{
 \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}} Extracts the model constant term(s),
-the model intercept, from a fitted model object.
+the model intercept, from a fitted model object. Predictors without an
+intercept return zero.
 }
 \examples{
 \dontshow{
