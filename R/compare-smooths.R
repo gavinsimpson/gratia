@@ -30,7 +30,9 @@
 #' a difference between fitted responses.
 #'
 #' The result retains one row per model and smooth, with estimates in the `data`
-#' list column. Use [draw.compare_smooths()] for faceted surface comparisons or
+#' list column. For distributional models, `.parameter` retains the label for
+#' the linear predictor, while `.model` identifies the input model. Use
+#' [draw.compare_smooths()] for faceted surface comparisons or
 #' estimated surface differences. Smooths with more than two covariates can be
 #' evaluated but cannot be drawn by this method.
 #'
@@ -139,11 +141,19 @@
         data = grid, unconditional = unconditional,
         overall_uncertainty = overall_uncertainty, unnest = FALSE,
         dist = dist, envir = envir)
+      if (".model" %in% names(x)) {
+        x <- dplyr::rename(x, .parameter = ".model")
+      }
       x <- add_column(x, .model = name, .before = 1L)
       x
     }, models, model_names)
+    coordinates <- lapply(results, attr, "coordinate_info")
+    auxiliary <- unique(unlist(lapply(coordinates, function(info) {
+      lapply(info, function(axis) axis$column)
+    }), use.names = FALSE))
+    auxiliary <- setdiff(auxiliary, keys[[1L]])
     info[[label]] <<- list(variables = variables[[1L]],
-      coordinate_info = attr(results[[1L]], "coordinate_info"))
+      coordinate_info = coordinates[[1L]], auxiliary = auxiliary)
     bind_rows(results)
   })
   sm_est <- bind_rows(estimates) |> arrange(.data$.smooth)
@@ -167,6 +177,8 @@
 #'   mode, subtract the second model from the first. With exactly two models,
 #'   the default uses their input order; with more models, supply `pair`.
 #' @param ci_level numeric; coverage for one-variable smooth intervals.
+#' @param contour logical; add contour lines? These require two numeric axes
+#'   and at least one grid cell with four finite corner values that are not all equal.
 #' @param surface character; `"raster"` or `"tile"` for surface displays.
 #'   Irregular numeric grids use rectangles bounded by coordinate midpoints.
 #' @param select,partial_match select smooths from the comparison, using the
@@ -223,7 +235,7 @@
     plot_comparison_of_smooths(x, coverage = ci_level, variables = variables,
       model_order = model_order, show = show, pair = pair,
       surface = surface, contour = contour, n_contour = n_contour,
-      continuous_fill = continuous_fill)
+      continuous_fill = continuous_fill, auxiliary = info[[label]]$auxiliary)
   })
   layout <- prepare_plot_layout(length(plts), ncol = ncol, nrow = nrow)
   wrap_plots(plts, byrow = TRUE, ncol = layout$ncol, nrow = layout$nrow,
@@ -251,7 +263,7 @@ comparison_model_pair <- function(pair, models) {
 }
 
 # Use all retained covariates, rather than row order, to match observations.
-comparison_surface_difference <- function(object, pair) {
+comparison_surface_difference <- function(object, pair, auxiliary = NULL) {
   first <- object[object$.model == pair[1L], ]
   second <- object[object$.model == pair[2L], ]
   if (!nrow(first) || !nrow(second)) stop("Both models in `pair` must contain the selected smooth.", call. = FALSE)
@@ -266,9 +278,9 @@ comparison_surface_difference <- function(object, pair) {
   }
   first <- surface_rows(first)
   second <- surface_rows(second)
-  metadata <- c(".model", ".smooth", ".type", ".by")
-  keys <- setdiff(names(first), c(value_cols, metadata))
-  other_keys <- setdiff(names(second), c(value_cols, metadata))
+  metadata <- c(".model", ".smooth", ".type", ".by", ".parameter")
+  keys <- setdiff(names(first), c(value_cols, metadata, auxiliary))
+  other_keys <- setdiff(names(second), c(value_cols, metadata, auxiliary))
   if (!length(keys) || !setequal(keys, other_keys)) {
     stop("Surface covariates must match in both models.", call. = FALSE)
   }
@@ -286,7 +298,7 @@ comparison_surface_difference <- function(object, pair) {
   out[c(keys, ".diff")]
 }
 
-# Retain the nested comparison contract; only the surface drawing changes.
+# Keep estimates in their existing data list column.
 #' @importFrom dplyr mutate
 #' @importFrom tidyr unnest
 #' @importFrom ggplot2 ggplot geom_ribbon geom_line facet_wrap facet_grid vars
@@ -294,7 +306,7 @@ comparison_surface_difference <- function(object, pair) {
     variables = vars_from_label(unique(object$.smooth)),
     model_order = unique(object$.model), show = "models", pair = NULL,
     surface = "raster", contour = TRUE, n_contour = NULL,
-    continuous_fill = NULL, ...) {
+    continuous_fill = NULL, auxiliary = NULL, ...) {
   label <- unique(object$.smooth)
   types <- unique(object$.type)
   isotropic <- all(types %in% c("TPRS (2d)", "TPRS (shrink) (2d)",
@@ -308,7 +320,7 @@ comparison_surface_difference <- function(object, pair) {
       boundary$.boundary_group <- interaction(boundary$.model, boundary$.loop)
     }
     if (show == "difference") {
-      object <- comparison_surface_difference(object, pair)
+      object <- comparison_surface_difference(object, pair, auxiliary)
       fill_var <- ".diff"
       fill_title <- paste(pair, collapse = " - ")
       facet <- NULL
@@ -317,20 +329,40 @@ comparison_surface_difference <- function(object, pair) {
       if (".bndry" %in% names(object)) {
         object <- object[!object$.bndry, setdiff(names(object), c(".bndry", ".loop"))]
       }
+      if (!nrow(object)) {
+        stop("No surface locations remain; supply data for the selected smooth and factor levels.",
+          call. = FALSE)
+      }
       object$.model <- factor(object$.model, levels = model_order)
       fill_var <- ".estimate"
       fill_title <- "Partial\neffect"
       facet <- facet_wrap(vars(.data$.model), nrow = 1L)
     }
     conditioning <- setdiff(names(object), c(variables, ".model", ".smooth",
-      ".type", ".by", ".estimate", ".se", ".diff", ".lower_ci", ".upper_ci"))
-    conditioning <- conditioning[!startsWith(conditioning, ".gratia_raw_")]
+      ".type", ".by", ".parameter", ".estimate", ".se", ".diff",
+      ".lower_ci", ".upper_ci", auxiliary))
     conditioning <- conditioning[vapply(object[conditioning],
       function(x) length(unique(x)) > 1L, logical(1))]
     if (length(conditioning)) {
       rows <- ggplot2::vars(!!!rlang::syms(conditioning))
       cols <- if (show == "models") vars(.data$.model) else vars()
-      facet <- facet_grid(rows = rows, cols = cols, labeller = "label_both")
+      facet <- facet_grid(rows = rows, cols = cols,
+        labeller = ggplot2::labeller(.rows = ggplot2::label_both,
+          .cols = ggplot2::label_value))
+    }
+    if (!is.null(boundary) && length(conditioning)) {
+      # Boundary annotations without by values belong in each observed panel.
+      values <- unique(object[conditioning])
+      boundary <- bind_rows(lapply(seq_len(nrow(values)), function(i) {
+        d <- boundary
+        for (v in conditioning) {
+          if (v %in% names(d)) {
+            d <- d[is.na(d[[v]]) | d[[v]] %in% values[[v]][i], ]
+          }
+          d[[v]] <- rep(values[[v]][i], nrow(d))
+        }
+        d
+      }))
     }
     if (show == "difference" && !is.null(boundary)) boundary$.model <- NULL
     if (all(types == "SOS")) {
@@ -343,10 +375,15 @@ comparison_surface_difference <- function(object, pair) {
       object$.lower_ci <- object$.upper_ci <- NA_real_
       plt <- plot_smooth.sos(object, variables = variables, title = label,
         grouped_by = show == "models", contour = contour, n_contour = n_contour,
-        continuous_fill = continuous_fill, caption = FALSE, subtitle = "")
+        continuous_fill = continuous_fill, caption = FALSE, subtitle = "",
+        facet_vars = c(if (show == "models") ".model", conditioning))
       return(plt + facet + labs(fill = fill_title) +
         guides(fill = guide_colourbar(title = fill_title, direction = "vertical")))
     }
+    panels <- c(if (show == "models") ".model", conditioning)
+    contours <- if (isTRUE(contour)) {
+      comparison_contour_data(object, variables, fill_var, panels)
+    } else object[FALSE, ]
     return(prepare_surface_plot(object,
       x_var = variables[1L], y_var = variables[2L], fill_var = fill_var,
       fill_limits = surface_fill_limits(object[[fill_var]]),
@@ -355,7 +392,7 @@ comparison_surface_difference <- function(object, pair) {
       surface = surface, facet = facet,
       coord = if (isotropic || !is.null(boundary)) coord_equal(),
       boundary = boundary, boundary_group = ".boundary_group",
-      contour = contour,
+      contour = isTRUE(contour) && nrow(contours) > 0L, contour_data = contours,
       n_contour = n_contour, continuous_fill = continuous_fill,
       irregular_cells = all(vapply(object[variables], is.numeric, logical(1)))))
   }
@@ -420,4 +457,36 @@ comparison_surface_data <- function(models, smooths, ids, data, n, n_2d) {
     }
   }
   grid
+}
+
+# Contours need two numeric axes and a complete cell with changing finite values.
+comparison_contour_data <- function(object, variables, value, panels) {
+  if (!all(vapply(object[variables], is.numeric, logical(1)))) return(object[FALSE, ])
+  groups <- if (length(panels)) {
+    dplyr::group_split(object, !!!rlang::syms(panels))
+  } else list(object)
+  groups <- lapply(groups, function(d) {
+    x <- sort(unique(d[[variables[1L]]][is.finite(d[[variables[1L]]])]))
+    y <- sort(unique(d[[variables[2L]]][is.finite(d[[variables[2L]]])]))
+    nx <- length(x)
+    ny <- length(y)
+    if (nx < 2L || ny < 2L) return(d[FALSE, ])
+    rows <- is.finite(d[[variables[1L]]]) & is.finite(d[[variables[2L]]]) &
+      is.finite(d[[value]])
+    if (sum(rows) < 4L) return(d[FALSE, ])
+    ix <- match(d[[variables[1L]]][rows], x)
+    iy <- match(d[[variables[2L]]][rows], y)
+    values <- d[[value]][rows]
+    # Match neighbouring corners without allocating a dense grid for scattered data.
+    id <- (as.double(ix) - 1) * ny + iy
+    corners <- which(ix < nx & iy < ny)
+    right <- match(id[corners] + ny, id)
+    above <- match(id[corners] + 1, id)
+    diagonal <- match(id[corners] + ny + 1, id)
+    complete <- !is.na(right) & !is.na(above) & !is.na(diagonal)
+    changed <- values[corners] != values[right] | values[corners] != values[above] |
+      values[corners] != values[diagonal]
+    if (any(complete & changed, na.rm = TRUE)) d else d[FALSE, ]
+  })
+  bind_rows(groups)
 }

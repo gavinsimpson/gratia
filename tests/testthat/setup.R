@@ -1797,3 +1797,28 @@ comparison_transformed_fixture <- function() {
     gam(y ~ s(log(x0 + 1), x1, k = 10), data = quick_eg1, method = "REML")
   })
 }
+
+comparison_coordinate_collision_fixture <- function() {
+  shared_test_fixture("comparison_coordinate_collision", {
+    d <- quick_eg1
+    d$.gratia_raw_x0 <- d$x2
+    gam(y ~ .gratia_raw_x0 + s(log(x0 + 1), x1, k = 10),
+      data = d, method = "REML")
+  })
+}
+
+comparison_spherical_by_fixture <- function() {
+  shared_test_fixture("comparison_spherical_by", {
+    d <- sos_df
+    d$.gratia_raw_multiplier <- rep(c(1, 2), length.out = nrow(d))
+    gam(y ~ s(latitude, longitude, bs = "sos", by = .gratia_raw_multiplier,
+      k = 15), data = d, method = "REML")
+  })
+}
+
+comparison_distributional_surface_fixture <- function() {
+  shared_test_fixture("comparison_distributional_surface", {
+    gam(list(y ~ s(x0, x1, k = 10), ~1), data = quick_eg1,
+      family = gaulss(), method = "REML")
+  })
+}

@@ -154,6 +154,8 @@
   and `draw()` compares their surfaces in side-by-side facets with shared axes
   and colours. Use `show = "difference"` and `pair` to plot one model's
   smooth contribution minus another's, with a colour scale centred on zero (#435).
+  Conditioning values retain separate panels, constant surfaces omit contours,
+  and labels for distribution parameters are preserved.
 
 * `difference_smooths()` computes first and second derivatives of differences
   between factor-by smooths using `order`, including partial derivatives across

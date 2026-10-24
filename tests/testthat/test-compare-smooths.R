@@ -266,3 +266,145 @@ test_that("spherical comparisons reuse geographic plotting", {
   expect_equal(p$labels$fill, "m_sos - Same")
   expect_null(p$labels$caption)
 })
+
+test_that("constant differences and categorical axes draw without contour warnings", {
+  cs <- compare_smooths(su_m_bivar, Same = su_m_bivar, n_2d = 5)
+  p <- draw(cs, show = "difference")[[1]]
+  expect_silent(ggplot_build(p))
+  expect_equal(p$data$.diff, rep(0, 25))
+  # A surface can be constant in one model and variable in another.
+  cs$data[[1]]$.estimate <- 0
+  expect_silent(ggplot_build(draw(cs)[[1]]))
+  cs <- compare_smooths(m_fs, Same = m_fs, select = "s(x1,fac)", n = 5)
+  p <- draw(cs)[[1]]
+  expect_silent(ggplot_build(p))
+  expect_true(is.factor(p$data$fac))
+  cs <- surface_comparison()
+  nd <- cs$data[[1]][c("x", "z")][c(1, 7, 13, 19, 25), ]
+  expect_silent(ggplot_build(draw(surface_comparison(data = nd))[[1]]))
+})
+
+test_that("auxiliary coordinate names do not determine matching or facets", {
+  m <- comparison_transformed_fixture()
+  other <- comparison_coordinate_collision_fixture()
+  nd <- quick_eg1[1:8, ]
+  nd$.gratia_raw_x0 <- nd$x2
+  cs <- compare_smooths(m, Other = other, data = nd)
+  expect_true(".gratia_raw_x0" %in% names(cs$data[[1]]))
+  expect_true(".gratia_raw_x0.1" %in% names(cs$data[[2]]))
+  cs$data[[2]] <- cs$data[[2]][8:1, ]
+  expected <- as.numeric(predict(m, nd, type = "terms")) -
+    as.numeric(predict(other, nd, type = "terms")[, "s(log(x0 + 1),x1)"])
+  expect_silent(p <- draw(cs, show = "difference", contour = FALSE)[[1]])
+  expect_equal(p$data$.diff, expected)
+  expect_equal(nrow(ggplot_build(draw(cs, contour = FALSE)[[1]])$layout$layout), 2L)
+})
+
+test_that("conditioning covariates may start with the auxiliary coordinate prefix", {
+  cs <- surface_comparison()
+  for (i in seq_along(cs$data)) {
+    a <- cs$data[[i]]
+    a$.gratia_raw_multiplier <- 1
+    b <- a
+    b$.gratia_raw_multiplier <- 2
+    b$.estimate <- 2 * b$.estimate
+    cs$data[[i]] <- dplyr::bind_rows(a, b)
+  }
+  p <- draw(cs, contour = FALSE)[[1]]
+  expect_equal(nrow(ggplot_build(p)$layout$layout), 4L)
+  p <- draw(cs, show = "difference", contour = FALSE)[[1]]
+  expect_equal(nrow(ggplot_build(p)$layout$layout), 2L)
+})
+
+test_that("spherical comparisons retain each conditioning surface and its contours", {
+  skip_if_not_installed("sf")
+  m <- comparison_spherical_by_fixture()
+  nd <- smooth_data(m, id = 1, n_2d = 5)
+  nd$.gratia_raw_multiplier <- 1
+  extra <- nd
+  extra$.gratia_raw_multiplier <- 2
+  nd <- dplyr::bind_rows(nd, extra)
+  cs <- compare_smooths(m, Same = m, data = nd)
+  expect_silent(p <- draw(cs)[[1]])
+  expect_equal(nrow(p$data), 2L * nrow(nd))
+  expect_silent(b <- ggplot_build(p))
+  expect_equal(nrow(b$layout$layout), 4L)
+  labels <- data.frame(.model = c("m", "Same"))
+  attr(labels, "type") <- "cols"
+  attr(labels, "facet") <- "grid"
+  expect_equal(p$facet$params$labeller(labels)[[1L]], c("m", "Same"))
+  contour_layers <- Filter(function(l) inherits(l$geom, "GeomSf") &&
+    "level" %in% names(l$data), p$layers)
+  expect_gt(length(contour_layers), 0L)
+  expect_true(all(vapply(contour_layers, function(l)
+    all(c(".model", ".gratia_raw_multiplier") %in% names(l$data)), logical(1))))
+  expect_silent(p <- draw(cs, show = "difference")[[1]])
+  expect_equal(nrow(p$data), nrow(nd))
+  expect_equal(p$data$.diff, rep(0, nrow(nd)))
+  expect_equal(sort(unique(p$data$.gratia_raw_multiplier)), c(1, 2))
+  expect_silent(b <- ggplot_build(p))
+  expect_equal(nrow(b$layout$layout), 2L)
+  cs$data[[2]]$.estimate <- cs$data[[2]]$.estimate * 0.8
+  cs$data[[2]] <- cs$data[[2]][rev(seq_len(nrow(nd))), ]
+  p <- draw(cs, show = "difference")[[1]]
+  actual <- dplyr::left_join(nd, p$data[c(names(nd), ".diff")], by = names(nd))
+  expect_equal(actual$.diff, 0.2 * as.numeric(predict(m, nd, type = "terms")))
+  cs$data <- lapply(cs$data, function(d) {
+    d$.estimate <- d$.se <- NA_real_
+    d
+  })
+  expect_silent(ggplot_build(draw(cs)[[1]]))
+})
+
+test_that("empty factor-by evaluation rows give an informative drawing error", {
+  m <- conditional_surface_fixture()
+  nd <- data.frame(x = c(.2, .8), z = c(.2, .8),
+    a = factor("B", levels = c("A", "B", "C")))
+  cs <- compare_smooths(m, Same = m, select = 1, data = nd)
+  expect_error(draw(cs), "No surface locations.*factor levels")
+})
+
+test_that("soap boundaries follow actual conditioning panels", {
+  cs <- compare_smooths(m_soap, Same = m_soap, n_2d = 5)
+  cs$data <- lapply(cs$data, function(d) {
+    # Boundary annotations have no by value; surface rows have two by values.
+    d$multiplier <- ifelse(d$.bndry, NA_real_, 1)
+    extra <- d[!d$.bndry, ]
+    extra$multiplier <- 2
+    extra$.estimate <- extra$.estimate * 2
+    dplyr::bind_rows(d, extra)
+  })
+  expect_silent(b <- ggplot_build(draw(cs, contour = FALSE)[[1]]))
+  expect_equal(nrow(b$layout$layout), 4L)
+  expect_false(anyNA(b$layout$layout$multiplier))
+  expect_equal(length(unique(tail(b$data, 1)[[1]]$PANEL)), 4L)
+  expect_silent(b <- ggplot_build(draw(cs, show = "difference", contour = FALSE)[[1]]))
+  expect_equal(nrow(b$layout$layout), 2L)
+  expect_false(anyNA(b$layout$layout$multiplier))
+  expect_equal(length(unique(tail(b$data, 1)[[1]]$PANEL)), 2L)
+})
+
+test_that("comparison model names retain labels for distribution parameters", {
+  cs <- compare_smooths(m_gaulss, Same = m_gaulss, select = 1, n = 5)
+  expect_equal(cs$.model, c("m_gaulss", "Same"))
+  expect_equal(cs$.parameter, rep("Mean (mu)", 2))
+  expect_silent(ggplot_build(draw(cs)[[1]]))
+})
+
+test_that("distribution parameter labels are metadata rather than locations", {
+  m <- comparison_distributional_surface_fixture()
+  ordinary <- comparison_mixed_fixture()$first
+  cs <- compare_smooths(m, Ordinary = ordinary, select = 1, n_2d = 5)
+  expect_equal(cs$.parameter, c("Mean (mu)", NA_character_))
+  expect_silent(b <- ggplot_build(draw(cs)[[1]]))
+  expect_equal(nrow(b$layout$layout), 2L)
+  nd <- cs$data[[1]][c("x0", "x1")]
+  nd$x2 <- median(quick_eg1$x2)
+  sm <- m$smooth[[1]]
+  reference <- as.numeric(mgcv::PredictMat(sm, nd) %*%
+    coef(m)[sm$first.para:sm$last.para]) -
+    as.numeric(predict(ordinary, nd, type = "terms")[, "s(x0,x1)"])
+  expect_silent(p <- draw(cs, show = "difference")[[1]])
+  expect_equal(p$data$.diff, reference)
+  expect_silent(ggplot_build(p))
+})

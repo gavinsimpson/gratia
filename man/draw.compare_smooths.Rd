@@ -49,8 +49,8 @@ the default uses their input order; with more models, supply \code{pair}.}
 \item{surface}{character; \code{"raster"} or \code{"tile"} for surface displays.
 Irregular numeric grids use rectangles bounded by coordinate midpoints.}
 
-\item{contour}{logical; should contours be draw on the plot using
-\code{\link[ggplot2:geom_contour]{ggplot2::geom_contour()}}.}
+\item{contour}{logical; add contour lines? These require two numeric axes
+and at least one grid cell with four finite corner values that are not all equal.}
 
 \item{n_contour}{numeric; the number of contour bins. Will result in
 \code{n_contour - 1} contour lines being drawn. See \code{\link[ggplot2:geom_contour]{ggplot2::geom_contour()}}.}

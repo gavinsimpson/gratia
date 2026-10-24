@@ -88,7 +88,9 @@ It is the difference between these fitted smooth contributions, rather than
 a difference between fitted responses.
 
 The result retains one row per model and smooth, with estimates in the \code{data}
-list column. Use \code{\link[=draw.compare_smooths]{draw.compare_smooths()}} for faceted surface comparisons or
+list column. For distributional models, \code{.parameter} retains the label for
+the linear predictor, while \code{.model} identifies the input model. Use
+\code{\link[=draw.compare_smooths]{draw.compare_smooths()}} for faceted surface comparisons or
 estimated surface differences. Smooths with more than two covariates can be
 evaluated but cannot be drawn by this method.
 }

@@ -1186,7 +1186,7 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
   surface = "raster", surface_3d = list(),
   ci_3d = FALSE,
   ci_3d_alpha = 0.15, ci_3d_col = "grey60",
-  grouped_by = FALSE,
+  grouped_by = FALSE, facet_vars = NULL,
   ...
 ) {
   if (surface == "3d") message("Spherical smooths retain their geographic rendering.")
@@ -1217,7 +1217,7 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
     guide_title <- "Partial\neffect"
     plot_var <- ".estimate"
     guide_limits <- if (is.null(ylim)) {
-      c(-1, 1) * max(abs(object[[plot_var]]), na.rm = TRUE)
+      surface_fill_limits(object[[plot_var]])
     } else {
       ylim
     }
@@ -1248,8 +1248,9 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
     ylab <- variables[1] ## yes, the smooth is s(lat, lon) !
   }
 
-  panel <- NULL
-  if (isTRUE(grouped_by) && all(!is.na(object$.by))) {
+  # Split conditioning panels before building cells or interpolating contours.
+  panel <- facet_vars
+  if (is.null(panel) && isTRUE(grouped_by) && all(!is.na(object$.by))) {
     by_var <- unique(object$.by)
     if (length(by_var) == 1L && is.factor(object[[by_var]])) {
       panel <- by_var
@@ -1263,7 +1264,9 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
   # Preserve the spherical method's omitted-versus-NULL axis convention.
   labels[c("x", "y")] <- list(xlab, ylab)
 
-  groups <- if (is.null(panel)) list(object) else split(object, object[[panel]], drop = TRUE)
+  groups <- if (!length(panel)) list(object) else {
+    dplyr::group_split(object, !!!rlang::syms(panel))
+  }
   prepared <- lapply(groups, sos_plot_data,
     longitude = variables[2], latitude = variables[1])
   object <- if (length(prepared) == 1L) prepared[[1L]]$data else {
@@ -1291,7 +1294,7 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
     guides(x = guide_axis(angle = angle),
       fill = guide_colourbar(title = guide_title, direction = "vertical"))
   plt <- gratia_plot_theme_defaults(plt, legend.position = "right")
-  if (!is.null(panel)) plt <- plt + facet_wrap(vars(!!rlang::sym(panel)))
+  if (length(panel)) plt <- plt + facet_wrap(vars(!!!rlang::syms(panel)))
   if (!any(vapply(geometry, nrow, integer(1))) && !is.null(sos_ortho_view(crs))) {
     # An entirely hidden supplied grid still needs finite panel bounds. An
     # invisible horizon outline trains the panel without inventing estimates.
@@ -1305,7 +1308,7 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
       if (!group$rectangular) next
       paths <- sos_contours(group$data, variables[2], variables[1], plot_var, n_contour)
       if (!is.null(paths)) {
-        if (!is.null(panel)) paths[[panel]] <- group$data[[panel]][rep(1L, nrow(paths))]
+        for (v in panel) paths[[v]] <- group$data[[v]][rep(1L, nrow(paths))]
         paths <- sos_project(paths, crs = crs)
         plt <- plt + geom_gratia_contour_sf(data = paths, inherit.aes = FALSE,
           colour = contour_col, fill = NA)
