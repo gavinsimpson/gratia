@@ -30,6 +30,9 @@
 #' @export
 #' @examples
 #' pal <- gratia_palette("tol_muted")
+#' \dontshow{
+#' pal <- utils::removeSource(pal)
+#' }
 #' pal(5)
 #' ggplot2::theme(
 #'   palette.colour.discrete = pal,

@@ -2019,6 +2019,9 @@ detaching ‘package:mgcv’
 > ### ** Examples
 > 
 > pal <- gratia_palette("tol_muted")
+> ## Don't show:
+> pal <- utils::removeSource(pal)
+> ## End(Don't show)
 > pal(5)
 [1] "#CC6677" "#332288" "#DDCC77" "#117733" "#88CCEE"
 > ggplot2::theme(
@@ -2054,6 +2057,9 @@ detaching ‘package:mgcv’
 > gratia_theme_set(old)
 > 
 > pal <- gratia_palette("tol_banded_16")
+> ## Don't show:
+> pal <- utils::removeSource(pal)
+> ## End(Don't show)
 > theme(palette.colour.discrete = pal, palette.fill.discrete = pal)
 <theme> List of 2
  $ palette.colour.discrete:function (n)  
@@ -3322,9 +3328,10 @@ detaching ‘package:mgcv’
 > 
 > ### Name: sdmTMB-methods
 > ### Title: Formula effects for sdmTMB models
-> ### Aliases: sdmTMB-methods smooths.sdmTMB get_smooths_by_id.sdmTMB
-> ###   smooth_coefs.sdmTMB smooth_estimates.sdmTMB parametric_terms.sdmTMB
-> ###   parametric_effects.sdmTMB assemble.sdmTMB draw.sdmTMB
+> ### Aliases: sdmTMB-methods smooths.sdmTMB n_smooths.sdmTMB
+> ###   get_smooths_by_id.sdmTMB smooth_coefs.sdmTMB smooth_estimates.sdmTMB
+> ###   parametric_terms.sdmTMB parametric_effects.sdmTMB assemble.sdmTMB
+> ###   draw.sdmTMB
 > 
 > ### ** Examples
 > 

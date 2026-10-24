@@ -85,5 +85,8 @@ gratia_theme_update(geom.gratia.contour = element_geom(colour = "grey40"))
 gratia_theme_set(old)
 
 pal <- gratia_palette("tol_banded_16")
+\dontshow{
+pal <- utils::removeSource(pal)
+}
 theme(palette.colour.discrete = pal, palette.fill.discrete = pal)
 }

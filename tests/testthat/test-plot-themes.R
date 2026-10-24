@@ -214,7 +214,7 @@ test_that("forwarded defaults do not hide explicit nested arguments", {
 
 test_that("smooth comparisons capture package theme settings", {
   m <- m_1_smooth
-  comparison <- compare_smooths(m, m, n = 10)
+  comparison <- compare_smooths(m, Same = m, n = 10)
   withr::local_options(list(gratia.plot.theme = ggplot2::theme(gratia.alpha.interval = .35)))
   p <- draw(comparison)
   gratia_theme_set(NULL)
