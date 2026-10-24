@@ -805,6 +805,10 @@
   Smooths use joint RTMB covariance, including tensor smooths with
   multiple penalties.
 
+  `get_smooth()` extracts sdmTMB smooths by exact name and `n_smooths()`
+  counts them, including both predictors of delta models, without calculating
+  coefficient covariances (#441).
+
   Breakpoint (`breakpt()`) and logistic (`logistic()`) curves are
   available through `parametric_terms()` and `parametric_effects()`, and
   are selected with `terms` in `draw()` and `assemble()`. Their pointwise
@@ -1040,6 +1044,27 @@
   families with fitted degrees of freedom at or below one, matching simulation
   (#437). Means with degrees of freedom between one and two and
   linear-predictor derivatives remain supported.
+
+* `add_fitted()` now advertises `value = ".fitted"` in its generic and help,
+  matching its established GAM output. Explicit column names are unchanged
+  (#441).
+
+* `confint.fderiv()` rejects missing, empty, non-numeric and non-finite confidence
+  levels, and levels outside the open interval between zero and one. Vectors
+  still warn and use their first value (#441).
+
+* `ref_level()` and `level()` preserve ordered-factor status as well as the
+  original levels and their order (#441).
+
+* **Response simulation**
+
+  `simulate.gam()` validates `nsim` as one finite positive whole number within
+  the supported integer range before prediction or changes to the random-number
+  state, including grouped-family and marginal simulations (#441).
+
+  Explicitly seeded GAM simulations restore the caller's previous random-number
+  state, including its absence, on success and error. Unseeded simulation
+  continues to advance or initialize the random-number state (#441).
 
 * `overview()` now returns the parametric coefficients for GAMs without
   smooth terms, or an empty overview when `parametric = FALSE` (#438).

@@ -145,7 +145,8 @@
 #' @param level character; the specific level to extract in the case of
 #'   `level()`.
 #'
-#' @return A length 1 factor with the same levels as the supplied factor `fct`.
+#' @return A factor with the selected values and the same levels, level order
+#'   and ordered status as `fct`. `ref_level()` returns the first level.
 #'
 #' @export
 #'
@@ -170,7 +171,7 @@
     stop("'fct' must be a factor")
   }
   lev <- levels(fct)
-  factor(lev[1], levels = lev)
+  factor(lev[1], levels = lev, ordered = is.ordered(fct))
 }
 #' @export
 #' @rdname ref_level
@@ -185,5 +186,5 @@
       "> not a valid level of factor"
     )
   }
-  factor(level, levels = lev)
+  factor(level, levels = lev, ordered = is.ordered(fct))
 }

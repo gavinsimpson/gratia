@@ -9,10 +9,10 @@
 #' @param ... additional arguments passed to methods.
 #'
 #' @return A data frame (tibble) formed from `data` and fitted values from
-#'   `model`.
+#'   `model`, stored in `".fitted"` by default.
 #'
 #' @export
-`add_fitted` <- function(data, model, value = ".value", ...) {
+`add_fitted` <- function(data, model, value = ".fitted", ...) {
   UseMethod("add_fitted", model)
 }
 

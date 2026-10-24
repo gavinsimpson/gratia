@@ -9,7 +9,7 @@ get_smooth(object, term)
 \arguments{
 \item{object}{a fitted GAM model object.}
 
-\item{term}{character; the name of a smooth term to extract}
+\item{term}{character; the exact name of a smooth term to extract}
 }
 \value{
 A single smooth object, or a list of smooths if several match the

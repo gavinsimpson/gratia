@@ -1832,3 +1832,13 @@ response_scat_fixture <- function(df, estimated = FALSE) {
         min.df = .1))
   })
 }
+
+# These optional utility fits are built once, only when requested.
+sdmtmb_utility_fixture <- function(smooth = TRUE) {
+  shared_test_fixture(paste0("sdmtmb-utility-", smooth), {
+    withr::local_preserve_seed()
+    formula <- if (smooth) y ~ s(x0, k = 5) + s(x1, k = 5) else y ~ x0
+    sdmTMB::sdmTMB(formula, data = tiny_eg1, spatial = "off",
+      control = sdmTMB::sdmTMBcontrol(backend = "rtmb"))
+  })
+}

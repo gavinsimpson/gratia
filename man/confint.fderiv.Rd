@@ -23,7 +23,8 @@ vector of terms. If missing, all parameters are considered.}
 
 \item{level}{numeric, \verb{0 < level < 1}; the confidence level of the
 point-wise or simultaneous interval. The default is \code{0.95} for a 95\%
-interval.}
+interval. It must be finite. If a vector is supplied, the first value is
+used with a warning.}
 
 \item{type}{character; the type of interval to compute. One of \code{"confidence"}
 for point-wise intervals, or \code{"simultaneous"} for simultaneous intervals.}

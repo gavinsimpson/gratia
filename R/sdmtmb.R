@@ -271,6 +271,11 @@ sdmtmb_smooth_model <- function(
 #' and unpenalized coefficients and their joint covariance are transformed
 #' back to the constrained mgcv basis.
 #'
+#' Use [smooths()] to list smooth names, [get_smooth()] to extract an exact
+#' name, [get_smooths_by_id()] to extract by position, and [n_smooths()] to
+#' count smooths, including both predictors of a delta model. These utilities
+#' do not calculate coefficient covariances.
+#'
 #' @param object,model A fitted `sdmTMB` model.
 #' @param select Smooth selection across both predictors of delta models.
 #'   Numeric and logical indices follow stored smooth order, first component
@@ -406,6 +411,12 @@ NULL
 #' @export
 smooths.sdmTMB <- function(object, ...) {
   vapply(sdmtmb_smooths(object), `[[`, character(1), "label")
+}
+
+#' @rdname sdmTMB-methods
+#' @export
+n_smooths.sdmTMB <- function(object) {
+  length(sdmtmb_smooths(object))
 }
 
 #' @rdname sdmTMB-methods

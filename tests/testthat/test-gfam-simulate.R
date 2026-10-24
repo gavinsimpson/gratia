@@ -244,7 +244,7 @@ test_that("grouped simulations preserve seeded and unseeded RNG contracts", {
   expect_identical(gfam_model$family$getTheta(), before_theta)
   rm(".Random.seed", envir = .GlobalEnv)
   expect_silent(simulate(gfam_model, seed = 3, data = d))
-  expect_true(exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE))
+  expect_false(exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE))
 })
 
 test_that("estimated component parameters and dispersions are not pooled", {

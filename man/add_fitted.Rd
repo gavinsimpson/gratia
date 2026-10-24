@@ -7,7 +7,7 @@
 \alias{add_fitted.scam}
 \title{Add fitted values from a model to a data frame}
 \usage{
-add_fitted(data, model, value = ".value", ...)
+add_fitted(data, model, value = ".fitted", ...)
 
 \method{add_fitted}{gamm4}(data, model, ...)
 
@@ -27,7 +27,7 @@ will be stored.}
 }
 \value{
 A data frame (tibble) formed from \code{data} and fitted values from
-\code{model}.
+\code{model}, stored in \code{".fitted"} by default.
 }
 \description{
 Add fitted values from a model to a data frame
