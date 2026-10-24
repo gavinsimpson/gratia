@@ -174,14 +174,7 @@ moment_family_values <- function(family, eta, scale, beta, scores = NULL) {
       p <- z / rowSums(z)
       labels <- seq.int(0, ncol(p) - 1L)
     } else {
-      cuts <- c(-Inf, th, Inf)
-      p <- vapply(seq_len(length(cuts) - 1L), function(j) {
-        lo <- cuts[j] - eta[, 1L]
-        hi <- cuts[j + 1L] - eta[, 1L]
-        ifelse(lo > 0, stats::plogis(lo, lower.tail = FALSE) -
-          stats::plogis(hi, lower.tail = FALSE), stats::plogis(hi) - stats::plogis(lo))
-      }, numeric(n))
-      p <- matrix(p, nrow = n)
+      p <- ordinal_probability_transform(eta[, 1L], th)$probability
       labels <- seq_len(ncol(p))
     }
     if (is.null(scores)) {

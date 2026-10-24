@@ -1768,3 +1768,14 @@ intercept_test_model <- function(type = "gaulss") {
       glm = glm(y ~ 0 + x0, data = tiny_eg1))
   })
 }
+
+# A linear ordinal fit with both tails inside the observed covariate range.
+ordinal_tail_model <- function() {
+  shared_test_fixture("ordinal-tail-probabilities", {
+    withr::local_preserve_seed()
+    set.seed(42)
+    d <- data.frame(x = seq(-50, 50, length.out = 200))
+    d$y <- findInterval(d$x + rlogis(200), c(-1, 1)) + 1L
+    mgcv::gam(y ~ x, data = d, family = mgcv::ocat(R = 3), method = "REML")
+  })
+}

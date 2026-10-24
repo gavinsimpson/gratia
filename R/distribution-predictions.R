@@ -60,16 +60,24 @@ fit_vals_distribution <- function(object, data, spec, quantity, scale,
     }
   } else {
     context <- lss_prediction_context(object, data = data, ...)
-    evaluate <- function(beta) as.numeric(distribution_output(spec,
-      lss_predictors(context, beta), quantity, scale))
-    J <- moment_gradient(evaluate, stats::coef(object), as.numeric(value))
+    categorical <- spec$categorical && scale == "response"
+    if (categorical) {
+      transform <- spec$category_transform(eta, gradient = TRUE)
+      J <- categorical_coefficient_gradient(context, transform)
+    } else {
+      evaluate <- function(beta) as.numeric(distribution_output(spec,
+        lss_predictors(context, beta), quantity, scale))
+      J <- moment_gradient(evaluate, stats::coef(object), as.numeric(value))
+    }
     std_err <- matrix(sqrt(pmax(0, rowSums((J %*% V) * J))), nrow(value))
-    lower <- value - crit * std_err
-    upper <- value + crit * std_err
-    if (spec$categorical && scale == "response") {
-      link_se <- std_err / (value * (1 - value))
-      lower <- plogis(qlogis(value) - crit * link_se)
-      upper <- plogis(qlogis(value) + crit * link_se)
+    if (categorical) {
+      limits <- categorical_probability_limits(transform, std_err, crit)
+      std_err <- limits$se
+      lower <- limits$lower
+      upper <- limits$upper
+    } else {
+      lower <- value - crit * std_err
+      upper <- value + crit * std_err
     }
   }
   fit <- distribution_table(spec, value, quantity)
