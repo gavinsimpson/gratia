@@ -366,7 +366,8 @@ combining model terms rather than estimating individual term effects.
 
 Use
 [`difference_smooths()`](https://gavinsimpson.github.io/gratia/reference/difference_smooths.md)
-for differences between factor-by smooths,
+for differences between factor-by smooths and their first or second
+derivatives, including partial derivatives across surfaces,
 [`conditional_differences()`](https://gavinsimpson.github.io/gratia/reference/conditional_differences.md)
 for contrasts of whole-model predictions, and
 [`compare_smooths()`](https://gavinsimpson.github.io/gratia/reference/compare_smooths.md)

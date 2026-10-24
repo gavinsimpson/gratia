@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-66</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-67</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -109,7 +109,8 @@
 </ul></div>
 <div class="section level3">
 <h3 id="new-features-development-version">New features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>
-<ul><li><p><code><a href="../reference/draw_label_control.html">draw_label_control()</a></code> provides optional label layout settings across <code><a href="../reference/draw.html">draw()</a></code> and <code><a href="../reference/assemble.html">assemble()</a></code> methods. Wrap discrete axis labels, legend entries and guide titles, stagger discrete tick labels, arrange legend keys, and adjust colour-bar dimensions and label angles. Existing defaults, scale labels and palettes are retained (<a href="https://github.com/gavinsimpson/gratia/issues/430" class="external-link">#430</a>).</p></li>
+<ul><li><p><code><a href="../reference/difference_smooths.html">difference_smooths()</a></code> computes first and second derivatives of differences between factor-by smooths using <code>order</code>, including partial derivatives across surfaces using <code>focal</code>. Intervals retain covariance between the smooths, and <code><a href="../reference/draw.html">draw()</a></code> labels the derivative values; raw-covariate comparisons also allow transformations that depend on the comparison factor (<a href="https://github.com/gavinsimpson/gratia/issues/264" class="external-link">#264</a>, <a href="https://github.com/gavinsimpson/gratia/issues/356" class="external-link">#356</a>).</p></li>
+<li><p><code><a href="../reference/draw_label_control.html">draw_label_control()</a></code> provides optional label layout settings across <code><a href="../reference/draw.html">draw()</a></code> and <code><a href="../reference/assemble.html">assemble()</a></code> methods. Wrap discrete axis labels, legend entries and guide titles, stagger discrete tick labels, arrange legend keys, and adjust colour-bar dimensions and label angles. Existing defaults, scale labels and palettes are retained (<a href="https://github.com/gavinsimpson/gratia/issues/430" class="external-link">#430</a>).</p></li>
 <li>
 <p><strong>Conditional prediction surfaces</strong></p>
 <p><code><a href="../reference/conditional_values.html">conditional_values()</a></code> accepts two numeric covariates grouped in the first condition, such as <code>condition = list(c("x1", "x2"), "treatment")</code>, to evaluate and draw prediction surfaces. Remaining conditions supply facets.</p>

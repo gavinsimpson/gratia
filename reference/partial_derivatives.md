@@ -274,6 +274,10 @@ worker inputs and returned results, in addition to the final output.
 
 ## See also
 
+[`difference_smooths()`](https://gavinsimpson.github.io/gratia/reference/difference_smooths.md)
+with `order > 0` and `focal` to compute partial derivatives of
+differences across full smooth surfaces.
+
 [gamm4_support](https://gavinsimpson.github.io/gratia/reference/gamm4_support.md)
 
 ## Author

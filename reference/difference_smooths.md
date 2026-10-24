@@ -3,7 +3,8 @@
 Estimates pairwise differences (comparisons) between factor smooth
 interactions (smooths with a factor `by` argument) for pairs of groups
 defined by the factor. The group means can be optionally included in the
-difference.
+difference. First and second derivatives of these differences, including
+partial derivatives across smooth surfaces, can also be estimated.
 
 ## Usage
 
@@ -34,7 +35,12 @@ difference_smooths(
   n_4d = 4,
   simultaneous_method = c("simulation", "tube"),
   simultaneous_domain = NULL,
-  tube_control = list()
+  tube_control = list(),
+  order = 0L,
+  focal = NULL,
+  type = c("central", "forward", "backward"),
+  eps = NULL,
+  wrt = c("smooth", "covariate")
 )
 
 # S3 method for class 'scam'
@@ -98,7 +104,8 @@ difference_smooths(model, ..., unconditional = FALSE)
 
 - group_means:
 
-  logical; should the group means be included in the difference?
+  logical; should the group means be included in the difference? Must be
+  `FALSE` when `order > 0`.
 
 - partial_match:
 
@@ -190,6 +197,56 @@ difference_smooths(model, ..., unconditional = FALSE)
   (`1e-8`). Requires tube calibration. Simulation controls `n_sim`,
   `n_cores` (or `ncores`), and `seed` are ignored by tube calibration.
 
+- order:
+
+  numeric; `0` (the default) estimates smooth differences; `1` and `2`
+  estimate their first and second derivatives.
+
+- focal:
+
+  character; one differentiation coordinate shared by all compared
+  smooths. Inferred for univariate smooths; required for multivariate
+  smooths when `order > 0`.
+
+- type:
+
+  character; finite-difference scheme for derivatives. One of
+  `"central"` (the default), `"forward"`, or `"backward"`.
+
+- eps:
+
+  a positive finite number giving the absolute finite-difference step,
+  or `NULL` (the default) to choose it automatically. The automatic step
+  is the fitted range of the differentiation coordinate multiplied by
+  `.Machine$double.eps^(1 / (order + p))`, where `p = 2` for central
+  differences and `p = 1` for forward or backward differences. A
+  constant coordinate uses its absolute value (or one if zero) instead
+  of its range. The step is rounded upwards and bounded below so that
+  adding it to the coordinates produces a representable change. Stored
+  transformed values or raw covariate summaries supply the range;
+  supplied `data` are used if neither is available. This is a
+  scale-aware heuristic, not an error bound; unusual function scales or
+  domain boundaries may require explicit `eps`. For first central
+  differences the two points are separated by `eps`; for second central
+  differences they are each `eps` from the target.
+
+- wrt:
+
+  differentiation coordinate: `"smooth"` (the default) uses the smooth
+  expression, such as `log(x)`; `"covariate"` uses a raw covariate, such
+  as `x`, and reevaluates expressions at each finite-difference point.
+
+## Value
+
+A tibble of class `"difference_smooth"`. Columns `.smooth`, `.by`,
+`.level_1`, and `.level_2` identify each comparison; `.diff` contains
+the estimate for level 1 minus level 2, with `.se`, `.lower_ci`,
+`.upper_ci`, and evaluation covariates. For `order > 0`, `.diff`
+contains the derivative difference and `.focal` names its coordinate.
+The `derivative_info` attribute records `order`, `focal`, `wrt`, `type`,
+and the resolved step `eps`. The `plot_variables` attribute records the
+plotting axes.
+
 ## Details
 
 With the default simulation calibration, simultaneous intervals cover
@@ -222,6 +279,35 @@ ignored for pointwise intervals. An explicit seed scopes the entire
 call: each pair uses a new batch of coefficient draws, and the caller's
 random number state is restored on exit. With `seed = NULL`, the current
 random number state is used and advanced.
+
+With `order > 0`, the estimate is the difference between the derivatives
+of the selected smooths, on the linear predictor scale. Equivalently, it
+is the derivative of their difference. The estimate and its uncertainty
+are computed from the difference of the derivative matrices, retaining
+covariance between the smooths. Group means are excluded, and tube
+intervals are unavailable for derivatives; use simulation for
+simultaneous intervals.
+
+For a multivariate smooth, `focal` identifies the coordinate to
+differentiate. All other independent coordinates are fixed at their
+value in each evaluation row. They can vary between rows, so `data` may
+describe a full surface or several slices. `order = 2` differentiates
+twice with respect to `focal`; mixed partial derivatives are not
+supported. Generated grids adjust the focal range for the
+finite-difference scheme; supplied evaluation locations are preserved.
+
+With `wrt = "covariate"`, model expressions are reevaluated after
+changing the raw focal covariate. Generated raw grids use
+[`smooth_data()`](https://gavinsimpson.github.io/gratia/reference/smooth_data.md)
+and require each axis to depend on one distinct original covariate.
+Supply raw `data` for other transformations. With `wrt = "smooth"`, only
+the named smooth coordinate is changed. Derivative controls are ignored
+when `order = 0`. Raw-coordinate comparisons match the same original
+covariates, excluding the comparison factor. Evaluated smooth
+coordinates may differ between factor levels when a transformation
+involves that factor. The finite-difference step must fit within the
+fitted focal range for generated grids, including grids with only one
+focal value.
 
 ## Parallel calculation
 
@@ -259,6 +345,11 @@ Parallel work is most useful for expensive bases or interval
 calculations. Small grids can be slower because of transfer and
 scheduling costs. Large grids and many draws also require memory for
 worker inputs and returned results, in addition to the final output.
+
+## See also
+
+[`derivatives()`](https://gavinsimpson.github.io/gratia/reference/derivatives.md),
+[`partial_derivatives()`](https://gavinsimpson.github.io/gratia/reference/partial_derivatives.md)
 
 ## Examples
 
@@ -303,6 +394,76 @@ draw(sm_sim)
 sm_dif3 <- difference_smooths(m,
   select = c("s(x2):fac1", "s(x2):fac2"), partial_match = FALSE
 )
+
+# Compare slopes of the factor-by smooths, retaining their joint uncertainty
+slope_dif <- difference_smooths(m, select = "s(x2)", order = 1)
+slope_dif
+#> # A tibble: 300 x 10
+#>    .smooth .focal .by   .level_1 .level_2 .diff   .se .lower_ci .upper_ci
+#>    <chr>   <chr>  <chr> <chr>    <chr>    <dbl> <dbl>     <dbl>     <dbl>
+#>  1 s(x2)   x2     fac   1        2         9.24  5.74   -2.01        20.5
+#>  2 s(x2)   x2     fac   1        2         9.24  5.73   -1.99        20.5
+#>  3 s(x2)   x2     fac   1        2         9.23  5.69   -1.93        20.4
+#>  4 s(x2)   x2     fac   1        2         9.22  5.60   -1.77        20.2
+#>  5 s(x2)   x2     fac   1        2         9.18  5.46   -1.51        19.9
+#>  6 s(x2)   x2     fac   1        2         9.13  5.26   -1.18        19.4
+#>  7 s(x2)   x2     fac   1        2         9.06  5.02   -0.785       18.9
+#>  8 s(x2)   x2     fac   1        2         8.95  4.76   -0.383       18.3
+#>  9 s(x2)   x2     fac   1        2         8.81  4.50   -0.0138      17.6
+#> 10 s(x2)   x2     fac   1        2         8.64  4.26    0.290       17.0
+#> # i 290 more rows
+#> # i 1 more variable: x2 <dbl>
+draw(slope_dif)
+
+
+# Fit a surface for each factor level to compare rates of change in x2
+m2 <- gam(y ~ fac + te(x2, x0, by = fac, k = c(4, 4)),
+  data = df, method = "REML")
+
+# Evaluate partial derivatives of the differences across both covariates
+partial_dif <- difference_smooths(m2, select = "te(x2,x0)",
+  order = 1, focal = "x2", n_2d = 20)
+partial_dif
+#> # A tibble: 1,200 x 11
+#>    .smooth   .focal .by   .level_1 .level_2 .diff   .se .lower_ci .upper_ci
+#>    <chr>     <chr>  <chr> <chr>    <chr>    <dbl> <dbl>     <dbl>     <dbl>
+#>  1 te(x2,x0) x2     fac   1        2         9.24  7.55    -5.57       24.0
+#>  2 te(x2,x0) x2     fac   1        2         9.19  6.85    -4.24       22.6
+#>  3 te(x2,x0) x2     fac   1        2         9.13  6.22    -3.07       21.3
+#>  4 te(x2,x0) x2     fac   1        2         9.08  5.69    -2.08       20.2
+#>  5 te(x2,x0) x2     fac   1        2         9.02  5.25    -1.27       19.3
+#>  6 te(x2,x0) x2     fac   1        2         8.97  4.90    -0.640      18.6
+#>  7 te(x2,x0) x2     fac   1        2         8.92  4.62    -0.131      18.0
+#>  8 te(x2,x0) x2     fac   1        2         8.86  4.37     0.296      17.4
+#>  9 te(x2,x0) x2     fac   1        2         8.80  4.16     0.638      17.0
+#> 10 te(x2,x0) x2     fac   1        2         8.72  4.01     0.858      16.6
+#> # i 1,190 more rows
+#> # i 2 more variables: x2 <dbl>, x0 <dbl>
+draw(partial_dif)
+
+
+# Choose a surface grid and calibrate simultaneous intervals for each pair
+derivative_grid <- data_slice(m2, x2 = evenly(x2, n = 15),
+  x0 = evenly(x0, n = 10), fac = levels(fac))
+partial_sim <- difference_smooths(m2, select = "te(x2,x0)",
+  data = derivative_grid, order = 1, focal = "x2",
+  interval = "simultaneous", n_sim = 1000, seed = 42)
+partial_sim
+#> # A tibble: 450 x 11
+#>    .smooth   .focal .by   .level_1 .level_2 .diff   .se .lower_ci .upper_ci
+#>    <chr>     <chr>  <chr> <chr>    <chr>    <dbl> <dbl>     <dbl>     <dbl>
+#>  1 te(x2,x0) x2     fac   1        2         9.24  7.55    -14.2       32.7
+#>  2 te(x2,x0) x2     fac   1        2         9.13  6.16     -9.98      28.2
+#>  3 te(x2,x0) x2     fac   1        2         9.01  5.17     -7.02      25.0
+#>  4 te(x2,x0) x2     fac   1        2         8.90  4.53     -5.15      22.9
+#>  5 te(x2,x0) x2     fac   1        2         8.77  4.09     -3.92      21.5
+#>  6 te(x2,x0) x2     fac   1        2         8.56  3.92     -3.58      20.7
+#>  7 te(x2,x0) x2     fac   1        2         8.21  4.04     -4.31      20.7
+#>  8 te(x2,x0) x2     fac   1        2         7.66  4.43     -6.10      21.4
+#>  9 te(x2,x0) x2     fac   1        2         6.97  5.28     -9.41      23.3
+#> 10 te(x2,x0) x2     fac   1        2         6.21  6.60    -14.3       26.7
+#> # i 440 more rows
+#> # i 2 more variables: x2 <dbl>, x0 <dbl>
 
 # Choose two axes and condition on the third covariate
 m3 <- gam(y ~ fac + te(x0, x1, x2, by = fac, k = c(3, 3, 3)),

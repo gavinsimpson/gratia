@@ -193,6 +193,16 @@
 
 ### New features
 
+- [`difference_smooths()`](https://gavinsimpson.github.io/gratia/reference/difference_smooths.md)
+  computes first and second derivatives of differences between factor-by
+  smooths using `order`, including partial derivatives across surfaces
+  using `focal`. Intervals retain covariance between the smooths, and
+  [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)
+  labels the derivative values; raw-covariate comparisons also allow
+  transformations that depend on the comparison factor
+  ([\#264](https://github.com/gavinsimpson/gratia/issues/264),
+  [\#356](https://github.com/gavinsimpson/gratia/issues/356)).
+
 - [`draw_label_control()`](https://gavinsimpson.github.io/gratia/reference/draw_label_control.md)
   provides optional label layout settings across
   [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)

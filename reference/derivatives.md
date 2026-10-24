@@ -270,6 +270,10 @@ worker inputs and returned results, in addition to the final output.
 
 ## See also
 
+[`difference_smooths()`](https://gavinsimpson.github.io/gratia/reference/difference_smooths.md)
+to compute derivatives of differences between factor-by smooths with
+`order = 1` or `order = 2`.
+
 [gamm4_support](https://gavinsimpson.github.io/gratia/reference/gamm4_support.md)
 
 ## Author
