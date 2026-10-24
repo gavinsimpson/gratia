@@ -82,10 +82,11 @@ confint(
 
 - shift:
 
-  logical; should the model intercept be added to the smooth? Only the
-  intercept is added; other parametric effects, including factor effects
-  associated with a factor `by` smooth, are excluded. For full fitted
-  values and their confidence intervals, use
+  logical; should the intercept of the smooth's linear predictor be
+  added to the smooth? Predictors without an intercept are shifted by
+  zero. Only the intercept is added; other parametric effects, including
+  factor effects associated with a factor `by` smooth, are excluded. For
+  full fitted values and their confidence intervals, use
   [`fitted_values()`](https://gavinsimpson.github.io/gratia/reference/fitted_values.md).
 
 - transform:

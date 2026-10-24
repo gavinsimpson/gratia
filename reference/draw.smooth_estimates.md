@@ -403,60 +403,11 @@ for the available settings.
 
 ``` r
 load_mgcv()
-# example data
-df <- data_sim("eg1", seed = 21)
-# fit GAM
+# Simulate an additive Gaussian response and fit a GAM
+df <- data_sim("eg1", n = 200, seed = 21)
 m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = "REML")
-# plot all of the estimated smooths
-sm <- smooth_estimates(m)
-draw(sm)
 
-m_log <- gam(y ~ s(log(x1), k = 6), data = df)
-draw(smooth_estimates(m_log, back_transform = TRUE), back_transform = TRUE)
-#> Error in map(smooths, eval_smooth, model = object, n = n, n_2d = n_2d,     n_3d = n_3d, n_4d = n_4d, data = data, unconditional = unconditional,     frequentist = frequentist, overall_uncertainty = overall_uncertainty,     dist = dist, clip = clip, back_transform = back_transform): i In index: 1.
-#> Caused by error in `recover_raw_data()`:
-#> ! Cannot recover raw model covariates.
-#> x The fitting data are unavailable.
-#> i Supply reference `data` and, if needed, `envir`; stored transformed values
-#>   cannot be inverted automatically.
-#> Caused by error in `doTryCatch()`:
-#> ! The fitting data are unavailable.
-# evaluate smooth of `x2`
+# Evaluate one smooth and plot its estimates and interval
 sm <- smooth_estimates(m, select = "s(x2)")
-# plot it
 draw(sm)
-
-
-# customising some plot elements
-draw(sm) & ggplot2::theme(
-  geom.gratia.interval = ggplot2::element_geom(fill = "steelblue"),
-  geom.gratia.smooth = ggplot2::element_geom(colour = "forestgreen"),
-  gratia.alpha.interval = 0.3)
-
-
-# Add a constant to the plotted smooth
-draw(sm, constant = coef(m)[1])
-
-
-# Adding change indicators to smooths based on derivatives of the smooth
-d <- derivatives(m, n = 100) # n to match smooth_estimates()
-
-smooth_estimates(m) |>
-  add_sizer(derivatives = d, type = "sizer") |>
-  draw()
-
-
-# Render a bivariate smooth as vector tiles
-m_surface <- gam(y ~ s(x0, x1), data = df, method = "REML")
-draw(smooth_estimates(m_surface, n_2d = 20), surface = "tile")
-
-
-# Choose the axes before generating the evaluation grid
-m_slices <- gam(y ~ s(x0, x1, x2), data = df, method = "REML")
-estimates <- smooth_estimates(m_slices,
-  variables = c("x1", "x2", "x0"), n_2d = 20, n_3d = 3)
-draw(estimates)
-
-# A redraw changes roles using the points already evaluated
-draw(estimates, variables = c("x2", "x1", "x0"))
 ```

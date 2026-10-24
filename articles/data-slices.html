@@ -27,7 +27,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-67</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-72</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -527,10 +527,13 @@ confidence interval</p>
 <span>    y <span class="op">=</span> <span class="va">ylab</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>
 <p><img src="data-slices_files/figure-html/plot-smooth-estimates-bivar-1.png" class="r-plt" alt="" width="700"></p>
-<p>Note that the above interval is not the Marra and Wood (2012)
-interval. It doesn’t include the uncertainty from the model constant
-term at the moment, but unless the smooth is very close to linear that
-shouldn’t make too much difference.</p>
+<p><code><a href="../reference/smooth_estimates.html">smooth_estimates()</a></code> defaults to
+<code>overall_uncertainty = TRUE</code>, so the interval above includes
+uncertainty in the overall mean (the model constant here). The plotted
+estimate is still the centred smooth contribution; the constant is not
+added to <code>.estimate</code>. Set
+<code>overall_uncertainty = FALSE</code> to construct an interval using
+only the smooth’s coefficient uncertainty.</p>
 <p>This extends to multiple slices by asking for several discrete
 <code>z</code></p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
@@ -556,13 +559,16 @@ shouldn’t make too much difference.</p>
 <p><img src="data-slices_files/figure-html/data-slice-biv-2-1.png" class="r-plt" alt="" width="700"></p>
 </div>
 <div class="section level3">
-<h3 id="using-fitted_samples">Using <code>fitted_samples()</code><a class="anchor" aria-label="anchor" href="#using-fitted_samples"></a>
+<h3 id="using-fitted_values">Using <code>fitted_values()</code><a class="anchor" aria-label="anchor" href="#using-fitted_values"></a>
 </h3>
-<p>If you want to evaluate the surface over <code>x</code> at fixed
-<code>z</code> conditional upon other values of other covariates (model
-predicted or fitted values) then <code><a href="../reference/fitted_samples.html">fitted_samples()</a></code> is a tidy
-wrapper to <code>predict.gam()</code>.</p>
-<p>For single <code>z</code> we have</p>
+<p><code><a href="../reference/fitted_values.html">fitted_values()</a></code> evaluates the full fitted model at the
+supplied covariate values and returns estimates with intervals. For this
+Gaussian identity-link model, the default response-scale quantity is the
+conditional mean, including the model constant and smooth contribution.
+Its interval describes uncertainty in that mean, rather than variation
+in new observations.</p>
+<p>We first plot the fitted mean over <code>x</code> at the single fixed
+value of <code>z</code>.</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/fitted_values.html">fitted_values</a></span><span class="op">(</span><span class="va">m_biv</span>, data <span class="op">=</span> <span class="va">ds3</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="co"># default is response scale, not link</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">.fitted</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
@@ -573,7 +579,8 @@ wrapper to <code>predict.gam()</code>.</p>
 <span>    y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/influence.measures.html" class="external-link">hat</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>
 <p><img src="data-slices_files/figure-html/data-slice-biv-1-fitted-values-1.png" class="r-plt" alt="" width="700"></p>
-<p>And for the multiple <code>z</code> we have</p>
+<p>We then plot the fitted mean at each of the three fixed values of
+<code>z</code>.</p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/fitted_values.html">fitted_values</a></span><span class="op">(</span><span class="va">m_biv</span>, data <span class="op">=</span> <span class="va">ds4</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>fz <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">z</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -587,8 +594,9 @@ wrapper to <code>predict.gam()</code>.</p>
 <span>    y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/influence.measures.html" class="external-link">hat</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span><span class="op">)</span>, colour <span class="op">=</span> <span class="st">"z"</span>, fill <span class="op">=</span> <span class="st">"z"</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>
 <p><img src="data-slices_files/figure-html/data-slice-biv-2-fitted-values-1.png" class="r-plt" alt="" width="700">
-where the only difference here is that now the model constant is
-included as well as its uncertainty.</p>
+The fitted means include the model constant, whereas the earlier plots
+show only the centred smooth contribution. Both sets of intervals
+include overall-mean uncertainty with the defaults used here.</p>
 </div>
 </div>
 

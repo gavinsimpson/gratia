@@ -510,10 +510,12 @@ sm |>
 
 ![](data-slices_files/figure-html/plot-smooth-estimates-bivar-1.png)
 
-Note that the above interval is not the Marra and Wood (2012) interval.
-It doesn’t include the uncertainty from the model constant term at the
-moment, but unless the smooth is very close to linear that shouldn’t
-make too much difference.
+[`smooth_estimates()`](https://gavinsimpson.github.io/gratia/reference/smooth_estimates.md)
+defaults to `overall_uncertainty = TRUE`, so the interval above includes
+uncertainty in the overall mean (the model constant here). The plotted
+estimate is still the centred smooth contribution; the constant is not
+added to `.estimate`. Set `overall_uncertainty = FALSE` to construct an
+interval using only the smooth’s coefficient uncertainty.
 
 This extends to multiple slices by asking for several discrete `z`
 
@@ -542,15 +544,16 @@ sm |>
 
 ![](data-slices_files/figure-html/data-slice-biv-2-1.png)
 
-### Using `fitted_samples()`
+### Using `fitted_values()`
 
-If you want to evaluate the surface over `x` at fixed `z` conditional
-upon other values of other covariates (model predicted or fitted values)
-then
-[`fitted_samples()`](https://gavinsimpson.github.io/gratia/reference/fitted_samples.md)
-is a tidy wrapper to `predict.gam()`.
+[`fitted_values()`](https://gavinsimpson.github.io/gratia/reference/fitted_values.md)
+evaluates the full fitted model at the supplied covariate values and
+returns estimates with intervals. For this Gaussian identity-link model,
+the default response-scale quantity is the conditional mean, including
+the model constant and smooth contribution. Its interval describes
+uncertainty in that mean, rather than variation in new observations.
 
-For single `z` we have
+We first plot the fitted mean over `x` at the single fixed value of `z`.
 
 ``` r
 
@@ -566,7 +569,7 @@ fitted_values(m_biv, data = ds3) |> # default is response scale, not link
 
 ![](data-slices_files/figure-html/data-slice-biv-1-fitted-values-1.png)
 
-And for the multiple `z` we have
+We then plot the fitted mean at each of the three fixed values of `z`.
 
 ``` r
 
@@ -584,8 +587,9 @@ fitted_values(m_biv, data = ds4) |>
 ```
 
 ![](data-slices_files/figure-html/data-slice-biv-2-fitted-values-1.png)
-where the only difference here is that now the model constant is
-included as well as its uncertainty.
+The fitted means include the model constant, whereas the earlier plots
+show only the centred smooth contribution. Both sets of intervals
+include overall-mean uncertainty with the defaults used here.
 
 [^1]: at least that’s what I’m calling them.
 

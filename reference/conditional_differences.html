@@ -13,7 +13,7 @@ rather than differences of selected smooth functions."><meta property="og:image"
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-67</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-72</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -301,9 +301,10 @@ simulation intervals need not be centred on this estimate.</p>
 standardized deviation over the selected coverage set. They are symmetric
 about <code>.diff</code>, with half-width <code>.crit * .se</code>. For <code>uncertainty = "delta"</code>,
 one shared batch of zero-mean Gaussian coefficient deviations is generated
-from the Bayesian covariance matrix using <code><a href="https://rdrr.io/pkg/mvnfast/man/rmvn.html" class="external-link">mvnfast::rmvn()</a></code>. Response-scale
+from the Bayesian covariance matrix. Response-scale
 differences use a first-order Taylor approximation. The covariance must be
-positive definite. Sampler arguments <code>method</code>, <code>draws</code>, <code>mvn_method</code>, <code>burnin</code>,
+positive semidefinite; singular covariance matrices are supported.
+Sampler arguments <code>method</code>, <code>draws</code>, <code>mvn_method</code>, <code>burnin</code>,
 <code>thin</code>, <code>t_df</code>, and <code>rw_scale</code> apply only to <code>uncertainty = "simulation"</code>.</p>
 <p>For <code>uncertainty = "simulation"</code>, deviations are posterior difference draws
 minus <code>.diff</code>, standardized by their sample standard deviations. Draws are
@@ -320,7 +321,16 @@ They need not contain the equal-tailed pointwise simulation intervals.</p>
 random effects does not integrate over their distribution. Offsets follow
 <code><a href="https://rdrr.io/pkg/mgcv/man/predict.gam.html" class="external-link">mgcv::predict.gam()</a></code> semantics. Supported models are <code>gam</code> and <code>bam</code> fits
 with a single linear predictor and an ordinary scalar inverse-link mean
-(including negative binomial, Tweedie, beta regression and scaled t families).</p>
+(including negative binomial, Tweedie, beta regression and scaled t families).
+SCAM fits with supported single-predictor families also support link- and
+response-scale differences, with delta or simulation uncertainty and
+pointwise or simultaneous intervals. SCAM delta intervals use the local
+covariance of transformed coefficients. Gaussian simulation draws
+unrestricted fitting coefficients and applies the fitted positivity
+transformation; user draws must already be in transformed coordinates and
+satisfy the coefficient constraints. MH sampling is unavailable for SCAM
+fits, and smoothing-parameter uncertainty is unsupported; use
+<code>unconditional = FALSE</code>.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
@@ -330,84 +340,29 @@ with a single linear predictor and an ordinary scalar inverse-link mean
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="load_mgcv.html">load_mgcv</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="data_sim.html">data_sim</a></span><span class="op">(</span><span class="st">"eg4"</span>, seed <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># Simulate group-specific curves with Gaussian noise and fit factor-by smooths</span></span></span>
+<span class="r-in"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="data_sim.html">data_sim</a></span><span class="op">(</span><span class="st">"eg4"</span>, n <span class="op">=</span> <span class="fl">300</span>, seed <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu">gam</span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="va">fac</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x2</span>, by <span class="op">=</span> <span class="va">fac</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x0</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">df</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Compare fitted responses over x2, including the parametric group effects</span></span></span>
 <span class="r-in"><span><span class="va">cd</span> <span class="op">&lt;-</span> <span class="fu">conditional_differences</span><span class="op">(</span><span class="va">m</span>, by <span class="op">=</span> <span class="st">"fac"</span>, condition <span class="op">=</span> <span class="st">"x2"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="va">cd</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="conditional_differences-1.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Compare treatment levels over both numeric covariates. Each comparison</span></span></span>
-<span class="r-in"><span><span class="co"># is drawn in a separate surface panel.</span></span></span>
-<span class="r-in"><span><span class="va">cd_surface</span> <span class="op">&lt;-</span> <span class="fu">conditional_differences</span><span class="op">(</span><span class="va">m</span>, by <span class="op">=</span> <span class="st">"fac"</span>,</span></span>
-<span class="r-in"><span>  condition <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"x2"</span>, <span class="st">"x0"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="va">cd_surface</span>, surface <span class="op">=</span> <span class="st">"tile"</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="conditional_differences-2.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Restrict comparisons and fix a further covariate</span></span></span>
-<span class="r-in"><span><span class="fu">conditional_differences</span><span class="op">(</span><span class="va">m</span>, by <span class="op">=</span> <span class="st">"fac"</span>,</span></span>
-<span class="r-in"><span>  condition <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"x2"</span>, fac <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"1"</span>, <span class="st">"3"</span><span class="op">)</span>, x0 <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 100 x 9</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    .contrast .level_1 .level_2     .diff   .se .lower_ci .upper_ci      x2    x0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span>         1 1        3         0.375    0.927     -<span style="color: #BB0000;">1.44</span>    2.19   0.003<span style="text-decoration: underline;">25</span>   0.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span>         1 1        3         0.000<span style="text-decoration: underline;">823</span> 0.834     -<span style="color: #BB0000;">1.63</span>    1.63   0.013<span style="text-decoration: underline;">3</span>    0.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span>         1 1        3        -<span style="color: #BB0000;">0.374</span>    0.748     -<span style="color: #BB0000;">1.84</span>    1.09   0.023<span style="text-decoration: underline;">3</span>    0.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span>         1 1        3        -<span style="color: #BB0000;">0.752</span>    0.673     -<span style="color: #BB0000;">2.07</span>    0.567  0.033<span style="text-decoration: underline;">4</span>    0.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span>         1 1        3        -<span style="color: #BB0000;">1.13</span>     0.612     -<span style="color: #BB0000;">2.33</span>    0.065<span style="text-decoration: underline;">6</span> 0.043<span style="text-decoration: underline;">4</span>    0.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span>         1 1        3        -<span style="color: #BB0000;">1.52</span>     0.566     -<span style="color: #BB0000;">2.63</span>   -<span style="color: #BB0000;">0.413</span>  0.053<span style="text-decoration: underline;">5</span>    0.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span>         1 1        3        -<span style="color: #BB0000;">1.92</span>     0.536     -<span style="color: #BB0000;">2.97</span>   -<span style="color: #BB0000;">0.869</span>  0.063<span style="text-decoration: underline;">5</span>    0.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span>         1 1        3        -<span style="color: #BB0000;">2.33</span>     0.518     -<span style="color: #BB0000;">3.34</span>   -<span style="color: #BB0000;">1.31</span>   0.073<span style="text-decoration: underline;">6</span>    0.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span>         1 1        3        -<span style="color: #BB0000;">2.74</span>     0.509     -<span style="color: #BB0000;">3.74</span>   -<span style="color: #BB0000;">1.74</span>   0.083<span style="text-decoration: underline;">6</span>    0.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span>         1 1        3        -<span style="color: #BB0000;">3.16</span>     0.505     -<span style="color: #BB0000;">4.15</span>   -<span style="color: #BB0000;">2.17</span>   0.093<span style="text-decoration: underline;">7</span>    0.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># i 90 more rows</span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Pointwise posterior bands from shared coefficient draws</span></span></span>
-<span class="r-in"><span><span class="fu">conditional_differences</span><span class="op">(</span><span class="va">m</span>, by <span class="op">=</span> <span class="st">"fac"</span>, condition <span class="op">=</span> <span class="st">"x2"</span>,</span></span>
-<span class="r-in"><span>  uncertainty <span class="op">=</span> <span class="st">"simulation"</span>, n_sim <span class="op">=</span> <span class="fl">1000</span>, seed <span class="op">=</span> <span class="fl">42</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">cd</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 300 x 9</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    .contrast .level_1 .level_2 .diff   .se .lower_ci .upper_ci      x2    x0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span>         1 1        2         2.76 0.878      1.05      4.51 0.003<span style="text-decoration: underline;">25</span> 0.462</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span>         1 1        2         2.80 0.830      1.15      4.45 0.013<span style="text-decoration: underline;">3</span>  0.462</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span>         1 1        2         2.85 0.784      1.29      4.42 0.023<span style="text-decoration: underline;">3</span>  0.462</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span>         1 1        2         2.89 0.741      1.43      4.34 0.033<span style="text-decoration: underline;">4</span>  0.462</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span>         1 1        2         2.94 0.699      1.55      4.32 0.043<span style="text-decoration: underline;">4</span>  0.462</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span>         1 1        2         2.98 0.660      1.67      4.25 0.053<span style="text-decoration: underline;">5</span>  0.462</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span>         1 1        2         3.03 0.625      1.81      4.23 0.063<span style="text-decoration: underline;">5</span>  0.462</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span>         1 1        2         3.07 0.592      1.93      4.19 0.073<span style="text-decoration: underline;">6</span>  0.462</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span>         1 1        2         3.11 0.562      2.01      4.19 0.083<span style="text-decoration: underline;">6</span>  0.462</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span>         1 1        2         3.16 0.536      2.10      4.20 0.093<span style="text-decoration: underline;">7</span>  0.462</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span>         1 1        2         3.13 0.868      1.42      4.83 0.003<span style="text-decoration: underline;">25</span> 0.468</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span>         1 1        2         3.17 0.830      1.54      4.80 0.013<span style="text-decoration: underline;">3</span>  0.468</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span>         1 1        2         3.22 0.794      1.66      4.77 0.023<span style="text-decoration: underline;">4</span>  0.468</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span>         1 1        2         3.26 0.760      1.77      4.75 0.033<span style="text-decoration: underline;">4</span>  0.468</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span>         1 1        2         3.31 0.729      1.88      4.74 0.043<span style="text-decoration: underline;">5</span>  0.468</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span>         1 1        2         3.35 0.700      1.98      4.73 0.053<span style="text-decoration: underline;">6</span>  0.468</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span>         1 1        2         3.40 0.675      2.07      4.72 0.063<span style="text-decoration: underline;">6</span>  0.468</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span>         1 1        2         3.44 0.652      2.16      4.72 0.073<span style="text-decoration: underline;">7</span>  0.468</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span>         1 1        2         3.48 0.631      2.24      4.72 0.083<span style="text-decoration: underline;">7</span>  0.468</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span>         1 1        2         3.52 0.613      2.32      4.72 0.093<span style="text-decoration: underline;">8</span>  0.468</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># i 290 more rows</span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Link-scale simultaneous bands, separately for each comparison</span></span></span>
-<span class="r-in"><span><span class="fu">conditional_differences</span><span class="op">(</span><span class="va">m</span>, by <span class="op">=</span> <span class="st">"fac"</span>, condition <span class="op">=</span> <span class="st">"x2"</span>, scale <span class="op">=</span> <span class="st">"link"</span>,</span></span>
-<span class="r-in"><span>  interval <span class="op">=</span> <span class="st">"simultaneous"</span>, n_vals <span class="op">=</span> <span class="fl">200</span>, n_sim <span class="op">=</span> <span class="fl">1000</span>, seed <span class="op">=</span> <span class="fl">42</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 600 x 10</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    .contrast .level_1 .level_2 .diff   .se .lower_ci .upper_ci      x2    x0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span>         1 1        2         2.76 0.859     0.338      5.18 0.003<span style="text-decoration: underline;">25</span> 0.462</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span>         1 1        2         2.78 0.836     0.424      5.14 0.008<span style="text-decoration: underline;">25</span> 0.462</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span>         1 1        2         2.80 0.814     0.509      5.10 0.013<span style="text-decoration: underline;">2</span>  0.462</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span>         1 1        2         2.83 0.792     0.593      5.06 0.018<span style="text-decoration: underline;">2</span>  0.462</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span>         1 1        2         2.85 0.770     0.675      5.02 0.023<span style="text-decoration: underline;">2</span>  0.462</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span>         1 1        2         2.87 0.749     0.756      4.98 0.028<span style="text-decoration: underline;">2</span>  0.462</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span>         1 1        2         2.89 0.729     0.836      4.95 0.033<span style="text-decoration: underline;">2</span>  0.462</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span>         1 1        2         2.91 0.709     0.913      4.92 0.038<span style="text-decoration: underline;">2</span>  0.462</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span>         1 1        2         2.94 0.690     0.989      4.88 0.043<span style="text-decoration: underline;">2</span>  0.462</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span>         1 1        2         2.96 0.672     1.06       4.85 0.048<span style="text-decoration: underline;">2</span>  0.462</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># i 590 more rows</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># i 1 more variable: .crit &lt;dbl&gt;</span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Nonlinear response differences: simultaneous coverage across all pairs</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">42</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">df</span><span class="op">$</span><span class="va">count</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Poisson.html" class="external-link">rpois</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="fl">0.2</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">sin</a></span><span class="op">(</span><span class="fl">3</span> <span class="op">*</span> <span class="va">df</span><span class="op">$</span><span class="va">x2</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer</a></span><span class="op">(</span><span class="va">df</span><span class="op">$</span><span class="va">fac</span><span class="op">)</span> <span class="op">/</span> <span class="fl">3</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">mp</span> <span class="op">&lt;-</span> <span class="fu">gam</span><span class="op">(</span><span class="va">count</span> <span class="op">~</span> <span class="va">fac</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x2</span>, by <span class="op">=</span> <span class="va">fac</span><span class="op">)</span>, family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">poisson</a></span><span class="op">(</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  data <span class="op">=</span> <span class="va">df</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">conditional_differences</span><span class="op">(</span><span class="va">mp</span>, by <span class="op">=</span> <span class="st">"fac"</span>, condition <span class="op">=</span> <span class="st">"x2"</span>, scale <span class="op">=</span> <span class="st">"response"</span>,</span></span>
-<span class="r-in"><span>  uncertainty <span class="op">=</span> <span class="st">"simulation"</span>, interval <span class="op">=</span> <span class="st">"simultaneous"</span>,</span></span>
-<span class="r-in"><span>  simultaneous_scope <span class="op">=</span> <span class="st">"all"</span>, n_vals <span class="op">=</span> <span class="fl">200</span>, n_sim <span class="op">=</span> <span class="fl">1000</span>, seed <span class="op">=</span> <span class="fl">42</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="conditional_differences-3.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="va">cd</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="conditional_differences-1.png" alt="" width="700" height="433"></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

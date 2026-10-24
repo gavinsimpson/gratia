@@ -27,7 +27,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-67</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-72</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -324,9 +324,20 @@ claim concerns any of those six comparisons.</p>
 <code>.diff</code>, not equal-tailed pointwise intervals. Both
 uncertainty methods concern mean differences, not observation noise.
 They support ordinary single-predictor GAM and BAM families, including
-Gamma, negative binomial and Tweedie; general families with multiple
-linear predictors and scam fits are not supported by
+Gamma, negative binomial and Tweedie. General families with multiple
+linear predictors remain unsupported by
 <code><a href="../reference/conditional_differences.html">conditional_differences()</a></code>.</p>
+<p>SCAM fits with supported single-predictor families also support link-
+and response-scale differences, with delta or simulation uncertainty and
+pointwise or simultaneous intervals. Delta intervals use the local
+covariance of the transformed coefficients. With
+<code>uncertainty = "simulation"</code>, the default
+<code>method = "gaussian"</code> draws unrestricted fitting coefficients
+and applies the fitted positivity transformation.
+<code>method = "user"</code> accepts transformed coefficient draws that
+satisfy the fitted coefficient constraints; MH sampling is unavailable
+for SCAM fits. Smoothing-parameter uncertainty is unavailable for both
+uncertainty methods, so retain <code>unconditional = FALSE</code>.</p>
 <div class="section level3">
 <h3 id="compare-shape-separately-from-complete-responses">Compare shape separately from complete responses<a class="anchor" aria-label="anchor" href="#compare-shape-separately-from-complete-responses"></a>
 </h3>
@@ -396,9 +407,11 @@ fitted predictions and normal intervals; simulation uses the median and
 quantiles of derivative draws. The plotted methods agree closely where
 uncertainty is modest. Differences can grow when the inverse link
 strongly transforms uncertain coefficients. Delta uncertainty supports
-single-predictor GAM/BAM families, but does not extend to scam or
-general families with several predictors; their existing simulation
-support is unchanged.</p>
+single-predictor GAM/BAM families and SCAM fits. For SCAM fits it uses
+the transformed-coefficient covariance, conditional on the fitted
+smoothing parameters. General families with several predictors do not
+support delta uncertainty; their existing simulation support is
+unchanged.</p>
 <p>The default <code>eps = NULL</code> chooses the perturbation from the
 fitted covariate range, derivative order and finite-difference method.
 This reduces dependence on measurement units and avoids many rounding

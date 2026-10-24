@@ -19,7 +19,7 @@ marginaleffects::plot_predictions()."><meta property="og:image" content="https:/
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-67</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-72</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -197,85 +197,29 @@ issued and the uncorrected covariance is used.</p></dd>
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="load_mgcv.html">load_mgcv</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="data_sim.html">data_sim</a></span><span class="op">(</span><span class="st">"eg1"</span>, seed <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">m1</span> <span class="op">&lt;-</span> <span class="fu">gam</span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">x0</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x1</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x2</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x3</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">df</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># Simulate an additive Gaussian response and fit a GAM</span></span></span>
+<span class="r-in"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="data_sim.html">data_sim</a></span><span class="op">(</span><span class="st">"eg1"</span>, n <span class="op">=</span> <span class="fl">200</span>, seed <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu">gam</span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">x0</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x1</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x2</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x3</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">df</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># predictions conditional on values evenly spaced over x2, all other</span></span></span>
-<span class="r-in"><span><span class="co"># variables in model are held at representative values</span></span></span>
-<span class="r-in"><span><span class="va">cv</span> <span class="op">&lt;-</span> <span class="fu">conditional_values</span><span class="op">(</span></span></span>
-<span class="r-in"><span>  <span class="va">m1</span>,</span></span>
-<span class="r-in"><span>  condition <span class="op">=</span> <span class="st">"x2"</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="co"># plot</span></span></span>
-<span class="r-in"><span><span class="va">cv</span> <span class="op">|&gt;</span> <span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># Vary x2 while holding the other covariates at representative values</span></span></span>
+<span class="r-in"><span><span class="va">cv</span> <span class="op">&lt;-</span> <span class="fu">conditional_values</span><span class="op">(</span><span class="va">m</span>, condition <span class="op">=</span> <span class="st">"x2"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">cv</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 100 x 10</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     .row       x2    x0    x1    x3 .parameter .fitted   .se .lower_ci .upper_ci</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span>     1 0.000<span style="text-decoration: underline;">663</span> 0.437 0.486 0.512 mean          3.71 0.772      2.20      5.23</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span>     2 0.010<span style="text-decoration: underline;">7</span>   0.437 0.486 0.512 mean          4.13 0.690      2.78      5.48</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span>     3 0.020<span style="text-decoration: underline;">8</span>   0.437 0.486 0.512 mean          4.55 0.619      3.34      5.77</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span>     4 0.030<span style="text-decoration: underline;">9</span>   0.437 0.486 0.512 mean          4.98 0.563      3.88      6.08</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span>     5 0.041<span style="text-decoration: underline;">0</span>   0.437 0.486 0.512 mean          5.42 0.525      4.39      6.45</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span>     6 0.051<span style="text-decoration: underline;">0</span>   0.437 0.486 0.512 mean          5.87 0.506      4.88      6.86</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span>     7 0.061<span style="text-decoration: underline;">1</span>   0.437 0.486 0.512 mean          6.34 0.503      5.36      7.33</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span>     8 0.071<span style="text-decoration: underline;">2</span>   0.437 0.486 0.512 mean          6.84 0.511      5.83      7.84</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span>     9 0.081<span style="text-decoration: underline;">3</span>   0.437 0.486 0.512 mean          7.35 0.523      6.33      8.38</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span>    10 0.091<span style="text-decoration: underline;">3</span>   0.437 0.486 0.512 mean          7.89 0.536      6.84      8.94</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># i 90 more rows</span></span>
+<span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="va">cv</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="conditional_values-1.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Grouping x2 and x1 creates a surface over both covariates, with</span></span></span>
-<span class="r-in"><span><span class="co"># 50 generated values along each axis by default.</span></span></span>
-<span class="r-in"><span><span class="va">cv_surface</span> <span class="op">&lt;-</span> <span class="fu">conditional_values</span><span class="op">(</span><span class="va">m1</span>, condition <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"x2"</span>, <span class="st">"x1"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="va">cv_surface</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="conditional_values-2.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="va">cv_surface</span>, surface <span class="op">=</span> <span class="st">"tile"</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="conditional_values-3.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># as above but condition on `x1` also. When plotted, `x1` is mapped to the</span></span></span>
-<span class="r-in"><span><span class="co"># colour channel, noting that it has been summarised using fivenum()</span></span></span>
-<span class="r-in"><span><span class="va">cv</span> <span class="op">&lt;-</span> <span class="fu">conditional_values</span><span class="op">(</span></span></span>
-<span class="r-in"><span>  <span class="va">m1</span>,</span></span>
-<span class="r-in"><span>  condition <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"x2"</span>, <span class="st">"x1"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="co"># plot</span></span></span>
-<span class="r-in"><span><span class="va">cv</span> <span class="op">|&gt;</span> <span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="conditional_values-4.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># can pass `condition` a list, allowing for greater flexibility</span></span></span>
-<span class="r-in"><span><span class="co"># For example, here we condition on all four variables in the model,</span></span></span>
-<span class="r-in"><span><span class="co"># summarising:</span></span></span>
-<span class="r-in"><span><span class="co">#   * `x1` at its five number summary,</span></span></span>
-<span class="r-in"><span><span class="co">#   * `x0  at its quartiles</span></span></span>
-<span class="r-in"><span><span class="co">#   * `x3` at its mean a d mean +/- sd</span></span></span>
-<span class="r-in"><span><span class="va">cv</span> <span class="op">&lt;-</span> <span class="fu">conditional_values</span><span class="op">(</span></span></span>
-<span class="r-in"><span>  <span class="va">m1</span>,</span></span>
-<span class="r-in"><span>  condition <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"x2"</span>, x1 <span class="op">=</span> <span class="st">"fivenum"</span>, x0 <span class="op">=</span> <span class="st">"quartile"</span>, x3 <span class="op">=</span> <span class="st">"threenum"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="co"># plot</span></span></span>
-<span class="r-in"><span><span class="va">cv</span> <span class="op">|&gt;</span> <span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="conditional_values-5.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># some model terms can be exclude from the conditional predictions using the</span></span></span>
-<span class="r-in"><span><span class="co"># `exclude` mechanism of `predict.gam`. Here we exclude the effects of</span></span></span>
-<span class="r-in"><span><span class="co"># `s(x0)` and `s(x3)` from the conditional predictions. This, in effect,</span></span></span>
-<span class="r-in"><span><span class="co"># treats these smooths as having **0** effect on the conditional predictions</span></span></span>
-<span class="r-in"><span><span class="co"># of the response, even though the two smooths conditioned on (`s(x2)` and</span></span></span>
-<span class="r-in"><span><span class="co"># `s(x1)`) were estimated given the two excluded smooths were in the model</span></span></span>
-<span class="r-in"><span><span class="va">cv</span> <span class="op">&lt;-</span> <span class="fu">conditional_values</span><span class="op">(</span></span></span>
-<span class="r-in"><span>  <span class="va">m1</span>,</span></span>
-<span class="r-in"><span>  condition <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"x2"</span>, x1 <span class="op">=</span> <span class="st">"minmax"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  exclude <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"s(x0)"</span>, <span class="st">"s(x3)"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="co"># plot</span></span></span>
-<span class="r-in"><span><span class="va">cv</span> <span class="op">|&gt;</span> <span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="conditional_values-6.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># categorical conditions are also handled</span></span></span>
-<span class="r-in"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="data_sim.html">data_sim</a></span><span class="op">(</span><span class="st">"eg4"</span>, seed <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">m2</span> <span class="op">&lt;-</span> <span class="fu">gam</span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="va">fac</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x2</span>, by <span class="op">=</span> <span class="va">fac</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x0</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">df</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">cv</span> <span class="op">&lt;-</span> <span class="fu">conditional_values</span><span class="op">(</span></span></span>
-<span class="r-in"><span>  <span class="va">m2</span>,</span></span>
-<span class="r-in"><span>  condition <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"fac"</span>, x2 <span class="op">=</span> <span class="st">"fivenum"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="co"># plot - we see a discrete x axis</span></span></span>
-<span class="r-in"><span><span class="va">cv</span> <span class="op">|&gt;</span> <span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="conditional_values-7.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># in this example we condition on `x2` and `fac %in% c(2,3)`</span></span></span>
-<span class="r-in"><span><span class="va">cv</span> <span class="op">&lt;-</span> <span class="fu">conditional_values</span><span class="op">(</span></span></span>
-<span class="r-in"><span>  <span class="va">m2</span>,</span></span>
-<span class="r-in"><span>  condition <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"x2"</span>, fac <span class="op">=</span> <span class="fl">2</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="co"># plot - smooths of `x2` for `fac == 2` and `fac == 3`</span></span></span>
-<span class="r-in"><span><span class="va">cv</span> <span class="op">|&gt;</span> <span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="conditional_values-8.png" alt="" width="700" height="433"></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-67</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-72</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -76,7 +76,8 @@
 <span>  unconditional <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  overall_uncertainty <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  partial_match <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  envir <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  envir <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  dist <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -148,7 +149,36 @@ against.</p></dd>
 in model expressions. The available model formula environment is used when
 <code>NULL</code>. Covariate observations should be supplied in <code>data</code>.</p></dd>
 
+
+<dt id="arg-dist">dist<a class="anchor" aria-label="anchor" href="#arg-dist"></a></dt>
+<dd><p>numeric; if greater than 0, this is used to determine when
+a location is too far from data to be plotted when plotting 2-D smooths.
+The data are scaled into the unit square before deciding what to exclude,
+and <code>dist</code> is a distance within the unit square. See
+<code><a href="https://rdrr.io/pkg/mgcv/man/exclude.too.far.html" class="external-link">mgcv::exclude.too.far()</a></code> for further details.</p></dd>
+
 </dl></div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>Two-variable smooths are evaluated at common locations. Automatic grids span
+the intersection of the models' observed covariate ranges; factor levels must
+overlap. Supplied <code>data</code> are evaluated as given, without filling gaps.
+Each selected smooth label must occur exactly once in every model and use
+the same covariates, including any <code>by</code> variable. Numeric and logical <code>select</code>
+refer to the primary model; matching labels are then used in every model.</p>
+<p>Estimates are contributions of individual smooths to the linear predictor,
+on its link scale, with the centring constraints used in each fitted model.
+They exclude the intercept and other model terms. Different fitting data can
+change the centring, so a surface difference can include a constant shift.
+It is the difference between these fitted smooth contributions, rather than
+a difference between fitted responses.</p>
+<p>The result retains one row per model and smooth, with estimates in the <code>data</code>
+list column. For distributional models, <code>.parameter</code> retains the label for
+the linear predictor, while <code>.model</code> identifies the input model. Use
+<code><a href="draw.compare_smooths.html">draw.compare_smooths()</a></code> for faceted surface comparisons or
+estimated surface differences. Smooths with more than two covariates can be
+evaluated but cannot be drawn by this method.</p>
+    </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
@@ -180,6 +210,19 @@ in model expressions. The available model formula environment is used when
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="va">comp</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="compare_smooths-1.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Simulate a noisy response over two continuous covariates, x and z</span></span></span>
+<span class="r-in"><span><span class="va">surf</span> <span class="op">&lt;-</span> <span class="fu"><a href="data_sim.html">data_sim</a></span><span class="op">(</span><span class="st">"eg2"</span>, n <span class="op">=</span> <span class="fl">100</span>, seed <span class="op">=</span> <span class="fl">7</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># Fit two small bases to the same surface data</span></span></span>
+<span class="r-in"><span><span class="va">coarse</span> <span class="op">&lt;-</span> <span class="fu">gam</span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">x</span>, <span class="va">z</span>, k <span class="op">=</span> <span class="fl">10</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">surf</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">fine</span> <span class="op">&lt;-</span> <span class="fu">gam</span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">x</span>, <span class="va">z</span>, k <span class="op">=</span> <span class="fl">15</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">surf</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># Compare surfaces on shared axes and a shared colour scale</span></span></span>
+<span class="r-in"><span><span class="va">surfaces</span> <span class="op">&lt;-</span> <span class="fu">compare_smooths</span><span class="op">(</span><span class="va">coarse</span>, <span class="va">fine</span>, n_2d <span class="op">=</span> <span class="fl">20</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="va">surfaces</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="compare_smooths-2.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span><span class="co"># Show coarse minus fine, with a colour scale centred on zero</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="va">surfaces</span>, show <span class="op">=</span> <span class="st">"difference"</span>, pair <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"coarse"</span>, <span class="st">"fine"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="compare_smooths-3.png" alt="" width="700" height="433"></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

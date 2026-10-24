@@ -187,9 +187,6 @@ smooth_samples(
   character; select which smooth's posterior to draw from. The default
   (`NULL`) means the posteriors of all smooths in `model` will be
   sampled from. If supplied, a character vector of requested terms.
-  0.8.1 or earlier is used, whereby a separate call the the random
-  number generator (RNG) is performed for each smooth. If FALSE, a
-  single call to the RNG is performed for all model parameters
 
 - n_grid:
 

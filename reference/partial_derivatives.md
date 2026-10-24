@@ -287,51 +287,29 @@ Gavin L. Simpson
 ## Examples
 
 ``` r
-
-library("ggplot2")
-library("patchwork")
 load_mgcv()
-df <- data_sim("eg2", n = 2000, dist = "normal", scale = 0.5, seed = 42)
+# Simulate a smooth surface with Gaussian noise and fit a tensor-product smooth
+df <- data_sim("eg2", n = 400, scale = 0.1, seed = 42)
+m <- gam(y ~ te(x, z, k = c(7, 7)), data = df, method = "REML")
 
-# fit the GAM (note: for execution time reasons, k is set articifially low)
-m <- gam(y ~ te(x, z, k = c(5, 5)), data = df, method = "REML")
-
-# data slice through te(x,z) holding z == 0.4
+# Estimate change along x while holding z at 0.4
 ds <- data_slice(m, x = evenly(x, n = 100), z = 0.4)
-
-# evaluate te(x,z) at values of x & z
-sm <- smooth_estimates(m, select = "te(x,z)", data = ds) |>
-  add_confint()
-
-# partial derivatives
 pd_x <- partial_derivatives(m, data = ds, type = "central", focal = "x")
-
-# draw te(x,z)
-p1 <- draw(m, rug = FALSE) &
-  geom_hline(yintercept = 0.4, linewidth = 1)
-p1
-
-
-# draw te(x,z) along slice
-cap <- expression(z == 0.4)
-p2 <- sm |>
-  ggplot(aes(x = x, y = .estimate)) +
-  geom_ribbon(aes(ymin = .lower_ci, ymax = .upper_ci), alpha = 0.2) +
-  geom_line() +
-  labs(
-    x = "x", y = "Partial effect", title = "te(x,z)",
-    caption = cap
-  )
-p2
-
-
-# draw partial derivs
-p3 <- pd_x |>
-  draw() +
-  labs(caption = cap)
-p3
-
-
-# draw all three panels
-p1 + p2 + p3 + plot_layout(ncol = 3)
+pd_x
+#> # A tibble: 100 x 10
+#>    .smooth .focal .by   .fs   .partial_deriv   .se .crit .lower_ci .upper_ci
+#>    <chr>   <chr>  <chr> <chr>          <dbl> <dbl> <dbl>     <dbl>     <dbl>
+#>  1 te(x,z) x      NA    NA              1.42 0.378  1.96     0.681      2.16
+#>  2 te(x,z) x      NA    NA              1.42 0.377  1.96     0.680      2.16
+#>  3 te(x,z) x      NA    NA              1.41 0.373  1.96     0.676      2.14
+#>  4 te(x,z) x      NA    NA              1.39 0.366  1.96     0.670      2.11
+#>  5 te(x,z) x      NA    NA              1.36 0.358  1.96     0.662      2.06
+#>  6 te(x,z) x      NA    NA              1.33 0.346  1.96     0.652      2.01
+#>  7 te(x,z) x      NA    NA              1.29 0.333  1.96     0.639      1.94
+#>  8 te(x,z) x      NA    NA              1.24 0.317  1.96     0.623      1.87
+#>  9 te(x,z) x      NA    NA              1.19 0.299  1.96     0.605      1.78
+#> 10 te(x,z) x      NA    NA              1.13 0.279  1.96     0.582      1.68
+#> # i 90 more rows
+#> # i 1 more variable: x <dbl>
+draw(pd_x)
 ```

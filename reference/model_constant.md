@@ -1,7 +1,8 @@
 # Extract the model constant term
 
 **\[experimental\]** Extracts the model constant term(s), the model
-intercept, from a fitted model object.
+intercept, from a fitted model object. Predictors without an intercept
+return zero.
 
 ## Usage
 

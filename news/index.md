@@ -4,6 +4,9 @@
 
 ### User visible changes
 
+- Help examples use fewer model fits and repeated plots to focus on each
+  function’s main use and reduce execution time.
+
 - gratia no longer requires ggokabeito; default plot colours and their
   ordering are unchanged. Unused curl and svglite suggestions have been
   removed, and ggdist, distributional and hexbin are now listed as
@@ -89,10 +92,10 @@
   response scale only. Both functions use explicit parameter names,
   including for scalar models.
 
-  Gaussian LSS returns standard deviation rather than reciprocal
-  standard deviation; GEV location is labelled separately from
-  expectation. Multivariate responses and categories have separate `.y`
-  and `.category` identifiers.
+  Gaussian location-scale models return standard deviation rather than
+  reciprocal standard deviation; GEV location is labelled separately
+  from expectation. Multivariate responses and categories have separate
+  `.y` and `.category` identifiers.
 
   Global family parameters remain fixed during coefficient sampling.
   Unknown general families require a natural-parameter or expectation
@@ -192,6 +195,24 @@
   so the development version of glmmTMB is no longer needed.
 
 ### New features
+
+- [`compare_smooths()`](https://gavinsimpson.github.io/gratia/reference/compare_smooths.md)
+  evaluates two-variable smooths at common locations, and
+  [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)
+  compares their surfaces in side-by-side facets with shared axes and
+  colours. Use `show = "difference"` and `pair` to plot one model’s
+  smooth contribution minus another’s, with a colour scale centred on
+  zero ([\#435](https://github.com/gavinsimpson/gratia/issues/435)).
+  Conditioning values retain separate panels, constant surfaces omit
+  contours, and labels for distribution parameters are preserved.
+
+- [`draw.compare_smooths()`](https://gavinsimpson.github.io/gratia/reference/draw.compare_smooths.md)
+  accepts `ci_level` to set the coverage of its pointwise intervals,
+  matching
+  [`draw.gam()`](https://gavinsimpson.github.io/gratia/reference/draw.gam.md).
+  Unsupported `coverage` and `level` arguments now give an error
+  directing callers to `ci_level`, including when supplied alongside it
+  ([\#436](https://github.com/gavinsimpson/gratia/issues/436)).
 
 - [`difference_smooths()`](https://gavinsimpson.github.io/gratia/reference/difference_smooths.md)
   computes first and second derivatives of differences between factor-by
@@ -601,24 +622,31 @@
   [`sampling_diagnostics()`](https://gavinsimpson.github.io/gratia/reference/sampling_diagnostics.md)
   provide coefficient convergence summaries and acceptance rates
   ([\#281](https://github.com/gavinsimpson/gratia/issues/281)).
+
   `draw(sampling_diagnostics(x))` plots native coefficient traces or
   pooled-rank histogram outlines by chain. Sampling with
   `diagnostics = TRUE` retains the coefficient draws for these plots
   through fitted, response, smooth and derivative sampling.
 
-  LSS sampling supports fitting rows, subsets and new covariates without
-  observed responses. All distribution parameters use the same
-  coefficient draw. Fitted response samples and their derivatives
-  evaluate the expected response, including means that depend on scale,
-  shape or hurdle probabilities.
+  Sampling for models with several distribution parameters supports
+  fitting rows, subsets and new covariates without observed responses.
+  Parameters represented by predictors use the same joint coefficient
+  draw.
+
+  [`fitted_samples()`](https://gavinsimpson.github.io/gratia/reference/fitted_samples.md)
+  defaults to distribution parameters; use `quantity = "expectation"`
+  for expected responses. On the response scale,
+  [`derivative_samples()`](https://gavinsimpson.github.io/gratia/reference/derivative_samples.md)
+  differentiates the expected response, including means that depend on
+  scale, shape or hurdle probabilities.
 
   Fixed-coefficient response sampling uses the same parameter
   transformations. Missing predictors or explicit sampling weights
   produce `NA` response draws consistently.
 
-  LSS response generation now reuses model-matrix blocks and constructs
-  the output table once, preserving seeded responses and chain
-  identities.
+  For models with several distribution parameters, response generation
+  now reuses model-matrix blocks and constructs the output table once,
+  preserving seeded responses and chain identities.
 
 - **Metropolis–Hastings backends**
 
@@ -1021,6 +1049,13 @@
   joint RTMB covariance, including tensor smooths with multiple
   penalties.
 
+  [`get_smooth()`](https://gavinsimpson.github.io/gratia/reference/get_smooth.md)
+  extracts sdmTMB smooths by exact name and
+  [`n_smooths()`](https://gavinsimpson.github.io/gratia/reference/n_smooths.md)
+  counts them, including both predictors of delta models, without
+  calculating coefficient covariances
+  ([\#441](https://github.com/gavinsimpson/gratia/issues/441)).
+
   Breakpoint (`breakpt()`) and logistic (`logistic()`) curves are
   available through
   [`parametric_terms()`](https://gavinsimpson.github.io/gratia/reference/parametric_terms.md)
@@ -1320,6 +1355,113 @@
   needing a recognised family name.
 
 ### Bug fixes
+
+- **Response derivatives**
+
+  [`response_derivatives()`](https://gavinsimpson.github.io/gratia/reference/response_derivatives.md)
+  now retains unavailable prediction rows with missing estimates,
+  standard errors and intervals under both uncertainty methods, while
+  respecting explicit `na.action` requests
+  ([\#437](https://github.com/gavinsimpson/gratia/issues/437)). Original
+  row order and response identifiers are preserved.
+
+  Delta uncertainty now rejects response-mean derivatives for scaled t
+  families with fitted degrees of freedom at or below one, matching
+  simulation
+  ([\#437](https://github.com/gavinsimpson/gratia/issues/437)). Means
+  with degrees of freedom between one and two and linear-predictor
+  derivatives remain supported.
+
+- [`add_fitted()`](https://gavinsimpson.github.io/gratia/reference/add_fitted.md)
+  now advertises `value = ".fitted"` in its generic and help, matching
+  its established GAM output. Explicit column names are unchanged
+  ([\#441](https://github.com/gavinsimpson/gratia/issues/441)).
+
+- [`confint.fderiv()`](https://gavinsimpson.github.io/gratia/reference/confint.fderiv.md)
+  rejects missing, empty, non-numeric and non-finite confidence levels,
+  and levels outside the open interval between zero and one. Vectors
+  still warn and use their first value
+  ([\#441](https://github.com/gavinsimpson/gratia/issues/441)).
+
+- [`ref_level()`](https://gavinsimpson.github.io/gratia/reference/ref_level.md)
+  and
+  [`level()`](https://gavinsimpson.github.io/gratia/reference/ref_level.md)
+  preserve ordered-factor status as well as the original levels and
+  their order
+  ([\#441](https://github.com/gavinsimpson/gratia/issues/441)).
+
+- **Response simulation**
+
+  [`simulate.gam()`](https://gavinsimpson.github.io/gratia/reference/simulate.md)
+  validates `nsim` as one finite positive whole number within the
+  supported integer range before prediction or changes to the
+  random-number state, including grouped-family and marginal simulations
+  ([\#441](https://github.com/gavinsimpson/gratia/issues/441)).
+
+  Explicitly seeded GAM simulations restore the caller’s previous
+  random-number state, including its absence, on success and error.
+  Unseeded simulation continues to advance or initialize the
+  random-number state
+  ([\#441](https://github.com/gavinsimpson/gratia/issues/441)).
+
+- [`overview()`](https://gavinsimpson.github.io/gratia/reference/overview.md)
+  now returns the parametric coefficients for GAMs without smooth terms,
+  or an empty overview when `parametric = FALSE`
+  ([\#438](https://github.com/gavinsimpson/gratia/issues/438)).
+
+- [`model_terms()`](https://gavinsimpson.github.io/gratia/reference/model_terms.md)
+  now returns the coefficient name for intercept-only GAMs and models
+  with a single slope and no intercept
+  ([\#438](https://github.com/gavinsimpson/gratia/issues/438)).
+
+- [`response_derivatives()`](https://gavinsimpson.github.io/gratia/reference/response_derivatives.md)
+  rejects `ci_level` and `coverage` with guidance to use `level` for
+  both delta and simulation uncertainty, including when `level` is also
+  supplied. These arguments can no longer silently leave delta intervals
+  at the default coverage
+  ([\#436](https://github.com/gavinsimpson/gratia/issues/436)).
+
+- Corrected the posterior simulation article’s coefficient-posterior and
+  interval explanations, matched uncertainty settings for its smooth and
+  prediction intervals, and updated obsolete sampling argument names.
+  Documentation now reflects SCAM predictive-plot and
+  conditional-comparison support and the uncertainty included in
+  data-slice examples
+  ([\#439](https://github.com/gavinsimpson/gratia/issues/439)).
+
+- [`fitted_values()`](https://gavinsimpson.github.io/gratia/reference/fitted_values.md)
+  retains small ordinal category probabilities and their standard errors
+  at extreme predictor values. Ordinal and multinomial intervals remain
+  defined when probabilities round to zero or one, including for grouped
+  ordinal models
+  ([\#434](https://github.com/gavinsimpson/gratia/issues/434)). Closely
+  spaced ordinal thresholds and large multinomial predictors retain
+  valid category probabilities.
+
+- `confint(shift = TRUE)` now adds the full intercept of each smooth’s
+  own linear predictor, including contributions from shared formula
+  blocks.
+  [`model_constant()`](https://gavinsimpson.github.io/gratia/reference/model_constant.md)
+  returns zero for predictors without an intercept and keeps selected
+  predictor names aligned;
+  [`add_fitted()`](https://gavinsimpson.github.io/gratia/reference/add_fitted.md)
+  uses native prediction constants for term predictions
+  ([\#433](https://github.com/gavinsimpson/gratia/issues/433)).
+
+- [`log_lik()`](https://gavinsimpson.github.io/gratia/reference/log_lik.md)
+  now divides the dispersion by each observation’s weight for Gamma and
+  inverse Gaussian densities, including grouped-family components
+  ([\#432](https://github.com/gavinsimpson/gratia/issues/432)). This
+  corrects their normalising constants and the LOO and WAIC scores
+  calculated from them.
+
+- [`response_derivatives()`](https://gavinsimpson.github.io/gratia/reference/response_derivatives.md)
+  now summarises each response category and multivariate response
+  separately within each prediction row, including categories in grouped
+  families ([\#431](https://github.com/gavinsimpson/gratia/issues/431)).
+  This corrects derivative estimates, standard errors and intervals that
+  previously mixed those quantities. Summaries preserve the supplied row
+  order and no longer retain draw, chain or iteration identifiers.
 
 - Bivariate factor-by basis plots now put each basis function in its own
   panel, instead of drawing their surfaces on top of one another
@@ -1726,9 +1868,13 @@
 
 - [`confint.gam()`](https://gavinsimpson.github.io/gratia/reference/confint.gam.md)
   now uses consistent covariance and standard errors for simultaneous
-  intervals, respecting `unconditional`. These intervals exclude
-  overall-mean uncertainty, as documented (GRA-005). Requesting multiple
-  smooths no longer causes an error (GRA-006).
+  intervals: `unconditional = TRUE` includes uncertainty from estimating
+  smoothing parameters in the Bayesian covariance when available, while
+  `frequentist = TRUE` selects the frequentist covariance (GRA-005).
+  Both pointwise and simultaneous intervals respect
+  `overall_uncertainty`, including uncertainty in the overall mean by
+  default for ordinary GAMs; native scasm fits default to `FALSE`.
+  Requesting multiple smooths no longer causes an error (GRA-006).
 
 - [`simulate.gamm()`](https://gavinsimpson.github.io/gratia/reference/simulate.md)
   now respects the supplied `data` argument. `smooth_samples.gamm()` and

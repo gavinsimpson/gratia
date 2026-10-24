@@ -65,11 +65,15 @@ simulate(
 
 - nsim:
 
-  numeric; number of response simulations to return.
+  numeric; number of response simulations to return. Supply one finite
+  positive whole number, no larger than `.Machine$integer.max`.
 
 - seed:
 
-  numeric; a random seed for the simulations.
+  numeric or `NULL`; a random seed for the simulations. An explicit seed
+  restores the previous random-number state, including its absence, when
+  simulation finishes or fails. With `NULL`, simulation advances or
+  initializes the random-number state.
 
 - conditioning:
 

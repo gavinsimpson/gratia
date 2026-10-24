@@ -282,6 +282,14 @@ expectation. Predictor-scale derivatives refer to the first linear
 predictor. Smooth-component derivatives and derivatives of the response
 expectation are different quantities.
 
+Rows with unavailable required covariates retain `NA` derivatives by
+default; explicit `na.action` requests follow
+[`response_derivatives()`](https://gavinsimpson.github.io/gratia/reference/response_derivatives.md).
+Non-finite derivative calculations at available rows raise an error,
+including when only some coefficient draws are affected. Response-scale
+derivatives require an existing response mean; scaled t families need
+fitted degrees of freedom greater than one.
+
 ## See also
 
 [gamm4_support](https://gavinsimpson.github.io/gratia/reference/gamm4_support.md)

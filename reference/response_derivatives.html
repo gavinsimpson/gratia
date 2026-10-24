@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-67</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-72</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -199,7 +199,9 @@ user-supplied draws.</p></dd>
 
 <dt id="arg-level">level<a class="anchor" aria-label="anchor" href="#arg-level"></a></dt>
 <dd><p>numeric; <code>0 &lt; level &lt; 1</code>; the coverage level of the
-credible interval. The default is <code>0.95</code> for a 95% interval.</p></dd>
+credible interval. The default is <code>0.95</code> for a 95% interval.
+Supply one finite numeric value. Use <code>level</code> for both uncertainty methods;
+<code>ci_level</code> and <code>coverage</code> are not accepted, even when <code>level</code> is also supplied.</p></dd>
 
 
 <dt id="arg-seed">seed<a class="anchor" aria-label="anchor" href="#arg-seed"></a></dt>
@@ -260,6 +262,19 @@ component. SCAM models use transformed-coefficient covariance conditional on
 the fitted smoothing parameters. General multi-predictor families do not
 support delta uncertainty; their existing simulation support is unchanged.
 The <code>uncertainty</code> attribute records the selected method.</p>
+<p>By default, all supplied prediction rows are returned in their original
+order. Rows with missing or non-finite required covariates have <code>NA</code>
+derivatives, standard errors and interval limits. Category, response and
+family identifiers are retained. An explicit <code>na.action</code> follows the
+prediction convention: <code>na.omit</code> drops unavailable rows with missing
+covariates, <code>na.exclude</code> and <code>na.pass</code> retain them, and <code>na.fail</code> reports
+missing covariates as an error. Undefined calculations at available rows,
+including in only some coefficient draws, raise an error; draws are never
+removed to form a summary.</p>
+<p>Response-scale derivatives require the expected response to exist. For a
+scaled t family, fitted degrees of freedom must exceed one, whether fixed
+or estimated. A finite response variance is not required. Linear-predictor
+derivatives remain available when the response mean does not exist.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>

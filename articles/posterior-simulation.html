@@ -27,7 +27,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-67</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-72</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -136,21 +136,35 @@ the covariate value <span class="math inline">x_{ij}</span> for the
 \mathbf{S}_j \boldsymbol{\beta}</span> controls the degree of smoothing
 applied to the <span class="math inline">f_j</span> through the
 smoothing parameters <span class="math inline">\lambda_j</span>.</p>
-<p>Having fitted the GAM in mgcv using REML or ML smoothness selection
-we obtain a vector of coefficients <span class="math inline">\hat{\boldsymbol{\beta}}</span> (which also includes
-the coefficients for the parametric terms, , for convenience). The
-estimates of these coefficients are conditional upon the data and the
-selected values of the smoothing parameters <span class="math inline">\lambda_j</span>. Using the Bayesian view of
-smoothing <span class="citation">(Miller, 2025)</span> via (RE)ML
-smoothness selection, <span class="math inline">\boldsymbol{\beta}</span> has a multivariate normal
-posterior distribution <span class="math inline">\boldsymbol{\beta} |
-\boldsymbol{\eta}, \boldsymbol{\lambda} \sim
-\text{MVN}(\hat{\boldsymbol{\beta}}, \mathbf{V}_{\text{b}})</span>,
-where <span class="math inline">\mathbf{V}_{\text{b}}</span> is the
-Bayesian covariance matrix of the estimated parameters (<span class="math inline">\hat{\boldsymbol{\beta}}</span>) — the subscript
-<span class="math inline">\text{b}</span> is used to differentiate this
-Bayesian covariance matrix from the frequentist version which is also
-available in the mgcv model output.</p>
+<p>Having fitted the GAM in mgcv using REML or ML smoothness selection,
+we obtain a vector of coefficients <span class="math inline">\hat{\boldsymbol{\beta}}</span>, including the
+parametric coefficients <span class="math inline">\boldsymbol{\gamma}</span>. Under the Bayesian view
+of smoothing <span class="citation">(Miller, 2025)</span>, we use a
+Gaussian approximation to their posterior:</p>
+<p><span class="math display">
+\boldsymbol{\beta} \mid \mathbf{y}, \mathbf{B},
+\hat{\boldsymbol{\lambda}}, \hat{\phi}
+\;\overset{\mathrm{approx}}{\sim}\;
+\mathrm{MVN}(\hat{\boldsymbol{\beta}}, \mathbf{V}_{\mathrm{b}}).
+</span></p>
+<p>Here <span class="math inline">\mathbf{y}</span> is the observed
+response vector and <span class="math inline">\mathbf{B}</span> is the
+full model matrix, including the parametric terms and spline bases. The
+chosen smoothing parameters <span class="math inline">\hat{\boldsymbol{\lambda}}</span> and the response
+scale <span class="math inline">\hat{\phi}</span>, when estimated, are
+held fixed. <span class="math inline">\mathbf{V}_{\mathrm{b}}</span> is
+the Bayesian coefficient covariance matrix, rather than the frequentist
+covariance matrix also available from mgcv.</p>
+<p>For a Gaussian identity-link GAM with a quadratic smoothing penalty
+and no coefficient inequality constraints, the Gaussian likelihood and
+the corresponding Gaussian smoothing prior give an exactly
+multivariate-normal coefficient posterior when the response variance
+<span class="math inline">\sigma^2 = \phi</span> and all smoothing
+parameters are fixed, provided the posterior is proper. Using fitted
+values of these quantities gives this conditional posterior; it does not
+integrate over their uncertainty. For other response distributions or
+links, normality is generally an approximation. The Metropolis Hastings
+example below shows a case where that approximation performs poorly.</p>
 <div class="section level2">
 <h2 id="what-are-we-simulating">What are we simulating?<a class="anchor" aria-label="anchor" href="#what-are-we-simulating"></a>
 </h2>
@@ -199,17 +213,13 @@ response at the supplied covariates. It adds no response noise.
 coefficients, so it includes response variation as well as coefficient
 uncertainty. <code><a href="../reference/predicted_samples.html">predicted_samples()</a></code> draws observations with
 the coefficients held at their fitted values.</p>
-<p>It is worth reminding ourselves that these posterior draws are all
-conditional upon the selected values of the smoothing parameter(s) <span class="math inline">\lambda_j</span>. We act as if the wiggliness of the
-estimated smooths was known, when in actual fact we estimated (selected
-is perhaps a better description) these wiglinesses from the data during
-model fitting. If the estimated GAM has been fitted with
-<code>method</code> argument <code>"REML"</code>, or <code>"ML"</code>,
-then a version of <span class="math inline">\mathbf{V}_{\text{b}}</span>
-that is corrected for having selected smoothing parameters, <span class="math inline">\mathbf{V}_{\text{c}}</span>, is generally
-available. This allows, to an extent, for posterior simulation to
-account for the additional source of uncertainty of having chosen then
-values of <span class="math inline">\boldsymbol{\lambda}</span>.</p>
+<p>By default, coefficient draws use <span class="math inline">\mathbf{V}_{\mathrm{b}}</span>, holding the selected
+smoothing parameters fixed. For many mgcv models fitted with REML or ML,
+a corrected covariance matrix <span class="math inline">\mathbf{V}_{\mathrm{c}}</span> is also available.
+Setting <code>unconditional = TRUE</code> uses this correction to
+approximately account for smoothing-parameter uncertainty. It does not
+draw smoothing parameters from their posterior or include uncertainty in
+the response scale.</p>
 <p>There are two additional functions available in gratia that do
 posterior simulation:</p>
 <ul>
@@ -235,23 +245,32 @@ posterior simulation functions in turn.</p>
 <div class="section level2">
 <h2 id="posterior-smooths-and-smooth_samples">Posterior smooths and <code>smooth_samples()</code><a class="anchor" aria-label="anchor" href="#posterior-smooths-and-smooth_samples"></a>
 </h2>
-<p>We can sample from the posterior distribution of the coefficients of
-a particular smooth <span class="math inline">\hat{\beta}_j</span> given
-the values of the smoothing parameters <span class="math inline">\hat{\boldsymbol{\lambda}}</span>. We generate
-posterior samples of smooths by sampling <span class="math inline">\boldsymbol{\beta}_{j\star} \sim N(\hat{\beta}_j,
-\mathbf{V}_{\hat{\beta}_j})</span> and forming <span class="math inline">\mathbf{X}_{\hat{\boldsymbol{\beta}}_j}
-\boldsymbol{\beta}_{j\star}^{\mathsf{T}}</span>. This sampling can be
-done using <code><a href="../reference/smooth_samples.html">smooth_samples()</a></code>.</p>
-<p>To illustrate this, we’ll simulate data from Gu &amp; Wahba’s 4
-smooth example, and fit a GAM to the simulated data</p>
+<p>For a selected smooth <span class="math inline">f_j</span>, we retain
+its coefficients <span class="math inline">\boldsymbol{\beta}_j^{\ast}</span> from each joint
+coefficient draw and evaluate <span class="math inline">\mathbf{f}_j^{\ast} =
+\mathbf{B}_j\boldsymbol{\beta}_j^{\ast}</span>, where <span class="math inline">\mathbf{B}_j</span> contains the smooth’s basis
+functions at the requested covariate values. Under the Gaussian
+approximation, the marginal distribution of these coefficients is <span class="math inline">\mathrm{MVN}(\hat{\boldsymbol{\beta}}_j,
+\mathbf{V}_{\mathrm{b},jj})</span>, where <span class="math inline">\mathbf{V}_{\mathrm{b},jj}</span> is their block of
+the full covariance matrix. <code><a href="../reference/smooth_samples.html">smooth_samples()</a></code> uses the same
+joint coefficient draws for all selected smooths, preserving dependence
+between their sampled contributions.</p>
+<p>To illustrate smooth uncertainty, we simulate independent covariates
+<code>x0</code> to <code>x3</code> on the unit interval. The Gaussian
+response combines nonlinear effects of <code>x0</code>, <code>x1</code>
+and <code>x2</code> with independent Gaussian noise; <code>x3</code> has
+no effect. This is Gu &amp; Wahba’s example, available through
+<code><a href="../reference/data_sim.html">data_sim()</a></code>.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">ss_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/data_sim.html">data_sim</a></span><span class="op">(</span><span class="st">"eg1"</span>, seed <span class="op">=</span> <span class="fl">42</span><span class="op">)</span></span>
-<span><span class="va">m_ss</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x0</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x1</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x2</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x3</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">ss_df</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span></code></pre></div>
-<p>When we are simulating from the posterior distribution of an
-estimated smooth, we are only sampling from the coefficients of the
-particular smooth. In this model, the coefficients for the smooth <span class="math inline">f(x_0)</span> are stored as elements 2 through 10 of
-the coefficients vector.</p>
+<code class="sourceCode R"><span><span class="va">ss_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/data_sim.html">data_sim</a></span><span class="op">(</span><span class="st">"eg1"</span>, seed <span class="op">=</span> <span class="fl">42</span><span class="op">)</span></span></code></pre></div>
+<p>We fit a GAM with a smooth for each covariate, selecting smoothing
+parameters by REML.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">m_ss</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x0</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x1</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x2</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x3</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">ss_df</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span></code></pre></div>
+<p>The contribution of <span class="math inline">f(x_0)</span> uses
+coefficients 2 through 10 of this model. The other coefficients are not
+included when evaluating this smooth contribution.</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">s_x0</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_smooth.html">get_smooth</a></span><span class="op">(</span><span class="va">m_ss</span>, <span class="st">"s(x0)"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/smooth_coef_indices.html">smooth_coef_indices</a></span><span class="op">(</span><span class="va">s_x0</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1]  2  3  4  5  6  7  8  9 10</span></span></code></pre></div>
@@ -260,30 +279,35 @@ use <code><a href="../reference/smooth_samples.html">smooth_samples()</a></code>
 interested in using the <code>select</code> argument; if we want to
 sample smooths from the posteriors of all smooths in a model, then
 <code>select</code> can be left at its default value.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">sm_samp</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/smooth_samples.html">smooth_samples</a></span><span class="op">(</span><span class="va">m_ss</span>, select <span class="op">=</span> <span class="st">"s(x0)"</span>, n_grid <span class="op">=</span> <span class="fl">100</span>, n_draws <span class="op">=</span> <span class="fl">100</span>,</span>
-<span>  seed <span class="op">=</span> <span class="fl">21</span><span class="op">)</span></span></code></pre></div>
-<p>Typically we’re not too bothered about the particular values of the
-covariate at which we evaluate the posterior smooths; below we ask for
-100 evenly spaced values of <code>x0</code> using <code>n_vals</code>,
-but you can provide the covariates values yourself via the
-<code>data</code> argument. The number of posterior smooths sampled is
-controlled by argument <code>n</code>; here we ask for 100 samples.</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">sm_grid</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/data_slice.html">data_slice</a></span><span class="op">(</span><span class="va">m_ss</span>, x0 <span class="op">=</span> <span class="fu"><a href="../reference/evenly.html">evenly</a></span><span class="op">(</span><span class="va">x0</span>, n <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">sm_samp</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/smooth_samples.html">smooth_samples</a></span><span class="op">(</span><span class="va">m_ss</span>, select <span class="op">=</span> <span class="st">"s(x0)"</span>, data <span class="op">=</span> <span class="va">sm_grid</span>,</span>
+<span>  n_draws <span class="op">=</span> <span class="fl">100</span>, seed <span class="op">=</span> <span class="fl">21</span><span class="op">)</span></span></code></pre></div>
+<p>Here we supply 100 evenly spaced values of <code>x0</code> through
+<code>data</code> so that we can reuse exactly the same grid for the
+interval below. Without <code>data</code>, <code>n_grid</code> controls
+the number of covariate evaluation points constructed by
+<code><a href="../reference/smooth_samples.html">smooth_samples()</a></code>. <code>n_draws</code> controls the number
+of coefficient draws and hence sampled smooths; here we request 100.</p>
 <p>Objects returned by <code><a href="../reference/smooth_samples.html">smooth_samples()</a></code> have a
 <code><a href="../reference/draw.html">draw()</a></code> method available for them</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">sm_samp</span><span class="op">)</span> <span class="op">&amp;</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>gratia.alpha.sample <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span></span></code></pre></div>
 <p><img src="posterior-simulation_files/figure-html/draw-smooth-samples-x0-1.png" class="r-plt" alt="" width="700">
 To only draw some of the posterior smooths you can set
 <code>n_samples</code> which will randomly select that many smooths to
 draw (a seed can be provided via argument <code>seed</code> to make the
 set of chosen smooths repeatable.)</p>
-<p>The credible interval of a smooth will contain most of these smooths.
-For the standard 95% credible interval, only some of the sampled smooths
-will exceed the limits of the interval.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<p>We now compare the sampled contribution of <code>s(x0)</code> with
+its pointwise 95% credible interval on the same grid.
+<code><a href="../reference/smooth_samples.html">smooth_samples()</a></code> draws only the selected smooth
+contribution. We therefore set <code>overall_uncertainty = FALSE</code>
+in <code><a href="../reference/smooth_estimates.html">smooth_estimates()</a></code> to omit overall-mean uncertainty from
+the interval too.</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># evaluate the fitted smooth over x0 and add on a credible interval</span></span>
-<span><span class="va">sm_est</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/smooth_estimates.html">smooth_estimates</a></span><span class="op">(</span><span class="va">m_ss</span>, select <span class="op">=</span> <span class="st">"s(x0)"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span><span class="va">sm_est</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/smooth_estimates.html">smooth_estimates</a></span><span class="op">(</span><span class="va">m_ss</span>, select <span class="op">=</span> <span class="st">"s(x0)"</span>, data <span class="op">=</span> <span class="va">sm_grid</span>,</span>
+<span>  overall_uncertainty <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/add_confint.html">add_confint</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co"># plot the smooth, credible interval, and posterior smooths</span></span>
 <span><span class="va">sm_est</span> <span class="op">|&gt;</span></span>
@@ -298,12 +322,26 @@ will exceed the limits of the interval.</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">.estimate</span><span class="op">)</span>, linewidth <span class="op">=</span> <span class="fl">1</span>, colour <span class="op">=</span> <span class="st">"#E69F00"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>y <span class="op">=</span> <span class="fu"><a href="../reference/smooth_label.html">smooth_label</a></span><span class="op">(</span><span class="va">s_x0</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="posterior-simulation_files/figure-html/plot-smooth-ci-and-posterior-smooths-1.png" class="r-plt" alt="" width="700"></p>
-<p>Following <span class="citation">Marra &amp; Wood (2012)</span>, the
-blue credible interval will contain on average 95% of the grey lines
-(posterior smooths) at any given value of <span class="math inline">x_0</span>. This <em>across the function</em>
-frequentist interpretation of the credible interval implies that for
-some values of <span class="math inline">x_0</span> the coverage will be
-less than 95% and for other values greater than 95%.</p>
+<p>At a fixed value of <span class="math inline">x_0</span>, the blue
+interval has approximately 95% posterior probability for the smooth
+contribution, conditional on the observed data, model design and fitted
+smoothing and variance parameters. With many posterior draws, about 95%
+of the sampled values at that particular <span class="math inline">x_0</span> would fall inside it. This does not mean
+that 95% of complete sampled curves stay inside the interval over the
+whole grid.</p>
+<p><span class="citation">Marra &amp; Wood (2012)</span> study a
+different property: repeated-sampling coverage averaged over the
+function. Imagine repeatedly generating data from the same true
+function, refitting the GAM and constructing intervals. For each fit,
+record the proportion of covariate values at which the interval contains
+the true function, then average that proportion over repeated data sets.
+Their theory and simulations show coverage close to the nominal level in
+many settings, provided heavy oversmoothing is avoided. Coverage can be
+poor when a centred component is close to a straight line or plane;
+including overall-mean uncertainty can improve it. These results do not
+promise 95% frequentist coverage at every covariate value. The
+component-only interval here is chosen to match the sampled smooth
+contribution.</p>
 </div>
 <div class="section level2">
 <h2 id="posterior-fitted-values-via-fitted_samples">Posterior fitted values via <code>fitted_samples()</code><a class="anchor" aria-label="anchor" href="#posterior-fitted-values-via-fitted_samples"></a>
@@ -320,7 +358,7 @@ example 6 of <span class="citation">Luo &amp; Wahba (1997)</span></p>
 <p><span class="math display">
 \sin(2 \cdots(4x - 2)) + 2 \cdots\exp(-256 \cdots(x - 0.5)^2)
 </span></p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">f</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">sin</a></span><span class="op">(</span><span class="fl">2</span> <span class="op">*</span> <span class="op">(</span><span class="op">(</span><span class="fl">4</span> <span class="op">*</span> <span class="va">x</span><span class="op">)</span> <span class="op">-</span> <span class="fl">2</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="op">(</span><span class="fl">2</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="op">-</span><span class="fl">256</span> <span class="op">*</span> <span class="op">(</span><span class="va">x</span> <span class="op">-</span> <span class="fl">0.5</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
@@ -332,28 +370,28 @@ example 6 of <span class="citation">Luo &amp; Wahba (1997)</span></p>
 <span><span class="va">plt</span></span></code></pre></div>
 <p><img src="posterior-simulation_files/figure-html/luo-wabha-function-sim-plot-1.png" class="r-plt" alt="" width="700"></p>
 <p>To these data we fit an adaptive smoother</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x</span>, k <span class="op">=</span> <span class="fl">25</span>, bs <span class="op">=</span> <span class="st">"ad"</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">df</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span></code></pre></div>
 <p>Next we create a data slice of 200 values over the interval (0,1) at
 which we’ll predict from the model and generate posterior fitted values
 for</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">new_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/data_slice.html">data_slice</a></span><span class="op">(</span><span class="va">m</span>, x <span class="op">=</span> <span class="fu"><a href="../reference/evenly.html">evenly</a></span><span class="op">(</span><span class="va">x</span>, lower <span class="op">=</span> <span class="fl">0</span>, upper <span class="op">=</span> <span class="fl">1</span>, n <span class="op">=</span> <span class="fl">200</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>.row <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/row_number.html" class="external-link">row_number</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>then we compute the fitted values for the new data</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fv</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fitted_values.html">fitted_values</a></span><span class="op">(</span><span class="va">m</span>, quantity <span class="op">=</span> <span class="st">"expectation"</span>, data <span class="op">=</span> <span class="va">new_df</span><span class="op">)</span></span></code></pre></div>
 <p>The posterior fitted values are drawn with
 <code><a href="../reference/fitted_samples.html">fitted_samples()</a></code> using a Gaussian approximation to the
 posterior. Here we just take 10 draws from the posterior for each
 observation in <code>new_df</code> and merge the posterior draws with
 the data</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fitted_samples.html">fitted_samples</a></span><span class="op">(</span><span class="va">m</span>, quantity <span class="op">=</span> <span class="st">"expectation"</span>, data <span class="op">=</span> <span class="va">new_df</span>, n_draws <span class="op">=</span> <span class="fl">10</span>, seed <span class="op">=</span> <span class="fl">4</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">new_df</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">.row</span>, <span class="va">x</span><span class="op">)</span>, by <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/join_by.html" class="external-link">join_by</a></span><span class="op">(</span><span class="va">.row</span> <span class="op">==</span> <span class="va">.row</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>Adding the posterior fitted samples to the plot of the data,
 superimposing the Bayesian credible interval on the fitted values</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">plt</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_ribbon.html" class="external-link">geom_ribbon</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">fv</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">.fitted</span>, ymin <span class="op">=</span> <span class="va">.lower_ci</span>, ymax <span class="op">=</span> <span class="va">.upper_ci</span><span class="op">)</span>,</span>
 <span>    fill <span class="op">=</span> <span class="st">"red"</span>, alpha <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span> <span class="op">+</span></span>
@@ -383,7 +421,7 @@ package, based on the classic <code>mcycle</code> data set from the
 <em>MASS</em> package.</p>
 <p>We being by loading the data and adding on a row number variable for
 use late</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">mcycle</span>, package <span class="op">=</span> <span class="st">"MASS"</span><span class="op">)</span></span>
 <span><span class="va">mcycle</span> <span class="op">&lt;-</span> <span class="va">mcycle</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
@@ -392,13 +430,13 @@ use late</p>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/relocate.html" class="external-link">relocate</a></span><span class="op">(</span><span class="va">.row</span>, .before <span class="op">=</span> <span class="fl">1L</span><span class="op">)</span></span></code></pre></div>
 <p>To these data we fit a standard Gaussian GAM for the conditional mean
 of <code>accel</code>.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">m_gau</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="va">accel</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">times</span>, k <span class="op">=</span> <span class="fl">20</span><span class="op">)</span>,</span>
 <span>  data <span class="op">=</span> <span class="va">mcycle</span>, method <span class="op">=</span> <span class="st">"REML"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p>Next, we simulate <code>n_sim</code> new response values for each of
 the observed data using <code><a href="../reference/predicted_samples.html">predicted_samples()</a></code></p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">n_sim</span> <span class="op">&lt;-</span> <span class="fl">10</span></span>
 <span><span class="va">n_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">mcycle</span><span class="op">)</span></span>
 <span></span>
@@ -419,7 +457,7 @@ the observed data using <code><a href="../reference/predicted_samples.html">pred
 <span>  <span class="op">)</span></span></code></pre></div>
 <p>The comments briefly indicate what the <em>dplyr</em> code is doing.
 Now we can plot the observed and simulated data</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">plt_labs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span></span>
 <span>  x <span class="op">=</span> <span class="st">"Time after impact [ms]"</span>,</span>
 <span>  y <span class="op">=</span> <span class="st">"Acceleration [g]"</span></span>
@@ -439,14 +477,14 @@ being for the conditional mean of <code>accel</code>.</p>
 <p>Instead, we model both the conditional mean <em>and</em> the
 conditional variance of the data, through linear predictors for both
 parameters of the Gaussian distribution</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">m_gaulss</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">accel</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">times</span>, k <span class="op">=</span> <span class="fl">20</span>, bs <span class="op">=</span> <span class="st">"tp"</span><span class="op">)</span>,</span>
 <span>    <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">times</span>, bs <span class="op">=</span> <span class="st">"tp"</span><span class="op">)</span></span>
 <span>  <span class="op">)</span>, data <span class="op">=</span> <span class="va">mcycle</span>, family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gaulss.html" class="external-link">gaulss</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p>Simulating new data follows using the same code as earlier</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sim_gaulss</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/predicted_samples.html">predicted_samples</a></span><span class="op">(</span><span class="va">m_gaulss</span>, n_draws <span class="op">=</span> <span class="va">n_sim</span>, seed <span class="op">=</span> <span class="fl">20</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">mcycle</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">accel</span><span class="op">)</span>,</span>
 <span>    by <span class="op">=</span> <span class="st">".row"</span></span>
@@ -462,7 +500,7 @@ parameters of the Gaussian distribution</p>
 <p>The benefit of all that data wrangling is now realised as we can
 replace the data in the plot we created earlier with the simulations
 from the distribution GAM, and then plot it</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">plt_gaulss</span> <span class="op">&lt;-</span> <span class="va">plt_gau</span> <span class="op">+</span> <span class="va">sim_gaulss</span></span>
 <span></span>
 <span><span class="va">plt_gau</span> <span class="op">+</span> <span class="va">plt_gaulss</span> <span class="op">+</span></span>
@@ -494,11 +532,11 @@ we might expect to observe at those covariate values.</p>
 <p>To illustrate, we’ll fit a simple GAM with a single smooth function
 to data simulate from Gu &amp; Wahba’s function <span class="math inline">f_2</span> using <code><a href="../reference/data_sim.html">data_sim()</a></code>. We
 simulate 400 values from a Gaussian distribution with variance <span class="math inline">\sigma^2 = 1</span>.</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/data_sim.html">data_sim</a></span><span class="op">(</span><span class="st">"gwf2"</span>, n <span class="op">=</span> <span class="fl">400</span>, scale <span class="op">=</span> <span class="fl">1</span>, dist <span class="op">=</span> <span class="st">"normal"</span>, seed <span class="op">=</span> <span class="fl">8</span><span class="op">)</span></span></code></pre></div>
 <p>The simulated data, and the true function from which they were
 generated are shown below</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">df</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
@@ -506,13 +544,13 @@ generated are shown below</p>
 <p><img src="posterior-simulation_files/figure-html/simulated-data-gaussian-gam-1.png" class="r-plt" alt="" width="700"></p>
 <p>A GAM for these data contains a single smooth function of
 <code>x</code></p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">df</span>, method <span class="op">=</span> <span class="st">"REML"</span>, family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">gaussian</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>If we consider a new value of the covariate <code>x</code>, <span class="math inline">x^{\ast} = 0.5</span>, the expected value of the
 response given our model, <span class="math inline">\mathbb{E}(y^{*} | x
 = x^{*})</span>, is ~2.92, which we obtain using
 <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code></p>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mu</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">m</span>, newdata <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">mu</span></span>
 <span><span class="co">#&gt;        1 </span></span>
@@ -525,17 +563,18 @@ distribution is defined by two parameters; the mean, <span class="math inline">\
 distribution, and the variance, <span class="math inline">\sigma^2</span>, which describes how spread out the
 distribution is about the mean. To fully describe the Gaussian
 distribution of the response when <span class="math inline">x =
-0.5</span>, we need an estimate of the variance. We didn’t model this
-explicitly in the our GAM, but we get an estimate any from the model’s
-scale parameter, <span class="math inline">\phi</span>. This is stored
-as the element <code>scale</code> in the model object</p>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">sigma</span> <span class="op">&lt;-</span> <span class="va">m</span><span class="op">$</span><span class="va">scale</span></span>
+0.5</span>, we need an estimate of the variance. We obtain an estimate
+from the model’s scale parameter, <span class="math inline">\phi</span>.
+This variance is stored as the element <code>scale</code> in the model
+object. We take its square root to obtain the standard deviation
+required by <code>dist_normal()</code> below</p>
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">sigma</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="va">m</span><span class="op">$</span><span class="va">scale</span><span class="op">)</span></span>
 <span><span class="va">sigma</span></span>
-<span><span class="co">#&gt; [1] 1.019426</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 1.009666</span></span></code></pre></div>
 <p>We can visualise what this distribution looks like with some magic
 from the <em>ggdist</em> package</p>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">df</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">stat_halfeye</span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>ydist <span class="op">=</span> <span class="fu">dist_normal</span><span class="op">(</span>mean <span class="op">=</span> <span class="va">mu</span>, sd <span class="op">=</span> <span class="va">sigma</span><span class="op">)</span><span class="op">)</span>,</span>
@@ -547,12 +586,12 @@ from the <em>ggdist</em> package</p>
 <p><img src="posterior-simulation_files/figure-html/unnamed-chunk-9-1.png" class="r-plt" alt="" width="700"></p>
 <p>The orange region shows the expected density of response values at
 <span class="math inline">x^{\ast} = 0.5</span> that our model predicts
-we could expect to observe. This region assumes there is no uncertainty
-in the estimate of the mean of variance. Prediction intervals take into
-account the variation about the expected value, plus the uncertainty in
-the expected value. <code><a href="../reference/fitted_values.html">fitted_values()</a></code> conveniently returns
-this uncertainty for us, which by default is a 95% credible interval</p>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+we could expect to observe. This region holds the estimated mean and
+variance fixed. Prediction intervals combine variation about the
+expected value with uncertainty in that expected value. We first use
+<code><a href="../reference/fitted_values.html">fitted_values()</a></code> to obtain a 95% credible interval for the
+expected value alone</p>
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/fitted_values.html">fitted_values</a></span><span class="op">(</span><span class="va">m</span>, quantity <span class="op">=</span> <span class="st">"expectation"</span>, data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 7</span></span></span>
 <span><span class="co">#&gt;    .row     x .parameter  .fitted   .se .lower_ci .upper_ci</span></span>
@@ -562,9 +601,9 @@ this uncertainty for us, which by default is a 95% credible interval</p>
 deviation) of the estimated value (<code>.fitted</code>), while
 <code>.lower_ci</code> and <code>.upper_ci</code> are lower and upper
 uncertainty bounds (at the 95% level) on the estimated value
-respectively. With GAMs fitted through mgcv we don’t have a
-corresponding estimate of the uncertainty in the scale parameter, <span class="math inline">\phi</span>, which for this model is the estimated
-standard deviation <span class="math inline">\hat{\sigma}</span>.</p>
+respectively. These coefficient-based calculations hold the response
+variance <span class="math inline">\phi = \sigma^2</span> at its fitted
+value; they do not include uncertainty in that variance.</p>
 <p>While it would be pretty easy to compute upper and lower tail
 quantiles of the fitted Gaussian distribution for a range of values of
 <code>x</code> to get a prediction interval, we’d be ignoring the
@@ -576,15 +615,17 @@ families are currently supported by gratia).</p>
 <p>To compute a prediction interval over <code>x</code> for our GAM, we
 being by creating a set of data evenly over the range of <code>x</code>
 observed in the data used to fit the model</p>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ds</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/data_slice.html">data_slice</a></span><span class="op">(</span><span class="va">m</span>, x <span class="op">=</span> <span class="fu"><a href="../reference/evenly.html">evenly</a></span><span class="op">(</span><span class="va">x</span>, n <span class="op">=</span> <span class="fl">200</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>.row <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/row_number.html" class="external-link">row_number</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>The added variable <code>.row</code> will be used later to match
-posterior simulated values to the row in the prediction data set
-<code>ds</code>. We also compute the fitted values for these new
-observations using <code><a href="../reference/fitted_values.html">fitted_values()</a></code>.</p>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">fv</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fitted_values.html">fitted_values</a></span><span class="op">(</span><span class="va">m</span>, quantity <span class="op">=</span> <span class="st">"expectation"</span>, data <span class="op">=</span> <span class="va">ds</span><span class="op">)</span></span></code></pre></div>
+simulated responses to the rows in <code>ds</code>. We also compute
+fitted means and credible intervals at these covariate values. We set
+<code>unconditional = TRUE</code> here and in
+<code><a href="../reference/posterior_samples.html">posterior_samples()</a></code> below so that both use the same
+covariance correction for smoothing-parameter uncertainty.</p>
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">fv</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fitted_values.html">fitted_values</a></span><span class="op">(</span><span class="va">m</span>, quantity <span class="op">=</span> <span class="st">"expectation"</span>, data <span class="op">=</span> <span class="va">ds</span>, unconditional <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p>That step isn’t required in order to do posterior simulation with
 gratia, but we’ll use the fitted values later to show the model
 estimated values and their uncertainty in contrast to the prediction
@@ -592,7 +633,7 @@ interval.</p>
 <p>We use <code><a href="../reference/posterior_samples.html">posterior_samples()</a></code> to generate new response data
 for each of the new <code>x</code> values in <code>ds</code> and use a
 join to add the prediction data to each draw</p>
-<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ps</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/posterior_samples.html">posterior_samples</a></span><span class="op">(</span><span class="va">m</span>, n_draws <span class="op">=</span> <span class="fl">10000</span>, data <span class="op">=</span> <span class="va">ds</span>, seed <span class="op">=</span> <span class="fl">24</span>,</span>
 <span>  unconditional <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">ds</span>, by <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/join_by.html" class="external-link">join_by</a></span><span class="op">(</span><span class="va">.row</span> <span class="op">==</span> <span class="va">.row</span><span class="op">)</span><span class="op">)</span></span>
@@ -619,30 +660,30 @@ computation time. We’re also using the smoothness parameter selection
 corrected version of the Bayesian covariance matrix; this matrix has
 been adjusted to account for us not knowing the value of the smoothing
 parameter for <span class="math inline">f(x_i)</span>.</p>
-<p><code>ps</code> is a tibble, with <code>n * nrow(ds)</code> rows. The
-<code>.draw</code> variable groups the simulated values by posterior
-draw, while <code>.row</code> groups posterior draws for the same value
-of <code>x</code>. To summarise the posterior draws using {dplyr} we
-need a function that will compute quantiles of the posterior
+<p><code>ps</code> is a tibble, with <code>n_draws * nrow(ds)</code>
+(here, <code>10000 * nrow(ds)</code>) rows. The <code>.draw</code>
+variable groups the simulated values by posterior draw, while
+<code>.row</code> groups posterior draws for the same value of
+<code>x</code>. To summarise the posterior draws using {dplyr} we need a
+function that will compute quantiles of the posterior predictive
 distribution for each value of <code>x</code> (each <code>.row</code>).
 The following function is a simple wrapper around the
 <code><a href="https://rdrr.io/r/stats/quantile.html" class="external-link">quantile()</a></code> function from base R, which arranges the output
 from <code><a href="https://rdrr.io/r/stats/quantile.html" class="external-link">quantile()</a></code> as a data frame.</p>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">quantile_fun</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">probs</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.025</span>, <span class="fl">0.5</span>, <span class="fl">0.975</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span>
 <span>    .value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/quantile.html" class="external-link">quantile</a></span><span class="op">(</span><span class="va">x</span>, probs <span class="op">=</span> <span class="va">probs</span>, <span class="va">...</span><span class="op">)</span>,</span>
 <span>    .q <span class="op">=</span> <span class="va">probs</span> <span class="op">*</span> <span class="fl">100</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
-<p>We apply this function to our set of posterior draws, grouping by
-<code>.row</code> to summarise separately the posterior distribution for
-each new value of <code>x</code>. <code><a href="https://dplyr.tidyverse.org/reference/reframe.html" class="external-link">reframe()</a></code> is used to
-summarise the posterior using our <code>quantile_fun()</code> function.
-For ease of use, we pivot the resulting summary from long to wide format
-and add on the covariate values by joining on the <code>.row</code>
-variable</p>
-<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
+<p>We apply this function to the simulated responses, grouping by
+<code>.row</code> to summarise the posterior predictive distribution
+separately at each new value of <code>x</code>. <code><a href="https://dplyr.tidyverse.org/reference/reframe.html" class="external-link">reframe()</a></code>
+applies <code>quantile_fun()</code> within each group. We then pivot the
+summary from long to wide format and join the covariate values using
+<code>.row</code>.</p>
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">p_int</span> <span class="op">&lt;-</span> <span class="va">ps</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">.row</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/reframe.html" class="external-link">reframe</a></span><span class="op">(</span><span class="fu">quantile_fun</span><span class="op">(</span><span class="va">.response</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -666,16 +707,17 @@ variable</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>     9 -<span style="color: #BB0000;">1.16</span>   0.843    2.80 0.041<span style="text-decoration: underline;">3</span> </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>    10 -<span style="color: #BB0000;">0.975</span>  1.04     3.05 0.046<span style="text-decoration: underline;">3</span> </span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 190 more rows</span></span></span></code></pre></div>
-<p>The 95% prediction interval is shown for the first 10 rows of the
-prediction data. the column labelled <code>.q50</code> is the median of
-the posterior distribution.</p>
+<p>The printed tibble shows the 95% pointwise prediction interval for
+the first 10 rows of <code>ds</code>. <code>.q50</code> is the median of
+the posterior predictive distribution at each value of
+<code>x</code>.</p>
 <p>We can now use the various objects we have produced to plot the
 fitted values from the model (and their uncertainties), as well as the
 prediction intervals we just generated. We add the observed data used to
 fit the model as black points, and summarise the posterior samples (from
 <code>ps</code>) using a hexagonal binning (to avoid plotting all 2
 million posterior samples)</p>
-<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fv</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">.fitted</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="co"># summarise the posterior samples</span></span>
@@ -699,31 +741,32 @@ million posterior samples)</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>y <span class="op">=</span> <span class="st">"Response"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="posterior-simulation_files/figure-html/plot-prediction-intervals-gaussian-gam-1.png" class="r-plt" alt="" width="700"></p>
-<p>The outermost pair of blue lines on the plot above is the prediction
-interval we created. This interval encloses, as expected, almost all of
-the observe data points. It also encloses, by design, most of the
-posterior samples, as indicated by the filled hexagonal bins, with
-warmer colours indicating larger counts of posterior draws.</p>
+<p>The outer pair of blue lines shows the 95% pointwise posterior
+predictive interval for a new response at each value of <code>x</code>.
+It combines coefficient uncertainty with response variation, while
+holding the response variance at its fitted value. The inner pair shows
+uncertainty in the fitted mean alone. The hexagonal bins summarise the
+simulated responses, with warmer colours indicating larger counts.</p>
 </div>
 <div class="section level3">
 <h3 id="metropolis-hastings-sampler">Metropolis Hastings sampler<a class="anchor" aria-label="anchor" href="#metropolis-hastings-sampler"></a>
 </h3>
 <p>In some cases, the Gaussian approximation to the posterior
 distribution of the model coefficients can fail. Simon Wood shows an
-example of just such a failure in the <code><a href="https://rdrr.io/pkg/mgcv/man/gam.mh.html" class="external-link">?gam.mh</a></code> help page,
-where the Gaussian approximation is basically useless for a binomial GAM
-with large numbers of zeroes. <code><a href="https://rdrr.io/pkg/mgcv/man/gam.mh.html" class="external-link">mgcv::gam.mh()</a></code> implements a
-simple Metropolis Hastings sampler, which alternates proposals from a
-Gaussian or <em>t</em> distribution approximation to the posterior with
-random walk proposals that are based on the shrunken approximate
-posterior covariance matrix.</p>
+example in <code><a href="https://rdrr.io/pkg/mgcv/man/gam.mh.html" class="external-link">?gam.mh</a></code>, where it performs poorly for a binomial
+GAM with large numbers of zeroes. <code><a href="https://rdrr.io/pkg/mgcv/man/gam.mh.html" class="external-link">mgcv::gam.mh()</a></code> alternates
+independent multivariate <em>t</em> proposals centred on the fitted
+coefficients with Gaussian random walk proposals scaled from the
+approximate coefficient covariance. Its acceptance step evaluates the
+conditional posterior using the penalised likelihood, with smoothing and
+other family parameters held fixed.</p>
 <p>In this section, I rework Simon’s example of the failure of the
 Gaussian approximation from <code><a href="https://rdrr.io/pkg/mgcv/man/gam.mh.html" class="external-link">?gam.mh</a></code> to show how to use
 <em>gratia</em> to generate posterior draws using the Metropolis
 Hastings sampler provided by <code><a href="https://rdrr.io/pkg/mgcv/man/gam.mh.html" class="external-link">gam.mh()</a></code>.</p>
 <p>We begin by defining a function that will simulate data for the
 example.</p>
-<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ga_fail</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">seed</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span>y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">89</span><span class="op">)</span>, <span class="fl">1</span>, <span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">13</span><span class="op">)</span>, <span class="fl">1</span>, <span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">1</span>,</span>
@@ -742,7 +785,7 @@ example.</p>
 <span>  <span class="va">df</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <p>Which we use to simulate a data set and plot it</p>
-<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu">ga_fail</span><span class="op">(</span><span class="fl">3</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">df</span> <span class="op">|&gt;</span></span>
@@ -753,12 +796,12 @@ example.</p>
 of the covariate space the response consists of only zeroes
 (failures).</p>
 <p>We fit a binomial (logistic) GAM to the data</p>
-<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">m_logit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x</span>, k <span class="op">=</span> <span class="fl">15</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">df</span>, method <span class="op">=</span> <span class="st">"REML"</span>, family <span class="op">=</span> <span class="va">binomial</span><span class="op">)</span></span></code></pre></div>
 <p>and then generate sample from the posterior distribution using the
 default Gaussian approximation and subsequently using the simpler
 Metropolis Hastings sampler.</p>
-<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fs_ga</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fitted_samples.html">fitted_samples</a></span><span class="op">(</span><span class="va">m_logit</span>, quantity <span class="op">=</span> <span class="st">"expectation"</span>, n_draws <span class="op">=</span> <span class="fl">2000</span>, seed <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="va">fs_mh</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fitted_samples.html">fitted_samples</a></span><span class="op">(</span><span class="va">m_logit</span>, quantity <span class="op">=</span> <span class="st">"expectation"</span>,</span>
 <span>  n_draws <span class="op">=</span> <span class="fl">2000</span>, seed <span class="op">=</span> <span class="fl">2</span>, method <span class="op">=</span> <span class="st">"mh"</span>, thin <span class="op">=</span> <span class="fl">2</span>,</span>
@@ -784,13 +827,14 @@ to sampling, and</li>
 <code>t_df = 40</code>, the degrees of freedom for the <em>t</em>
 proposals.</li>
 </ol>
-<p>Because the the degrees of freedom for the <em>t</em> proposals is
-large, we’re effectively doing Gaussian approximation with this default,
-alternating those proposals with random walk proposals.</p>
+<p>With <code>t_df = 40</code>, the independent <em>t</em> proposals are
+close to Gaussian. The acceptance step still targets the conditional
+posterior, so nearly Gaussian proposals do not require the accepted
+draws to follow the Gaussian approximation.</p>
 <p>Having collected the posterior draws, we summarise each set into 50%,
 80%, and 95% intervals using <code><a href="https://mjskay.github.io/ggdist/reference/point_interval.html" class="external-link">ggdist::median_qi()</a></code>, and add
 on the data locations with a left join</p>
-<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">excl_col</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">".draw"</span>, <span class="st">".parameter"</span>, <span class="st">".row"</span><span class="op">)</span></span>
 <span><span class="va">int_ga</span> <span class="op">&lt;-</span> <span class="va">fs_ga</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">.row</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -805,7 +849,7 @@ on the data locations with a left join</p>
 posterior, and then we repeat the plot using the intervals derived from
 the Metropolis Hastings sampler, arranging the two plots using
 <em>patchwork</em></p>
-<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">plt_ga</span> <span class="op">&lt;-</span> <span class="va">df</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
@@ -845,13 +889,14 @@ are all zeroes.</p>
 <div class="section level2">
 <h2 id="multiple-chains-and-sampling-diagnostics">Multiple chains and sampling diagnostics<a class="anchor" aria-label="anchor" href="#multiple-chains-and-sampling-diagnostics"></a>
 </h2>
-<p><code>n</code> is the total number of retained draws. For example,
-four chains with <code>n_draws = 1000</code> retain 250 draws each. Each
-MH chain has its own burn-in period. Use <code>n_cores</code> to run
-chains concurrently with mirai. gratia reuses an active mirai pool; if
-none is available, it creates and removes a separate temporary pool. An
-existing pool is never resized or stopped by the sampler.</p>
-<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
+<p><code>n_draws</code> is the total number of retained coefficient
+draws across chains. For example, four chains with
+<code>n_draws = 1000</code> retain 250 draws each. Each MH chain has its
+own burn-in period. Use <code>n_cores</code> to run chains concurrently
+with mirai. gratia reuses an active mirai pool; if none is available, it
+creates and removes a separate temporary pool. An existing pool is never
+resized or stopped by the sampler.</p>
+<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">response_draws</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/posterior_samples.html">posterior_samples</a></span><span class="op">(</span></span>
 <span>  <span class="va">m_ss</span>, n_draws <span class="op">=</span> <span class="fl">1000</span>, chains <span class="op">=</span> <span class="fl">4</span>, n_cores <span class="op">=</span> <span class="fl">4</span>,</span>
 <span>  method <span class="op">=</span> <span class="st">"mh"</span>, burnin <span class="op">=</span> <span class="fl">1000</span>, seed <span class="op">=</span> <span class="fl">281</span>,</span>
@@ -870,7 +915,7 @@ need not provide the information of 1,000 independent draws.</p>
 simulation. Response noise can conceal poor mixing of the coefficient
 chains. To examine coefficient trace plots and then reuse the same draws
 for response sampling, generate the coefficients once:</p>
-<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">coefficients</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/post_draws.html">post_draws</a></span><span class="op">(</span></span>
 <span>  <span class="va">m_ss</span>, n_draws <span class="op">=</span> <span class="fl">1000</span>, chains <span class="op">=</span> <span class="fl">4</span>, n_cores <span class="op">=</span> <span class="fl">4</span>,</span>
 <span>  method <span class="op">=</span> <span class="st">"mh"</span>, burnin <span class="op">=</span> <span class="fl">1000</span>, seed <span class="op">=</span> <span class="fl">281</span>,</span>
@@ -902,7 +947,7 @@ sampling speedup is about 1.6 times.</p>
 <p><code><a href="https://rdrr.io/pkg/mgcv/man/gam.mh.html" class="external-link">mgcv::gam.mh()</a></code> does not support bam fits. Use
 <code>mh_backend = "gratia"</code> for independent-observation bam fits,
 or to use the compiled evaluator for a gam:</p>
-<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">bam_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/data_sim.html">data_sim</a></span><span class="op">(</span><span class="st">"eg1"</span>, n <span class="op">=</span> <span class="fl">1000</span>, dist <span class="op">=</span> <span class="st">"poisson"</span>, seed <span class="op">=</span> <span class="fl">281</span><span class="op">)</span></span>
 <span><span class="va">b</span> <span class="op">&lt;-</span> <span class="fu">mgcv</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/bam.html" class="external-link">bam</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x0</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x1</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">bam_data</span>, family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">poisson</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">response_draws</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/posterior_samples.html">posterior_samples</a></span><span class="op">(</span></span>
@@ -923,12 +968,15 @@ full matrix. This reduces memory use but repeatedly constructs the basis
 matrices. The <code>dense_limit</code> argument sets the maximum number
 of elements in a cached design matrix; zero forces blockwise
 evaluation.</p>
-<p>For Gaussian models with fixed dispersion and smoothing parameters,
-the coefficient posterior is Gaussian, so the existing
-<code>method = "gaussian"</code> provides direct independent draws. Its
-<code>unconditional = TRUE</code> covariance correction can include an
-approximation to smoothing-parameter uncertainty when mgcv supplies it.
-Neither MH backend samples smoothing parameters.</p>
+<p>For Gaussian identity-link GAMs with no coefficient inequality
+constraints, a quadratic smoothing penalty, fixed response variance and
+fixed smoothing parameters, the proper coefficient posterior is
+Gaussian, as described above. <code>method = "gaussian"</code> therefore
+provides direct independent draws from that conditional posterior. Its
+<code>unconditional = TRUE</code> covariance correction can
+approximately account for smoothing-parameter uncertainty when mgcv
+supplies it; it does not integrate over response-variance uncertainty.
+The MH backends also hold smoothing parameters and dispersion fixed.</p>
 <div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0" line-spacing="2">
 <div id="ref-Luo1997-xg" class="csl-entry">
 Luo, Z., &amp; Wahba, G. (1997). Hybrid adaptive splines. <em>Journal of

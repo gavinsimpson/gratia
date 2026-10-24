@@ -11,7 +11,7 @@ See diagnostic_support."><meta property="og:image" content="https://gavinsimpson
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-67</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-72</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -127,11 +127,15 @@ See <a href="diagnostic_support.html">diagnostic_support</a>.</p>
 
 
 <dt id="arg-nsim">nsim<a class="anchor" aria-label="anchor" href="#arg-nsim"></a></dt>
-<dd><p>numeric; number of response simulations to return.</p></dd>
+<dd><p>numeric; number of response simulations to return. Supply one
+finite positive whole number, no larger than <code>.Machine$integer.max</code>.</p></dd>
 
 
 <dt id="arg-seed">seed<a class="anchor" aria-label="anchor" href="#arg-seed"></a></dt>
-<dd><p>numeric; a random seed for the simulations.</p></dd>
+<dd><p>numeric or <code>NULL</code>; a random seed for the simulations. An explicit
+seed restores the previous random-number state, including its absence,
+when simulation finishes or fails. With <code>NULL</code>, simulation advances or
+initializes the random-number state.</p></dd>
 
 
 <dt id="arg-conditioning">conditioning<a class="anchor" aria-label="anchor" href="#arg-conditioning"></a></dt>

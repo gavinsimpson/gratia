@@ -24,7 +24,8 @@ level(fct, level)
 
 ## Value
 
-A length 1 factor with the same levels as the supplied factor `fct`.
+A factor with the selected values and the same levels, level order and
+ordered status as `fct`. `ref_level()` returns the first level.
 
 ## Examples
 

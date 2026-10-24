@@ -9,7 +9,7 @@ derivatives of smooth terms in a fitted GAM."><meta property="og:image" content=
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-67</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-72</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -97,7 +97,8 @@ vector of terms. If missing, all parameters are considered.</p></dd>
 <dt id="arg-level">level<a class="anchor" aria-label="anchor" href="#arg-level"></a></dt>
 <dd><p>numeric, <code>0 &lt; level &lt; 1</code>; the confidence level of the
 point-wise or simultaneous interval. The default is <code>0.95</code> for a 95%
-interval.</p></dd>
+interval. It must be finite. If a vector is supplied, the first value is
+used with a warning.</p></dd>
 
 
 <dt id="arg-type">type<a class="anchor" aria-label="anchor" href="#arg-type"></a></dt>

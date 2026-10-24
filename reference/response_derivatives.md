@@ -140,7 +140,9 @@ response_derivatives(object, ...)
 - level:
 
   numeric; `0 < level < 1`; the coverage level of the credible interval.
-  The default is `0.95` for a 95% interval.
+  The default is `0.95` for a 95% interval. Supply one finite numeric
+  value. Use `level` for both uncertainty methods; `ci_level` and
+  `coverage` are not accepted, even when `level` is also supplied.
 
 - seed:
 
@@ -213,6 +215,22 @@ covariance conditional on the fitted smoothing parameters. General
 multi-predictor families do not support delta uncertainty; their
 existing simulation support is unchanged. The `uncertainty` attribute
 records the selected method.
+
+By default, all supplied prediction rows are returned in their original
+order. Rows with missing or non-finite required covariates have `NA`
+derivatives, standard errors and interval limits. Category, response and
+family identifiers are retained. An explicit `na.action` follows the
+prediction convention: `na.omit` drops unavailable rows with missing
+covariates, `na.exclude` and `na.pass` retain them, and `na.fail`
+reports missing covariates as an error. Undefined calculations at
+available rows, including in only some coefficient draws, raise an
+error; draws are never removed to form a summary.
+
+Response-scale derivatives require the expected response to exist. For a
+scaled t family, fitted degrees of freedom must exceed one, whether
+fixed or estimated. A finite response variance is not required.
+Linear-predictor derivatives remain available when the response mean
+does not exist.
 
 ## See also
 

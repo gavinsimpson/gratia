@@ -354,132 +354,47 @@ worker inputs and returned results, in addition to the final output.
 ## Examples
 
 ``` r
-
 load_mgcv()
-df <- data_sim("eg4", seed = 42)
+# Simulate group-specific curves with Gaussian noise and fit factor-by smooths
+df <- data_sim("eg4", n = 300, seed = 42)
 m <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = df, method = "REML")
 
+# Compare the centred smooth shapes for each pair of factor levels
 sm_dif <- difference_smooths(m, select = "s(x2)")
 sm_dif
 #> # A tibble: 300 x 9
 #>    .smooth .by   .level_1 .level_2 .diff   .se .lower_ci .upper_ci      x2
 #>    <chr>   <chr> <chr>    <chr>    <dbl> <dbl>     <dbl>     <dbl>   <dbl>
-#>  1 s(x2)   fac   1        2        0.386 0.618  -0.824        1.60 0.00359
-#>  2 s(x2)   fac   1        2        0.479 0.574  -0.646        1.60 0.0136 
-#>  3 s(x2)   fac   1        2        0.572 0.534  -0.474        1.62 0.0237 
-#>  4 s(x2)   fac   1        2        0.665 0.497  -0.308        1.64 0.0338 
-#>  5 s(x2)   fac   1        2        0.758 0.464  -0.151        1.67 0.0438 
-#>  6 s(x2)   fac   1        2        0.850 0.435  -0.00342      1.70 0.0539 
-#>  7 s(x2)   fac   1        2        0.941 0.412   0.134        1.75 0.0639 
-#>  8 s(x2)   fac   1        2        1.03  0.393   0.262        1.80 0.0740 
-#>  9 s(x2)   fac   1        2        1.12  0.378   0.380        1.86 0.0841 
-#> 10 s(x2)   fac   1        2        1.21  0.367   0.489        1.93 0.0941 
+#>  1 s(x2)   fac   1        2         2.53 0.646      1.26      3.80 0.00359
+#>  2 s(x2)   fac   1        2         2.49 0.622      1.27      3.71 0.0136 
+#>  3 s(x2)   fac   1        2         2.45 0.598      1.28      3.62 0.0236 
+#>  4 s(x2)   fac   1        2         2.41 0.575      1.28      3.54 0.0336 
+#>  5 s(x2)   fac   1        2         2.37 0.553      1.29      3.45 0.0435 
+#>  6 s(x2)   fac   1        2         2.33 0.531      1.29      3.37 0.0535 
+#>  7 s(x2)   fac   1        2         2.29 0.511      1.29      3.29 0.0635 
+#>  8 s(x2)   fac   1        2         2.25 0.490      1.29      3.21 0.0735 
+#>  9 s(x2)   fac   1        2         2.21 0.471      1.29      3.13 0.0835 
+#> 10 s(x2)   fac   1        2         2.17 0.453      1.28      3.06 0.0935 
 #> # i 290 more rows
-
 draw(sm_dif)
 
 
-# include the groups means for `fac` in the difference
-sm_dif2 <- difference_smooths(m, select = "s(x2)", group_means = TRUE)
-draw(sm_dif2)
-
-
-# simultaneous intervals, separately for each pair of factor levels
-sm_sim <- difference_smooths(m, select = "s(x2)",
-  interval = "simultaneous", n_sim = 1000, seed = 42)
-draw(sm_sim)
-
-
-# compare specific smooths
-sm_dif3 <- difference_smooths(m,
-  select = c("s(x2):fac1", "s(x2):fac2"), partial_match = FALSE
-)
-
-# Compare slopes of the factor-by smooths, retaining their joint uncertainty
+# Compare rates of change instead of smooth values, using the same fit
 slope_dif <- difference_smooths(m, select = "s(x2)", order = 1)
 slope_dif
 #> # A tibble: 300 x 10
 #>    .smooth .focal .by   .level_1 .level_2 .diff   .se .lower_ci .upper_ci
 #>    <chr>   <chr>  <chr> <chr>    <chr>    <dbl> <dbl>     <dbl>     <dbl>
-#>  1 s(x2)   x2     fac   1        2         9.24  5.74   -2.01        20.5
-#>  2 s(x2)   x2     fac   1        2         9.24  5.73   -1.99        20.5
-#>  3 s(x2)   x2     fac   1        2         9.23  5.69   -1.93        20.4
-#>  4 s(x2)   x2     fac   1        2         9.22  5.60   -1.77        20.2
-#>  5 s(x2)   x2     fac   1        2         9.18  5.46   -1.51        19.9
-#>  6 s(x2)   x2     fac   1        2         9.13  5.26   -1.18        19.4
-#>  7 s(x2)   x2     fac   1        2         9.06  5.02   -0.785       18.9
-#>  8 s(x2)   x2     fac   1        2         8.95  4.76   -0.383       18.3
-#>  9 s(x2)   x2     fac   1        2         8.81  4.50   -0.0138      17.6
-#> 10 s(x2)   x2     fac   1        2         8.64  4.26    0.290       17.0
+#>  1 s(x2)   x2     fac   1        2        -4.03  2.98     -9.88      1.82
+#>  2 s(x2)   x2     fac   1        2        -4.03  2.98     -9.88      1.82
+#>  3 s(x2)   x2     fac   1        2        -4.03  2.98     -9.86      1.80
+#>  4 s(x2)   x2     fac   1        2        -4.03  2.96     -9.82      1.77
+#>  5 s(x2)   x2     fac   1        2        -4.03  2.93     -9.76      1.71
+#>  6 s(x2)   x2     fac   1        2        -4.02  2.88     -9.68      1.63
+#>  7 s(x2)   x2     fac   1        2        -4.02  2.83     -9.58      1.54
+#>  8 s(x2)   x2     fac   1        2        -4.02  2.78     -9.46      1.43
+#>  9 s(x2)   x2     fac   1        2        -4.01  2.72     -9.34      1.31
+#> 10 s(x2)   x2     fac   1        2        -4.01  2.66     -9.21      1.20
 #> # i 290 more rows
 #> # i 1 more variable: x2 <dbl>
-draw(slope_dif)
-
-
-# Fit a surface for each factor level to compare rates of change in x2
-m2 <- gam(y ~ fac + te(x2, x0, by = fac, k = c(4, 4)),
-  data = df, method = "REML")
-
-# Evaluate partial derivatives of the differences across both covariates
-partial_dif <- difference_smooths(m2, select = "te(x2,x0)",
-  order = 1, focal = "x2", n_2d = 20)
-partial_dif
-#> # A tibble: 1,200 x 11
-#>    .smooth   .focal .by   .level_1 .level_2 .diff   .se .lower_ci .upper_ci
-#>    <chr>     <chr>  <chr> <chr>    <chr>    <dbl> <dbl>     <dbl>     <dbl>
-#>  1 te(x2,x0) x2     fac   1        2         9.24  7.55    -5.57       24.0
-#>  2 te(x2,x0) x2     fac   1        2         9.19  6.85    -4.24       22.6
-#>  3 te(x2,x0) x2     fac   1        2         9.13  6.22    -3.07       21.3
-#>  4 te(x2,x0) x2     fac   1        2         9.08  5.69    -2.08       20.2
-#>  5 te(x2,x0) x2     fac   1        2         9.02  5.25    -1.27       19.3
-#>  6 te(x2,x0) x2     fac   1        2         8.97  4.90    -0.640      18.6
-#>  7 te(x2,x0) x2     fac   1        2         8.92  4.62    -0.131      18.0
-#>  8 te(x2,x0) x2     fac   1        2         8.86  4.37     0.296      17.4
-#>  9 te(x2,x0) x2     fac   1        2         8.80  4.16     0.638      17.0
-#> 10 te(x2,x0) x2     fac   1        2         8.72  4.01     0.858      16.6
-#> # i 1,190 more rows
-#> # i 2 more variables: x2 <dbl>, x0 <dbl>
-draw(partial_dif)
-
-
-# Choose a surface grid and calibrate simultaneous intervals for each pair
-derivative_grid <- data_slice(m2, x2 = evenly(x2, n = 15),
-  x0 = evenly(x0, n = 10), fac = levels(fac))
-partial_sim <- difference_smooths(m2, select = "te(x2,x0)",
-  data = derivative_grid, order = 1, focal = "x2",
-  interval = "simultaneous", n_sim = 1000, seed = 42)
-partial_sim
-#> # A tibble: 450 x 11
-#>    .smooth   .focal .by   .level_1 .level_2 .diff   .se .lower_ci .upper_ci
-#>    <chr>     <chr>  <chr> <chr>    <chr>    <dbl> <dbl>     <dbl>     <dbl>
-#>  1 te(x2,x0) x2     fac   1        2         9.24  7.55    -14.2       32.7
-#>  2 te(x2,x0) x2     fac   1        2         9.13  6.16     -9.98      28.2
-#>  3 te(x2,x0) x2     fac   1        2         9.01  5.17     -7.02      25.0
-#>  4 te(x2,x0) x2     fac   1        2         8.90  4.53     -5.15      22.9
-#>  5 te(x2,x0) x2     fac   1        2         8.77  4.09     -3.92      21.5
-#>  6 te(x2,x0) x2     fac   1        2         8.56  3.92     -3.58      20.7
-#>  7 te(x2,x0) x2     fac   1        2         8.21  4.04     -4.31      20.7
-#>  8 te(x2,x0) x2     fac   1        2         7.66  4.43     -6.10      21.4
-#>  9 te(x2,x0) x2     fac   1        2         6.97  5.28     -9.41      23.3
-#> 10 te(x2,x0) x2     fac   1        2         6.21  6.60    -14.3       26.7
-#> # i 440 more rows
-#> # i 2 more variables: x2 <dbl>, x0 <dbl>
-
-# Choose two axes and condition on the third covariate
-m3 <- gam(y ~ fac + te(x0, x1, x2, by = fac, k = c(3, 3, 3)),
-  data = df, method = "REML")
-sm_dif_3d <- difference_smooths(m3, select = "te(x0,x1,x2)",
-  variables = c("x1", "x2", "x0"), n_2d = 20, n_3d = 3)
-draw(sm_dif_3d)
-
-# Redraw the evaluated points with the axes exchanged
-draw(sm_dif_3d, variables = c("x2", "x1", "x0"))
-
-
-# Supply particular conditioning values using a prediction grid
-grid <- data_slice(m3, x1 = evenly(x1, n = 20),
-  x2 = evenly(x2, n = 20), x0 = c(0.2, 0.8), fac = levels(fac))
-sm_dif_at <- difference_smooths(m3, select = "te(x0,x1,x2)",
-  data = grid, variables = c("x1", "x2", "x0"))
-draw(sm_dif_at)
 ```

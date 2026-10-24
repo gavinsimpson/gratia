@@ -265,9 +265,21 @@ Simultaneous simulation bands are symmetric calibrated bands about
 `.diff`, not equal-tailed pointwise intervals. Both uncertainty methods
 concern mean differences, not observation noise. They support ordinary
 single-predictor GAM and BAM families, including Gamma, negative
-binomial and Tweedie; general families with multiple linear predictors
-and scam fits are not supported by
+binomial and Tweedie. General families with multiple linear predictors
+remain unsupported by
 [`conditional_differences()`](https://gavinsimpson.github.io/gratia/reference/conditional_differences.md).
+
+SCAM fits with supported single-predictor families also support link-
+and response-scale differences, with delta or simulation uncertainty and
+pointwise or simultaneous intervals. Delta intervals use the local
+covariance of the transformed coefficients. With
+`uncertainty = "simulation"`, the default `method = "gaussian"` draws
+unrestricted fitting coefficients and applies the fitted positivity
+transformation. `method = "user"` accepts transformed coefficient draws
+that satisfy the fitted coefficient constraints; MH sampling is
+unavailable for SCAM fits. Smoothing-parameter uncertainty is
+unavailable for both uncertainty methods, so retain
+`unconditional = FALSE`.
 
 ### Compare shape separately from complete responses
 
@@ -345,8 +357,10 @@ intervals; simulation uses the median and quantiles of derivative draws.
 The plotted methods agree closely where uncertainty is modest.
 Differences can grow when the inverse link strongly transforms uncertain
 coefficients. Delta uncertainty supports single-predictor GAM/BAM
-families, but does not extend to scam or general families with several
-predictors; their existing simulation support is unchanged.
+families and SCAM fits. For SCAM fits it uses the
+transformed-coefficient covariance, conditional on the fitted smoothing
+parameters. General families with several predictors do not support
+delta uncertainty; their existing simulation support is unchanged.
 
 The default `eps = NULL` chooses the perturbation from the fitted
 covariate range, derivative order and finite-difference method. This

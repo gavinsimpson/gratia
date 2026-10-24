@@ -660,9 +660,8 @@ Internally, plots of each smooth are created using
 and composed into a single plot using
 [`patchwork::wrap_plots()`](https://patchwork.data-imaginist.com/reference/wrap_plots.html).
 As a result, it is not possible to use `+` to add to the plots in the
-way one might typically work with
-[`ggplot()`](https://ggplot2.tidyverse.org/reference/ggplot.html) plots.
-Instead, use the `&` operator; see the examples.
+way one might typically work with `ggplot()` plots. Instead, use the `&`
+operator; see the examples.
 
 ## Label layout
 

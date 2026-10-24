@@ -5,7 +5,7 @@ Add fitted values from a model to a data frame
 ## Usage
 
 ``` r
-add_fitted(data, model, value = ".value", ...)
+add_fitted(data, model, value = ".fitted", ...)
 
 # S3 method for class 'gamm4'
 add_fitted(data, model, ...)
@@ -40,7 +40,8 @@ add_fitted(data, model, ...)
 
 ## Value
 
-A data frame (tibble) formed from `data` and fitted values from `model`.
+A data frame (tibble) formed from `data` and fitted values from `model`,
+stored in `".fitted"` by default.
 
 ## See also
 

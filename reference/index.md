@@ -42,6 +42,7 @@ plots](https://gavinsimpson.github.io/gratia/articles/custom-plotting.md).
   : Effects and diagnostics for glmmTMB models
 
 - [`smooths(`*`<sdmTMB>`*`)`](https://gavinsimpson.github.io/gratia/reference/sdmTMB-methods.md)
+  [`n_smooths(`*`<sdmTMB>`*`)`](https://gavinsimpson.github.io/gratia/reference/sdmTMB-methods.md)
   [`get_smooths_by_id(`*`<sdmTMB>`*`)`](https://gavinsimpson.github.io/gratia/reference/sdmTMB-methods.md)
   [`smooth_coefs(`*`<sdmTMB>`*`)`](https://gavinsimpson.github.io/gratia/reference/sdmTMB-methods.md)
   [`smooth_estimates(`*`<sdmTMB>`*`)`](https://gavinsimpson.github.io/gratia/reference/sdmTMB-methods.md)

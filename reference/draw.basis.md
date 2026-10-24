@@ -159,32 +159,11 @@ Gavin L. Simpson
 
 ``` r
 load_mgcv()
-df <- data_sim("eg1", n = 400, seed = 42)
+# Simulate an additive Gaussian response and fit a GAM
+df <- data_sim("eg1", n = 200, seed = 42)
 m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = "REML")
 
-bf <- basis(m)
+# Plot the coefficient-weighted basis functions for one smooth
+bf <- basis(m, select = "s(x2)")
 draw(bf)
-
-
-bf <- basis(m, "s(x2)")
-draw(bf)
-
-
-# A single shared basis for a factor-by set
-df_by <- data_sim("eg4", n = 400, seed = 42)
-m_by <- gam(y ~ fac + s(x2, by = fac), data = df_by)
-draw(basis(m_by, unweighted = TRUE))
-
-
-# A three-covariate basis, evaluated at two conditioning values
-m3 <- gam(y ~ s(x0, x1, x2, k = 12), data = df)
-bf3 <- basis(m3, variables = c("x1", "x2", "x0"),
-  n_2d = 15, n_3d = 2)
-draw(bf3, ncol = 3)
-
-
-# Four covariates: conditioning values form facet rows and columns
-m4 <- gam(y ~ s(x0, x1, x2, x3, k = 20), data = df)
-bf4 <- basis(m4, n_2d = 15, n_4d = 2)
-draw(bf4, ncol = 3)
 ```

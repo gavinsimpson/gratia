@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-67</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-72</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -258,7 +258,11 @@ of category membership; multivariate models return a mean per response.
 <code>.category</code> and <code>.y</code> identify the category or response separately from
 <code>.parameter</code>. Global parameters are described but held fixed when calculating
 coefficient uncertainty. Coupled expectations use the full coefficient
-covariance and a delta-method Jacobian. Their intervals are pointwise.</p>
+covariance and a delta-method Jacobian. Their intervals are pointwise.
+Ordinal and multinomial probability intervals use a normal approximation to
+log odds, transformed back to probabilities. Log odds and their uncertainty
+are computed before rounding probabilities, so valid probabilities rounded
+to zero or one retain defined intervals.</p>
 <p>The <code>prediction_info</code> attribute records the quantity, scale, standard-error
 scale and parameter descriptions. Parameter standard errors retain their
 link-scale meaning; category-probability and expectation standard errors are

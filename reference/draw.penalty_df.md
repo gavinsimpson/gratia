@@ -111,19 +111,11 @@ for the available settings.
 
 ``` r
 load_mgcv()
-dat <- data_sim("eg4", n = 400, seed = 42)
-m <- gam(y ~ s(x0) + s(x1, bs = "cr") + s(x2, bs = "bs", by = fac),
-  data = dat, method = "REML"
-)
+# Fit different spline bases to simulated Gaussian responses
+dat <- data_sim("eg1", n = 200, seed = 42)
+m <- gam(y ~ s(x0) + s(x1, bs = "cr") + s(x2, bs = "bs"),
+  data = dat, method = "REML")
 
-## produce a multi-panel plot of all penalties
+# Display the penalty matrices for the fitted smooths
 draw(penalty(m))
-
-
-# for a specific smooth
-draw(penalty(m, select = "s(x2):fac1"))
-
-
-# draw individual vector cells
-draw(penalty(m), geom = "tile")
 ```

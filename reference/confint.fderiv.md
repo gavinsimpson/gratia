@@ -32,7 +32,9 @@ confint(
 - level:
 
   numeric, `0 < level < 1`; the confidence level of the point-wise or
-  simultaneous interval. The default is `0.95` for a 95% interval.
+  simultaneous interval. The default is `0.95` for a 95% interval. It
+  must be finite. If a vector is supplied, the first value is used with
+  a warning.
 
 - type:
 

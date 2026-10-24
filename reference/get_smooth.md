@@ -16,7 +16,7 @@ get_smooth(object, term)
 
 - term:
 
-  character; the name of a smooth term to extract
+  character; the exact name of a smooth term to extract
 
 ## Value
 

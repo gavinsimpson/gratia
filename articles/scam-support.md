@@ -1,27 +1,48 @@
 # Working with shape-constrained additive models
 
-gratia supports the 24 univariate and 17 bivariate smooth constructors
-in scam 1.2-22, including cyclic margins, endpoint constraints, local
-constraints, `by` smooths and smooth interactions. Ordinary mgcv smooths
-fitted through [`scam()`](https://rdrr.io/pkg/scam/man/scam.html) are
-also supported. The same fitted coefficient mapping is used for smooth
-estimates, bases, derivatives, predictions and sampled smooths.
+gratia supports scam’s univariate and bivariate shape-constrained smooth
+constructors, including cyclic margins, endpoint constraints, local
+constraints, `by` smooths and smooth interactions. This includes the
+`tedi` and `teid` tensor constructors introduced in scam 1.2-23, which
+constrain one covariate’s effect to increase and the other’s to
+decrease. These two constructors require a scam version that provides
+them. Ordinary mgcv smooths fitted through
+[`scam()`](https://rdrr.io/pkg/scam/man/scam.html) are also supported.
+The same fitted coefficient mapping is used for smooth estimates, bases,
+derivatives, predictions and sampled smooths.
+
+We load gratia and scam before simulating the example.
 
 ``` r
 
 library("gratia")
 load_mgcv()
 library("scam")
+```
+
+The response below combines an increasing curved effect of `x` and a
+linear effect of `z`, with independent Gaussian noise of standard
+deviation 0.15. The covariates are independently sampled on the unit
+interval.
+
+``` r
 
 set.seed(46)
 d <- data.frame(x = runif(200), z = runif(200))
 d$y <- exp(d$x) + d$z + rnorm(nrow(d), sd = 0.15)
+```
+
+We fit increasing smooths for both covariates and plot their estimated
+contributions.
+
+``` r
+
 m <- scam(y ~ s(x, bs = "mpi", k = 8) + s(z, bs = "mpi", k = 8),
   data = d, not.exp = TRUE)
 draw(m)
 ```
 
-![](scam-support_files/figure-html/packages-1.png)
+![](scam-support_files/figure-html/fit-model-1.png)
 
 ## Fitted functions and native plots
 

@@ -9,7 +9,7 @@ terms of a fitted GAM."><meta property="og:image" content="https://gavinsimpson.
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-67</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-72</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -145,7 +145,8 @@ simultaneous intervals.</p></dd>
 
 
 <dt id="arg-shift">shift<a class="anchor" aria-label="anchor" href="#arg-shift"></a></dt>
-<dd><p>logical; should the model intercept be added to the smooth?
+<dd><p>logical; should the intercept of the smooth's linear predictor
+be added to the smooth? Predictors without an intercept are shifted by zero.
 Only the intercept is added; other parametric effects, including factor
 effects associated with a factor <code>by</code> smooth, are excluded. For full fitted
 values and their confidence intervals, use <code><a href="fitted_values.html">fitted_values()</a></code>.</p></dd>

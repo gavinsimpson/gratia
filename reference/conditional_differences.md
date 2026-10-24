@@ -254,12 +254,12 @@ Simultaneous intervals use the `ci_level` quantile of the maximum
 absolute standardized deviation over the selected coverage set. They are
 symmetric about `.diff`, with half-width `.crit * .se`. For
 `uncertainty = "delta"`, one shared batch of zero-mean Gaussian
-coefficient deviations is generated from the Bayesian covariance matrix
-using [`mvnfast::rmvn()`](https://rdrr.io/pkg/mvnfast/man/rmvn.html).
+coefficient deviations is generated from the Bayesian covariance matrix.
 Response-scale differences use a first-order Taylor approximation. The
-covariance must be positive definite. Sampler arguments `method`,
-`draws`, `mvn_method`, `burnin`, `thin`, `t_df`, and `rw_scale` apply
-only to `uncertainty = "simulation"`.
+covariance must be positive semidefinite; singular covariance matrices
+are supported. Sampler arguments `method`, `draws`, `mvn_method`,
+`burnin`, `thin`, `t_df`, and `rw_scale` apply only to
+`uncertainty = "simulation"`.
 
 For `uncertainty = "simulation"`, deviations are posterior difference
 draws minus `.diff`, standardized by their sample standard deviations.
@@ -282,7 +282,16 @@ Offsets follow
 [`mgcv::predict.gam()`](https://rdrr.io/pkg/mgcv/man/predict.gam.html)
 semantics. Supported models are `gam` and `bam` fits with a single
 linear predictor and an ordinary scalar inverse-link mean (including
-negative binomial, Tweedie, beta regression and scaled t families).
+negative binomial, Tweedie, beta regression and scaled t families). SCAM
+fits with supported single-predictor families also support link- and
+response-scale differences, with delta or simulation uncertainty and
+pointwise or simultaneous intervals. SCAM delta intervals use the local
+covariance of transformed coefficients. Gaussian simulation draws
+unrestricted fitting coefficients and applies the fitted positivity
+transformation; user draws must already be in transformed coordinates
+and satisfy the coefficient constraints. MH sampling is unavailable for
+SCAM fits, and smoothing-parameter uncertainty is unsupported; use
+`unconditional = FALSE`.
 
 ## See also
 
@@ -292,81 +301,26 @@ negative binomial, Tweedie, beta regression and scaled t families).
 
 ``` r
 load_mgcv()
-df <- data_sim("eg4", seed = 2)
+# Simulate group-specific curves with Gaussian noise and fit factor-by smooths
+df <- data_sim("eg4", n = 300, seed = 2)
 m <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = df, method = "REML")
+
+# Compare fitted responses over x2, including the parametric group effects
 cd <- conditional_differences(m, by = "fac", condition = "x2")
-draw(cd)
-
-
-# Compare treatment levels over both numeric covariates. Each comparison
-# is drawn in a separate surface panel.
-cd_surface <- conditional_differences(m, by = "fac",
-  condition = list(c("x2", "x0")))
-draw(cd_surface, surface = "tile")
-
-
-# Restrict comparisons and fix a further covariate
-conditional_differences(m, by = "fac",
-  condition = list("x2", fac = c("1", "3"), x0 = 0.5))
-#> # A tibble: 100 x 9
-#>    .contrast .level_1 .level_2     .diff   .se .lower_ci .upper_ci      x2    x0
-#>        <int> <fct>    <fct>        <dbl> <dbl>     <dbl>     <dbl>   <dbl> <dbl>
-#>  1         1 1        3         0.375    0.927     -1.44    2.19   0.00325   0.5
-#>  2         1 1        3         0.000823 0.834     -1.63    1.63   0.0133    0.5
-#>  3         1 1        3        -0.374    0.748     -1.84    1.09   0.0233    0.5
-#>  4         1 1        3        -0.752    0.673     -2.07    0.567  0.0334    0.5
-#>  5         1 1        3        -1.13     0.612     -2.33    0.0656 0.0434    0.5
-#>  6         1 1        3        -1.52     0.566     -2.63   -0.413  0.0535    0.5
-#>  7         1 1        3        -1.92     0.536     -2.97   -0.869  0.0635    0.5
-#>  8         1 1        3        -2.33     0.518     -3.34   -1.31   0.0736    0.5
-#>  9         1 1        3        -2.74     0.509     -3.74   -1.74   0.0836    0.5
-#> 10         1 1        3        -3.16     0.505     -4.15   -2.17   0.0937    0.5
-#> # i 90 more rows
-
-# Pointwise posterior bands from shared coefficient draws
-conditional_differences(m, by = "fac", condition = "x2",
-  uncertainty = "simulation", n_sim = 1000, seed = 42)
+cd
 #> # A tibble: 300 x 9
 #>    .contrast .level_1 .level_2 .diff   .se .lower_ci .upper_ci      x2    x0
 #>        <int> <fct>    <fct>    <dbl> <dbl>     <dbl>     <dbl>   <dbl> <dbl>
-#>  1         1 1        2         2.76 0.878      1.05      4.51 0.00325 0.462
-#>  2         1 1        2         2.80 0.830      1.15      4.45 0.0133  0.462
-#>  3         1 1        2         2.85 0.784      1.29      4.42 0.0233  0.462
-#>  4         1 1        2         2.89 0.741      1.43      4.34 0.0334  0.462
-#>  5         1 1        2         2.94 0.699      1.55      4.32 0.0434  0.462
-#>  6         1 1        2         2.98 0.660      1.67      4.25 0.0535  0.462
-#>  7         1 1        2         3.03 0.625      1.81      4.23 0.0635  0.462
-#>  8         1 1        2         3.07 0.592      1.93      4.19 0.0736  0.462
-#>  9         1 1        2         3.11 0.562      2.01      4.19 0.0836  0.462
-#> 10         1 1        2         3.16 0.536      2.10      4.20 0.0937  0.462
+#>  1         1 1        2         3.13 0.868      1.42      4.83 0.00325 0.468
+#>  2         1 1        2         3.17 0.830      1.54      4.80 0.0133  0.468
+#>  3         1 1        2         3.22 0.794      1.66      4.77 0.0234  0.468
+#>  4         1 1        2         3.26 0.760      1.77      4.75 0.0334  0.468
+#>  5         1 1        2         3.31 0.729      1.88      4.74 0.0435  0.468
+#>  6         1 1        2         3.35 0.700      1.98      4.73 0.0536  0.468
+#>  7         1 1        2         3.40 0.675      2.07      4.72 0.0636  0.468
+#>  8         1 1        2         3.44 0.652      2.16      4.72 0.0737  0.468
+#>  9         1 1        2         3.48 0.631      2.24      4.72 0.0837  0.468
+#> 10         1 1        2         3.52 0.613      2.32      4.72 0.0938  0.468
 #> # i 290 more rows
-
-# Link-scale simultaneous bands, separately for each comparison
-conditional_differences(m, by = "fac", condition = "x2", scale = "link",
-  interval = "simultaneous", n_vals = 200, n_sim = 1000, seed = 42)
-#> # A tibble: 600 x 10
-#>    .contrast .level_1 .level_2 .diff   .se .lower_ci .upper_ci      x2    x0
-#>        <int> <fct>    <fct>    <dbl> <dbl>     <dbl>     <dbl>   <dbl> <dbl>
-#>  1         1 1        2         2.76 0.859     0.338      5.18 0.00325 0.462
-#>  2         1 1        2         2.78 0.836     0.424      5.14 0.00825 0.462
-#>  3         1 1        2         2.80 0.814     0.509      5.10 0.0132  0.462
-#>  4         1 1        2         2.83 0.792     0.593      5.06 0.0182  0.462
-#>  5         1 1        2         2.85 0.770     0.675      5.02 0.0232  0.462
-#>  6         1 1        2         2.87 0.749     0.756      4.98 0.0282  0.462
-#>  7         1 1        2         2.89 0.729     0.836      4.95 0.0332  0.462
-#>  8         1 1        2         2.91 0.709     0.913      4.92 0.0382  0.462
-#>  9         1 1        2         2.94 0.690     0.989      4.88 0.0432  0.462
-#> 10         1 1        2         2.96 0.672     1.06       4.85 0.0482  0.462
-#> # i 590 more rows
-#> # i 1 more variable: .crit <dbl>
-
-# Nonlinear response differences: simultaneous coverage across all pairs
-set.seed(42)
-df$count <- rpois(nrow(df), exp(0.2 + sin(3 * df$x2) + as.integer(df$fac) / 3))
-mp <- gam(count ~ fac + s(x2, by = fac), family = poisson(),
-  data = df, method = "REML")
-conditional_differences(mp, by = "fac", condition = "x2", scale = "response",
-  uncertainty = "simulation", interval = "simultaneous",
-  simultaneous_scope = "all", n_vals = 200, n_sim = 1000, seed = 42) |>
-  draw()
+draw(cd)
 ```

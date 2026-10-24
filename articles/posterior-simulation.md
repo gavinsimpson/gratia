@@ -44,20 +44,34 @@ the jth smooth function f_j. Wiggliness penalties \sum_j \lambda_j
 controls the degree of smoothing applied to the f_j through the
 smoothing parameters \lambda_j.
 
-Having fitted the GAM in mgcv using REML or ML smoothness selection we
-obtain a vector of coefficients \hat{\boldsymbol{\beta}} (which also
-includes the coefficients for the parametric terms, , for convenience).
-The estimates of these coefficients are conditional upon the data and
-the selected values of the smoothing parameters \lambda_j. Using the
-Bayesian view of smoothing (Miller, 2025) via (RE)ML smoothness
-selection, \boldsymbol{\beta} has a multivariate normal posterior
-distribution \boldsymbol{\beta} \| \boldsymbol{\eta},
-\boldsymbol{\lambda} \sim \text{MVN}(\hat{\boldsymbol{\beta}},
-\mathbf{V}\_{\text{b}}), where \mathbf{V}\_{\text{b}} is the Bayesian
-covariance matrix of the estimated parameters (\hat{\boldsymbol{\beta}})
-— the subscript \text{b} is used to differentiate this Bayesian
-covariance matrix from the frequentist version which is also available
-in the mgcv model output.
+Having fitted the GAM in mgcv using REML or ML smoothness selection, we
+obtain a vector of coefficients \hat{\boldsymbol{\beta}}, including the
+parametric coefficients \boldsymbol{\gamma}. Under the Bayesian view of
+smoothing (Miller, 2025), we use a Gaussian approximation to their
+posterior:
+
+\boldsymbol{\beta} \mid \mathbf{y}, \mathbf{B},
+\hat{\boldsymbol{\lambda}}, \hat{\phi}
+\\\overset{\mathrm{approx}}{\sim}\\
+\mathrm{MVN}(\hat{\boldsymbol{\beta}}, \mathbf{V}\_{\mathrm{b}}).
+
+Here \mathbf{y} is the observed response vector and \mathbf{B} is the
+full model matrix, including the parametric terms and spline bases. The
+chosen smoothing parameters \hat{\boldsymbol{\lambda}} and the response
+scale \hat{\phi}, when estimated, are held fixed.
+\mathbf{V}\_{\mathrm{b}} is the Bayesian coefficient covariance matrix,
+rather than the frequentist covariance matrix also available from mgcv.
+
+For a Gaussian identity-link GAM with a quadratic smoothing penalty and
+no coefficient inequality constraints, the Gaussian likelihood and the
+corresponding Gaussian smoothing prior give an exactly
+multivariate-normal coefficient posterior when the response variance
+\sigma^2 = \phi and all smoothing parameters are fixed, provided the
+posterior is proper. Using fitted values of these quantities gives this
+conditional posterior; it does not integrate over their uncertainty. For
+other response distributions or links, normality is generally an
+approximation. The Metropolis Hastings example below shows a case where
+that approximation performs poorly.
 
 ## What are we simulating?
 
@@ -109,17 +123,13 @@ response variation as well as coefficient uncertainty.
 [`predicted_samples()`](https://gavinsimpson.github.io/gratia/reference/predicted_samples.md)
 draws observations with the coefficients held at their fitted values.
 
-It is worth reminding ourselves that these posterior draws are all
-conditional upon the selected values of the smoothing parameter(s)
-\lambda_j. We act as if the wiggliness of the estimated smooths was
-known, when in actual fact we estimated (selected is perhaps a better
-description) these wiglinesses from the data during model fitting. If
-the estimated GAM has been fitted with `method` argument `"REML"`, or
-`"ML"`, then a version of \mathbf{V}\_{\text{b}} that is corrected for
-having selected smoothing parameters, \mathbf{V}\_{\text{c}}, is
-generally available. This allows, to an extent, for posterior simulation
-to account for the additional source of uncertainty of having chosen
-then values of \boldsymbol{\lambda}.
+By default, coefficient draws use \mathbf{V}\_{\mathrm{b}}, holding the
+selected smoothing parameters fixed. For many mgcv models fitted with
+REML or ML, a corrected covariance matrix \mathbf{V}\_{\mathrm{c}} is
+also available. Setting `unconditional = TRUE` uses this correction to
+approximately account for smoothing-parameter uncertainty. It does not
+draw smoothing parameters from their posterior or include uncertainty in
+the response scale.
 
 There are two additional functions available in gratia that do posterior
 simulation:
@@ -151,29 +161,42 @@ simulation functions in turn.
 
 ## Posterior smooths and `smooth_samples()`
 
-We can sample from the posterior distribution of the coefficients of a
-particular smooth \hat{\beta}\_j given the values of the smoothing
-parameters \hat{\boldsymbol{\lambda}}. We generate posterior samples of
-smooths by sampling \boldsymbol{\beta}\_{j\star} \sim N(\hat{\beta}\_j,
-\mathbf{V}\_{\hat{\beta}\_j}) and forming
-\mathbf{X}\_{\hat{\boldsymbol{\beta}}\_j}
-\boldsymbol{\beta}\_{j\star}^{\mathsf{T}}. This sampling can be done
-using
-[`smooth_samples()`](https://gavinsimpson.github.io/gratia/reference/smooth_samples.md).
+For a selected smooth f_j, we retain its coefficients
+\boldsymbol{\beta}\_j^{\ast} from each joint coefficient draw and
+evaluate \mathbf{f}\_j^{\ast} =
+\mathbf{B}\_j\boldsymbol{\beta}\_j^{\ast}, where \mathbf{B}\_j contains
+the smooth’s basis functions at the requested covariate values. Under
+the Gaussian approximation, the marginal distribution of these
+coefficients is \mathrm{MVN}(\hat{\boldsymbol{\beta}}\_j,
+\mathbf{V}\_{\mathrm{b},jj}), where \mathbf{V}\_{\mathrm{b},jj} is their
+block of the full covariance matrix.
+[`smooth_samples()`](https://gavinsimpson.github.io/gratia/reference/smooth_samples.md)
+uses the same joint coefficient draws for all selected smooths,
+preserving dependence between their sampled contributions.
 
-To illustrate this, we’ll simulate data from Gu & Wahba’s 4 smooth
-example, and fit a GAM to the simulated data
+To illustrate smooth uncertainty, we simulate independent covariates
+`x0` to `x3` on the unit interval. The Gaussian response combines
+nonlinear effects of `x0`, `x1` and `x2` with independent Gaussian
+noise; `x3` has no effect. This is Gu & Wahba’s example, available
+through
+[`data_sim()`](https://gavinsimpson.github.io/gratia/reference/data_sim.md).
 
 ``` r
 
 ss_df <- data_sim("eg1", seed = 42)
+```
+
+We fit a GAM with a smooth for each covariate, selecting smoothing
+parameters by REML.
+
+``` r
+
 m_ss <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = ss_df, method = "REML")
 ```
 
-When we are simulating from the posterior distribution of an estimated
-smooth, we are only sampling from the coefficients of the particular
-smooth. In this model, the coefficients for the smooth f(x_0) are stored
-as elements 2 through 10 of the coefficients vector.
+The contribution of f(x_0) uses coefficients 2 through 10 of this model.
+The other coefficients are not included when evaluating this smooth
+contribution.
 
 ``` r
 
@@ -190,16 +213,18 @@ smooths in a model, then `select` can be left at its default value.
 
 ``` r
 
-sm_samp <- smooth_samples(m_ss, select = "s(x0)", n_grid = 100, n_draws = 100,
-  seed = 21)
+sm_grid <- data_slice(m_ss, x0 = evenly(x0, n = 100))
+sm_samp <- smooth_samples(m_ss, select = "s(x0)", data = sm_grid,
+  n_draws = 100, seed = 21)
 ```
 
-Typically we’re not too bothered about the particular values of the
-covariate at which we evaluate the posterior smooths; below we ask for
-100 evenly spaced values of `x0` using `n_vals`, but you can provide the
-covariates values yourself via the `data` argument. The number of
-posterior smooths sampled is controlled by argument `n`; here we ask for
-100 samples.
+Here we supply 100 evenly spaced values of `x0` through `data` so that
+we can reuse exactly the same grid for the interval below. Without
+`data`, `n_grid` controls the number of covariate evaluation points
+constructed by
+[`smooth_samples()`](https://gavinsimpson.github.io/gratia/reference/smooth_samples.md).
+`n_draws` controls the number of coefficient draws and hence sampled
+smooths; here we request 100.
 
 Objects returned by
 [`smooth_samples()`](https://gavinsimpson.github.io/gratia/reference/smooth_samples.md)
@@ -217,14 +242,19 @@ To only draw some of the posterior smooths you can set `n_samples` which
 will randomly select that many smooths to draw (a seed can be provided
 via argument `seed` to make the set of chosen smooths repeatable.)
 
-The credible interval of a smooth will contain most of these smooths.
-For the standard 95% credible interval, only some of the sampled smooths
-will exceed the limits of the interval.
+We now compare the sampled contribution of `s(x0)` with its pointwise
+95% credible interval on the same grid.
+[`smooth_samples()`](https://gavinsimpson.github.io/gratia/reference/smooth_samples.md)
+draws only the selected smooth contribution. We therefore set
+`overall_uncertainty = FALSE` in
+[`smooth_estimates()`](https://gavinsimpson.github.io/gratia/reference/smooth_estimates.md)
+to omit overall-mean uncertainty from the interval too.
 
 ``` r
 
 # evaluate the fitted smooth over x0 and add on a credible interval
-sm_est <- smooth_estimates(m_ss, select = "s(x0)") |>
+sm_est <- smooth_estimates(m_ss, select = "s(x0)", data = sm_grid,
+  overall_uncertainty = FALSE) |>
   add_confint()
 # plot the smooth, credible interval, and posterior smooths
 sm_est |>
@@ -242,11 +272,25 @@ sm_est |>
 
 ![](posterior-simulation_files/figure-html/plot-smooth-ci-and-posterior-smooths-1.png)
 
-Following Marra & Wood (2012), the blue credible interval will contain
-on average 95% of the grey lines (posterior smooths) at any given value
-of x_0. This *across the function* frequentist interpretation of the
-credible interval implies that for some values of x_0 the coverage will
-be less than 95% and for other values greater than 95%.
+At a fixed value of x_0, the blue interval has approximately 95%
+posterior probability for the smooth contribution, conditional on the
+observed data, model design and fitted smoothing and variance
+parameters. With many posterior draws, about 95% of the sampled values
+at that particular x_0 would fall inside it. This does not mean that 95%
+of complete sampled curves stay inside the interval over the whole grid.
+
+Marra & Wood (2012) study a different property: repeated-sampling
+coverage averaged over the function. Imagine repeatedly generating data
+from the same true function, refitting the GAM and constructing
+intervals. For each fit, record the proportion of covariate values at
+which the interval contains the true function, then average that
+proportion over repeated data sets. Their theory and simulations show
+coverage close to the nominal level in many settings, provided heavy
+oversmoothing is avoided. Coverage can be poor when a centred component
+is close to a straight line or plane; including overall-mean uncertainty
+can improve it. These results do not promise 95% frequentist coverage at
+every covariate value. The component-only interval here is chosen to
+match the sampled smooth contribution.
 
 ## Posterior fitted values via `fitted_samples()`
 
@@ -545,15 +589,16 @@ defined by two parameters; the mean, \mu, which describes the middle of
 the distribution, and the variance, \sigma^2, which describes how spread
 out the distribution is about the mean. To fully describe the Gaussian
 distribution of the response when x = 0.5, we need an estimate of the
-variance. We didn’t model this explicitly in the our GAM, but we get an
-estimate any from the model’s scale parameter, \phi. This is stored as
-the element `scale` in the model object
+variance. We obtain an estimate from the model’s scale parameter, \phi.
+This variance is stored as the element `scale` in the model object. We
+take its square root to obtain the standard deviation required by
+`dist_normal()` below
 
 ``` r
 
-sigma <- m$scale
+sigma <- sqrt(m$scale)
 sigma
-#> [1] 1.019426
+#> [1] 1.009666
 ```
 
 We can visualise what this distribution looks like with some magic from
@@ -575,12 +620,11 @@ df |>
 
 The orange region shows the expected density of response values at
 x^{\ast} = 0.5 that our model predicts we could expect to observe. This
-region assumes there is no uncertainty in the estimate of the mean of
-variance. Prediction intervals take into account the variation about the
-expected value, plus the uncertainty in the expected value.
+region holds the estimated mean and variance fixed. Prediction intervals
+combine variation about the expected value with uncertainty in that
+expected value. We first use
 [`fitted_values()`](https://gavinsimpson.github.io/gratia/reference/fitted_values.md)
-conveniently returns this uncertainty for us, which by default is a 95%
-credible interval
+to obtain a 95% credible interval for the expected value alone
 
 ``` r
 
@@ -594,9 +638,9 @@ fitted_values(m, quantity = "expectation", data = data.frame(x = 0.5))
 The `.se` column is the standard error (standard deviation) of the
 estimated value (`.fitted`), while `.lower_ci` and `.upper_ci` are lower
 and upper uncertainty bounds (at the 95% level) on the estimated value
-respectively. With GAMs fitted through mgcv we don’t have a
-corresponding estimate of the uncertainty in the scale parameter, \phi,
-which for this model is the estimated standard deviation \hat{\sigma}.
+respectively. These coefficient-based calculations hold the response
+variance \phi = \sigma^2 at its fitted value; they do not include
+uncertainty in that variance.
 
 While it would be pretty easy to compute upper and lower tail quantiles
 of the fitted Gaussian distribution for a range of values of `x` to get
@@ -617,14 +661,17 @@ ds <- data_slice(m, x = evenly(x, n = 200)) |>
   mutate(.row = row_number())
 ```
 
-The added variable `.row` will be used later to match posterior
-simulated values to the row in the prediction data set `ds`. We also
-compute the fitted values for these new observations using
-[`fitted_values()`](https://gavinsimpson.github.io/gratia/reference/fitted_values.md).
+The added variable `.row` will be used later to match simulated
+responses to the rows in `ds`. We also compute fitted means and credible
+intervals at these covariate values. We set `unconditional = TRUE` here
+and in
+[`posterior_samples()`](https://gavinsimpson.github.io/gratia/reference/posterior_samples.md)
+below so that both use the same covariance correction for
+smoothing-parameter uncertainty.
 
 ``` r
 
-fv <- fitted_values(m, quantity = "expectation", data = ds)
+fv <- fitted_values(m, quantity = "expectation", data = ds, unconditional = TRUE)
 ```
 
 That step isn’t required in order to do posterior simulation with
@@ -667,14 +714,14 @@ also using the smoothness parameter selection corrected version of the
 Bayesian covariance matrix; this matrix has been adjusted to account for
 us not knowing the value of the smoothing parameter for f(x_i).
 
-`ps` is a tibble, with `n * nrow(ds)` rows. The `.draw` variable groups
-the simulated values by posterior draw, while `.row` groups posterior
-draws for the same value of `x`. To summarise the posterior draws using
-{dplyr} we need a function that will compute quantiles of the posterior
-distribution for each value of `x` (each `.row`). The following function
-is a simple wrapper around the
-[`quantile()`](https://rdrr.io/r/stats/quantile.html) function from base
-R, which arranges the output from
+`ps` is a tibble, with `n_draws * nrow(ds)` (here, `10000 * nrow(ds)`)
+rows. The `.draw` variable groups the simulated values by posterior
+draw, while `.row` groups posterior draws for the same value of `x`. To
+summarise the posterior draws using {dplyr} we need a function that will
+compute quantiles of the posterior predictive distribution for each
+value of `x` (each `.row`). The following function is a simple wrapper
+around the [`quantile()`](https://rdrr.io/r/stats/quantile.html)
+function from base R, which arranges the output from
 [`quantile()`](https://rdrr.io/r/stats/quantile.html) as a data frame.
 
 ``` r
@@ -687,12 +734,12 @@ quantile_fun <- function(x, probs = c(0.025, 0.5, 0.975), ...) {
 }
 ```
 
-We apply this function to our set of posterior draws, grouping by `.row`
-to summarise separately the posterior distribution for each new value of
-`x`. [`reframe()`](https://dplyr.tidyverse.org/reference/reframe.html)
-is used to summarise the posterior using our `quantile_fun()` function.
-For ease of use, we pivot the resulting summary from long to wide format
-and add on the covariate values by joining on the `.row` variable
+We apply this function to the simulated responses, grouping by `.row` to
+summarise the posterior predictive distribution separately at each new
+value of `x`.
+[`reframe()`](https://dplyr.tidyverse.org/reference/reframe.html)
+applies `quantile_fun()` within each group. We then pivot the summary
+from long to wide format and join the covariate values using `.row`.
 
 ``` r
 
@@ -721,9 +768,9 @@ p_int
 #> # ℹ 190 more rows
 ```
 
-The 95% prediction interval is shown for the first 10 rows of the
-prediction data. the column labelled `.q50` is the median of the
-posterior distribution.
+The printed tibble shows the 95% pointwise prediction interval for the
+first 10 rows of `ds`. `.q50` is the median of the posterior predictive
+distribution at each value of `x`.
 
 We can now use the various objects we have produced to plot the fitted
 values from the model (and their uncertainties), as well as the
@@ -760,25 +807,25 @@ fv |>
 
 ![](posterior-simulation_files/figure-html/plot-prediction-intervals-gaussian-gam-1.png)
 
-The outermost pair of blue lines on the plot above is the prediction
-interval we created. This interval encloses, as expected, almost all of
-the observe data points. It also encloses, by design, most of the
-posterior samples, as indicated by the filled hexagonal bins, with
-warmer colours indicating larger counts of posterior draws.
+The outer pair of blue lines shows the 95% pointwise posterior
+predictive interval for a new response at each value of `x`. It combines
+coefficient uncertainty with response variation, while holding the
+response variance at its fitted value. The inner pair shows uncertainty
+in the fitted mean alone. The hexagonal bins summarise the simulated
+responses, with warmer colours indicating larger counts.
 
 ### Metropolis Hastings sampler
 
 In some cases, the Gaussian approximation to the posterior distribution
-of the model coefficients can fail. Simon Wood shows an example of just
-such a failure in the
-[`?gam.mh`](https://rdrr.io/pkg/mgcv/man/gam.mh.html) help page, where
-the Gaussian approximation is basically useless for a binomial GAM with
-large numbers of zeroes.
-[`mgcv::gam.mh()`](https://rdrr.io/pkg/mgcv/man/gam.mh.html) implements
-a simple Metropolis Hastings sampler, which alternates proposals from a
-Gaussian or *t* distribution approximation to the posterior with random
-walk proposals that are based on the shrunken approximate posterior
-covariance matrix.
+of the model coefficients can fail. Simon Wood shows an example in
+[`?gam.mh`](https://rdrr.io/pkg/mgcv/man/gam.mh.html), where it performs
+poorly for a binomial GAM with large numbers of zeroes.
+[`mgcv::gam.mh()`](https://rdrr.io/pkg/mgcv/man/gam.mh.html) alternates
+independent multivariate *t* proposals centred on the fitted
+coefficients with Gaussian random walk proposals scaled from the
+approximate coefficient covariance. Its acceptance step evaluates the
+conditional posterior using the penalised likelihood, with smoothing and
+other family parameters held fixed.
 
 In this section, I rework Simon’s example of the failure of the Gaussian
 approximation from [`?gam.mh`](https://rdrr.io/pkg/mgcv/man/gam.mh.html)
@@ -859,9 +906,10 @@ We leave the two other important arguments at their defaults:
     and
 2.  `t_df = 40`, the degrees of freedom for the *t* proposals.
 
-Because the the degrees of freedom for the *t* proposals is large, we’re
-effectively doing Gaussian approximation with this default, alternating
-those proposals with random walk proposals.
+With `t_df = 40`, the independent *t* proposals are close to Gaussian.
+The acceptance step still targets the conditional posterior, so nearly
+Gaussian proposals do not require the accepted draws to follow the
+Gaussian approximation.
 
 Having collected the posterior draws, we summarise each set into 50%,
 80%, and 95% intervals using
@@ -926,12 +974,12 @@ as a function of `x` where the data are all zeroes.
 
 ## Multiple chains and sampling diagnostics
 
-`n` is the total number of retained draws. For example, four chains with
-`n_draws = 1000` retain 250 draws each. Each MH chain has its own
-burn-in period. Use `n_cores` to run chains concurrently with mirai.
-gratia reuses an active mirai pool; if none is available, it creates and
-removes a separate temporary pool. An existing pool is never resized or
-stopped by the sampler.
+`n_draws` is the total number of retained coefficient draws across
+chains. For example, four chains with `n_draws = 1000` retain 250 draws
+each. Each MH chain has its own burn-in period. Use `n_cores` to run
+chains concurrently with mirai. gratia reuses an active mirai pool; if
+none is available, it creates and removes a separate temporary pool. An
+existing pool is never resized or stopped by the sampler.
 
 ``` r
 
@@ -1019,12 +1067,15 @@ reduces memory use but repeatedly constructs the basis matrices. The
 `dense_limit` argument sets the maximum number of elements in a cached
 design matrix; zero forces blockwise evaluation.
 
-For Gaussian models with fixed dispersion and smoothing parameters, the
-coefficient posterior is Gaussian, so the existing `method = "gaussian"`
-provides direct independent draws. Its `unconditional = TRUE` covariance
-correction can include an approximation to smoothing-parameter
-uncertainty when mgcv supplies it. Neither MH backend samples smoothing
-parameters.
+For Gaussian identity-link GAMs with no coefficient inequality
+constraints, a quadratic smoothing penalty, fixed response variance and
+fixed smoothing parameters, the proper coefficient posterior is
+Gaussian, as described above. `method = "gaussian"` therefore provides
+direct independent draws from that conditional posterior. Its
+`unconditional = TRUE` covariance correction can approximately account
+for smoothing-parameter uncertainty when mgcv supplies it; it does not
+integrate over response-variance uncertainty. The MH backends also hold
+smoothing parameters and dispersion fixed.
 
 Luo, Z., & Wahba, G. (1997). Hybrid adaptive splines. *Journal of the
 American Statistical Association*, *92*(437), 107–116.

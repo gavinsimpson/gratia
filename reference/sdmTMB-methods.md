@@ -12,6 +12,9 @@ transformed back to the constrained mgcv basis.
 smooths(object, ...)
 
 # S3 method for class 'sdmTMB'
+n_smooths(object)
+
+# S3 method for class 'sdmTMB'
 get_smooths_by_id(object, id, ...)
 
 # S3 method for class 'sdmTMB'
@@ -136,6 +139,17 @@ parametric effects.
 
 ## Details
 
+Use
+[`smooths()`](https://gavinsimpson.github.io/gratia/reference/smooths.md)
+to list smooth names,
+[`get_smooth()`](https://gavinsimpson.github.io/gratia/reference/get_smooth.md)
+to extract an exact name,
+[`get_smooths_by_id()`](https://gavinsimpson.github.io/gratia/reference/get_smooths_by_id.md)
+to extract by position, and
+[`n_smooths()`](https://gavinsimpson.github.io/gratia/reference/n_smooths.md)
+to count smooths, including both predictors of a delta model. These
+utilities do not calculate coefficient covariances.
+
 Smooth, ordinary parametric and threshold estimates are partial
 contributions on each component's link scale. Spatial, spatiotemporal,
 IID random effects, offsets and varying coefficients are not added to
@@ -250,24 +264,14 @@ for the available settings.
 ``` r
 if (requireNamespace("sdmTMB", quietly = TRUE)) {
   load_mgcv()
+  # Simulate nonlinear and linear effects with Gaussian noise
   set.seed(42)
   d <- data.frame(x = runif(150), z = runif(150))
   d$y <- 1 + sin(6 * d$x) + 0.5 * d$z + rnorm(150, sd = 0.3)
-  m <- sdmTMB::sdmTMB(y ~ z + s(x, k = 6), data = d, spatial = "off")
-  draw(m)
-  smooth_estimates(m, select = "s(x)")
-  assemble(m)
-  if (requireNamespace("ggcube", quietly = TRUE)) {
-    surface <- sdmTMB::sdmTMB(y ~ s(x, z, k = 8), data = d, spatial = "off")
-    draw(surface, surface = "3d", ci_3d = TRUE, n_2d = 15)
-  }
 
-  d$y <- ifelse(runif(150) < 0.3, 0, exp(d$y))
-  delta <- sdmTMB::sdmTMB(y ~ z + s(x, k = 6),
-    data = d,
-    spatial = "off", family = sdmTMB::delta_gamma()
-  )
-  draw(delta)
-  draw(delta, select = "s.1(x)", parametric = TRUE, terms = "z.1")
+  # Fit without a spatial field and draw the linear and smooth effects
+  m <- sdmTMB::sdmTMB(y ~ z + s(x, k = 6), data = d, spatial = "off")
+  smooths(m)
+  draw(m)
 }
 ```

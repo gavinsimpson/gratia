@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-67</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-72</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -330,6 +330,12 @@ returned by <code><a href="fitted_samples.html">fitted_samples()</a></code>, ret
 parameter that affects that expectation. Predictor-scale derivatives refer
 to the first linear predictor. Smooth-component derivatives and derivatives
 of the response expectation are different quantities.</p>
+<p>Rows with unavailable required covariates retain <code>NA</code> derivatives by
+default; explicit <code>na.action</code> requests follow <code><a href="response_derivatives.html">response_derivatives()</a></code>.
+Non-finite derivative calculations at available rows raise an error,
+including when only some coefficient draws are affected. Response-scale
+derivatives require an existing response mean; scaled t families need
+fitted degrees of freedom greater than one.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>

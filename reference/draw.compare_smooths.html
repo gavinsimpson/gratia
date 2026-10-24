@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-67</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-72</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -66,7 +66,22 @@
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S3 method for class 'compare_smooths'</span></span>
-<span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="va">object</span>, ncol <span class="op">=</span> <span class="cn">NULL</span>, nrow <span class="op">=</span> <span class="cn">NULL</span>, guides <span class="op">=</span> <span class="st">"collect"</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span></span>
+<span>  <span class="va">object</span>,</span>
+<span>  ncol <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  nrow <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  guides <span class="op">=</span> <span class="st">"collect"</span>,</span>
+<span>  select <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  partial_match <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  show <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"models"</span>, <span class="st">"difference"</span><span class="op">)</span>,</span>
+<span>  pair <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  ci_level <span class="op">=</span> <span class="fl">0.95</span>,</span>
+<span>  surface <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"raster"</span>, <span class="st">"tile"</span><span class="op">)</span>,</span>
+<span>  contour <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  n_contour <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  continuous_fill <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -84,14 +99,70 @@ spread the plots</p></dd>
 
 
 <dt id="arg-guides">guides<a class="anchor" aria-label="anchor" href="#arg-guides"></a></dt>
-<dd><p>character; one of <code>"keep"</code> (the default), <code>"collect"</code>, or
-<code>"auto"</code>. Passed to <code><a href="https://patchwork.data-imaginist.com/reference/plot_layout.html" class="external-link">patchwork::plot_layout()</a></code></p></dd>
+<dd><p>character; guide handling for the combined plot, passed to
+<code><a href="https://patchwork.data-imaginist.com/reference/wrap_plots.html" class="external-link">patchwork::wrap_plots()</a></code>. The default is <code>"collect"</code>.</p></dd>
+
+
+<dt id="arg-select-partial-match">select, partial_match<a class="anchor" aria-label="anchor" href="#arg-select-partial-match"></a></dt>
+<dd><p>select smooths from the comparison, using the
+conventions of <code><a href="compare_smooths.html">compare_smooths()</a></code>. Numeric and logical selections follow
+the order of unique smooth labels in <code>object</code>.</p></dd>
+
+
+<dt id="arg-show">show<a class="anchor" aria-label="anchor" href="#arg-show"></a></dt>
+<dd><p>character; <code>"models"</code> (default) overlays one-variable smooths
+and draws two-variable smooths in side-by-side model facets with fixed axes
+and a shared fill scale. <code>"difference"</code> draws the estimated difference for
+selected two-variable smooths, using a fill scale centred on zero.</p></dd>
+
+
+<dt id="arg-pair">pair<a class="anchor" aria-label="anchor" href="#arg-pair"></a></dt>
+<dd><p>two model names or integer indices in input order. In difference
+mode, subtract the second model from the first. With exactly two models,
+the default uses their input order; with more models, supply <code>pair</code>.</p></dd>
+
+
+<dt id="arg-ci-level">ci_level<a class="anchor" aria-label="anchor" href="#arg-ci-level"></a></dt>
+<dd><p>numeric; one finite value strictly between 0 and 1, giving
+the coverage of the pointwise normal intervals for one-variable smooths.
+The default is <code>0.95</code>. Use <code>ci_level</code> to change the interval level;
+<code>coverage</code> and <code>level</code> are not accepted, even when <code>ci_level</code> is also supplied.</p></dd>
+
+
+<dt id="arg-surface">surface<a class="anchor" aria-label="anchor" href="#arg-surface"></a></dt>
+<dd><p>character; <code>"raster"</code> or <code>"tile"</code> for surface displays.
+Irregular numeric grids use rectangles bounded by coordinate midpoints.</p></dd>
+
+
+<dt id="arg-contour">contour<a class="anchor" aria-label="anchor" href="#arg-contour"></a></dt>
+<dd><p>logical; add contour lines? These require two numeric axes
+and at least one grid cell with four finite corner values that are not all equal.</p></dd>
+
+
+<dt id="arg-n-contour">n_contour<a class="anchor" aria-label="anchor" href="#arg-n-contour"></a></dt>
+<dd><p>numeric; the number of contour bins. Will result in
+<code>n_contour - 1</code> contour lines being drawn. See <code><a href="https://ggplot2.tidyverse.org/reference/geom_contour.html" class="external-link">ggplot2::geom_contour()</a></code>.</p></dd>
+
+
+<dt id="arg-continuous-fill">continuous_fill<a class="anchor" aria-label="anchor" href="#arg-continuous-fill"></a></dt>
+<dd><p>a suitable fill scale to be used when plotting
+continuous variables.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
-<dd><p>additional arguments passed to <code><a href="https://patchwork.data-imaginist.com/reference/wrap_plots.html" class="external-link">patchwork::wrap_plots()</a></code>.</p></dd>
+<dd><p>arguments passed to <code><a href="https://patchwork.data-imaginist.com/reference/wrap_plots.html" class="external-link">patchwork::wrap_plots()</a></code>.</p></dd>
 
 </dl></div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>Difference plots match both coordinates and any retained conditioning
+covariates. Locations missing from either model, and missing estimates, remain
+missing. Multiple conditioning values are drawn in separate panels.
+No interval is calculated for the difference: estimates from models fitted
+to the same observations can be correlated, and their separate covariance
+matrices do not supply the covariance between models. See <code><a href="compare_smooths.html">compare_smooths()</a></code>
+for the scale and centring of the compared smooth contributions.</p>
+    </div>
     <div class="section level2">
     <h2 id="label-layout">Label layout<a class="anchor" aria-label="anchor" href="#label-layout"></a></h2>
 

@@ -775,9 +775,6 @@ m_cycle <- gam(y ~ s(x0, bs = "cc", k = 10), data = df1,
   knots = list(x0 = c(0, 1)), method = "REML")
 draw(m_cycle, cyclic = "polar")
 
-draw(m_cycle, cyclic = "polar",
-  polar_args = list(start = -pi / 2, reverse = "theta"))
-
 
 # See https://gavinsimpson.github.io/gratia/articles/custom-plotting.html
 # for more examples. Use the & operator to modify the theme of all panels.

@@ -27,7 +27,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-67</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-72</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -94,25 +94,36 @@
 
     
     
-<p>gratia supports the 24 univariate and 17 bivariate smooth
-constructors in scam 1.2-22, including cyclic margins, endpoint
-constraints, local constraints, <code>by</code> smooths and smooth
-interactions. Ordinary mgcv smooths fitted through <code><a href="https://rdrr.io/pkg/scam/man/scam.html" class="external-link">scam()</a></code>
-are also supported. The same fitted coefficient mapping is used for
-smooth estimates, bases, derivatives, predictions and sampled
-smooths.</p>
+<p>gratia supports scam’s univariate and bivariate shape-constrained
+smooth constructors, including cyclic margins, endpoint constraints,
+local constraints, <code>by</code> smooths and smooth interactions. This
+includes the <code>tedi</code> and <code>teid</code> tensor constructors
+introduced in scam 1.2-23, which constrain one covariate’s effect to
+increase and the other’s to decrease. These two constructors require a
+scam version that provides them. Ordinary mgcv smooths fitted through
+<code><a href="https://rdrr.io/pkg/scam/man/scam.html" class="external-link">scam()</a></code> are also supported. The same fitted coefficient
+mapping is used for smooth estimates, bases, derivatives, predictions
+and sampled smooths.</p>
+<p>We load gratia and scam before simulating the example.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://gavinsimpson.github.io/gratia/">"gratia"</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/load_mgcv.html">load_mgcv</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st">"scam"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">46</span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st">"scam"</span><span class="op">)</span></span></code></pre></div>
+<p>The response below combines an increasing curved effect of
+<code>x</code> and a linear effect of <code>z</code>, with independent
+Gaussian noise of standard deviation 0.15. The covariates are
+independently sampled on the unit interval.</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">46</span><span class="op">)</span></span>
 <span><span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">200</span><span class="op">)</span>, z <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">200</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">d</span><span class="op">$</span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">d</span><span class="op">$</span><span class="va">x</span><span class="op">)</span> <span class="op">+</span> <span class="va">d</span><span class="op">$</span><span class="va">z</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">d</span><span class="op">)</span>, sd <span class="op">=</span> <span class="fl">0.15</span><span class="op">)</span></span>
-<span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scam/man/scam.html" class="external-link">scam</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x</span>, bs <span class="op">=</span> <span class="st">"mpi"</span>, k <span class="op">=</span> <span class="fl">8</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">z</span>, bs <span class="op">=</span> <span class="st">"mpi"</span>, k <span class="op">=</span> <span class="fl">8</span><span class="op">)</span>,</span>
+<span><span class="va">d</span><span class="op">$</span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">d</span><span class="op">$</span><span class="va">x</span><span class="op">)</span> <span class="op">+</span> <span class="va">d</span><span class="op">$</span><span class="va">z</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">d</span><span class="op">)</span>, sd <span class="op">=</span> <span class="fl">0.15</span><span class="op">)</span></span></code></pre></div>
+<p>We fit increasing smooths for both covariates and plot their
+estimated contributions.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scam/man/scam.html" class="external-link">scam</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x</span>, bs <span class="op">=</span> <span class="st">"mpi"</span>, k <span class="op">=</span> <span class="fl">8</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">z</span>, bs <span class="op">=</span> <span class="st">"mpi"</span>, k <span class="op">=</span> <span class="fl">8</span><span class="op">)</span>,</span>
 <span>  data <span class="op">=</span> <span class="va">d</span>, not.exp <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span></span></code></pre></div>
-<p><img src="scam-support_files/figure-html/packages-1.png" class="r-plt" alt="" width="700"></p>
+<p><img src="scam-support_files/figure-html/fit-model-1.png" class="r-plt" alt="" width="700"></p>
 <div class="section level2">
 <h2 id="fitted-functions-and-native-plots">Fitted functions and native plots<a class="anchor" aria-label="anchor" href="#fitted-functions-and-native-plots"></a>
 </h2>
@@ -131,7 +142,7 @@ bivariate plots instead subtract the mean of the evaluated surface. Use
 and their covariance receive the same centring operation.
 <code><a href="../reference/assemble.html">assemble()</a></code> accepts the same argument. Match grids and
 exclusion distances when comparing plots from the two packages.</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">b</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scam/man/scam.html" class="external-link">scam</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">z</span>, bs <span class="op">=</span> <span class="st">"tedmi"</span>, k <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">5</span><span class="op">)</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">d</span>,</span>
 <span>  not.exp <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">b</span>, centre <span class="op">=</span> <span class="st">"plot"</span>, n_2d <span class="op">=</span> <span class="fl">40</span><span class="op">)</span></span></code></pre></div>
@@ -153,7 +164,7 @@ and contrasts use scam’s covariance for the transformed coefficients
 approximations, conditional on the fitted smoothing parameters.
 Including intercept uncertainty is controlled by
 <code>overall_uncertainty</code>.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">e</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/smooth_estimates.html">smooth_estimates</a></span><span class="op">(</span><span class="va">m</span>, overall_uncertainty <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="va">e</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_confint.html">add_confint</a></span><span class="op">(</span><span class="va">e</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">e</span><span class="op">)</span></span>
@@ -210,7 +221,7 @@ these same transformed coefficient draws.
 <code>uncertainty = "simulation"</code>;
 <code>uncertainty = "delta"</code> instead uses the local
 transformed-coefficient covariance.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">draws</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/gaussian_draws.html">gaussian_draws</a></span><span class="op">(</span><span class="va">m</span>, n_draws <span class="op">=</span> <span class="fl">100</span>, seed <span class="op">=</span> <span class="fl">54</span><span class="op">)</span></span>
 <span><span class="va">samples</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/smooth_samples.html">smooth_samples</a></span><span class="op">(</span><span class="va">m</span>, n_draws <span class="op">=</span> <span class="fl">5</span>, seed <span class="op">=</span> <span class="fl">55</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">samples</span><span class="op">)</span></span>
