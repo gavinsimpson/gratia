@@ -2019,7 +2019,7 @@ detaching ‘package:mgcv’
 > ### ** Examples
 > 
 > pal <- gratia_palette("tol_muted")
-> ## Don't show:
+> ## Don't show: 
 > pal <- utils::removeSource(pal)
 > ## End(Don't show)
 > pal(5)
@@ -2057,7 +2057,7 @@ detaching ‘package:mgcv’
 > gratia_theme_set(old)
 > 
 > pal <- gratia_palette("tol_banded_16")
-> ## Don't show:
+> ## Don't show: 
 > pal <- utils::removeSource(pal)
 > ## End(Don't show)
 > theme(palette.colour.discrete = pal, palette.fill.discrete = pal)
@@ -2195,11 +2195,11 @@ pmax(exp(eta), .Machine$double.eps)
 > link(mod, parameter = "scale")
 function (mu) 
 log(1/mu - 0.01)
-<environment: 0xaf6f4c698>
+<environment: 0x9ba9a3b28>
 > inv_link(mod, parameter = "scale")
 function (eta) 
 1/(exp(eta) + 0.01)
-<environment: 0xaf6f4c698>
+<environment: 0x9ba9a3b28>
 > 
 > ## Works with `family` objects too
 > link(shash(), parameter = "skewness")
@@ -3900,7 +3900,7 @@ detaching ‘package:mgcv’
 
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  36.579 0.589 38.478 0.003 0.004 
+Time elapsed:  18.565 0.337 20.004 0.003 0.003 
 > grDevices::dev.off()
 null device 
           1 
