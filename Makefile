@@ -42,6 +42,9 @@ build-devel: docs-devel
 check: build
 	cd ..; \
 	export NOT_CRAN="true"; \
+	export GRATIA_RUN_HGAM="false"; \
+	export TESTTHAT_PARALLEL="true"; \
+	export TESTTHAT_CPUS="$(TEST_CPUS)"; \
 	echo "$${NOT_CRAN}"; \
 	R CMD check gratia_$(PKGVERS).tar.gz
 
