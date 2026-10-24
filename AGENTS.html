@@ -100,6 +100,12 @@
 <p>Before committing, check that every new public topic is included in the index and validate the reference index with pkgdown. A missing topic causes the website build to fail.</p>
 </div>
 <div class="section level2">
+<h2 id="reusing-models-in-tests">Reusing models in tests<a class="anchor" aria-label="anchor" href="#reusing-models-in-tests"></a></h2>
+<p>Reuse models fitted in <code>tests/testthat/setup.R</code> by default. Before adding a model fit to a test, check whether an existing setup model provides the class, family, fitted terms, data and retained fitting information needed by the assertion. Avoid repeated fitting because CRAN test run time is critical.</p>
+<p>Add a new fit only when the test needs a model structure or fitting property that the existing setup models do not provide. Relevant differences include smooth and random-effect structures, families and links, offsets, weights, missing-row handling and fitting methods. Keep independent reference fits or fresh native model state when those are part of what the test checks.</p>
+<p>Put new reusable model structures and their fixture builders in <code>tests/testthat/setup.R</code>, using existing simulated data wherever possible. Construct expensive or optional models on first use and cache them for reuse, rather than adding unconditional setup work or fitting them repeatedly in individual tests.</p>
+</div>
+<div class="section level2">
 <h2 id="running-tests">Running tests<a class="anchor" aria-label="anchor" href="#running-tests"></a></h2>
 <p>Do not run the <code>hgam-paper</code> tests unless the user specifically asks for them. Keep the HGAM paper tests out of routine validation, including full-suite runs. Use <code>make test-hgam-paper</code> only when specifically checking the paper code; the existing weekly/manual CI job also runs this check. Do not enable <code>GRATIA_RUN_HGAM</code> for ordinary package changes.</p>
 <p>Run all package tests and checks outside the sandbox from the outset, including targeted tests and the full test suite. Request elevated execution with <code>sandbox_permissions="require_escalated"</code> for test commands; do not first attempt them inside the sandbox. Parallel-worker tests need local socket permissions that the sandbox blocks, so a sandboxed run can produce misleading failures and require an unnecessary rerun. This instruction does not bypass tool approval requirements.</p>

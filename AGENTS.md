@@ -108,6 +108,27 @@ Before committing, check that every new public topic is included in the
 index and validate the reference index with pkgdown. A missing topic
 causes the website build to fail.
 
+## Reusing models in tests
+
+Reuse models fitted in `tests/testthat/setup.R` by default. Before
+adding a model fit to a test, check whether an existing setup model
+provides the class, family, fitted terms, data and retained fitting
+information needed by the assertion. Avoid repeated fitting because CRAN
+test run time is critical.
+
+Add a new fit only when the test needs a model structure or fitting
+property that the existing setup models do not provide. Relevant
+differences include smooth and random-effect structures, families and
+links, offsets, weights, missing-row handling and fitting methods. Keep
+independent reference fits or fresh native model state when those are
+part of what the test checks.
+
+Put new reusable model structures and their fixture builders in
+`tests/testthat/setup.R`, using existing simulated data wherever
+possible. Construct expensive or optional models on first use and cache
+them for reuse, rather than adding unconditional setup work or fitting
+them repeatedly in individual tests.
+
 ## Running tests
 
 Do not run the `hgam-paper` tests unless the user specifically asks for
