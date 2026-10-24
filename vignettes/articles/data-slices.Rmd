@@ -262,7 +262,7 @@ sm |>
   )
 ```
 
-Note that the above interval is not the Marra and Wood (2012) interval. It doesn't include the uncertainty from the model constant term at the moment, but unless the smooth is very close to linear that shouldn't make too much difference.
+`smooth_estimates()` defaults to `overall_uncertainty = TRUE`, so the interval above includes uncertainty in the overall mean (the model constant here). The plotted estimate is still the centred smooth contribution; the constant is not added to `.estimate`. Set `overall_uncertainty = FALSE` to construct an interval using only the smooth's coefficient uncertainty.
 
 This extends to multiple slices by asking for several discrete `z`
 ```{r data-slice-biv-2}
@@ -287,11 +287,11 @@ sm |>
   )
 ```
 
-### Using `fitted_samples()`
+### Using `fitted_values()`
 
-If you want to evaluate the surface over `x` at fixed `z` conditional upon other values of other covariates (model predicted or fitted values) then `fitted_samples()` is a tidy wrapper to `predict.gam()`.
+`fitted_values()` evaluates the full fitted model at the supplied covariate values and returns estimates with intervals. For this Gaussian identity-link model, the default response-scale quantity is the conditional mean, including the model constant and smooth contribution. Its interval describes uncertainty in that mean, rather than variation in new observations.
 
-For single `z` we have
+We first plot the fitted mean over `x` at the single fixed value of `z`.
 ```{r data-slice-biv-1-fitted-values}
 fitted_values(m_biv, data = ds3) |> # default is response scale, not link
   ggplot(aes(x = x, y = .fitted)) +
@@ -303,7 +303,7 @@ fitted_values(m_biv, data = ds3) |> # default is response scale, not link
   )
 ```
 
-And for the multiple `z` we have
+We then plot the fitted mean at each of the three fixed values of `z`.
 ```{r data-slice-biv-2-fitted-values}
 fitted_values(m_biv, data = ds4) |>
   mutate(fz = factor(z)) |>
@@ -317,4 +317,4 @@ fitted_values(m_biv, data = ds4) |>
     y = expression(hat(y)), colour = "z", fill = "z"
   )
 ```
-where the only difference here is that now the model constant is included as well as its uncertainty.
+The fitted means include the model constant, whereas the earlier plots show only the centred smooth contribution. Both sets of intervals include overall-mean uncertainty with the defaults used here.

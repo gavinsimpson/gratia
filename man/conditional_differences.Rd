@@ -209,6 +209,15 @@ random effects does not integrate over their distribution. Offsets follow
 \code{\link[mgcv:predict.gam]{mgcv::predict.gam()}} semantics. Supported models are \code{gam} and \code{bam} fits
 with a single linear predictor and an ordinary scalar inverse-link mean
 (including negative binomial, Tweedie, beta regression and scaled t families).
+SCAM fits with supported single-predictor families also support link- and
+response-scale differences, with delta or simulation uncertainty and
+pointwise or simultaneous intervals. SCAM delta intervals use the local
+covariance of transformed coefficients. Gaussian simulation draws
+unrestricted fitting coefficients and applies the fitted positivity
+transformation; user draws must already be in transformed coordinates and
+satisfy the coefficient constraints. MH sampling is unavailable for SCAM
+fits, and smoothing-parameter uncertainty is unsupported; use
+\code{unconditional = FALSE}.
 }
 \examples{
 load_mgcv()

@@ -59,8 +59,8 @@ category probabilities in mgcv's numeric coding order, \verb{0, ..., K}.
 Nominal multinomial GAMs also support utility surrogate residuals in
 ordinary and scalable plots. Utility residuals need no ordering of
 categories. Traditional residual checks and PPCs remain available.
-\item SCAM models support ordinary posterior predictive plots. Scalable posterior
-predictive plots are not currently available; use \code{scalable = FALSE}.
+\item SCAM models support ordinary and scalable posterior predictive plots for
+supported response families.
 Smoothing-parameter uncertainty is not currently supported for SCAM models;
 use \code{unconditional = FALSE}.
 \item \code{gamm}/\code{gamm4} and direct \code{lme}/\code{merMod} fits use their full predictors.
