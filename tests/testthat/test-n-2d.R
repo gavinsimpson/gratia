@@ -72,7 +72,7 @@ test_that("plotting, model wrappers, bases and comparisons forward n_2d", {
   expect_equal(nrow(assemble(m, rug = FALSE)[[1]]$data), 2500L)
   expect_equal(nrow(draw(m, rug = FALSE, wrap = FALSE)[[1]]$data), 2500L)
   expect_equal(nrow(unique(basis(m)[c("x", "z")])), 2500L)
-  cmp <- compare_smooths(m, m, n = 11, n_2d = 7)
+  cmp <- compare_smooths(m, Same = m, n = 11, n_2d = 7)
   expect_true(all(vapply(cmp$data, nrow, integer(1)) == 49L))
 })
 

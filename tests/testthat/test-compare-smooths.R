@@ -22,6 +22,17 @@ test_that("compare_smooths() errors when passed a single model", {
   )
 })
 
+test_that("repeated comparison models need distinct names", {
+  m <- m_1_smooth
+  expect_error(compare_smooths(m, m, n = 5), "Model names must be unique")
+  expect_error(compare_smooths(m, m = m, n = 5), "Model names must be unique")
+  expect_error(compare_smooths(m, Same = m, Same = m, n = 5),
+    "Model names must be unique")
+  expect_silent(cs <- compare_smooths(m, Same = m, n = 5))
+  expect_identical(cs$.model, c("m", "Same"))
+  expect_equal(cs$data[[1]], cs$data[[2]])
+})
+
 test_that("draw.compare_smooths() can plot a comparison of smooths", {
   expect_silent(cs <- compare_smooths(
     su_m_quick_eg1,

@@ -72,7 +72,7 @@ test_that("comparisons and factor differences accept transformed coordinates", {
   m <- mgcv::gam(y ~ g + s(fun(x), by = g, k = 5), data = d)
   nd <- expand.grid(x = seq(1, 5, length.out = 8), g = levels(d$g))
   nd$g <- factor(nd$g, levels = levels(d$g))
-  expect_s3_class(compare_smooths(m, m, data = nd, envir = environment()), "compare_smooths")
+  expect_s3_class(compare_smooths(m, Same = m, data = nd, envir = environment()), "compare_smooths")
   a <- difference_smooths(m, select = smooths(m)[1:2], partial_match = FALSE,
     data = nd, envir = environment())
   expect_true(nrow(a) > 0)
