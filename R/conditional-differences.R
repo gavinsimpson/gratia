@@ -112,38 +112,14 @@
 #' @export
 #' @examples
 #' load_mgcv()
-#' df <- data_sim("eg4", seed = 2)
+#' # Simulate group-specific curves with Gaussian noise and fit factor-by smooths
+#' df <- data_sim("eg4", n = 300, seed = 2)
 #' m <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = df, method = "REML")
+#'
+#' # Compare fitted responses over x2, including the parametric group effects
 #' cd <- conditional_differences(m, by = "fac", condition = "x2")
+#' cd
 #' draw(cd)
-#'
-#' # Compare treatment levels over both numeric covariates. Each comparison
-#' # is drawn in a separate surface panel.
-#' cd_surface <- conditional_differences(m, by = "fac",
-#'   condition = list(c("x2", "x0")))
-#' draw(cd_surface, surface = "tile")
-#'
-#' # Restrict comparisons and fix a further covariate
-#' conditional_differences(m, by = "fac",
-#'   condition = list("x2", fac = c("1", "3"), x0 = 0.5))
-#'
-#' # Pointwise posterior bands from shared coefficient draws
-#' conditional_differences(m, by = "fac", condition = "x2",
-#'   uncertainty = "simulation", n_sim = 1000, seed = 42)
-#'
-#' # Link-scale simultaneous bands, separately for each comparison
-#' conditional_differences(m, by = "fac", condition = "x2", scale = "link",
-#'   interval = "simultaneous", n_vals = 200, n_sim = 1000, seed = 42)
-#'
-#' # Nonlinear response differences: simultaneous coverage across all pairs
-#' set.seed(42)
-#' df$count <- rpois(nrow(df), exp(0.2 + sin(3 * df$x2) + as.integer(df$fac) / 3))
-#' mp <- gam(count ~ fac + s(x2, by = fac), family = poisson(),
-#'   data = df, method = "REML")
-#' conditional_differences(mp, by = "fac", condition = "x2", scale = "response",
-#'   uncertainty = "simulation", interval = "simultaneous",
-#'   simultaneous_scope = "all", n_vals = 200, n_sim = 1000, seed = 42) |>
-#'   draw()
 conditional_differences <- function(model, by, condition = NULL, data = NULL,
                                     scale = c("response", "link", "linear_predictor"),
                                     ...) {

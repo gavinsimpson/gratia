@@ -49,15 +49,21 @@
 #' @export
 #' @examples
 #' load_mgcv()
-#' dat <- data_sim("eg1", n = 100, seed = 42)
-#' model <- gam(y ~ x0 + s(x1, k = 6), data = dat, method = "REML")
+#' # Simulate linear and nonlinear effects with Gaussian noise
+#' set.seed(42)
+#' dat <- data.frame(x = runif(120), z = runif(120))
+#' dat$y <- 2 * dat$z + sin(2 * pi * dat$x) + rnorm(120, sd = 0.3)
+#'
+#' # Fit a linear effect of z and a smooth effect of x
+#' model <- gam(y ~ z + s(x, k = 8), data = dat, method = "REML")
+#'
+#' # Plot the variances used in the random-effect representation of the penalties
 #' components <- variance_comp(model)
 #' draw(components)
-#' draw(components, type = "std_dev")
 #'
+#' # Plot variation of fitted term contributions across the fitting observations
 #' terms <- variance_comp(model, type = "terms", n_draws = 200, seed = 42)
 #' draw(terms)
-#' draw(terms, type = "proportion", include_total = FALSE)
 #' @inheritSection draw Label layout
 draw.variance_comp <- function(object, type = c("variance", "std_dev", "proportion"),
     select = NULL, include_total = TRUE, predictor = NULL, ncol = NULL,

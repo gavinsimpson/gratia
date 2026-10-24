@@ -341,40 +341,18 @@ detaching ‘package:mgcv’
 > ### ** Examples
 > 
 > load_mgcv()
-> ## simulate some data...
-> dat <- data_sim("eg1", n = 400, dist = "normal", scale = 2, seed = 2)
-> mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat)
-> ## run some basic model checks
-> appraise(mod) & ggplot2::theme(
-+   geom.gratia.diagnostic.point = ggplot2::element_geom(colour = "steelblue"),
-+   gratia.alpha.diagnostic.point = 0.4)
-> ## replace the residual histogram with a posterior predictive check
-> appraise(mod, ppcheck = TRUE, n_ppc = 20, seed = 42)
+> # Simulate an additive Gaussian response and fit a GAM
+> dat <- data_sim("eg1", n = 200, scale = 2, seed = 2)
+> mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 > 
-> ## To change the theme for all panels use the & operator, for example to
-> ## change the ggplot theme for all panels
-> library("ggplot2")
-> appraise(mod, seed = 42) & theme_minimal()
-> 
-> ## Select a grouped-family component by its position in the family list
-> set.seed(53)
-> grouped <- data.frame(x = runif(160), family_id = rep(1:2, 80))
-> grouped$component <- factor(grouped$family_id)
-> grouped$y <- rnorm(160, sin(2 * pi * grouped$x), 0.4)
-> is_count <- grouped$family_id == 2L
-> grouped$y[is_count] <- rpois(sum(is_count), exp(grouped$x[is_count]))
-> grouped_fit <- gam(cbind(y, family_id) ~ component +
-+   s(x, by = component, k = 6), data = grouped,
-+   family = gfam(list(gaussian(), poisson())), method = "REML")
-> appraise(grouped_fit, response = 2, seed = 54)
-> ## Layout remains a separate choice
-> qq_plot(grouped_fit, response = 2, by_family = TRUE, seed = 54)
+> # Inspect residuals, fitted values and the residual distribution
+> appraise(mod, seed = 42)
 > 
 > 
 > 
 > cleanEx()
 
-detaching ‘package:ggplot2’, ‘package:mgcv’
+detaching ‘package:mgcv’
 
 > nameEx("assemble.gam")
 > ### * assemble.gam
@@ -541,81 +519,28 @@ detaching ‘package:mgcv’
 > ### ** Examples
 > 
 > load_mgcv()
-> df <- data_sim("eg4", seed = 2)
+> # Simulate group-specific curves with Gaussian noise and fit factor-by smooths
+> df <- data_sim("eg4", n = 300, seed = 2)
 > m <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = df, method = "REML")
+> 
+> # Compare fitted responses over x2, including the parametric group effects
 > cd <- conditional_differences(m, by = "fac", condition = "x2")
-> draw(cd)
-> 
-> # Compare treatment levels over both numeric covariates. Each comparison
-> # is drawn in a separate surface panel.
-> cd_surface <- conditional_differences(m, by = "fac",
-+   condition = list(c("x2", "x0")))
-> draw(cd_surface, surface = "tile")
-> 
-> # Restrict comparisons and fix a further covariate
-> conditional_differences(m, by = "fac",
-+   condition = list("x2", fac = c("1", "3"), x0 = 0.5))
-# A tibble: 100 x 9
-   .contrast .level_1 .level_2     .diff   .se .lower_ci .upper_ci      x2    x0
-       <int> <fct>    <fct>        <dbl> <dbl>     <dbl>     <dbl>   <dbl> <dbl>
- 1         1 1        3         0.375    0.927     -1.44    2.19   0.00325   0.5
- 2         1 1        3         0.000823 0.834     -1.63    1.63   0.0133    0.5
- 3         1 1        3        -0.374    0.748     -1.84    1.09   0.0233    0.5
- 4         1 1        3        -0.752    0.673     -2.07    0.567  0.0334    0.5
- 5         1 1        3        -1.13     0.612     -2.33    0.0656 0.0434    0.5
- 6         1 1        3        -1.52     0.566     -2.63   -0.413  0.0535    0.5
- 7         1 1        3        -1.92     0.536     -2.97   -0.869  0.0635    0.5
- 8         1 1        3        -2.33     0.518     -3.34   -1.31   0.0736    0.5
- 9         1 1        3        -2.74     0.509     -3.74   -1.74   0.0836    0.5
-10         1 1        3        -3.16     0.505     -4.15   -2.17   0.0937    0.5
-# i 90 more rows
-> 
-> # Pointwise posterior bands from shared coefficient draws
-> conditional_differences(m, by = "fac", condition = "x2",
-+   uncertainty = "simulation", n_sim = 1000, seed = 42)
+> cd
 # A tibble: 300 x 9
    .contrast .level_1 .level_2 .diff   .se .lower_ci .upper_ci      x2    x0
        <int> <fct>    <fct>    <dbl> <dbl>     <dbl>     <dbl>   <dbl> <dbl>
- 1         1 1        2         2.76 0.878      1.05      4.51 0.00325 0.462
- 2         1 1        2         2.80 0.830      1.15      4.45 0.0133  0.462
- 3         1 1        2         2.85 0.784      1.29      4.42 0.0233  0.462
- 4         1 1        2         2.89 0.741      1.43      4.34 0.0334  0.462
- 5         1 1        2         2.94 0.699      1.55      4.32 0.0434  0.462
- 6         1 1        2         2.98 0.660      1.67      4.25 0.0535  0.462
- 7         1 1        2         3.03 0.625      1.81      4.23 0.0635  0.462
- 8         1 1        2         3.07 0.592      1.93      4.19 0.0736  0.462
- 9         1 1        2         3.11 0.562      2.01      4.19 0.0836  0.462
-10         1 1        2         3.16 0.536      2.10      4.20 0.0937  0.462
+ 1         1 1        2         3.13 0.868      1.42      4.83 0.00325 0.468
+ 2         1 1        2         3.17 0.830      1.54      4.80 0.0133  0.468
+ 3         1 1        2         3.22 0.794      1.66      4.77 0.0234  0.468
+ 4         1 1        2         3.26 0.760      1.77      4.75 0.0334  0.468
+ 5         1 1        2         3.31 0.729      1.88      4.74 0.0435  0.468
+ 6         1 1        2         3.35 0.700      1.98      4.73 0.0536  0.468
+ 7         1 1        2         3.40 0.675      2.07      4.72 0.0636  0.468
+ 8         1 1        2         3.44 0.652      2.16      4.72 0.0737  0.468
+ 9         1 1        2         3.48 0.631      2.24      4.72 0.0837  0.468
+10         1 1        2         3.52 0.613      2.32      4.72 0.0938  0.468
 # i 290 more rows
-> 
-> # Link-scale simultaneous bands, separately for each comparison
-> conditional_differences(m, by = "fac", condition = "x2", scale = "link",
-+   interval = "simultaneous", n_vals = 200, n_sim = 1000, seed = 42)
-# A tibble: 600 x 10
-   .contrast .level_1 .level_2 .diff   .se .lower_ci .upper_ci      x2    x0
-       <int> <fct>    <fct>    <dbl> <dbl>     <dbl>     <dbl>   <dbl> <dbl>
- 1         1 1        2         2.76 0.859     0.338      5.18 0.00325 0.462
- 2         1 1        2         2.78 0.836     0.424      5.14 0.00825 0.462
- 3         1 1        2         2.80 0.814     0.509      5.10 0.0132  0.462
- 4         1 1        2         2.83 0.792     0.593      5.06 0.0182  0.462
- 5         1 1        2         2.85 0.770     0.675      5.02 0.0232  0.462
- 6         1 1        2         2.87 0.749     0.756      4.98 0.0282  0.462
- 7         1 1        2         2.89 0.729     0.836      4.95 0.0332  0.462
- 8         1 1        2         2.91 0.709     0.913      4.92 0.0382  0.462
- 9         1 1        2         2.94 0.690     0.989      4.88 0.0432  0.462
-10         1 1        2         2.96 0.672     1.06       4.85 0.0482  0.462
-# i 590 more rows
-# i 1 more variable: .crit <dbl>
-> 
-> # Nonlinear response differences: simultaneous coverage across all pairs
-> set.seed(42)
-> df$count <- rpois(nrow(df), exp(0.2 + sin(3 * df$x2) + as.integer(df$fac) / 3))
-> mp <- gam(count ~ fac + s(x2, by = fac), family = poisson(),
-+   data = df, method = "REML")
-> conditional_differences(mp, by = "fac", condition = "x2", scale = "response",
-+   uncertainty = "simulation", interval = "simultaneous",
-+   simultaneous_scope = "all", n_vals = 200, n_sim = 1000, seed = 42) |>
-+   draw()
+> draw(cd)
 > 
 > 
 > 
@@ -658,77 +583,28 @@ detaching ‘package:mgcv’
 > ### ** Examples
 > 
 > load_mgcv()
-> df <- data_sim("eg1", seed = 2)
-> m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = "REML")
+> # Simulate an additive Gaussian response and fit a GAM
+> df <- data_sim("eg1", n = 200, seed = 2)
+> m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = "REML")
 > 
-> # predictions conditional on values evenly spaced over x2, all other
-> # variables in model are held at representative values
-> cv <- conditional_values(
-+   m1,
-+   condition = "x2"
-+ )
-> # plot
-> cv |> draw()
-> 
-> # Grouping x2 and x1 creates a surface over both covariates, with
-> # 50 generated values along each axis by default.
-> cv_surface <- conditional_values(m1, condition = list(c("x2", "x1")))
-> draw(cv_surface)
-> draw(cv_surface, surface = "tile")
-> 
-> # as above but condition on `x1` also. When plotted, `x1` is mapped to the
-> # colour channel, noting that it has been summarised using fivenum()
-> cv <- conditional_values(
-+   m1,
-+   condition = c("x2", "x1")
-+ )
-> # plot
-> cv |> draw()
-> 
-> # can pass `condition` a list, allowing for greater flexibility
-> # For example, here we condition on all four variables in the model,
-> # summarising:
-> #   * `x1` at its five number summary,
-> #   * `x0  at its quartiles
-> #   * `x3` at its mean a d mean +/- sd
-> cv <- conditional_values(
-+   m1,
-+   condition = list("x2", x1 = "fivenum", x0 = "quartile", x3 = "threenum")
-+ )
-> # plot
-> cv |> draw()
-> 
-> # some model terms can be exclude from the conditional predictions using the
-> # `exclude` mechanism of `predict.gam`. Here we exclude the effects of
-> # `s(x0)` and `s(x3)` from the conditional predictions. This, in effect,
-> # treats these smooths as having **0** effect on the conditional predictions
-> # of the response, even though the two smooths conditioned on (`s(x2)` and
-> # `s(x1)`) were estimated given the two excluded smooths were in the model
-> cv <- conditional_values(
-+   m1,
-+   condition = list("x2", x1 = "minmax"),
-+   exclude = c("s(x0)", "s(x3)")
-+ )
-> # plot
-> cv |> draw()
-> 
-> # categorical conditions are also handled
-> df <- data_sim("eg4", seed = 2)
-> m2 <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = df, method = "REML")
-> cv <- conditional_values(
-+   m2,
-+   condition = list("fac", x2 = "fivenum")
-+ )
-> # plot - we see a discrete x axis
-> cv |> draw()
-> 
-> # in this example we condition on `x2` and `fac %in% c(2,3)`
-> cv <- conditional_values(
-+   m2,
-+   condition = list("x2", fac = 2:3)
-+ )
-> # plot - smooths of `x2` for `fac == 2` and `fac == 3`
-> cv |> draw()
+> # Vary x2 while holding the other covariates at representative values
+> cv <- conditional_values(m, condition = "x2")
+> cv
+# A tibble: 100 x 10
+    .row       x2    x0    x1    x3 .parameter .fitted   .se .lower_ci .upper_ci
+   <int>    <dbl> <dbl> <dbl> <dbl> <chr>        <dbl> <dbl>     <dbl>     <dbl>
+ 1     1 0.000663 0.437 0.486 0.512 mean          3.71 0.772      2.20      5.23
+ 2     2 0.0107   0.437 0.486 0.512 mean          4.13 0.690      2.78      5.48
+ 3     3 0.0208   0.437 0.486 0.512 mean          4.55 0.619      3.34      5.77
+ 4     4 0.0309   0.437 0.486 0.512 mean          4.98 0.563      3.88      6.08
+ 5     5 0.0410   0.437 0.486 0.512 mean          5.42 0.525      4.39      6.45
+ 6     6 0.0510   0.437 0.486 0.512 mean          5.87 0.506      4.88      6.86
+ 7     7 0.0611   0.437 0.486 0.512 mean          6.34 0.503      5.36      7.33
+ 8     8 0.0712   0.437 0.486 0.512 mean          6.84 0.511      5.83      7.84
+ 9     9 0.0813   0.437 0.486 0.512 mean          7.35 0.523      6.33      8.38
+10    10 0.0913   0.437 0.486 0.512 mean          7.89 0.536      6.84      8.94
+# i 90 more rows
+> draw(cv)
 > 
 > 
 > 
@@ -1185,133 +1061,48 @@ detaching ‘package:mgcv’
 > 
 > ### ** Examples
 > 
-> 
 > load_mgcv()
-> ## Don't show: 
-> op <- options(pillar.sigfig = 3, cli.unicode = FALSE)
-> ## End(Don't show)
-> df <- data_sim("eg4", seed = 42)
+> # Simulate group-specific curves with Gaussian noise and fit factor-by smooths
+> df <- data_sim("eg4", n = 300, seed = 42)
 > m <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = df, method = "REML")
 > 
+> # Compare the centred smooth shapes for each pair of factor levels
 > sm_dif <- difference_smooths(m, select = "s(x2)")
 > sm_dif
 # A tibble: 300 x 9
    .smooth .by   .level_1 .level_2 .diff   .se .lower_ci .upper_ci      x2
    <chr>   <chr> <chr>    <chr>    <dbl> <dbl>     <dbl>     <dbl>   <dbl>
- 1 s(x2)   fac   1        2        0.386 0.618  -0.824        1.60 0.00359
- 2 s(x2)   fac   1        2        0.479 0.574  -0.646        1.60 0.0136 
- 3 s(x2)   fac   1        2        0.572 0.534  -0.474        1.62 0.0237 
- 4 s(x2)   fac   1        2        0.665 0.497  -0.308        1.64 0.0338 
- 5 s(x2)   fac   1        2        0.758 0.464  -0.151        1.67 0.0438 
- 6 s(x2)   fac   1        2        0.850 0.435  -0.00342      1.70 0.0539 
- 7 s(x2)   fac   1        2        0.941 0.412   0.134        1.75 0.0639 
- 8 s(x2)   fac   1        2        1.03  0.393   0.262        1.80 0.0740 
- 9 s(x2)   fac   1        2        1.12  0.378   0.380        1.86 0.0841 
-10 s(x2)   fac   1        2        1.21  0.367   0.489        1.93 0.0941 
+ 1 s(x2)   fac   1        2         2.53 0.646      1.26      3.80 0.00359
+ 2 s(x2)   fac   1        2         2.49 0.622      1.27      3.71 0.0136 
+ 3 s(x2)   fac   1        2         2.45 0.598      1.28      3.62 0.0236 
+ 4 s(x2)   fac   1        2         2.41 0.575      1.28      3.54 0.0336 
+ 5 s(x2)   fac   1        2         2.37 0.553      1.29      3.45 0.0435 
+ 6 s(x2)   fac   1        2         2.33 0.531      1.29      3.37 0.0535 
+ 7 s(x2)   fac   1        2         2.29 0.511      1.29      3.29 0.0635 
+ 8 s(x2)   fac   1        2         2.25 0.490      1.29      3.21 0.0735 
+ 9 s(x2)   fac   1        2         2.21 0.471      1.29      3.13 0.0835 
+10 s(x2)   fac   1        2         2.17 0.453      1.28      3.06 0.0935 
 # i 290 more rows
-> 
 > draw(sm_dif)
 > 
-> # include the groups means for `fac` in the difference
-> sm_dif2 <- difference_smooths(m, select = "s(x2)", group_means = TRUE)
-> draw(sm_dif2)
-> 
-> # simultaneous intervals, separately for each pair of factor levels
-> sm_sim <- difference_smooths(m, select = "s(x2)",
-+   interval = "simultaneous", n_sim = 1000, seed = 42)
-> draw(sm_sim)
-> 
-> # compare specific smooths
-> sm_dif3 <- difference_smooths(m,
-+   select = c("s(x2):fac1", "s(x2):fac2"), partial_match = FALSE
-+ )
->
-> # Compare slopes of the factor-by smooths, retaining their joint uncertainty
+> # Compare rates of change instead of smooth values, using the same fit
 > slope_dif <- difference_smooths(m, select = "s(x2)", order = 1)
 > slope_dif
 # A tibble: 300 x 10
    .smooth .focal .by   .level_1 .level_2 .diff   .se .lower_ci .upper_ci
    <chr>   <chr>  <chr> <chr>    <chr>    <dbl> <dbl>     <dbl>     <dbl>
- 1 s(x2)   x2     fac   1        2         9.24  5.74   -2.01        20.5
- 2 s(x2)   x2     fac   1        2         9.24  5.73   -1.99        20.5
- 3 s(x2)   x2     fac   1        2         9.23  5.69   -1.93        20.4
- 4 s(x2)   x2     fac   1        2         9.22  5.60   -1.77        20.2
- 5 s(x2)   x2     fac   1        2         9.18  5.46   -1.51        19.9
- 6 s(x2)   x2     fac   1        2         9.13  5.26   -1.18        19.4
- 7 s(x2)   x2     fac   1        2         9.06  5.02   -0.785       18.9
- 8 s(x2)   x2     fac   1        2         8.95  4.76   -0.383       18.3
- 9 s(x2)   x2     fac   1        2         8.81  4.50   -0.0138      17.6
-10 s(x2)   x2     fac   1        2         8.64  4.26    0.290       17.0
+ 1 s(x2)   x2     fac   1        2        -4.03  2.98     -9.88      1.82
+ 2 s(x2)   x2     fac   1        2        -4.03  2.98     -9.88      1.82
+ 3 s(x2)   x2     fac   1        2        -4.03  2.98     -9.86      1.80
+ 4 s(x2)   x2     fac   1        2        -4.03  2.96     -9.82      1.77
+ 5 s(x2)   x2     fac   1        2        -4.03  2.93     -9.76      1.71
+ 6 s(x2)   x2     fac   1        2        -4.02  2.88     -9.68      1.63
+ 7 s(x2)   x2     fac   1        2        -4.02  2.83     -9.58      1.54
+ 8 s(x2)   x2     fac   1        2        -4.02  2.78     -9.46      1.43
+ 9 s(x2)   x2     fac   1        2        -4.01  2.72     -9.34      1.31
+10 s(x2)   x2     fac   1        2        -4.01  2.66     -9.21      1.20
 # i 290 more rows
 # i 1 more variable: x2 <dbl>
-> draw(slope_dif)
->
-> # Fit a surface for each factor level to compare rates of change in x2
-> m2 <- gam(y ~ fac + te(x2, x0, by = fac, k = c(4, 4)),
-+   data = df, method = "REML")
->
-> # Evaluate partial derivatives of the differences across both covariates
-> partial_dif <- difference_smooths(m2, select = "te(x2,x0)",
-+   order = 1, focal = "x2", n_2d = 20)
-> partial_dif
-# A tibble: 1,200 x 11
-   .smooth   .focal .by   .level_1 .level_2 .diff   .se .lower_ci .upper_ci
-   <chr>     <chr>  <chr> <chr>    <chr>    <dbl> <dbl>     <dbl>     <dbl>
- 1 te(x2,x0) x2     fac   1        2         9.24  7.55    -5.57       24.0
- 2 te(x2,x0) x2     fac   1        2         9.19  6.85    -4.24       22.6
- 3 te(x2,x0) x2     fac   1        2         9.13  6.22    -3.07       21.3
- 4 te(x2,x0) x2     fac   1        2         9.08  5.69    -2.08       20.2
- 5 te(x2,x0) x2     fac   1        2         9.02  5.25    -1.27       19.3
- 6 te(x2,x0) x2     fac   1        2         8.97  4.90    -0.640      18.6
- 7 te(x2,x0) x2     fac   1        2         8.92  4.62    -0.131      18.0
- 8 te(x2,x0) x2     fac   1        2         8.86  4.37     0.296      17.4
- 9 te(x2,x0) x2     fac   1        2         8.80  4.16     0.638      17.0
-10 te(x2,x0) x2     fac   1        2         8.72  4.01     0.858      16.6
-# i 1,190 more rows
-# i 2 more variables: x2 <dbl>, x0 <dbl>
-> draw(partial_dif)
->
-> # Choose a surface grid and calibrate simultaneous intervals for each pair
-> derivative_grid <- data_slice(m2, x2 = evenly(x2, n = 15),
-+   x0 = evenly(x0, n = 10), fac = levels(fac))
-> partial_sim <- difference_smooths(m2, select = "te(x2,x0)",
-+   data = derivative_grid, order = 1, focal = "x2",
-+   interval = "simultaneous", n_sim = 1000, seed = 42)
-> partial_sim
-# A tibble: 450 x 11
-   .smooth   .focal .by   .level_1 .level_2 .diff   .se .lower_ci .upper_ci
-   <chr>     <chr>  <chr> <chr>    <chr>    <dbl> <dbl>     <dbl>     <dbl>
- 1 te(x2,x0) x2     fac   1        2         9.24  7.55    -14.2       32.7
- 2 te(x2,x0) x2     fac   1        2         9.13  6.16     -9.98      28.2
- 3 te(x2,x0) x2     fac   1        2         9.01  5.17     -7.02      25.0
- 4 te(x2,x0) x2     fac   1        2         8.90  4.53     -5.15      22.9
- 5 te(x2,x0) x2     fac   1        2         8.77  4.09     -3.92      21.5
- 6 te(x2,x0) x2     fac   1        2         8.56  3.92     -3.58      20.7
- 7 te(x2,x0) x2     fac   1        2         8.21  4.04     -4.31      20.7
- 8 te(x2,x0) x2     fac   1        2         7.66  4.43     -6.10      21.4
- 9 te(x2,x0) x2     fac   1        2         6.97  5.28     -9.41      23.3
-10 te(x2,x0) x2     fac   1        2         6.21  6.60    -14.3       26.7
-# i 440 more rows
-# i 2 more variables: x2 <dbl>, x0 <dbl>
->
-> # Choose two axes and condition on the third covariate
-> m3 <- gam(y ~ fac + te(x0, x1, x2, by = fac, k = c(3, 3, 3)),
-+   data = df, method = "REML")
-> sm_dif_3d <- difference_smooths(m3, select = "te(x0,x1,x2)",
-+   variables = c("x1", "x2", "x0"), n_2d = 20, n_3d = 3)
-> draw(sm_dif_3d)
-> # Redraw the evaluated points with the axes exchanged
-> draw(sm_dif_3d, variables = c("x2", "x1", "x0"))
-> 
-> # Supply particular conditioning values using a prediction grid
-> grid <- data_slice(m3, x1 = evenly(x1, n = 20),
-+   x2 = evenly(x2, n = 20), x0 = c(0.2, 0.8), fac = levels(fac))
-> sm_dif_at <- difference_smooths(m3, select = "te(x0,x1,x2)",
-+   data = grid, variables = c("x1", "x2", "x0"))
-> draw(sm_dif_at)
-> ## Don't show: 
-> options(op)
-> ## End(Don't show)
 > 
 > 
 > 
@@ -1353,30 +1144,13 @@ detaching ‘package:mgcv’
 > ### ** Examples
 > 
 > load_mgcv()
-> df <- data_sim("eg1", n = 400, seed = 42)
+> # Simulate an additive Gaussian response and fit a GAM
+> df <- data_sim("eg1", n = 200, seed = 42)
 > m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = "REML")
 > 
-> bf <- basis(m)
+> # Plot the coefficient-weighted basis functions for one smooth
+> bf <- basis(m, select = "s(x2)")
 > draw(bf)
-> 
-> bf <- basis(m, "s(x2)")
-> draw(bf)
-> 
-> # A single shared basis for a factor-by set
-> df_by <- data_sim("eg4", n = 400, seed = 42)
-> m_by <- gam(y ~ fac + s(x2, by = fac), data = df_by)
-> draw(basis(m_by, unweighted = TRUE))
-> 
-> # A three-covariate basis, evaluated at two conditioning values
-> m3 <- gam(y ~ s(x0, x1, x2, k = 12), data = df)
-> bf3 <- basis(m3, variables = c("x1", "x2", "x0"),
-+   n_2d = 15, n_3d = 2)
-> draw(bf3, ncol = 3)
-> 
-> # Four covariates: conditioning values form facet rows and columns
-> m4 <- gam(y ~ s(x0, x1, x2, x3, k = 20), data = df)
-> bf4 <- basis(m4, n_2d = 15, n_4d = 2)
-> draw(bf4, ncol = 3)
 > 
 > 
 > 
@@ -1417,16 +1191,14 @@ detaching ‘package:mgcv’
 > 
 > ### ** Examples
 > 
-> 
 > load_mgcv()
-> dat <- data_sim("eg1", n = 800, dist = "normal", scale = 2, seed = 42)
+> # Simulate an additive Gaussian response and fit a GAM
+> dat <- data_sim("eg1", n = 200, scale = 1, seed = 42)
 > mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 > 
-> ## first derivative of all smooths
-> df <- derivatives(mod, type = "central")
+> # Estimate and plot the rate of change of one smooth
+> df <- derivatives(mod, select = "s(x2)", type = "central")
 > draw(df)
-> ## fixed axis scales
-> draw(df, scales = "fixed")
 > 
 > 
 > 
@@ -1486,8 +1258,6 @@ detaching ‘package:mgcv’
 > m_cycle <- gam(y ~ s(x0, bs = "cc", k = 10), data = df1,
 +   knots = list(x0 = c(0, 1)), method = "REML")
 > draw(m_cycle, cyclic = "polar")
-> draw(m_cycle, cyclic = "polar",
-+   polar_args = list(start = -pi / 2, reverse = "theta"))
 > 
 > # See https://gavinsimpson.github.io/gratia/articles/custom-plotting.html
 > # for more examples. Use the & operator to modify the theme of all panels.
@@ -1509,10 +1279,9 @@ detaching ‘package:mgcv’
 > 
 > ### ** Examples
 > 
-> if (suppressPackageStartupMessages(require("GJRM", quietly = TRUE))) {
-+   # follow example from ?GJRM::gamlss
+> if (requireNamespace("GJRM", quietly = TRUE)) {
 +   load_mgcv()
-+   suppressPackageStartupMessages(library("GJRM"))
++   # Simulate a nonlinear mean with a binary group effect and Gaussian noise
 +   set.seed(0)
 +   n <- 100
 +   x1 <- round(runif(n))
@@ -1522,54 +1291,16 @@ detaching ‘package:mgcv’
 +   y1 <- -1.55 + 2 * x1 + f1(x2) + rnorm(n)
 +   dataSim <- data.frame(y1, x1, x2, x3)
 + 
-+   eq_mu <- y1 ~ x1 + s(x2)
-+   eq_s <- ~ s(x3, k = 6)
-+   fl <- list(eq_mu, eq_s)
-+   m <- gamlss(fl, data = dataSim)
-+ 
++   # Fit smooths for the mean and scale, then plot both model components
++   m <- GJRM::gamlss(list(y1 ~ x1 + s(x2), ~ s(x3, k = 6)), data = dataSim)
 +   draw(m)
-+   plots <- assemble(m, parametric = FALSE)
-+   names(plots)
-+   plots[[1]]
-+   if (requireNamespace("ggcube", quietly = TRUE)) {
-+     surface <- GJRM::gamlss(list(y1 ~ s(x2, x3, k = 10), ~ s(x3, k = 6)),
-+       data = dataSim)
-+     draw(surface, surface = "3d", ci_3d = TRUE, n_2d = 15)
-+   }
 + }
-> 
-> if (requireNamespace("GJRM", quietly = TRUE)) {
-+   load_mgcv()
-+   set.seed(12)
-+   d <- data.frame(x = runif(150), z = runif(150))
-+   d$y1 <- sin(2 * pi * d$x) + rnorm(150)
-+   d$y2 <- cos(2 * pi * d$z) + 0.3 * d$y1 + rnorm(150)
-+   joint <- GJRM::gjrm(list(y1 ~ s(x, k = 5), y2 ~ s(z, k = 5),
-+     ~ 1, ~ 1, ~ s(x, k = 4)), data = d, margins = c("N", "N"),
-+     model = "B")
-+   draw(joint, parametric = FALSE)
-+   smooth_estimates(joint, select = smooths(joint)[3])
-+ }
-# A tibble: 100 x 7
-   .smooth .type .by   .estimate   .se       x .model            
-   <chr>   <chr> <chr>     <dbl> <dbl>   <dbl> <chr>             
- 1 s.4(x)  TPRS  <NA>    -0.155  0.307 0.00832 Dependence (theta)
- 2 s.4(x)  TPRS  <NA>    -0.146  0.294 0.0181  Dependence (theta)
- 3 s.4(x)  TPRS  <NA>    -0.138  0.282 0.0280  Dependence (theta)
- 4 s.4(x)  TPRS  <NA>    -0.129  0.270 0.0378  Dependence (theta)
- 5 s.4(x)  TPRS  <NA>    -0.121  0.258 0.0476  Dependence (theta)
- 6 s.4(x)  TPRS  <NA>    -0.112  0.246 0.0574  Dependence (theta)
- 7 s.4(x)  TPRS  <NA>    -0.104  0.234 0.0673  Dependence (theta)
- 8 s.4(x)  TPRS  <NA>    -0.0956 0.223 0.0771  Dependence (theta)
- 9 s.4(x)  TPRS  <NA>    -0.0875 0.212 0.0869  Dependence (theta)
-10 s.4(x)  TPRS  <NA>    -0.0794 0.202 0.0967  Dependence (theta)
-# i 90 more rows
 > 
 > 
 > 
 > cleanEx()
 
-detaching ‘package:mgcv’, ‘package:GJRM’
+detaching ‘package:mgcv’
 
 > nameEx("draw.mgcv_smooth")
 > ### * draw.mgcv_smooth
@@ -1609,19 +1340,13 @@ detaching ‘package:mgcv’
 > ### ** Examples
 > 
 > load_mgcv()
-> dat <- data_sim("eg4", n = 400, seed = 42)
-> m <- gam(y ~ s(x0) + s(x1, bs = "cr") + s(x2, bs = "bs", by = fac),
-+   data = dat, method = "REML"
-+ )
+> # Fit different spline bases to simulated Gaussian responses
+> dat <- data_sim("eg1", n = 200, seed = 42)
+> m <- gam(y ~ s(x0) + s(x1, bs = "cr") + s(x2, bs = "bs"),
++   data = dat, method = "REML")
 > 
-> ## produce a multi-panel plot of all penalties
+> # Display the penalty matrices for the fitted smooths
 > draw(penalty(m))
-> 
-> # for a specific smooth
-> draw(penalty(m, select = "s(x2):fac1"))
-> 
-> # draw individual vector cells
-> draw(penalty(m), geom = "tile")
 > 
 > 
 > 
@@ -1698,47 +1423,13 @@ detaching ‘package:mgcv’
 > ### ** Examples
 > 
 > load_mgcv()
-> # example data
-> df <- data_sim("eg1", seed = 21)
-> # fit GAM
+> # Simulate an additive Gaussian response and fit a GAM
+> df <- data_sim("eg1", n = 200, seed = 21)
 > m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = "REML")
-> # plot all of the estimated smooths
-> sm <- smooth_estimates(m)
-> draw(sm)
-> m_log <- gam(y ~ s(log(x1), k = 6), data = df)
-> draw(smooth_estimates(m_log, back_transform = TRUE), back_transform = TRUE)
-> # evaluate smooth of `x2`
+> 
+> # Evaluate one smooth and plot its estimates and interval
 > sm <- smooth_estimates(m, select = "s(x2)")
-> # plot it
 > draw(sm)
-> 
-> # customising some plot elements
-> draw(sm) & ggplot2::theme(
-+   geom.gratia.interval = ggplot2::element_geom(fill = "steelblue"),
-+   geom.gratia.smooth = ggplot2::element_geom(colour = "forestgreen"),
-+   gratia.alpha.interval = 0.3)
-> 
-> # Add a constant to the plotted smooth
-> draw(sm, constant = coef(m)[1])
-> 
-> # Adding change indicators to smooths based on derivatives of the smooth
-> d <- derivatives(m, n = 100) # n to match smooth_estimates()
-> 
-> smooth_estimates(m) |>
-+   add_sizer(derivatives = d, type = "sizer") |>
-+   draw()
-> 
-> # Render a bivariate smooth as vector tiles
-> m_surface <- gam(y ~ s(x0, x1), data = df, method = "REML")
-> draw(smooth_estimates(m_surface, n_2d = 20), surface = "tile")
-> 
-> # Choose the axes before generating the evaluation grid
-> m_slices <- gam(y ~ s(x0, x1, x2), data = df, method = "REML")
-> estimates <- smooth_estimates(m_slices,
-+   variables = c("x1", "x2", "x0"), n_2d = 20, n_3d = 3)
-> draw(estimates)
-> # A redraw changes roles using the points already evaluated
-> draw(estimates, variables = c("x2", "x1", "x0"))
 > 
 > 
 > 
@@ -1758,26 +1449,14 @@ detaching ‘package:mgcv’
 > ### ** Examples
 > 
 > load_mgcv()
-> dat1 <- data_sim("eg1", n = 400, dist = "normal", scale = 1, seed = 1)
-> ## a single smooth GAM
-> m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat1, method = "REML")
-> ## posterior smooths from m1
-> sm1 <- smooth_samples(m1, n_draws = 15, seed = 23478)
-> ## plot
-> draw(sm1) & ggplot2::theme(gratia.alpha.sample = 0.7)
-> ## plot only 5 randomly smapled draws
-> draw(sm1, n_samples = 5) & ggplot2::theme(gratia.alpha.sample = 0.7)
+> # Simulate an additive Gaussian response and fit a GAM
+> dat <- data_sim("eg1", n = 200, scale = 1, seed = 1)
+> m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 > 
-> ## A factor-by smooth example
-> dat2 <- data_sim("eg4", n = 400, dist = "normal", scale = 1, seed = 1)
-> ## a multi-smooth GAM with a factor-by smooth
-> m2 <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = dat2, method = "REML")
-> ## posterior smooths from m1
-> sm2 <- smooth_samples(m2, n_draws = 15, seed = 23478)
-> ## plot, this time selecting only the factor-by smooth
-> draw(sm2, select = "s(x2)", partial_match = TRUE) &
-+   ggplot2::theme(gratia.alpha.sample = 0.7)
-> 
+> # Draw 15 possible curves for the smooth of x2 on a 100-point grid
+> sm <- smooth_samples(m, select = "s(x2)", n_grid = 100,
++   n_draws = 15, seed = 23478)
+> draw(sm)
 > 
 > 
 > 
@@ -1797,15 +1476,21 @@ detaching ‘package:mgcv’
 > ### ** Examples
 > 
 > load_mgcv()
-> dat <- data_sim("eg1", n = 100, seed = 42)
-> model <- gam(y ~ x0 + s(x1, k = 6), data = dat, method = "REML")
+> # Simulate linear and nonlinear effects with Gaussian noise
+> set.seed(42)
+> dat <- data.frame(x = runif(120), z = runif(120))
+> dat$y <- 2 * dat$z + sin(2 * pi * dat$x) + rnorm(120, sd = 0.3)
+> 
+> # Fit a linear effect of z and a smooth effect of x
+> model <- gam(y ~ z + s(x, k = 8), data = dat, method = "REML")
+> 
+> # Plot the variances used in the random-effect representation of the penalties
 > components <- variance_comp(model)
 > draw(components)
-> draw(components, type = "std_dev")
 > 
+> # Plot variation of fitted term contributions across the fitting observations
 > terms <- variance_comp(model, type = "terms", n_draws = 200, seed = 42)
 > draw(terms)
-> draw(terms, type = "proportion", include_total = FALSE)
 > 
 > 
 > 
@@ -2294,29 +1979,15 @@ detaching ‘package:lme4’, ‘package:Matrix’, ‘package:mgcv’
 > 
 > if (requireNamespace("glmmTMB", quietly = TRUE)) {
 +   load_mgcv()
++   # Simulate a nonlinear mean with Gaussian noise
 +   set.seed(42)
 +   d <- data.frame(x = runif(150))
 +   d$y <- sin(6 * d$x) + rnorm(150, sd = 0.2)
-+   m <- glmmTMB::glmmTMB(y ~ s(x, k = 8), data = d, REML = TRUE)
-+   n_smooths(m) # one smooth term
-+   draw(m)
-+   # Get individual ggplot objects for further customization
-+   panels <- assemble(m)
-+   panels[["s(x)"]]
-+   appraise(m, seed = 42)
 + 
-+   # Parametric terms and native random intercepts and slopes
-+   d$z <- rnorm(150)
-+   d$g <- factor(rep(seq_len(10), each = 15))
-+   d$y <- d$y + 0.5 * d$z + rnorm(10)[d$g] + rnorm(10)[d$g] * d$z
-+   mixed <- glmmTMB::glmmTMB(y ~ z + s(x, k = 8) + (1 + z | g),
-+     data = d, REML = TRUE)
-+   draw(mixed) # separate QQ panels for intercepts and slopes
-+   draw(mixed, ranef_lines = TRUE) # random contributions only
-+   if (requireNamespace("ggcube", quietly = TRUE)) {
-+     interaction <- glmmTMB::glmmTMB(y ~ x:z, data = d)
-+     draw(interaction, surface = "3d", ci_3d = TRUE, n_2d = 15)
-+   }
++   # Fit and draw a smooth using glmmTMB
++   m <- glmmTMB::glmmTMB(y ~ s(x, k = 8), data = d, REML = TRUE)
++   n_smooths(m)
++   draw(m)
 + }
 > 
 > 
@@ -2943,62 +2614,37 @@ detaching ‘package:mgcv’
 > 
 > ### ** Examples
 > 
-> 
-> library("ggplot2")
-> library("patchwork")
 > load_mgcv()
-> ## Don't show: 
-> op <- options(pillar.sigfig = 3, cli.unicode = FALSE)
-> ## End(Don't show)
-> df <- data_sim("eg2", n = 2000, dist = "normal", scale = 0.5, seed = 42)
+> # Simulate a smooth surface with Gaussian noise and fit a tensor-product smooth
+> df <- data_sim("eg2", n = 400, scale = 0.1, seed = 42)
+> m <- gam(y ~ te(x, z, k = c(7, 7)), data = df, method = "REML")
 > 
-> # fit the GAM (note: for execution time reasons, k is set articifially low)
-> m <- gam(y ~ te(x, z, k = c(5, 5)), data = df, method = "REML")
-> 
-> # data slice through te(x,z) holding z == 0.4
+> # Estimate change along x while holding z at 0.4
 > ds <- data_slice(m, x = evenly(x, n = 100), z = 0.4)
-> 
-> # evaluate te(x,z) at values of x & z
-> sm <- smooth_estimates(m, select = "te(x,z)", data = ds) |>
-+   add_confint()
-> 
-> # partial derivatives
 > pd_x <- partial_derivatives(m, data = ds, type = "central", focal = "x")
-> 
-> # draw te(x,z)
-> p1 <- draw(m, rug = FALSE) &
-+   geom_hline(yintercept = 0.4, linewidth = 1)
-> p1
-> 
-> # draw te(x,z) along slice
-> cap <- expression(z == 0.4)
-> p2 <- sm |>
-+   ggplot(aes(x = x, y = .estimate)) +
-+   geom_ribbon(aes(ymin = .lower_ci, ymax = .upper_ci), alpha = 0.2) +
-+   geom_line() +
-+   labs(
-+     x = "x", y = "Partial effect", title = "te(x,z)",
-+     caption = cap
-+   )
-> p2
-> 
-> # draw partial derivs
-> p3 <- pd_x |>
-+   draw() +
-+   labs(caption = cap)
-> p3
-> 
-> # draw all three panels
-> p1 + p2 + p3 + plot_layout(ncol = 3)
-> ## Don't show: 
-> options(op)
-> ## End(Don't show)
+> pd_x
+# A tibble: 100 x 10
+   .smooth .focal .by   .fs   .partial_deriv   .se .crit .lower_ci .upper_ci
+   <chr>   <chr>  <chr> <chr>          <dbl> <dbl> <dbl>     <dbl>     <dbl>
+ 1 te(x,z) x      <NA>  <NA>            1.42 0.378  1.96     0.681      2.16
+ 2 te(x,z) x      <NA>  <NA>            1.42 0.377  1.96     0.680      2.16
+ 3 te(x,z) x      <NA>  <NA>            1.41 0.373  1.96     0.676      2.14
+ 4 te(x,z) x      <NA>  <NA>            1.39 0.366  1.96     0.670      2.11
+ 5 te(x,z) x      <NA>  <NA>            1.36 0.358  1.96     0.662      2.06
+ 6 te(x,z) x      <NA>  <NA>            1.33 0.346  1.96     0.652      2.01
+ 7 te(x,z) x      <NA>  <NA>            1.29 0.333  1.96     0.639      1.94
+ 8 te(x,z) x      <NA>  <NA>            1.24 0.317  1.96     0.623      1.87
+ 9 te(x,z) x      <NA>  <NA>            1.19 0.299  1.96     0.605      1.78
+10 te(x,z) x      <NA>  <NA>            1.13 0.279  1.96     0.582      1.68
+# i 90 more rows
+# i 1 more variable: x <dbl>
+> draw(pd_x)
 > 
 > 
 > 
 > cleanEx()
 
-detaching ‘package:mgcv’, ‘package:patchwork’, ‘package:ggplot2’
+detaching ‘package:mgcv’
 
 > nameEx("partial_residuals")
 > ### * partial_residuals
@@ -3673,25 +3319,15 @@ detaching ‘package:mgcv’
 > 
 > if (requireNamespace("sdmTMB", quietly = TRUE)) {
 +   load_mgcv()
++   # Simulate nonlinear and linear effects with Gaussian noise
 +   set.seed(42)
 +   d <- data.frame(x = runif(150), z = runif(150))
 +   d$y <- 1 + sin(6 * d$x) + 0.5 * d$z + rnorm(150, sd = 0.3)
-+   m <- sdmTMB::sdmTMB(y ~ z + s(x, k = 6), data = d, spatial = "off")
-+   draw(m)
-+   smooth_estimates(m, select = "s(x)")
-+   assemble(m)
-+   if (requireNamespace("ggcube", quietly = TRUE)) {
-+     surface <- sdmTMB::sdmTMB(y ~ s(x, z, k = 8), data = d, spatial = "off")
-+     draw(surface, surface = "3d", ci_3d = TRUE, n_2d = 15)
-+   }
 + 
-+   d$y <- ifelse(runif(150) < 0.3, 0, exp(d$y))
-+   delta <- sdmTMB::sdmTMB(y ~ z + s(x, k = 6),
-+     data = d,
-+     spatial = "off", family = sdmTMB::delta_gamma()
-+   )
-+   draw(delta)
-+   draw(delta, select = "s.1(x)", parametric = TRUE, terms = "z.1")
++   # Fit without a spatial field and draw the linear and smooth effects
++   m <- sdmTMB::sdmTMB(y ~ z + s(x, k = 6), data = d, spatial = "off")
++   smooths(m)
++   draw(m)
 + }
 > 
 > 

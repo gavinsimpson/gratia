@@ -129,74 +129,19 @@
 #'
 #' @export
 #' @examples
-#'
 #' load_mgcv()
-#' \dontshow{
-#' op <- options(pillar.sigfig = 3, cli.unicode = FALSE)
-#' }
-#' df <- data_sim("eg4", seed = 42)
+#' # Simulate group-specific curves with Gaussian noise and fit factor-by smooths
+#' df <- data_sim("eg4", n = 300, seed = 42)
 #' m <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = df, method = "REML")
 #'
+#' # Compare the centred smooth shapes for each pair of factor levels
 #' sm_dif <- difference_smooths(m, select = "s(x2)")
 #' sm_dif
-#'
 #' draw(sm_dif)
 #'
-#' # include the groups means for `fac` in the difference
-#' sm_dif2 <- difference_smooths(m, select = "s(x2)", group_means = TRUE)
-#' draw(sm_dif2)
-#'
-#' # simultaneous intervals, separately for each pair of factor levels
-#' sm_sim <- difference_smooths(m, select = "s(x2)",
-#'   interval = "simultaneous", n_sim = 1000, seed = 42)
-#' draw(sm_sim)
-#'
-#' # compare specific smooths
-#' sm_dif3 <- difference_smooths(m,
-#'   select = c("s(x2):fac1", "s(x2):fac2"), partial_match = FALSE
-#' )
-#'
-#' # Compare slopes of the factor-by smooths, retaining their joint uncertainty
+#' # Compare rates of change instead of smooth values, using the same fit
 #' slope_dif <- difference_smooths(m, select = "s(x2)", order = 1)
 #' slope_dif
-#' draw(slope_dif)
-#'
-#' # Fit a surface for each factor level to compare rates of change in x2
-#' m2 <- gam(y ~ fac + te(x2, x0, by = fac, k = c(4, 4)),
-#'   data = df, method = "REML")
-#'
-#' # Evaluate partial derivatives of the differences across both covariates
-#' partial_dif <- difference_smooths(m2, select = "te(x2,x0)",
-#'   order = 1, focal = "x2", n_2d = 20)
-#' partial_dif
-#' draw(partial_dif)
-#'
-#' # Choose a surface grid and calibrate simultaneous intervals for each pair
-#' derivative_grid <- data_slice(m2, x2 = evenly(x2, n = 15),
-#'   x0 = evenly(x0, n = 10), fac = levels(fac))
-#' partial_sim <- difference_smooths(m2, select = "te(x2,x0)",
-#'   data = derivative_grid, order = 1, focal = "x2",
-#'   interval = "simultaneous", n_sim = 1000, seed = 42)
-#' partial_sim
-#'
-#' # Choose two axes and condition on the third covariate
-#' m3 <- gam(y ~ fac + te(x0, x1, x2, by = fac, k = c(3, 3, 3)),
-#'   data = df, method = "REML")
-#' sm_dif_3d <- difference_smooths(m3, select = "te(x0,x1,x2)",
-#'   variables = c("x1", "x2", "x0"), n_2d = 20, n_3d = 3)
-#' draw(sm_dif_3d)
-#' # Redraw the evaluated points with the axes exchanged
-#' draw(sm_dif_3d, variables = c("x2", "x1", "x0"))
-#'
-#' # Supply particular conditioning values using a prediction grid
-#' grid <- data_slice(m3, x1 = evenly(x1, n = 20),
-#'   x2 = evenly(x2, n = 20), x0 = c(0.2, 0.8), fac = levels(fac))
-#' sm_dif_at <- difference_smooths(m3, select = "te(x0,x1,x2)",
-#'   data = grid, variables = c("x1", "x2", "x0"))
-#' draw(sm_dif_at)
-#' \dontshow{
-#' options(op)
-#' }
 `difference_smooths` <- function(model, ...) {
   UseMethod("difference_smooths")
 }

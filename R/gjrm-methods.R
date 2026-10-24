@@ -56,10 +56,9 @@
 #'   models; requesting partial residuals warns and draws the smooths alone.
 #'
 #' @examples
-#' if (suppressPackageStartupMessages(require("GJRM", quietly = TRUE))) {
-#'   # follow example from ?GJRM::gamlss
+#' if (requireNamespace("GJRM", quietly = TRUE)) {
 #'   load_mgcv()
-#'   suppressPackageStartupMessages(library("GJRM"))
+#'   # Simulate a nonlinear mean with a binary group effect and Gaussian noise
 #'   set.seed(0)
 #'   n <- 100
 #'   x1 <- round(runif(n))
@@ -69,33 +68,9 @@
 #'   y1 <- -1.55 + 2 * x1 + f1(x2) + rnorm(n)
 #'   dataSim <- data.frame(y1, x1, x2, x3)
 #'
-#'   eq_mu <- y1 ~ x1 + s(x2)
-#'   eq_s <- ~ s(x3, k = 6)
-#'   fl <- list(eq_mu, eq_s)
-#'   m <- gamlss(fl, data = dataSim)
-#'
+#'   # Fit smooths for the mean and scale, then plot both model components
+#'   m <- GJRM::gamlss(list(y1 ~ x1 + s(x2), ~ s(x3, k = 6)), data = dataSim)
 #'   draw(m)
-#'   plots <- assemble(m, parametric = FALSE)
-#'   names(plots)
-#'   plots[[1]]
-#'   if (requireNamespace("ggcube", quietly = TRUE)) {
-#'     surface <- GJRM::gamlss(list(y1 ~ s(x2, x3, k = 10), ~ s(x3, k = 6)),
-#'       data = dataSim)
-#'     draw(surface, surface = "3d", ci_3d = TRUE, n_2d = 15)
-#'   }
-#' }
-#'
-#' if (requireNamespace("GJRM", quietly = TRUE)) {
-#'   load_mgcv()
-#'   set.seed(12)
-#'   d <- data.frame(x = runif(150), z = runif(150))
-#'   d$y1 <- sin(2 * pi * d$x) + rnorm(150)
-#'   d$y2 <- cos(2 * pi * d$z) + 0.3 * d$y1 + rnorm(150)
-#'   joint <- GJRM::gjrm(list(y1 ~ s(x, k = 5), y2 ~ s(z, k = 5),
-#'     ~ 1, ~ 1, ~ s(x, k = 4)), data = d, margins = c("N", "N"),
-#'     model = "B")
-#'   draw(joint, parametric = FALSE)
-#'   smooth_estimates(joint, select = smooths(joint)[3])
 #' }
 #' @inheritSection draw Label layout
 `draw.gamlss` <- function(object,

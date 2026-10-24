@@ -62,16 +62,14 @@
 #' @export
 #'
 #' @examples
-#'
 #' load_mgcv()
-#' dat <- data_sim("eg1", n = 800, dist = "normal", scale = 2, seed = 42)
+#' # Simulate an additive Gaussian response and fit a GAM
+#' dat <- data_sim("eg1", n = 200, scale = 1, seed = 42)
 #' mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 #'
-#' ## first derivative of all smooths
-#' df <- derivatives(mod, type = "central")
+#' # Estimate and plot the rate of change of one smooth
+#' df <- derivatives(mod, select = "s(x2)", type = "central")
 #' draw(df)
-#' ## fixed axis scales
-#' draw(df, scales = "fixed")
 #' @inheritSection draw Label layout
 `draw.derivatives` <- function(
   object,
@@ -354,30 +352,13 @@
 #'
 #' @examples
 #' load_mgcv()
-#' df <- data_sim("eg1", n = 400, seed = 42)
+#' # Simulate an additive Gaussian response and fit a GAM
+#' df <- data_sim("eg1", n = 200, seed = 42)
 #' m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = "REML")
 #'
-#' bf <- basis(m)
+#' # Plot the coefficient-weighted basis functions for one smooth
+#' bf <- basis(m, select = "s(x2)")
 #' draw(bf)
-#'
-#' bf <- basis(m, "s(x2)")
-#' draw(bf)
-#'
-#' # A single shared basis for a factor-by set
-#' df_by <- data_sim("eg4", n = 400, seed = 42)
-#' m_by <- gam(y ~ fac + s(x2, by = fac), data = df_by)
-#' draw(basis(m_by, unweighted = TRUE))
-#'
-#' # A three-covariate basis, evaluated at two conditioning values
-#' m3 <- gam(y ~ s(x0, x1, x2, k = 12), data = df)
-#' bf3 <- basis(m3, variables = c("x1", "x2", "x0"),
-#'   n_2d = 15, n_3d = 2)
-#' draw(bf3, ncol = 3)
-#'
-#' # Four covariates: conditioning values form facet rows and columns
-#' m4 <- gam(y ~ s(x0, x1, x2, x3, k = 20), data = df)
-#' bf4 <- basis(m4, n_2d = 15, n_4d = 2)
-#' draw(bf4, ncol = 3)
 #' @inheritSection draw Label layout
 `draw.basis` <- function(object,
                          legend = FALSE,
@@ -661,36 +642,14 @@ plot_multivariate_basis <- function(object, variables, subtitle = NULL, ...) {
 #'
 #' @examples
 #' load_mgcv()
-#' dat1 <- data_sim("eg1", n = 400, dist = "normal", scale = 1, seed = 1)
-#' ## a single smooth GAM
-#' m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat1, method = "REML")
-#' ## posterior smooths from m1
-#' sm1 <- smooth_samples(m1, n_draws = 15, seed = 23478)
-#' ## plot
-#' draw(sm1) & ggplot2::theme(gratia.alpha.sample = 0.7)
-#' ## plot only 5 randomly smapled draws
-#' draw(sm1, n_samples = 5) & ggplot2::theme(gratia.alpha.sample = 0.7)
+#' # Simulate an additive Gaussian response and fit a GAM
+#' dat <- data_sim("eg1", n = 200, scale = 1, seed = 1)
+#' m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 #'
-#' ## A factor-by smooth example
-#' dat2 <- data_sim("eg4", n = 400, dist = "normal", scale = 1, seed = 1)
-#' ## a multi-smooth GAM with a factor-by smooth
-#' m2 <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = dat2, method = "REML")
-#' ## posterior smooths from m1
-#' sm2 <- smooth_samples(m2, n_draws = 15, seed = 23478)
-#' ## plot, this time selecting only the factor-by smooth
-#' draw(sm2, select = "s(x2)", partial_match = TRUE) &
-#'   ggplot2::theme(gratia.alpha.sample = 0.7)
-#'
-#' \donttest{
-#' ## A 2D smooth example
-#' dat3 <- data_sim("eg2", n = 400, dist = "normal", scale = 1, seed = 1)
-#' ## fit a 2D smooth
-#' m3 <- gam(y ~ te(x, z), data = dat3, method = "REML")
-#' ## get samples
-#' sm3 <- smooth_samples(m3, n_draws = 10)
-#' ## plot just 6 of the draws, with contour line overlays
-#' draw(sm3, n_samples = 6, contour = TRUE, seed = 42)
-#' }
+#' # Draw 15 possible curves for the smooth of x2 on a 100-point grid
+#' sm <- smooth_samples(m, select = "s(x2)", n_grid = 100,
+#'   n_draws = 15, seed = 23478)
+#' draw(sm)
 #' @inheritSection draw Label layout
 `draw.smooth_samples` <- function(object,
                                   select = NULL,
@@ -1340,19 +1299,13 @@ difference_value_label <- function(object) {
 #'
 #' @examples
 #' load_mgcv()
-#' dat <- data_sim("eg4", n = 400, seed = 42)
-#' m <- gam(y ~ s(x0) + s(x1, bs = "cr") + s(x2, bs = "bs", by = fac),
-#'   data = dat, method = "REML"
-#' )
+#' # Fit different spline bases to simulated Gaussian responses
+#' dat <- data_sim("eg1", n = 200, seed = 42)
+#' m <- gam(y ~ s(x0) + s(x1, bs = "cr") + s(x2, bs = "bs"),
+#'   data = dat, method = "REML")
 #'
-#' ## produce a multi-panel plot of all penalties
+#' # Display the penalty matrices for the fitted smooths
 #' draw(penalty(m))
-#'
-#' # for a specific smooth
-#' draw(penalty(m, select = "s(x2):fac1"))
-#'
-#' # draw individual vector cells
-#' draw(penalty(m), geom = "tile")
 #' @inheritSection draw Label layout
 `draw.penalty_df` <- function(object,
                               normalize = FALSE,

@@ -104,14 +104,12 @@ plot lists. See \code{\link[=draw_label_control]{draw_label_control()}} for the 
 }
 
 \examples{
-
 load_mgcv()
-dat <- data_sim("eg1", n = 800, dist = "normal", scale = 2, seed = 42)
+# Simulate an additive Gaussian response and fit a GAM
+dat <- data_sim("eg1", n = 200, scale = 1, seed = 42)
 mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
 
-## first derivative of all smooths
-df <- derivatives(mod, type = "central")
+# Estimate and plot the rate of change of one smooth
+df <- derivatives(mod, select = "s(x2)", type = "central")
 draw(df)
-## fixed axis scales
-draw(df, scales = "fixed")
 }
