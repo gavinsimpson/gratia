@@ -46,7 +46,7 @@ plot lists. See \code{\link[=draw_label_control]{draw_label_control()}} for the 
 }
 
 \examples{
-library("mgcv")
+load_mgcv()
 df <- data_sim("eg1", n = 100, seed = 2)
 m <- gam(y ~ s(x2), data = df, method = "REML")
 ale(m, "x2") |> draw()

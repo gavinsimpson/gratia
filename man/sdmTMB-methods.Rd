@@ -201,7 +201,7 @@ plot lists. See \code{\link[=draw_label_control]{draw_label_control()}} for the 
 
 \examples{
 if (requireNamespace("sdmTMB", quietly = TRUE)) {
-  library("mgcv")
+  load_mgcv()
   set.seed(42)
   d <- data.frame(x = runif(150), z = runif(150))
   d$y <- 1 + sin(6 * d$x) + 0.5 * d$z + rnorm(150, sd = 0.3)

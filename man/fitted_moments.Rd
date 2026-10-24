@@ -162,7 +162,7 @@ finite precision or invalid distribution parameters; \code{"derivative_unavailab
 identifies a finite estimate whose local derivative could not be calculated.
 }
 \examples{
-library("mgcv")
+load_mgcv()
 m <- gam(mpg ~ s(wt, k = 5), data = mtcars, method = "REML")
 fitted_moments(m, data = mtcars[1:3, ], moments = c("mean", "variance"))
 fitted_moments(m, data = mtcars[1:3, ], moments = "variance",

@@ -23,8 +23,8 @@ uses three examples to show how to fit those models and interpret gratia's
 effect displays.
 
 ```{r packages, message = FALSE}
-library("mgcv")
 library("gratia")
+load_mgcv()
 library("ggplot2")
 ```
 

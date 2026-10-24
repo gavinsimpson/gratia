@@ -88,7 +88,7 @@
 #' @seealso [appraise()], [residuals_linpred_plot()], [partial_residuals()]
 #' @export
 #' @examples
-#' library("mgcv")
+#' load_mgcv()
 #' dat <- data_sim("eg1", n = 400, seed = 2)
 #' m <- gam(y ~ x2 + s(x0) + s(x1), data = dat, method = "REML")
 #' # A curve against x2 suggests reconsidering its linear effect.

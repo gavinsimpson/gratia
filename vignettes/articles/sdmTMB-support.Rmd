@@ -46,8 +46,8 @@ cost more than plotting an ordinary GAM, so we use modest simulation counts.
 
 ```{r packages}
 library("sdmTMB")
-library("mgcv")
 library("gratia")
+load_mgcv()
 library("dplyr")
 library("ggplot2")
 library("patchwork")

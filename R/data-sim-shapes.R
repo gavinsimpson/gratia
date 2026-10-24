@@ -44,7 +44,7 @@
 #' @name data_sim_shapes
 #' @seealso [data_sim()], [data_sim_families], [mgcv::scasm()]
 #' @examples
-#' library("mgcv")
+#' load_mgcv()
 #' d <- data_sim("sc_increasing", n = 200, seed = 2)
 #' m <- scasm(y ~ s(x, bs = "sc", xt = "m+", k = 8), data = d)
 #'
