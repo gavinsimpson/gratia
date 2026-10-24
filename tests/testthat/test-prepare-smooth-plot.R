@@ -169,16 +169,13 @@ test_that("sz supports custom scales and transforms without enabling SiZer", {
 })
 
 test_that("continuous by curves build through both draw entry points", {
-  withr::local_seed(308)
-  d <- data.frame(x = runif(60), z = runif(60))
-  d$y <- sin(4 * d$x) * d$z + rnorm(60, sd = 0.1)
-  m <- mgcv::gam(y ~ s(x, by = z, k = 5), data = d)
+  m <- su_m_cont_by
   sm <- smooth_estimates(m, n = 8)
   for (p in list(draw(m, n = 8, rug = FALSE, grouped = "factor-by"),
     draw(sm, grouped = "factor-by"))) {
     panel <- p[[1]]
     expect_equal(curve_geoms(panel), c("GeomRibbon", "GeomLine"))
-    expect_equal(panel$labels$subtitle, "By: z")
+    expect_equal(panel$labels$subtitle, "By: x1")
     expect_silent(b <- ggplot2::ggplot_build(panel))
     expect_equal(b$data[[2]]$y, sm$.estimate)
     expect_equal(b$data[[1]]$ymin, panel$data$.lower_ci)
@@ -255,21 +252,18 @@ test_that("continuous-x methods use shared axis defaults and keep overrides", {
 })
 
 test_that("fs axis defaults work through both draw entry points", {
-  withr::local_seed(308)
-  d <- data.frame(x = runif(60), f = factor(rep(1:3, each = 20)))
-  d$y <- sin(4 * d$x) + as.numeric(d$f) + rnorm(60, sd = 0.1)
-  m <- mgcv::gam(y ~ s(x, f, bs = "fs", k = 4), data = d)
-  sm <- smooth_estimates(m, n = 8)
+  m <- m_fs
+  sm <- smooth_estimates(m, select = "s(x1,fac)", n = 8)
   # draw.gam() sends ... to wrap_plots(), not to the smooth methods.
   # Test its defaults, then exercise label overrides via draw.smooth_estimates().
-  model_plot <- draw(m, n = 8, rug = FALSE)[[1]]
+  model_plot <- draw(m, select = "s(x1,fac)", n = 8, rug = FALSE)[[1]]
   omitted <- draw(sm)[[1]]
   defaults <- draw(sm, xlab = NULL, ylab = NULL)[[1]]
   custom <- draw(sm, xlab = "Time", ylab = "Effect")[[1]]
   blank <- draw(sm, xlab = "", ylab = "")[[1]]
-  expect_equal(model_plot$labels$x, "x")
+  expect_equal(model_plot$labels$x, "x1")
   expect_equal(model_plot$labels$y, "Partial effect")
-  expect_equal(defaults$labels$x, "x")
+  expect_equal(defaults$labels$x, "x1")
   expect_equal(defaults$labels$y, "Partial effect")
   expect_equal(defaults$labels, omitted$labels)
   expect_equal(custom$labels$x, "Time")

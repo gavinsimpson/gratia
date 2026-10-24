@@ -295,12 +295,12 @@ test_that("label controls work throughout the drawing methods", {
     }
   }
   # A numerical surface exercises partial derivatives and colour bars.
-  surface <- mgcv::gam(y ~ s(x, z, k = 8), data = d)
+  surface <- su_m_bivar
   pd <- partial_derivatives(surface, focal = "x", n = 5)
   expect_silent(patchwork::patchworkGrob(draw(pd, label_control = control)))
   expect_silent(patchwork::patchworkGrob(draw(surface, n_2d = 5,
     contour = FALSE, label_control = control)))
-  counts <- mgcv::gam(round(exp(y / 3)) ~ s(x, k = 5), family = stats::poisson(), data = d)
+  counts <- b_pois
   expect_silent(ggplot2::ggplotGrob(draw(rootogram(counts), label_control = control)))
   ids <- data.frame(.draw = 1:16, .chain = rep(1:2, each = 8),
     .iteration = rep(1:8, 2))
@@ -310,6 +310,6 @@ test_that("label controls work throughout the drawing methods", {
     expect_silent(ggplot2::ggplotGrob(draw(sampling_diagnostics(draws), type = type,
       label_control = control)))
   }
-  gm <- mgcv::gamm(y ~ f + s(x, k = 4), data = d)
+  gm <- m_gamm
   expect_silent(patchwork::patchworkGrob(draw(gm, n = 8, label_control = control)))
 })

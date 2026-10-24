@@ -1,18 +1,5 @@
-scasm_sampling_fixture <- function() {
-  skip_if_not(exists("scasm", asNamespace("mgcv")))
-  withr::with_seed(91, {
-    d <- data.frame(x = seq(0, 1, length.out = 80),
-      off = seq(-0.2, 0.2, length.out = 80))
-    d$y <- d$off + rnorm(nrow(d), sd = 0.5)
-    mgcv::scasm(y ~ s(x, bs = "sc", xt = "m+", k = 7) + offset(off),
-      data = d, bs = 6)
-  })
-}
-
 test_that("ordinary GAM sampling does not report inequality constraints", {
-  d <- data.frame(x = seq(0, 1, length.out = 30))
-  d$y <- sin(d$x * 6) + d$x / 10
-  m <- mgcv::gam(y ~ s(x, k = 5), data = d)
+  m <- m_1_smooth
   expect_false(has_inequality_constraints(m))
   expect_silent(post_draws(m, n_draws = 3, seed = 2, mvn_method = "mgcv"))
   expect_silent(post_draws(m, n_draws = 3, method = "mh", burnin = 5, seed = 2))

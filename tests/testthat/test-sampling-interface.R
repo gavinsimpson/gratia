@@ -1,5 +1,5 @@
 test_that("obsolete sampling arguments fail before matching or evaluation", {
-  m <- mgcv::gam(mpg ~ s(wt, k = 4), data = mtcars)
+  m <- sampling_interface_model
   functions <- list(
     posterior_samples,
     fitted_samples,
@@ -62,7 +62,7 @@ test_that("obsolete sampling arguments fail before matching or evaluation", {
 })
 
 test_that("draw counts, grid resolution and model names are consistent", {
-  m <- mgcv::gam(mpg ~ s(wt, k = 4), data = mtcars)
+  m <- sampling_interface_model
   for (fun in list(
     fitted_samples,
     posterior_samples,
@@ -134,7 +134,7 @@ test_that("draw counts, grid resolution and model names are consistent", {
 
 test_that("supplied draws determine counts and retain coefficient diagnostics", {
   skip_if_not_installed("posterior")
-  m <- mgcv::gam(mpg ~ s(wt, k = 4), data = mtcars)
+  m <- sampling_interface_model
   b <- post_draws(m, n_draws = 40, chains = 4, seed = 9, diagnostics = TRUE)
   functions <- list(
     fitted_samples,
@@ -168,7 +168,7 @@ test_that("supplied draws determine counts and retain coefficient diagnostics", 
 })
 
 test_that("explicit inactive sampler controls and unsupported capabilities fail", {
-  m <- mgcv::gam(mpg ~ s(wt, k = 4), data = mtcars)
+  m <- sampling_interface_model
   for (fun in list(
     posterior_samples,
     fitted_samples,
@@ -208,7 +208,7 @@ test_that("explicit inactive sampler controls and unsupported capabilities fail"
     length(unique(predicted_samples(m, n_draws = 8, seed = 9)$.draw)),
     8
   )
-  lm <- stats::lm(mpg ~ wt, data = mtcars)
+  lm <- m_lm
   expect_error(posterior_samples(lm, n_draws = 8, chains = 2), "not supported")
   expect_error(
     posterior_samples(lm, n_draws = 8, method = "mh"),
@@ -218,7 +218,7 @@ test_that("explicit inactive sampler controls and unsupported capabilities fail"
 
 
 test_that("direct samplers share seed and chain semantics", {
-  m <- mgcv::gam(mpg ~ s(wt, k = 4), data = mtcars)
+  m <- sampling_interface_model
   withr::local_seed(521)
   before <- .Random.seed
   for (fun in list(gaussian_draws, mh_draws)) {
@@ -246,7 +246,7 @@ test_that("direct samplers share seed and chain semantics", {
 
 test_that("GAMM forwarding preserves errors for explicit inactive controls", {
   fake <- structure(
-    list(gam = mgcv::gam(mpg ~ s(wt, k = 4), data = mtcars)),
+    list(gam = sampling_interface_model),
     class = "gamm"
   )
   expect_error(
@@ -257,7 +257,7 @@ test_that("GAMM forwarding preserves errors for explicit inactive controls", {
 
 
 test_that("the old direct Gaussian core control names its replacement", {
-  m <- mgcv::gam(mpg ~ s(wt, k = 4), data = mtcars)
+  m <- sampling_interface_model
   expect_error(gaussian_draws(m, n_draws = 4, n_cores = 2),
     "Argument 'n_cores' has been removed. Use n_threads", fixed = TRUE)
 })

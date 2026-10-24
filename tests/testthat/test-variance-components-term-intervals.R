@@ -48,7 +48,7 @@ test_that("term interval controls are reproducible and validate inputs", {
   }
   expect_error(variance_comp(m, type = "terms", coverage = 1), "coverage")
   expect_error(variance_comp(m, type = "terms", unconditional = NA), "unconditional")
-  m <- gam(y ~ 1, data = d)
+  m <- variance_intercept_model
   empty <- variance_comp(m, type = "terms", seed = 14)
   expect_equal(empty$.component, "total")
   expect_equal(empty$.variance, 0)
@@ -133,16 +133,9 @@ expect_joint_random_draws <- function(m, gam, native) {
 test_that("mixed term intervals preserve GAM and native random-effect covariance", {
   skip_if_not_installed("gamm4")
   withr::local_preserve_seed()
-  d <- variance_terms_data()
-  d <- d[sample(nrow(d)), ]
-  d$y <- d$y - d$off
-  d$x[c(4, 40)] <- NA_real_
-  models <- list(
-    gamm(y ~ x + z + fac + s(w, k = 6), random = list(group = ~1 + z),
-      data = d, subset = z > 0.1, na.action = na.exclude, method = "REML"),
-    gamm4::gamm4(y ~ x + z + fac + s(w, k = 6), random = ~(1 + z | group),
-      data = d, subset = z > 0.1, na.action = na.exclude)
-  )
+  fixture <- variance_mixed_fixture(missing = TRUE)
+  d <- fixture$data
+  models <- fixture$models
   for (m in models) {
     g <- model_used_rows(m$gam)
     native <- if (inherits(m, "gamm")) variance_terms_lme_design(m, g) else
@@ -181,7 +174,7 @@ test_that("SCAM term intervals transform joint draws before computing variances"
   skip_if_not_installed("scam")
   withr::local_preserve_seed()
   d <- variance_terms_data()
-  m <- scam::scam(y ~ z + s(x, bs = "mpi", k = 6), data = d)
+  m <- variance_scam_model
   got <- variance_comp(m, type = "terms", n_draws = 50, seed = 13)
   betas <- gaussian_draws(m, n_draws = 50, seed = 13, mvn_method = "mgcv")
   X <- predict_model(m, type = "lpmatrix")

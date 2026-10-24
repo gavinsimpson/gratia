@@ -190,7 +190,7 @@ test_that("missing intervals and undefined proportions retain component labels",
   expect_equal(as.character(prop$data$.component), c("x", "total", "total.1"))
   expect_equal(nrow(b$data[[3]]), 2L)
   expect_silent(ggplot2::ggplotGrob(prop))
-  m <- gam(y ~ 1, data = d)
+  m <- variance_intercept_model
   x <- variance_comp(m, type = "terms", n_draws = 10, seed = 83)
   expect_silent(b <- ggplot2::ggplot_build(draw(x, type = "proportion")))
   expect_equal(nrow(b$data[[2]]), 0L)

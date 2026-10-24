@@ -1,10 +1,3 @@
-adjustment_fixture <- function() {
-  withr::local_seed(630)
-  d <- data.frame(x = seq(0, 1, length.out = 120))
-  d$y <- sin(2 * pi * d$x) + rnorm(120, sd = .5)
-  mgcv::gam(y ~ s(x, k = 6), data = d, method = "REML")
-}
-
 adjustment_draws <- function(fit, n = 800L, chains = 4L) {
   withr::local_seed(631)
   p <- length(coef(fit))

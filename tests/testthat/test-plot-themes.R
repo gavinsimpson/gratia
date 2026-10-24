@@ -1,10 +1,5 @@
-theme_test_model <- function() {
-  d <- data_sim("eg1", n = 80, seed = 814)
-  mgcv::gam(y ~ s(x0) + s(x1), data = d)
-}
-
 test_that("smooth and interval themes modify completed plots independently", {
-  m <- theme_test_model()
+  m <- su_m_quick_eg1
   p <- draw(m)
   original <- ggplot2::ggplot_build(p[[1]])$data
   q <- p & ggplot2::theme(
@@ -28,7 +23,7 @@ test_that("smooth and interval themes modify completed plots independently", {
 })
 
 test_that("ordinary elements and complete themes preserve opacity settings", {
-  p <- draw(theme_test_model())[[1]]
+  p <- draw(m_1_smooth)[[1]]
   q <- p + ggplot2::theme_minimal() + ggplot2::theme(
     geom.gratia.interval = ggplot2::element_geom(fill = "red"),
     gratia.alpha.interval = .4) + ggplot2::theme(
@@ -45,7 +40,7 @@ test_that("package overrides are captured and scoped without changing ggplot2", 
   withr::local_options(list(gratia.plot.theme = NULL))
   active <- ggplot2::theme_get()
   parent <- ggplot2::GeomLine$default_aes
-  m <- theme_test_model()
+  m <- m_1_smooth
   p <- draw(m)
   override <- ggplot2::theme(geom.gratia.smooth = ggplot2::element_geom(colour = "purple"))
   expect_null(gratia_theme_set(override))
@@ -71,7 +66,7 @@ test_that("package overrides are captured and scoped without changing ggplot2", 
 
 test_that("explicit deprecated arguments override themes, even at old defaults", {
   withr::local_options(lifecycle_verbosity = "warning")
-  m <- theme_test_model()
+  m <- m_1_smooth
   expect_warning(p <- draw(m, smooth_col = "black"), class = "lifecycle_warning_deprecated")
   p <- p & ggplot2::theme(geom.gratia.smooth = ggplot2::element_geom(colour = "red"))
   expect_equal(unique(ggplot2::ggplot_build(p[[1]])$data[[2]]$colour), "black")
@@ -135,7 +130,7 @@ test_that("Okabe-Ito scales preserve missing values and fixed component colours"
 })
 
 test_that("diagnostic, predictive and sample components have separate themes", {
-  m <- theme_test_model()
+  m <- m_1_smooth
   q <- qq_plot(m) + ggplot2::theme(
     geom.gratia.diagnostic.point = ggplot2::element_geom(colour = "purple"),
     geom.gratia.reference = ggplot2::element_geom(colour = "green"))
@@ -158,8 +153,7 @@ test_that("diagnostic, predictive and sample components have separate themes", {
 test_that("3D scene styling preserves geometry and explicit interval overrides", {
   skip_if_not_installed("ggcube")
   withr::local_options(lifecycle_verbosity = "quiet")
-  d <- data_sim("eg2", n = 100, seed = 42)
-  m <- mgcv::gam(y ~ s(x, z, k = 12), data = d)
+  m <- su_m_bivar
   p <- draw(m, n_2d = 8, surface = "3d", ci_3d = TRUE)[[1]]
   q <- p + ggplot2::theme(
     geom.gratia.surface.interval = ggplot2::element_geom(fill = "purple"),
@@ -194,7 +188,7 @@ test_that("3D scene styling preserves geometry and explicit interval overrides",
 
 test_that("appraisal forwards predictive defaults without deprecating them", {
   withr::local_options(lifecycle_verbosity = "warning")
-  m <- theme_test_model()
+  m <- m_1_smooth
   expect_silent(p <- appraise(m, ppcheck = TRUE, n_ppc = 2, seed = 42))
   expect_s3_class(p, "patchwork")
 })
@@ -219,7 +213,7 @@ test_that("forwarded defaults do not hide explicit nested arguments", {
 })
 
 test_that("smooth comparisons capture package theme settings", {
-  m <- theme_test_model()
+  m <- m_1_smooth
   comparison <- compare_smooths(m, m, n = 10)
   withr::local_options(list(gratia.plot.theme = ggplot2::theme(gratia.alpha.interval = .35)))
   p <- draw(comparison)
@@ -290,8 +284,7 @@ test_that("mapped aesthetics and supplied scales take precedence over themes", {
 
 
 test_that("surface legend defaults respect captured package settings", {
-  d <- data_sim("eg2", n = 80, seed = 2)
-  m <- mgcv::gam(y ~ s(x, z, k = 10), data = d)
+  m <- su_m_bivar
   withr::local_options(list(gratia.plot.theme = ggplot2::theme(legend.position = "bottom")))
   p <- draw(m, n_2d = 6)[[1]]
   expect_equal(p$theme$legend.position, "bottom")

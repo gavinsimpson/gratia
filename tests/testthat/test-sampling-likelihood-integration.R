@@ -14,7 +14,7 @@ integration_chain_draws <- function(model, diagnostics = FALSE) {
 
 test_that("likelihoods retain coefficient diagnostics and joint draw identities", {
   skip_if_not_installed("posterior")
-  model <- mgcv::gam(mpg ~ wt, data = mtcars, method = "REML")
+  model <- sampling_linear_model
   draws <- integration_chain_draws(model, diagnostics = TRUE)
   before <- withr::with_seed(31, .Random.seed)
   withr::local_seed(31)
@@ -76,7 +76,7 @@ test_that("likelihood adapters use each MH backend and parallel chain streams", 
 
 test_that("LOO uses stored iteration order without reordering likelihood weights", {
   skip_if_not_installed("loo")
-  model <- mgcv::gam(mpg ~ wt, data = mtcars, method = "REML")
+  model <- sampling_linear_model
   draws <- integration_chain_draws(model)
   ids <- attr(draws, "sampling")$draw_ids
   ll <- log_lik(model, method = "user", draws = draws)
@@ -102,7 +102,7 @@ test_that("LOO uses stored iteration order without reordering likelihood weights
 test_that("bayesplot aligns arbitrary draw IDs with likelihoods and responses", {
   skip_if_not_installed("bayesplot")
   skip_if_not_installed("loo")
-  model <- mgcv::gam(mpg ~ wt, data = mtcars, method = "REML")
+  model <- sampling_linear_model
   draws <- integration_chain_draws(model)
   args <- list(method = "user", draws = draws)
   prepared <- suppressWarnings(bayesplot_prepare(model, "loo_pit_overlay", "ppc",
@@ -123,7 +123,7 @@ test_that("bayesplot aligns arbitrary draw IDs with likelihoods and responses", 
 })
 
 test_that("integrated adapters reject obsolete and inactive sampling controls", {
-  model <- mgcv::gam(mpg ~ wt, data = mtcars, method = "REML")
+  model <- sampling_linear_model
   expect_error(log_lik(model, n = 20), "removed.*n_draws")
   expect_error(log_lik(model, 20), "must be named")
   expect_error(log_lik(model, n_draws = 20, method = "mh", unconditional = FALSE),

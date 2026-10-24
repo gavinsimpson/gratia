@@ -31,12 +31,7 @@ reference_term_proportion_draws <- function(model, n_draws, seed,
 
 test_that("proportions allocate covariance and use the same posterior draws", {
   withr::local_preserve_seed()
-  d <- variance_terms_data()
-  d$y <- 2 * d$x + 2 * d$z + sin(6 * d$w) + (d$fac == "b") +
-    d$off + rnorm(nrow(d), sd = 0.3)
-  for (fit in list(gam, bam)) {
-    m <- fit(y ~ x + z + fac * poly(w, 2) + s(w, k = 6) + offset(off),
-      data = d, method = "REML")
+  for (m in variance_total_models()) {
     got <- variance_comp(m, type = "terms", n_draws = 137, seed = 83,
       coverage = 0.8)
     C <- attr(got, "covariance")
@@ -165,13 +160,7 @@ test_that("each predictor has separate allocations for its own and shared terms"
 test_that("mixed-model proportions retain joint dependence with fitted random effects", {
   skip_if_not_installed("gamm4")
   withr::local_preserve_seed()
-  d <- variance_terms_data()
-  d$y <- d$y - d$off
-  models <- list(
-    gamm(y ~ x + z + fac + s(w, k = 6), random = list(group = ~1 + z),
-      data = d, method = "REML"),
-    gamm4::gamm4(y ~ x + z + fac + s(w, k = 6), random = ~(1 + z | group), data = d)
-  )
+  models <- variance_mixed_fixture()$models
   for (m in models) {
     g <- model_used_rows(m$gam)
     random <- if (inherits(m, "gamm")) gamm_fitted_random_terms(m, g) else
@@ -214,7 +203,7 @@ test_that("SCAM allocations use the jointly transformed coefficients", {
   skip_if_not_installed("scam")
   withr::local_preserve_seed()
   d <- variance_terms_data()
-  m <- scam::scam(y ~ z + s(x, bs = "mpi", k = 6), data = d)
+  m <- variance_scam_model
   got <- variance_comp(m, type = "terms", n_draws = 30, seed = 83)
   X <- predict_model(m, type = "lpmatrix")
   betas <- gaussian_draws(m, n_draws = 30, seed = 83, mvn_method = "mgcv")

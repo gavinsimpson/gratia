@@ -1,22 +1,3 @@
-family_mh_model <- function(family, bam = FALSE, discrete = FALSE) {
-  withr::with_seed(281, {
-    d <- data.frame(x = runif(100), off = runif(100, -0.1, 0.1),
-      w = rep(c(1, 2), 50))
-    eta <- 0.3 + sin(2 * pi * d$x) / 2 + d$off
-    d$y <- switch(family$family,
-      gaussian = rnorm(100, eta, 0.5),
-      poisson = rpois(100, exp(eta)),
-      binomial = rbinom(100, 5, plogis(eta)) / 5,
-      Gamma = rgamma(100, 3, scale = exp(eta) / 3),
-      rnbinom(100, mu = exp(eta), size = 2))
-    if (family$family == "binomial") d$w <- d$w * 5
-    if (bam) mgcv::bam(y ~ s(x, k = 5) + offset(off), data = d,
-      family = family, weights = w, discrete = discrete) else
-      mgcv::gam(y ~ s(x, k = 5) + offset(off), data = d,
-        family = family, weights = w, method = "REML")
-  })
-}
-
 expect_family_target <- function(model) {
   target <- sampling_family_target(model)
   compact <- model_used_rows(model)

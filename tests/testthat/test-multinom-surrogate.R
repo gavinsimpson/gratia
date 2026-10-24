@@ -1,16 +1,3 @@
-multinom_surrogate_fit <- function(n = 150L, action = na.omit, missing = FALSE, k = 2L) {
-  withr::with_seed(819, {
-    d <- data.frame(x = runif(n, -2, 2), z = runif(n), off = rnorm(n, sd = .2))
-    mu <- cbind(0, .3 + d$x + d$off)
-    if (k == 2L) mu <- cbind(mu, -.4 + d$z - d$x / 2)
-    u <- mu - log(-log(matrix(runif(length(mu)), n)))
-    d$y <- max.col(u) - 1L
-    if (missing) d$x[c(3, 9)] <- NA_real_
-    f <- if (k == 2L) list(y ~ x + offset(off), ~ z + x) else list(y ~ x + offset(off))
-    mgcv::gam(f, family = mgcv::multinom(K = k), data = d, na.action = action)
-  })
-}
-
 test_that("conditional utilities agree with independent rejection simulation", {
   withr::local_seed(816)
   mu <- c(0, .4, -.6)

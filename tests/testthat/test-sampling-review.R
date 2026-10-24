@@ -91,13 +91,13 @@ test_that("streaming diagnostics reject obsolete sampling controls", {
     freq = TRUE), "Argument 'freq' has been removed. Use frequentist", fixed = TRUE)
   expect_error(posterior_predictive_plot(m_gam, n = 4, scalable = TRUE,
     ncores = 2), "Argument 'ncores' has been removed", fixed = TRUE)
-  m <- lm(mpg ~ wt, data = mtcars)
+  m <- m_lm
   expect_error(posterior_predictive_plot(m, n = 4, scalable = TRUE,
     freq = TRUE), "Argument 'freq' has been removed. Use frequentist", fixed = TRUE)
 })
 
 test_that("add helpers preserve supplied identities without remapping twice", {
-  m <- mgcv::gam(mpg ~ s(wt, k = 4), data = mtcars)
+  m <- sampling_interface_model
   nd <- mtcars[1:3, ]
   draws <- post_draws(m, n_draws = 12, chains = 3, seed = 9)
   indices <- 12:1
@@ -126,7 +126,7 @@ test_that("the new evaluator rejects dependent GAMM components", {
 
 test_that("coefficient diagnostics support selection by supplied column names", {
   skip_if_not_installed("posterior")
-  m <- mgcv::gam(mpg ~ s(wt, k = 4), data = mtcars)
+  m <- sampling_interface_model
   b <- post_draws(m, n_draws = 40, chains = 4, seed = 9)
   expected <- names(coef(m))[2:4]
   for (labels in list(names(coef(m)), paste0("coefficient", 1:4))) {

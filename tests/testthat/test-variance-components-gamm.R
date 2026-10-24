@@ -81,12 +81,10 @@ test_that("gamm maps factor smooths and tensor penalties back to terms", {
   d <- gamm_variance_data()
   d$fac <- factor(rep(1:2, length.out = nrow(d)))
   models <- list(
-    tensor = gamm(y ~ te(x, z, k = c(4, 4)), data = d, method = "REML"),
+    tensor = su_gamm_bivar_te,
     t2 = gamm(y ~ t2(x, z, k = c(4, 4)), data = d, method = "REML"),
-    factor_by = gamm(y ~ fac + s(z, by = fac, k = 6) + s(x, k = 6),
-      data = d, method = "REML"),
-    factor_smooth = gamm(y ~ s(z, k = 6) + s(x, group, bs = "fs", k = 5),
-      data = d, method = "REML"),
+    factor_by = su_m_factor_by_gamm,
+    factor_smooth = m_fs_gamm,
     random_smooth = gamm(y ~ s(x, k = 6) + s(group, bs = "re"),
       data = d, method = "REML"),
     fixed_basis = gamm(y ~ s(z, k = 5, fx = TRUE) + s(x, k = 6),
@@ -99,7 +97,7 @@ test_that("gamm maps factor smooths and tensor penalties back to terms", {
   expect_true(all(is.na(tensor$.upper_ci)))
   fs <- variance_comp(models$factor_smooth)
   expect_equal(fs$.component,
-    c("s(z)", "s(x,group)1", "s(x,group)2", "s(x,group)3", "scale"))
+    c("s(x0)", "s(x1,fac)1", "s(x1,fac)2", "s(x1,fac)3", "s(x2)", "scale"))
 })
 
 test_that("gamm handles random-only models and blocked native covariance", {
@@ -169,7 +167,7 @@ test_that("gamm variance components validate the model and arguments", {
   skip_if_not_installed("nlme")
   withr::local_preserve_seed()
   d <- gamm_variance_data()
-  m <- gamm(y ~ s(x, k = 6), data = d)
+  m <- m_gamm
   expect_error(variance_comp(structure(list(), class = "gamm")),
     "valid 'gam' and 'lme'")
   expect_error(variance_comp(m, coverage = 1), "between zero and one")

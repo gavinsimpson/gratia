@@ -1,17 +1,6 @@
 # Check fitted cycle limits as well as coordinates: observed ranges need not
 # cover a complete cycle.
-cyclic_polar_data <- function() {
-  d <- data.frame(x = seq(0.1, 0.9, length.out = 80))
-  d$z <- rep(seq(0, 1, length.out = 20), 4)
-  d$f <- factor(rep(c("a", "b"), each = 40))
-  d$y <- sin(2 * pi * d$x) + 0.2 * cos(35 * d$x) + d$z
-  d
-}
 
-cyclic_polar_model <- function(bs = "cc") {
-  mgcv::gam(y ~ s(x, bs = bs, k = 7), data = cyclic_polar_data(),
-    knots = list(x = c(0, 1)), method = "REML")
-}
 
 expect_polar_build <- function(plot) {
   expect_s3_class(plot$coordinates, "CoordRadial")

@@ -1,9 +1,8 @@
 test_that("parametric effects constant works", {
-  withr::local_seed(42)
-  d <- data.frame(x = runif(200), z = runif(200))
-  d$y <- sin(6 * d$x) + 2 * d$z + rnorm(200, sd = 0.3)
-  m <- gam(y ~ s(x, k = 8) + z, data = d, method = "REML")
-  p <- parametric_effects(m, data = d)
+  m <- gamm4_gaussian$gam
+  d <- m$model
+  p <- parametric_effects(m, terms = "z", data = d)
+  expect_equal(unique(p$.term), "z")
   ci <- add_confint(p)
   cols <- c(".partial", ".lower_ci", ".upper_ci")
   expect_equal(add_constant(p, 10)$.partial, p$.partial + 10)

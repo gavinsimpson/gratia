@@ -1,21 +1,3 @@
-sampling_test_model <- function(family = stats::gaussian(), bam = FALSE,
-                                discrete = FALSE) {
-  withr::with_seed(913, {
-    d <- data.frame(x = runif(60), z = runif(60), off = rep(0.2, 60), w = rep(c(1, 2), 30))
-    eta <- sin(2 * pi * d$x) / 2 + d$off
-    d$y <- if (family$family == "poisson") rpois(60, exp(eta)) else
-      if (family$family == "binomial") rbinom(60, 5, plogis(eta)) / 5 else
-      if (family$family == "Gamma") rgamma(60, shape = 3, scale = exp(eta) / 3) else
-      if (grepl("negative binomial", family$family, ignore.case = TRUE)) rnbinom(60, mu = exp(eta), size = 2) else
-      rnorm(60, eta, 0.5)
-    if (family$family == "binomial") d$w <- d$w * 5
-    if (bam) mgcv::bam(y ~ s(x, k = 5) + offset(off), data = d,
-      family = family, weights = w, discrete = discrete) else
-      mgcv::gam(y ~ s(x, k = 5) + offset(off), data = d,
-        family = family, weights = w, method = "REML")
-  })
-}
-
 sampling_values <- function(x) as.vector(x)
 
 test_that("draw counts, chain IDs, and legacy MH values are correct", {

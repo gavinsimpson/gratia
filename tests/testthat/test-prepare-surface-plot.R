@@ -268,11 +268,7 @@ test_that("tensor surfaces forward geometry and retain marginal ordering", {
 })
 
 test_that("GAMM and BAM drawing forward surface geometry", {
-  withr::local_seed(310)
-  d <- data.frame(x = runif(80), z = runif(80))
-  d$y <- sin(4 * d$x) + d$z + rnorm(80, sd = 0.2)
-  models <- list(mgcv::gamm(y ~ s(x, z, k = 8), data = d),
-    mgcv::bam(y ~ s(x, z, k = 8), data = d))
+  models <- list(su_gamm_bivar_te, shared_bam_surface())
   for (m in models) {
     p <- draw(m, surface = "tile", n_2d = 5, rug = FALSE)[[1]]
     expect_s3_class(p$layers[[1]]$geom, "GeomTile")
@@ -283,10 +279,7 @@ test_that("GAMM and BAM drawing forward surface geometry", {
 
 test_that("gamm4 drawing forwards surface geometry", {
   skip_if_not_installed("gamm4")
-  withr::local_seed(311)
-  d <- data.frame(x = runif(80), z = runif(80))
-  d$y <- sin(4 * d$x) + d$z + rnorm(80, sd = 0.2)
-  m <- gamm4::gamm4(y ~ s(x, z, k = 8), data = d)
+  m <- gamm4_surface
   p <- draw(m, surface = "tile", n_2d = 5, rug = FALSE)[[1]]
   expect_s3_class(p$layers[[1]]$geom, "GeomTile")
   expect_silent(ggplot2::ggplot_build(p))

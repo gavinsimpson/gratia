@@ -1,12 +1,3 @@
-scasm_integration_fixture <- function() {
-  withr::with_seed(29, {
-    d <- data.frame(x = runif(90), off = seq(-0.2, 0.2, length.out = 90))
-    d$y <- d$x + d$off + rnorm(90, sd = 0.3)
-    mgcv::scasm(y ~ s(x, bs = "sc", xt = "m+", k = 6) + offset(off),
-      data = d, bs = 8)
-  })
-}
-
 test_that("native scasm drawing dispatch preserves classes and warns once", {
   m <- scasm_integration_fixture()
   original <- m
@@ -25,7 +16,7 @@ test_that("native scasm drawing dispatch preserves classes and warns once", {
   expect_identical(m, original)
   expect_silent(assemble(m, n = 12, rug = FALSE))
   expect_silent(smooth_estimates(m, n = 12))
-  ordinary <- mgcv::gam(y ~ s(x, k = 5), data = m$model)
+  ordinary <- m_1_smooth
   expect_silent(draw(ordinary, n = 12, rug = FALSE))
 })
 

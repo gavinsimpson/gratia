@@ -1,14 +1,6 @@
 # glmmTMB is an optional dependency.
 skip_if_not_installed("glmmTMB", minimum_version = "1.1.15.2")
 
-tmb_data <- function() {
-  set.seed(928)
-  d <- data.frame(x = runif(180), z = runif(180),
-    g = factor(rep(seq_len(18), 10)))
-  d$y <- sin(6 * d$x) + cos(6 * d$z) + rnorm(18)[d$g] + rnorm(180, sd = .3)
-  d
-}
-
 test_that("smooth coefficients reconstruct mixed model predictors in formula order", {
   d <- tmb_data()
   for (f in list(y ~ (1 | g) + s(x, k = 6) + s(z, k = 5),
@@ -153,8 +145,9 @@ test_that("all linear predictors share mgcv-style smooth selection and labels", 
 })
 
 test_that("native residuals are preserved for observed and replaced responses", {
-  d <- tmb_data()
-  m <- glmmTMB::glmmTMB(y ~ s(x, k = 6) + (1 | g), d, REML = TRUE)
+  fixture <- glmmtmb_gaussian_fixture()
+  d <- fixture$data
+  m <- fixture$model
   expect_identical(n_smooths(m), 1L)
   expect_identical(n_smooths(m), length(smooths(m)))
   for (type in c("response", "pearson", "deviance")) {
@@ -284,8 +277,7 @@ test_that("Gaussian smooths agree with mgcv and covariance failures are explicit
 
 test_that("glmmTMB plots render consistently", {
   skip_on_cran()
-  d <- tmb_data()
-  m <- glmmTMB::glmmTMB(y ~ s(x, k = 6) + (1 | g), d, REML = TRUE)
+  m <- glmmtmb_gaussian_fixture()$model
   vdiffr::expect_doppelganger("glmmTMB smooth", draw(m, select = "s(x)"))
   vdiffr::expect_doppelganger("glmmTMB appraise", appraise(m, n_simulate = 20, seed = 928))
 })

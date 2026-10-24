@@ -45,10 +45,9 @@ test_that("gamm4 maps every smooth penalty to its fitted block", {
   withr::local_preserve_seed()
   d <- gamm4_variance_data()
   models <- list(
-    tensor = gamm4::gamm4(y ~ t2(x, z, k = c(4, 4)),
-      random = ~(1 | group), data = d),
-    fs = gamm4::gamm4(y ~ s(x, group, bs = "fs", k = 5), data = d),
-    factor_by = gamm4::gamm4(y ~ fac + s(x, by = fac, k = 5), data = d),
+    tensor = gamm4_surface,
+    fs = m_fs_gamm4,
+    factor_by = su_m_factor_by_gamm4,
     random_smooth = gamm4::gamm4(y ~ s(x, k = 5) + s(group, bs = "re"), data = d),
     fixed = gamm4::gamm4(y ~ s(x, k = 5, fx = TRUE) + s(z, k = 5), data = d)
   )
@@ -98,7 +97,7 @@ test_that("gamm4 profile intervals follow the penalty transformation", {
   skip_if_not_installed("gamm4")
   withr::local_preserve_seed()
   d <- gamm4_variance_data()
-  m <- gamm4::gamm4(y ~ s(x, k = 5), random = ~(1 | group), data = d)
+  m <- gamm4_gaussian
   theta <- lme4::getME(m$mer, "theta")
   design <- lme4::getME(m$mer, "Zt")
   ref <- stats::confint(stats::profile(m$mer, which = "theta_", signames = FALSE),
@@ -143,7 +142,7 @@ test_that("gamm4 keeps estimates and other bounds when a profile fails", {
   skip_if_not_installed("gamm4")
   withr::local_preserve_seed()
   d <- gamm4_variance_data()
-  m <- gamm4::gamm4(y ~ s(x, k = 5), random = ~(1 | group), data = d)
+  m <- gamm4_gaussian
   # Isolate failure handling at the external profiling boundary.
   testthat::local_mocked_bindings(
     profile = function(fitted, which, ...) {
@@ -164,7 +163,7 @@ test_that("gamm4 variance components validate arguments", {
   skip_if_not_installed("gamm4")
   withr::local_preserve_seed()
   d <- gamm4_variance_data()
-  m <- gamm4::gamm4(y ~ s(x, k = 5), data = d)
+  m <- m_gamm4
   expect_error(variance_comp(m, coverage = NA), "between zero and one")
   expect_error(variance_comp(m, rescale = 1), "TRUE or FALSE")
   expect_error(variance_comp(m, interval_method = "unknown"), "arg")

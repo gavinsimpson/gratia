@@ -1,22 +1,3 @@
-random_effect_fixture <- function(family = stats::poisson(), fs = FALSE,
-                                  bam = FALSE, ...) {
-  set.seed(42)
-  d <- data.frame(x = stats::runif(240),
-    g = factor(rep(letters[1:12], each = 20)),
-    h = factor(rep(LETTERS[1:4], 60)))
-  eta <- 0.3 + sin(3 * d$x) + stats::rnorm(12, sd = .7)[d$g]
-  d$y <- if (family$family == "gaussian") eta + stats::rnorm(240, sd = .3) else
-    if (family$family == "binomial") stats::rbinom(240, 1, family$linkinv(eta)) else
-      stats::rpois(240, exp(eta))
-  formula <- if (fs) y ~ x + s(x, g, bs = "fs", k = 4) else
-    y ~ s(x, k = 5) + s(g, bs = "re")
-  fit <- if (bam) mgcv::bam else mgcv::gam
-  model <- fit(formula, data = d, family = family,
-    method = if (bam) "fREML" else "REML", ...)
-  attr(model, "fixture_data") <- d
-  model
-}
-
 test_that("new random intercepts share groups and have the fitted variance", {
   m <- random_effect_fixture()
   nd <- data.frame(g = c("new", "new", "other"))

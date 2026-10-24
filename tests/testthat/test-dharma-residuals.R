@@ -71,7 +71,7 @@ test_that("explicit seeds preserve RNG state, while NULL advances it", {
 })
 
 test_that("extraction, QQ, worm and ordinary panels share the residual definition", {
-  m <- glm(count ~ spray, family = poisson(), data = InsectSprays)
+  m <- dharma_poisson_model
   r <- dharma_residuals(m, n = 30, seed = 21)
   q <- qq_plot(m, type = "dharma", n_dharma = 30, seed = 21)
   w <- worm_plot(m, type = "dharma", n_dharma = 30, seed = 21)
@@ -233,7 +233,7 @@ test_that("gamm and native mixed-model adapters retain their conditioning defaul
 
 test_that("family generators extend support without requiring analytic CDFs", {
   # An unknown family name prevents the analytic-family fallback from helping.
-  m <- glm(count ~ spray, family = poisson(), data = InsectSprays)
+  m <- dharma_poisson_model
   m$family$family <- "Custom count distribution"
   m$family$rd <- function(mu, wt, scale) rpois(length(mu), mu)
   expect_length(dharma_residuals(m, n = 20, seed = 8), nrow(InsectSprays))
@@ -320,7 +320,7 @@ test_that("extended and distributional mgcv families use their own generators", 
 })
 
 test_that("abbreviated DHARMa types retain the requested simulation count", {
-  m <- glm(count ~ spray, family = poisson(), data = InsectSprays)
+  m <- dharma_poisson_model
   r <- dharma_residuals(m, n = 7, seed = 2)
   q <- qq_plot(m, type = "dharma", n_dharma = 7, seed = 2)
   for (fun in list(qq_plot, scalable_qq_plot)) {

@@ -76,16 +76,9 @@ test_that("mixed-model term variances include fitted extra random coefficients",
   skip_if_not_installed("nlme")
   skip_if_not_installed("gamm4")
   withr::local_preserve_seed()
-  d <- variance_terms_data()
-  d <- d[sample(nrow(d)), ]
-  d$y <- d$y - d$off
-  d$x[c(4, 40)] <- NA_real_
-  models <- list(
-    gamm(y ~ x + z + fac + s(w, k = 6), random = list(group = ~1 + z),
-      data = d, subset = z > 0.1, na.action = na.exclude, method = "REML"),
-    gamm4::gamm4(y ~ x + z + fac + s(w, k = 6), random = ~(1 + z | group),
-      data = d, subset = z > 0.1, na.action = na.exclude)
-  )
+  fixture <- variance_mixed_fixture(missing = TRUE)
+  d <- fixture$data
+  models <- fixture$models
   for (m in models) {
     used <- d[match(rownames(m$gam$model), rownames(d)), ]
     values <- predict(m$gam, newdata = used, type = "terms")
@@ -132,20 +125,22 @@ test_that("mixed-model term covariances exclude varying formula offsets", {
 
 test_that("multi-penalty smooths contribute one whole term", {
   skip_if_not_installed("gamm4")
-  withr::local_preserve_seed()
-  d <- variance_terms_data()
   models <- list(
-    gam(y ~ te(x, w, k = c(4, 4)), data = d, method = "REML"),
-    gamm(y ~ te(x, w, k = c(4, 4)), data = d, method = "REML"),
-    gamm(y ~ s(w, k = 6) + s(x, group, bs = "fs", k = 5), data = d,
-      method = "REML"),
-    gamm4::gamm4(y ~ t2(x, w, k = c(4, 4)), data = d),
-    gamm4::gamm4(y ~ s(w, k = 6) + s(x, group, bs = "fs", k = 5), data = d)
+    su_m_bivar_te, m_fs, su_gamm_bivar_te, m_fs_gamm,
+    gamm4_surface, m_fs_gamm4
   )
   for (m in models) {
     g <- if (inherits(m, "gam")) m else m$gam
-    got <- expect_term_variances(m, predict(g, type = "terms"))
-    expect_equal(nrow(got), length(g$smooth) + 1L)
+    values <- predict(g, type = "terms")
+    if (inherits(m, "gamm4")) {
+      re <- lme4::ranef(m$mer)$group
+      if (!is.null(re)) {
+        group <- as.character(model.frame(m$mer)$group)
+        values <- cbind(values, "group:(Intercept)" = re[group, "(Intercept)"])
+      }
+    }
+    got <- expect_term_variances(m, values)
+    expect_equal(nrow(got), ncol(values) + 1L)
   }
 })
 
@@ -201,7 +196,7 @@ test_that("nested and separate native blocks retain all contributions", {
 test_that("term variances handle empty and distributional models", {
   withr::local_preserve_seed()
   d <- variance_terms_data()
-  m <- gam(y ~ 1, data = d, method = "REML")
+  m <- variance_intercept_model
   got <- variance_comp(m, type = "terms", n_draws = 0)
   expect_equal(got$.component, "total")
   expect_equal(got$.variance, 0)
@@ -217,12 +212,12 @@ test_that("term mode avoids penalty intervals and retains SCAM term estimates", 
   skip_if_not_installed("scam")
   withr::local_preserve_seed()
   d <- variance_terms_data()
-  m <- gamm4::gamm4(y ~ x + s(w, k = 6), random = ~(1 | group), data = d)
+  m <- gamm4_gaussian
   testthat::local_mocked_bindings(gamm4_variance_intervals = function(...) {
     stop("profiling must not run")
   })
   expect_silent(variance_comp(m, type = "terms", n_draws = 0))
-  m <- scam::scam(y ~ z + s(x, bs = "mpi", k = 6), data = d)
+  m <- variance_scam_model
   got <- expect_term_variances(m, predict(m, type = "terms"))
   expect_null(attr(got, "parameterisation"))
 })

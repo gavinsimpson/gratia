@@ -1,15 +1,3 @@
-scasm_shape_fixture <- function(tensor = FALSE) {
-  withr::with_seed(801, {
-    d <- data.frame(x = runif(150), z = runif(150))
-    d$y <- exp(d$x) + d$z + rnorm(150, sd = .2)
-    form <- if (tensor) {
-      y ~ te(x, z, bs = c("sc", "bs"), k = c(5, 5),
-        xt = list(c("m+", "c+"), NULL), np = FALSE)
-    } else y ~ s(x, bs = "sc", xt = c("m+", "c+"), k = 6)
-    mgcv::scasm(form, data = d, bs = 20)
-  })
-}
-
 test_that("shape intervals transform an explicitly chosen initial source", {
   m <- scasm_shape_fixture()
   for (source in c("gaussian", "bootstrap")) {

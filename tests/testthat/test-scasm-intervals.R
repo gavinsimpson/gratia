@@ -1,15 +1,3 @@
-scasm_interval_fixture <- function(tensor = FALSE) {
-  skip_if_not(exists("scasm", asNamespace("mgcv")))
-  withr::with_seed(9, {
-    d <- data.frame(x = runif(100), z = runif(100), off = seq(-.2, .2, length.out = 100))
-    d$y <- d$x + d$z + d$off + rnorm(100, sd = .3)
-    form <- if (tensor) {
-      y ~ te(x, z, bs = c("sc", "cr"), xt = list("m+", NULL), k = c(5, 4)) + offset(off)
-    } else y ~ s(x, bs = "sc", xt = "m+", k = 6) + offset(off)
-    mgcv::scasm(form, data = d, bs = 8)
-  })
-}
-
 test_that("scasm detection and interval selection use fitted model storage", {
   m <- scasm_interval_fixture()
   expect_true(is_scasm_model(m))
@@ -33,7 +21,7 @@ test_that("scasm detection and interval selection use fitted model storage", {
   expect_false(valid_scasm_bootstrap(m))
   m$beta0 <- NULL
   expect_false(is_scasm_model(m))
-  ordinary <- mgcv::gam(y ~ s(x, k = 5), data = m$model)
+  ordinary <- m_1_smooth
   expect_false(is_scasm_model(ordinary))
   expect_identical(scasm_interval_method(ordinary), "gaussian")
 })

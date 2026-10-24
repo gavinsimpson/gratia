@@ -1,13 +1,3 @@
-covariate_plot_fixture <- function(n = 240L) {
-  withr::local_seed(912)
-  d <- data.frame(x = runif(n, .1, 2), z = runif(n),
-    f = factor(rep(c("a", "b", "c"), length.out = n)),
-    g = factor(rep(seq_len(12), length.out = n)), exposure = runif(n, 1, 2))
-  d$y <- 3 * (d$x - 1)^2 + as.numeric(d$f) + rnorm(n, sd = .3)
-  list(data = d, model = mgcv::gam(y ~ x + s(z, k = 5) + f,
-    data = d, method = "REML"))
-}
-
 test_that("covariate selection preserves order and excludes special variables", {
   f <- covariate_plot_fixture()
   m <- mgcv::gam(y ~ x + s(z, k = 5) + s(g, bs = "re") +

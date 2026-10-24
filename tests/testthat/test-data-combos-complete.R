@@ -1,12 +1,7 @@
 test_that("data_combos honours complete and preserves variable selection", {
-  withr::local_seed(42)
-  d <- data.frame(
-    a = factor(rep(c("a", "a", "b"), each = 20)),
-    b = factor(rep(c("x", "y", "y"), each = 20)),
-    x = runif(60)
-  )
-  d$y <- as.integer(d$a) + as.integer(d$b) + d$x + rnorm(60)
-  m <- gam(y ~ a + b + x, data = d, method = "REML")
+  fixture <- conditional_combos_fixture()
+  d <- fixture$data
+  m <- fixture$model
   observed <- data_combos(m, complete = FALSE, data = d)
   complete <- data_combos(m, complete = TRUE, data = d)
 

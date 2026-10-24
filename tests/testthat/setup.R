@@ -11,6 +11,16 @@ suppressPackageStartupMessages(
   }
 )
 
+# Fit reusable test models only when a test first requests them.
+# The cache belongs to this setup environment and is shared across test files.
+shared_test_fixture <- local({
+  models <- new.env(parent = emptyenv())
+  function(key, code) {
+    if (!exists(key, envir = models, inherits = FALSE)) models[[key]] <- code
+    models[[key]]
+  }
+})
+
 ## Fit models
 n_quick <- 300
 quick_eg1 <- data_sim("eg1", n = n_quick, seed = 21)
@@ -60,6 +70,10 @@ su_m_bivar_ds <- gam(y ~ s(x, z, k = 20, bs = "ds"),
 su_m_trivar <- gam(y ~ s(x0, x1, x2), data = su_eg1, method = "REML")
 
 su_m_bivar_te <- gam(y ~ te(x, z, k = c(5, 5)), data = su_eg2, method = "REML")
+
+delayedAssign("su_gamm_bivar_te", gamm(y ~ te(x, z, k = c(5, 5)),
+  data = su_eg2, method = "REML"
+))
 
 su_m_bivar_ti <- gam(y ~ s(x, k = 5) + s(z, k = 5) + ti(x, z, k = c(5, 5)),
   data = su_eg2, method = "REML"
@@ -389,6 +403,16 @@ df_fs <- withr::with_seed(0, {
 m_fs <- gam(y ~ s(x0) + s(x1, fac, bs = "fs", k = 5) + s(x2, k = 20),
   data = df_fs, method = "ML"
 )
+
+delayedAssign("m_fs_gamm", gamm(
+  y ~ s(x0) + s(x1, fac, bs = "fs", k = 5) + s(x2, k = 20),
+  data = df_fs, method = "ML"
+))
+
+delayedAssign("m_fs_gamm4", gamm4::gamm4(
+  y ~ s(x0) + s(x1, fac, bs = "fs", k = 5) + s(x2, k = 20),
+  data = df_fs
+))
 
 #-- A standard GAM with a simple random effect ---------------------------------
 su_re <- quick_eg1
@@ -1160,3 +1184,516 @@ gfam_gamma_model <- local(withr::with_seed(26704, {
   gam(cbind(y, family_id) ~ factor(family_id) + s(x, k = 4), data = d,
     family = gfam(list(Gamma(link = "log"), gaussian(), poisson())), method = "REML")
 }))
+
+conditional_difference_fixture <- function(family = stats::gaussian()) {
+  shared_test_fixture(paste("conditional-difference", family$family, family$link, sep = ":"), {
+    withr::local_seed(45)
+    d <- expand.grid(x = seq(0.1, 0.9, length.out = 30),
+      a = factor(c("B", "A", "C"), levels = c("B", "A", "C")),
+      b = factor(c("low", "high")))
+    d$exposure <- runif(nrow(d), 0.5, 2)
+    eta <- 0.4 + 0.3 * as.integer(d$a) + sin(d$x * 3) +
+      0.2 * (d$b == "high") * as.integer(d$a)
+    d$y <- if (family$family == "poisson") {
+      rpois(nrow(d), exp(eta) * d$exposure)
+    } else eta + rnorm(nrow(d), sd = 0.3)
+    m <- mgcv::gam(y ~ a * b + s(x, by = a, k = 5) + offset(log(exposure)),
+      data = d, family = family, method = "REML")
+    list(model = with_model_envir(m, environment()), data = d)
+  })
+}
+
+conditional_surface_fixture <- function(family = stats::gaussian()) {
+  shared_test_fixture(paste("conditional-surface", family$family, family$link, sep = ":"), {
+    withr::local_seed(418)
+    d <- data.frame(x = runif(240), z = runif(240), u = runif(240),
+      a = factor(rep(c("A", "B", "C"), 80)),
+      b = factor(rep(c("low", "high"), each = 120)))
+    eta <- 0.3 + sin(4 * d$x) * cos(3 * d$z) +
+      as.integer(d$a) * d$x / 3 + 0.2 * (d$b == "high") + d$u
+    d$y <- if (family$family == "poisson") rpois(nrow(d), exp(eta)) else
+      eta + rnorm(nrow(d), sd = 0.2)
+    mgcv::gam(y ~ a + b + s(x, z, by = a, k = 8) + s(u, k = 4),
+      data = d, family = family, method = "REML")
+  })
+}
+
+adjustment_fixture <- function() {
+  shared_test_fixture("sampling-covariance-adjustment", {
+    withr::local_seed(630)
+    d <- data.frame(x = seq(0, 1, length.out = 120))
+    d$y <- sin(2 * pi * d$x) + rnorm(120, sd = .5)
+    mgcv::gam(y ~ s(x, k = 6), data = d, method = "REML")
+  })
+}
+
+tube_fixture <- function(bs = "cr", by = FALSE) {
+  shared_test_fixture(paste("tube", bs, by, sep = ":"), {
+    withr::local_seed(7021)
+    d <- data.frame(
+      x = seq(0, 1, length.out = 90),
+      group = factor(rep(c("a", "b", "c"), 30)), z = rep(1, 90)
+    )
+    d$y <- sin(5 * d$x) + if (by) as.integer(d$group) * d$x else 0
+    d$y <- d$y + rnorm(90, sd = .3)
+    model <- if (by) {
+      mgcv::gam(y ~ group + s(x, by = group, bs = bs, k = 6), data = d, method = "REML")
+    } else {
+      mgcv::gam(y ~ s(x, bs = bs, k = 6), data = d, method = "REML")
+    }
+    list(model = model, data = d)
+  })
+}
+
+covariate_plot_fixture <- function(n = 240L) {
+  shared_test_fixture(paste("residual-covariate", n, sep = ":"), {
+    withr::local_seed(912)
+    d <- data.frame(x = runif(n, .1, 2), z = runif(n),
+      f = factor(rep(c("a", "b", "c"), length.out = n)),
+      g = factor(rep(seq_len(12), length.out = n)), exposure = runif(n, 1, 2))
+    d$y <- 3 * (d$x - 1)^2 + as.numeric(d$f) + rnorm(n, sd = .3)
+    list(data = d, model = mgcv::gam(y ~ x + s(z, k = 5) + f,
+      data = d, method = "REML"))
+  })
+}
+
+conditional_combos_fixture <- function() {
+  shared_test_fixture("conditional-factor-combinations", {
+    withr::local_seed(42)
+    d <- data.frame(
+      a = factor(rep(c("a", "a", "b"), c(40, 10, 10))),
+      b = factor(rep(c("x", "y", "y"), c(40, 10, 10))),
+      x = runif(60)
+    )
+    d$y <- as.integer(d$a) + as.integer(d$b) + d$x + rnorm(60)
+    list(model = gam(y ~ a + b + x, data = d, method = "REML"), data = d)
+  })
+}
+
+smoothing_research_fixture <- function(method = "REML", bam = FALSE,
+                                       linked = FALSE, fixed = FALSE,
+                                       tensor = FALSE, known_scale = FALSE) {
+  key <- paste("smoothing-research", method, bam, linked, fixed,
+    tensor, known_scale, sep = ":")
+  shared_test_fixture(key, {
+    withr::local_seed(501)
+    d <- data.frame(x = runif(180), z = runif(180), w = runif(180, .5, 2))
+    d$o <- .2 + .3 * d$x
+    d$y <- sin(6 * d$x) + cos(3 * d$z) + d$o + rnorm(180, sd = .3)
+    f <- if (tensor) y ~ te(x, z, k = c(4, 4)) + offset(o) else
+      if (linked) y ~ s(x, k = 5, id = "same") + s(z, k = 5, id = "same") + offset(o) else
+      if (fixed) y ~ s(x, k = 5, sp = .1) + s(z, k = 5) + offset(o) else
+        y ~ s(x, k = 5) + s(z, k = 5) + offset(o)
+    fitter <- if (bam) mgcv::bam else mgcv::gam
+    fit <- fitter(f, data = d, weights = w, method = method,
+      scale = if (known_scale) .09 else 0)
+    list(model = fit, data = d, formula = f)
+  })
+}
+
+smoothing_family_fixture <- function(name, engine = "gam", method = "ML",
+                                     linked = FALSE, fixed = FALSE, tensor = FALSE,
+                                     missing = FALSE, call_offset = FALSE,
+                                     censored = TRUE) {
+  key <- paste("smoothing-family", name, engine, method, linked,
+    fixed, tensor, missing, call_offset, censored, sep = ":")
+  shared_test_fixture(key, {
+    withr::local_seed(if (name == "ziP") 943 else 941)
+    n <- if (name == "ziP") 600L else 320L
+    d <- data.frame(x = runif(n), z = runif(n), w = runif(n, .8, 1.2))
+    d$o <- .1 + .15 * d$x
+    eta <- .2 + 1.2 * sin(6 * d$x) + cos(7 * d$z) + d$o
+    family <- switch(name,
+      gaussian_log = gaussian("log"), poisson_sqrt = poisson("sqrt"),
+      binomial_probit = binomial("probit"), binomial_matrix = binomial(),
+      binomial_factor = binomial(), Tweedie = mgcv::Tweedie(p = 1.5),
+      negbin = mgcv::negbin(theta = 3), ocat = mgcv::ocat(R = 4),
+      ziP = mgcv::ziP(b = .3),
+      gfam = mgcv::gfam(list(gaussian(), mgcv::nb())),
+      gfam_ocat = mgcv::gfam(list(gaussian(), mgcv::ocat(R = 4))),
+      inverse.gaussian = inverse.gaussian("log"),
+      if (name %in% c("poisson", "binomial", "Gamma", "quasipoisson", "quasibinomial"))
+        get(name, asNamespace("stats"))(link = if (name == "Gamma") "log" else
+          if (name %in% c("binomial", "quasibinomial")) "logit" else "log") else
+        get(name, asNamespace("mgcv"))())
+    # Native families can refer to exported mgcv helpers through the search
+    # path. Supply them locally when fitting namespace-only test fixtures.
+    family <- sampling_smoothing_family_bindings(family)
+    y <- switch(name,
+      gaussian_log = exp(eta) + rnorm(n, sd = .12),
+      poisson = , poisson_sqrt = , cpois = , quasipoisson = rpois(n, exp(eta)),
+      binomial = , quasibinomial = , binomial_matrix = , binomial_probit = {
+        trials <- sample(8:15, n, replace = TRUE)
+        probability <- if (name == "binomial_probit") pnorm(eta) else plogis(eta)
+        success <- rbinom(n, trials, probability)
+        d$w <- sample(1:2, n, replace = TRUE)
+        if (name == "binomial_matrix") cbind(success, trials - success) else {
+          d$w <- d$w * trials
+          success / trials
+        }
+      },
+      binomial_factor = {d$w <- sample(1:2, n, replace = TRUE)
+        factor(rbinom(n, 1, plogis(eta)), labels = c("no", "yes"))},
+      Gamma = rgamma(n, shape = 8, scale = exp(eta) / 8),
+      nb = , negbin = rnbinom(n, mu = exp(eta), size = 3),
+      betar = rbeta(n, plogis(eta) * 15, (1 - plogis(eta)) * 15),
+      scat = eta + .3 * rt(n, df = 5),
+      tw = , Tweedie = mgcv::rTweedie(exp(eta), p = 1.5, phi = .2),
+      cnorm = eta + rnorm(n, sd = .3),
+      clog = eta + rlogis(n, scale = .2),
+      bcg = exp(eta + rnorm(n, sd = .3)),
+      ocat = , gfam_ocat = 1L + rowSums(outer(eta + rlogis(n), c(-1, .5, 2), `>`)),
+      gfam = rnbinom(n, mu = exp(eta), size = 3),
+      ziP = {
+        d$w <- rep(1, n)
+        lambda <- exp(eta)
+        probability <- -expm1(-exp(-.5 + 1.5 * eta))
+        presence <- runif(n) < probability
+        y <- numeric(n)
+        y[presence] <- qpois(runif(sum(presence), dpois(0, lambda[presence]), 1),
+          lambda[presence])
+        y
+      },
+      inverse.gaussian = {
+        mu <- exp(eta); v <- rnorm(n)^2
+        a <- mu + mu^2 * v / 20 - mu / 20 * sqrt(40 * mu * v + mu^2 * v^2)
+        ifelse(runif(n) <= mu / (mu + a), a, mu^2 / a)
+      })
+    if (censored && name %in% c("cnorm", "clog", "cpois", "bcg")) {
+      limits <- cbind(y, y)
+      # Include left, right and interval censoring, without censoring all rows.
+      right <- seq_len(n) %% 8L == 0L
+      left <- seq_len(n) %% 8L == 1L
+      interval <- seq_len(n) %% 8L == 2L
+      limits[right, 1] <- y[right] - if (name == "cpois") .5 else .1
+      limits[right, 2] <- Inf
+      limits[left, 1] <- y[left] + if (name == "cpois") .5 else .1
+      limits[left, 2] <- if (name == "bcg") 0 else -Inf
+      limits[interval, 1] <- pmax(if (name == "bcg") 1e-4 else -Inf,
+        y[interval] - if (name == "cpois") .5 else .05)
+      limits[interval, 2] <- y[interval] + if (name == "cpois") .5 else .05
+      if (name == "cpois") {
+        limits <- cbind(y, y)
+        right <- right & y > 4.5
+        left <- left & y < 2.5
+        interval <- interval & y > 1.5 & y < 5.5
+        limits[right, ] <- cbind(rep(4.5, sum(right)), rep(Inf, sum(right)))
+        limits[left, ] <- cbind(rep(2.5, sum(left)), rep(-Inf, sum(left)))
+        limits[interval, ] <- cbind(rep(1.5, sum(interval)), rep(5.5, sum(interval)))
+      }
+      y <- limits
+    }
+    if (name %in% c("gfam", "gfam_ocat")) {
+      d$group <- factor(rep(1:2, length.out = n))
+      first <- d$group == 1
+      y[first] <- eta[first] + rnorm(sum(first), sd = .3)
+      y <- cbind(y, as.integer(d$group))
+    }
+    d$y <- y
+    if (missing) d$x[c(5, 18)] <- NA_real_
+    f <- if (name %in% c("gfam", "gfam_ocat"))
+      y ~ group + s(x, by = group, k = 5) + s(z, by = group, k = 5) else
+      if (tensor) y ~ te(x, z, k = c(4, 4)) else
+      if (linked) y ~ s(x, k = 5, id = "same") + s(z, k = 5, id = "same") else
+      if (fixed) y ~ s(x, k = 5, sp = .1) + s(z, k = 5) else
+        y ~ s(x, k = 5) + s(z, k = 5)
+    if (!call_offset) f <- update(f, . ~ . + offset(o))
+    fitter <- get(engine, asNamespace("mgcv"))
+    fit <- fitter(f, data = d, weights = w, family = family, method = method,
+      offset = if (call_offset) d$o else NULL, na.action = na.exclude,
+      control = mgcv::gam.control(epsilon = 1e-8, maxit = 100L))
+    list(model = fit, data = d, formula = f)
+  })
+}
+
+scasm_sampling_fixture <- function() {
+  shared_test_fixture("scasm-sampling", {
+    skip_if_not(exists("scasm", asNamespace("mgcv")))
+    withr::with_seed(91, {
+      d <- data.frame(x = seq(0, 1, length.out = 80),
+        off = seq(-0.2, 0.2, length.out = 80))
+      d$y <- d$off + rnorm(nrow(d), sd = 0.5)
+      mgcv::scasm(y ~ s(x, bs = "sc", xt = "m+", k = 7) + offset(off),
+        data = d, bs = 6)
+    })
+  })
+}
+
+scasm_interval_fixture <- function(tensor = FALSE) {
+  shared_test_fixture(paste("scasm-interval", tensor, sep = ":"), {
+    skip_if_not(exists("scasm", asNamespace("mgcv")))
+    withr::with_seed(9, {
+      d <- data.frame(x = runif(100), z = runif(100), off = seq(-.2, .2, length.out = 100))
+      d$y <- d$x + d$z + d$off + rnorm(100, sd = .3)
+      form <- if (tensor) {
+        y ~ te(x, z, bs = c("sc", "cr"), xt = list("m+", NULL), k = c(5, 4)) + offset(off)
+      } else y ~ s(x, bs = "sc", xt = "m+", k = 6) + offset(off)
+      mgcv::scasm(form, data = d, bs = 8)
+    })
+  })
+}
+
+scasm_integration_fixture <- function() {
+  shared_test_fixture("scasm-integration", {
+    withr::with_seed(29, {
+      d <- data.frame(x = runif(90), off = seq(-0.2, 0.2, length.out = 90))
+      d$y <- d$x + d$off + rnorm(90, sd = 0.3)
+      mgcv::scasm(y ~ s(x, bs = "sc", xt = "m+", k = 6) + offset(off),
+        data = d, bs = 8)
+    })
+  })
+}
+
+
+# Compact sampling references retain their fitted coefficient dimensions.
+delayedAssign("sampling_interface_model",
+  gam(mpg ~ s(wt, k = 4), data = mtcars))
+delayedAssign("sampling_linear_model",
+  gam(mpg ~ wt, data = mtcars, method = "REML"))
+
+# The term-variance references deliberately include correlated covariates,
+# random slopes, and missing rows. Reuse each fit across its point and draw tests.
+variance_total_models <- function() {
+  shared_test_fixture("variance-totals", {
+    withr::local_preserve_seed()
+    d <- variance_terms_data()
+    d$y <- 2 * d$x + 2 * d$z + sin(6 * d$w) + (d$fac == "b") +
+      d$off + rnorm(nrow(d), sd = 0.3)
+    lapply(list(gam, bam), function(fit) {
+      fit(y ~ x + z + fac * poly(w, 2) + s(w, k = 6) + offset(off),
+        data = d, method = "REML")
+    })
+  })
+}
+
+variance_mixed_fixture <- function(missing = FALSE) {
+  shared_test_fixture(paste("variance-mixed", missing, sep = ":"), {
+    withr::local_preserve_seed()
+    d <- variance_terms_data()
+    if (missing) d <- d[sample(nrow(d)), ]
+    d$y <- d$y - d$off
+    if (missing) d$x[c(4, 40)] <- NA_real_
+    models <- if (missing) {
+      list(
+        gamm(y ~ x + z + fac + s(w, k = 6), random = list(group = ~1 + z),
+          data = d, subset = z > 0.1, na.action = na.exclude, method = "REML"),
+        gamm4::gamm4(y ~ x + z + fac + s(w, k = 6), random = ~(1 + z | group),
+          data = d, subset = z > 0.1, na.action = na.exclude)
+      )
+    } else {
+      list(
+        gamm(y ~ x + z + fac + s(w, k = 6), random = list(group = ~1 + z),
+          data = d, method = "REML"),
+        gamm4::gamm4(y ~ x + z + fac + s(w, k = 6), random = ~(1 + z | group),
+          data = d)
+      )
+    }
+    list(models = models, data = d)
+  })
+}
+
+delayedAssign("variance_scam_model", local({
+  withr::local_preserve_seed()
+  d <- variance_terms_data()
+  scam::scam(y ~ z + s(x, bs = "mpi", k = 6), data = d)
+}))
+
+delayedAssign("variance_intercept_model", local({
+  withr::local_preserve_seed()
+  d <- variance_terms_data()
+  gam(y ~ 1, data = d)
+}))
+
+shared_bam_surface <- function() {
+  shared_test_fixture("bam-surface", {
+    bam(y ~ te(x, z, k = c(5, 5)), data = su_eg2, method = "fREML")
+  })
+}
+
+sampling_test_model <- function(family = stats::gaussian(), bam = FALSE,
+                                discrete = FALSE) {
+  key <- paste("chain-sampling", family$family, family$link, bam, discrete, sep = ":")
+  shared_test_fixture(key, {
+    withr::with_seed(913, {
+      d <- data.frame(x = runif(60), z = runif(60), off = rep(0.2, 60), w = rep(c(1, 2), 30))
+      eta <- sin(2 * pi * d$x) / 2 + d$off
+      d$y <- if (family$family == "poisson") rpois(60, exp(eta)) else
+        if (family$family == "binomial") rbinom(60, 5, plogis(eta)) / 5 else
+        if (family$family == "Gamma") rgamma(60, shape = 3, scale = exp(eta) / 3) else
+        if (grepl("negative binomial", family$family, ignore.case = TRUE)) rnbinom(60, mu = exp(eta), size = 2) else
+        rnorm(60, eta, 0.5)
+      if (family$family == "binomial") d$w <- d$w * 5
+      if (bam) mgcv::bam(y ~ s(x, k = 5) + offset(off), data = d,
+        family = family, weights = w, discrete = discrete) else
+        mgcv::gam(y ~ s(x, k = 5) + offset(off), data = d,
+          family = family, weights = w, method = "REML")
+    })
+  })
+}
+
+family_mh_model <- function(family, bam = FALSE, discrete = FALSE) {
+  key <- paste("family-target", family$family, family$link, bam, discrete, sep = ":")
+  shared_test_fixture(key, {
+    withr::with_seed(281, {
+      d <- data.frame(x = runif(100), off = runif(100, -0.1, 0.1),
+        w = rep(c(1, 2), 50))
+      eta <- 0.3 + sin(2 * pi * d$x) / 2 + d$off
+      d$y <- switch(family$family,
+        gaussian = rnorm(100, eta, 0.5),
+        poisson = rpois(100, exp(eta)),
+        binomial = rbinom(100, 5, plogis(eta)) / 5,
+        Gamma = rgamma(100, 3, scale = exp(eta) / 3),
+        rnbinom(100, mu = exp(eta), size = 2))
+      if (family$family == "binomial") d$w <- d$w * 5
+      if (bam) mgcv::bam(y ~ s(x, k = 5) + offset(off), data = d,
+        family = family, weights = w, discrete = discrete) else
+        mgcv::gam(y ~ s(x, k = 5) + offset(off), data = d,
+          family = family, weights = w, method = "REML")
+    })
+  })
+}
+
+scasm_shape_fixture <- function(tensor = FALSE) {
+  key <- paste("scasm-shape", tensor, sep = ":")
+  shared_test_fixture(key, {
+    withr::with_seed(801, {
+      d <- data.frame(x = runif(150), z = runif(150))
+      d$y <- exp(d$x) + d$z + rnorm(150, sd = .2)
+      form <- if (tensor) {
+        y ~ te(x, z, bs = c("sc", "bs"), k = c(5, 5),
+          xt = list(c("m+", "c+"), NULL), np = FALSE)
+      } else y ~ s(x, bs = "sc", xt = c("m+", "c+"), k = 6)
+      mgcv::scasm(form, data = d, bs = 20)
+    })
+  })
+}
+
+cyclic_polar_data <- function() {
+  d <- data.frame(x = seq(0.1, 0.9, length.out = 80))
+  d$z <- rep(seq(0, 1, length.out = 20), 4)
+  d$f <- factor(rep(c("a", "b"), each = 40))
+  d$y <- sin(2 * pi * d$x) + 0.2 * cos(35 * d$x) + d$z
+  d
+}
+
+cyclic_polar_model <- function(bs = "cc") {
+  key <- paste("cyclic-polar", bs, sep = ":")
+  shared_test_fixture(key, {
+    mgcv::gam(y ~ s(x, bs = bs, k = 7), data = cyclic_polar_data(),
+      knots = list(x = c(0, 1)), method = "REML")
+  })
+}
+
+surrogate_test_data <- function(n = 180L) {
+  withr::with_seed(359, {
+    dat <- data.frame(x = runif(n, -2, 2), off = runif(n, -.4, .4),
+      w = runif(n, .5, 2))
+    latent <- .3 + sin(dat$x) + dat$off + rlogis(n)
+    dat$y <- findInterval(latent, c(-1, 0, 2)) + 1L
+    dat
+  })
+}
+
+surrogate_test_fit <- function(dat = surrogate_test_data(),
+                               family = mgcv::ocat(R = 4)) {
+  fit <- function() {
+    mgcv::gam(y ~ s(x, k = 6) + offset(off), data = dat,
+      family = family, weights = w, method = "REML")
+  }
+  if (missing(dat) && missing(family)) {
+    shared_test_fixture("surrogate-ordinal", fit())
+  } else fit()
+}
+
+# The QQ and worm examples use the same trial counts and observed responses.
+diagnostic_binomial_data <- function() {
+  shared_test_fixture("diagnostic-binomial-data", {
+    dat <- data_sim("eg1", n = 200, dist = "binary", scale = .33, seed = 0)
+    p <- binomial()$linkinv(dat$f)
+    n <- withr::with_seed(0, sample(c(1, 3), 200, replace = TRUE))
+    withr::with_seed(0, transform(dat, y = rbinom(n, n, p), n = n))
+  })
+}
+
+delayedAssign("diagnostic_binomial_model", local({
+  dat <- diagnostic_binomial_data()
+  gam(y / n ~ s(x0) + s(x1) + s(x2) + s(x3),
+    family = binomial, data = dat, weights = n, method = "REML")
+}))
+
+response_delta_fixture <- function(family = poisson()) {
+  key <- paste("response-delta", family$family, family$link, sep = ":")
+  shared_test_fixture(key, {
+    withr::local_seed(32)
+    d <- data.frame(x = seq(-1, 1, length.out = 400))
+    eta <- .8 + .45 * d$x
+    d$y <- if (family$family == "poisson") rpois(nrow(d), exp(eta)) else
+      if (family$family == "binomial") rbinom(nrow(d), 1, plogis(eta)) else
+        eta + rnorm(nrow(d), sd = .3)
+    mgcv::gam(y ~ x, data = d, family = family, method = "REML")
+  })
+}
+
+multinom_surrogate_fit <- function(n = 150L, action = na.omit, missing = FALSE, k = 2L) {
+  key <- paste("multinomial-surrogate", n, missing, k,
+    paste(deparse(action), collapse = ""), sep = ":")
+  shared_test_fixture(key, {
+    withr::with_seed(819, {
+      d <- data.frame(x = runif(n, -2, 2), z = runif(n), off = rnorm(n, sd = .2))
+      mu <- cbind(0, .3 + d$x + d$off)
+      if (k == 2L) mu <- cbind(mu, -.4 + d$z - d$x / 2)
+      u <- mu - log(-log(matrix(runif(length(mu)), n)))
+      d$y <- max.col(u) - 1L
+      if (missing) d$x[c(3, 9)] <- NA_real_
+      f <- if (k == 2L) list(y ~ x + offset(off), ~ z + x) else list(y ~ x + offset(off))
+      mgcv::gam(f, family = mgcv::multinom(K = k), data = d, na.action = action)
+    })
+  })
+}
+
+random_effect_fixture <- function(family = stats::poisson(), fs = FALSE,
+                                  bam = FALSE, ...) {
+  set.seed(42)
+  d <- data.frame(x = stats::runif(240),
+    g = factor(rep(letters[1:12], each = 20)),
+    h = factor(rep(LETTERS[1:4], 60)))
+  eta <- 0.3 + sin(3 * d$x) + stats::rnorm(12, sd = .7)[d$g]
+  d$y <- if (family$family == "gaussian") eta + stats::rnorm(240, sd = .3) else
+    if (family$family == "binomial") stats::rbinom(240, 1, family$linkinv(eta)) else
+      stats::rpois(240, exp(eta))
+  formula <- if (fs) y ~ x + s(x, g, bs = "fs", k = 4) else
+    y ~ s(x, k = 5) + s(g, bs = "re")
+  fit <- if (bam) mgcv::bam else mgcv::gam
+  key <- paste("random-effect", family$family, family$link, fs, bam,
+    paste(serialize(list(...), NULL), collapse = ""), sep = ":")
+  shared_test_fixture(key, {
+    model <- fit(formula, data = d, family = family,
+      method = if (bam) "fREML" else "REML", ...)
+    attr(model, "fixture_data") <- d
+    model
+  })
+}
+
+delayedAssign("dharma_poisson_model",
+  glm(count ~ spray, family = poisson(), data = InsectSprays))
+
+tmb_data <- function() {
+  set.seed(928)
+  d <- data.frame(x = runif(180), z = runif(180),
+    g = factor(rep(seq_len(18), 10)))
+  d$y <- sin(6 * d$x) + cos(6 * d$z) + rnorm(18)[d$g] + rnorm(180, sd = .3)
+  d
+}
+
+# Only read-only diagnostics and plots share this native model.
+# Covariance comparisons and tests that alter native state fit fresh models.
+glmmtmb_gaussian_fixture <- function() {
+  shared_test_fixture("glmmtmb-gaussian-random-smooth", {
+    withr::local_preserve_seed()
+    d <- tmb_data()
+    list(
+      model = glmmTMB::glmmTMB(y ~ s(x, k = 6) + (1 | g), d, REML = TRUE),
+      data = d
+    )
+  })
+}

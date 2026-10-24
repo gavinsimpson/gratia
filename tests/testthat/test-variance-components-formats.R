@@ -246,7 +246,7 @@ test_that("custom parametric mappings also work with bam and fixed parameters", 
 test_that("unpenalized models return an empty variance component table", {
   withr::local_preserve_seed()
   d <- variance_component_data()
-  for (m in list(gam(y ~ x + group, data = d, method = "REML"),
+  for (m in list(m_only_para,
       gam(y ~ s(x, k = 5, fx = TRUE), data = d, method = "REML"))) {
     got <- variance_comp(m)
     expect_equal(nrow(got), 0L)
@@ -258,7 +258,7 @@ test_that("unpenalized models return an empty variance component table", {
 test_that("variance_comp validates coverage and rescaling", {
   withr::local_preserve_seed()
   d <- variance_component_data()
-  m <- gam(y ~ s(x, k = 8), data = d)
+  m <- m_1_smooth
   for (coverage in list(0, 1, -1, NA_real_, Inf, numeric(), c(0.9, 0.95), "a")) {
     expect_error(variance_comp(m, coverage = coverage), "between zero and one")
   }

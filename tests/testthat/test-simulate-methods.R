@@ -1,11 +1,5 @@
 ## Test simulate() methods
 
-data(smallAges)
-smallAges$Error[1] <- 1.1
-sw <- scam(Date ~ s(Depth, k = 5, bs = "mpd"),
-  data = smallAges,
-  weights = 1 / smallAges$Error, gamma = 1.4
-)
 
 test_that("simulate() works with a gam", {
   sims <- simulate(m_gam, nsim = 5, seed = 42)

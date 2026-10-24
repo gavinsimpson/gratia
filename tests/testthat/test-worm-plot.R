@@ -1,18 +1,7 @@
 ## Test worm_plot() methods
 
-## simulate binomial data...
-n.samp <- 200
-dat <- data_sim("eg1",
-  n = n.samp, dist = "binary",
-  scale = .33, seed = 0
-)
-p <- binomial()$linkinv(dat$f) # binomial p
-n <- withr::with_seed(0, sample(c(1, 3), n.samp, replace = TRUE)) # binomial n
-dat <- withr::with_seed(0, transform(dat, y = rbinom(n, n, p), n = n))
-m <- gam(y / n ~ s(x0) + s(x1) + s(x2) + s(x3),
-  family = binomial, data = dat, weights = n,
-  method = "REML"
-)
+delayedAssign("m", diagnostic_binomial_model)
+delayedAssign("dat", diagnostic_binomial_data())
 
 types <- c("deviance", "response", "pearson")
 methods <- c("uniform", "simulate", "normal")

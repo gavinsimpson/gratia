@@ -53,7 +53,7 @@ test_that("total rows can be omitted without changing individual term results", 
 test_that("omitting totals handles several predictors and intercept-only models", {
   withr::local_preserve_seed()
   d <- variance_terms_data()
-  expect_variance_totals_omitted(gam(y ~ 1, data = d))
+  expect_variance_totals_omitted(variance_intercept_model)
   model <- gam(list(y ~ x, ~1, 1 + 2 ~ 0 + s(w, k = 6)), data = d,
     family = gaulss())
   expect_variance_totals_omitted(model)

@@ -1,19 +1,3 @@
-surrogate_test_data <- function(n = 180L) {
-  withr::with_seed(359, {
-    dat <- data.frame(x = runif(n, -2, 2), off = runif(n, -.4, .4),
-      w = runif(n, .5, 2))
-    latent <- .3 + sin(dat$x) + dat$off + rlogis(n)
-    dat$y <- findInterval(latent, c(-1, 0, 2)) + 1L
-    dat
-  })
-}
-
-surrogate_test_fit <- function(dat = surrogate_test_data(),
-                               family = mgcv::ocat(R = 4)) {
-  mgcv::gam(y ~ s(x, k = 6) + offset(off), data = dat,
-    family = family, weights = w, method = "REML")
-}
-
 # Independent formula on ordinary probabilities for moderate fitted values.
 surrogate_oracle <- function(model, seed) {
   cuts <- c(-Inf, model$family$getTheta(TRUE), Inf)

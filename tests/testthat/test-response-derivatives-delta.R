@@ -1,13 +1,3 @@
-response_delta_fixture <- function(family = poisson()) {
-  withr::local_seed(32)
-  d <- data.frame(x = seq(-1, 1, length.out = 400))
-  eta <- .8 + .45 * d$x
-  d$y <- if (family$family == "poisson") rpois(nrow(d), exp(eta)) else
-    if (family$family == "binomial") rbinom(nrow(d), 1, plogis(eta)) else
-      eta + rnorm(nrow(d), sd = .3)
-  mgcv::gam(y ~ x, data = d, family = family, method = "REML")
-}
-
 test_that("delta derivatives agree with analytic log and logit gradients", {
   nd <- data.frame(x = c(-.6, 0, .6))
   for (fam in list(poisson(), binomial())) {

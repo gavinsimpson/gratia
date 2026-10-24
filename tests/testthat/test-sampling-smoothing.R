@@ -1,20 +1,3 @@
-smoothing_research_fixture <- function(method = "REML", bam = FALSE,
-                                       linked = FALSE, fixed = FALSE,
-                                       tensor = FALSE, known_scale = FALSE) {
-  withr::local_seed(501)
-  d <- data.frame(x = runif(180), z = runif(180), w = runif(180, .5, 2))
-  d$o <- .2 + .3 * d$x
-  d$y <- sin(6 * d$x) + cos(3 * d$z) + d$o + rnorm(180, sd = .3)
-  f <- if (tensor) y ~ te(x, z, k = c(4, 4)) + offset(o) else
-    if (linked) y ~ s(x, k = 5, id = "same") + s(z, k = 5, id = "same") + offset(o) else
-    if (fixed) y ~ s(x, k = 5, sp = .1) + s(z, k = 5) + offset(o) else
-      y ~ s(x, k = 5) + s(z, k = 5) + offset(o)
-  fitter <- if (bam) mgcv::bam else mgcv::gam
-  fit <- fitter(f, data = d, weights = w, method = method,
-    scale = if (known_scale) .09 else 0)
-  list(model = fit, data = d, formula = f)
-}
-
 test_that("smoothing setup preserves fitted Gaussian conditionals and mappings", {
   configurations <- list(list(), list(method = "ML"), list(bam = TRUE, method = "fREML"),
     list(linked = TRUE), list(linked = TRUE, bam = TRUE, method = "fREML"),

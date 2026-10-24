@@ -1,19 +1,3 @@
-tube_fixture <- function(bs = "cr", by = FALSE) {
-  withr::local_seed(7021)
-  d <- data.frame(
-    x = seq(0, 1, length.out = 90),
-    group = factor(rep(c("a", "b", "c"), 30)), z = rep(1, 90)
-  )
-  d$y <- sin(5 * d$x) + if (by) as.integer(d$group) * d$x else 0
-  d$y <- d$y + rnorm(90, sd = .3)
-  model <- if (by) {
-    mgcv::gam(y ~ group + s(x, by = group, bs = bs, k = 6), data = d, method = "REML")
-  } else {
-    mgcv::gam(y ~ s(x, bs = bs, k = 6), data = d, method = "REML")
-  }
-  list(model = model, data = d)
-}
-
 test_that("tube geometry matches an analytic circular arc and its bound", {
   arc <- function(x, deriv = 0L) {
     if (deriv == 0L) cbind(cos(x), sin(x)) else cbind(-sin(x), cos(x))

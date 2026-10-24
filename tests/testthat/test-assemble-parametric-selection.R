@@ -1,9 +1,7 @@
 test_that("assemble and draw respect parametric term selection", {
-  withr::local_seed(42)
-  d <- data.frame(x = runif(200), z = runif(200), w = runif(200))
-  d$y <- sin(6 * d$x) + d$z - d$w + rnorm(200, sd = 0.3)
-  m <- gam(y ~ s(x, k = 6) + z + w, data = d, method = "REML")
-  for (term in c("z", "w")) {
+  m <- gamm4_gaussian$gam
+  d <- m$model
+  for (term in c("z", "fac")) {
     assembled <- assemble(m, data = d, parametric = TRUE, terms = term)
     expect_setequal(names(assembled), c("s(x)", term))
     expect_equal(unique(assembled[[term]]$data$.term), term)
@@ -15,23 +13,21 @@ test_that("assemble and draw respect parametric term selection", {
     expect_setequal(plot_terms, c("s(x)", term))
   }
   expect_setequal(
-    names(assemble(m, data = d, parametric = TRUE)), c("s(x)", "z", "w")
+    names(assemble(m, data = d, parametric = TRUE)), c("s(x)", "z", "fac")
   )
   expect_setequal(
-    names(assemble(m, data = d, parametric = TRUE, terms = c("z", "w"))),
-    c("s(x)", "z", "w")
+    names(assemble(m, data = d, parametric = TRUE, terms = c("z", "fac"))),
+    c("s(x)", "z", "fac")
   )
 })
 
 test_that("parametric defaults respect smooth selection and explicit overrides", {
-  withr::local_seed(43)
-  d <- data.frame(x = runif(100), z = runif(100), w = runif(100))
-  d$y <- sin(6 * d$x) + d$z - d$w + rnorm(100, sd = 0.3)
-  m <- gam(y ~ s(x, k = 6) + z + w, data = d, method = "REML")
+  m <- gamm4_gaussian$gam
+  d <- m$model
 
   for (plotter in list(assemble, function(...) draw(..., wrap = FALSE))) {
-    expect_named(plotter(m), c("s(x)", "z", "w"), ignore.order = TRUE)
-    expect_named(plotter(m, parametric = NULL), c("s(x)", "z", "w"),
+    expect_named(plotter(m), c("s(x)", "z", "fac"), ignore.order = TRUE)
+    expect_named(plotter(m, parametric = NULL), c("s(x)", "z", "fac"),
       ignore.order = TRUE)
     expect_named(plotter(m, parametric = FALSE), "s(x)")
     expect_named(plotter(m, terms = "z"), c("s(x)", "z"))
@@ -39,10 +35,10 @@ test_that("parametric defaults respect smooth selection and explicit overrides",
       expect_named(plotter(m, select = selection), "s(x)")
       expect_named(plotter(m, select = selection, parametric = NULL), "s(x)")
       expect_named(plotter(m, select = selection, parametric = TRUE),
-        c("s(x)", "z", "w"), ignore.order = TRUE)
+        c("s(x)", "z", "fac"), ignore.order = TRUE)
       expect_named(plotter(m, select = selection, parametric = FALSE), "s(x)")
-      expect_named(plotter(m, select = selection, parametric = TRUE, terms = "w"),
-        c("s(x)", "w"))
+      expect_named(plotter(m, select = selection, parametric = TRUE, terms = "fac"),
+        c("s(x)", "fac"))
     }
   }
   expect_length(draw(m), 3L)
@@ -50,16 +46,13 @@ test_that("parametric defaults respect smooth selection and explicit overrides",
 })
 
 test_that("default plotting handles smooth-only and parametric-only models", {
-  withr::local_seed(44)
-  d <- data.frame(x = runif(100), z = runif(100))
-  d$y <- sin(6 * d$x) + d$z + rnorm(100, sd = 0.3)
-  smooth_model <- gam(y ~ s(x, k = 6), data = d, method = "REML")
-  parametric_model <- gam(y ~ z, data = d, method = "REML")
+  smooth_model <- m_1_smooth
+  parametric_model <- sampling_linear_model
 
   for (plotter in list(assemble, function(...) draw(..., wrap = FALSE))) {
     expect_silent(plots <- plotter(smooth_model))
-    expect_named(plots, "s(x)")
+    expect_named(plots, "s(x0)")
     expect_silent(plots <- plotter(parametric_model))
-    expect_named(plots, "z")
+    expect_named(plots, "wt")
   }
 })

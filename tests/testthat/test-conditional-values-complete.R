@@ -1,14 +1,3 @@
-conditional_combos_fixture <- function() {
-  withr::local_seed(42)
-  d <- data.frame(
-    a = factor(rep(c("a", "a", "b"), c(40, 10, 10))),
-    b = factor(rep(c("x", "y", "y"), c(40, 10, 10))),
-    x = runif(60)
-  )
-  d$y <- as.integer(d$a) + as.integer(d$b) + d$x + rnorm(60)
-  list(model = gam(y ~ a + b + x, data = d, method = "REML"), data = d)
-}
-
 test_that("conditional_values filters observed factor combinations", {
   f <- conditional_combos_fixture()
   condition <- c("x", "a", "b")

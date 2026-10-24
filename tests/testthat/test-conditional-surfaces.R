@@ -1,16 +1,3 @@
-conditional_surface_fixture <- function(family = stats::gaussian()) {
-  withr::local_seed(418)
-  d <- data.frame(x = runif(240), z = runif(240), u = runif(240),
-    a = factor(rep(c("A", "B", "C"), 80)),
-    b = factor(rep(c("low", "high"), each = 120)))
-  eta <- 0.3 + sin(4 * d$x) * cos(3 * d$z) +
-    as.integer(d$a) * d$x / 3 + 0.2 * (d$b == "high") + d$u
-  d$y <- if (family$family == "poisson") rpois(nrow(d), exp(eta)) else
-    eta + rnorm(nrow(d), sd = 0.2)
-  mgcv::gam(y ~ a + b + s(x, z, by = a, k = 8) + s(u, k = 4),
-    data = d, family = family, method = "REML")
-}
-
 test_that("grouping selects surfaces without changing existing conditions", {
   m <- conditional_surface_fixture()
   curve <- conditional_values(m, c("x", "z"))
