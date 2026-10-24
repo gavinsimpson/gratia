@@ -1018,6 +1018,12 @@
 
 ## Bug fixes
 
+* `overview()` now returns the parametric coefficients for GAMs without
+  smooth terms, or an empty overview when `parametric = FALSE` (#438).
+
+* `model_terms()` now returns the coefficient name for intercept-only GAMs
+  and models with a single slope and no intercept (#438).
+
 * `fitted_values()` retains small ordinal category probabilities and their
   standard errors at extreme predictor values. Ordinal and multinomial
   intervals remain defined when probabilities round to zero or one, including
