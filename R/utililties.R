@@ -1836,14 +1836,12 @@ multivariate_y <- function() {
   # some people (!) prefix everything with the namespace, so match those too
   smoothers <- c(smoothers, paste0("mgcv::", smoothers))
 
-  # need to apply startsWith(..., smoothers) to each element of x
   vapply(
-    smoothers,
-    FUN = \(prefix, x) startsWith(x, prefix),
-    FUN.VALUE = logical(length(x)),
-    x = x
-  ) |> # an array is returned with 1 row per element of x
-    apply(MARGIN = 1, FUN = any) # do elements of x match any of the prefixes?
+    x,
+    FUN = \(name) any(startsWith(name, smoothers)),
+    FUN.VALUE = logical(1),
+    USE.NAMES = FALSE
+  )
 }
 
 # Decreasing transformations exchange the endpoints of an interval.
