@@ -4,7 +4,22 @@
 \alias{draw.compare_smooths}
 \title{Plot comparisons of smooths}
 \usage{
-\method{draw}{compare_smooths}(object, ncol = NULL, nrow = NULL, guides = "collect", ...)
+\method{draw}{compare_smooths}(
+  object,
+  ncol = NULL,
+  nrow = NULL,
+  guides = "collect",
+  select = NULL,
+  partial_match = FALSE,
+  show = c("models", "difference"),
+  pair = NULL,
+  ci_level = 0.95,
+  surface = c("raster", "tile"),
+  contour = TRUE,
+  n_contour = NULL,
+  continuous_fill = NULL,
+  ...
+)
 }
 \arguments{
 \item{object}{of class \code{"compare_smooths"}, the result of a call to
@@ -13,13 +28,49 @@
 \item{ncol, nrow}{numeric; the numbers of rows and columns over which to
 spread the plots}
 
-\item{guides}{character; one of \code{"keep"} (the default), \code{"collect"}, or
-\code{"auto"}. Passed to \code{\link[patchwork:plot_layout]{patchwork::plot_layout()}}}
+\item{guides}{character; guide handling for the combined plot, passed to
+\code{\link[patchwork:wrap_plots]{patchwork::wrap_plots()}}. The default is \code{"collect"}.}
 
-\item{...}{additional arguments passed to \code{\link[patchwork:wrap_plots]{patchwork::wrap_plots()}}.}
+\item{select, partial_match}{select smooths from the comparison, using the
+conventions of \code{\link[=compare_smooths]{compare_smooths()}}. Numeric and logical selections follow
+the order of unique smooth labels in \code{object}.}
+
+\item{show}{character; \code{"models"} (default) overlays one-variable smooths
+and draws two-variable smooths in side-by-side model facets with fixed axes
+and a shared fill scale. \code{"difference"} draws the estimated difference for
+selected two-variable smooths, using a fill scale centred on zero.}
+
+\item{pair}{two model names or integer indices in input order. In difference
+mode, subtract the second model from the first. With exactly two models,
+the default uses their input order; with more models, supply \code{pair}.}
+
+\item{ci_level}{numeric; coverage for one-variable smooth intervals.}
+
+\item{surface}{character; \code{"raster"} or \code{"tile"} for surface displays.
+Irregular numeric grids use rectangles bounded by coordinate midpoints.}
+
+\item{contour}{logical; add contour lines? These require two numeric axes
+and at least one grid cell with four finite corner values that are not all equal.}
+
+\item{n_contour}{numeric; the number of contour bins. Will result in
+\code{n_contour - 1} contour lines being drawn. See \code{\link[ggplot2:geom_contour]{ggplot2::geom_contour()}}.}
+
+\item{continuous_fill}{a suitable fill scale to be used when plotting
+continuous variables.}
+
+\item{...}{arguments passed to \code{\link[patchwork:wrap_plots]{patchwork::wrap_plots()}}.}
 }
 \description{
 Plot comparisons of smooths
+}
+\details{
+Difference plots match both coordinates and any retained conditioning
+covariates. Locations missing from either model, and missing estimates, remain
+missing. Multiple conditioning values are drawn in separate panels.
+No interval is calculated for the difference: estimates from models fitted
+to the same observations can be correlated, and their separate covariance
+matrices do not supply the covariance between models. See \code{\link[=compare_smooths]{compare_smooths()}}
+for the scale and centring of the compared smooth contributions.
 }
 \section{Label layout}{
 

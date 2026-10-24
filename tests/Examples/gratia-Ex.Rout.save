@@ -496,6 +496,17 @@ detaching ‘package:mgcv’
 > ## notice that the result is a nested tibble
 > 
 > draw(comp)
+> 
+> # Simulate a noisy response over two continuous covariates, x and z
+> surf <- data_sim("eg2", n = 100, seed = 7)
+> # Fit two small bases to the same surface data
+> coarse <- gam(y ~ s(x, z, k = 10), data = surf, method = "REML")
+> fine <- gam(y ~ s(x, z, k = 15), data = surf, method = "REML")
+> # Compare surfaces on shared axes and a shared colour scale
+> surfaces <- compare_smooths(coarse, fine, n_2d = 20)
+> draw(surfaces)
+> # Show coarse minus fine, with a colour scale centred on zero
+> draw(surfaces, show = "difference", pair = c("coarse", "fine"))
 > ## Don't show: 
 > options(op)
 > ## End(Don't show)
