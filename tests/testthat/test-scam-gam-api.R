@@ -95,6 +95,30 @@ test_that("SCAM derivatives match numerical prediction gradients", {
     tolerance = 1e-8, ignore_attr = TRUE)
 })
 
+test_that("SCAM smooth difference derivatives use transformed coefficient covariance", {
+  m <- scam_api_fixture$factor
+  nd <- expand.grid(x = c(.2, .5, .8), z = .4,
+    fac = levels(scam_api_fixture$data$fac))
+  for (order in 1:2) {
+    h <- .001
+    upper <- lower <- nd
+    upper$x <- upper$x + if (order == 1) h / 2 else h
+    lower$x <- lower$x - if (order == 1) h / 2 else h
+    X <- if (order == 1) {
+      (predict(m, upper, type = "lpmatrix") - predict(m, lower, type = "lpmatrix")) / h
+    } else {
+      (predict(m, upper, type = "lpmatrix") - 2 * predict(m, nd, type = "lpmatrix") +
+        predict(m, lower, type = "lpmatrix")) / h^2
+    }
+    K <- X[nd$fac == "a", , drop = FALSE] - X[nd$fac == "b", , drop = FALSE]
+    a <- difference_smooths(m, select = "s(x)", data = nd, order = order, eps = h)
+    expect_equal(a$.diff, as.numeric(K %*% coef(m)), tolerance = 1e-7)
+    expect_equal(a$.se, unname(sqrt(rowSums((K %*% m$Vp.t) * K))), tolerance = 1e-7)
+    expect_s3_class(difference_smooths(m, select = "s(x)", n = 5,
+      order = order, interval = "simultaneous", n_sim = 100, seed = 264), "difference_smooth")
+  }
+})
+
 test_that("SCAM ALE retains the fitted function and its covariance", {
   m <- scam_api_fixture$model
   a <- ale(m, "x", n_bins = 6, center = FALSE)

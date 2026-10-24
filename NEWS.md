@@ -150,6 +150,12 @@
 
 ## New features
 
+* `difference_smooths()` computes first and second derivatives of differences
+  between factor-by smooths using `order`, including partial derivatives across
+  surfaces using `focal`. Intervals retain covariance between the smooths, and
+  `draw()` labels the derivative values; raw-covariate comparisons also allow
+  transformations that depend on the comparison factor (#264, #356).
+
 * `draw_label_control()` provides optional label layout settings across
   `draw()` and `assemble()` methods. Wrap discrete axis labels, legend
   entries and guide titles, stagger discrete tick labels, arrange legend

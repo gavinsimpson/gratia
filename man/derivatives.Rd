@@ -236,6 +236,9 @@ options(op)
 }
 }
 \seealso{
+\code{\link[=difference_smooths]{difference_smooths()}} to compute derivatives of differences
+between factor-by smooths with \code{order = 1} or \code{order = 2}.
+
 \link{gamm4_support}
 }
 \author{

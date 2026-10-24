@@ -3,7 +3,8 @@
 #' Estimates pairwise differences (comparisons) between factor smooth
 #' interactions (smooths with a factor `by` argument) for pairs of groups
 #' defined by the factor. The group means can be optionally included in the
-#' difference.
+#' difference. First and second derivatives of these differences, including
+#' partial derivatives across smooth surfaces, can also be estimated.
 #'
 #' @param model A fitted model.
 #' @param select character, logical, or numeric; which smooths to compare. If
@@ -34,7 +35,15 @@
 #' @param data data frame of locations at which to evaluate the difference
 #'   between smooths.
 #' @param group_means logical; should the group means be included in the
-#'   difference?
+#'   difference? Must be `FALSE` when `order > 0`.
+#' @param order numeric; `0` (the default) estimates smooth differences;
+#'   `1` and `2` estimate their first and second derivatives.
+#' @param focal character; one differentiation coordinate shared by all
+#'   compared smooths. Inferred for univariate smooths; required for
+#'   multivariate smooths when `order > 0`.
+#' @param type character; finite-difference scheme for derivatives. One of
+#'   `"central"` (the default), `"forward"`, or `"backward"`.
+#' @inheritParams derivatives eps wrt
 #' @param partial_match logical; should `smooth` match partially against
 #'   `smooths`? If `partial_match = TRUE`, `smooth` must only be a single
 #'   string, a character vector of length 1. Unlike similar functions, the
@@ -82,6 +91,42 @@
 #' restored on exit. With `seed = NULL`, the current random number state is
 #' used and advanced.
 #'
+#' With `order > 0`, the estimate is the difference between the derivatives
+#' of the selected smooths, on the linear predictor scale. Equivalently, it is
+#' the derivative of their difference. The estimate and its uncertainty are
+#' computed from the difference of the derivative matrices, retaining covariance
+#' between the smooths. Group means are excluded, and tube intervals are
+#' unavailable for derivatives; use simulation for simultaneous intervals.
+#'
+#' For a multivariate smooth, `focal` identifies the coordinate to differentiate.
+#' All other independent coordinates are fixed at their value in each evaluation
+#' row. They can vary between rows, so `data` may describe a full surface or
+#' several slices. `order = 2` differentiates twice with respect to `focal`;
+#' mixed partial derivatives are not supported. Generated grids adjust the
+#' focal range for the finite-difference scheme; supplied evaluation locations
+#' are preserved.
+#'
+#' With `wrt = "covariate"`, model expressions are reevaluated after changing
+#' the raw focal covariate. Generated raw grids use [smooth_data()] and require
+#' each axis to depend on one distinct original covariate. Supply raw `data`
+#' for other transformations. With `wrt = "smooth"`, only the named smooth
+#' coordinate is changed. Derivative controls are ignored when `order = 0`.
+#' Raw-coordinate comparisons match the same original covariates, excluding
+#' the comparison factor. Evaluated smooth coordinates may differ between
+#' factor levels when a transformation involves that factor. The finite-difference
+#' step must fit within the fitted focal range for generated grids, including
+#' grids with only one focal value.
+#'
+#' @return A tibble of class `"difference_smooth"`. Columns `.smooth`, `.by`,
+#'   `.level_1`, and `.level_2` identify each comparison; `.diff` contains the
+#'   estimate for level 1 minus level 2, with `.se`, `.lower_ci`, `.upper_ci`,
+#'   and evaluation covariates. For `order > 0`, `.diff` contains the derivative
+#'   difference and `.focal` names its coordinate. The `derivative_info`
+#'   attribute records `order`, `focal`, `wrt`, `type`, and the resolved step
+#'   `eps`. The `plot_variables` attribute records the plotting axes.
+#'
+#' @seealso [derivatives()], [partial_derivatives()]
+#'
 #' @export
 #' @examples
 #'
@@ -110,6 +155,29 @@
 #' sm_dif3 <- difference_smooths(m,
 #'   select = c("s(x2):fac1", "s(x2):fac2"), partial_match = FALSE
 #' )
+#'
+#' # Compare slopes of the factor-by smooths, retaining their joint uncertainty
+#' slope_dif <- difference_smooths(m, select = "s(x2)", order = 1)
+#' slope_dif
+#' draw(slope_dif)
+#'
+#' # Fit a surface for each factor level to compare rates of change in x2
+#' m2 <- gam(y ~ fac + te(x2, x0, by = fac, k = c(4, 4)),
+#'   data = df, method = "REML")
+#'
+#' # Evaluate partial derivatives of the differences across both covariates
+#' partial_dif <- difference_smooths(m2, select = "te(x2,x0)",
+#'   order = 1, focal = "x2", n_2d = 20)
+#' partial_dif
+#' draw(partial_dif)
+#'
+#' # Choose a surface grid and calibrate simultaneous intervals for each pair
+#' derivative_grid <- data_slice(m2, x2 = evenly(x2, n = 15),
+#'   x0 = evenly(x0, n = 10), fac = levels(fac))
+#' partial_sim <- difference_smooths(m2, select = "te(x2,x0)",
+#'   data = derivative_grid, order = 1, focal = "x2",
+#'   interval = "simultaneous", n_sim = 1000, seed = 42)
+#' partial_sim
 #'
 #' # Choose two axes and condition on the third covariate
 #' m3 <- gam(y ~ fac + te(x0, x1, x2, by = fac, k = c(3, 3, 3)),
@@ -165,11 +233,24 @@
   n_3d = 16,
   n_4d = 4,
   simultaneous_method = c('simulation', 'tube'),
-  simultaneous_domain = NULL, tube_control = list()
+  simultaneous_domain = NULL, tube_control = list(),
+  order = 0L, focal = NULL,
+  type = c("central", "forward", "backward"), eps = NULL,
+  wrt = c("smooth", "covariate")
 ) {
+  if (!is.numeric(order) || length(order) != 1L || is.na(order) ||
+      !order %in% 0:2) {
+    cli::cli_abort("{.arg order} must be 0, 1, or 2.")
+  }
+  if (order > 0L && !identical(group_means, FALSE)) {
+    cli::cli_abort("Derivatives of smooth differences require {.code group_means = FALSE}.")
+  }
   interval <- match.arg(interval)
   simultaneous_method <- resolve_simultaneous_method(simultaneous_method, interval,
     simultaneous_domain, tube_control)
+  if (order > 0L && simultaneous_method == "tube") {
+    cli::cli_abort("Tube intervals are not available for derivatives of smooth differences; use simulation.")
+  }
   if (simultaneous_method == 'tube') tube_check_model(model)
   if (interval == "simultaneous" && simultaneous_method == 'simulation') {
     validate_smooth_interval(interval, ci_level, n_sim, n_cores, seed)
@@ -189,25 +270,20 @@
     stop("Must specify a smooth to difference via 'select'.")
   }
 
-  # smooths in model
-  S <- smooths(model) # vector of smooth labels - "s(x)"
-  # select smooths
-  take <-
-    check_user_select_smooths(
-      smooths = S, select = select,
-      partial_match = partial_match,
-      model_name = expr_label(substitute(object))
-    )
-  sm_ids <- which(take)
-  smooths <- get_smooths_by_id(model, sm_ids)
-  # take only factor by smooths, as we could have a decomposed model with a
-  # main effect smooth and an interaction by smooth
-  is_by <- vapply(smooths, is_factor_by_smooth, logical(1L))
-  if (any(!is_by)) {
-    smooths <- smooths[is_by]
-    sm_ids <- sm_ids[is_by]
+  selection <- difference_smooth_selection(model, select, partial_match)
+  sm_ids <- selection$ids
+  smooths <- selection$smooths
+  if (order > 0L && length(smooths) < 2L) {
+    cli::cli_abort("Select at least two factor-by smooths to compare their derivatives.")
   }
   model <- plan_smooth_variables(model, sm_ids, variables = variables)
+  if (order > 0L) {
+    type <- match.arg(type)
+    wrt <- match.arg(wrt)
+    return(difference_smooth_derivatives(model, select, sm_ids, smooths,
+      data, n, n_2d, n_3d, n_4d, focal, wrt, type, order, eps,
+      unconditional, frequentist, interval, ci_level, n_sim, n_cores, seed))
+  }
   if (is.null(data)) {
     sm_data <- map(sm_ids, function(id) smooth_data(model, id,
       n = n, n_2d = n_2d, n_3d = n_3d, n_4d = n_4d,
@@ -227,41 +303,10 @@
       }
     }
   }
-  if (length(select) == 1L) {
-    by_var <- by_variable(smooths[[1L]])
-    smooth_var <- smooth_variable(smooths[[1L]])
-    pairs <- as_tibble(as.data.frame(t(combn(levels(data[[by_var]]), 2)),
-      stringsAsFactor = FALSE
-    ))
-  } else {
-    # Read factor levels from smooth metadata; function calls can contain
-    # parentheses and punctuation that cannot be parsed as simple labels.
-    # get the smooth variable part
-    smooth_var <- lapply(
-      smooths,
-      \(x) paste(smooth_variable(x), collapse = ",")
-    ) |> unique()
-    if (length(smooth_var) > 1L) {
-      stop("Can't currently compare across smooths of different variables.")
-    } else {
-      # now reset smooth_var so it can be found later
-      smooth_var <- smooth_variable(smooths[[1L]])
-    }
-    # get the by var part
-    by_var <- vapply(smooths, by_variable, character(1L)) |> unique()
-    if (length(unique(by_var)) > 1L) {
-      stop(
-        "Can't currently compare factor-by smooths with different `by`",
-        "variables.")
-    }
-
-    lvls <- unique(vapply(smooths, by_level, character(1L)))
-    # finally compute the pairs
-    pairs <- as_tibble(as.data.frame(t(combn(lvls, 2)),
-      stringsAsFactor = FALSE
-    ))
-  }
-  names(pairs) <- paste0("f", 1:2)
+  comparison <- difference_smooth_pairs(smooths, select, data)
+  by_var <- comparison$by
+  smooth_var <- comparison$variables
+  pairs <- comparison$pairs
 
   Xp <- predict_model(model, newdata = data, type = "lpmatrix")
   V <- get_vcov(model,
@@ -303,6 +348,66 @@
     rep(list(smooth_plot_variables(model, sm_ids[[1L]])),
       length(unique(result$.smooth))), unique(result$.smooth))
   result
+}
+
+# A shared smooth can accompany factor-by terms in a decomposed model.
+difference_smooth_selection <- function(model, select, partial_match) {
+  take <- check_user_select_smooths(smooths(model), select,
+    partial_match = partial_match)
+  ids <- which(take)
+  smooths <- get_smooths_by_id(model, ids)
+  is_by <- vapply(smooths, is_factor_by_smooth, logical(1L))
+  list(ids = ids[is_by], smooths = smooths[is_by])
+}
+
+difference_smooth_pairs <- function(smooths, select, data, derivative = FALSE) {
+  if (length(select) == 1L && !derivative) {
+    by_var <- by_variable(smooths[[1L]])
+    smooth_var <- smooth_variable(smooths[[1L]])
+    pairs <- as_tibble(as.data.frame(t(combn(levels(data[[by_var]]), 2)),
+      stringsAsFactor = FALSE
+    ))
+  } else {
+    # Read factor levels from smooth metadata; function calls can contain
+    # parentheses and punctuation that cannot be parsed as simple labels.
+    # get the smooth variable part
+    smooth_var <- lapply(
+      smooths,
+      \(x) paste(smooth_variable(x), collapse = ",")
+    ) |> unique()
+    if (length(smooth_var) > 1L) {
+      stop("Can't currently compare across smooths of different variables.")
+    } else {
+      # now reset smooth_var so it can be found later
+      smooth_var <- smooth_variable(smooths[[1L]])
+    }
+    # get the by var part
+    by_var <- vapply(smooths, by_variable, character(1L)) |> unique()
+    if (length(unique(by_var)) > 1L) {
+      stop(
+        "Can't currently compare factor-by smooths with different `by`",
+        "variables.")
+    }
+
+    lvls <- unique(vapply(smooths, by_level, character(1L)))
+    if (derivative) {
+      if (length(lvls) != length(smooths)) {
+        cli::cli_abort("Select one smooth for each compared factor level.")
+      }
+      if (length(select) == 1L) {
+        lvls <- intersect(levels(data[[by_var]]), lvls)
+      }
+      if (length(lvls) < 2L) {
+        cli::cli_abort("At least two selected factor levels are required.")
+      }
+    }
+    # finally compute the pairs
+    pairs <- as_tibble(as.data.frame(t(combn(lvls, 2)),
+      stringsAsFactor = FALSE
+    ))
+  }
+  names(pairs) <- paste0("f", 1:2)
+  list(pairs = pairs, by = by_var, variables = smooth_var)
 }
 
 #' @export
@@ -370,11 +475,24 @@
     (c1 | c2)
   }
 
-  ## Match covariate combinations before differencing the factor levels.
+  rows <- difference_smooth_rows(data, by_var, f1, f2, smooth_var)
+  r1 <- rows$first
+  r2 <- rows$second
+
+  # Send only matched rows and active coefficient columns for this pair.
+  list(first = Xp[r1, keep, drop = FALSE], second = Xp[r2, keep, drop = FALSE],
+    V = V[keep, keep, drop = FALSE], coefs = coefs[keep],
+    data = smooth_task_data(data[r1, smooth_var, drop = FALSE]),
+    select = select, by_var = by_var, f1 = f1, f2 = f2,
+    interval = interval, ci_level = ci_level)
+}
+
+# Match covariate combinations before differencing the factor levels.
+difference_smooth_rows <- function(data, by_var, f1, f2, variables) {
   r1 <- which(data[[by_var]] == f1)
   r2 <- which(data[[by_var]] == f2)
-  keys1 <- data[r1, smooth_var, drop = FALSE]
-  keys2 <- data[r2, smooth_var, drop = FALSE]
+  keys1 <- data[r1, variables, drop = FALSE]
+  keys2 <- data[r2, variables, drop = FALSE]
   if (anyDuplicated(keys1) || anyDuplicated(keys2)) {
     stop("Factor levels '", f1, "' and '", f2,
       "' must have unique covariate combinations for the selected smooth.",
@@ -386,21 +504,16 @@
       "' must use the same prediction grid for the selected smooth.",
       call. = FALSE)
   }
-  r2 <- r2[matched]
-
-  # Send only matched rows and active coefficient columns for this pair.
-  list(first = Xp[r1, keep, drop = FALSE], second = Xp[r2, keep, drop = FALSE],
-    V = V[keep, keep, drop = FALSE], coefs = coefs[keep],
-    data = smooth_task_data(data[r1, smooth_var, drop = FALSE]),
-    select = select, by_var = by_var, f1 = f1, f2 = f2,
-    interval = interval, ci_level = ci_level)
+  list(first = r1, second = r2[matched])
 }
 
 calculate_difference <- function(first, second, V, coefs, data, select,
-                                 by_var, f1, f2, interval, ci_level) {
+                                 by_var, f1, f2, interval, ci_level,
+                                 offset = NULL) {
   X <- first - second
   ## compute difference
   sm_diff <- drop(X %*% coefs)
+  if (!is.null(offset)) sm_diff <- sm_diff + offset
   se <- sqrt(rowSums((X %*% V) * X))
   nr <- NROW(X)
   out <- list(

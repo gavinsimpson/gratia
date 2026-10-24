@@ -116,7 +116,9 @@ reference:
 
   - title: Compare smooths and predictions
     desc: >
-      Use `difference_smooths()` for differences between factor-by smooths,
+      Use `difference_smooths()` for differences between factor-by smooths
+      and their first or second derivatives, including partial derivatives
+      across surfaces,
       `conditional_differences()` for contrasts of whole-model predictions,
       and `compare_smooths()` to compare smooth estimates across models.
   - contents:
