@@ -21,16 +21,11 @@ functions
 ``` r
 
 library("gratia")
-library("mgcv")
-#> Loading required package: nlme
-#> This is mgcv 1.9-4. For overview type '?mgcv'.
+load_mgcv()
 library("ggplot2")
 library("dplyr")
 #> 
 #> Attaching package: 'dplyr'
-#> The following object is masked from 'package:nlme':
-#> 
-#>     collapse
 #> The following objects are masked from 'package:stats':
 #> 
 #>     filter, lag

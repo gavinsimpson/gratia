@@ -12,16 +12,15 @@ This article needs the optional package glmmTMB, with support for
 require glmmTMB 1.1.15.2 or later and mgcv 1.9-4. Smooth fitting remains
 experimental in glmmTMB. Its [fitting
 documentation](https://glmmtmb.github.io/glmmTMB/reference/glmmTMB.html)
-recommends `REML = TRUE`. Use an unqualified
-[`s()`](https://rdrr.io/pkg/mgcv/man/s.html) in the formula after
+recommends `REML = TRUE`. Use an unqualified `s()` in the formula after
 attaching mgcv, rather than replacing the smooth with an unpenalised
 spline basis. The smoothing penalty is estimated during fitting.
 
 ``` r
 
-library("mgcv")
-library("glmmTMB")
 library("gratia")
+load_mgcv()
+library("glmmTMB")
 library("ggplot2")
 ```
 

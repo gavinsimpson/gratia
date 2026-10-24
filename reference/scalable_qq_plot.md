@@ -143,16 +143,14 @@ scalable_residuals_hist_plot(
   Residual type; `NULL` follows the model-specific defaults in
   [`appraise()`](https://gavinsimpson.github.io/gratia/reference/appraise.md).
   PIT and quantile residuals are available for supported response
-  distributions. `"surrogate"` is available for
-  [`ocat()`](https://rdrr.io/pkg/mgcv/man/ocat.html) and
-  [`multinom()`](https://rdrr.io/pkg/mgcv/man/multinom.html) GAMs with
-  `method = NULL`: logistic references for ordinal residuals and centred
-  Gumbel references for each nominal category utility. Nominal
-  components always have separate panels. Their residuals are drawn once
-  per observation and shared with ordinary diagnostics. Components are
-  summarised one at a time; QQ bin limits apply to each category.
-  Residuals use category probabilities on the predictor axis, including
-  category 0. See
+  distributions. `"surrogate"` is available for `ocat()` and
+  `multinom()` GAMs with `method = NULL`: logistic references for
+  ordinal residuals and centred Gumbel references for each nominal
+  category utility. Nominal components always have separate panels.
+  Their residuals are drawn once per observation and shared with
+  ordinary diagnostics. Components are summarised one at a time; QQ bin
+  limits apply to each category. Residuals use category probabilities on
+  the predictor axis, including category 0. See
   [`surrogate_residuals()`](https://gavinsimpson.github.io/gratia/reference/surrogate_residuals.md)
   and
   [diagnostic_support](https://gavinsimpson.github.io/gratia/reference/diagnostic_support.md).
@@ -365,7 +363,7 @@ doi:10.1080/10618600.2019.1629942.
 ## Examples
 
 ``` r
-library("mgcv")
+load_mgcv()
 dat <- data_sim("eg1", n = 400, seed = 2)
 m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat)
 scalable_qq_plot(m, seed = 42)

@@ -124,8 +124,8 @@ patchwork. Fitting and simulation cost more than plotting an ordinary
 GAM, so we use modest simulation counts.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://sdmTMB.github.io/sdmTMB/" class="external-link">"sdmTMB"</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st">"mgcv"</span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://gavinsimpson.github.io/gratia/">"gratia"</a></span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/load_mgcv.html">load_mgcv</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://dplyr.tidyverse.org" class="external-link">"dplyr"</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://ggplot2.tidyverse.org" class="external-link">"ggplot2"</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://patchwork.data-imaginist.com" class="external-link">"patchwork"</a></span><span class="op">)</span></span>
@@ -619,8 +619,8 @@ frequency and a positive-tail summary:</p>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> New fields              density_95th    187.    143.    214.     157.   </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> New fields              proportion_zero   0.518   0.414   0.630    0.538</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> Uncertain fitted fields density_95th    161.    144.    182.     157.   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> Uncertain fitted fields proportion_zero   0.542   0.525   0.554    0.538</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> Uncertain fitted fields density_95th    158.    138.    175.     157.   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> Uncertain fitted fields proportion_zero   0.539   0.524   0.559    0.538</span></span></code></pre></div>
 <p>The conditional comparison asks whether new responses around the
 inferred survey fields reproduce these summaries. The marginal
 comparison asks whether new field realisations at the survey locations

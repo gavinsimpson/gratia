@@ -96,9 +96,7 @@
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://gavinsimpson.github.io/gratia/">"gratia"</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st">"mgcv"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Loading required package: nlme</span></span>
-<span><span class="co">#&gt; This is mgcv 1.9-4. For overview type '?mgcv'.</span></span></code></pre></div>
+<span><span class="fu"><a href="../reference/load_mgcv.html">load_mgcv</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>gratia is a package to make working with generalized additive models
 (GAMs) in R easier, including producing plots of estimated smooths using
 the ggplot2 📦.</p>
@@ -124,7 +122,7 @@ often used to illustrate properties of GAMs</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 390 more rows</span></span></span></code></pre></div>
 <p>and the following GAM</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x0</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x1</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x2</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x3</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">df</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu">gam</span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">x0</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x1</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x2</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x3</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">df</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Family: gaussian </span></span>
@@ -237,9 +235,6 @@ example</p>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://dplyr.tidyverse.org" class="external-link">"dplyr"</a></span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Attaching package: 'dplyr'</span></span>
-<span><span class="co">#&gt; The following object is masked from 'package:nlme':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     collapse</span></span>
 <span><span class="co">#&gt; The following objects are masked from 'package:stats':</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;     filter, lag</span></span>

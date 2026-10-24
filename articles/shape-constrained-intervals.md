@@ -10,8 +10,8 @@ functions satisfying coefficient restrictions, including equalities.
 
 ``` r
 
-library("mgcv")
 library("gratia")
+load_mgcv()
 library("ggplot2")
 ```
 

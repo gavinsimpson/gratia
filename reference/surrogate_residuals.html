@@ -105,7 +105,7 @@ The default, <code>NULL</code>, holds fitted random effects fixed in the same wa
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>For <code><a href="https://rdrr.io/pkg/mgcv/man/ocat.html" class="external-link">ocat()</a></code>, a numeric vector with one residual per observation.
+    <p>For <code>ocat()</code>, a numeric vector with one residual per observation.
 For <code>multinom(K)</code>, a numeric matrix with one row per observation and <code>K+1</code>
 columns named <code>"0"</code>, ..., <code>"K"</code>, identifying the category utilities.
 With <code>na.exclude</code>, excluded fitting rows are restored as <code>NA</code>; with
@@ -123,7 +123,7 @@ from this surrogate response.</p>
 model with known parameters, the residuals have a logistic distribution with
 location zero and scale one: mean zero and variance <code>pi^2 / 3</code>. Fitted
 parameters affect this reference approximation. The identity link reported by
-<code><a href="https://rdrr.io/pkg/mgcv/man/ocat.html" class="external-link">ocat()</a></code> describes the latent mean; its latent distribution is logistic.</p>
+<code>ocat()</code> describes the latent mean; its latent distribution is logistic.</p>
 <p>This calculation shares the randomised probabilities used by
 <code><a href="quantile_residuals.html">quantile_residuals()</a></code>, which instead applies <code><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">qnorm()</a></code> for normal scores.
 Both tails are calculated using log probabilities to retain accuracy when
@@ -148,17 +148,17 @@ have independent upper-truncated Gumbel distributions. The sampler uses
 this identity directly, with log calculations that retain accuracy for rare
 observed categories and extreme predictors, without rejection or Gibbs
 iterations. This construction does not impose an ordering on categories.</p>
-<p>Supported fits are <code>gam</code> and <code>bam</code> models with a single <code><a href="https://rdrr.io/pkg/mgcv/man/ocat.html" class="external-link">ocat()</a></code> family,
-and <code>gam</code> models with <code><a href="https://rdrr.io/pkg/mgcv/man/multinom.html" class="external-link">multinom()</a></code>. Grouped families and other model classes
+<p>Supported fits are <code>gam</code> and <code>bam</code> models with a single <code>ocat()</code> family,
+and <code>gam</code> models with <code>multinom()</code>. Grouped families and other model classes
 are not supported. Fitted random effects are held fixed. Use
 <code>type = "surrogate"</code> in <code><a href="appraise.html">appraise()</a></code>, <code><a href="qq_plot.html">qq_plot()</a></code>, <code><a href="worm_plot.html">worm_plot()</a></code> and
 residual plots. QQ and worm plots require <code>method = NULL</code>, with logistic
-references for <code><a href="https://rdrr.io/pkg/mgcv/man/ocat.html" class="external-link">ocat()</a></code> and centred Gumbel references for <code><a href="https://rdrr.io/pkg/mgcv/man/multinom.html" class="external-link">multinom()</a></code>.
+references for <code>ocat()</code> and centred Gumbel references for <code>multinom()</code>.
 Pointwise order-statistic bands apply separately to each utility component,
 treating fitted parameters as fixed. They do not give simultaneous coverage
 across categories. Components are always shown separately, including when
-<code>by_family = FALSE</code>. For <code><a href="https://rdrr.io/pkg/mgcv/man/ocat.html" class="external-link">ocat()</a></code>, <code><a href="residuals_linpred_plot.html">residuals_linpred_plot()</a></code> uses the fitted
-latent mean. For <code><a href="https://rdrr.io/pkg/mgcv/man/multinom.html" class="external-link">multinom()</a></code>, it uses each category's fitted probability;
+<code>by_family = FALSE</code>. For <code>ocat()</code>, <code><a href="residuals_linpred_plot.html">residuals_linpred_plot()</a></code> uses the fitted
+latent mean. For <code>multinom()</code>, it uses each category's fitted probability;
 observed-versus-fitted panels compare that probability with its category
 indicator. This also gives category 0 a varying horizontal axis despite its
 fixed utility location. Covariate plots separate the category utilities.
@@ -193,12 +193,12 @@ Models: A Surrogate Approach. Journal of the American Statistical Association,
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st">"mgcv"</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="load_mgcv.html">load_mgcv</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">359</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">200</span>, <span class="op">-</span><span class="fl">2</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">latent</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">sin</a></span><span class="op">(</span><span class="va">dat</span><span class="op">$</span><span class="va">x</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Logistic.html" class="external-link">rlogis</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">dat</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">dat</span><span class="op">$</span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/findInterval.html" class="external-link">findInterval</a></span><span class="op">(</span><span class="va">latent</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">0</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fl">1L</span></span></span>
-<span class="r-in"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">dat</span>, family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/ocat.html" class="external-link">ocat</a></span><span class="op">(</span>R <span class="op">=</span> <span class="fl">4</span><span class="op">)</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu">gam</span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">dat</span>, family <span class="op">=</span> <span class="fu">ocat</span><span class="op">(</span>R <span class="op">=</span> <span class="fl">4</span><span class="op">)</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu">surrogate_residuals</span><span class="op">(</span><span class="va">fit</span>, seed <span class="op">=</span> <span class="fl">42</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1]  3.8326093  0.8855870 -0.3476107  0.1092911 -0.4888706  1.4880031</span>
 <span class="r-in"><span><span class="fu"><a href="appraise.html">appraise</a></span><span class="op">(</span><span class="va">fit</span>, type <span class="op">=</span> <span class="st">"surrogate"</span>, seed <span class="op">=</span> <span class="fl">42</span><span class="op">)</span></span></span>

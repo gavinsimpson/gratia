@@ -82,11 +82,10 @@ simulate(
 - ...:
 
   arguments passed to methods. `simulate.gam()` and `simulate.scam()`
-  pass `...` on to
-  [`predict.gam()`](https://rdrr.io/pkg/mgcv/man/predict.gam.html). As
-  such you can pass additional arguments such as `terms`, `exclude`, to
-  select which model terms are included in the predictions. This may be
-  useful, for example, for excluding the effects of random effect terms.
+  pass `...` on to `predict.gam()`. As such you can pass additional
+  arguments such as `terms`, `exclude`, to select which model terms are
+  included in the predictions. This may be useful, for example, for
+  excluding the effects of random effect terms.
 
 - data:
 
@@ -100,11 +99,10 @@ simulate(
   fitting weights; a single value applies to every observation. With
   `data = NULL`, the default is the fitted prior weights, except
   factor-valued binomial responses retain one Bernoulli trial per
-  observation. Native
-  [`gaulss()`](https://rdrr.io/pkg/mgcv/man/gaulss.html) ignores fitting
-  weights in its likelihood, so its default response weights are ones;
-  explicit sampling weights still override this. With prediction data,
-  the default is a vector of ones. For ordinary Gaussian and Gamma
+  observation. Native `gaulss()` ignores fitting weights in its
+  likelihood, so its default response weights are ones; explicit
+  sampling weights still override this. With prediction data, the
+  default is a vector of ones. For ordinary Gaussian and Gamma
   responses, larger weights reduce response variance (precision
   weights). For binomial responses, weights give integer trial counts.
   Include positions restored by `na.exclude` when supplying weights for
@@ -132,9 +130,8 @@ simulate(
   Fitted predictions integrate response means over new zero-mean
   Gaussian effects. Response samplers draw new effects before sampling
   responses. Smoothing parameters and dispersion remain fixed. Only
-  ordinary [`gam()`](https://rdrr.io/pkg/mgcv/man/gam.html) and
-  [`bam()`](https://rdrr.io/pkg/mgcv/man/bam.html) fits with a scalar
-  response mean are supported.
+  ordinary `gam()` and `bam()` fits with a scalar response mean are
+  supported.
 
 ## Value
 
@@ -189,9 +186,8 @@ random generators retain their usual treatment of prior weights.
 Ordered-categorical and `ziP` components are simulated from their latent
 predictors. General families with multiple linear predictors and matrix
 responses encoding censoring or binomial counts are outside the scope
-supported by [`gfam()`](https://rdrr.io/pkg/mgcv/man/gfam.html). Scalar
-censored-family components produce draws from their uncensored latent
-distributions.
+supported by `gfam()`. Scalar censored-family components produce draws
+from their uncensored latent distributions.
 
 ## See also
 

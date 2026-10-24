@@ -124,7 +124,7 @@ Society: Series B*, **85**, 842–868.
 ## Examples
 
 ``` r
-library("mgcv")
+load_mgcv()
 set.seed(4)
 dat <- data.frame(x = seq(0, 1, length.out = 100))
 dat$y <- sin(6 * dat$x) + rnorm(100, sd = 0.2)

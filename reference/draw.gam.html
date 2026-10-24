@@ -679,8 +679,8 @@ parameter for mgcv models. Single-predictor models omit these automatic
 labels; by-variable information and custom subtitles are still shown.
 Constant glmmTMB dispersion
 alone does not count as an additional predictor.
-For example, <code><a href="https://rdrr.io/pkg/mgcv/man/gaulss.html" class="external-link">gaulss()</a></code> uses "Mean (mu)" and "Standard deviation (sigma)",
-while <code><a href="https://rdrr.io/pkg/mgcv/man/twlss.html" class="external-link">twlss()</a></code> uses "Mean (mu)", "Power (p)" and "Dispersion (phi)".
+For example, <code>gaulss()</code> uses "Mean (mu)" and "Standard deviation (sigma)",
+while <code>twlss()</code> uses "Mean (mu)", "Power (p)" and "Dispersion (phi)".
 Shared smooths name each predictor to which they contribute. Families without
 a known parameter mapping use numbered linear predictors. The existing smooth
 titles and <code>select</code> values are unchanged, and all smooths are drawn by default.
@@ -709,7 +709,7 @@ obtain fitted boundaries. Polar plots of transformed cyclic covariates
 require <code>back_transform = FALSE</code>.</p>
 <p>Random-effect tensor plots put continuous covariates before factors. Two
 continuous covariates form a surface, with remaining factor levels and numeric
-slices forming conditioning panels, consistently for <code><a href="https://rdrr.io/pkg/mgcv/man/te.html" class="external-link">te()</a></code>, <code><a href="https://rdrr.io/pkg/mgcv/man/te.html" class="external-link">ti()</a></code> and <code><a href="https://rdrr.io/pkg/mgcv/man/t2.html" class="external-link">t2()</a></code>.
+slices forming conditioning panels, consistently for <code>te()</code>, <code>ti()</code> and <code>t2()</code>.
 One continuous covariate gives curves for categorical combinations;
 categorical-only terms give point ranges. Up to four covariates are supported.
 Numeric conditioning slices use <code>n_3d</code> or <code>n_4d</code>. For factor conditioning
@@ -770,14 +770,14 @@ plot lists. See <code><a href="draw_label_control.html">draw_label_control()</a>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Simulate data and fit a GAM</span></span></span>
 <span class="r-in"><span><span class="va">df1</span> <span class="op">&lt;-</span> <span class="fu"><a href="data_sim.html">data_sim</a></span><span class="op">(</span><span class="st">"eg1"</span>, n <span class="op">=</span> <span class="fl">200</span>, dist <span class="op">=</span> <span class="st">"normal"</span>, scale <span class="op">=</span> <span class="fl">2</span>, seed <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">m1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x0</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x1</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x2</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x3</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">df1</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">m1</span> <span class="op">&lt;-</span> <span class="fu">gam</span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">x0</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x1</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x2</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x3</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">df1</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Plot all smooths</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="va">m1</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="draw.gam-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Draw a complete cycle in polar coordinates, using fitted knot boundaries</span></span></span>
-<span class="r-in"><span><span class="va">m_cycle</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x0</span>, bs <span class="op">=</span> <span class="st">"cc"</span>, k <span class="op">=</span> <span class="fl">10</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">df1</span>,</span></span>
+<span class="r-in"><span><span class="va">m_cycle</span> <span class="op">&lt;-</span> <span class="fu">gam</span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">x0</span>, bs <span class="op">=</span> <span class="st">"cc"</span>, k <span class="op">=</span> <span class="fl">10</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">df1</span>,</span></span>
 <span class="r-in"><span>  knots <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>x0 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="va">m_cycle</span>, cyclic <span class="op">=</span> <span class="st">"polar"</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="draw.gam-2.png" alt="" width="700" height="433"></span>

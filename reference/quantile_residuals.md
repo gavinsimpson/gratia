@@ -229,9 +229,7 @@ the unbounded end, respectively. Quantile residuals apply
 [`qnorm()`](https://rdrr.io/r/stats/Normal.html) to these PIT values.
 Uncensored continuous observations use `F(y)`; uncensored Poisson
 observations are randomised between `F(y - 1)` and `F(y)`. Use
-non-integer censoring limits for
-[`cpois()`](https://rdrr.io/pkg/mgcv/man/cpois.html), as recommended by
-mgcv.
+non-integer censoring limits for `cpois()`, as recommended by mgcv.
 
 For grouped-family GAMs fitted with
 [`mgcv::gfam()`](https://rdrr.io/pkg/mgcv/man/gfam.html), each

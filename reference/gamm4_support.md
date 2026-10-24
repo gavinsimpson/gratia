@@ -53,10 +53,9 @@ uncertainty-corrected covariance matrices and alternative EDF are
 unavailable from gamm4; requested corrections warn and fall back to the
 available covariance matrix or EDF. Variance components are extracted
 from the mixed-model component. Smooth components use the same penalty
-scale and labels as [`gam()`](https://rdrr.io/pkg/mgcv/man/gam.html) and
-[`bam()`](https://rdrr.io/pkg/mgcv/man/bam.html), with a separate row
-for each penalty of a tensor or factor smooth. Additional random effects
-retain their mixed-model variances. Confidence intervals use likelihood
+scale and labels as `gam()` and `bam()`, with a separate row for each
+penalty of a tensor or factor smooth. Additional random effects retain
+their mixed-model variances. Confidence intervals use likelihood
 profiles by default; use `interval_method = "none"` to obtain estimates
 only. Gaussian profiles use a maximum-likelihood refit even when the
 reported estimates were fitted by REML. See

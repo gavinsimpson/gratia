@@ -39,9 +39,8 @@ with `family = poisson()` to sample mgcv's Poisson example.
 `dx` and `dz` columns give the true partial derivatives.
 
 `sc_location_scale` uses log mean `sin(pi * x) / 2` and log dispersion
-`-2 + z`, returned in `f` and `f_scale`. It defaults to
-[`gammals()`](https://rdrr.io/pkg/mgcv/man/gammals.html) and records
-derivatives in `d1`, `d2` and `d_scale`. Constraints act on the
+`-2 + z`, returned in `f` and `f_scale`. It defaults to `gammals()` and
+records derivatives in `d1`, `d2` and `d_scale`. Constraints act on the
 specified predictors; in particular the concavity concerns the log mean.
 
 The recipes use the default `bs = 0` for fitting without bootstrap
@@ -57,7 +56,7 @@ draws, fit with a positive `bs`, such as `bs = 100`.
 ## Examples
 
 ``` r
-library("mgcv")
+load_mgcv()
 d <- data_sim("sc_increasing", n = 200, seed = 2)
 m <- scasm(y ~ s(x, bs = "sc", xt = "m+", k = 8), data = d)
 

@@ -17,16 +17,11 @@ We’ll need the following packages for this article
 
 ``` r
 
-library("mgcv")
-#> Loading required package: nlme
-#> This is mgcv 1.9-4. For overview type '?mgcv'.
 library("gratia")
+load_mgcv()
 library("dplyr")
 #> 
 #> Attaching package: 'dplyr'
-#> The following object is masked from 'package:nlme':
-#> 
-#>     collapse
 #> The following objects are masked from 'package:stats':
 #> 
 #>     filter, lag
@@ -175,8 +170,7 @@ ds1
 
 Having created the data slice, we can predict from the model using the
 combination of covariate values specified in our slice. We could use
-[`predict.gam()`](https://rdrr.io/pkg/mgcv/man/predict.gam.html) for
-this, but the
+`predict.gam()` for this, but the
 [`fitted_values()`](https://gavinsimpson.github.io/gratia/reference/fitted_values.md)
 function in {gratia} is easier to use, especially for non-Gaussian
 models
@@ -554,8 +548,7 @@ If you want to evaluate the surface over `x` at fixed `z` conditional
 upon other values of other covariates (model predicted or fitted values)
 then
 [`fitted_samples()`](https://gavinsimpson.github.io/gratia/reference/fitted_samples.md)
-is a tidy wrapper to
-[`predict.gam()`](https://rdrr.io/pkg/mgcv/man/predict.gam.html).
+is a tidy wrapper to `predict.gam()`.
 
 For single `z` we have
 
@@ -597,7 +590,6 @@ included as well as its uncertainty.
 [^1]: at least that’s what I’m calling them.
 
 [^2]: Depending on the value of argument `drop.unused.levels` passed to
-    [`gam()`](https://rdrr.io/pkg/mgcv/man/gam.html) when you fitted the
-    model. The default will drop any unused levels before fitting the
-    model, and as a result the helpers will not include those levels
-    either.
+    `gam()` when you fitted the model. The default will drop any unused
+    levels before fitting the model, and as a result the helpers will
+    not include those levels either.

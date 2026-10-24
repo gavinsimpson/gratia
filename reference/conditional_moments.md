@@ -93,7 +93,7 @@ and the plotting channels of
 ## Examples
 
 ``` r
-library("mgcv")
+load_mgcv()
 m <- gam(mpg ~ s(wt, k = 5), data = mtcars, method = "REML")
 conditional_moments(m, condition = "wt", moments = c("mean", "variance")) |>
   draw()

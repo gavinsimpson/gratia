@@ -152,7 +152,7 @@ the median value is used,</p></li>
 <li><p>for factor covariates, the modal (most frequently observed) level is used,
 or the first level (sorted as per the vector returned by <code><a href="https://rdrr.io/r/base/levels.html" class="external-link">base::levels()</a></code>
 if several levels are observed the same number of times.</p></li>
-</ul><p>These values are already computed when calling <code><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam()</a></code> or <code><a href="https://rdrr.io/pkg/mgcv/man/bam.html" class="external-link">bam()</a></code> for example
+</ul><p>These values are already computed when calling <code>gam()</code> or <code>bam()</code> for example
 and can be found in the <code>var.summary</code> component of the fitted model. Function
 <code><a href="typical_values.html">typical_values()</a></code> will extract these values for you if you are interested.</p>
 <p>Convenience functions <code><a href="evenly.html">evenly()</a></code>, <code><a href="ref_level.html">ref_level()</a></code>, and <code><a href="ref_level.html">level()</a></code> are provided
@@ -185,7 +185,7 @@ covariates in the model but not named in the slice.</p></div>
 <span class="r-in"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="data_sim.html">data_sim</a></span><span class="op">(</span><span class="st">"eg1"</span>, n <span class="op">=</span> <span class="fl">50</span>, seed <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># fit a GAM with 1 smooth and 1 linear term</span></span></span>
-<span class="r-in"><span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x2</span>, k <span class="op">=</span> <span class="fl">7</span><span class="op">)</span> <span class="op">+</span> <span class="va">x1</span>, data <span class="op">=</span> <span class="va">df</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu">gam</span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">x2</span>, k <span class="op">=</span> <span class="fl">7</span><span class="op">)</span> <span class="op">+</span> <span class="va">x1</span>, data <span class="op">=</span> <span class="va">df</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Want to predict over f(x2) while holding `x1` at some value.</span></span></span>
 <span class="r-in"><span><span class="co"># Default will use the observation closest to the median for unspecified</span></span></span>

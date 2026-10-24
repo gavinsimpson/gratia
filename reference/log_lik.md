@@ -149,7 +149,7 @@ smoothing-parameter uncertainty is unavailable.
 ## Examples
 
 ``` r
-library("mgcv")
+load_mgcv()
 m <- gam(mpg ~ s(wt, k = 5), data = mtcars, method = "REML")
 ll <- log_lik(m, n_draws = 500, seed = 42)
 dim(ll)

@@ -283,7 +283,7 @@ distribution function (CDF) of the underlying response. Left and right
 censoring use probabilities zero and one for the unbounded end, respectively.
 Quantile residuals apply <code><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">qnorm()</a></code> to these PIT values. Uncensored continuous
 observations use <code>F(y)</code>; uncensored Poisson observations are randomised between
-<code>F(y - 1)</code> and <code>F(y)</code>. Use non-integer censoring limits for <code><a href="https://rdrr.io/pkg/mgcv/man/cpois.html" class="external-link">cpois()</a></code>, as
+<code>F(y - 1)</code> and <code>F(y)</code>. Use non-integer censoring limits for <code>cpois()</code>, as
 recommended by mgcv.</p>
 <p>For grouped-family GAMs fitted with <code><a href="https://rdrr.io/pkg/mgcv/man/gfam.html" class="external-link">mgcv::gfam()</a></code>, each observation uses its
 component's CDF, fitted nuisance parameters, dispersion and weights. Residuals

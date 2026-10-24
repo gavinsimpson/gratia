@@ -113,11 +113,10 @@ scalable_residuals_covariate_plot(
 
   character or `NULL`; residual type: `"deviance"`, `"pearson"`,
   `"response"`, `"pit"`, `"quantile"`, `"dharma"`, or `"surrogate"` (for
-  [`ocat()`](https://rdrr.io/pkg/mgcv/man/ocat.html) or
-  [`multinom()`](https://rdrr.io/pkg/mgcv/man/multinom.html) GAMs).
-  Grouped models automatically use quantile residuals when all active
-  components are supported, otherwise all use deviance residuals with a
-  message. Ordinary models retain deviance residuals by default. See
+  `ocat()` or `multinom()` GAMs). Grouped models automatically use
+  quantile residuals when all active components are supported, otherwise
+  all use deviance residuals with a message. Ordinary models retain
+  deviance residuals by default. See
   [`appraise()`](https://gavinsimpson.github.io/gratia/reference/appraise.md)
   for distributional support.
 
@@ -302,7 +301,7 @@ each requested plot.
 ## Examples
 
 ``` r
-library("mgcv")
+load_mgcv()
 dat <- data_sim("eg1", n = 400, seed = 2)
 m <- gam(y ~ x2 + s(x0) + s(x1), data = dat, method = "REML")
 # A curve against x2 suggests reconsidering its linear effect.

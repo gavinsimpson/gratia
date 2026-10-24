@@ -10,8 +10,8 @@ noisy version of `x`, so the two are positively correlated. We generate
 
 ``` r
 
-library("mgcv")
 library("gratia")
+load_mgcv()
 
 set.seed(2026)
 dat <- data.frame(x = runif(360, -1, 1), w = runif(360),

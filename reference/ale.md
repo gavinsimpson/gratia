@@ -260,7 +260,7 @@ Statistical Society: Series B, 82, 1059–1086.
 ## Examples
 
 ``` r
-library("mgcv")
+load_mgcv()
 df <- data_sim("eg1", n = 200, seed = 42)
 m <- gam(y ~ s(x0) + te(x1, x2, k = c(5, 5)) + s(x3),
   data = df, method = "REML")

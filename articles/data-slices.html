@@ -106,16 +106,11 @@ its <code><a href="../reference/data_slice.html">data_slice()</a></code> functio
 features of your fitted GAMs.</p>
 <p>We’ll need the following packages for this article</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st">"mgcv"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Loading required package: nlme</span></span>
-<span><span class="co">#&gt; This is mgcv 1.9-4. For overview type '?mgcv'.</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://gavinsimpson.github.io/gratia/">"gratia"</a></span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://gavinsimpson.github.io/gratia/">"gratia"</a></span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/load_mgcv.html">load_mgcv</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://dplyr.tidyverse.org" class="external-link">"dplyr"</a></span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Attaching package: 'dplyr'</span></span>
-<span><span class="co">#&gt; The following object is masked from 'package:nlme':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     collapse</span></span>
 <span><span class="co">#&gt; The following objects are masked from 'package:stats':</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;     filter, lag</span></span>
@@ -156,8 +151,8 @@ covariates</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">plant</span> <span class="op">&lt;-</span> <span class="va">plant</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>tt <span class="op">=</span> <span class="fu"><a href="https://forcats.tidyverse.org/reference/fct_cross.html" class="external-link">fct_cross</a></span><span class="op">(</span><span class="va">treatment</span>, <span class="va">type</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">m_plant</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="va">uptake</span> <span class="op">~</span> <span class="va">treatment</span> <span class="op">*</span> <span class="va">type</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">conc</span>, by <span class="op">=</span> <span class="va">tt</span>, k <span class="op">=</span> <span class="fl">6</span><span class="op">)</span> <span class="op">+</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">plant</span>, bs <span class="op">=</span> <span class="st">"re"</span><span class="op">)</span>,</span>
+<span><span class="va">m_plant</span> <span class="op">&lt;-</span> <span class="fu">gam</span><span class="op">(</span><span class="va">uptake</span> <span class="op">~</span> <span class="va">treatment</span> <span class="op">*</span> <span class="va">type</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">conc</span>, by <span class="op">=</span> <span class="va">tt</span>, k <span class="op">=</span> <span class="fl">6</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu">s</span><span class="op">(</span><span class="va">plant</span>, bs <span class="op">=</span> <span class="st">"re"</span><span class="op">)</span>,</span>
 <span>  data <span class="op">=</span> <span class="va">plant</span>, method <span class="op">=</span> <span class="st">"REML"</span>, family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">Gamma</a></span><span class="op">(</span>link <span class="op">=</span> <span class="st">"log"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/overview.html">overview</a></span><span class="op">(</span><span class="va">m_plant</span><span class="op">)</span></span>
@@ -236,7 +231,7 @@ correct level explicitly for <code>tt</code></p>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 90 more rows</span></span></span></code></pre></div>
 <p>Having created the data slice, we can predict from the model using
 the combination of covariate values specified in our slice. We could use
-<code><a href="https://rdrr.io/pkg/mgcv/man/predict.gam.html" class="external-link">predict.gam()</a></code> for this, but the
+<code>predict.gam()</code> for this, but the
 <code><a href="../reference/fitted_values.html">fitted_values()</a></code> function in {gratia} is easier to use,
 especially for non-Gaussian models</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
@@ -372,11 +367,11 @@ and</li>
 <code>"level"</code> from the factor <code>fct</code>.</li>
 </ul>
 <p>In all cases involving factors, the helper functions set the levels
-of the factor to match those in the original model fit<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;Depending on the value of argument
-&lt;code&gt;drop.unused.levels&lt;/code&gt; passed to &lt;code&gt;&lt;a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link"&gt;gam()&lt;/a&gt;&lt;/code&gt; when you
+of the factor to match those in the original model fit<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content="&lt;p&gt;Depending on the value of argument
+&lt;code&gt;drop.unused.levels&lt;/code&gt; passed to &lt;code&gt;gam()&lt;/code&gt; when you
 fitted the model. The default will drop any unused levels before fitting
 the model, and as a result the helpers will not include those levels
-either.&lt;/p&gt;'><sup>2</sup></a>.</p>
+either.&lt;/p&gt;"><sup>2</sup></a>.</p>
 <p>The second argument to <code><a href="../reference/data_slice.html">data_slice()</a></code> is
 <code>...</code></p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
@@ -481,7 +476,7 @@ values that do not occur in the observed data.</p>
 <span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/data_sim.html">data_sim</a></span><span class="op">(</span><span class="st">"eg2"</span>, n <span class="op">=</span> <span class="fl">1000</span>, scale <span class="op">=</span> <span class="fl">0.25</span>, seed <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># fit the GAM</span></span>
-<span><span class="va">m_biv</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/te.html" class="external-link">te</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">z</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">df</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">m_biv</span> <span class="op">&lt;-</span> <span class="fu">gam</span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu">te</span><span class="op">(</span><span class="va">x</span>, <span class="va">z</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">df</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span></code></pre></div>
 <p>The aim of the example will be to create a univariate data slice
 through the 2D smooth at user-specified values of <code>x</code> while
 holding <code>z</code> at one or more fixed values. We could visualise
@@ -566,7 +561,7 @@ shouldn’t make too much difference.</p>
 <p>If you want to evaluate the surface over <code>x</code> at fixed
 <code>z</code> conditional upon other values of other covariates (model
 predicted or fitted values) then <code><a href="../reference/fitted_samples.html">fitted_samples()</a></code> is a tidy
-wrapper to <code><a href="https://rdrr.io/pkg/mgcv/man/predict.gam.html" class="external-link">predict.gam()</a></code>.</p>
+wrapper to <code>predict.gam()</code>.</p>
 <p>For single <code>z</code> we have</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/fitted_values.html">fitted_values</a></span><span class="op">(</span><span class="va">m_biv</span>, data <span class="op">=</span> <span class="va">ds3</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="co"># default is response scale, not link</span></span>

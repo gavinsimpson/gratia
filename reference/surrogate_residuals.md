@@ -42,12 +42,11 @@ surrogate_residuals(model, seed = NULL, ...)
 
 ## Value
 
-For [`ocat()`](https://rdrr.io/pkg/mgcv/man/ocat.html), a numeric vector
-with one residual per observation. For `multinom(K)`, a numeric matrix
-with one row per observation and `K+1` columns named `"0"`, ..., `"K"`,
-identifying the category utilities. With `na.exclude`, excluded fitting
-rows are restored as `NA`; with `na.omit`, only observations used for
-fitting are returned.
+For `ocat()`, a numeric vector with one residual per observation. For
+`multinom(K)`, a numeric matrix with one row per observation and `K+1`
+columns named `"0"`, ..., `"K"`, identifying the category utilities.
+With `na.exclude`, excluded fitting rows are restored as `NA`; with
+`na.omit`, only observations used for fitting are returned.
 
 ## Details
 
@@ -63,9 +62,8 @@ probabilities `Pr(Y < y)` and `Pr(Y <= y)`, then apply
 assumed model with known parameters, the residuals have a logistic
 distribution with location zero and scale one: mean zero and variance
 `pi^2 / 3`. Fitted parameters affect this reference approximation. The
-identity link reported by
-[`ocat()`](https://rdrr.io/pkg/mgcv/man/ocat.html) describes the latent
-mean; its latent distribution is logistic.
+identity link reported by `ocat()` describes the latent mean; its latent
+distribution is logistic.
 
 This calculation shares the randomised probabilities used by
 [`quantile_residuals()`](https://gavinsimpson.github.io/gratia/reference/quantile_residuals.md),
@@ -98,30 +96,24 @@ rare observed categories and extreme predictors, without rejection or
 Gibbs iterations. This construction does not impose an ordering on
 categories.
 
-Supported fits are `gam` and `bam` models with a single
-[`ocat()`](https://rdrr.io/pkg/mgcv/man/ocat.html) family, and `gam`
-models with [`multinom()`](https://rdrr.io/pkg/mgcv/man/multinom.html).
-Grouped families and other model classes are not supported. Fitted
-random effects are held fixed. Use `type = "surrogate"` in
+Supported fits are `gam` and `bam` models with a single `ocat()` family,
+and `gam` models with `multinom()`. Grouped families and other model
+classes are not supported. Fitted random effects are held fixed. Use
+`type = "surrogate"` in
 [`appraise()`](https://gavinsimpson.github.io/gratia/reference/appraise.md),
 [`qq_plot()`](https://gavinsimpson.github.io/gratia/reference/qq_plot.md),
 [`worm_plot()`](https://gavinsimpson.github.io/gratia/reference/worm_plot.md)
 and residual plots. QQ and worm plots require `method = NULL`, with
-logistic references for
-[`ocat()`](https://rdrr.io/pkg/mgcv/man/ocat.html) and centred Gumbel
-references for
-[`multinom()`](https://rdrr.io/pkg/mgcv/man/multinom.html). Pointwise
-order-statistic bands apply separately to each utility component,
-treating fitted parameters as fixed. They do not give simultaneous
-coverage across categories. Components are always shown separately,
-including when `by_family = FALSE`. For
-[`ocat()`](https://rdrr.io/pkg/mgcv/man/ocat.html),
+logistic references for `ocat()` and centred Gumbel references for
+`multinom()`. Pointwise order-statistic bands apply separately to each
+utility component, treating fitted parameters as fixed. They do not give
+simultaneous coverage across categories. Components are always shown
+separately, including when `by_family = FALSE`. For `ocat()`,
 [`residuals_linpred_plot()`](https://gavinsimpson.github.io/gratia/reference/residuals_linpred_plot.md)
-uses the fitted latent mean. For
-[`multinom()`](https://rdrr.io/pkg/mgcv/man/multinom.html), it uses each
-category's fitted probability; observed-versus-fitted panels compare
-that probability with its category indicator. This also gives category 0
-a varying horizontal axis despite its fixed utility location. Covariate
+uses the fitted latent mean. For `multinom()`, it uses each category's
+fitted probability; observed-versus-fitted panels compare that
+probability with its category indicator. This also gives category 0 a
+varying horizontal axis despite its fixed utility location. Covariate
 plots separate the category utilities. The ordered correlation helpers
 do not yet accept multinomial utilities.
 
@@ -164,7 +156,7 @@ Statistical Association, 113(522), 845–854.
 ## Examples
 
 ``` r
-library("mgcv")
+load_mgcv()
 set.seed(359)
 dat <- data.frame(x = runif(200, -2, 2))
 latent <- sin(dat$x) + rlogis(nrow(dat))

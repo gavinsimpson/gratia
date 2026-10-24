@@ -43,12 +43,10 @@ are natural distribution parameters, which can differ from the fitting
 package's native response predictions. For example, Gaussian LSS output
 contains standard deviation, whereas mgcv predicts reciprocal standard
 deviation. GEV location is not its expectation. `link` describes the
-native representation: for example,
-[`ziplss()`](https://rdrr.io/pkg/mgcv/man/ziplss.html) uses an identity
-link for log rate, while natural rate is the exponential of that
-predictor. The sinh-arcsinh skewness and tailweight parameters control
-distribution shape; they are not the response's standardized skewness
-and kurtosis.
+native representation: for example, `ziplss()` uses an identity link for
+log rate, while natural rate is the exponential of that predictor. The
+sinh-arcsinh skewness and tailweight parameters control distribution
+shape; they are not the response's standardized skewness and kurtosis.
 
 [`link()`](https://gavinsimpson.github.io/gratia/reference/link.md) and
 [`inv_link()`](https://gavinsimpson.github.io/gratia/reference/link.md)

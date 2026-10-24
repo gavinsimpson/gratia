@@ -25,8 +25,8 @@ final interval estimates.
 
 ``` r
 
-library("mgcv")
 library("gratia")
+load_mgcv()
 library("dplyr")
 library("ggplot2")
 ```
@@ -57,8 +57,7 @@ ggplot(survey, aes(woodland, observed)) +
 The binary panel contains only zero and one. The count panel has a wider
 range and variance that grows with the mean. A binomial family with one
 trial and a Poisson family are appropriate for the simulated protocols.
-For real counts, extra variation may require
-[`nb()`](https://rdrr.io/pkg/mgcv/man/negbin.html) instead of Poisson;
+For real counts, extra variation may require `nb()` instead of Poisson;
 residual checks help assess that choice.
 
 ## Share the smooth, retain different intercepts and links
@@ -268,15 +267,14 @@ no useful survey question.
 
 ## Limits when extending the model
 
-[`gfam()`](https://rdrr.io/pkg/mgcv/man/gfam.html) accepts ordinary and
-extended mgcv families with a scalar response, including negative
-binomial, Tweedie, beta, scaled-t and ordered categories. Gratia
-response simulation uses each component’s fitted parameters and can
-simulate ordered-category codes. Response-scale fitted draws for ordinal
-components remain unsupported because an ordinal response requires a
-vector of category probabilities; link-scale fitted draws are available.
-General families with several linear predictors are not
-[`gfam()`](https://rdrr.io/pkg/mgcv/man/gfam.html) components.
+`gfam()` accepts ordinary and extended mgcv families with a scalar
+response, including negative binomial, Tweedie, beta, scaled-t and
+ordered categories. Gratia response simulation uses each component’s
+fitted parameters and can simulate ordered-category codes.
+Response-scale fitted draws for ordinal components remain unsupported
+because an ordinal response requires a vector of category probabilities;
+link-scale fitted draws are available. General families with several
+linear predictors are not `gfam()` components.
 
 Missing required predictors or membership give missing predictions.
 Missing responses alone do not prevent prediction. With `na.exclude`,

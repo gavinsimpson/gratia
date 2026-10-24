@@ -238,9 +238,8 @@ fitted_samples(
   Fitted predictions integrate response means over new zero-mean
   Gaussian effects. Response samplers draw new effects before sampling
   responses. Smoothing parameters and dispersion remain fixed. Only
-  ordinary [`gam()`](https://rdrr.io/pkg/mgcv/man/gam.html) and
-  [`bam()`](https://rdrr.io/pkg/mgcv/man/bam.html) fits with a scalar
-  response mean are supported.
+  ordinary `gam()` and `bam()` fits with a scalar response mean are
+  supported.
 
 - integration:
 
@@ -314,14 +313,13 @@ parameters.
 
 Use `quantity = "expectation"` for expected responses labelled
 `"expectation"`. This includes Gumbel, GEV and sinh-arcsinh mean
-adjustments and the zero-truncated Poisson adjustment in
-[`ziplss()`](https://rdrr.io/pkg/mgcv/man/ziplss.html). A GEV
-expectation does not exist at shape \>= 1; parameter and response draws
-remain available. Categorical expectations are category probabilities,
-not numeric category scores. `.category` identifies categories, and `.y`
-identifies multivariate responses. Multinomial link output includes a
-zero reference predictor. Ordinal parameter output is the latent
-location predictor; its thresholds are global parameters.
+adjustments and the zero-truncated Poisson adjustment in `ziplss()`. A
+GEV expectation does not exist at shape \>= 1; parameter and response
+draws remain available. Categorical expectations are category
+probabilities, not numeric category scores. `.category` identifies
+categories, and `.y` identifies multivariate responses. Multinomial link
+output includes a zero reference predictor. Ordinal parameter output is
+the latent location predictor; its thresholds are global parameters.
 
 The `prediction_info` attribute records the quantity, scale and resolved
 parameter descriptions. Unlike
@@ -346,11 +344,9 @@ components. Grouped expectations include scalar fitted means and ordinal
 category probabilities, with `.category` identifying the ordinal
 category and `NA` for scalar components. Distributional nuisance
 parameters are held at their fitted values. This does not add support
-for general/location-scale families that
-[`gfam()`](https://rdrr.io/pkg/mgcv/man/gfam.html) itself rejects, nor
+for general/location-scale families that `gfam()` itself rejects, nor
 repair upstream fitting failures (including fixed-theta
-negative-binomial components and some
-[`ziP()`](https://rdrr.io/pkg/mgcv/man/ziP.html) fits in some mgcv
+negative-binomial components and some `ziP()` fits in some mgcv
 versions).
 
 Observation rows use the same missing-value convention as

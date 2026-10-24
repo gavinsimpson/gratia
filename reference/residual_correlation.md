@@ -83,9 +83,8 @@ number of finite observation pairs used at each lag.
 Use `type = "dharma"` and `n_dharma` for simulation-based PIT residuals
 on the uniform scale; see
 [`dharma_residuals()`](https://gavinsimpson.github.io/gratia/reference/dharma_residuals.md).
-Use `type = "surrogate"` for
-[`ocat()`](https://rdrr.io/pkg/mgcv/man/ocat.html) models to calculate
-correlations of residuals on the latent logistic scale; see
+Use `type = "surrogate"` for `ocat()` models to calculate correlations
+of residuals on the latent logistic scale; see
 [`surrogate_residuals()`](https://gavinsimpson.github.io/gratia/reference/surrogate_residuals.md).
 
 BAM's generalized estimating equations (GEE) AR1 correction acts on the

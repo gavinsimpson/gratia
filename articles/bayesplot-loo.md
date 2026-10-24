@@ -16,10 +16,8 @@ also require bayesplot’s optional rstantools package; install it with
 
 ``` r
 
-library("mgcv")
-#> Loading required package: nlme
-#> This is mgcv 1.9-4. For overview type '?mgcv'.
 library("gratia")
+load_mgcv()
 set.seed(278)
 dat <- data.frame(x = runif(100, -1, 1))
 dat$y <- rpois(nrow(dat), exp(.3 + sin(3 * dat$x)))

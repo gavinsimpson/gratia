@@ -20,17 +20,17 @@ the truth.
 |----|----|
 | Family | Generating parameters |
 | [`gaussian()`](https://rdrr.io/r/stats/family.html) | `dispersion = 1`, the non-negative variance |
-| [`poisson()`](https://rdrr.io/r/stats/family.html), [`cpois()`](https://rdrr.io/pkg/mgcv/man/cpois.html) | None |
+| [`poisson()`](https://rdrr.io/r/stats/family.html), `cpois()` | None |
 | [`binomial()`](https://rdrr.io/r/stats/family.html) | `trials = 1`, positive integer trial counts |
 | [`Gamma()`](https://rdrr.io/r/stats/family.html), [`inverse.gaussian()`](https://rdrr.io/r/stats/family.html) | `dispersion = 1` |
-| [`nb()`](https://rdrr.io/pkg/mgcv/man/negbin.html), [`negbin()`](https://rdrr.io/pkg/mgcv/man/negbin.html) | `theta`, positive size; `Inf` gives the Poisson limit |
-| [`tw()`](https://rdrr.io/pkg/mgcv/man/Tweedie.html), [`Tweedie()`](https://rdrr.io/pkg/mgcv/man/Tweedie.html) | `power` in (1, 2), and `dispersion = 1` |
-| [`betar()`](https://rdrr.io/pkg/mgcv/man/Beta.html) | Positive `precision` |
-| [`scat()`](https://rdrr.io/pkg/mgcv/man/scat.html) | `df` above the family's `min.df`, and positive t scale `sigma` |
-| [`ocat()`](https://rdrr.io/pkg/mgcv/man/ocat.html) | Finite increasing `cuts`, one fewer than the categories |
-| [`ziP()`](https://rdrr.io/pkg/mgcv/man/ziP.html) | `intercept` and natural-scale `slope` above the constructor's `b` |
-| [`cnorm()`](https://rdrr.io/pkg/mgcv/man/cnorm.html), [`clog()`](https://rdrr.io/pkg/mgcv/man/clog.html) | Positive `sigma`, Gaussian SD or logistic scale |
-| [`bcg()`](https://rdrr.io/pkg/mgcv/man/bcg.html) | `lambda = 0` and positive log-response SD `sigma` |
+| `nb()`, `negbin()` | `theta`, positive size; `Inf` gives the Poisson limit |
+| `tw()`, `Tweedie()` | `power` in (1, 2), and `dispersion = 1` |
+| `betar()` | Positive `precision` |
+| `scat()` | `df` above the family's `min.df`, and positive t scale `sigma` |
+| `ocat()` | Finite increasing `cuts`, one fewer than the categories |
+| `ziP()` | `intercept` and natural-scale `slope` above the constructor's `b` |
+| `cnorm()`, `clog()` | Positive `sigma`, Gaussian SD or logistic scale |
+| `bcg()` | `lambda = 0` and positive log-response SD `sigma` |
 
 Dispersion and trials can have length one or `n`. All other
 scalar-family parameters are constant across observations. Fixed
@@ -43,8 +43,7 @@ Constructor starting values for an estimated parameter are not used as
 generating truth. A size range in `negbin(c(1, 10))` also requires an
 explicit generating `theta`.
 
-For [`ziP()`](https://rdrr.io/pkg/mgcv/man/ziP.html),
-`lambda = exp(eta)` and
+For `ziP()`, `lambda = exp(eta)` and
 `P(Y > 0) = 1 - exp(-exp(intercept + slope * eta))`. Positive
 observations follow a Poisson distribution conditioned on being
 positive. The natural `slope` includes the constructor's lower bound
@@ -70,63 +69,47 @@ predictors, not the `mu` arguments of mgcv's random-number generators.
 |  |  |
 |----|----|
 | Family | Predictor order and natural parameters recorded in truth |
-| [`gaulss()`](https://rdrr.io/pkg/mgcv/man/gaulss.html) | Mean, SD predictor; records `mu`, `sigma` |
-| [`gammals()`](https://rdrr.io/pkg/mgcv/man/gammals.html) | Log mean, log-dispersion predictor; records `mu`, `dispersion` |
-| [`gumbls()`](https://rdrr.io/pkg/mgcv/man/gumbls.html) | Location, log-scale predictor; records `location`, `mu` (mean), `sigma` |
-| [`gevlss()`](https://rdrr.io/pkg/mgcv/man/gevlss.html) | Location, log scale, shape predictor; records `location`, `sigma`, `shape` |
-| [`shash()`](https://rdrr.io/pkg/mgcv/man/shash.html) | Location, scale predictor, skewness, log tail; records `location`, `sigma`, `skewness`, `tail` |
-| [`twlss()`](https://rdrr.io/pkg/mgcv/man/twlss.html) | Mean predictor, power predictor, log dispersion; records `mu`, `power`, `dispersion` |
-| [`ziplss()`](https://rdrr.io/pkg/mgcv/man/ziplss.html) | Log Poisson intensity, complementary log-log presence predictor; records `lambda`, `presence` |
+| `gaulss()` | Mean, SD predictor; records `mu`, `sigma` |
+| `gammals()` | Log mean, log-dispersion predictor; records `mu`, `dispersion` |
+| `gumbls()` | Location, log-scale predictor; records `location`, `mu` (mean), `sigma` |
+| `gevlss()` | Location, log scale, shape predictor; records `location`, `sigma`, `shape` |
+| `shash()` | Location, scale predictor, skewness, log tail; records `location`, `sigma`, `skewness`, `tail` |
+| `twlss()` | Mean predictor, power predictor, log dispersion; records `mu`, `power`, `dispersion` |
+| `ziplss()` | Log Poisson intensity, complementary log-log presence predictor; records `lambda`, `presence` |
 | `multinom(K)` | K logits relative to category 0; records category `probabilities` |
 | `mvn(d)` | d response means; `parameters$covariance` defaults to the identity matrix |
 
-These families need no scalar generating parameters except
-[`mvn()`](https://rdrr.io/pkg/mgcv/man/mvn.html)'s optional positive
-definite covariance matrix. In
-[`shash()`](https://rdrr.io/pkg/mgcv/man/shash.html), the transformed
-normal is multiplied by `tail * sigma`, following mgcv's
-parameterisation. In
-[`gumbls()`](https://rdrr.io/pkg/mgcv/man/gumbls.html), the mean is
-location plus Euler's constant times `sigma`; the first predictor
-specifies the location. For
-[`gevlss()`](https://rdrr.io/pkg/mgcv/man/gevlss.html), the default
-shape link restricts shape to (-1, 0.5); the identity link allows any
-finite shape. In [`ziplss()`](https://rdrr.io/pkg/mgcv/man/ziplss.html),
-positive counts follow a zero-truncated Poisson distribution.
+These families need no scalar generating parameters except `mvn()`'s
+optional positive definite covariance matrix. In `shash()`, the
+transformed normal is multiplied by `tail * sigma`, following mgcv's
+parameterisation. In `gumbls()`, the mean is location plus Euler's
+constant times `sigma`; the first predictor specifies the location. For
+`gevlss()`, the default shape link restricts shape to (-1, 0.5); the
+identity link allows any finite shape. In `ziplss()`, positive counts
+follow a zero-truncated Poisson distribution.
 
 ## Default predictors
 
 Let `g` be the template's `f` before distribution transformations.
 Scalar Gaussian, t, Gaussian-censoring, logistic-censoring and Box-Cox
 families use natural location `g`. Binomial and beta means are
-`plogis((g - 5) / 5)`; ordinal location is `g - mean(g)`; the
-[`ziP()`](https://rdrr.io/pkg/mgcv/man/ziP.html) predictor is `g / 5`.
-Other scalar means are `exp(g / 5)`. Each mean is transformed with the
-supplied family's link. If it is outside that link's domain, supply
-custom predictors rather than relying on a default.
+`plogis((g - 5) / 5)`; ordinal location is `g - mean(g)`; the `ziP()`
+predictor is `g / 5`. Other scalar means are `exp(g / 5)`. Each mean is
+transformed with the supplied family's link. If it is outside that
+link's domain, supply custom predictors rather than relying on a
+default.
 
-For general families, default predictors are: `(g, 0)` for
-[`gaulss()`](https://rdrr.io/pkg/mgcv/man/gaulss.html) and
-[`gumbls()`](https://rdrr.io/pkg/mgcv/man/gumbls.html); `(g / 5, 0)` for
-[`gammals()`](https://rdrr.io/pkg/mgcv/man/gammals.html) and
-[`ziplss()`](https://rdrr.io/pkg/mgcv/man/ziplss.html);
-`(g, 0, linkfun(0))` for
-[`gevlss()`](https://rdrr.io/pkg/mgcv/man/gevlss.html) (zero shape under
-the supplied shape link); `(g, 0, 0, 0)` for
-[`shash()`](https://rdrr.io/pkg/mgcv/man/shash.html); and
-`(g / 5, 0, 0)` for
-[`twlss()`](https://rdrr.io/pkg/mgcv/man/twlss.html). Multivariate
-normal means repeat `g`. Multinomial logit j is
+For general families, default predictors are: `(g, 0)` for `gaulss()`
+and `gumbls()`; `(g / 5, 0)` for `gammals()` and `ziplss()`;
+`(g, 0, linkfun(0))` for `gevlss()` (zero shape under the supplied shape
+link); `(g, 0, 0, 0)` for `shash()`; and `(g / 5, 0, 0)` for `twlss()`.
+Multivariate normal means repeat `g`. Multinomial logit j is
 `(g - mean(g)) / 5 * j / K`. The `sc_location_scale` template instead
-supplies its own log mean and log dispersion for
-[`gammals()`](https://rdrr.io/pkg/mgcv/man/gammals.html).
+supplies its own log mean and log dispersion for `gammals()`.
 
 ## Censoring and survival
 
-For [`cnorm()`](https://rdrr.io/pkg/mgcv/man/cnorm.html),
-[`clog()`](https://rdrr.io/pkg/mgcv/man/clog.html),
-[`cpois()`](https://rdrr.io/pkg/mgcv/man/cpois.html) and
-[`bcg()`](https://rdrr.io/pkg/mgcv/man/bcg.html), `observation` can
+For `cnorm()`, `clog()`, `cpois()` and `bcg()`, `observation` can
 contain finite `left` and `right` detection limits and a positive
 `interval_width`. Responses outside detection limits are left or right
 censored. Other responses are placed in rounding intervals wholly inside
@@ -135,15 +118,13 @@ Omitting `observation` returns complete responses.
 
 Matrix responses use equal entries for exact observations,
 `(limit, -Inf)` for left censoring, `(limit, Inf)` for right censoring,
-and `(lower, upper)` for intervals.
-[`bcg()`](https://rdrr.io/pkg/mgcv/man/bcg.html) instead uses zero in
-the second entry for left censoring; its limits must be positive.
-Poisson detection limits must be non-integer, and interval widths must
-be integer numbers of counts. Its intervals use half-integer endpoints
-to avoid ambiguity at count values.
+and `(lower, upper)` for intervals. `bcg()` instead uses zero in the
+second entry for left censoring; its limits must be positive. Poisson
+detection limits must be non-integer, and interval widths must be
+integer numbers of counts. Its intervals use half-integer endpoints to
+avoid ambiguity at count values.
 
-[`cox.ph()`](https://rdrr.io/pkg/mgcv/man/coxph.html) uses Weibull
-cumulative baseline hazard
+`cox.ph()` uses Weibull cumulative baseline hazard
 `H0(t) = (t / baseline_scale)^baseline_shape`, with both baseline
 parameters defaulting to 1. Event times have survival
 `exp(-H0(t) * exp(eta))`. Independent exponential censoring has

@@ -224,8 +224,8 @@ smoothing parameter can still have an interval when the model scale is
 estimated. The scale is included as a separate row when its uncertainty is
 available. Unavailable intervals are <code>NA</code>.</p>
 <p>For <code><a href="https://rdrr.io/pkg/mgcv/man/gamm.html" class="external-link">mgcv::gamm()</a></code> fits, components are extracted from <code>lme</code>. Smooth
-variances are expressed on the same penalty scale as for <code><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam()</a></code> and
-<code><a href="https://rdrr.io/pkg/mgcv/man/bam.html" class="external-link">bam()</a></code>, with one row per penalty. Additional random effects have one row
+variances are expressed on the same penalty scale as for <code>gam()</code> and
+<code>bam()</code>, with one row per penalty. Additional random effects have one row
 per coefficient variance, labelled by grouping factor and coefficient;
 their covariances are omitted. Intervals use <code><a href="https://rdrr.io/pkg/nlme/man/intervals.html" class="external-link">nlme::intervals()</a></code> when the
 fitted covariance parameters support this calculation. Bounds are <code>NA</code>
@@ -252,7 +252,7 @@ the linear predictor, evaluated over the observations used to fit the model.
 Parametric formula terms are included, with all coefficients of a factor,
 polynomial or interaction combined into one term. Each smooth has one row,
 including smooths with several penalties. Additional random effects in
-<code><a href="https://rdrr.io/pkg/mgcv/man/gamm.html" class="external-link">gamm()</a></code> and <code>gamm4()</code> contribute one component per grouping factor and
+<code>gamm()</code> and <code>gamm4()</code> contribute one component per grouping factor and
 coefficient, evaluated at their fitted values. Formula terms follow the
 model's contrast coding. Duplicated component labels receive numeric suffixes.</p>
 <p>Term variances and covariances use equal observation weights and the sample

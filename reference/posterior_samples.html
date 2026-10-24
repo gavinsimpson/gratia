@@ -290,7 +290,7 @@ for the gratia MH backend. Use zero to force blockwise evaluation.</p></dd>
 explicit vector overrides the fitting weights; a single value applies to
 every observation. With <code>data = NULL</code>, the default is the fitted prior
 weights, except factor-valued binomial responses retain one Bernoulli trial
-per observation. Native <code><a href="https://rdrr.io/pkg/mgcv/man/gaulss.html" class="external-link">gaulss()</a></code> ignores fitting weights in its likelihood,
+per observation. Native <code>gaulss()</code> ignores fitting weights in its likelihood,
 so its default response weights are also ones; explicitly supplied sampling
 weights still override this default. With prediction data, weights default
 to a vector of ones.
@@ -312,8 +312,8 @@ in <code>data</code>; observed response values are not required.</p></dd>
 supported <code>re</code> and <code>fs</code> terms; character vectors select exact smooth labels.
 Fitted predictions integrate response means over new zero-mean Gaussian
 effects. Response samplers draw new effects before sampling responses.
-Smoothing parameters and dispersion remain fixed. Only ordinary <code><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam()</a></code>
-and <code><a href="https://rdrr.io/pkg/mgcv/man/bam.html" class="external-link">bam()</a></code> fits with a scalar response mean are supported.</p></dd>
+Smoothing parameters and dispersion remain fixed. Only ordinary <code>gam()</code>
+and <code>bam()</code> fits with a scalar response mean are supported.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -352,7 +352,7 @@ an error.</p>
 Every distribution parameter is computed from the same joint coefficient
 draw. Formula offsets and prescribed smooth contributions are retained.
 Evaluation data need predictors and formula-offset variables, but no
-observed response. mgcv natively represents the second <code><a href="https://rdrr.io/pkg/mgcv/man/gaulss.html" class="external-link">gaulss()</a></code> parameter
+observed response. mgcv natively represents the second <code>gaulss()</code> parameter
 as reciprocal standard deviation: response sampling uses SD, divided by the square
 root of the sampling weight. Other LSS generators currently ignore sampling
 weights, following their mgcv implementations. Parameters represented by

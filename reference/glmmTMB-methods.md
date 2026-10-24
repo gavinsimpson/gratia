@@ -231,7 +231,7 @@ for the available settings.
 
 ``` r
 if (requireNamespace("glmmTMB", quietly = TRUE)) {
-  library("mgcv")
+  load_mgcv()
   set.seed(42)
   d <- data.frame(x = runif(150))
   d$y <- sin(6 * d$x) + rnorm(150, sd = 0.2)

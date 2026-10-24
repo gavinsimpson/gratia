@@ -371,7 +371,7 @@ The following models illustrate why the quantity must be explicit:
 
 ``` r
 
-library("mgcv")
+load_mgcv()
 set.seed(426)
 d <- data.frame(x = runif(200), y = rnorm(200))
 gev_fit <- gam(list(y ~ x, ~1, ~1), data = d, family = gevlss())

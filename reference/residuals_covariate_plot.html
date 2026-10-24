@@ -170,7 +170,7 @@ fitting call only when needed and verifying them in the same way.</p></dd>
 <dt id="arg-type">type<a class="anchor" aria-label="anchor" href="#arg-type"></a></dt>
 <dd><p>character or <code>NULL</code>; residual type: <code>"deviance"</code>, <code>"pearson"</code>,
 <code>"response"</code>, <code>"pit"</code>, <code>"quantile"</code>, <code>"dharma"</code>, or <code>"surrogate"</code> (for
-<code><a href="https://rdrr.io/pkg/mgcv/man/ocat.html" class="external-link">ocat()</a></code> or <code><a href="https://rdrr.io/pkg/mgcv/man/multinom.html" class="external-link">multinom()</a></code> GAMs). Grouped models automatically use
+<code>ocat()</code> or <code>multinom()</code> GAMs). Grouped models automatically use
 quantile residuals when all active components are supported, otherwise all
 use deviance residuals with a message. Ordinary models retain deviance
 residuals by default. See <code><a href="appraise.html">appraise()</a></code> for distributional support.</p></dd>
@@ -337,9 +337,9 @@ reported and omitted separately for each requested plot.</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st">"mgcv"</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="load_mgcv.html">load_mgcv</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="data_sim.html">data_sim</a></span><span class="op">(</span><span class="st">"eg1"</span>, n <span class="op">=</span> <span class="fl">400</span>, seed <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="va">x2</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x0</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x1</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">dat</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu">gam</span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="va">x2</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x0</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x1</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">dat</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># A curve against x2 suggests reconsidering its linear effect.</span></span></span>
 <span class="r-in"><span><span class="fu">residuals_covariate_plot</span><span class="op">(</span><span class="va">m</span>, covariates <span class="op">=</span> <span class="st">"x2"</span>, type <span class="op">=</span> <span class="st">"pearson"</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="residuals_covariate_plot-1.png" alt="" width="700" height="433"></span>

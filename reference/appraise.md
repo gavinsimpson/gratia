@@ -174,13 +174,12 @@ appraise(
 
   character or `NULL`; residual type: `"deviance"`, `"response"`,
   `"pearson"`, `"pit"`, `"quantile"`, `"dharma"`, or `"surrogate"` (for
-  [`ocat()`](https://rdrr.io/pkg/mgcv/man/ocat.html) or
-  [`multinom()`](https://rdrr.io/pkg/mgcv/man/multinom.html) GAMs).
-  `NULL` uses the model-specific default: deviance for ordinary
-  lm/glm/GAM fits, and quantile for supported grouped families, GJRM,
-  sdmTMB and full mixed-model checks. glmmTMB uses Pearson residuals
-  conditionally and response residuals marginally. Extracted GAM
-  components follow the ordinary GAM defaults. See
+  `ocat()` or `multinom()` GAMs). `NULL` uses the model-specific
+  default: deviance for ordinary lm/glm/GAM fits, and quantile for
+  supported grouped families, GJRM, sdmTMB and full mixed-model checks.
+  glmmTMB uses Pearson residuals conditionally and response residuals
+  marginally. Extracted GAM components follow the ordinary GAM defaults.
+  See
   [diagnostic_support](https://gavinsimpson.github.io/gratia/reference/diagnostic_support.md).
 
 - n_bins:
@@ -393,13 +392,10 @@ components are supported. Unrecognised custom-family bounds remain
 unsupported. A custom CDF must also support the probabilities just below
 discrete values and at censoring limits. Replacements for recognised
 family CDFs must use the same arguments and probability conventions.
-Scalar uncensored [`cnorm()`](https://rdrr.io/pkg/mgcv/man/cnorm.html),
-[`clog()`](https://rdrr.io/pkg/mgcv/man/clog.html) and
-[`cpois()`](https://rdrr.io/pkg/mgcv/man/cpois.html) components are
+Scalar uncensored `cnorm()`, `clog()` and `cpois()` components are
 supported; genuine censoring requires recoverable, aligned censoring
-bounds. Matrix censored responses rejected by
-[`gfam()`](https://rdrr.io/pkg/mgcv/man/gfam.html) and upstream fitting
-failures are not repaired.
+bounds. Matrix censored responses rejected by `gfam()` and upstream
+fitting failures are not repaired.
 
 Use `response = NULL` to check every grouped-family component or a
 single integer to select a component by its position in the

@@ -8,8 +8,8 @@ interpret gratia’s effect displays.
 
 ``` r
 
-library("mgcv")
 library("gratia")
+load_mgcv()
 library("ggplot2")
 ```
 

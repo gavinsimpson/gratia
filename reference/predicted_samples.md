@@ -84,16 +84,15 @@ predicted_samples(
   overrides the fitting weights; a single value applies to every
   observation. With `data = NULL`, the default is the fitted prior
   weights, except factor-valued binomial responses retain one Bernoulli
-  trial per observation. Native
-  [`gaulss()`](https://rdrr.io/pkg/mgcv/man/gaulss.html) ignores fitting
-  weights in its likelihood, so its default response weights are also
-  ones; explicitly supplied sampling weights still override this
-  default. With prediction data, weights default to a vector of ones.
-  For ordinary Gaussian and Gamma responses, larger weights reduce
-  response variance (precision weights). For binomial responses, weights
-  give integer trial counts. They do not alter the fitted coefficient
-  covariance. Include positions restored by `na.exclude` when supplying
-  weights for fitting rows.
+  trial per observation. Native `gaulss()` ignores fitting weights in
+  its likelihood, so its default response weights are also ones;
+  explicitly supplied sampling weights still override this default. With
+  prediction data, weights default to a vector of ones. For ordinary
+  Gaussian and Gamma responses, larger weights reduce response variance
+  (precision weights). For binomial responses, weights give integer
+  trial counts. They do not alter the fitted coefficient covariance.
+  Include positions restored by `na.exclude` when supplying weights for
+  fitting rows.
 
 - marginalise:
 
@@ -102,9 +101,8 @@ predicted_samples(
   Fitted predictions integrate response means over new zero-mean
   Gaussian effects. Response samplers draw new effects before sampling
   responses. Smoothing parameters and dispersion remain fixed. Only
-  ordinary [`gam()`](https://rdrr.io/pkg/mgcv/man/gam.html) and
-  [`bam()`](https://rdrr.io/pkg/mgcv/man/bam.html) fits with a scalar
-  response mean are supported.
+  ordinary `gam()` and `bam()` fits with a scalar response mean are
+  supported.
 
 ## Value
 

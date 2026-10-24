@@ -11,8 +11,8 @@ simulation describes its measurement protocol and response distribution.
 
 ``` r
 
-library("mgcv")
 library("gratia")
+load_mgcv()
 library("ggplot2")
 ```
 

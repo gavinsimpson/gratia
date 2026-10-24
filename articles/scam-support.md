@@ -9,9 +9,9 @@ estimates, bases, derivatives, predictions and sampled smooths.
 
 ``` r
 
-library("mgcv")
-library("scam")
 library("gratia")
+load_mgcv()
+library("scam")
 
 set.seed(46)
 d <- data.frame(x = runif(200), z = runif(200))

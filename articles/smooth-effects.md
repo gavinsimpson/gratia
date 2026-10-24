@@ -11,8 +11,8 @@ measurements to read interaction surfaces.
 
 ``` r
 
-library("mgcv")
 library("gratia")
+load_mgcv()
 library("ggplot2")
 ```
 

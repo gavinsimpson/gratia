@@ -16,8 +16,8 @@ this count and check that the limit is stable.
 
 ``` r
 
-library("mgcv")
 library("gratia")
+load_mgcv()
 library("dplyr")
 library("ggplot2")
 ```

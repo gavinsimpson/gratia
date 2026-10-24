@@ -117,8 +117,8 @@ presentation. All are gratia dependencies. The example has 600
 observations and uses 200 coefficient draws; increase the latter for
 final interval estimates.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st">"mgcv"</span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://gavinsimpson.github.io/gratia/">"gratia"</a></span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://gavinsimpson.github.io/gratia/">"gratia"</a></span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/load_mgcv.html">load_mgcv</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://dplyr.tidyverse.org" class="external-link">"dplyr"</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://ggplot2.tidyverse.org" class="external-link">"ggplot2"</a></span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
@@ -144,7 +144,7 @@ final interval estimates.</p>
 wider range and variance that grows with the mean. A binomial family
 with one trial and a Poisson family are appropriate for the simulated
 protocols. For real counts, extra variation may require
-<code><a href="https://rdrr.io/pkg/mgcv/man/negbin.html" class="external-link">nb()</a></code> instead of Poisson; residual checks help assess that
+<code>nb()</code> instead of Poisson; residual checks help assess that
 choice.</p>
 </div>
 <div class="section level2">
@@ -156,8 +156,8 @@ factor <code>source</code> supplies different intercepts. A single
 <code>s(woodland)</code> supplies the shared effect on both linear
 predictors, and REML estimates its smoothness.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">joint</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">observed</span>, <span class="va">family_id</span><span class="op">)</span> <span class="op">~</span> <span class="va">source</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">woodland</span>, k <span class="op">=</span> <span class="fl">10</span><span class="op">)</span>,</span>
-<span>  data <span class="op">=</span> <span class="va">survey</span>, family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gfam.html" class="external-link">gfam</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">binomial</a></span><span class="op">(</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">poisson</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">joint</span> <span class="op">&lt;-</span> <span class="fu">gam</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">observed</span>, <span class="va">family_id</span><span class="op">)</span> <span class="op">~</span> <span class="va">source</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">woodland</span>, k <span class="op">=</span> <span class="fl">10</span><span class="op">)</span>,</span>
+<span>  data <span class="op">=</span> <span class="va">survey</span>, family <span class="op">=</span> <span class="fu">gfam</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">binomial</a></span><span class="op">(</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">poisson</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">joint</span>, parametric <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="gfam-support_files/figure-html/fit-1.png" class="r-plt" alt="" width="700"></p>
 <p>A positive smooth contribution multiplies the expected count by
@@ -175,9 +175,9 @@ explicitly described survey protocols.</p>
 reasonable. A model with different smooths provides a useful comparison
 when the surveys have enough information to estimate them:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">separate</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">observed</span>, <span class="va">family_id</span><span class="op">)</span> <span class="op">~</span> <span class="va">source</span> <span class="op">+</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">woodland</span>, by <span class="op">=</span> <span class="va">source</span>, k <span class="op">=</span> <span class="fl">10</span><span class="op">)</span>,</span>
-<span>  data <span class="op">=</span> <span class="va">survey</span>, family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gfam.html" class="external-link">gfam</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">binomial</a></span><span class="op">(</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">poisson</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">separate</span> <span class="op">&lt;-</span> <span class="fu">gam</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">observed</span>, <span class="va">family_id</span><span class="op">)</span> <span class="op">~</span> <span class="va">source</span> <span class="op">+</span></span>
+<span>    <span class="fu">s</span><span class="op">(</span><span class="va">woodland</span>, by <span class="op">=</span> <span class="va">source</span>, k <span class="op">=</span> <span class="fl">10</span><span class="op">)</span>,</span>
+<span>  data <span class="op">=</span> <span class="va">survey</span>, family <span class="op">=</span> <span class="fu">gfam</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">binomial</a></span><span class="op">(</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">poisson</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">separate</span>, parametric <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="gfam-support_files/figure-html/different-responses-1.png" class="r-plt" alt="" width="700"></p>
 <p>Compare the shapes and their uncertainty, particularly at the ends of
@@ -306,14 +306,14 @@ no useful survey question.</p>
 <div class="section level2">
 <h2 id="limits-when-extending-the-model">Limits when extending the model<a class="anchor" aria-label="anchor" href="#limits-when-extending-the-model"></a>
 </h2>
-<p><code><a href="https://rdrr.io/pkg/mgcv/man/gfam.html" class="external-link">gfam()</a></code> accepts ordinary and extended mgcv families with
+<p><code>gfam()</code> accepts ordinary and extended mgcv families with
 a scalar response, including negative binomial, Tweedie, beta, scaled-t
 and ordered categories. Gratia response simulation uses each component’s
 fitted parameters and can simulate ordered-category codes.
 Response-scale fitted draws for ordinal components remain unsupported
 because an ordinal response requires a vector of category probabilities;
 link-scale fitted draws are available. General families with several
-linear predictors are not <code><a href="https://rdrr.io/pkg/mgcv/man/gfam.html" class="external-link">gfam()</a></code> components.</p>
+linear predictors are not <code>gfam()</code> components.</p>
 <p>Missing required predictors or membership give missing predictions.
 Missing responses alone do not prevent prediction. With
 <code>na.exclude</code>, excluded fitting rows are restored as
