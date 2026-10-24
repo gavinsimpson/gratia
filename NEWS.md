@@ -153,6 +153,11 @@
 
 ## New features
 
+* `draw.compare_smooths()` accepts `ci_level` to set the coverage of its
+  pointwise intervals, matching `draw.gam()`. Unsupported `coverage` and `level`
+  arguments now give an error directing callers to `ci_level`, including when
+  supplied alongside it (#436).
+
 * `difference_smooths()` computes first and second derivatives of differences
   between factor-by smooths using `order`, including partial derivatives across
   surfaces using `focal`. Intervals retain covariance between the smooths, and
@@ -1010,6 +1015,11 @@
   recognised family name.
 
 ## Bug fixes
+
+* `response_derivatives()` rejects `ci_level` and `coverage` with guidance to
+  use `level` for both delta and simulation uncertainty, including when `level`
+  is also supplied. These arguments can no longer silently leave delta intervals
+  at the default coverage (#436).
 
 * `fitted_values()` retains small ordinal category probabilities and their
   standard errors at extreme predictor values. Ordinal and multinomial

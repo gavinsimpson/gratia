@@ -4,7 +4,14 @@
 \alias{draw.compare_smooths}
 \title{Plot comparisons of smooths}
 \usage{
-\method{draw}{compare_smooths}(object, ncol = NULL, nrow = NULL, guides = "collect", ...)
+\method{draw}{compare_smooths}(
+  object,
+  ncol = NULL,
+  nrow = NULL,
+  guides = "collect",
+  ...,
+  ci_level = 0.95
+)
 }
 \arguments{
 \item{object}{of class \code{"compare_smooths"}, the result of a call to
@@ -17,6 +24,11 @@ spread the plots}
 \code{"auto"}. Passed to \code{\link[patchwork:plot_layout]{patchwork::plot_layout()}}}
 
 \item{...}{additional arguments passed to \code{\link[patchwork:wrap_plots]{patchwork::wrap_plots()}}.}
+
+\item{ci_level}{numeric; one finite value strictly between 0 and 1, giving
+the coverage of the pointwise normal intervals. The default is \code{0.95}.
+Use \code{ci_level} to change the interval level; \code{coverage} and \code{level} are not
+accepted, even when \code{ci_level} is also supplied.}
 }
 \description{
 Plot comparisons of smooths

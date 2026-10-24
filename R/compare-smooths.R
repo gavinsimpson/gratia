@@ -117,6 +117,10 @@
 #'
 #' @param object of class `"compare_smooths"`, the result of a call to
 #'   [gratia::compare_smooths()].
+#' @param ci_level numeric; one finite value strictly between 0 and 1, giving
+#'   the coverage of the pointwise normal intervals. The default is `0.95`.
+#'   Use `ci_level` to change the interval level; `coverage` and `level` are not
+#'   accepted, even when `ci_level` is also supplied.
 #' @inheritParams draw.gam
 #'
 #' @export
@@ -127,10 +131,11 @@
 `draw.compare_smooths` <- function(object,
                                    ncol = NULL, nrow = NULL,
                                    guides = "collect",
-                                   ...) {
+                                   ..., ci_level = 0.95) {
+  check_interval_level(ci_level, "ci_level", ...names())
   l <- group_split(object, .data$.smooth)
 
-  plts <- map(l, plot_comparison_of_smooths)
+  plts <- map(l, plot_comparison_of_smooths, coverage = ci_level)
 
   ## return
   n_plots <- length(plts)
@@ -151,9 +156,6 @@
   sm_vars <- vars_from_label(unique(object[[".smooth"]]))
   ## unnest data cols
   object <- unnest(object, cols = all_of("data"))
-
-  ## compute the critical value
-  crit <- coverage_normal(coverage)
 
   ## add the frequentist confidence interval
   object <- object |> add_confint(coverage = coverage)
