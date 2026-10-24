@@ -1008,6 +1008,13 @@
 
 ## Bug fixes
 
+* `response_derivatives()` now summarises each response category and
+  multivariate response separately within each prediction row, including
+  categories in grouped families (#431). This corrects derivative estimates,
+  standard errors and intervals that previously mixed those quantities.
+  Summaries preserve the supplied row order and no longer retain draw,
+  chain or iteration identifiers.
+
 * Bivariate factor-by basis plots now put each basis function in its own
   panel, instead of drawing their surfaces on top of one another (#428).
 
