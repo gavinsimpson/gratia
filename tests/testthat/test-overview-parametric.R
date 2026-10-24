@@ -32,3 +32,60 @@ test_that("overview reports coefficient-level parametric degrees of freedom", {
     }
   }
 })
+
+test_that("overview retains every coefficient in models without smooths", {
+  models <- list(m_only_para, variance_intercept_model,
+    intercept_test_model("gam_linear"))
+  for (model in models) {
+    ref <- summary(model)$p.table
+    for (stars in c(FALSE, TRUE)) {
+      got <- overview(model, stars = stars)
+      expect_identical(class(got), c("overview", "tbl_df", "tbl", "data.frame"))
+      expect_identical(nrow(got), nrow(ref))
+      expect_identical(
+        got$term,
+        sub("^\\(Intercept\\)$", "Intercept", rownames(ref))
+      )
+      expect_identical(got$type, rep("parametric", nrow(ref)))
+      expect_identical(got$k, rep(NA_real_, nrow(ref)))
+      expect_equal(got$edf, rep(1, nrow(ref)))
+      expect_equal(got$ref.edf, rep(1, nrow(ref)))
+      expect_equal(got$statistic, unname(ref[, 3]))
+      expect_identical(
+        got$p.value,
+        format.pval(unname(ref[, 4]), eps = 0.001, digits = 3)
+      )
+      if (stars) {
+        ref_stars <- symnum(unname(ref[, 4]), corr = FALSE, na = FALSE,
+          cutpoints = c(0, 0.001, 0.01, 0.05, 0.1, 1),
+          symbols = c("***", "**", "*", ".", " "))
+        expect_identical(got$stars, ref_stars)
+        expect_identical(attr(got, "legend"), attr(ref_stars, "legend"))
+      } else {
+        expect_null(attr(got, "legend"))
+      }
+      expect_output(print(got), "Generalized Additive Model")
+    }
+  }
+})
+
+test_that("overview without parametric terms can be empty", {
+  models <- list(m_only_para, variance_intercept_model,
+    intercept_test_model("gam_linear"))
+  for (model in models) {
+    for (stars in c(FALSE, TRUE)) {
+      got <- overview(model, parametric = FALSE, stars = stars)
+      expected_types <- c(term = "character", type = "character", k = "double",
+        edf = "double", ref.edf = "double", statistic = "double",
+        p.value = "character")
+      if (stars) expected_types <- c(expected_types, stars = "character")
+      expect_identical(nrow(got), 0L)
+      expect_named(got, names(expected_types))
+      expect_identical(vapply(got, typeof, character(1)), expected_types)
+      expect_identical(class(got), c("overview", "tbl_df", "tbl", "data.frame"))
+      expect_null(attr(got, "legend"))
+      if (stars) expect_s3_class(got$stars, "noquote")
+      expect_output(print(got), "Generalized Additive Model with 0 terms")
+    }
+  }
+})

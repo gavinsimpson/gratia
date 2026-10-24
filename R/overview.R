@@ -63,14 +63,21 @@
   nms <- c("term", "type", "k", "edf", "ref.edf", "statistic", "p.value")
 
   # smooth terms
-  types <- vapply(model$smooth, smooth_type, character(1))
-  dfs <- vapply(model$smooth, basis_size, double(1))
-  out <- as.data.frame(smry$s.table) |>
-    rownames_to_column() |>
-    as_tibble() |>
-    # select(!matches("Ref.df")) |>
-    add_column(type = types, k = dfs, .after = 1L) |>
-    set_names(nms)
+  out <- if (is.null(smry$s.table)) {
+    tibble(
+      term = character(), type = character(), k = double(),
+      edf = double(), ref.edf = double(), statistic = double(),
+      p.value = double()
+    )
+  } else {
+    types <- vapply(model$smooth, smooth_type, character(1))
+    dfs <- vapply(model$smooth, basis_size, double(1))
+    as.data.frame(smry$s.table) |>
+      rownames_to_column() |>
+      as_tibble() |>
+      add_column(type = types, k = dfs, .after = 1L) |>
+      set_names(nms)
+  }
 
   # parametric terms
   para <- NULL
