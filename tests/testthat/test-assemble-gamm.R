@@ -13,7 +13,9 @@ assemble_gamm_fixture <- local({
       formula <- if (parametric) y ~ a else
         y ~ a + s(x, bs = "cc", k = 6) + s(z, k = 5)
       models[[key]] <<- mgcv::gamm(formula, random = list(g = ~ 1),
-        data = d, knots = list(x = c(0, 1)), method = "REML")
+        data = d, knots = list(x = c(0, 1)), method = "REML",
+        control = list(niterEM = 0, optimMethod = "L-BFGS-B",
+          returnObject = TRUE, apVar = FALSE))
     }
     models[[key]]
   }

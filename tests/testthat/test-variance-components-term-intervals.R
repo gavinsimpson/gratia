@@ -66,7 +66,9 @@ test_that("term draws retain fitting rows, whole smooths and multiple predictors
     bam(y ~ x + s(w, k = 6), data = d, subset = z > 0.1,
       na.action = na.exclude, discrete = TRUE),
     gam(list(y ~ s(w, k = 6), ~x + z), data = d, family = gaulss()),
-    gamm(y ~ te(x, w, k = c(4, 4)), data = d),
+    gamm(y ~ te(x, w, k = c(4, 4)), data = d,
+      control = list(niterEM = 0, optimMethod = "L-BFGS-B",
+        returnObject = TRUE, apVar = FALSE)),
     gamm4::gamm4(y ~ t2(x, w, k = c(4, 4)), data = d)
   )
   for (m in models) {
