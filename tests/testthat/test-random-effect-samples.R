@@ -38,9 +38,15 @@ test_that("fs draws retain the complete covariance of a random curve", {
   known <- nd
   known$g <- factor(rep(sm$flev[1], 4), levels = sm$flev)
   B <- mgcv::PredictMat(sm, known)[, 1:k]
-  expected <- B %*% covariance %*% t(B)
-  expect_equal(stats::cov(t(z[1:3, ])), expected[1:3, 1:3],
-    tolerance = .04 * max(expected))
+  expect_equal(attr(result, "random_effect_info")$coefficient_covariance[[1L]],
+    covariance)
+  expected <- (B %*% covariance %*% t(B))[1:3, 1:3]
+  # Each sample covariance has variance (V[i,j]^2 + V[i,i] * V[j,j]) / (n - 1).
+  # Allow five Monte Carlo standard errors for each of the six distinct entries.
+  se <- sqrt((expected^2 + outer(diag(expected), diag(expected))) /
+    (ncol(z) - 1L))
+  error <- abs(stats::cov(t(z[1:3, ])) - expected)
+  expect_lt(max(error / se), 5)
   expect_lt(abs(stats::cor(z[1, ], z[4, ])), .04)
 })
 

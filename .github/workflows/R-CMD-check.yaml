@@ -43,8 +43,8 @@ jobs:
       # Visual snapshots run in the separate macOS workflow.
       VDIFFR_RUN_TESTS: "false"
       VDIFFR_LOG_PATH: "../vdiffr.Rout.fail"
-      # Keep macOS oldrel progress outside captured messages and snapshots.
-      GRATIA_TEST_DIAGNOSTICS: ${{ matrix.config.os == 'macOS-latest' && matrix.config.r == 'oldrel' && 'true' || 'false' }}
+      # Keep builder progress outside captured messages and snapshots.
+      GRATIA_TEST_DIAGNOSTICS: ${{ (matrix.config.os == 'macOS-latest' && matrix.config.r == 'oldrel' || matrix.config.os == 'windows-11-arm') && 'true' || 'false' }}
 
     steps:
       - uses: actions/checkout@v6
@@ -92,7 +92,7 @@ jobs:
 
       - uses: r-lib/actions/check-r-package@v2
         env:
-          GRATIA_TEST_PROGRESS: ${{ runner.os == 'macOS' && matrix.config.r == 'oldrel' && format('{0}/check-test-progress.log', runner.temp) || '' }}
+          GRATIA_TEST_PROGRESS: ${{ (runner.os == 'macOS' && matrix.config.r == 'oldrel' || runner.os == 'Windows' && runner.arch == 'ARM64') && format('{0}/check-test-progress.log', runner.temp) || '' }}
         with:
           upload-snapshots: true
           build_args: 'c("--no-manual","--compact-vignettes=gs+qpdf")'
@@ -110,8 +110,8 @@ jobs:
         run: Rscript --vanilla inst/validation/optional-bayesplot-loo.R
         shell: bash
 
-      - name: Show macOS oldrel test output
-        if: always() && runner.os == 'macOS' && matrix.config.r == 'oldrel'
+      - name: Show test progress and check output
+        if: always() && (runner.os == 'macOS' && matrix.config.r == 'oldrel' || runner.os == 'Windows' && runner.arch == 'ARM64')
         shell: bash
         run: |
           for log in "$RUNNER_TEMP/threshold-test-progress.log" "$RUNNER_TEMP/check-test-progress.log"; do
@@ -125,11 +125,11 @@ jobs:
               -print -exec tail -n 100 '{}' \;
           fi
 
-      - name: Upload macOS oldrel check logs
-        if: always() && runner.os == 'macOS' && matrix.config.r == 'oldrel'
+      - name: Upload test progress and check logs
+        if: always() && (runner.os == 'macOS' && matrix.config.r == 'oldrel' || runner.os == 'Windows' && runner.arch == 'ARM64')
         uses: actions/upload-artifact@v7
         with:
-          name: macOS-oldrel-check-logs
+          name: ${{ runner.os }}-${{ runner.arch }}-${{ matrix.config.r }}-check-logs
           if-no-files-found: ignore
           path: |
             ${{ runner.temp }}/threshold-test-progress.log
