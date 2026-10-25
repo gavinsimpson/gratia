@@ -84,6 +84,7 @@ test_that("sdmTMB effects reproduce native ML and REML predictions", {
 })
 
 test_that("sdmTMB smooths handle multiple penalties and by variables", {
+  skip_on_cran()
   d <- sdmtmb_test_data()
   formulas <- list(
     y ~ s(x, k = 5) + s(z, k = 6),
@@ -111,6 +112,7 @@ test_that("sdmTMB smooths handle multiple penalties and by variables", {
 })
 
 test_that("delta plots and uncertainty follow component selection", {
+  skip_on_cran()
   d <- sdmtmb_test_data()
   for (reml in c(FALSE, TRUE)) {
     m <- sdmtmb_test_fit(positive ~ z + s(x, k = 5), d,
@@ -161,6 +163,7 @@ test_that("delta plots and uncertainty follow component selection", {
 })
 
 test_that("parametric effects retain fitted transforms and contrasts", {
+  skip_on_cran()
   d <- sdmtmb_test_data()
   contrasts(d$fac) <- contr.sum(3)
   for (reml in c(FALSE, TRUE)) {
@@ -203,6 +206,7 @@ test_that("parametric effects retain fitted transforms and contrasts", {
 })
 
 test_that("spatial and IID effects are excluded from formula plots", {
+  skip_on_cran()
   d <- sdmtmb_test_data()
   mesh <- sdmTMB::make_mesh(d, c("X", "Y"), n_knots = 15)
   control <- sdmTMB::sdmTMBcontrol(backend = "rtmb")
@@ -226,6 +230,7 @@ test_that("spatial and IID effects are excluded from formula plots", {
 })
 
 test_that("sdmTMB evaluation and plots use shared GAM controls", {
+  skip_on_cran()
   d <- sdmtmb_test_data()
   m <- sdmtmb_test_fit(y ~ s(x, k = 5), d)
   nd <- data.frame(x = c(.2, NA, .8))
@@ -306,6 +311,7 @@ test_that("sdmTMB methods require recent fits made with RTMB", {
 })
 
 test_that("sdmTMB plots retain the existing smooth visual conventions", {
+  skip_on_cran()
   d <- sdmtmb_test_data()
   m <- sdmtmb_test_fit(y ~ z + s(x, k = 5), d)
   expect_doppelganger("sdmTMB smooth and parametric effects", draw(m))

@@ -1,3 +1,7 @@
+# The full suite checks combinations across models, families and plot options.
+# Small function checks remain in test-function-core.R and focused test files.
+skip_on_cran()
+
 diagnostic_plot_draws <- function() {
   ids <- data.frame(.draw = 101:116, .chain = rep(c(2L, 7L), each = 8L),
     .iteration = rep(11:18, 2L))

@@ -1,3 +1,7 @@
+# The full suite checks combinations across models, families and plot options.
+# Small function checks remain in test-function-core.R and focused test files.
+skip_on_cran()
+
 # Indices and reference distributions come directly from the fitted mgcv object.
 gfam_response_test_index <- function(model) attr(model$family$getfl(), "fi")
 gfam_response_test_labels <- function(model) paste0(seq_along(model$family$getfl()),
@@ -140,7 +144,10 @@ test_that("gfam response selection is independent of family facet choices", {
   labels <- gfam_response_test_labels(model)
   for (name in names(gfam_response_test_plotters())) {
     config <- gfam_response_test_plotters()[[name]]
-    for (by_family in list(NULL, FALSE, TRUE)) {
+    choices <- test_cases_for_cran(list(NULL, FALSE, TRUE),
+      if (name %in% c("qq", "observed", "scalable_qq")) list(NULL, FALSE, TRUE)
+        else list(NULL))
+    for (by_family in choices) {
       arguments <- c(list(model = model, by_family = by_family), config$args)
       all <- do.call(config$fun, c(arguments, list(response = NULL)))
       selected <- do.call(config$fun, c(arguments, list(response = 2)))
@@ -179,7 +186,7 @@ test_that("gfam appraise selects every panel while preserving family layout defa
   model <- gfam_model
   expected <- diagnostic_data(model, response = 2, seed = 54)$data$residuals
   for (scalable in c(FALSE, TRUE)) {
-    for (by_family in list(NULL, FALSE, TRUE)) {
+    for (by_family in test_cases_for_cran(list(NULL, FALSE, TRUE), list(NULL))) {
       all <- appraise(model, response = NULL, by_family = by_family,
         seed = 54, scalable = scalable, qq_bins = 12)
       selected <- appraise(model, response = 2, by_family = by_family,

@@ -1,3 +1,7 @@
+# The full suite checks combinations across models, families and plot options.
+# Small function checks remain in test-function-core.R and focused test files.
+skip_on_cran()
+
 test_that("Student-t distributions retain scale, tails and moment requirements", {
   location <- c(-1, 2, 4)
   scale <- c(0.5, 1, 2)

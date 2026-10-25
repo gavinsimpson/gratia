@@ -1,3 +1,7 @@
+# The full suite checks combinations across models, families and plot options.
+# Small function checks remain in test-function-core.R and focused test files.
+skip_on_cran()
+
 surface_plot_data <- function(dimension = 2L) {
   grid <- list(x = seq(2, 8, by = 2), y = seq(10, 25, by = 5))
   if (dimension > 2L) grid$z <- c(0, 1)

@@ -349,6 +349,7 @@ test_that("SCAM response-scale delta contrasts and derivatives use inverse-link 
 })
 
 test_that("SCAM likelihood and predictive-check external generics dispatch", {
+  skip_on_cran()
   skip_if_not_installed("loo")
   m <- scam_api_fixture$model
   beta <- post_draws(m, n_draws = 400, seed = 651)

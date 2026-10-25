@@ -1,3 +1,7 @@
+# The full suite checks combinations across models, families and plot options.
+# Small function checks remain in test-function-core.R and focused test files.
+skip_on_cran()
+
 test_that("scalable grouped diagnostics preserve new main defaults and shared residuals", {
   for (model in list(gfam_model, gfam_bam, gfam_missing_model)) {
     d <- diagnostic_data(model, seed = 23)

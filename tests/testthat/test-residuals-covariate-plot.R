@@ -1,3 +1,7 @@
+# The full suite checks combinations across models, families and plot options.
+# Small function checks remain in test-function-core.R and focused test files.
+skip_on_cran()
+
 test_that("covariate selection preserves order and excludes special variables", {
   f <- covariate_plot_fixture()
   m <- mgcv::gam(y ~ x + s(z, k = 5) + s(g, bs = "re") +

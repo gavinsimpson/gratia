@@ -1,3 +1,7 @@
+# The full suite checks combinations across models, families and plot options.
+# Small function checks remain in test-function-core.R and focused test files.
+skip_on_cran()
+
 # Check fitted cycle limits as well as coordinates: observed ranges need not
 # cover a complete cycle.
 

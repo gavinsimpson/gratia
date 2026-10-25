@@ -87,6 +87,12 @@ test_that("simulation keeps medians and quantiles and reports posterior SD", {
     expect_equal(unname(out$.lower_ci[i]), unname(quantile(x, .025)))
     expect_equal(unname(out$.upper_ci[i]), unname(quantile(x, .975)))
   }
+})
+
+test_that("large derivative simulations agree with delta standard errors", {
+  skip_on_cran()
+  m <- response_delta_fixture()
+  nd <- data.frame(x = c(-.2, .3))
   m$Vp <- m$Vp * .001
   delta <- response_derivatives(m, focal = "x", data = nd,
     type = "central", uncertainty = "delta")

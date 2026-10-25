@@ -1,3 +1,7 @@
+# The full suite checks combinations across models, families and plot options.
+# Small function checks remain in test-function-core.R and focused test files.
+skip_on_cran()
+
 integration_chain_draws <- function(model, diagnostics = FALSE) {
   draws <- post_draws(model, n_draws = 160, chains = 4, seed = 278,
     mvn_method = "mgcv", diagnostics = diagnostics)
@@ -100,6 +104,7 @@ test_that("LOO uses stored iteration order without reordering likelihood weights
 })
 
 test_that("bayesplot aligns arbitrary draw IDs with likelihoods and responses", {
+  skip_on_cran()
   skip_if_not_installed("bayesplot")
   skip_if_not_installed("loo")
   model <- sampling_linear_model

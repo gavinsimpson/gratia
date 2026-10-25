@@ -202,6 +202,7 @@ test_that("simultaneous validation and RNG handling apply to both uncertainty me
 })
 
 test_that("response bands cover an independent batch of posterior curves", {
+  skip_on_cran()
   f <- conditional_difference_fixture(poisson())
   m <- f$model
   for (scope in c("contrast", "all")) {

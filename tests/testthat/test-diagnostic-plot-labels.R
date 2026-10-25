@@ -1,3 +1,7 @@
+# The full suite checks combinations across models, families and plot options.
+# Small function checks remain in test-function-core.R and focused test files.
+skip_on_cran()
+
 test_that("ordinary and scalable QQ and worm plots share labels", {
   labels <- c("x", "y", "title", "subtitle", "caption", "colour")
   for (model in list(m_tiny_eg1, b_pois, gfam_model)) {

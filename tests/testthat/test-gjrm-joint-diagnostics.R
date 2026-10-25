@@ -80,7 +80,8 @@ test_that("binary and mixed joint diagnostics randomise within the correct proba
 })
 
 test_that("joint appraisals keep four panels and facet every panel by response", {
-  for (kind in c("normal", "binary_cont", "trivariate")) {
+  for (kind in test_cases_for_cran(c("normal", "binary_cont", "trivariate"),
+    "binary_cont")) {
     m <- gjrm_joint_fixture(kind)
     for (scalable in c(FALSE, TRUE)) {
       plots <- appraise(m, seed = 17, scalable = scalable, qq_bins = 20)

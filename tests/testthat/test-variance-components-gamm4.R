@@ -94,6 +94,7 @@ test_that("gamm4 native blocks retain separate variance labels", {
 })
 
 test_that("gamm4 profile intervals follow the penalty transformation", {
+  skip_on_cran()
   skip_if_not_installed("gamm4")
   withr::local_preserve_seed()
   d <- gamm4_variance_data()
@@ -110,12 +111,15 @@ test_that("gamm4 profile intervals follow the penalty transformation", {
   expect_equal(got$.upper_ci, unname(ref[rows, 2]) * scaling)
   expect_equal(lme4::getME(m$mer, "theta"), theta)
   expect_equal(lme4::getME(m$mer, "Zt"), design)
-  raw <- variance_comp(m, rescale = FALSE, coverage = 0.9)
-  expect_equal(got$.lower_ci, raw$.lower_ci * scaling)
-  expect_equal(got$.upper_ci, raw$.upper_ci * scaling)
+  if (full_test_run()) {
+    raw <- variance_comp(m, rescale = FALSE, coverage = 0.9)
+    expect_equal(got$.lower_ci, raw$.lower_ci * scaling)
+    expect_equal(got$.upper_ci, raw$.upper_ci * scaling)
+  }
 })
 
 test_that("gamm4 profiles generalized fits with a fixed scale", {
+  skip_on_cran()
   skip_if_not_installed("gamm4")
   withr::local_preserve_seed()
   d <- gamm4_variance_data()
@@ -173,6 +177,7 @@ test_that("gamm4 variance components validate arguments", {
 })
 
 test_that("gamm4 profiles separate t2 penalties", {
+  skip_on_cran()
   skip_if_not_installed("gamm4")
   withr::local_preserve_seed()
   d <- gamm4_variance_data()
@@ -192,6 +197,7 @@ test_that("gamm4 profiles separate t2 penalties", {
 })
 
 test_that("gamm4 preserves estimates when GLMM scale profiling is unavailable", {
+  skip_on_cran()
   skip_if_not_installed("gamm4")
   withr::local_preserve_seed()
   d <- gamm4_variance_data()

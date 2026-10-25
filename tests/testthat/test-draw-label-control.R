@@ -1,3 +1,7 @@
+# The full suite checks combinations across models, families and plot options.
+# Small function checks remain in test-function-core.R and focused test files.
+skip_on_cran()
+
 label_control_example <- function() {
   data.frame(f = ordered(c("Boat (guided)", "Boat (unguided)", "Shore"),
     levels = c("Boat (guided)", "Boat (unguided)", "Shore")),

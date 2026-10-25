@@ -1,3 +1,7 @@
+# The full suite checks combinations across models, families and plot options.
+# Small function checks remain in test-function-core.R and focused test files.
+skip_on_cran()
+
 test_that("response derivative levels control normal bounds across wrappers", {
   for (case in list(list(su_m_quick_eg1, "x0"),
                    list(su_gamm_univar_4, "x0"), list(m_gamm4, "x0"),

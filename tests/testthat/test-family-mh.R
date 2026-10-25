@@ -1,3 +1,7 @@
+# The full suite checks combinations across models, families and plot options.
+# Small function checks remain in test-function-core.R and focused test files.
+skip_on_cran()
+
 expect_family_target <- function(model) {
   target <- sampling_family_target(model)
   compact <- model_used_rows(model)
@@ -111,7 +115,8 @@ test_that("family chains share setup and agree between serial and mirai runs", {
     setups <<- setups + 1L
     original(...)
   })
-  for (model in list(family_mh_model(poisson()), m_multinom)) {
+  for (model in test_cases_for_cran(list(family_mh_model(poisson()), m_multinom),
+    list(family_mh_model(poisson())))) {
     before <- .Random.seed
     serial <- post_draws(model, n_draws = 24, chains = 3, method = "mh",
       mh_backend = "family", burnin = 5, thin = 2, seed = 281)

@@ -1,3 +1,7 @@
+# The full suite checks combinations across models, families and plot options.
+# Small function checks remain in test-function-core.R and focused test files.
+skip_on_cran()
+
 # Small cached fits exercise basis evaluation and plotting on the same terms.
 multivariate_basis_model <- local({
   models <- new.env(parent = emptyenv())
@@ -119,6 +123,12 @@ test_that("basis surfaces separate basis functions and facet conditioning values
     vars <- c("w", "z", "x", "v")[seq_len(dimension)]
     b <- basis(multivariate_basis_model(dimension, type), variables = vars,
       n_2d = 3, n_3d = 2, n_4d = 2)
+    # Matrix comparisons above check every basis function. Plot the first and
+    # last on CRAN, retaining both facet dimensions and every tensor type.
+    keep <- test_cases_for_cran(levels(b$.bf),
+      levels(b$.bf)[c(1L, nlevels(b$.bf))])
+    b <- b[b$.bf %in% keep, ]
+    b$.bf <- droplevels(b$.bf)
     plots <- draw(b, legend = TRUE, ncol = 2)
     expect_s3_class(plots, "patchwork")
     expect_length(plots, nlevels(b$.bf))
@@ -150,7 +160,7 @@ test_that("basis surfaces separate basis functions and facet conditioning values
       }
       if (type == "tp") expect_equal(p$coordinates$ratio, 1)
     }
-    expect_silent(ggplot2::ggplotGrob(plots[[1L]]))
+    expect_plot_render(plots[[1L]], cran = type == "tp")
     override <- rev(vars)
     p <- draw(b, variables = override)[[1L]]
     expect_equal(c(p$labels$x, p$labels$y), override[1:2])

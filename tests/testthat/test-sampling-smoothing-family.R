@@ -1,30 +1,41 @@
+# The full suite checks combinations across models, families and plot options.
+# Small function checks remain in test-function-core.R and focused test files.
+skip_on_cran()
+
 test_that("native smoothing conditionals cover ordinary and extended families", {
   families <- c("poisson", "binomial", "Gamma", "inverse.gaussian", "negbin",
     "Tweedie", "nb", "betar", "scat", "tw", "cnorm", "clog", "cpois", "bcg",
     "ocat", "ziP", "gfam", "gfam_ocat", "quasipoisson", "quasibinomial",
     "gaussian_log", "poisson_sqrt", "binomial_probit", "binomial_matrix",
     "binomial_factor")
-  for (name in families) for (engine in c("gam", "bam")) {
-    if (name == "cpois" && engine == "bam") next
-    fit <- smoothing_family_fixture(name, engine,
-      if (engine == "gam") "ML" else "fREML",
-      censored = !(name == "cpois" && engine == "bam"))$model
-    original <- if (is.function(fit$family$getTheta)) fit$family$getTheta() else NULL
-    setup <- sampling_smoothing_setup(fit, block_size = 37L)
-    expect_identical(setup$conditional_backend, "family", info = paste(name, engine))
-    expect_lt(setup$audit$mean_error, 1e-4)
-    expect_lt(setup$audit$covariance_error, 1e-3)
-    expect_false(setup$audit$dispersion_sampled)
-    expect_false(setup$audit$family_parameters$sampled)
-    changed <- sampling_smoothing_conditional(setup, setup$log_sp + .15)
-    expect_true(all(is.finite(changed$mean)))
-    expect_gt(min(eigen(changed$covariance, symmetric = TRUE)$values), 0)
-    draws <- sampling_smoothing_draws(setup, n_draws = 3L, seed = 719)
-    expect_identical(dim(draws$bs), c(3L, length(coef(fit))))
-    expect_identical(colnames(draws$bs), names(coef(fit)))
-    if (!is.null(original)) {
-      expect_identical(fit$family$getTheta(), original)
-      expect_equal(setup$family$getTheta(), original)
+  for (name in families) {
+    # Every family retains a native numerical reference. Repeat across engines
+    # for ordinary, extended, grouped and matrix-response families on CRAN.
+    engines <- test_cases_for_cran(c("gam", "bam"),
+      if (name %in% c("poisson", "betar", "gfam", "binomial_matrix"))
+        c("gam", "bam") else "gam")
+    for (engine in engines) {
+      if (name == "cpois" && engine == "bam") next
+      fit <- smoothing_family_fixture(name, engine,
+        if (engine == "gam") "ML" else "fREML",
+        censored = !(name == "cpois" && engine == "bam"))$model
+      original <- if (is.function(fit$family$getTheta)) fit$family$getTheta() else NULL
+      setup <- sampling_smoothing_setup(fit, block_size = 37L)
+      expect_identical(setup$conditional_backend, "family", info = paste(name, engine))
+      expect_lt(setup$audit$mean_error, 1e-4)
+      expect_lt(setup$audit$covariance_error, 1e-3)
+      expect_false(setup$audit$dispersion_sampled)
+      expect_false(setup$audit$family_parameters$sampled)
+      changed <- sampling_smoothing_conditional(setup, setup$log_sp + .15)
+      expect_true(all(is.finite(changed$mean)))
+      expect_gt(min(eigen(changed$covariance, symmetric = TRUE)$values), 0)
+      draws <- sampling_smoothing_draws(setup, n_draws = 3L, seed = 719)
+      expect_identical(dim(draws$bs), c(3L, length(coef(fit))))
+      expect_identical(colnames(draws$bs), names(coef(fit)))
+      if (!is.null(original)) {
+        expect_identical(fit$family$getTheta(), original)
+        expect_equal(setup$family$getTheta(), original)
+      }
     }
   }
 })
@@ -34,7 +45,10 @@ test_that("non-Gaussian mappings and fixed-sp refits agree across methods", {
     list(tensor = TRUE), list(missing = TRUE, call_offset = TRUE))
   for (engine in c("gam", "bam")) {
     for (method in if (engine == "gam") c("ML", "REML") else c("ML", "REML", "fREML")) {
-      for (configuration in configurations) {
+      cases <- test_cases_for_cran(configurations,
+        if ((engine == "gam" && method == "REML") || method == "fREML")
+          configurations else configurations[1L])
+      for (configuration in cases) {
         fixture <- do.call(smoothing_family_fixture,
           c(list(name = "nb", engine = engine, method = method), configuration))
         fit <- fixture$model

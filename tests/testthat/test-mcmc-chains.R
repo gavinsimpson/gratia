@@ -20,12 +20,13 @@ test_that("draw counts, chain IDs, and legacy MH values are correct", {
 })
 
 test_that("mirai and serial chains have the same draws and preserve caller state", {
+  skip_on_cran()
   skip_if_not_installed("mirai")
   m <- sampling_test_model()
   withr::local_seed(123)
   old <- .Random.seed
   kind <- RNGkind()
-  for (backend in c("mgcv", "gratia")) {
+  for (backend in test_cases_for_cran(c("mgcv", "gratia"), "gratia")) {
     a <- post_draws(m, n_draws = 24, chains = 3, method = "mh", burnin = 10,
       seed = 7, mh_backend = backend)
     b <- post_draws(m, n_draws = 24, chains = 3, n_cores = 2, method = "mh", burnin = 10,
@@ -170,6 +171,7 @@ test_that("penalty mapping, binomial encodings, and bam are supported", {
 })
 
 test_that("MH and the alternative prototypes reproduce known posteriors", {
+  skip_on_cran()
   skip_if_not_installed("posterior")
   withr::local_seed(135)
   m <- sampling_test_model()

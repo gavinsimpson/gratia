@@ -1,3 +1,7 @@
+# The full suite checks combinations across models, families and plot options.
+# Small function checks remain in test-function-core.R and focused test files.
+skip_on_cran()
+
 # Fixtures use explicit exclusions, not random missing positions, so row identity
 # and numerical correctness can be checked independently of implementation.
 missing_row_fixture <- function(fit = mgcv::gam, family = gaussian()) {

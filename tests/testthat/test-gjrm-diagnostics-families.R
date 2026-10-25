@@ -139,12 +139,16 @@ test_that("GJRM additional families support ordinary and scalable residual plots
     for (scalable in c(FALSE, TRUE)) {
       p <- appraise(m, scalable = scalable, seed = 9, qq_bins = 30)
       expect_s3_class(p, "patchwork")
-      expect_silent(patchwork::patchworkGrob(p))
+      if (full_test_run() || fam == "BE") {
+        expect_silent(patchwork::patchworkGrob(p))
+      }
       expect_equal(qq_plot(m, seed = 9)$data$residuals,
         sort(diagnostic_data(m, seed = 9)$data$residuals), info = fam)
       expect_s3_class(worm_plot(m, seed = 9), "ggplot")
       for (type in c("response", "pearson")) {
-        for (method in c("uniform", "simulate", "normal", "marginal")) {
+        methods <- c("uniform", "simulate", "normal", "marginal")
+        for (method in test_cases_for_cran(methods,
+          if (fam == "BE") methods else "uniform")) {
           q <- if (scalable) scalable_qq_plot(m, type = type, method = method,
             n_uniform = 3, n_simulate = 4, seed = 9) else
             qq_plot(m, type = type, method = method, n_uniform = 3,
@@ -154,7 +158,9 @@ test_that("GJRM additional families support ordinary and scalable residual plots
       }
       r <- dharma_residuals(m, n = 12, seed = 9)
       a <- appraise(m, type = "dharma", n_dharma = 12, seed = 9, scalable = scalable)
-      expect_silent(patchwork::patchworkGrob(a))
+      if (full_test_run() || fam == "BE") {
+        expect_silent(patchwork::patchworkGrob(a))
+      }
       if (!scalable) expect_equal(a[[2]]$data$residuals, as.vector(r), info = fam)
     }
     expect_identical(.Random.seed, before)
@@ -174,10 +180,12 @@ test_that("GJRM additional posterior checks work with varying and implicit const
       expect_equal(raw$data$.response[raw$data$.draw == 0], as.vector(m$y1), info = fam)
       expect_true(all(is.finite(raw$data$.response)), info = fam)
       if (fam == "BE") expect_true(all(raw$data$.response > 0 & raw$data$.response < 1))
-      expect_silent(ggplot2::ggplot_build(raw))
-      expect_silent(ggplot2::ggplot_build(streamed))
-      expect_silent(patchwork::patchworkGrob(appraise(m, ppcheck = TRUE,
-        n_ppc = 3, seed = 11, scalable = constant)))
+      if (full_test_run() || fam == "BE") {
+        expect_silent(ggplot2::ggplot_build(raw))
+        expect_silent(ggplot2::ggplot_build(streamed))
+        expect_silent(patchwork::patchworkGrob(appraise(m, ppcheck = TRUE,
+          n_ppc = 3, seed = 11, scalable = constant)))
+      }
     }
   }
 })

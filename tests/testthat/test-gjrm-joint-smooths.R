@@ -73,6 +73,7 @@ test_that("joint smooth selection and saved estimates retain equation identity",
 })
 
 test_that("joint assemble and draw share the established smooth and random effect plots", {
+  skip_on_cran()
   m <- gjrm_joint_fixture()
   components <- gjrm_gamlss_components(m)
   all <- assemble(m, n = 8, rug = FALSE, parametric = FALSE)
@@ -101,6 +102,7 @@ test_that("joint assemble and draw share the established smooth and random effec
 })
 
 test_that("joint plotting dispatch covers binary, mixed and trivariate fits", {
+  skip_on_cran()
   for (kind in c("binary", "binary_cont", "trivariate")) {
     m <- gjrm_joint_fixture(kind)
     expect_s3_class(m, "gjrm")
@@ -123,6 +125,7 @@ test_that("joint plotting dispatch covers binary, mixed and trivariate fits", {
 })
 
 test_that("ordinal and fixed-margin smooths use the correct final coefficient positions", {
+  skip_on_cran()
   d <- data.frame(x = c(.2, .7, .4), z = c(.8, .1, .6))
   m <- gjrm_joint_fixture("ordinal")
   thresholds <- m$VC$K1 - 1L
@@ -155,6 +158,7 @@ test_that("ordinal and fixed-margin smooths use the correct final coefficient po
 })
 
 test_that("selection smooths use each equation's observed covariates and final fit", {
+  skip_on_cran()
   m <- gjrm_joint_fixture("selection")
   expect_s3_class(m, "copulaSampleSel")
   expect_lt(nrow(m$gam2$model), nrow(m$gam1$model))
@@ -174,6 +178,7 @@ test_that("selection smooths use each equation's observed covariates and final f
 })
 
 test_that("two ordinal responses skip both sets of thresholds when estimating smooths", {
+  skip_on_cran()
   m <- gjrm_joint_fixture("ordinal_pair")
   thresholds <- m$VC$K1 + m$VC$K2 - 2L
   d <- data.frame(x = c(.2, .7, .4), z = c(.8, .1, .6))

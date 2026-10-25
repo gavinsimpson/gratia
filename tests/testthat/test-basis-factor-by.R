@@ -7,7 +7,7 @@ factor_by_basis_data <- function() {
 
 test_that("unweighted factor-by bases draw once in one to four dimensions", {
   d <- factor_by_basis_data()
-  for (dimension in 1:4) {
+  for (dimension in test_cases_for_cran(1:4, 1:2)) {
     vars <- c("x", "z", "w", "v")[seq_len(dimension)]
     term <- sprintf("s(%s, by = f, k = 20)", paste(vars, collapse = ","))
     m <- mgcv::gam(stats::as.formula(paste("y ~ f +", term)), data = d)
@@ -113,6 +113,7 @@ test_that("unweighted basis options reach wrappers and configured workers", {
   }
   expect_error(basis(m_gam, unweighted = NA), "unweighted")
   expect_error(basis(m_gam, unweighted = 1), "unweighted")
+  skip_on_cran()
   skip_if_not_installed("mirai")
   skip_if_not_installed("carrier")
   mirai::daemons(0)

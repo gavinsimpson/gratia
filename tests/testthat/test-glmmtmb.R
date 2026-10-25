@@ -3,9 +3,10 @@ skip_if_not_installed("glmmTMB", minimum_version = "1.1.15.2")
 
 test_that("smooth coefficients reconstruct mixed model predictors in formula order", {
   d <- tmb_data()
-  for (f in list(y ~ (1 | g) + s(x, k = 6) + s(z, k = 5),
+  formulas <- list(y ~ (1 | g) + s(x, k = 6) + s(z, k = 5),
     y ~ s(x, k = 6) + (1 | g) + s(z, k = 5),
-    y ~ s(x, k = 6) + s(z, k = 5) + (1 | g))) {
+    y ~ s(x, k = 6) + s(z, k = 5) + (1 | g))
+  for (f in test_cases_for_cran(formulas, formulas[1L])) {
     m <- glmmTMB::glmmTMB(f, d, REML = TRUE)
     a <- glmmtmb_smooth_model(m)
     # Check against the native full prediction after removing ordinary REs.
@@ -51,6 +52,7 @@ test_that("joint covariance matches native ML and REML prediction intervals", {
 })
 
 test_that("smooth plotting supports transformed, bivariate and numeric by smooths", {
+  skip_on_cran()
   d <- tmb_data()
   for (f in list(y ~ s(log(x + 1), k = 6), y ~ s(x, z, k = 12),
     y ~ z + s(x, by = z, k = 6, m = c(2, 0)), y ~ s(x, bs = "ts", k = 6))) {
@@ -73,6 +75,7 @@ test_that("smooth plotting supports transformed, bivariate and numeric by smooth
 })
 
 test_that("smooth counts exclude native random effects and parametric terms", {
+  skip_on_cran()
   d <- tmb_data()
   for (f in list(y ~ 1, y ~ (1 | g), y ~ x + (1 | g))) {
     m <- glmmTMB::glmmTMB(f, data = d, REML = TRUE)
@@ -86,6 +89,7 @@ test_that("smooth counts exclude native random effects and parametric terms", {
 })
 
 test_that("all linear predictors share mgcv-style smooth selection and labels", {
+  skip_on_cran()
   d <- tmb_data()
   set.seed(29)
   d$y <- rpois(nrow(d), exp(sin(6*d$x)))
@@ -181,6 +185,7 @@ test_that("native residuals are preserved for observed and replaced responses", 
 })
 
 test_that("diagnostics align excluded rows and binomial counts", {
+  skip_on_cran()
   d <- tmb_data(); d$x[3] <- NA
   m <- glmmTMB::glmmTMB(y ~ x, d, na.action = na.exclude)
   p <- observed_fitted_plot(m)
@@ -226,6 +231,7 @@ test_that("conditional response generators have correct moments and support", {
 })
 
 test_that("QQ simulation works across supported glmmTMB distributions", {
+  skip_on_cran()
   set.seed(139)
   d <- data.frame(x = runif(250))
   specs <- list(
@@ -259,6 +265,7 @@ test_that("QQ simulation works across supported glmmTMB distributions", {
 })
 
 test_that("Gaussian smooths agree with mgcv and covariance failures are explicit", {
+  skip_on_cran()
   d <- tmb_data()
   m <- glmmTMB::glmmTMB(y ~ s(x, k = 6), d, REML = TRUE)
   g <- mgcv::gam(y ~ s(x, k = 6), data = d, method = "REML")
@@ -277,12 +284,14 @@ test_that("Gaussian smooths agree with mgcv and covariance failures are explicit
 
 test_that("glmmTMB plots render consistently", {
   skip_on_cran()
+  skip_on_cran()
   m <- glmmtmb_gaussian_fixture()$model
   vdiffr::expect_doppelganger("glmmTMB smooth", draw(m, select = "s(x)"))
   vdiffr::expect_doppelganger("glmmTMB appraise", appraise(m, n_simulate = 20, seed = 928))
 })
 
 test_that("fitted Gamma dispersion is converted from sigma to shape", {
+  skip_on_cran()
   set.seed(290)
   d <- data.frame(x = rep(c(-1,1), each=150))
   d$y <- rgamma(300, shape = exp(1+d$x), scale = 2/exp(1+d$x))
@@ -299,6 +308,7 @@ test_that("fitted Gamma dispersion is converted from sigma to shape", {
 })
 
 test_that("draw includes all three predictors in one model-wide layout", {
+  skip_on_cran()
   set.seed(128)
   d <- data.frame(x = runif(600))
   d$y <- rnbinom(600, mu = exp(1 + sin(6 * d$x)),

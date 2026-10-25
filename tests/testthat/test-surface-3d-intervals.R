@@ -1,3 +1,7 @@
+# The full suite checks combinations across models, families and plot options.
+# Small function checks remain in test-function-core.R and focused test files.
+skip_on_cran()
+
 skip_if_not_installed("ggcube", "0.3.0")
 
 ci3d_grid <- function() {
@@ -45,7 +49,7 @@ expect_ci3d <- function(p, alpha = 0.15, colour = "grey60") {
   expect_false(any(lower$.surface_face %in% estimate$.surface_face))
   expect_false(any(upper$.surface_face %in% lower$.surface_face))
   expect_true(all(is.na(lower$.surface_fill)))
-  expect_plot_render(p, cran = TRUE)
+  expect_plot_render(p)
 }
 
 test_that("3D interval controls are validated even for flat plots", {
@@ -70,6 +74,8 @@ test_that("neutral bounds share geometry without changing the fill palette", {
   b <- ci3d_plot(ci_3d = TRUE, ci_3d_alpha = 0.12, ci_3d_col = "grey50",
     contour = FALSE)
   expect_ci3d(b, alpha = 0.12, colour = "grey50")
+  # One small surface exercises the renderer; the remaining cases check values.
+  expect_plot_render(b, cran = TRUE)
   built_a <- ggplot2::ggplot_build(a)
   built_b <- ggplot2::ggplot_build(b)
   expect_equal(built_a$plot$scales$get_scales("fill")$get_limits(),

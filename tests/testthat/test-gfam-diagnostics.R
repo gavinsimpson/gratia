@@ -62,6 +62,7 @@ test_that("grouped observed residuals use component scales and genuine Pearson r
 })
 
 test_that("grouped QQ and worm references match independent weighted calculations", {
+  skip_on_cran()
   for (model in list(gfam_model, gfam_bam, gfam_missing_model)) {
     compact <- model_used_rows(model)
     for (method in c("uniform", "simulate")) {
@@ -114,6 +115,7 @@ test_that("grouped defaults choose available reference methods including Tweedie
 })
 
 test_that("full grouped appraisal uses consistent residual and mean panels", {
+  skip_on_cran()
   for (model in list(gfam_model, gfam_bam, gfam_missing_model, gfam_gaussian_model)) {
     for (type in c("deviance", "pearson", "response")) {
       expect_s3_class(appraise(model, type = type, seed = 2), "patchwork")

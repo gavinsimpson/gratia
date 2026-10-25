@@ -4,6 +4,7 @@
 ^\.Rproj\.user$
 ^Makefile
 ^tools/run-tests\.R$
+^tools/profile-tests\.R$
 ^tools/(test-inlaws-diagnostics|inlaws-diagnostic-families)\.R$
 ^tests/integration$
 ^\.gitattributes
