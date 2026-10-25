@@ -1,3 +1,7 @@
+# The full suite checks combinations across models, families and plot options.
+# Small function checks remain in test-function-core.R and focused test files.
+skip_on_cran()
+
 skip_if_not_installed("sdmTMB", minimum_version = "1.2.0")
 
 sdmtmb_threshold_test_curve <- function(x, b, type) {

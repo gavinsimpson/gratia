@@ -33,6 +33,7 @@ test_that("grouped quantile and PIT residuals match independent row-aligned calc
 })
 
 test_that("default calibrated QQ and worm use a fixed normal reference and pointwise bands", {
+  skip_on_cran()
   for (model in list(gfam_model, gfam_bam, gfam_missing_model)) {
     r <- quantile_residuals(model, type = "quantile", seed = 23)
     included <- which(is.finite(r))
@@ -61,6 +62,7 @@ test_that("default calibrated QQ and worm use a fixed normal reference and point
 })
 
 test_that("component identity follows QQ sorting and indexed colours distinguish repeated families", {
+  skip_on_cran()
   for (model in list(gfam_model, gfam_gaussian_model, gfam_rank_model)) {
     used <- model_used_rows(model)
     r <- quantile_residuals(used, type = "quantile", seed = 29)
@@ -80,6 +82,7 @@ test_that("component identity follows QQ sorting and indexed colours distinguish
 })
 
 test_that("grouped diagnostics share stable Okabe-Ito component colours and fills", {
+  skip_on_cran()
   for (model in list(gfam_model, gfam_gaussian_model, gfam_missing_model)) {
     labels <- gfam_diagnostic_labels(model)
     expected <- c("#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2",
@@ -111,6 +114,7 @@ test_that("grouped diagnostics share stable Okabe-Ito component colours and fill
 })
 
 test_that("appraisal reuses one seeded residual vector across all residual panels", {
+  skip_on_cran()
   for (model in list(gfam_model, gfam_missing_model, gfam_rank_model)) {
     set.seed(267)
     before <- .Random.seed
@@ -134,6 +138,7 @@ test_that("appraisal reuses one seeded residual vector across all residual panel
 })
 
 test_that("pooled predictor ranks are within-component and respect included rows and ties", {
+  skip_on_cran()
   model <- gfam_rank_model
   used <- model_used_rows(model)
   index <- attr(model$family$getfl(), "fi")
@@ -168,6 +173,7 @@ test_that("pooled predictor ranks are within-component and respect included rows
 })
 
 test_that("pooled histograms use common bin edges and component-specific density", {
+  skip_on_cran()
   p <- residuals_hist_plot(gfam_rank_model, seed = 43, n_bins = 8)
   built <- ggplot2::ggplot_build(p)$data[[1L]]
   expect_identical(p$labels$y, "Density")
@@ -208,6 +214,7 @@ test_that("unsupported quantile configurations fallback consistently or error wh
 })
 
 test_that("unit-weight Gamma, beta and scaled-t use fitted distribution parameters", {
+  skip_on_cran()
   model <- gfam_gamma_model
   theta <- model$family$getTheta()
   i <- which(attr(model$family$getfl(), "fi") == 1L)
@@ -228,6 +235,7 @@ test_that("unit-weight Gamma, beta and scaled-t use fitted distribution paramete
 })
 
 test_that("Tweedie zero atom is randomized using its independent compound-Poisson mass", {
+  skip_on_cran()
   mu <- c(.8, 1.2, 2, 1.5)
   phi <- .7; power <- 1.5
   y <- c(0, 0, 1, 0)
@@ -248,6 +256,7 @@ test_that("Tweedie zero atom is randomized using its independent compound-Poisso
 })
 
 test_that("quantile defaults preserve absent RNG states as well as ordinary-model behaviour", {
+  skip_on_cran()
   had <- exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)
   if (had) {
     old <- .Random.seed
@@ -266,6 +275,7 @@ test_that("quantile defaults preserve absent RNG states as well as ordinary-mode
 
 test_that("default quantile and explicit traditional displays have visual coverage", {
   skip_on_cran()
+  skip_on_cran()
   vdiffr::expect_doppelganger("grouped-family calibrated QQ", qq_plot(gfam_model, seed = 267))
   vdiffr::expect_doppelganger("grouped-family calibrated worm", worm_plot(gfam_model, seed = 267))
   vdiffr::expect_doppelganger("grouped-family calibrated appraisal", appraise(gfam_model, seed = 267))
@@ -274,6 +284,7 @@ test_that("default quantile and explicit traditional displays have visual covera
 
 
 test_that("negative-binomial fitted shapes and Tweedie components have independent CDF oracles", {
+  skip_on_cran()
   model <- gfam_extended_model
   index <- attr(model$family$getfl(), "fi")
   theta <- model$family$getTheta()
@@ -311,6 +322,7 @@ test_that("negative-binomial fitted shapes and Tweedie components have independe
 })
 
 test_that("scalar censored-family CDFs and recoverable censor bounds are preserved", {
+  skip_on_cran()
   for (name in names(gfam_censored_models)) {
     model <- gfam_censored_models[[name]]
     index <- attr(model$family$getfl(), "fi")
@@ -344,6 +356,7 @@ test_that("scalar censored-family CDFs and recoverable censor bounds are preserv
 })
 
 test_that("faceted calibrated intervals and worms use each component's sample size", {
+  skip_on_cran()
   model <- gfam_rank_model
   qq <- qq_plot(model, seed = 17, level = .8, by_family = TRUE)
   worm <- worm_plot(model, seed = 17, level = .8, by_family = TRUE)
@@ -361,6 +374,7 @@ test_that("faceted calibrated intervals and worms use each component's sample si
 
 
 test_that("traditional reference fallback is identified and never automatically normal", {
+  skip_on_cran()
   model <- gfam_model
   families <- model$family$getfl()
   families[[2L]]$family <- "No generator"
@@ -382,6 +396,7 @@ test_that("traditional reference fallback is identified and never automatically 
 })
 
 test_that("grouped log-tail residuals retain finite extreme-tail information", {
+  skip_on_cran()
   model <- gfam_model
   row <- which(attr(model$family$getfl(), "fi") == 2L)[1L]
   sigma <- sqrt(exp(model$family$getTheta()[1L]) / model$prior.weights[row])
@@ -392,6 +407,7 @@ test_that("grouped log-tail residuals retain finite extreme-tail information", {
 
 
 test_that("constant grouped observed-fit facets have a single readable x tick", {
+  skip_on_cran()
   p <- observed_fitted_plot(gfam_rank_model)
   built <- ggplot2::ggplot_build(p)
   panels <- built$layout$panel_params
@@ -412,6 +428,7 @@ test_that("constant grouped observed-fit facets have a single readable x tick", 
 
 
 test_that("constant-axis detection does not collapse a variable component with the same centre", {
+  skip_on_cran()
   data <- data.frame(.family = factor(c(1, 1, 2, 2)), fitted = c(0, 0, -1, 1))
   breaks <- gfam_observed_breaks(data)
   expect_equal(breaks(c(-.05, .05)), 0)

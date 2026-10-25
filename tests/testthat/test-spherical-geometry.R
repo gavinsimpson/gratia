@@ -1,3 +1,7 @@
+# The full suite checks combinations across models, families and plot options.
+# Small function checks remain in test-function-core.R and focused test files.
+skip_on_cran()
+
 test_that("automatic SOS evaluation grids keep named observed ranges", {
   d <- data.frame(north = c(-89.9, 89.9), east = c(-179.9, 179.9))
   g <- sos_data(d, n = 5, vars = c("north", "east"))

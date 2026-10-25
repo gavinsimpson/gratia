@@ -1,3 +1,7 @@
+# The full suite checks combinations across models, families and plot options.
+# Small function checks remain in test-function-core.R and focused test files.
+skip_on_cran()
+
 parametric_label_data <- function() {
   withr::with_seed(430, {
     d <- data.frame(x = runif(200), z = runif(200), w = runif(200),

@@ -1,3 +1,7 @@
+# The full suite checks combinations across models, families and plot options.
+# Small function checks remain in test-function-core.R and focused test files.
+skip_on_cran()
+
 factor_control_models <- local({
   models <- NULL
   function() {
@@ -22,7 +26,8 @@ factor_control_models <- local({
 
 factor_control_sets <- function() {
   types <- c("factor-by", "sz", "fs")
-  lapply(0:7, function(i) types[as.logical(intToBits(i)[1:3])])
+  cases <- test_cases_for_cran(0:7, c(0L, 1L, 6L, 7L))
+  lapply(cases, function(i) types[as.logical(intToBits(i)[1:3])])
 }
 
 factor_control_type <- function(p) {
@@ -57,7 +62,10 @@ test_that("every grouping and ribbon subset works for mixed factor smooths", {
         type <- factor_control_type(panel)
         expect_identical(factor_control_ribbon(panel),
           type == "ordinary" || type %in% types)
-        expect_silent(ggplot2::ggplot_build(panel))
+        # The layer and grouping checks apply to every case. Render one of each
+        # smooth type on CRAN, and every combination in the full suite.
+        expect_plot_render(panel,
+          cran = identical(entry, entries$model) && length(types) == 3L)
       }
     }
     for (types in factor_control_sets()) {
@@ -114,7 +122,7 @@ test_that("FALSE separates factor smooths and hides their intervals", {
       panel <- p[[i]]
       expect_identical(factor_control_ribbon(panel),
         factor_control_type(panel) == "ordinary")
-      expect_silent(ggplot2::ggplot_build(panel))
+      expect_plot_render(panel)
     }
     empty <- entry(grouped = character(0), show_ci = character(0))
     for (i in seq_len(length(p))) expect_equal(p[[i]]$data, empty[[i]]$data)

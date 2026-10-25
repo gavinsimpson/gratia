@@ -32,6 +32,7 @@ test_that("bayesplot receives fitting responses and complete replicated datasets
 })
 
 test_that("binomial checks use success counts and fitted trial counts", {
+  skip_on_cran()
   skip_if_not_installed("bayesplot")
   dat <- data.frame(x = seq(-1, 1, length.out = 50), trials = rep(10L, 50))
   dat$success <- rep(1:10, 5)
@@ -58,6 +59,7 @@ test_that("binomial checks use success counts and fitted trial counts", {
 })
 
 test_that("bayesplot removes excluded rows from all inputs together", {
+  skip_on_cran()
   skip_if_not_installed("bayesplot")
   dat <- data.frame(x = seq(-1, 1, length.out = 30),
     y = sin(seq(-1, 1, length.out = 30)), group = factor(rep(1:2, 15)))
@@ -79,6 +81,7 @@ test_that("bayesplot removes excluded rows from all inputs together", {
 })
 
 test_that("full mixed binomial checks retain actual trials with frequency weights", {
+  skip_on_cran()
   skip_if_not_installed("bayesplot")
   dat <- withr::with_seed(13, {
     out <- data.frame(x = stats::runif(80), id = factor(rep(1:8, each = 10)),
@@ -103,6 +106,7 @@ test_that("full mixed binomial checks retain actual trials with frequency weight
 })
 
 test_that("multivariate and grouped checks require an explicit response", {
+  skip_on_cran()
   skip_if_not_installed("bayesplot")
   expect_error(bayesplot_test_prepare(m_mvn), "Select a 'response'")
   p <- bayesplot_test_prepare(m_mvn, response = "response2")
@@ -118,6 +122,7 @@ test_that("multivariate and grouped checks require an explicit response", {
 })
 
 test_that("posterior check arguments fail clearly instead of changing the sampler", {
+  skip_on_cran()
   skip_if_not_installed("bayesplot")
   expect_error(bayesplot_test_prepare(m_tiny_eg1, type = "not_a_plot"), "Available ppc types")
   expect_error(bayesplot_test_prepare(m_tiny_eg1, n = 0), "positive integer")
@@ -136,6 +141,7 @@ test_that("posterior check arguments fail clearly instead of changing the sample
 })
 
 test_that("grouped selections retain component numbers and evaluate only their means", {
+  skip_on_cran()
   skip_if_not_installed("bayesplot")
   dat <- withr::with_seed(278, {
     d <- data.frame(x = seq(-1, 1, length.out = 80),
@@ -168,6 +174,7 @@ test_that("grouped selections retain component numbers and evaluate only their m
 })
 
 test_that("Gumbel binned errors use the response mean and preserve custom means", {
+  skip_on_cran()
   skip_if_not_installed("bayesplot")
   draws <- matrix(stats::coef(m_gumbls), nrow = 1L)
   p <- bayesplot_test_prepare(m_gumbls, type = "error_binned", n = 1,
@@ -186,6 +193,7 @@ test_that("Gumbel binned errors use the response mean and preserve custom means"
 })
 
 test_that("hurdle Poisson binned errors retain a scalar response", {
+  skip_on_cran()
   skip_if_not_installed("bayesplot")
   fit <- bayesplot_test_zip_fit()
   draws <- matrix(coef(fit), nrow = 1L)
@@ -200,6 +208,7 @@ test_that("hurdle Poisson binned errors retain a scalar response", {
 })
 
 test_that("bayesplot renders hurdle Poisson binned errors with rstantools", {
+  skip_on_cran()
   skip_if_not_installed("bayesplot")
   skip_if_not_installed("rstantools")
   fit <- bayesplot_test_zip_fit()
@@ -208,6 +217,7 @@ test_that("bayesplot renders hurdle Poisson binned errors with rstantools", {
 })
 
 test_that("posterior check seeds are reproducible without changing RNG state", {
+  skip_on_cran()
   skip_if_not_installed("bayesplot")
   withr::local_seed(101)
   before <- .Random.seed
@@ -219,6 +229,7 @@ test_that("posterior check seeds are reproducible without changing RNG state", {
 })
 
 test_that("leave-one-out checks share coefficient draws with likelihood weights", {
+  skip_on_cran()
   skip_if_not_installed("bayesplot")
   skip_if_not_installed("loo")
   draws <- post_draws(m_tiny_eg1, n_draws = 100, seed = 11, method = "gaussian")
@@ -239,6 +250,7 @@ test_that("leave-one-out checks share coefficient draws with likelihood weights"
 })
 
 test_that("bayesplot renders LOO-PIT checks with rstantools", {
+  skip_on_cran()
   skip_if_not_installed("bayesplot")
   skip_if_not_installed("loo")
   skip_if_not_installed("rstantools")
@@ -247,6 +259,7 @@ test_that("bayesplot renders LOO-PIT checks with rstantools", {
 })
 
 test_that("grouped leave-one-out plots receive only their selected PSIS columns", {
+  skip_on_cran()
   skip_if_not_installed("bayesplot")
   skip_if_not_installed("loo")
   if (!exists("gfam_model")) skip("mgcv has no grouped family support")
@@ -263,6 +276,7 @@ test_that("grouped leave-one-out plots receive only their selected PSIS columns"
 })
 
 test_that("multivariate LOO response draws retain drawn covariance parameters", {
+  skip_on_cran()
   prep <- posterior_likelihood_prepare(m_mvn, n = 2, seed = 10)
   # Make the precision substantially different from the fitted precision.
   d <- n_eta(prep$model)

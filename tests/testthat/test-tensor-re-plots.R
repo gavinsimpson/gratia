@@ -1,3 +1,7 @@
+# The full suite checks combinations across models, families and plot options.
+# Small function checks remain in test-function-core.R and focused test files.
+skip_on_cran()
+
 # Numeric correctness is checked against mgcv, independently of plot assembly.
 test_that("all tensor constructors display numeric axes before random factors", {
   withr::local_pdf(NULL)

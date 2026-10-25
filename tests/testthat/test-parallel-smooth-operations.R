@@ -1,3 +1,7 @@
+# The full suite checks combinations across models, families and plot options.
+# Small function checks remain in test-function-core.R and focused test files.
+skip_on_cran()
+
 skip_if_not_installed("mirai")
 skip_if_not_installed("carrier")
 
@@ -15,13 +19,15 @@ parallel_tensor_fixture <- local({
 
 # Compare all outputs, including attributes, and the caller's final RNG state.
 # Starting the pool after the reference call exercises the serial fallback.
-expect_smooth_workers <- function(calculate) {
+expect_smooth_workers <- function(calculate, cran = FALSE) {
   mirai::daemons(0)
   withr::defer(mirai::daemons(0))
   set.seed(348)
   reference <- calculate()
   reference_state <- .Random.seed
-  counts <- if (full_test_run()) c(1L, 2L) else 1L
+  # Exercise each operation with workers on CRAN. Additional model and option
+  # combinations keep their serial checks there, with workers in full runs.
+  counts <- test_cases_for_cran(c(1L, 2L), if (cran) 1L else integer())
   for (n in counts) {
     gratia_test_workers(n)
     set.seed(348)
@@ -47,7 +53,7 @@ test_that("term workers preserve derivatives, selections and supplied row order"
       derivatives(m_scam, n = 5)
     )
   }
-  reference <- expect_smooth_workers(calculate)
+  reference <- expect_smooth_workers(calculate, cran = TRUE)
   expect_equal(reference[[1]]$x0[1:4], nd$x0)
   expect_equal(reference[[1]]$x2[5:8], nd$x2)
   expect_equal(nrow(reference[[4]]), 0L)
@@ -65,11 +71,12 @@ test_that("partial derivative workers preserve focal variables and intervals", {
     partial_derivatives(model, n = 5, order = 2, focal = c("x1", "x2"),
       interval = "simultaneous", n_sim = 100),
     partial_derivatives(model, select = "te(x0,x1)", n = 5)
-  ))
+  ), cran = TRUE)
   expect_equal(reference[[2]]$x0, rep(nd$x0, 2))
 })
 
 test_that("parallel calculations evaluate local expressions in the caller", {
+  skip_on_cran()
   d <- transformed_data()
   shift <- .7
   fun <- function(x) log(x + shift)
@@ -133,7 +140,7 @@ test_that("fresh workers preserve custom prediction methods and tensor margins",
     smooth_samples(tensor, data = nd, n_draws = 4, seed = 24),
     derivatives(factor_model, data = nd),
     smooth_samples(factor_model, data = nd, n_draws = 4, seed = 24)
-  ))
+  ), cran = TRUE)
   # Verify the custom sample values against the caller's prediction method,
   # rather than relying only on agreement between the two execution paths.
   draws <- post_draws(model, n_draws = 4, seed = 24)
@@ -151,6 +158,7 @@ test_that("fresh workers preserve custom prediction methods and tensor margins",
 })
 
 test_that("fresh workers preserve optional prediction methods in gam fits", {
+  skip_on_cran()
   skip_if_not_installed("scam")
   loadNamespace("scam")
   model <- mgcv::gam(y ~ s(x0, bs = "mpi", k = 5) + s(x1, k = 5),
@@ -194,7 +202,7 @@ test_that("smooth workers reuse joint draws and preserve chain diagnostics", {
     smooth_samples(m_scam, n_draws = 12, n_grid = 5, seed = 54),
     smooth_samples(m_gam, select = "s(x0)", method = "user", draws = draws,
       data = nd, seed = 55)
-  ))
+  ), cran = TRUE)
   sims <- reference[[1]]
   expect_identical(sampling_diagnostics(sims), sampling_diagnostics(draws))
   expect_identical(attr(sims, "sampling"), metadata)
@@ -223,13 +231,14 @@ test_that("comparison workers preserve pair order, alignment and uncertainty", {
     difference_smooths(model, select = c("s(x2):fac1", "s(x2):fac3"),
       n = 5, interval = "simultaneous", n_sim = 100, partial_match = FALSE),
     difference_smooths(su_m_factor_by_gamm4, select = "s(x2)", n = 5)
-  ))
+  ), cran = TRUE)
   expect_equal(reference[[1]]$x2, rep(nd$x2[1:3], 3))
   expect_equal(unique(paste(reference[[1]]$.level_1, reference[[1]]$.level_2)),
     c("1 2", "1 3", "2 3"))
 })
 
 test_that("comparison workers preserve derivative differences and surface grids", {
+  skip_on_cran()
   model <- su_m_factor_by
   nd <- expand.grid(x2 = c(.8, .2, .5), fac = levels(su_eg4$fac), x0 = .4)
   surface <- mgcv::gam(y ~ fac + te(x0, x2, by = fac, k = c(3, 3)),
@@ -375,6 +384,7 @@ test_that("MH sampling finishes before term workers and retains its controls", {
 })
 
 test_that("bootstrap derivative workers retain smoothing-bias correction", {
+  skip_on_cran()
   skip_if_not(exists("scasm", asNamespace("mgcv")))
   withr::local_seed(353)
   model <- mgcv::scasm(y ~ s(x0, bs = "sc", xt = "m+", k = 5) +

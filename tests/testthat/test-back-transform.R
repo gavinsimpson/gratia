@@ -1,3 +1,7 @@
+# The full suite checks combinations across models, families and plot options.
+# Small function checks remain in test-function-core.R and focused test files.
+skip_on_cran()
+
 coordinate_fixture <- function() {
   withr::with_seed(412, {
     d <- expand.grid(x = seq(1, 5, length.out = 12),

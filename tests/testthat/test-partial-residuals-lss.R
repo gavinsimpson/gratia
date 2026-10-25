@@ -48,10 +48,15 @@ test_that("drawing LSS smooths warns once and omits partial residuals", {
     expect_identical(names(plots), names(reference))
     expect_gte(length(plots), length(m$smooth))
     for (i in seq_along(plots)) {
-      expect_silent(actual <- ggplot2::ggplot_build(plots[[i]]))
-      expected <- ggplot2::ggplot_build(reference[[i]])
-      expect_equal(actual$data, expected$data)
-      expect_equal(actual$layout$panel_params, expected$layout$panel_params)
+      expect_equal(plots[[i]]$data, reference[[i]]$data)
+      expect_equal(lapply(plots[[i]]$layers, `[[`, "data"),
+        lapply(reference[[i]]$layers, `[[`, "data"))
+      if (full_test_run() || (identical(m, lss_partial_residual_models$gaulss) && i == 1L)) {
+        expect_silent(actual <- ggplot2::ggplot_build(plots[[i]]))
+        expected <- ggplot2::ggplot_build(reference[[i]])
+        expect_equal(actual$data, expected$data)
+        expect_equal(actual$layout$panel_params, expected$layout$panel_params)
+      }
     }
     expect_warning(assemble(m, residuals = TRUE, select = 1, n = 8,
       rug = FALSE), "Drawing smooths without partial residuals", fixed = TRUE)

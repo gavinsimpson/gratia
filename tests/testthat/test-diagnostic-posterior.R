@@ -1,3 +1,7 @@
+# The full suite checks combinations across models, families and plot options.
+# Small function checks remain in test-function-core.R and focused test files.
+skip_on_cran()
+
 test_that("ordinary posterior diagnostics respect weights, trials and offsets", {
   withr::local_seed(1)
   d <- data.frame(x = runif(120), wt = rep(c(1, 4), 60), off = runif(120))

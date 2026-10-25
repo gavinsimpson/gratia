@@ -58,17 +58,25 @@ test_that("simulation pairs shared draws before summarising on either scale", {
   }
 })
 
-test_that("simulation is reproducible and approximates analytic link intervals", {
+test_that("simulation is reproducible and preserves the caller RNG", {
   f <- conditional_difference_fixture()
   m <- f$model
   withr::local_seed(21)
   rng <- .Random.seed
+  n_sim <- test_cases_for_cran(10000L, 30L)
   sim <- conditional_differences(m, "a", list(x = 0.5), scale = "link",
-    uncertainty = "simulation", n_sim = 10000, seed = 42, mvn_method = "mgcv")
+    uncertainty = "simulation", n_sim = n_sim, seed = 42, mvn_method = "mgcv")
   expect_identical(.Random.seed, rng)
   expect_identical(sim, conditional_differences(m, "a", list(x = 0.5),
-    scale = "link", uncertainty = "simulation", n_sim = 10000,
+    scale = "link", uncertainty = "simulation", n_sim = n_sim,
     seed = 42, mvn_method = "mgcv"))
+})
+
+test_that("large contrast simulations approximate analytic link intervals", {
+  skip_on_cran()
+  m <- conditional_difference_fixture()$model
+  sim <- conditional_differences(m, "a", list(x = 0.5), scale = "link",
+    uncertainty = "simulation", n_sim = 10000, seed = 42, mvn_method = "mgcv")
   delta <- conditional_differences(m, "a", list(x = 0.5), scale = "link")
   expect_equal(sim$.se / delta$.se, rep(1, 3), tolerance = 0.04)
   expect_equal((sim$.upper_ci - sim$.diff) / delta$.se,

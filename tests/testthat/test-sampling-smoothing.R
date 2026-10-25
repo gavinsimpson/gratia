@@ -1,3 +1,7 @@
+# The full suite checks combinations across models, families and plot options.
+# Small function checks remain in test-function-core.R and focused test files.
+skip_on_cran()
+
 test_that("smoothing setup preserves fitted Gaussian conditionals and mappings", {
   configurations <- list(list(), list(method = "ML"), list(bam = TRUE, method = "fREML"),
     list(linked = TRUE), list(linked = TRUE, bam = TRUE, method = "fREML"),
@@ -251,11 +255,13 @@ test_that("smoothing audit distinguishes actual fitting and parameter blocks", {
 test_that("smoothing uncertainty excludes NCV and QNCV using the actual fit", {
   fixture <- smoothing_research_fixture()
   formula <- y ~ s(x, k = 5) + s(z, k = 5)
-  fits <- lapply(c("NCV", "QNCV"), function(method)
+  fits <- lapply(test_cases_for_cran(c("NCV", "QNCV"), "NCV"), function(method)
     mgcv::gam(formula, data = fixture$data, weights = w, method = method,
       nei = list(jackknife = FALSE)))
-  fits[[3L]] <- mgcv::bam(formula, data = fixture$data, weights = w,
-    method = "NCV", discrete = TRUE)
+  if (full_test_run()) {
+    fits[[3L]] <- mgcv::bam(formula, data = fixture$data, weights = w,
+      method = "NCV", discrete = TRUE)
+  }
   for (fit in fits) {
     actual <- fit$method
     # A misleading stored call or a supplied covariance cannot enable a fit

@@ -1,3 +1,7 @@
+# The full suite checks combinations across models, families and plot options.
+# Small function checks remain in test-function-core.R and focused test files.
+skip_on_cran()
+
 # Evaluate a native conditional parameter state without estimating covariance
 # parameters: covariance tests then have a known AR1 coefficient and cannot
 # pass merely because a fitted variance collapsed to zero.
@@ -90,15 +94,17 @@ test_that("native temporal simulations retain AR1 field covariance", {
   skip_if_not_installed("sdmTMB", minimum_version = "1.2.0")
   withr::local_options(gratia.diagnostics.marginal_draws = 29L)
   m <- sdmtmb_dependence_state(temporal = TRUE)
-  values <- simulate(m, nsim = 2000, seed = 1, re_form = NA,
-    observation_error = FALSE, silent = TRUE)
-  # Compare on Fisher's z scale, allowing five sampling standard errors.
-  # This retains checks for independence and for the wrong correlation at lag 2.
-  z_tolerance <- 5 / sqrt(ncol(values) - 3)
-  expect_lt(abs(atanh(cor(values[1, ], values[5, ])) - atanh(0.7)),
-    z_tolerance)
-  expect_lt(abs(atanh(cor(values[1, ], values[9, ])) - atanh(0.7^2)),
-    z_tolerance)
+  if (full_test_run()) {
+    values <- simulate(m, nsim = 2000, seed = 1, re_form = NA,
+      observation_error = FALSE, silent = TRUE)
+    # Compare on Fisher's z scale, allowing five sampling standard errors.
+    # This detects independence and the wrong correlation at lag 2.
+    z_tolerance <- 5 / sqrt(ncol(values) - 3)
+    expect_lt(abs(atanh(cor(values[1, ], values[5, ])) - atanh(0.7)),
+      z_tolerance)
+    expect_lt(abs(atanh(cor(values[1, ], values[9, ])) - atanh(0.7^2)),
+      z_tolerance)
+  }
   for (conditioning in c("conditional", "marginal")) {
     dist <- sdmtmb_diagnostic_model(m, conditioning, field_method = "mle-mvn-integrated")$distribution
     expect_false(dist$independent)

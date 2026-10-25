@@ -1,3 +1,7 @@
+# The full suite checks combinations across models, families and plot options.
+# Small function checks remain in test-function-core.R and focused test files.
+skip_on_cran()
+
 skip_if_not_installed("scam", minimum_version = "1.2-22")
 
 # Fit every constructor, including explicit numeric-by bases and the bases
@@ -54,7 +58,7 @@ test_that("every SCAM constructor has a type and evaluates the fitted function",
     idx <- smooth_coef_indices(sm)
     expect_type(smooth_type(sm), "character")
     expect_true(all(is.finite(m$coefficients.t)), info = name)
-    for (n in c(1L, 2L, 9L)) {
+    for (n in test_cases_for_cran(c(1L, 2L, 9L), c(1L, 9L))) {
       nd <- fixtures$data[seq_len(n), ]
       # Native lipl drops matrix dimensions for a single prediction row.
       ref <- if (n == 1L) nd[c(1L, 1L), , drop = FALSE] else nd
@@ -85,7 +89,8 @@ test_that("SCAM plots reproduce native functions with an explicit surface centre
   file <- tempfile(fileext = ".pdf")
   grDevices::pdf(file)
   on.exit({grDevices::dev.off(); unlink(file)}, add = TRUE)
-  for (name in names(fixtures$models)) {
+  for (name in test_cases_for_cran(names(fixtures$models),
+    c("mpi", "lipl", "mpiBy", "tedmi", "tismi"))) {
     m <- fixtures$models[[name]]
     sm <- m$smooth[[1L]]
     native <- scam::plot.scam(m, n = 20, n2 = 10, se = 1, rug = FALSE,
@@ -122,7 +127,7 @@ test_that("endpoint curves and constrained surfaces reach ggplot's renderer", {
   fixtures <- scam_constructor_models()
   bases <- intersect(c("mifo", "ipo", "lipl", "mpiBy", "tedmi", "tedi",
     "teid", "tesmi1", "tismi"), names(fixtures$models))
-  for (name in bases) {
+  for (name in test_cases_for_cran(bases, c("lipl", "mpiBy", "tedmi"))) {
     plots <- draw(fixtures$models[[name]], n = 20, n_2d = 10,
       rug = FALSE, parametric = FALSE, wrap = FALSE, dist = 0)
     expect_length(plots, 1L)

@@ -1,3 +1,7 @@
+# The full suite checks combinations across models, families and plot options.
+# Small function checks remain in test-function-core.R and focused test files.
+skip_on_cran()
+
 test_that("smooth and interval themes modify completed plots independently", {
   m <- su_m_quick_eg1
   p <- draw(m)

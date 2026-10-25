@@ -1,3 +1,7 @@
+# The full suite checks combinations across models, families and plot options.
+# Small function checks remain in test-function-core.R and focused test files.
+skip_on_cran()
+
 skip_if_not_installed("GJRM", minimum_version = "0.2-6")
 
 gjrm_selection_fixture <- local({

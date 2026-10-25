@@ -4,10 +4,11 @@ test_that("LOO and WAIC match direct calls with the same coefficient draws", {
   dat <- data.frame(x = seq(-1, 1, length.out = 45))
   dat$y <- sin(dat$x) + rnorm(nrow(dat), sd = 0.5)
   fit <- mgcv::gam(y ~ s(x, k = 5), data = dat, method = "REML")
-  ll <- log_lik(fit, n_draws = 400, seed = 41)
+  n_draws <- test_cases_for_cran(400L, 40L)
+  ll <- log_lik(fit, n_draws = n_draws, seed = 41)
   direct <- suppressWarnings(loo::loo(ll, r_eff = 1, save_psis = TRUE,
     cores = 1))
-  result <- suppressWarnings(loo::loo(fit, n_draws = 400, seed = 41,
+  result <- suppressWarnings(loo::loo(fit, n_draws = n_draws, seed = 41,
     save_psis = TRUE, cores = 1))
   expect_s3_class(result, "loo")
   expect_equal(result$estimates, direct$estimates)
@@ -17,7 +18,7 @@ test_that("LOO and WAIC match direct calls with the same coefficient draws", {
     stats::weights(direct$psis_object))
   expect_equal(attr(result, "observation"), attr(ll, "observation"))
   expect_equal(attr(result, "gratia"), attr(ll, "gratia"))
-  expect_equal(suppressWarnings(loo::waic(fit, n_draws = 400, seed = 41))$estimates,
+  expect_equal(suppressWarnings(loo::waic(fit, n_draws = n_draws, seed = 41))$estimates,
     suppressWarnings(loo::waic(ll))$estimates)
   expect_identical(getS3method("logLik", "gam"),
     getFromNamespace("logLik.gam", "mgcv"))
@@ -158,6 +159,7 @@ test_that("multivariate likelihoods honour explicit family hooks", {
 })
 
 test_that("weighted Gamma and inverse Gaussian LOO and WAIC use native densities", {
+  skip_on_cran()
   skip_if_not_installed("loo")
   for (name in c("Gamma", "inverse.gaussian")) {
     m <- log_lik_ordinary_fixture(name)

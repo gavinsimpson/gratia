@@ -106,6 +106,7 @@ test_that("smooth difference derivatives retain joint coefficient covariance", {
 })
 
 test_that("smooth difference derivatives align full grids and restrict selections", {
+  skip_on_cran()
   f <- difference_derivative_fixture(TRUE)
   calculate <- function(data, ...) difference_smooths(f$model,
     select = f$select, data = data, order = 1, focal = "x", ...)
@@ -142,6 +143,7 @@ test_that("smooth difference derivatives align full grids and restrict selection
 })
 
 test_that("transformed differences obey the chain rule and retain raw coordinates", {
+  skip_on_cran()
   f <- difference_derivative_fixture(transformed = TRUE)
   a <- difference_smooths(f$model, select = f$select, data = f$data, order = 1)
   b <- difference_smooths(f$model, select = f$select, data = f$data, order = 1,
@@ -171,6 +173,7 @@ test_that("transformed differences obey the chain rule and retain raw coordinate
 })
 
 test_that("automatic derivative grids accommodate the stencil and preserve supplied points", {
+  skip_on_cran()
   for (surface in c(FALSE, TRUE)) {
     f <- difference_derivative_fixture(surface)
     for (order in 1:2) {
@@ -191,6 +194,7 @@ test_that("automatic derivative grids accommodate the stencil and preserve suppl
 })
 
 test_that("derivative intervals use each comparison design and preserve seed scope", {
+  skip_on_cran()
   f <- difference_derivative_fixture(TRUE)
   m <- f$model
   calculate <- function(...) difference_smooths(m, select = f$select,
@@ -247,6 +251,7 @@ test_that("derivative arguments reject unsupported requests without altering ord
 })
 
 test_that("existing model adapters forward smooth difference derivatives", {
+  skip_on_cran()
   for (model in list(su_m_factor_by_bam, su_m_factor_by_gamm, su_m_factor_by_gamm4)) {
     gam <- if (inherits(model, "gamm")) model$gam else if (inherits(model, "gamm4")) gamm4_gam(model) else model
     args <- list(select = "s(x2)", order = 1, n = 5,
@@ -257,6 +262,7 @@ test_that("existing model adapters forward smooth difference derivatives", {
 })
 
 test_that("known smooth offsets shift derivative differences without adding uncertainty", {
+  skip_on_cran()
   f <- difference_derivative_fixture()
   model <- f$model
   rlang::local_bindings(.env = .GlobalEnv,
@@ -289,6 +295,7 @@ test_that("known smooth offsets shift derivative differences without adding unce
 })
 
 test_that("raw differentiation matches inputs even when transformed coordinates repeat", {
+  skip_on_cran()
   d <- difference_derivative_fixture()$training
   d$x <- 2 * (d$x - 2)
   m <- mgcv::gam(y ~ group + s(I(x^2), by = group, k = 6) + s(z, k = 5),
@@ -310,6 +317,7 @@ test_that("raw differentiation matches inputs even when transformed coordinates 
 })
 
 test_that("local expressions and composite raw coordinates are evaluated forwards", {
+  skip_on_cran()
   d <- difference_derivative_fixture()$training
   shift <- .2
   fun <- function(x) log(x + shift)
@@ -334,6 +342,7 @@ test_that("local expressions and composite raw coordinates are evaluated forward
 })
 
 test_that("empty factor-level names retain both derivative contributions", {
+  skip_on_cran()
   d <- difference_derivative_fixture()$training
   d$group <- factor(d$group, labels = c("", "b", "c"))
   m <- mgcv::gam(y ~ group + s(x, by = group, k = 6) + s(z, k = 5),
@@ -354,6 +363,7 @@ test_that("empty factor-level names retain both derivative contributions", {
 })
 
 test_that("raw derivative comparisons allow group-dependent transformations", {
+  skip_on_cran()
   d <- difference_derivative_fixture()$training
   m <- mgcv::gam(y ~ group +
     te(I(x * as.numeric(group)), z, by = group, k = c(4, 4)),
@@ -394,6 +404,7 @@ test_that("raw derivative comparisons allow group-dependent transformations", {
 })
 
 test_that("singleton automatic derivative grids validate the full fitted range", {
+  skip_on_cran()
   f <- difference_derivative_fixture()
   d <- f$training
   d$w <- withr::with_seed(265, runif(nrow(d), .05, .95))
@@ -431,6 +442,7 @@ test_that("singleton automatic derivative grids validate the full fitted range",
 })
 
 test_that("derivative difference plots label the values on curves and surfaces", {
+  skip_on_cran()
   for (surface in c(FALSE, TRUE)) {
     f <- difference_derivative_fixture(surface)
     for (order in 1:2) {

@@ -1,3 +1,7 @@
+# The full suite checks combinations across models, families and plot options.
+# Small function checks remain in test-function-core.R and focused test files.
+skip_on_cran()
+
 library("mgcv")
 
 moment_test_models <- local({
@@ -149,6 +153,7 @@ test_that("joint uncertainty retains covariance between LSS predictors", {
 })
 
 test_that("delta and joint simulation agree locally for global and LSS parameters", {
+  skip_on_cran()
   models <- moment_test_models()
   for (nm in c("gamma", "tweedie", "negative_binomial", "beta_regression", "gammals", "twlss")) {
     m <- models[[nm]]
@@ -161,6 +166,21 @@ test_that("delta and joint simulation agree locally for global and LSS parameter
     expect_equal(simulation$.se / delta$.se, rep(1, 3), tolerance = 0.14, info = nm)
     if (!is.null(before)) expect_identical(m$family$getTheta(), before, info = nm)
   }
+})
+
+test_that("moment simulation preserves its seed and fitted values", {
+  m <- moment_test_models()$gammals
+  nd <- data.frame(x = 0.5)
+  withr::local_seed(27)
+  before <- .Random.seed
+  actual <- fitted_moments(m, data = nd, moments = c("mean", "variance", "cv"),
+    uncertainty = "simulation", n_draws = 30, seed = 27)
+  expect_identical(.Random.seed, before)
+  expect_identical(actual, fitted_moments(m, data = nd,
+    moments = c("mean", "variance", "cv"), uncertainty = "simulation",
+    n_draws = 30, seed = 27))
+  expect_equal(actual$.fitted,
+    fitted_moments(m, data = nd, moments = c("mean", "variance", "cv"))$.fitted)
 })
 
 test_that("GEV moments agree with integration through the Gumbel limit", {
@@ -517,7 +537,7 @@ test_that("likelihood dispersion and coefficient covariance use the same estimat
   delta <- fitted_moments(m, data = nd, moments = c("mean", "variance", "cv"))
   expect_equal(delta$.fitted, c(mu, m$reml.scale * mu^2, sqrt(m$reml.scale)))
   expect_equal(delta$.se[1], expected_mean_se)
-  for (mode in c("none", "simulation")) {
+  for (mode in test_cases_for_cran(c("none", "simulation"), "none")) {
     result <- fitted_moments(m, data = nd, moments = c("mean", "variance", "cv"),
       uncertainty = mode, n_draws = 3000, seed = 98)
     expect_equal(result$.fitted, delta$.fitted)
@@ -599,9 +619,11 @@ test_that("linked and fixed smoothing parameters map into the joint covariance",
     smooth <- (m$family$n.theta %||% 0L) + 1L
     fixed_V <- m$Vp + tcrossprod(D[, smooth, drop = FALSE]) / H[smooth, smooth]
     expect_equal(fixed$.se, mu * sqrt(drop(X %*% fixed_V %*% t(X))))
-    simulation <- fitted_moments(m, data = nd, moments = "mean", unconditional = TRUE,
-      uncertainty = "simulation", n_draws = 2500, seed = 44)
-    expect_equal(simulation$.se / actual$.se, 1, tolerance = 0.06)
+    if (full_test_run()) {
+      simulation <- fitted_moments(m, data = nd, moments = "mean", unconditional = TRUE,
+        uncertainty = "simulation", n_draws = 2500, seed = 44)
+      expect_equal(simulation$.se / actual$.se, 1, tolerance = 0.06)
+    }
   }
 })
 

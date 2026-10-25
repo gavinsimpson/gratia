@@ -1,3 +1,7 @@
+# The full suite checks combinations across models, families and plot options.
+# Small function checks remain in test-function-core.R and focused test files.
+skip_on_cran()
+
 skip_if_not_installed("mirai")
 skip_if_not_installed("carrier")
 
@@ -114,6 +118,9 @@ test_that("ALE workers preserve block order, row counts and all returned attribu
     cases[[paste0("tied_bins_", size)]] <- list(object = f$smooth,
       focal = "x", data = tied, n_bins = 40, block_size = size)
   }
+  cases <- test_cases_for_cran(cases,
+    cases[c("factor_link", "bam_response", "distributional_scale",
+      "omitted_training", "repeated_reference_rows", "tied_bins_1")])
   expected <- lapply(cases, function(args) do.call(ale, args))
   expect_identical(sum(expected$factor_link$.n), nrow(d))
   expect_identical(attr(expected$omitted_training, "ale_info")$n_reference, 122L)
@@ -171,7 +178,8 @@ test_that("ALE workers retain one caller draw matrix and the caller RNG state", 
   withr::defer(do.call(RNGkind, as.list(old_kind)))
   f <- parallel_ale_fixture()
   specs <- list()
-  for (kind in c("Mersenne-Twister", "L'Ecuyer-CMRG")) {
+  for (kind in test_cases_for_cran(c("Mersenne-Twister", "L'Ecuyer-CMRG"),
+    "L'Ecuyer-CMRG")) {
     for (seed in list(53L, NULL)) {
       RNGkind(kind)
       set.seed(8403)
