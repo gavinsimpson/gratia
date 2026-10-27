@@ -86,6 +86,9 @@
   ## having pruned off any standard errors, process the result
   if (is.array(pred_vals) && length(dim(pred_vals)) > 1L) {
     constant <- attr(pred_vals, "constant", exact = TRUE) %||% 0
+    if (is.null(colnames(pred_vals))) {
+      colnames(pred_vals) <- paste0("V", seq_len(ncol(pred_vals)))
+    }
     pred_vals <- as_tibble(pred_vals)
     if (type %in% c("terms", "iterms")) {
       pred_vals <-

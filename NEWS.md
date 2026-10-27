@@ -1033,6 +1033,10 @@
 
 ## Bug fixes
 
+* `add_fitted()` no longer emits a tibble deprecation warning for multinomial
+  predictions with unnamed columns. The existing `V1`, `V2`, ... column names
+  are preserved (#443).
+
 * **Response derivatives**
 
   `response_derivatives()` now retains unavailable prediction rows with

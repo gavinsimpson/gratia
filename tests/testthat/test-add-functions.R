@@ -24,6 +24,34 @@ test_that("add_fitted works for a GAM with se.fit = TRUE", {
   expect_named(df, c("y", "x0", "x1", "x2", "x3", ".fitted"))
 })
 
+test_that("add_fitted preserves unnamed multinomial predictions without warnings", {
+  withr::local_options(lifecycle_verbosity = "error")
+  data <- multinom_df[c(5L, 2L, 10L), ]
+
+  for (type in c("response", "link")) {
+    expected <- predict(m_multinom, newdata = data, type = type)
+    pred_names <- paste0("V", seq_len(ncol(expected)))
+
+    for (se in c(FALSE, TRUE)) {
+      expect_silent(df <- add_fitted(data, m_multinom, type = type, se.fit = se))
+      expect_s3_class(df, "tbl_df")
+      expect_named(df, c(names(data), pred_names))
+      expect_equal(df[names(data)], data)
+      expect_equal(unname(as.matrix(df[pred_names])), unname(expected))
+    }
+  }
+})
+
+test_that("add_fitted preserves named multinomial term predictions", {
+  data <- multinom_df[c(5L, 2L, 10L), ]
+  expected <- predict(m_multinom, newdata = data, type = "terms")
+
+  expect_silent(df <- add_fitted(data, m_multinom, type = "terms"))
+  expect_named(df, c(names(data), ".constant", colnames(expected)))
+  expect_equal(df[names(data)], data)
+  expect_equal(as.vector(as.matrix(df[colnames(expected)])), as.vector(expected))
+})
+
 test_that("add_residuals works for a GAM", {
   expect_silent(df <- add_residuals(add_data, m_gam, type = "pearson"))
   expect_s3_class(df, "tbl_df")
