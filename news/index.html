@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-72</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-73</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -383,7 +383,8 @@
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-development-version">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
-<ul><li>
+<ul><li><p><code><a href="../reference/add_fitted.html">add_fitted()</a></code> no longer emits a tibble deprecation warning for multinomial predictions with unnamed columns. The existing <code>V1</code>, <code>V2</code>, … column names are preserved (<a href="https://github.com/gavinsimpson/gratia/issues/443" class="external-link">#443</a>).</p></li>
+<li>
 <p><strong>Response derivatives</strong></p>
 <p><code><a href="../reference/response_derivatives.html">response_derivatives()</a></code> now retains unavailable prediction rows with missing estimates, standard errors and intervals under both uncertainty methods, while respecting explicit <code>na.action</code> requests (<a href="https://github.com/gavinsimpson/gratia/issues/437" class="external-link">#437</a>). Original row order and response identifiers are preserved.</p>
 <p>Delta uncertainty now rejects response-mean derivatives for scaled t families with fitted degrees of freedom at or below one, matching simulation (<a href="https://github.com/gavinsimpson/gratia/issues/437" class="external-link">#437</a>). Means with degrees of freedom between one and two and linear-predictor derivatives remain supported.</p>

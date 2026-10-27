@@ -1356,6 +1356,12 @@
 
 ### Bug fixes
 
+- [`add_fitted()`](https://gavinsimpson.github.io/gratia/reference/add_fitted.md)
+  no longer emits a tibble deprecation warning for multinomial
+  predictions with unnamed columns. The existing `V1`, `V2`, … column
+  names are preserved
+  ([\#443](https://github.com/gavinsimpson/gratia/issues/443)).
+
 - **Response derivatives**
 
   [`response_derivatives()`](https://gavinsimpson.github.io/gratia/reference/response_derivatives.md)
