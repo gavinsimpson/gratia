@@ -313,16 +313,16 @@ sms
 #> # A tibble: 1,000 x 8
 #>    .smooth .term .type .by    .row .draw .value      x0
 #>    <chr>   <chr> <chr> <chr> <int> <int>  <dbl>   <dbl>
-#>  1 s(x0)   s(x0) TPRS  NA        1     1 -0.357 0.00711
-#>  2 s(x0)   s(x0) TPRS  NA        1     2 -0.465 0.00711
-#>  3 s(x0)   s(x0) TPRS  NA        1     3 -0.720 0.00711
-#>  4 s(x0)   s(x0) TPRS  NA        1     4 -1.27  0.00711
-#>  5 s(x0)   s(x0) TPRS  NA        1     5 -1.18  0.00711
-#>  6 s(x0)   s(x0) TPRS  NA        2     1 -0.365 0.0121 
-#>  7 s(x0)   s(x0) TPRS  NA        2     2 -0.464 0.0121 
-#>  8 s(x0)   s(x0) TPRS  NA        2     3 -0.708 0.0121 
-#>  9 s(x0)   s(x0) TPRS  NA        2     4 -1.24  0.0121 
-#> 10 s(x0)   s(x0) TPRS  NA        2     5 -1.16  0.0121 
+#>  1 s(x0)   s(x0) TPRS  NA        1     1 -0.386 0.00711
+#>  2 s(x0)   s(x0) TPRS  NA        1     2 -0.546 0.00711
+#>  3 s(x0)   s(x0) TPRS  NA        1     3 -0.724 0.00711
+#>  4 s(x0)   s(x0) TPRS  NA        1     4 -1.22  0.00711
+#>  5 s(x0)   s(x0) TPRS  NA        1     5 -1.15  0.00711
+#>  6 s(x0)   s(x0) TPRS  NA        2     1 -0.391 0.0121 
+#>  7 s(x0)   s(x0) TPRS  NA        2     2 -0.538 0.0121 
+#>  8 s(x0)   s(x0) TPRS  NA        2     3 -0.714 0.0121 
+#>  9 s(x0)   s(x0) TPRS  NA        2     4 -1.19  0.0121 
+#> 10 s(x0)   s(x0) TPRS  NA        2     5 -1.12  0.0121 
 #> # i 990 more rows
 # }
 

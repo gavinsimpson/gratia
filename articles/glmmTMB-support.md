@@ -101,7 +101,7 @@ smooths(nile_tmb)
 #> [1] "s(year)"
 head(smooth_coefs(nile_tmb, select = "s(year)"))
 #>   s(year).1   s(year).2   s(year).3   s(year).4   s(year).5   s(year).6 
-#>   18.174609 -115.231114   -2.991595  -24.387354  -15.572794   13.125102
+#>   13.965792 -111.874312  -11.759876  -21.067622   -6.673338    9.788104
 trend <- smooth_estimates(nile_tmb, select = "s(year)",
   interval = "credible")
 head(trend)
