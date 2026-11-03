@@ -439,16 +439,18 @@ test_that("factor-by fs curves keep their by levels when another group is replac
   expect_error(predicted_samples(m, data = unknown, marginalise = TRUE, n_draws = 2),
     "selected by smooths")
 
-  # Full new-group response covariance distinguishes independent by curves
-  # from the within-curve dependence that simulations must retain.
-  expected <- outer(mu, mu) * expm1(K) + diag(mu)
+  # Inspect the Gaussian predictors passed to the Poisson generator. Their
+  # covariance tests both dependence within a curve and independence between
+  # by levels, without the large sampling error from exponentiation and counts.
+  local_mocked_bindings(choose_rd_fun = function(model) function(mu, ...) log(mu))
   nd$g <- "new"
   samples <- predicted_samples(m, data = nd, marginalise = TRUE,
-    n_draws = 24000, seed = 381)
+    n_draws = 4000, seed = 381)
   z <- matrix(samples$.response, nrow = 4)
-  expect_equal(rowMeans(z), unname(mu), tolerance = .04 * max(mu))
-  expect_lt(max(abs(stats::cov(t(z)) - expected)), .07 * max(expected))
-  expect_lt(abs(stats::cor(z[1, ], z[3, ])), .03)
+  mean_se <- sqrt(diag(K) / ncol(z))
+  cov_se <- sqrt((K^2 + outer(diag(K), diag(K))) / (ncol(z) - 1L))
+  expect_lt(max(abs(rowMeans(z) - eta) / mean_se), 5)
+  expect_lt(max(abs(stats::cov(t(z)) - K) / cov_se), 5)
   draws <- matrix(rep(coef(m), each = 3), nrow = 3)
   fitted <- fitted_samples(m, data = nd, marginalise = TRUE,
     method = "user", draws = draws)
