@@ -338,7 +338,7 @@ growth_fit <- lme(distance ~ Sex * age_c, random = ~ age_c | Subject,
 summary(growth_fit)$tTable
 #>                      Value  Std.Error DF   t-value      p-value
 #> (Intercept)     24.9687500 0.48600071 79 51.375953 1.812713e-62
-#> SexFemale       -2.3210227 0.76141679 25 -3.048295 5.375053e-03
+#> SexFemale       -2.3210227 0.76141678 25 -3.048295 5.375053e-03
 #> age_c            0.7843750 0.08599951 79  9.120691 5.654754e-14
 #> SexFemale:age_c -0.3048295 0.13473534 79 -2.262432 2.641752e-02
 ```

@@ -196,6 +196,12 @@
 
 ### New features
 
+- mgcv’s B-spline tensor products (`bs = "bt"`, available from mgcv
+  1.9-5) are supported in smooth estimates, drawing, basis and penalty
+  extraction, derivatives and smooth sampling.
+  [`smooth_type()`](https://gavinsimpson.github.io/gratia/reference/smooth_type.md)
+  returns `"B spline tensor"` for these smooths.
+
 - [`compare_smooths()`](https://gavinsimpson.github.io/gratia/reference/compare_smooths.md)
   evaluates two-variable smooths at common locations, and
   [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)

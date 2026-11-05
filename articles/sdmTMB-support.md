@@ -615,8 +615,8 @@ summary_draws |>
 #>   <chr>                   <chr>             <dbl>   <dbl>   <dbl>    <dbl>
 #> 1 New fields              density_95th    187.    143.    214.     157.   
 #> 2 New fields              proportion_zero   0.518   0.414   0.630    0.538
-#> 3 Uncertain fitted fields density_95th    160.    144.    183.     157.   
-#> 4 Uncertain fitted fields proportion_zero   0.542   0.526   0.559    0.538
+#> 3 Uncertain fitted fields density_95th    153.    139.    180.     157.   
+#> 4 Uncertain fitted fields proportion_zero   0.542   0.517   0.556    0.538
 ```
 
 The conditional comparison asks whether new responses around the

@@ -3,6 +3,9 @@
 Soap-film boundary and wiggly components use the `sf.film` and
 `sf.wiggly` classes introduced in mgcv 1.9-4.
 
+B-spline tensor products (`bs = "bt"`, available from mgcv 1.9-5) use
+the short name `"B spline tensor"`.
+
 ## Usage
 
 ``` r
@@ -33,6 +36,9 @@ smooth_type(smooth)
 smooth_type(smooth)
 
 # S3 method for class 'Bspline.smooth'
+smooth_type(smooth)
+
+# S3 method for class 'b.tensor'
 smooth_type(smooth)
 
 # S3 method for class 'duchon.spline'

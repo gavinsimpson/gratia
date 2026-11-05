@@ -101,7 +101,7 @@ smooths(nile_tmb)
 #> [1] "s(year)"
 head(smooth_coefs(nile_tmb, select = "s(year)"))
 #>   s(year).1   s(year).2   s(year).3   s(year).4   s(year).5   s(year).6 
-#>   13.965792 -111.874312  -11.759876  -21.067622   -6.673338    9.788104
+#>   18.174609 -115.231114   -2.991595  -24.387354  -15.572794   13.125102
 trend <- smooth_estimates(nile_tmb, select = "s(year)",
   interval = "credible")
 head(trend)
@@ -310,7 +310,7 @@ summary(plant_tmb)
 #> TypeMississippi                  -0.31784    0.09327   -3.41 0.000655 ***
 #> Treatmentchilled                 -0.13966    0.09931   -1.41 0.159638    
 #> TypeMississippi:Treatmentchilled -0.27192    0.18888   -1.44 0.149972    
-#> s(log_conc)1                      0.46392    0.04158   11.16  < 2e-16 ***
+#> s(log_conc)1                     -0.46392    0.04158  -11.16  < 2e-16 ***
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
