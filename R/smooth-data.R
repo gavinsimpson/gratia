@@ -213,7 +213,8 @@
     newlist <- seq_per_dim(
       data = mf, vars = grid_vars, dim = sm_dim,
       n = n, n_2d = n_2d, n_3d = n_3d, n_4d = n_4d,
-      round_extra = !back_transform
+      # Rounding can move B-spline tensor grid values outside its knot range.
+      round_extra = !back_transform && !inherits(sm, "b.tensor")
     )
   }
 

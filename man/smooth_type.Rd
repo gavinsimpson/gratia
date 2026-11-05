@@ -11,6 +11,7 @@
 \alias{smooth_type.pspline.smooth}
 \alias{smooth_type.cpspline.smooth}
 \alias{smooth_type.Bspline.smooth}
+\alias{smooth_type.b.tensor}
 \alias{smooth_type.duchon.spline}
 \alias{smooth_type.fs.interaction}
 \alias{smooth_type.sz.interaction}
@@ -87,6 +88,8 @@ smooth_type(smooth)
 \method{smooth_type}{cpspline.smooth}(smooth)
 
 \method{smooth_type}{Bspline.smooth}(smooth)
+
+\method{smooth_type}{b.tensor}(smooth)
 
 \method{smooth_type}{duchon.spline}(smooth)
 
@@ -204,6 +207,9 @@ smooth_type(smooth)
 \description{
 Soap-film boundary and wiggly components use the \code{sf.film} and \code{sf.wiggly}
 classes introduced in mgcv 1.9-4.
+
+B-spline tensor products (\code{bs = "bt"}, available from mgcv 1.9-5) use
+the short name \code{"B spline tensor"}.
 }
 \details{
 SCAM smooth types use compact constraint descriptions: \code{inc} for

@@ -3,6 +3,9 @@
 #' Soap-film boundary and wiggly components use the `sf.film` and `sf.wiggly`
 #' classes introduced in mgcv 1.9-4.
 #'
+#' B-spline tensor products (`bs = "bt"`, available from mgcv 1.9-5) use
+#' the short name `"B spline tensor"`.
+#'
 #' @details SCAM smooth types use compact constraint descriptions: `inc` for
 #'   increasing, `dec` for decreasing, and `pos` for positive. For tensor
 #'   smooths, the two descriptions follow the covariate order in the smooth
@@ -85,6 +88,12 @@
 `smooth_type.Bspline.smooth` <- function(smooth) {
   sm_type <- "B spline"
   sm_type
+}
+
+#' @export
+#' @rdname smooth_type
+`smooth_type.b.tensor` <- function(smooth) {
+  "B spline tensor"
 }
 
 #' @export
