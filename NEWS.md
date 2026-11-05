@@ -154,6 +154,11 @@
 
 ## New features
 
+* mgcv's B-spline tensor products (`bs = "bt"`, available from mgcv 1.9-5)
+  are supported in smooth estimates, drawing, basis and penalty extraction,
+  derivatives and smooth sampling. `smooth_type()` returns `"B spline tensor"`
+  for these smooths.
+
 * `compare_smooths()` evaluates two-variable smooths at common locations,
   and `draw()` compares their surfaces in side-by-side facets with shared axes
   and colours. Use `show = "difference"` and `pair` to plot one model's

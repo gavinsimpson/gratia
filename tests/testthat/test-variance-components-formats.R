@@ -12,8 +12,13 @@ variance_component_data <- function() {
 expect_variance_component_reference <- function(model, rescale = TRUE,
     compare_intervals = TRUE, compare_expanded = TRUE) {
   got <- variance_comp(model, rescale = rescale, coverage = 0.9)
-  invisible(capture.output(ref <- mgcv::gam.vcomp(model,
-    rescale = rescale, conf.lev = 0.9)))
+  ref <- NULL
+  # mgcv 1.9-5's gam.vcomp() errors when there are no smooth terms.
+  # Keep checking gratia's results, but omit this broken reference comparison.
+  if (packageVersion("mgcv") != "1.9-5" || length(model$smooth) > 0L) {
+    invisible(capture.output(ref <- mgcv::gam.vcomp(model,
+      rescale = rescale, conf.lev = 0.9)))
+  }
   expect_s3_class(got, "variance_comp")
   expect_equal(got$.variance, got$.std_dev^2)
   if (is.list(ref)) {

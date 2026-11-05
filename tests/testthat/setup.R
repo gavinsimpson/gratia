@@ -21,6 +21,27 @@ shared_test_fixture <- local({
   }
 })
 
+# mgcv 1.9-5's B-spline tensors have a separate class and knot range.
+b_tensor_fixture <- function(dimension = 2L, penalty_order = 3, by = "none") {
+  shared_test_fixture(paste("b-tensor", dimension, penalty_order, by), {
+    f <- if (by == "factor") {
+      y ~ fac + s(x0, x1, bs = "bt", k = 5, by = fac)
+    } else if (by == "numeric") {
+      y ~ s(x0, x1, bs = "bt", k = 5, by = x3)
+    } else if (dimension == 1L) {
+      y ~ s(x0, bs = "bt", k = 5)
+    } else if (dimension == 3L) {
+      y ~ s(x0, x1, x2, bs = "bt", k = 5)
+    } else if (penalty_order == 3.2) {
+      y ~ s(x0, x1, bs = "bt", k = 5, m = 3.2)
+    } else {
+      y ~ s(x0, x1, bs = "bt", k = 5)
+    }
+    d <- if (by == "factor" || dimension == 3L) su_eg4 else quick_eg1
+    gam(f, data = d, method = "REML")
+  })
+}
+
 ## Fit models
 n_quick <- 300
 quick_eg1 <- data_sim("eg1", n = n_quick, seed = 21)

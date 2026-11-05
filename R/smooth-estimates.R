@@ -1813,7 +1813,8 @@ smooth_estimates.gjrm <- smooth_estimates.gamlss
   if (sm_dim == 1L &&
     sm_type %in% c(
       "TPRS", "TPRS (shrink)", "CRS", "CRS (shrink)",
-      "Cyclic CRS", "Cyclic P spline", "P spline", "B spline", "Duchon spline",
+      "Cyclic CRS", "Cyclic P spline", "P spline", "B spline", "B spline tensor",
+      "Duchon spline",
       "GP",
       "P spline (inc)",
       "P spline (dec)",
