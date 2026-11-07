@@ -2,11 +2,11 @@ This submission updates gratia to version 0.12.0.
 
 The latest release candidate has been checked under:
 
-* R 4.6.2 on macOS Tahoe 26.6.1 (aarch64), locally, and
-* R 4.6.2 on Windows Server 2022 (x86_64), via winbuilder r-release.
+* R 4.6.2 on macOS Tahoe 26.6.1 (aarch64), locally,
+* R 4.6.2 on Windows Server 2022 (x86_64), via winbuilder r-release, and
+* R-devel (2026-11-06 r90845) on Windows Server 2022 (x86_64), via winbuilder.
 
-Both checks completed on 7 November 2026 with Status: OK. The final
-winbuilder r-devel result is still to be recorded.
+All three checks completed on 7 November 2026 with Status: OK.
 
 Reverse dependency checks completed on 7 November 2026, with no regressions
 against the CRAN version of gratia (0.11.2). Details are below.
@@ -39,6 +39,14 @@ The [winbuilder r-release log](https://win-builder.r-project.org/sZQBNEARvWsO/00
 reports Status: OK for gratia 0.12.0 under R 4.6.2. Tests, examples, saved
 example-output comparisons, vignette rebuilding, compiled-code checks, and
 PDF and HTML manuals all passed, with no errors, warnings or NOTEs.
+
+### Winbuilder r-devel
+
+The [winbuilder r-devel log](https://win-builder.r-project.org/ndk7OhlaPOhy/00check.log)
+reports Status: OK for gratia 0.12.0 under R-devel (2026-11-06 r90845).
+Tests, examples, saved example-output comparisons, vignette rebuilding,
+compiled-code checks, and PDF and HTML manuals all passed, with no errors,
+warnings or NOTEs.
 
 ## Reverse dependency check results
 
