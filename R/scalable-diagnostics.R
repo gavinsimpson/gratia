@@ -574,7 +574,7 @@ render_diagnostic_qq <- function(
 #'   Used only for `density_method = "kde"` and conditional density.
 #' @param type Residual type; `NULL` follows the model-specific defaults in
 #'   [appraise()]. PIT and quantile residuals are available for supported response
-#'   distributions. `"surrogate"` is available for `ocat()` and `multinom()`
+#'   distributions. `"surrogate"` is available for [mgcv::ocat()] and [mgcv::multinom()]
 #'   GAMs with `method = NULL`: logistic references for ordinal residuals and
 #'   centred Gumbel references for each nominal category utility. Nominal
 #'   components always have separate panels. Their residuals are drawn once

@@ -41,8 +41,8 @@ model's formula environment. Supply raw covariates in \code{data}.}
 supported \code{re} and \code{fs} terms; character vectors select exact smooth labels.
 Fitted predictions integrate response means over new zero-mean Gaussian
 effects. Response samplers draw new effects before sampling responses.
-Smoothing parameters and dispersion remain fixed. Only ordinary \code{gam()}
-and \code{bam()} fits with a scalar response mean are supported.}
+Smoothing parameters and dispersion remain fixed. Only ordinary \code{\link[mgcv:gam]{mgcv::gam()}}
+and \code{\link[mgcv:bam]{mgcv::bam()}} fits with a scalar response mean are supported.}
 
 \item{integration}{Integration method when \code{marginalise} is supplied:
 \code{"quadrature"} (the default) or \code{"monte_carlo"}. Both integrate

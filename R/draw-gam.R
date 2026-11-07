@@ -2,7 +2,7 @@
 #'
 #' Plots smooth and parametric contributions from a fitted GAM model using
 #' [ggplot2::ggplot()].
-#' For models fitted by [mgcv::gamm()], `draw()` and [assemble()] use the
+#' For models fitted by [mgcv::gamm()], [draw()] and [assemble()] use the
 #' fitted `gam` component.
 #'
 #' @param object a fitted GAM, the result of a call to [mgcv::gam()].
@@ -138,7 +138,7 @@
 #'   effects? For parametric effects this includes the intercept variance and
 #'   its covariance with the term, without changing the partial estimates.
 #'   Each term uses the intercept of its own linear predictor.
-#'   Native scasm models are routed to `draw.scasm()` with
+#'   Native [mgcv::scasm()] models are routed to [draw.scasm()] with
 #'   `overall_uncertainty = FALSE`. An explicit request for unavailable mean
 #'   uncertainty warns once. The stored model class is unchanged.
 #' @param dist numeric; if greater than 0, this is used to determine when
@@ -215,7 +215,7 @@
 #'   settings instead. One R colour; fill of both interval surfaces, independent
 #'   of `ci_col` and the estimate's continuous fill scale. Defaults to `"grey60"`.
 #' @param surface_3d named list of view options passed to [ggcube::coord_3d()],
-#'   for example `list(yaw = 45, persp = FALSE)`. The default `list()` uses the
+#'   for example `list(yaw = 45, persp = FALSE)`. The default [base::list()] uses the
 #'   default view with `ggcube::light(backface_scale = 1)`, preserving equal
 #'   horizontal units for isotropic smooths. Supply `light = ggcube::light(...)`
 #'   in this list to override lighting; `ggcube::light(method = "none")` disables
@@ -272,8 +272,8 @@
 #' labels; by-variable information and custom subtitles are still shown.
 #' Constant glmmTMB dispersion
 #' alone does not count as an additional predictor.
-#' For example, `gaulss()` uses "Mean (mu)" and "Standard deviation (sigma)",
-#' while `twlss()` uses "Mean (mu)", "Power (p)" and "Dispersion (phi)".
+#' For example, [mgcv::gaulss()] uses "Mean (mu)" and "Standard deviation (sigma)",
+#' while [mgcv::twlss()] uses "Mean (mu)", "Power (p)" and "Dispersion (phi)".
 #' Shared smooths name each predictor to which they contribute. Families without
 #' a known parameter mapping use numbered linear predictors. The existing smooth
 #' titles and `select` values are unchanged, and all smooths are drawn by default.
@@ -304,7 +304,7 @@
 #'
 #' Random-effect tensor plots put continuous covariates before factors. Two
 #' continuous covariates form a surface, with remaining factor levels and numeric
-#' slices forming conditioning panels, consistently for `te()`, `ti()` and `t2()`.
+#' slices forming conditioning panels, consistently for [mgcv::te()], [mgcv::ti()] and [mgcv::t2()].
 #' One continuous covariate gives curves for categorical combinations;
 #' categorical-only terms give point ranges. Up to four covariates are supported.
 #' Numeric conditioning slices use `n_3d` or `n_4d`. For factor conditioning
@@ -344,7 +344,7 @@
 #' @note Internally, plots of each smooth are created using [ggplot2::ggplot()]
 #'   and composed into a single plot using [patchwork::wrap_plots()]. As a
 #'   result, it is not possible to use `+` to add to the plots in the way one
-#'   might typically work with `ggplot()` plots. Instead, use the `&` operator;
+#'   might typically work with [ggplot2::ggplot()] plots. Instead, use the `&` operator;
 #'   see the examples.
 #'
 #' @return The object returned is created by [patchwork::wrap_plots()].

@@ -25,8 +25,8 @@
 #' available. Unavailable intervals are `NA`.
 #'
 #' For [mgcv::gamm()] fits, components are extracted from `lme`. Smooth
-#' variances are expressed on the same penalty scale as for `gam()` and
-#' `bam()`, with one row per penalty. Additional random effects have one row
+#' variances are expressed on the same penalty scale as for [mgcv::gam()] and
+#' [mgcv::bam()], with one row per penalty. Additional random effects have one row
 #' per coefficient variance, labelled by grouping factor and coefficient;
 #' their covariances are omitted. Intervals use [nlme::intervals()] when the
 #' fitted covariance parameters support this calculation. Bounds are `NA`
@@ -55,7 +55,7 @@
 #' Parametric formula terms are included, with all coefficients of a factor,
 #' polynomial or interaction combined into one term. Each smooth has one row,
 #' including smooths with several penalties. Additional random effects in
-#' `gamm()` and `gamm4()` contribute one component per grouping factor and
+#' [mgcv::gamm()] and [gamm4::gamm4()] contribute one component per grouping factor and
 #' coefficient, evaluated at their fitted values. Formula terms follow the
 #' model's contrast coding. Duplicated component labels receive numeric suffixes.
 #'
@@ -151,10 +151,10 @@
 #'   of smooths are rescaled before fitting. If `rescale = TRUE`, this rescaling
 #'   is undone, resulting in variance components that are on their original
 #'   scale. This is needed if comparing with other mixed model software, such as
-#'   `lmer()`.
+#'   [lme4::lmer()].
 #' @param coverage numeric; a value between 0 and 1 indicating the (approximate)
 #'   coverage of the confidence interval that is returned.
-#' @param interval_method character; for `gamm4()` fits, `"profile"` computes
+#' @param interval_method character; for [gamm4::gamm4()] fits, `"profile"` computes
 #'   likelihood profile intervals and `"none"` returns estimates only.
 #' @param type character; `"penalty"` (the default) returns variance parameters
 #'   associated with penalties and random effects. `"terms"` returns sample
@@ -170,7 +170,7 @@
 #'   uncorrected covariance is used. SCAM fits require `FALSE`.
 #' @param include_total logical; include total rows for `type = "terms"`?
 #'   Defaults to `TRUE`. Ignored for `type = "penalty"`.
-#' @param ... arguments passed to other methods. For `gamm4()` fits, additional
+#' @param ... arguments passed to other methods. For [gamm4::gamm4()] fits, additional
 #'   arguments are passed to [stats::profile()], for example `maxpts`. With
 #'   `type = "terms"`, no additional arguments are accepted.
 #' @return A tibble of class `variance_comp`, with `.component`, `.variance`,

@@ -46,7 +46,7 @@ settings instead. Numeric; alpha transparency for points in plots.}
 \item{by_family}{logical or \code{NULL}; separate indexed grouped-family components
 into facets. The default pools quantile residuals with component colours
 and facets traditional residuals. \code{TRUE} and \code{FALSE} explicitly select the
-layout. In \code{appraise()}, observed-versus-fitted values always use component
+layout. In \code{\link[=appraise]{appraise()}}, observed-versus-fitted values always use component
 facets. Standalone \code{observed_fitted_plot()} facets by default and permits
 explicit pooling. Ignored for ordinary models.}
 

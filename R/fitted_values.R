@@ -28,7 +28,7 @@
 #' @param ... arguments passed to [mgcv::predict.gam()]. Note that `type`,
 #'   `newdata`, and `se.fit` are already used and passed on to
 #'   [mgcv::predict.gam()].
-#' @param interval_method character; `"auto"` uses stored scasm bootstrap draws
+#' @param interval_method character; `"auto"` uses stored [mgcv::scasm()] bootstrap draws
 #'   for pointwise intervals when available and Gaussian intervals otherwise.
 #'   `"gaussian"` requests covariance-based limits and `"bootstrap"` requires
 #'   stored draws. Simultaneous bootstrap bands are unsupported. Shape-enforced
@@ -69,7 +69,7 @@
 #' on the response scale. Unsupported simultaneous or bootstrap transformations
 #' are rejected rather than combining marginal parameter intervals.
 #'
-#' Native scasm fits with stored bootstrap draws use mgcv's pointwise limits
+#' Native [mgcv::scasm()] fits with stored bootstrap draws use mgcv's pointwise limits
 #' by default, including its `svar.only` correction for smoothing bias.
 #' `interval_method = "gaussian"` restores covariance-based limits. `.se`
 #' retains its existing covariance-based meaning. No replicates are generated.
@@ -87,16 +87,16 @@
 #' `data` argument is `NULL`. Put offsets in the formula to evaluate them at
 #' new observations.
 #'
-#' With `data = NULL`, results follow the model's `na.action`: `na.exclude`
+#' With `data = NULL`, results follow the model's `na.action`: [stats::na.exclude()]
 #' restores excluded observations as `NA` fitted values, standard errors and
-#' interval bounds; `na.omit` returns only retained observations. Covariates
+#' interval bounds; [stats::na.omit()] returns only retained observations. Covariates
 #' unavailable in the stored model frame are restored as typed `NA` values.
 #' `.row` indexes the fitting data after any `subset` was applied.
 #'
 #' Supplying `data` requests predictions at those rows, independently of training
 #' exclusions. Missing responses do not prevent prediction. Missing required
 #' predictors produce `NA` results by default. An explicit `na.action` passed
-#' through `...` is honoured; with `na.omit`, `.row` retains the positions in the
+#' through `...` is honoured; with [stats::na.omit()], `.row` retains the positions in the
 #' supplied data, rather than numbering the remaining rows consecutively.
 #'
 #' For supplied prediction data, an informative message identifies combinations
@@ -124,8 +124,8 @@
 #' `scale = "response"`; `.se` remains on the link scale. The simulation
 #' covariance may be positive semidefinite. Supported families are Gaussian,
 #' Poisson, binomial, Gamma, inverse Gaussian, quasi families, negative binomial,
-#' Tweedie, beta regression, and scaled t, fitted by `gam()` or `bam()` (including
-#' the `gam` component of a `gamm()` fit), and by `scam()`. For SCAM models,
+#' Tweedie, beta regression, and scaled t, fitted by [mgcv::gam()] or [mgcv::bam()] (including
+#' the `gam` component of a [mgcv::gamm()] fit), and by [scam::scam()]. For SCAM models,
 #' the Gaussian approximation uses transformed coefficients conditional on
 #' the fitted smoothing parameters. Other families support pointwise intervals
 #' only.
@@ -157,7 +157,7 @@
 #'
 #' Models fitted with certain families will include additional variables
 #'
-#' * `mgcv::ocat()` models: when `quantity = "expectation"`, the returned object will
+#' * [mgcv::ocat()] models: when `quantity = "expectation"`, the returned object will
 #'   contain a `.row` column and a `.category` column, which indicate to which row
 #'   of the `data` each row of the returned object belongs. Additionally, there
 #'   will be `nrow(data) * n_categories` rows in the returned object; each row

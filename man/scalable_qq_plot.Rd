@@ -121,7 +121,7 @@ error; a normal approximation must be requested explicitly.}
 
 \item{type}{Residual type; \code{NULL} follows the model-specific defaults in
 \code{\link[=appraise]{appraise()}}. PIT and quantile residuals are available for supported response
-distributions. \code{"surrogate"} is available for \code{ocat()} and \code{multinom()}
+distributions. \code{"surrogate"} is available for \code{\link[mgcv:ocat]{mgcv::ocat()}} and \code{\link[mgcv:multinom]{mgcv::multinom()}}
 GAMs with \code{method = NULL}: logistic references for ordinal residuals and
 centred Gumbel references for each nominal category utility. Nominal
 components always have separate panels. Their residuals are drawn once
@@ -170,7 +170,7 @@ settings instead. Colour used to draw the reference line.}
 \item{by_family}{logical or \code{NULL}; separate indexed grouped-family components
 into facets. The default pools quantile residuals with component colours
 and facets traditional residuals. \code{TRUE} and \code{FALSE} explicitly select the
-layout. In \code{appraise()}, observed-versus-fitted values always use component
+layout. In \code{\link[=appraise]{appraise()}}, observed-versus-fitted values always use component
 facets. Standalone \code{observed_fitted_plot()} facets by default and permits
 explicit pooling. Ignored for ordinary models.}
 

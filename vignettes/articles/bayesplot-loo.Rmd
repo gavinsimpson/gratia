@@ -63,7 +63,7 @@ Binomial checks use success counts and fitted trial counts; gratia's own
 posterior predictive plots use proportions. Multivariate and grouped-family
 models require `response`, for example `"response1"` or `"component2"`. These
 selections keep distinct responses and observation families from being pooled.
-For gamm/gamm4 fits, `conditioning` retains its existing gratia meaning.
+For `gamm()`/`gamm4()` fits, `conditioning` retains its existing gratia meaning.
 
 ## Evaluate observed-response log likelihoods
 
@@ -163,7 +163,7 @@ and bayesplot, to retain coefficient diagnostics. The likelihood matrix also
 supports `as_mcmc_draws()` for diagnostics of its observation-wise log densities.
 
 Likelihood and LOO methods initially cover independent GAM/BAM responses. They
-exclude residual-correlated BAMs, full gamm/gamm4 fits, quasi families, Cox
+exclude residual-correlated BAMs, full `gamm()`/`gamm4()` fits, quasi families, Cox
 partial likelihoods and censored observation processes. Supported ordinary
 posterior predictive checks retain their existing model coverage. With
 random-effect smooths, observation-level LOO predicts further observations in

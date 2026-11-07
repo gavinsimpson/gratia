@@ -117,7 +117,7 @@ fitting parameters, before scam transforms selected coefficients to impose
 positivity. The \code{parameterisation} attribute records this distinction.
 }
 \note{
-The \code{print()} method uses \code{\link[base:zapsmall]{base::zapsmall()}} to turn very small numbers
+The \code{\link[base:print]{base::print()}} method uses \code{\link[base:zapsmall]{base::zapsmall()}} to turn very small numbers
 into 0s for display purposes only; the underlying values of the penalty
 matrix or matrices are not changed.
 

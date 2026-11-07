@@ -1,9 +1,9 @@
 #' Posterior checks with bayesplot
 #'
 #' Compare observations with replicated responses using an optional installation
-#' of bayesplot. Call `bayesplot::pp_check()` after loading gratia.
+#' of bayesplot. Call [bayesplot::pp_check()] after loading gratia.
 #'
-#' @param object a fitted GAM, BAM, gamm, or gamm4 model.
+#' @param object a fitted GAM, BAM, [mgcv::gamm()], or [gamm4::gamm4()] model.
 #' @param type character; the bayesplot plot name without its `ppc_` or `ppd_`
 #'   prefix. Available names come from the installed version of bayesplot.
 #' @param prefix character; `"ppc"` compares responses with observations;
@@ -34,15 +34,15 @@
 #' multivariate response, the weights leave out the entire response vector.
 #' Grouped-family checks use only the selected component's observations.
 #'
-#' Some bayesplot plotting functions, including `error_binned` and LOO-PIT
+#' Some bayesplot plotting functions, including [bayesplot::ppc_error_binned()] and LOO-PIT
 #' plots, also require bayesplot's optional rstantools package. Install it with
 #' `install.packages("rstantools")` to use those plots.
 #'
 #' Binomial observations and replicated responses are shown as numbers of
 #' successes with fitted trial counts. Other gratia predictive plots use
-#' proportions. The `error_binned` plot uses expected responses rather than
+#' proportions. The [bayesplot::ppc_error_binned()] plot uses expected responses rather than
 #' response simulations and requires an available finite response mean. For
-#' gamm and gamm4 it currently requires `conditioning = "gam_component"`.
+#' [mgcv::gamm()] and [gamm4::gamm4()] it currently requires `conditioning = "gam_component"`.
 #' Plotting functions requiring additional inputs, such
 #' as censoring indicators, receive those inputs through `...`.
 #'

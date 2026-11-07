@@ -33,7 +33,7 @@
 #' `dx` and `dz` columns give the true partial derivatives.
 #'
 #' `sc_location_scale` uses log mean `sin(pi * x) / 2` and log dispersion
-#' `-2 + z`, returned in `f` and `f_scale`. It defaults to `gammals()` and
+#' `-2 + z`, returned in `f` and `f_scale`. It defaults to [mgcv::gammals()] and
 #' records derivatives in `d1`, `d2` and `d_scale`. Constraints act on the
 #' specified predictors; in particular the concavity concerns the log mean.
 #'

@@ -68,7 +68,7 @@ pp_check.gamm4(
 pp_check.scam(object, ...)
 }
 \arguments{
-\item{object}{a fitted GAM, BAM, gamm, or gamm4 model.}
+\item{object}{a fitted GAM, BAM, \code{\link[mgcv:gamm]{mgcv::gamm()}}, or \code{\link[gamm4:gamm4]{gamm4::gamm4()}} model.}
 
 \item{...}{arguments passed only to the selected bayesplot plotting function.}
 
@@ -107,7 +107,7 @@ ggplot object.
 }
 \description{
 Compare observations with replicated responses using an optional installation
-of bayesplot. Call \code{bayesplot::pp_check()} after loading gratia.
+of bayesplot. Call \code{\link[bayesplot:pp_check]{bayesplot::pp_check()}} after loading gratia.
 }
 \details{
 These methods require bayesplot only when called. Leave-one-out plots also
@@ -116,15 +116,15 @@ likelihood calculations use exactly the same coefficient draws. For a
 multivariate response, the weights leave out the entire response vector.
 Grouped-family checks use only the selected component's observations.
 
-Some bayesplot plotting functions, including \code{error_binned} and LOO-PIT
+Some bayesplot plotting functions, including \code{\link[bayesplot:ppc_error_binned]{bayesplot::ppc_error_binned()}} and LOO-PIT
 plots, also require bayesplot's optional rstantools package. Install it with
 \code{install.packages("rstantools")} to use those plots.
 
 Binomial observations and replicated responses are shown as numbers of
 successes with fitted trial counts. Other gratia predictive plots use
-proportions. The \code{error_binned} plot uses expected responses rather than
+proportions. The \code{\link[bayesplot:ppc_error_binned]{bayesplot::ppc_error_binned()}} plot uses expected responses rather than
 response simulations and requires an available finite response mean. For
-gamm and gamm4 it currently requires \code{conditioning = "gam_component"}.
+\code{\link[mgcv:gamm]{mgcv::gamm()}} and \code{\link[gamm4:gamm4]{gamm4::gamm4()}} it currently requires \code{conditioning = "gam_component"}.
 Plotting functions requiring additional inputs, such
 as censoring indicators, receive those inputs through \code{...}.
 

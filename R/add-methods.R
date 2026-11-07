@@ -115,7 +115,7 @@
 #'
 #' @param data a data frame containing values for the variables used to fit the
 #'   model, in fitting order. Supply either the retained fitting rows or, for
-#'   `na.exclude`, the original fitting rows after any `subset`. This does not
+#'   [stats::na.exclude()], the original fitting rows after any `subset`. This does not
 #'   compute residuals for new or reordered observations.
 #' @param model a fitted model for which a [stats::residuals()] method is
 #'   available. S3 method dispatch is performed on the `model` argument.
@@ -185,7 +185,7 @@
 #'
 #' @param data a data frame containing values for the variables used to fit the
 #'   model, in fitting order. Supply either the retained fitting rows or, for
-#'   `na.exclude`, the original fitting rows after any `subset`. This does not
+#'   [stats::na.exclude()], the original fitting rows after any `subset`. This does not
 #'   compute residuals for new or reordered observations.
 #' @param model a fitted model for which a [stats::residuals()] method is
 #'   available. S3 method dispatch is performed on the `model` argument.

@@ -123,21 +123,21 @@ is reserved by the sampling machinery but is not implemented.}
 coefficient order, used with \code{method = "user"}. At least two are required.}
 
 \item{mvn_method}{character; one of \code{"mvnfast"} or \code{"mgcv"}. The default is
-uses \code{mvnfast::rmvn()}, which can be considerably faster at generate large
-numbers of MVN random values than \code{mgcv::rmvn()}, but which might not work
+uses \code{\link[mvnfast:rmvn]{mvnfast::rmvn()}}, which can be considerably faster at generate large
+numbers of MVN random values than \code{\link[mgcv:rmvn]{mgcv::rmvn()}}, but which might not work
 for some marginal fits, such as those where the covariance matrix is close
 to singular.}
 
 \item{burnin}{numeric; the length of any initial burn in period to discard.
-See \code{mgcv::gam.mh()}.}
+See \code{\link[mgcv:gam.mh]{mgcv::gam.mh()}}.}
 
 \item{thin}{positive integer; retain every \code{thin} iterations after burn-in.}
 
 \item{t_df}{numeric; degrees of freedom for static multivariate \emph{t} proposal.
-See \code{mgcv::gam.mh()}.}
+See \code{\link[mgcv:gam.mh]{mgcv::gam.mh()}}.}
 
 \item{rw_scale}{numeric; factor by which to scale posterior covariance
-matrix when generating random walk proposals. See \code{mgcv::gam.mh()}.}
+matrix when generating random walk proposals. See \code{\link[mgcv:gam.mh]{mgcv::gam.mh()}}.}
 
 \item{envir}{an optional environment supplying functions and constants used
 in model expressions. The available model formula environment is used when

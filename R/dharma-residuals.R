@@ -9,8 +9,8 @@
 #' @inheritParams quantile_residuals
 #' @param ... model-specific diagnostic options, including sdmTMB's `component`
 #'   and `field_method`.
-#' @return A numeric vector in observation order. With `na.exclude`, excluded
-#'   observations are restored as `NA`; with `na.omit`, only fitting rows remain.
+#' @return A numeric vector in observation order. With [stats::na.exclude()], excluded
+#'   observations are restored as `NA`; with [stats::na.omit()], only fitting rows remain.
 #' @details
 #' For each observation, calculate the fractions of simulated responses strictly
 #' below it and below or equal to it. The residual is sampled uniformly between

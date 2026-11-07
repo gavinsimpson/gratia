@@ -76,7 +76,7 @@
 #' Gaussian `gamm` and `gamm4` models draw fixed and random effects together,
 #' keeping covariance parameters at fitted values; marginal checks draw new
 #' effects.
-#' For gamm fits estimated by penalized quasi-likelihood (PQL), the sampler uses
+#' For [mgcv::gamm()] fits estimated by penalized quasi-likelihood (PQL), the sampler uses
 #' the Gaussian approximation used in fitting and then generates responses from
 #' the fitted response family. This is supported only when the Gaussian working
 #' residuals are uncorrelated. Correlation in those working residuals does not

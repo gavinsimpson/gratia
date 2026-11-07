@@ -7,7 +7,7 @@
 \method{coef}{scam}(object, parametrized = TRUE, ...)
 }
 \arguments{
-\item{object}{a model object fitted by \code{scam()}}
+\item{object}{a model object fitted by \code{\link[scam:scam]{scam::scam()}}}
 
 \item{parametrized}{logical; extract parametrized coefficients, which
 respect the linear inequality constraints of the model.}

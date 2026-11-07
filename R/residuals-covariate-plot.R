@@ -7,7 +7,7 @@
 #'   diagnostic data. The original model must retain its fitting observations.
 #' @param covariates character vector of exact covariate names, in plotting
 #'   order. `NULL` selects model covariates, excluding variables used only as
-#'   offsets or random-effect groups. `character()` selects no individual
+#'   offsets or random-effect groups. [base::character()] selects no individual
 #'   panels, for use with `pairs`.
 #' @param terms character vector of exact mgcv smooth labels, as returned by
 #'   [smooths()]. For example, use `"te(x,z)"`, not `"te(x, z)"`. Parametric

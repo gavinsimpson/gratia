@@ -24,8 +24,8 @@ extracted GAM (\code{"gam_component"}), where supported. See \link{diagnostic_su
 and \code{field_method}.}
 }
 \value{
-A numeric vector in observation order. With \code{na.exclude}, excluded
-observations are restored as \code{NA}; with \code{na.omit}, only fitting rows remain.
+A numeric vector in observation order. With \code{\link[stats:na.exclude]{stats::na.exclude()}}, excluded
+observations are restored as \code{NA}; with \code{\link[stats:na.omit]{stats::na.omit()}}, only fitting rows remain.
 }
 \description{
 Calculate DHARMa-style residuals using gratia's fitted response generators.

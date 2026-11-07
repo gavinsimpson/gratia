@@ -96,7 +96,7 @@ predictors. Other scale, shape and smoothing parameters remain at fitted
 values. Even with \code{unconditional = TRUE}, those additional parameters are
 not jointly sampled. Ordinary PSIS-LOO uses these draws without correcting
 their Gaussian approximation. Pareto diagnostics assess reweighting, not the
-accuracy of the Gaussian approximation. See \link{loo.gam} for optional loo methods.
+accuracy of the Gaussian approximation. See \code{\link[=loo.gam]{loo.gam()}} for optional loo methods.
 
 Independent-response SCAM fits are supported using the coefficient
 approximation selected by \code{\link[=post_draws]{post_draws()}}. The prediction matrix multiplies

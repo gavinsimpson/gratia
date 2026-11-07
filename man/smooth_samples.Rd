@@ -44,7 +44,7 @@ smooth_samples(model, ...)
 \item{...}{arguments passed to other methods. For \code{fitted_samples()}, these
 are passed on to \code{\link[mgcv:predict.gam]{mgcv::predict.gam()}}. For \code{posterior_samples()} these are
 passed on to \code{fitted_samples()}. For \code{predicted_samples()} these are
-passed on to the relevant \code{simulate()} method.}
+passed on to the relevant \code{\link[stats:simulate]{stats::simulate()}} method.}
 
 \item{data}{data frame; new observations at which the posterior draws
 from the model should be evaluated. If not supplied, the data used to fit
@@ -112,8 +112,8 @@ a full design matrix,
 smoothing penalty, and proposal factorisation once for all chains.}
 
 \item{mvn_method}{character; one of \code{"mvnfast"} or \code{"mgcv"}. The default is
-uses \code{mvnfast::rmvn()}, which can be considerably faster at generate large
-numbers of MVN random values than \code{mgcv::rmvn()}, but which might not work
+uses \code{\link[mvnfast:rmvn]{mvnfast::rmvn()}}, which can be considerably faster at generate large
+numbers of MVN random values than \code{\link[mgcv:rmvn]{mgcv::rmvn()}}, but which might not work
 for some marginal fits, such as those where the covariance matrix is close
 to singular.}
 
@@ -187,7 +187,7 @@ change in future versions. Don't rely on position.
 \section{Parallel calculation}{
 
 With mirai and carrier installed, configure workers with
-\code{mirai::daemons()} to distribute calculations across selected smooths.
+\code{\link[mirai:daemons]{mirai::daemons()}} to distribute calculations across selected smooths.
 \code{\link[=difference_smooths]{difference_smooths()}} distributes factor-level comparisons instead.
 Without configured workers, or with only one calculation, evaluation is
 serial. These functions leave the caller's worker pool running.
@@ -197,9 +197,9 @@ prepared in the caller. Workers receive the coordinates and coefficient
 columns needed for their calculation. Custom prediction methods are evaluated
 in the caller, including custom tensor margins and factor-smooth bases;
 workers receive their prediction matrices. Simultaneous intervals use successive
-draws in selection order, so \code{set.seed()} gives the same results with or
+draws in selection order, so \code{\link[base:set.seed]{base::set.seed()}} gives the same results with or
 without workers, independently of their number or completion order.
-\code{derivatives()} uses \code{set.seed()}; the other functions also accept \code{seed},
+\code{derivatives()} uses \code{\link[base:set.seed]{base::set.seed()}}; the other functions also accept \code{seed},
 which restores the caller's random number state on exit.
 
 \code{\link[=smooth_samples]{smooth_samples()}} draws coefficients jointly once, then reuses those draws

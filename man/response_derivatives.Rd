@@ -118,8 +118,8 @@ Supply one finite numeric value. Use \code{level} for both uncertainty methods;
 \item{seed}{numeric; a random seed for the simulations.}
 
 \item{mvn_method}{character; one of \code{"mvnfast"} or \code{"mgcv"}. The default is
-uses \code{mvnfast::rmvn()}, which can be considerably faster at generate large
-numbers of MVN random values than \code{mgcv::rmvn()}, but which might not work
+uses \code{\link[mvnfast:rmvn]{mvnfast::rmvn()}}, which can be considerably faster at generate large
+numbers of MVN random values than \code{\link[mgcv:rmvn]{mgcv::rmvn()}}, but which might not work
 for some marginal fits, such as those where the covariance matrix is close
 to singular.}
 
@@ -175,8 +175,8 @@ By default, all supplied prediction rows are returned in their original
 order. Rows with missing or non-finite required covariates have \code{NA}
 derivatives, standard errors and interval limits. Category, response and
 family identifiers are retained. An explicit \code{na.action} follows the
-prediction convention: \code{na.omit} drops unavailable rows with missing
-covariates, \code{na.exclude} and \code{na.pass} retain them, and \code{na.fail} reports
+prediction convention: \code{\link[stats:na.omit]{stats::na.omit()}} drops unavailable rows with missing
+covariates, \code{\link[stats:na.exclude]{stats::na.exclude()}} and \code{\link[stats:na.pass]{stats::na.pass()}} retain them, and \code{\link[stats:na.fail]{stats::na.fail()}} reports
 missing covariates as an error. Undefined calculations at available rows,
 including in only some coefficient draws, raise an error; draws are never
 removed to form a summary.

@@ -92,8 +92,8 @@
 #'   generating data with grouped families for use with `family = gfam()`. The
 #'   allowed distributions as as per `dist`.
 #'
-#' @param family an instantiated family object, such as `poisson()` or
-#'   `mgcv::gaulss()`. Cannot be combined with explicitly supplied `dist`,
+#' @param family an instantiated family object, such as [stats::poisson()] or
+#'   [mgcv::gaulss()]. Cannot be combined with explicitly supplied `dist`,
 #'   `scale`, `theta`, `power`, `n_cat`, `cuts` or `gfam_families`. See
 #'   [data_sim_families] for coverage and generating parameters.
 #' @param predictors `NULL` or a function of the generated data, including raw
@@ -119,7 +119,7 @@
 #' coordinates; `"sc_location_scale"` has a concave log-mean and increasing
 #' log dispersion. The latter defaults to `family = mgcv::gammals()`; other
 #' shape templates default to Gaussian noise with standard deviation 0.2.
-#' See [data_sim_shapes] for functions, derivatives and `mgcv::scasm()` recipes.
+#' See [data_sim_shapes] for functions, derivatives and [mgcv::scasm()] recipes.
 #'
 #' @return A tibble containing responses, covariates and true-function columns.
 #'   Legacy `f` is the predictor after its distribution-specific transformation;

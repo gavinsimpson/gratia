@@ -24,6 +24,24 @@ When reviewing a qualification, ask: “What misunderstanding does this sentence
 prevent, and has the surrounding text given the reader a reason to have it?”
 If there is no concrete answer, delete it.
 
+## Function names in prose
+
+Preserve each function's exact spelling and capitalisation, including at the
+start of a sentence. Write `scasm()`, not `Scasm()`. Append `()` whenever
+referring to a function by name so readers can distinguish functions from
+packages, arguments, classes and other objects.
+
+In Markdown documents, including `NEWS.md` and vignettes, wrap the complete
+function reference in backticks, including `()` and any package qualifier:
+for example, `smooth_estimates()` and `mgcv::gam()`.
+
+In roxygen prose, use function links for functions documented in another
+file: `[smooth_estimates()]` for a gratia function and `[mgcv::gam()]` for a
+function in another package. Use backticks for a function documented in the
+same file or functions without their own help topic. Keep executable code,
+roxygen metadata, argument names, class names and non-function documentation
+topics in their required syntax.
+
 ## Release notes
 
 Keep each individual `NEWS.md` entry to 1–3 sentences, including each entry

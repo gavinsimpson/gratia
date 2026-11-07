@@ -228,7 +228,7 @@
 #' @param partial_match logical; should matching `parm` use a partial match or
 #'   an exact match? Can only be used if `length(parm)` is `1`.
 #' @param ... additional arguments passed to [smooth_estimates()], including
-#'   `interval_method` to select Gaussian, stored scasm bootstrap, or
+#'   `interval_method` to select Gaussian, stored [mgcv::scasm()] bootstrap, or
 #'   shape-enforced intervals, and `shape_source` to choose their initial source.
 #'   `simultaneous_method`, `simultaneous_domain`, and `tube_control` request
 #'   and configure continuous-interval tube bands; see [simultaneous_bands].
@@ -243,7 +243,7 @@
 #'   intervals. Each simultaneous band covers the evaluation points of one
 #'   fitted smooth by default, or its continuous domain with tube calibration;
 #'   separate smooths do not form a joint coverage set.
-#'   Native scasm fits default to `overall_uncertainty = FALSE` and use stored
+#'   Native [mgcv::scasm()] fits default to `overall_uncertainty = FALSE` and use stored
 #'   bootstrap draws for pointwise intervals when available, as in
 #'   [smooth_estimates()]. Shifting and transforming a smooth preserves its
 #'   interval limits, including asymmetric bootstrap limits.

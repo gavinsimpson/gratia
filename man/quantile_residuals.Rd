@@ -187,20 +187,20 @@ parameters. Quantile residuals transform them to standard-normal scores.
 Discrete observations require randomisation over their probability mass.
 }
 \details{
-With \code{na.exclude}, excluded observations are restored as \code{NA} residuals;
-with \code{na.omit}, only observations used for fitting are returned. Selecting a
+With \code{\link[stats:na.exclude]{stats::na.exclude()}}, excluded observations are restored as \code{NA} residuals;
+with \code{\link[stats:na.omit]{stats::na.omit()}}, only observations used for fitting are returned. Selecting a
 grouped-family component with \code{response} returns only its retained fitting
 observations, without placeholders for excluded rows whose component
 membership is unavailable.
 
-For \code{mgcv::cnorm()}, \code{mgcv::clog()} and \code{mgcv::cpois()} models, censored
+For \code{\link[mgcv:cnorm]{mgcv::cnorm()}}, \code{\link[mgcv:clog]{mgcv::clog()}} and \code{\link[mgcv:cpois]{mgcv::cpois()}} models, censored
 observations have PIT residuals sampled uniformly between \code{F(l)} and \code{F(u)}.
 Here \code{l} and \code{u} bound the censoring interval and \code{F} is the fitted cumulative
 distribution function (CDF) of the underlying response. Left and right
 censoring use probabilities zero and one for the unbounded end, respectively.
-Quantile residuals apply \code{qnorm()} to these PIT values. Uncensored continuous
+Quantile residuals apply \code{\link[stats:qnorm]{stats::qnorm()}} to these PIT values. Uncensored continuous
 observations use \code{F(y)}; uncensored Poisson observations are randomised between
-\code{F(y - 1)} and \code{F(y)}. Use non-integer censoring limits for \code{cpois()}, as
+\code{F(y - 1)} and \code{F(y)}. Use non-integer censoring limits for \code{\link[mgcv:cpois]{mgcv::cpois()}}, as
 recommended by mgcv.
 
 For grouped-family GAMs fitted with \code{\link[mgcv:gfam]{mgcv::gfam()}}, each observation uses its
@@ -222,7 +222,7 @@ caused by rounding probabilities to zero or one. Probabilities are not
 clipped, so true zero-probability tails still give infinite residuals for
 ordinary models; grouped diagnostics report non-finite residuals as errors.
 PITs are returned as ordinary probabilities and may still round to zero or
-one in extreme tails. Applying \code{qnorm()} to returned PITs can therefore be
+one in extreme tails. Applying \code{\link[stats:qnorm]{stats::qnorm()}} to returned PITs can therefore be
 less accurate than requesting quantile residuals directly. CDFs without log
 probabilities retain ordinary-probability calculations.
 
