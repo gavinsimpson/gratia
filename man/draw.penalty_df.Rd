@@ -2,7 +2,7 @@
 % Please edit documentation in R/draw-methods.R
 \name{draw.penalty_df}
 \alias{draw.penalty_df}
-\title{Display penalty matrices of smooths using \code{ggplot}}
+\title{Display penalty matrices of smooths using \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}}}
 \usage{
 \method{draw}{penalty_df}(
   object,
@@ -62,7 +62,7 @@ cells in PDF and SVG output, but can increase file size for large matrices.}
 \item{...}{additional arguments passed to \code{\link[patchwork:wrap_plots]{patchwork::wrap_plots()}}.}
 }
 \description{
-Displays the penalty matrices of smooths as a heatmap using \code{ggplot}
+Displays the penalty matrices of smooths as a heatmap using \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}}
 }
 \section{Label layout}{
 

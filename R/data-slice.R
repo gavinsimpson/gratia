@@ -16,7 +16,7 @@
 #'   or the first level (sorted as per the vector returned by [base::levels()]
 #'   if several levels are observed the same number of times.
 #'
-#' These values are already computed when calling `gam()` or `bam()` for example
+#' These values are already computed when calling [mgcv::gam()] or [mgcv::bam()] for example
 #' and can be found in the `var.summary` component of the fitted model. Function
 #' [typical_values()] will extract these values for you if you are interested.
 #'
@@ -53,7 +53,7 @@
 #' is an ungrouped tibble. `.observed_only` filters exact matches within each
 #' group; interpolated values need not match observed values.
 #'
-#' Grouping limits the default range of `evenly()` to each group's marginal
+#' Grouping limits the default range of [evenly()] to each group's marginal
 #' range. It does not ensure joint support for multiple continuous covariates.
 #' Explicit values or `lower` and `upper` bounds can still request extrapolation.
 #'
@@ -98,7 +98,7 @@
 
 #' @param data an alternative data frame of values containing all the variables
 #'   needed to fit the model. If `NULL`, the default, the data used to fit the
-#'   model will be recovered using `model.frame`. User-supplied expressions
+#'   model will be recovered using [stats::model.frame()]. User-supplied expressions
 #'   passed in `...` will be evaluated in `data`.
 #' @param envir the environment within which to recreate the data used to fit
 #'   `object`.

@@ -105,11 +105,11 @@ negative binomial, beta, scaled t, Tweedie, all seven location/scale/shape
 families, ordinal, multinomial and multivariate-normal models are supported.
 Censored normal, logistic and Poisson families return moments of the latent
 uncensored response. Beta moments describe the beta likelihood, without the
-epsilon clipping used by some response generators. \code{bcg()} supports the
+epsilon clipping used by some response generators. \code{\link[mgcv:bcg]{mgcv::bcg()}} supports the
 original lognormal response only when its Box-Cox parameter is fixed at zero:
 other powers require a distribution outside the inverse transformation's
 domain that the fitted family does not specify. Quasi and Cox families are
-unsupported. Grouped (\code{gfam}) predictions use each row's component family
+unsupported. Grouped (\code{\link[mgcv:gfam]{mgcv::gfam()}}) predictions use each row's component family
 and the full joint model covariance. Grouped ordinal components require
 explicit category scores; grouped category-indicator output is unsupported.
 
@@ -142,8 +142,8 @@ simulation with \code{unconditional = TRUE} and fixed estimated global parameter
 the first-order smoothing correction conditional on those fixed parameters:
 native corrected covariance can also include their uncertainty. This requires
 the same saved outer Hessian and sensitivities when smoothing parameters are
-present. Legacy \code{negbin()} fits outside ML/REML require explicit
-\code{nuisance = "fixed"}; use \code{nb()} to estimate and propagate shape uncertainty.
+present. Legacy \code{\link[mgcv:negbin]{mgcv::negbin()}} fits outside ML/REML require explicit
+\code{nuisance = "fixed"}; use \code{\link[mgcv:nb]{mgcv::nb()}} to estimate and propagate shape uncertainty.
 The covariance calculation uses a first-order expansion of the coefficient
 means and does not include mgcv's additional correction for changes in the
 conditional coefficient covariance. The \code{moment_info} attribute

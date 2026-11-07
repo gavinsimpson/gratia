@@ -41,7 +41,7 @@
 #'   Numeric `by` multipliers are one on automatic grids, including when a
 #'   multiplier shares an original axis name; raw axis coordinates are retained
 #'   separately. If the multiplier is itself an untransformed grid axis, supply
-#'   prediction `data` to `smooth_estimates()` instead. Typical values added by
+#'   prediction `data` to [smooth_estimates()] instead. Typical values added by
 #'   `include_all = TRUE` to model-scale
 #'   grids do not provide raw coordinates for transformed axes.
 #' @inheritParams smooth_estimates

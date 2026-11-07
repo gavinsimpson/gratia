@@ -42,7 +42,7 @@ in model expressions. The available model formula environment is used when
 \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}
 
 The function \code{spline_values2()} has been renamed to \code{spline_values()} as of
-version 0.9.0. This was allowed following the removal of \code{evaluate_smooth()},
+version 0.9.0. This was allowed following the removal of \code{\link[=evaluate_smooth]{evaluate_smooth()}},
 which was the only function using \code{spline_values()}. So \code{spline_values2()}
 has been renamed to \code{spline_values()}.
 }

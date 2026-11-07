@@ -409,7 +409,7 @@
 
   `shape_intervals()` applies monotone rearrangement and convex or concave
   envelopes to existing interval endpoints on a finite grid. Supported
-  scasm smooths expose this through `interval_method = "shape"` and an
+  `scasm()` smooths expose this through `interval_method = "shape"` and an
   explicit Gaussian or stored-bootstrap initial source. The transformation
   preserves whole-grid containment events; it does not establish nominal
   coverage or preserve marginal coverage of pointwise limits.
@@ -430,7 +430,7 @@
   estimates reject interval computation controls that require the fitted
   model.
 
-  `interval_method` selects native scasm bootstrap or Gaussian pointwise
+  `interval_method` selects native `scasm()` bootstrap or Gaussian pointwise
   intervals for smooths, fitted values, smooth derivatives and
   `confint()`.
 
@@ -1288,7 +1288,7 @@
 
 * **Missing observations and prediction rows**
 
-  For models fitted with `na.exclude`, default fitted values, partial
+  For models fitted with `na.exclude()`, default fitted values, partial
   residuals, fitted and posterior samples, simulations and
   `quantile_residuals()` now restore excluded rows as `NA`. Diagnostics
   align retained observations with predictors, and histogram bin selection
@@ -1338,7 +1338,7 @@
 * `draw.gamlss()` now sizes its plot layout using the panels actually drawn,
   including parametric effects, avoiding rendering errors for GJRM models.
 
-* Posterior sampling for GAMs, including the GAM component of gamm4 models,
+* Posterior sampling for GAMs, including the GAM component of `gamm4()` models,
   now falls back to `mgcv::rmvn()` with a warning if the default sampler's
   Cholesky decomposition fails (#332).
 
@@ -1432,7 +1432,7 @@
   while `frequentist = TRUE` selects the frequentist covariance (GRA-005).
   Both pointwise and simultaneous intervals respect `overall_uncertainty`,
   including uncertainty in the overall mean by default for ordinary GAMs;
-  native scasm fits default to `FALSE`. Requesting multiple smooths no longer
+  native `scasm()` fits default to `FALSE`. Requesting multiple smooths no longer
   causes an error (GRA-006).
 
 * `simulate.gamm()` now respects the supplied `data` argument.

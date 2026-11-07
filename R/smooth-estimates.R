@@ -3,7 +3,7 @@
 #' Evaluate a smooth at a grid of evenly spaced value over the range of the
 #' covariate associated with the smooth. Alternatively, a set of points at which
 #' the smooth should be evaluated can be supplied. `smooth_estimates()` is a new
-#' implementation of `evaluate_smooth()`, and replaces that function, which has
+#' implementation of [evaluate_smooth()], and replaces that function, which has
 #' been removed from the package.
 #'
 #' @param object a fitted model, including objects of class `"gam"`, `"gamm"`
@@ -62,11 +62,11 @@
 #'   fitted smooth. `"credible"` is an alias for `"confidence"`; the default
 #'   Bayesian covariance gives approximate Bayesian credible intervals.
 #' @param ci_level numeric; interval coverage, strictly between zero and one.
-#' @param interval_method character; "auto" uses stored scasm bootstrap draws
+#' @param interval_method character; "auto" uses stored [mgcv::scasm()] bootstrap draws
 #'   for pointwise intervals when available, and Gaussian intervals otherwise.
 #'   Use "gaussian" to request covariance-based limits or "bootstrap" to
 #'   require stored draws. Simultaneous bootstrap bands are not supported.
-#'   `"shape"` applies [shape_intervals()] to supported scasm smooth components,
+#'   `"shape"` applies [shape_intervals()] to supported [mgcv::scasm()] smooth components,
 #'   using the initial limits chosen by `shape_source`.
 #' @param simultaneous_method character; calibration for simultaneous bands.
 #'   The default, `"simulation"`, uses coefficient draws on the evaluation
@@ -157,7 +157,7 @@
 #' `overall_uncertainty = TRUE`, their standard errors also include intercept
 #' uncertainty and its covariance with the smooth; estimates remain centred.
 #' Models without an intercept use smooth-only uncertainty for either setting.
-#' Native scasm fits use component-only uncertainty by default. Explicitly
+#' Native [mgcv::scasm()] fits use component-only uncertainty by default. Explicitly
 #' requesting `overall_uncertainty = TRUE` warns once if selected smooths lack
 #' the centring information needed to add mean uncertainty. Ordinary GAM
 #' defaults are unchanged.
@@ -192,7 +192,7 @@
 #' `.crit` is `NA` after shape enforcement. Metadata records the initial source,
 #' correction, named shapes, model coordinates and whole-grid guarantee.
 #'
-#' Every selected term must have retained named scasm restrictions. Supported
+#' Every selected term must have retained named [mgcv::scasm()] restrictions. Supported
 #' combinations are positivity, monotonicity in any directions and curvature
 #' in at most one direction. Tensor smooths require `te(..., np = FALSE)` with
 #' univariate B-spline margins (`"sc"` or `"bs"`). Normal reparameterisation
@@ -824,7 +824,7 @@ smooth_estimates.gjrm <- smooth_estimates.gamlss
 #' `r lifecycle::badge("deprecated")`
 #'
 #' The function `spline_values2()` has been renamed to `spline_values()` as of
-#' version 0.9.0. This was allowed following the removal of `evaluate_smooth()`,
+#' version 0.9.0. This was allowed following the removal of [evaluate_smooth()],
 #' which was the only function using `spline_values()`. So `spline_values2()`
 #' has been renamed to `spline_values()`.
 #'
@@ -1133,7 +1133,7 @@ smooth_estimates.gjrm <- smooth_estimates.gamlss
   eval_sm
 }
 
-#' Wrapper to `gratia::smooth_data()` and `gratia:::check_user_data()` for use
+#' Wrapper to [gratia::smooth_data()] and `gratia:::check_user_data()` for use
 #' with [gratia::eval_smooth()] methods
 #'
 #' @param data an optional data frame of values for the smooth

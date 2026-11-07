@@ -7,7 +7,7 @@
 #' @param model a fitted model
 #' @param data a data frame of values at which to return the linear prediction
 #'   matrix.
-#' @param ... arguments passed to other methods and `predict` methods including
+#' @param ... arguments passed to other methods and [stats::predict()] methods including
 #'   [mgcv::predict.gam()] and [mgcv::predict.bam()]
 #'
 #' @details

@@ -34,8 +34,8 @@ against.}
 Partial residuals
 }
 \details{
-With \code{na.exclude}, excluded observations are restored as \code{NA} partial
-residuals, in fitting order after any \code{subset}. With \code{na.omit}, only retained
+With \code{\link[stats:na.exclude]{stats::na.exclude()}}, excluded observations are restored as \code{NA} partial
+residuals, in fitting order after any \code{subset}. With \code{\link[stats:na.omit]{stats::na.omit()}}, only retained
 observations are returned. Computation uses aligned working residuals,
 working weights and term predictions before restoring excluded positions.
 

@@ -31,7 +31,7 @@ A character vector of model terms.
 }
 \description{
 Returns the names of any terms in a model, without needing to call
-\code{summary()}. The list of model terms is especially useful when predicting
+\code{\link[base:summary]{base::summary()}}. The list of model terms is especially useful when predicting
 from a \code{\link[mgcv:gam]{mgcv::gam()}} model using the \code{exclude} or \code{terms} argument of
 \code{\link[mgcv:predict.gam]{mgcv::predict.gam()}} or \code{\link[mgcv:predict.bam]{mgcv::predict.bam()}}.
 }

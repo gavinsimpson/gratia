@@ -1263,9 +1263,9 @@ difference_value_label <- function(object) {
       cols = vars(.data[[xvars[4L]]]), labeller = label_both)
 }
 
-#' Display penalty matrices of smooths using `ggplot`
+#' Display penalty matrices of smooths using [ggplot2::ggplot()]
 #'
-#' Displays the penalty matrices of smooths as a heatmap using `ggplot`
+#' Displays the penalty matrices of smooths as a heatmap using [ggplot2::ggplot()]
 #'
 #' @param geom character; either `"raster"` (the default) or `"tile"`.
 #'   Raster rendering uses an image for the matrix, which can keep large PDF

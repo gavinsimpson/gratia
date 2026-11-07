@@ -95,7 +95,7 @@ posterior_samples(model, ...)
 \item{...}{arguments passed to other methods. For \code{fitted_samples()}, these
 are passed on to \code{\link[mgcv:predict.gam]{mgcv::predict.gam()}}. For \code{posterior_samples()} these are
 passed on to \code{fitted_samples()}. For \code{predicted_samples()} these are
-passed on to the relevant \code{simulate()} method.}
+passed on to the relevant \code{\link[stats:simulate]{stats::simulate()}} method.}
 
 \item{n_draws}{positive integer; total retained draws across all chains.
 Required when generating draws. With \code{method = "user"}, the supplied
@@ -166,8 +166,8 @@ a full design matrix,
 smoothing penalty, and proposal factorisation once for all chains.}
 
 \item{mvn_method}{character; one of \code{"mvnfast"} or \code{"mgcv"}. The default is
-uses \code{mvnfast::rmvn()}, which can be considerably faster at generate large
-numbers of MVN random values than \code{mgcv::rmvn()}, but which might not work
+uses \code{\link[mvnfast:rmvn]{mvnfast::rmvn()}}, which can be considerably faster at generate large
+numbers of MVN random values than \code{\link[mgcv:rmvn]{mgcv::rmvn()}}, but which might not work
 for some marginal fits, such as those where the covariance matrix is close
 to singular.}
 
@@ -181,14 +181,14 @@ for the gratia MH backend. Use zero to force blockwise evaluation.}
 explicit vector overrides the fitting weights; a single value applies to
 every observation. With \code{data = NULL}, the default is the fitted prior
 weights, except factor-valued binomial responses retain one Bernoulli trial
-per observation. Native \code{gaulss()} ignores fitting weights in its likelihood,
+per observation. Native \code{\link[mgcv:gaulss]{mgcv::gaulss()}} ignores fitting weights in its likelihood,
 so its default response weights are also ones; explicitly supplied sampling
 weights still override this default. With prediction data, weights default
 to a vector of ones.
 For ordinary Gaussian and Gamma responses, larger weights reduce response
 variance (precision weights). For binomial responses, weights give integer
 trial counts. They do not alter the fitted coefficient covariance. Include
-positions restored by \code{na.exclude} when supplying weights for fitting rows.}
+positions restored by \code{\link[stats:na.exclude]{stats::na.exclude()}} when supplying weights for fitting rows.}
 
 \item{family_index}{numeric; optional family-list positions for grouped
 family (\code{\link[mgcv:gfam]{mgcv::gfam()}}) response draws, one integer per evaluation row.
@@ -199,8 +199,8 @@ in \code{data}; observed response values are not required.}
 supported \code{re} and \code{fs} terms; character vectors select exact smooth labels.
 Fitted predictions integrate response means over new zero-mean Gaussian
 effects. Response samplers draw new effects before sampling responses.
-Smoothing parameters and dispersion remain fixed. Only ordinary \code{gam()}
-and \code{bam()} fits with a scalar response mean are supported.}
+Smoothing parameters and dispersion remain fixed. Only ordinary \code{\link[mgcv:gam]{mgcv::gam()}}
+and \code{\link[mgcv:bam]{mgcv::bam()}} fits with a scalar response mean are supported.}
 }
 \value{
 A tibble (data frame) in long format, with columns:
@@ -217,15 +217,15 @@ coefficient diagnostics are available through \code{\link[=sampling_diagnostics]
 Draw samples from the posterior distribution of an estimated model
 }
 \details{
-The \code{lm}, \code{glm}, \code{glmmTMB}, \code{GJRM::gamlss}, \code{sdmTMB}, and full mixed-model
+The \code{lm}, \code{glm}, \code{glmmTMB}, \code{\link[GJRM:gamlss]{GJRM::gamlss()}}, \code{sdmTMB}, and full mixed-model
 diagnostic samplers currently use the fitting observations only. They draw
 coefficients together using Gaussian approximations. See
 \code{\link[=posterior_predictive_plot]{posterior_predictive_plot()}} for which additional distribution parameters
 remain fixed and how random effects are treated for each fitter.
 
 With no explicit \code{data}, observation rows follow the fitted model's
-\code{na.action}. \code{na.exclude} restores excluded rows as \code{NA} in every draw;
-\code{na.omit} returns retained rows only. \code{.row} indexes the fitting data after
+\code{na.action}. \code{\link[stats:na.exclude]{stats::na.exclude()}} restores excluded rows as \code{NA} in every draw;
+\code{\link[stats:na.omit]{stats::na.omit()}} returns retained rows only. \code{.row} indexes the fitting data after
 any \code{subset}. With explicit \code{data}, \code{.row} indexes that data, missing
 responses do not prevent prediction, and missing required predictors give
 \code{NA} draws. An explicit prediction \code{na.action} in \code{...} is honoured without
@@ -245,7 +245,7 @@ Location-scale-shape families \code{\link[mgcv:gaulss]{mgcv::gaulss()}}, \code{\
 Every distribution parameter is computed from the same joint coefficient
 draw. Formula offsets and prescribed smooth contributions are retained.
 Evaluation data need predictors and formula-offset variables, but no
-observed response. mgcv natively represents the second \code{gaulss()} parameter
+observed response. mgcv natively represents the second \code{\link[mgcv:gaulss]{mgcv::gaulss()}} parameter
 as reciprocal standard deviation: response sampling uses SD, divided by the square
 root of the sampling weight. Other LSS generators currently ignore sampling
 weights, following their mgcv implementations. Parameters represented by
@@ -258,7 +258,7 @@ an observation process and remains unsupported in posterior predictive checks.
 Grouped-family posterior response draws support fitting observations and
 supplied data with known family membership. Component nuisance parameters
 remain fixed. \code{.parameter} identifies the component used for each row.
-Censored grouped components require an observation process; use \code{simulate()}
+Censored grouped components require an observation process; use \code{\link[stats:simulate]{stats::simulate()}}
 for their latent, uncensored responses.
 
 With \code{marginalise}, selected random effects are drawn for new groups in

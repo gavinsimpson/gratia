@@ -1,7 +1,9 @@
 #' @title Model diagnostic plots
 #'
 #' @param model a fitted model supported by [diagnostic_support], including
-#'   lm, glm, gam/bam, gamm/gamm4, glmmTMB, univariate GJRM and sdmTMB.
+#'   [stats::lm()], [stats::glm()], [mgcv::gam()], [mgcv::bam()],
+#'   [mgcv::gamm()], [gamm4::gamm4()], [glmmTMB::glmmTMB()], univariate
+#'   [GJRM::gamlss()] and [sdmTMB::sdmTMB()].
 #' @param method character or `NULL`; how to calculate reference quantiles.
 #'   Probability integral transform (PIT) and quantile residuals use fixed
 #'   uniform and standard-normal references, respectively. For quantile residuals, `"normal"` also selects that fixed
@@ -68,9 +70,9 @@
 #'   A custom CDF must also support the probabilities just below discrete
 #'   values and at censoring limits. Replacements for recognised family CDFs
 #'   must use the same arguments and probability conventions. Scalar uncensored
-#'   `cnorm()`, `clog()` and
-#'   `cpois()` components are supported; genuine censoring requires recoverable,
-#'   aligned censoring bounds. Matrix censored responses rejected by `gfam()`
+#'   [mgcv::cnorm()], [mgcv::clog()] and
+#'   [mgcv::cpois()] components are supported; genuine censoring requires recoverable,
+#'   aligned censoring bounds. Matrix censored responses rejected by [mgcv::gfam()]
 #'   and upstream fitting failures are not repaired.
 #'
 #'   Use `response = NULL` to check every grouped-family component or a single
@@ -116,7 +118,7 @@
 #'   into facets. The default pools quantile residuals with component colours
 #'   and facets traditional residuals. `TRUE` and `FALSE` explicitly select the
 #'   layout. In `appraise()`, observed-versus-fitted values always use component
-#'   facets. Standalone `observed_fitted_plot()` facets by default and permits
+#'   facets. Standalone [observed_fitted_plot()] facets by default and permits
 #'   explicit pooling. Ignored for ordinary models.
 #' @param rank logical or `NULL`; use within-component ranks on the horizontal
 #'   axis of residual-versus-predictor plots. The default ranks pooled grouped
@@ -134,7 +136,7 @@
 #'   posterior predictive draws.
 #' @param type character or `NULL`; residual type: `"deviance"`, `"response"`,
 #'   `"pearson"`, `"pit"`, `"quantile"`, `"dharma"`, or `"surrogate"` (for
-#'   `ocat()` or `multinom()` GAMs). `NULL` uses the model-specific default:
+#'   [mgcv::ocat()] or [mgcv::multinom()] GAMs). `NULL` uses the model-specific default:
 #'   deviance for ordinary lm/glm/GAM fits, and quantile for supported grouped
 #'   families, GJRM, sdmTMB and full mixed-model checks. glmmTMB uses Pearson
 #'   residuals conditionally and response residuals marginally. Extracted GAM
@@ -208,7 +210,7 @@
 #'   counts. Point styling applies to QQ/worm points, and heatmap fill scales can
 #'   be changed with ggplot scales. QQ references average draws as they are
 #'   generated or compute exact pooled quantiles using temporary files above
-#'   the configured memory threshold; see [diagnostic_support]. Supported univariate GJRM::gamlss models use quantile
+#'   the configured memory threshold; see [diagnostic_support]. Supported univariate [GJRM::gamlss()] models use quantile
 #'   residuals by default.
 #'
 #'   If the response expectation does not exist, the observed-versus-fitted
