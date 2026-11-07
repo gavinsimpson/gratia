@@ -183,7 +183,7 @@ The estimate is always the difference of fitted predictions. Pointwise
 simulation intervals need not be centred on this estimate.
 
 Simultaneous intervals use the \code{ci_level} quantile of the maximum absolute
-standardized deviation over the selected coverage set. They are symmetric
+standardised deviation over the selected coverage set. They are symmetric
 about \code{.diff}, with half-width \code{.crit * .se}. For \code{uncertainty = "delta"},
 one shared batch of zero-mean Gaussian coefficient deviations is generated
 from the Bayesian covariance matrix. Response-scale
@@ -193,7 +193,7 @@ Sampler arguments \code{method}, \code{draws}, \code{mvn_method}, \code{burnin},
 \code{thin}, \code{t_df}, and \code{rw_scale} apply only to \code{uncertainty = "simulation"}.
 
 For \code{uncertainty = "simulation"}, deviations are posterior difference draws
-minus \code{.diff}, standardized by their sample standard deviations. Draws are
+minus \code{.diff}, standardised by their sample standard deviations. Draws are
 transformed to the response scale before differencing; invalid inverse-link
 domains or response means cause an error rather than discarded draws.
 Zero-variance draws that disagree with \code{.diff} cannot calibrate a band and

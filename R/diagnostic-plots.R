@@ -181,7 +181,7 @@ qq_plot.default <- function(model, ...) {
 #'   method = "REML"
 #' )
 #'
-#' ## Q-Q plot; default using direct randomization of uniform quantiles
+#' ## Q-Q plot; default using direct randomisation of uniform quantiles
 #' qq_plot(m)
 #'
 #' ## Alternatively simulate new data from the model, which

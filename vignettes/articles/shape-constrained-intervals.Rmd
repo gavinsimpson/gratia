@@ -91,7 +91,7 @@ This implication does not establish nominal coverage for the initial band.
 In particular, transforming separately calibrated pointwise limits does not
 preserve their marginal coverage at each point: sorting moves information
 between coordinates. `interval = "pointwise"` records this source calibration
-without assigning new pointwise coverage to the result. Penalization bias or
+without assigning new pointwise coverage to the result. Penalisation bias or
 an inadequate covariance approximation can also affect initial coverage; the
 shape operation does not correct either problem.
 
@@ -200,7 +200,7 @@ curvature in that coordinate need not be curvature in `x`.
 
 Tensor restrictions require particular care: retained coefficient inequalities
 alone do not imply the named shape when complementary basis functions can be
-negative. Automatic shape inference therefore accepts unreparameterized
+negative. Automatic shape inference therefore accepts unreparameterised
 univariate B-spline margins, fitted with `np = FALSE`, within their basis
 domains. Both `"sc"` and ordinary `"bs"` margins can be used in this supported
 construction.
@@ -295,17 +295,17 @@ The level and band type again record the caller's calibration. On a feasible
 true coefficient vector, intersection preserves exactly the initial band's
 coverage event. Pointwise limits alone do not provide a simultaneous region.
 `in_shape_set()` checks candidate vectors with a documented absolute tolerance;
-it neither samples the set nor optimizes over it. Construction does not test
+it neither samples the set nor optimises over it. Construction does not test
 whether the restrictions define an empty set. Coordinatewise extrema of the
 set need not themselves satisfy its equalities.
 
 The set representation supports linear equalities and coupled inequalities
 without replacing them by shaped endpoints. Ellipsoidal initial regions,
-optimization of bounds over the admissible set and constrained posterior
+optimisation of bounds over the admissible set and constrained posterior
 sampling are separate extensions. A Bayesian sampler would need to specify
 and sample a posterior supported on the coefficient restrictions; see
 [Hazelton and Turlach (2011)](https://doi.org/10.1016/j.csda.2011.04.018)
-for shape-constrained penalized splines. Likewise,
+for shape-constrained penalised splines. Likewise,
 [Dümbgen (2003)](https://arxiv.org/abs/1312.6466) constructs calibrated bands
 using multiscale tests in a Gaussian white-noise model. Those calibration
 results are distinct from the finite-grid endpoint transformation implemented

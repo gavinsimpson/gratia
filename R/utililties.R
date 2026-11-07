@@ -791,7 +791,7 @@ get_vcov.scam <- function(object, unconditional = FALSE,
   factor(rep(levs[1L], length.out = n), levels = levs)
 }
 
-#' Vectorized version of [base::data.class()]
+#' Vectorised version of [base::data.class()]
 #'
 #' @param df a data frame or tibble.
 #' @return A named character vector of data classes.

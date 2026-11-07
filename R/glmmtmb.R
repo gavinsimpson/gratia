@@ -233,7 +233,7 @@ glmmtmb_smooth_model <- function(object, component = NULL, covariance = TRUE) {
 #' including applicable zero-inflation or hurdle mixtures and varying dispersion.
 #' Truncated nbinom1 currently requires `type = "response"` because glmmTMB
 #' does not supply its Pearson residuals. Other unavailable residual types fail
-#' explicitly. Supported fitted response distributions also provide randomized
+#' explicitly. Supported fitted response distributions also provide randomised
 #' PIT/quantile residuals and inverse-CDF QQ references, including their
 #' zero-inflation and truncation probabilities. Posterior predictive checks draw
 #' coefficients and fitted random effects together from their approximate

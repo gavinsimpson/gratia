@@ -34,7 +34,7 @@ simultaneous intervals.}
 
 \item{ncores}{number of cores for generating random variables from a
 multivariate normal distribution. Passed to \code{\link[mvnfast:rmvn]{mvnfast::rmvn()}}.
-Parallelization will take place only if OpenMP is supported (but appears
+Parallelisation will take place only if OpenMP is supported (but appears
 to work on Windows with current \code{R}).}
 
 \item{...}{additional arguments for methods}

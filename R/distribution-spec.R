@@ -64,7 +64,7 @@ parameter_description <- function(parameter, symbol, definition, predictor,
 #' an identity link for log rate, while natural rate is the exponential of
 #' that predictor.
 #' The sinh-arcsinh skewness and tailweight parameters control distribution
-#' shape; they are not the response's standardized skewness and kurtosis.
+#' shape; they are not the response's standardised skewness and kurtosis.
 #'
 #' [link()] and [inv_link()] retain the fitting package's native conventions
 #' and their existing aliases. Use the definitions here to interpret them.

@@ -38,7 +38,7 @@
 #'   distributional parameter as described in [draw.gam()]. Custom labels, including
 #'   `subtitle`, can be passed through `...`. Use `cyclic = "polar"` to draw
 #'   one-dimensional cyclic smooths with polar coordinates; `polar_args`
-#'   customizes the coordinate display as described in [draw.gam()].
+#'   customises the coordinate display as described in [draw.gam()].
 #' @param ... Additional smooth plotting arguments, including `title`,
 #'   `subtitle`, `xlab` and `ylab`. `subtitle` also applies to parametric panels;
 #'   use `NULL` for automatic predictor labels or `""` to suppress them.

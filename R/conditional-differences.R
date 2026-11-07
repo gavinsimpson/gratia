@@ -73,7 +73,7 @@
 #' simulation intervals need not be centred on this estimate.
 #'
 #' Simultaneous intervals use the `ci_level` quantile of the maximum absolute
-#' standardized deviation over the selected coverage set. They are symmetric
+#' standardised deviation over the selected coverage set. They are symmetric
 #' about `.diff`, with half-width `.crit * .se`. For `uncertainty = "delta"`,
 #' one shared batch of zero-mean Gaussian coefficient deviations is generated
 #' from the Bayesian covariance matrix. Response-scale
@@ -83,7 +83,7 @@
 #' `thin`, `t_df`, and `rw_scale` apply only to `uncertainty = "simulation"`.
 #'
 #' For `uncertainty = "simulation"`, deviations are posterior difference draws
-#' minus `.diff`, standardized by their sample standard deviations. Draws are
+#' minus `.diff`, standardised by their sample standard deviations. Draws are
 #' transformed to the response scale before differencing; invalid inverse-link
 #' domains or response means cause an error rather than discarded draws.
 #' Zero-variance draws that disagree with `.diff` cannot calibrate a band and

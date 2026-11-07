@@ -8,7 +8,7 @@
 #' `paraPen`.
 #' Fixed smoothing parameters are included, and terms sharing a smoothing
 #' parameter each have their own rows. A smooth with several penalties has
-#' several rows. Unpenalized parametric terms have no variance parameter and
+#' several rows. Unpenalised parametric terms have no variance parameter and
 #' are omitted.
 #'
 #' The variance component is the fitted scale parameter divided by the
@@ -34,7 +34,7 @@
 #' tensor-product blocks. The estimated residual scale is labelled `scale`;
 #' a fixed scale is omitted. With residual variance weights, `scale` is the
 #' baseline variance before those weights are applied. For models fitted by
-#' penalized quasi-likelihood (PQL), these are approximate components of the
+#' penalised quasi-likelihood (PQL), these are approximate components of the
 #' working mixed model.
 #'
 #' For [gamm4::gamm4()] fits, components are extracted from `mer`. Smooth

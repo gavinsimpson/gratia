@@ -465,7 +465,7 @@ Smooth and parametric plot subtitles identify the model part or
 distributional parameter as described in \code{\link[=draw.gam]{draw.gam()}}. Custom labels, including
 \code{subtitle}, can be passed through \code{...}. Use \code{cyclic = "polar"} to draw
 one-dimensional cyclic smooths with polar coordinates; \code{polar_args}
-customizes the coordinate display as described in \code{\link[=draw.gam]{draw.gam()}}.
+customises the coordinate display as described in \code{\link[=draw.gam]{draw.gam()}}.
 }
 \note{
 Internally, plots of each smooth are created using \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}}

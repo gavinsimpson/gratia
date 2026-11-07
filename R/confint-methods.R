@@ -17,7 +17,7 @@
 #'   simultaneous intervals.
 #' @param ncores number of cores for generating random variables from a
 #'   multivariate normal distribution. Passed to [mvnfast::rmvn()].
-#'   Parallelization will take place only if OpenMP is supported (but appears
+#'   Parallelisation will take place only if OpenMP is supported (but appears
 #'   to work on Windows with current `R`).
 #' @param ... additional arguments for methods
 #'
@@ -223,7 +223,7 @@
 #'   confidence interval.
 #' @param ncores number of cores for generating random variables from a
 #'   multivariate normal distribution. Passed to [mvnfast::rmvn()].
-#'   Parallelization will take place only if OpenMP is supported (but appears
+#'   Parallelisation will take place only if OpenMP is supported (but appears
 #'   to work on Windows with current `R`).
 #' @param partial_match logical; should matching `parm` use a partial match or
 #'   an exact match? Can only be used if `length(parm)` is `1`.

@@ -24,7 +24,7 @@
 \arguments{
 \item{object}{a fitted GAM, the result of a call to \code{\link[mgcv:gam]{mgcv::gam()}}.}
 
-\item{normalize}{logical; normalize the penalty to the range -1, 1?}
+\item{normalize}{logical; normalise the penalty to the range -1, 1?}
 
 \item{as_matrix}{logical; how should the plotted penalty matrix be oriented?
 If \code{TRUE} row 1, column 1 of the penalty matrix is draw in the upper left,

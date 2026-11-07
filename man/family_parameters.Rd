@@ -37,7 +37,7 @@ predicts reciprocal standard deviation. GEV location is not its expectation.
 an identity link for log rate, while natural rate is the exponential of
 that predictor.
 The sinh-arcsinh skewness and tailweight parameters control distribution
-shape; they are not the response's standardized skewness and kurtosis.
+shape; they are not the response's standardised skewness and kurtosis.
 
 \code{\link[=link]{link()}} and \code{\link[=inv_link]{inv_link()}} retain the fitting package's native conventions
 and their existing aliases. Use the definitions here to interpret them.

@@ -231,7 +231,7 @@ category coding order \verb{0, ..., K}. If category \code{j} has probability \co
 its PIT is \code{F(j - 1) + V * p_j}, where \code{V} is uniform on \verb{(0, 1)}.
 This uses one categorical response, rather than a vector of trial counts.
 The coding does not change the multinomial likelihood into an ordinal model.
-Each fixed enumeration gives a uniform randomized transform under the true
+Each fixed enumeration gives a uniform randomised transform under the true
 model, but changing the enumeration can change individual residuals and
 which departures from the model are easiest to detect.
 

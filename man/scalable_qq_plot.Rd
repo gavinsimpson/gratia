@@ -136,7 +136,7 @@ See \code{\link[=surrogate_residuals]{surrogate_residuals()}} and \link{diagnost
 \item{n_simulate}{numeric; number of data sets to simulate from the estimated
 model when using the simulation method (\code{method = "simulate"}).}
 
-\item{seed}{Random seed for QQ calculations or randomized residuals. Explicit
+\item{seed}{Random seed for QQ calculations or randomised residuals. Explicit
 seeds preserve the caller's RNG state, including an absent state.}
 
 \item{level}{Coverage of pointwise QQ reference intervals, strictly between
@@ -244,7 +244,7 @@ predictor.
 Grouped-family models retain the residual defaults, component reference
 distributions, predictor ranks and layout controls of \code{\link[=appraise]{appraise()}}. QQ
 bin limits apply separately to each component. Pooled residual
-heatmaps summarize the component mixture rather than colouring individual
+heatmaps summarise the component mixture rather than colouring individual
 observations; observed-versus-fitted appraisals always separate components.
 Pooled histograms use faint component-coloured fills with opaque stepped
 upper boundaries, retaining common bin edges and component densities.
@@ -254,7 +254,7 @@ and show conditioning and field choices in the caption where relevant,
 matching \code{\link[=residuals_linpred_plot]{residuals_linpred_plot()}}. Supply \code{caption = ""} to omit the caption.
 
 Kernel density estimates are calculated on a fixed grid before plotting.
-Each predictor slice is normalized to integrate to one over the displayed
+Each predictor slice is normalised to integrate to one over the displayed
 residual grid. Bandwidths, rather than \code{density_bins}, control smoothing;
 increase grid resolution when using small bandwidths. A square-root fill
 transformation reveals low-density regions while retaining density units
