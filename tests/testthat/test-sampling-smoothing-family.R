@@ -2,6 +2,9 @@
 # Small function checks remain in test-function-core.R and focused test files.
 skip_on_cran()
 
+separate_bam_dispersion <- utils::packageVersion("mgcv") >= "1.9-5"
+tweedie_bam_covariance_mismatch <- utils::packageVersion("mgcv") == "1.9-5"
+
 test_that("native smoothing conditionals cover ordinary and extended families", {
   families <- c("poisson", "binomial", "Gamma", "inverse.gaussian", "negbin",
     "Tweedie", "nb", "betar", "scat", "tw", "cnorm", "clog", "cpois", "bcg",
@@ -20,6 +23,13 @@ test_that("native smoothing conditionals cover ordinary and extended families", 
         if (engine == "gam") "ML" else "fREML",
         censored = !(name == "cpois" && engine == "bam"))$model
       original <- if (is.function(fit$family$getTheta)) fit$family$getTheta() else NULL
+      # mgcv 1.9-5's fREML Tweedie BAM covariance uses a different dispersion
+      # estimate from the fixed-parameter refit; the reconstruction must reject it.
+      if (name == "tw" && engine == "bam" && tweedie_bam_covariance_mismatch) {
+        expect_error(sampling_smoothing_setup(fit, block_size = 37L),
+          "does not reproduce the fitted coefficients and covariance", fixed = TRUE)
+        next
+      }
       setup <- sampling_smoothing_setup(fit, block_size = 37L)
       expect_identical(setup$conditional_backend, "family", info = paste(name, engine))
       expect_lt(setup$audit$mean_error, 1e-4)
@@ -181,13 +191,21 @@ test_that("extended covariance layouts distinguish family and global scales", {
     fit <- smoothing_family_fixture("tw", engine, method)$model
     info <- sampling_smoothing_info(fit)
     prefix <- if (engine == "gam") 1L else 0L
+    scale_omitted <- engine == "bam" && separate_bam_dispersion
     expect_identical(info$V_sp_layout$family, seq_len(prefix))
     expect_identical(info$V_sp_layout$log_sp, prefix + 1:2)
     expect_identical(info$V_sp_layout$log_scale,
-      if (engine == "bam" && method == "fREML") integer() else prefix + 3L)
-    expect_identical(info$sp_vcov_layout$log_scale, prefix + 3L)
+      if (scale_omitted || (engine == "bam" && method == "fREML"))
+        integer() else prefix + 3L)
+    expect_identical(info$sp_vcov_layout$log_scale,
+      if (scale_omitted) integer() else prefix + 3L)
     expect_false(info$family_parameters$sampled)
-    expect_silent(sampling_smoothing_setup(fit))
+    if (engine == "bam" && method == "fREML" && tweedie_bam_covariance_mismatch) {
+      expect_error(sampling_smoothing_setup(fit),
+        "does not reproduce the fitted coefficients and covariance", fixed = TRUE)
+    } else {
+      expect_silent(sampling_smoothing_setup(fit))
+    }
   }
   # These families have component/nuisance scales, not a separate global phi.
   for (name in c("nb", "cnorm", "gfam")) {
