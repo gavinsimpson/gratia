@@ -442,7 +442,7 @@
   smoothing-bias correction. Simultaneous bootstrap bands remain
   unsupported (#372, #373).
 
-* Scasm captions show retained shape constraints with portable mathematical
+* `scasm()` captions show retained shape constraints with portable mathematical
   arrows. Saved estimates retain constraint metadata for each tensor margin;
   ignored requests, including named constraints replaced by general `pc`
   inequalities, are labelled and produce a warning (#373). Shape-enforced
@@ -450,7 +450,8 @@
   the documentation and metadata.
 
 * Gaussian simultaneous bands now support positive-semidefinite coefficient
-  covariance matrices, including scasm fits with exact equality constraints.
+  covariance matrices, including `scasm()` fits with exact equality
+  constraints.
 
 * `penalty()` extracts stored tensor and `t2()` penalty matrices, including
   marginal penalties via `margins = TRUE` and their original scaling.
