@@ -13,7 +13,7 @@ name: Reverse dependency check
 jobs:
   revdep_check:
     name: Reverse check ${{ inputs.which }} dependents
-    uses: r-devel/recheck/.github/workflows/recheck.yml@v1
+    uses: ./.github/workflows/recheck-unstripped.yml
     with:
       which: ${{ inputs.which }}
       subdirectory: '' # set if your R package is in a subdir of the git repo
