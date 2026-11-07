@@ -1,4 +1,4 @@
-# gratia (development version)
+# gratia 0.12.0
 
 ## User visible changes
 
@@ -31,7 +31,7 @@
   single plot. For example, replace `smooth_col` with
   `geom.gratia.smooth = element_geom(colour = ...)` and `ci_alpha` with
   `gratia.alpha.interval` inside `theme()`. See `gratia_theme_get()` and
-  the Customizing plots article for migration examples.
+  the Customising plots article for migration examples.
 
   gratia now requires ggplot2 >= 4.0.3 and patchwork >= 1.3.2.
 
@@ -293,7 +293,7 @@
   smooth estimates retain these boundaries; supplied evaluation points are
   unchanged.
 
-  `polar_args` customizes the polar coordinate display. Radial padding
+  `polar_args` customises the polar coordinate display. Radial padding
   separates interval bands from the outer observation rug. Radial axes
   appear inside the circle by default; override their position through
   `polar_args`.
