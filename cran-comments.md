@@ -1,19 +1,12 @@
-This is a patch release of gratia that is largely motivated by the issues on 
-gratia's CRAN Check Results page arising from breaking changes in the scam
-package. The new version also addresses the soft deprecation of `case_match()`
-in dplyr v 1.2.0 that was recently released.
+This submission updates gratia to version 0.12.0.
 
-The package has been checked under:
+The latest release candidate has been checked under:
 
-* r-devel on Windows via winbuilder,
-* r-devel on Ubuntu via GitHub Actions, and
-* r-release on MacOS X, ubuntu, and Windows
+* R 4.6.2 on macOS Tahoe 26.6.1 (aarch64), locally, and
+* R 4.6.2 on Windows Server 2022 (x86_64), via winbuilder r-release.
 
-No problems were observed. I note the `INFO` from `R CMD check` regarding the
-large number of imports; gratia is designed to work within the tidyverse of
-packages, and most of the dependencies in Imports are to those packages which
-are considered (relatively) stable and dependable. This is unavoidable when
-working within the tidyverse.
+Both checks completed on 7 November 2026 with Status: OK. The final
+winbuilder r-devel result is still to be recorded.
 
 Reverse dependency checks completed on 7 November 2026, with no regressions
 against the CRAN version of gratia (0.11.2). Details are below.
@@ -21,6 +14,31 @@ against the CRAN version of gratia (0.11.2). Details are below.
 ## R CMD check results
 
 0 errors | 0 warnings | 0 notes
+
+### Local release check
+
+`make check-release` passed for commit `f74ce435b`, using R's reference BLAS
+and mgcv 1.9-5. The target builds the source package and runs
+`R CMD check --as-cran`, enabling the local tests, visual snapshots and HGAM
+paper tests with `NOT_CRAN=true`, `VDIFFR_RUN_TESTS=true` and
+`GRATIA_RUN_HGAM=true`.
+
+All 39,694 test assertions passed, with no failures, test warnings or skips.
+Help examples, including `--run-donttest`, saved example-output comparisons,
+vignette rebuilding, compiled-code checks, and PDF and HTML manuals passed.
+The installed package size (6.7 MB) was reported as INFO.
+
+The target sets `OMP_NUM_THREADS=1` and `OMP_THREAD_LIMIT=1`. OpenMP printed
+runtime notices when a test requested two threads and ran with one instead.
+These notices were expected consequences of the thread limit; no validation
+was skipped.
+
+### Winbuilder r-release
+
+The [winbuilder r-release log](https://win-builder.r-project.org/sZQBNEARvWsO/00check.log)
+reports Status: OK for gratia 0.12.0 under R 4.6.2. Tests, examples, saved
+example-output comparisons, vignette rebuilding, compiled-code checks, and
+PDF and HTML manuals all passed, with no errors, warnings or NOTEs.
 
 ## Reverse dependency check results
 
