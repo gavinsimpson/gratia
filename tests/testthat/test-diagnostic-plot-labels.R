@@ -9,7 +9,8 @@ test_that("ordinary and scalable QQ and worm plots share labels", {
       list(type = "deviance", method = "normal"),
       list(type = "deviance", method = "uniform"),
       list(type = "deviance", method = "simulate"),
-      list(type = "pit"), list(type = "quantile"), list(type = "dharma")
+      list(type = "pit"), list(type = "quantile"),
+      list(type = "quantile", method = "normal"), list(type = "dharma")
     )
     for (case in cases) {
       args <- c(list(model = model, seed = 31, n_simulate = 3,
@@ -17,6 +18,12 @@ test_that("ordinary and scalable QQ and worm plots share labels", {
       for (worm in c(FALSE, TRUE)) {
         ordinary <- do.call(if (worm) worm_plot else qq_plot, args)
         scalable <- do.call(if (worm) scalable_worm_plot else scalable_qq_plot, args)
+        expected_subtitle <- switch(case$type,
+          quantile = "Quantile residuals; standard normal reference",
+          deviance = if (case$method == "normal") "Method: normal approximation"
+            else paste("Method:", case$method),
+          "Method: uniform")
+        expect_identical(ordinary$labels$subtitle, expected_subtitle)
         for (label in labels) {
           expect_identical(scalable$labels[[label]], ordinary$labels[[label]])
         }
@@ -55,7 +62,9 @@ test_that("diagnostic captions can be replaced or omitted", {
       args <- list(model = model, conditioning = conditioning, seed = 31,
         type = "quantile", n_simulate = 3)
       p <- do.call(fun, args)
-      expect_identical(p$labels$subtitle, "Method: std. normal")
+      expect_identical(p$labels$subtitle, "Quantile residuals; standard normal reference")
+      expect_identical(do.call(fun, c(args, list(subtitle = "Custom subtitle")))$labels$subtitle,
+        "Custom subtitle")
       expect_identical(p$labels$caption, paste0("Conditioning: ", conditioning,
         if (conditioning == "marginal") "; joint simulation bands" else ""))
       for (caption in c("Custom caption", "")) {

@@ -1,5 +1,5 @@
 ---
-title: "Working with shape-constrained additive models"
+title: "Working with scam models in gratia"
 output:
   rmarkdown::html_vignette:
     fig_width: 8
@@ -7,7 +7,7 @@ output:
     dev: png
     dpi: 96
 vignette: >
-  %\VignetteIndexEntry{Working with shape-constrained additive models}
+  %\VignetteIndexEntry{Working with scam models in gratia}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -123,37 +123,27 @@ exponential transformation to overflow, sampling reports an error; it does
 not truncate those draws. Finite transformed draws from an appropriate
 alternative sampler can still be supplied.
 
-## Other GAM operations
+## Predictions and model checks
 
-Supported methods include model summaries and term extraction, parametric
-effects, fitted and conditional predictions, smooth differences, analytic
-response derivatives, accumulated local effects, residual helpers,
-concurvity, penalties and response diagnostics. `lp_matrix()` and
-`model.matrix()` return a design whose columns match `coef(m)`. Formula
-expressions retain their fitted prediction parameters, formula offsets are
-evaluated on new data, and training predictions also retain an `offset`
-argument used in fitting. Missing-row handling is shared across these methods.
+To predict the mean response as `x` varies, use `conditional_values()`. It
+combines both smooths and the intercept, holding `z` at its median in the
+fitting data. The bands show uncertainty in the mean response.
 
-Likelihood evaluation and LOO/WAIC use the supported independent-response
-family adapters, conditional on smoothing and other fitted family parameters.
-They use the same coefficient sampling approximation described above.
-`variance_comp()` reports response scale divided by smoothing parameters;
-these ratios describe penalties on unrestricted fitting parameters. They are
-not Gaussian variances of the transformed smooth coefficients, and their
-confidence limits are unavailable.
+```{r conditional-predictions}
+predictions <- conditional_values(m, condition = "x")
+predictions
+draw(predictions)
+```
 
-For Gaussian identity-link fits with AR1 dependence, response simulation uses
-the fitted correlation and `AR.start` series boundaries, including observation
-weights. It requires the fitting observations: a joint correlation structure
-for arbitrary new data is not defined. Other families with scam's working AR1
-correction do not automatically have a joint response simulator. Independent
-pointwise likelihood adapters reject correlated fits.
+Use `appraise()` to check the fitted response distribution and look for
+remaining patterns in the residuals. Here, quantile residuals compare each
+observation with its fitted Gaussian distribution. Inspect the QQ plot for
+departures from its reference line and the residual-versus-predictor panel
+for curvature or changes in spread.
 
-GCV and UBRE fits do not supply the smoothing-parameter covariance needed for
-`unconditional = TRUE`, unconditional EDF, or likelihood-based confidence
-limits for variance components. MH and INLA coefficient sampling are also
-unavailable. `model_edf(type = "unconditional")` follows the shared GAM
-convention: it warns and returns standard EDF when the correction is missing.
-Automatic `interval_method = "shape"` integration remains specific
-to supported `scasm()` smooths; `shape_intervals()` can be used explicitly on
-supplied estimates and grids when its named shape restrictions apply.
+```{r model-checks}
+appraise(m, type = "quantile", seed = 56)
+```
+
+The [model diagnostics article](model-checking.html) explains how to interpret
+these panels and their reference bands.

@@ -1,5 +1,5 @@
 ---
-title: "Posterior Simulation"
+title: "Posterior simulation of GAM smooths, fitted values and responses"
 bibliography: references.bib
 csl: methods-in-ecology-and-evolution.csl
 output: 
@@ -8,7 +8,7 @@ output:
     fig_height: 5.3333
     dev: "png"
 vignette: >
-  %\VignetteIndexEntry{Posterior Simulation}
+  %\VignetteIndexEntry{Posterior simulation of GAM smooths, fitted values and responses}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

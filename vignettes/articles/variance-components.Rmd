@@ -1,5 +1,5 @@
 ---
-title: "Variance components in GAMs"
+title: "Estimating and interpreting variance components in GAMs"
 output:
   rmarkdown::html_vignette:
     fig_width: 8
@@ -7,7 +7,7 @@ output:
     dev: png
     dpi: 96
 vignette: >
-  %\VignetteIndexEntry{Variance components in GAMs}
+  %\VignetteIndexEntry{Estimating and interpreting variance components in GAMs}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

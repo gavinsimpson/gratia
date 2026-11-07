@@ -1,8 +1,8 @@
 ---
-title: "Migrating posterior sampling calls"
+title: "Updating sampling code for gratia 0.12.0"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Migrating posterior sampling calls}
+  %\VignetteIndexEntry{Updating sampling code for gratia 0.12.0}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

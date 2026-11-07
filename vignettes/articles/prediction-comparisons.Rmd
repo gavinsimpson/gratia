@@ -1,5 +1,5 @@
 ---
-title: "Comparing treatments and finding rates of change"
+title: "Comparing treatments and estimating rates of change"
 output:
   rmarkdown::html_vignette:
     fig_width: 8
@@ -7,7 +7,7 @@ output:
     dev: "png"
     dpi: 120
 vignette: >
-  %\VignetteIndexEntry{Comparing treatments and finding rates of change}
+  %\VignetteIndexEntry{Comparing treatments and estimating rates of change}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -385,7 +385,7 @@ Both concern the smooth's contribution to **log uptake**, not uptake itself.
 responses in raw concentration units instead. For tensor smooths such as
 `te(log(conc), temperature)`, use `partial_derivatives()` with
 `wrt = "covariate", focal = "conc"` while holding temperature fixed.
-See [Functions of covariates and evaluation environments](transformed-covariates.html)
+See [Predictions, plots and derivatives with transformed covariates](transformed-covariates.html)
 for worked tensor, transformed-offset and local-function examples. Preserve
 the fitting environment, or pass `envir`, if expressions need local functions
 or constants at new data.

@@ -1,8 +1,8 @@
 ---
-title: "Functions of covariates and evaluation environments"
+title: "Predictions, plots and derivatives with transformed covariates"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Functions of covariates and evaluation environments}
+  %\VignetteIndexEntry{Predictions, plots and derivatives with transformed covariates}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

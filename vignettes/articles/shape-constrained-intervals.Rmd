@@ -1,5 +1,5 @@
 ---
-title: "Intervals for shape-constrained smooths"
+title: "Shape-constrained intervals and coefficient confidence sets"
 output:
   rmarkdown::html_vignette:
     fig_width: 8
@@ -7,7 +7,7 @@ output:
     dev: png
     dpi: 96
 vignette: >
-  %\VignetteIndexEntry{Intervals for shape-constrained smooths}
+  %\VignetteIndexEntry{Shape-constrained intervals and coefficient confidence sets}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

@@ -1,5 +1,5 @@
 ---
-title: "Data slices"
+title: "Creating prediction grids with data_slice()"
 output: 
   rmarkdown::html_vignette:
     fig_width: 8
@@ -7,7 +7,7 @@ output:
     dev: "png"
     dpi: 96
 vignette: >
-  %\VignetteIndexEntry{Data slices}
+  %\VignetteIndexEntry{Creating prediction grids with data_slice()}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

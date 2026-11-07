@@ -1,5 +1,5 @@
 ---
-title: "Combining surveys with different response distributions"
+title: "Working with mgcv::gfam() models in gratia"
 output:
   rmarkdown::html_vignette:
     fig_width: 8
@@ -7,7 +7,7 @@ output:
     dev: png
     dpi: 96
 vignette: >
-  %\VignetteIndexEntry{Combining surveys with different response distributions}
+  %\VignetteIndexEntry{Working with mgcv::gfam() models in gratia}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -16,7 +16,14 @@ vignette: >
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>", message = FALSE)
 ```
 
-## Can two surveys inform the same environmental response?
+This article shows how gratia works with models fitted using `mgcv::gfam()`,
+which allows different observations to follow different response families.
+It covers plotting shared and family-specific smooths, predicting and
+simulating responses for each family, and checking the fitted model. A
+simulated example with binary and count observations illustrates these
+operations.
+
+## An example with binary and count responses
 
 Suppose one bird survey records whether a species was detected, while another
 records its count during a fixed observation period. Both might tell us about

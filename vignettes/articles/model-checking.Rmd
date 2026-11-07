@@ -1,5 +1,5 @@
 ---
-title: "Model diagnostics: distributions, uncertainty and dependence"
+title: "Residual diagnostics and posterior predictive checks with gratia"
 output:
   rmarkdown::html_vignette:
     fig_width: 8
@@ -7,7 +7,7 @@ output:
     dev: png
     dpi: 96
 vignette: >
-  %\VignetteIndexEntry{Model diagnostics: distributions, uncertainty and dependence}
+  %\VignetteIndexEntry{Residual diagnostics and posterior predictive checks with gratia}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -28,7 +28,7 @@ question.
 
 This article develops three questions: is the response distribution adequate,
 is variation between groups represented, and does serial structure remain?
-[Checking different response distributions](response-distributions.html) extends
+[Model diagnostics for distributional, discrete and censored responses](response-distributions.html) extends
 the examples to distributional parameters, censoring and weights.
 The [grouped-survey](gfam-support.html), [glmmTMB](glmmTMB-support.html) and
 [spatial-survey](sdmTMB-support.html) articles explain their fitting choices.

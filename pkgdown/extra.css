@@ -2,3 +2,8 @@ table.ref-index{
     overflow-x: visible;
     overflow-y: auto;
 }
+
+/* Omit the divider before the first article group. */
+#dropdown-articles + .dropdown-menu > li:first-child > .dropdown-divider {
+    display: none;
+}
