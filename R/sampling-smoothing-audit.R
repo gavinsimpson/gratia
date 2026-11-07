@@ -17,6 +17,10 @@ sampling_smoothing_info <- function(model) {
   layout <- function(V, fast = FALSE) {
     if (!known_layout || !is.matrix(V)) return(NULL)
     scale <- scale_estimated && !fast
+    # mgcv 1.9-5 estimates extended-family BAM dispersion separately from
+    # smoothing parameters, so its covariance can omit log(scale) for ML/REML.
+    if (bam && inherits(fam, "extended.family") && scale &&
+        identical(dim(V), rep(nth_cov + q, 2L))) scale <- FALSE
     expected <- nth_cov + q + as.integer(scale)
     if (!identical(dim(V), c(expected, expected))) return(NULL)
     list(family = seq_len(nth_cov), log_sp = nth_cov + seq_len(q),
