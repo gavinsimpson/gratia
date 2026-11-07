@@ -49,6 +49,9 @@ check: build
 	R CMD check --as-cran gratia_$(PKGVERS).tar.gz
 
 # Include all local tests, visual snapshots and HGAM paper examples.
+# Limit OpenMP to one thread per R process during building and checking.
+check-release: export OMP_NUM_THREADS = 1
+check-release: export OMP_THREAD_LIMIT = 1
 check-release: build
 	cd .. && \
 	NOT_CRAN=true GRATIA_RUN_HGAM=true VDIFFR_RUN_TESTS=true \
