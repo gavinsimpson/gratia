@@ -166,7 +166,7 @@ constant term be included in the standard errors of smooth and parametric
 effects? For parametric effects this includes the intercept variance and
 its covariance with the term, without changing the partial estimates.
 Each term uses the intercept of its own linear predictor.
-Native scasm models are routed to \code{draw.scasm()} with
+Native \code{\link[mgcv:scasm]{mgcv::scasm()}} models are routed to \code{\link[=draw.scasm]{draw.scasm()}} with
 \code{overall_uncertainty = FALSE}. An explicit request for unavailable mean
 uncertainty warns once. The stored model class is unchanged.}
 
@@ -294,7 +294,7 @@ Covariate scale changes that produce irregular spacing use rectangles
 bounded by adjacent coordinate midpoints for flat surfaces.}
 
 \item{surface_3d}{named list of view options passed to \code{\link[ggcube:coord_3d]{ggcube::coord_3d()}},
-for example \code{list(yaw = 45, persp = FALSE)}. The default \code{list()} uses the
+for example \code{list(yaw = 45, persp = FALSE)}. The default \code{\link[base:list]{base::list()}} uses the
 default view with \code{ggcube::light(backface_scale = 1)}, preserving equal
 horizontal units for isotropic smooths. Supply \code{light = ggcube::light(...)}
 in this list to override lighting; \code{ggcube::light(method = "none")} disables
@@ -369,11 +369,11 @@ for simultaneous bands. Parallel simulation requires OpenMP support.}
 \item{seed}{integer or \code{NULL}; an explicit simulation seed preserves the
 caller's RNG state.}
 
-\item{interval_method}{character; "auto" uses stored scasm bootstrap draws
+\item{interval_method}{character; "auto" uses stored \code{\link[mgcv:scasm]{mgcv::scasm()}} bootstrap draws
 for pointwise intervals when available, and Gaussian intervals otherwise.
 Use "gaussian" to request covariance-based limits or "bootstrap" to
 require stored draws. Simultaneous bootstrap bands are not supported.
-\code{"shape"} applies \code{\link[=shape_intervals]{shape_intervals()}} to supported scasm smooth components,
+\code{"shape"} applies \code{\link[=shape_intervals]{shape_intervals()}} to supported \code{\link[mgcv:scasm]{mgcv::scasm()}} smooth components,
 using the initial limits chosen by \code{shape_source}.}
 
 \item{frequentist}{logical; use frequentist covariance for smooth-component
@@ -463,7 +463,7 @@ The object returned is created by \code{\link[patchwork:wrap_plots]{patchwork::w
 \description{
 Plots smooth and parametric contributions from a fitted GAM model using
 \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}}.
-For models fitted by \code{\link[mgcv:gamm]{mgcv::gamm()}}, \code{draw()} and \code{\link[=assemble]{assemble()}} use the
+For models fitted by \code{\link[mgcv:gamm]{mgcv::gamm()}}, \code{\link[=draw]{draw()}} and \code{\link[=assemble]{assemble()}} use the
 fitted \code{gam} component.
 }
 \details{
@@ -473,8 +473,8 @@ parameter for mgcv models. Single-predictor models omit these automatic
 labels; by-variable information and custom subtitles are still shown.
 Constant glmmTMB dispersion
 alone does not count as an additional predictor.
-For example, \code{gaulss()} uses "Mean (mu)" and "Standard deviation (sigma)",
-while \code{twlss()} uses "Mean (mu)", "Power (p)" and "Dispersion (phi)".
+For example, \code{\link[mgcv:gaulss]{mgcv::gaulss()}} uses "Mean (mu)" and "Standard deviation (sigma)",
+while \code{\link[mgcv:twlss]{mgcv::twlss()}} uses "Mean (mu)", "Power (p)" and "Dispersion (phi)".
 Shared smooths name each predictor to which they contribute. Families without
 a known parameter mapping use numbered linear predictors. The existing smooth
 titles and \code{select} values are unchanged, and all smooths are drawn by default.
@@ -505,7 +505,7 @@ require \code{back_transform = FALSE}.
 
 Random-effect tensor plots put continuous covariates before factors. Two
 continuous covariates form a surface, with remaining factor levels and numeric
-slices forming conditioning panels, consistently for \code{te()}, \code{ti()} and \code{t2()}.
+slices forming conditioning panels, consistently for \code{\link[mgcv:te]{mgcv::te()}}, \code{\link[mgcv:ti]{mgcv::ti()}} and \code{\link[mgcv:t2]{mgcv::t2()}}.
 One continuous covariate gives curves for categorical combinations;
 categorical-only terms give point ranges. Up to four covariates are supported.
 Numeric conditioning slices use \code{n_3d} or \code{n_4d}. For factor conditioning
@@ -546,7 +546,7 @@ non-collinear locations or conflicting heights at one location are errors.
 Internally, plots of each smooth are created using \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}}
 and composed into a single plot using \code{\link[patchwork:wrap_plots]{patchwork::wrap_plots()}}. As a
 result, it is not possible to use \code{+} to add to the plots in the way one
-might typically work with \code{ggplot()} plots. Instead, use the \code{&} operator;
+might typically work with \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}} plots. Instead, use the \code{&} operator;
 see the examples.
 }
 \section{Label layout}{

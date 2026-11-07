@@ -2,7 +2,7 @@
 % Please edit documentation in R/gamm4-methods.R
 \name{gamm4_support}
 \alias{gamm4_support}
-\title{Support for models fitted by gamm4}
+\title{Support for models fitted by \code{\link[gamm4:gamm4]{gamm4::gamm4()}}}
 \description{
 Models fitted by \code{\link[gamm4:gamm4]{gamm4::gamm4()}} (version 0.2-7 or later) have class
 \code{"gamm4"}. Pass the fitted object directly to gratia methods; historical
@@ -11,9 +11,9 @@ unclassed lists are not supported.
 \details{
 Smooths, parametric effects, predictions, derivatives, simulations,
 and posterior draws describe the population GAM component. Terms supplied
-through \code{random} are excluded, including their realized effects, predictive
-variation, and uncertainty. \code{conditional_values()} and
-\code{conditional_differences()} condition on covariate values, not on realized
+through \code{random} are excluded, including their realised effects, predictive
+variation, and uncertainty. \code{\link[=conditional_values]{conditional_values()}} and
+\code{\link[=conditional_differences]{conditional_differences()}} condition on covariate values, not on realised
 group effects. Group variables occurring only in \code{random} are not required
 in prediction data, so new groups receive the same population predictions.
 Use the \code{mer} component with lme4 for predictions conditional on group
@@ -40,15 +40,15 @@ its uncertainty due to fitting the mixed model. User draws must have one
 column per GAM coefficient. Metropolis-Hastings sampling is unsupported:
 the GAM likelihood does not include the additional random effects.
 Smoothness uncertainty-corrected covariance matrices and alternative EDF
-are unavailable from gamm4; requested corrections warn and fall back to
+are unavailable from \code{\link[gamm4:gamm4]{gamm4::gamm4()}}; requested corrections warn and fall back to
 the available covariance matrix or EDF. Variance components are extracted
 from the mixed-model component. Smooth components use the same penalty
-scale and labels as \code{gam()} and \code{bam()}, with a separate row for each
+scale and labels as \code{\link[mgcv:gam]{mgcv::gam()}} and \code{\link[mgcv:bam]{mgcv::bam()}}, with a separate row for each
 penalty of a tensor or factor smooth. Additional random effects retain
 their mixed-model variances. Confidence intervals use likelihood profiles
 by default; use \code{interval_method = "none"} to obtain estimates only.
 Gaussian profiles use a maximum-likelihood refit even when the reported
-estimates were fitted by REML. See \link{variance_comp} for interval details.
+estimates were fitted by REML. See \code{\link[=variance_comp]{variance_comp()}} for interval details.
 With \code{type = "terms"}, variances describe fitted term contributions,
 including the additional random effects. Their covariance matrix is
 returned in the \code{covariance} attribute. Term intervals use joint posterior

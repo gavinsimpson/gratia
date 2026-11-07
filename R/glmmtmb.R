@@ -56,7 +56,7 @@ smooths.glmmTMB <- function(object, ...) {
 
 #' @rdname n_smooths
 #' @details
-#' For `glmmTMB` models, `n_smooths()` counts smooth terms across the
+#' For `glmmTMB` models, [n_smooths()] counts smooth terms across the
 #' conditional, zero-inflation and dispersion predictors. Each fitted smooth
 #' is counted once; native random effects are excluded. Models without smooths
 #' return integer zero.
@@ -182,15 +182,15 @@ glmmtmb_smooth_model <- function(object, component = NULL, covariance = TRUE) {
 #' @param select Smooth or native random-effect coefficient selection, across
 #'   all linear predictors. Numeric indices select smooths first, then native
 #'   random coefficients. Native labels have the form `(1 | g)` and `(x | g)`;
-#'   later predictors append `.1`, `.2`, etc. `smooth_estimates()` and
-#'   `smooth_coefs()` select smooths only.
+#'   later predictors append `.1`, `.2`, etc. [smooth_estimates()] and
+#'   [smooth_coefs()] select smooths only.
 #' @param terms Character vector selecting parametric terms, as returned by
-#'   `parametric_terms()`. Later predictors append `.1`, `.2`, etc.
+#'   [parametric_terms()]. Later predictors append `.1`, `.2`, etc.
 #' @param id Integer positions of smooths across all linear predictors.
 #' @param unconditional,frequentist Must be `FALSE`; mgcv-specific covariance
 #'   alternatives are not available.
 #' @param parametric Include parametric effect plots? `NULL` follows
-#'   `draw.gam()`: include them unless `select` is supplied. Use `terms` to
+#'   [draw.gam()]: include them unless `select` is supplied. Use `terms` to
 #'   choose parametric terms, and `parametric = FALSE` to omit them.
 #' @param residuals Must be `FALSE`; partial residual overlays are not supported.
 #' @param ranef_lines Logical; replace QQ plots for a simple native random
@@ -208,8 +208,8 @@ glmmtmb_smooth_model <- function(object, component = NULL, covariance = TRUE) {
 #' Use `draw(model, surface = "3d", ci_3d = TRUE)` for interval surfaces on
 #' smooths and numeric parametric interactions in any linear predictor.
 #' `ci_3d_alpha` and `ci_3d_col` control their opacity and fill colour.
-#' Pass `cyclic = "polar"` and optional `polar_args` to `draw()` or
-#' `assemble()` for polar plots of supported one-dimensional cyclic smooths.
+#' Pass `cyclic = "polar"` and optional `polar_args` to [draw()] or
+#' [assemble()] for polar plots of supported one-dimensional cyclic smooths.
 #' See [draw.gam()] for the coordinate options.
 #'
 #' Parametric effects use fitted contrast coding and exclude smooth null-space
@@ -233,7 +233,7 @@ glmmtmb_smooth_model <- function(object, component = NULL, covariance = TRUE) {
 #' including applicable zero-inflation or hurdle mixtures and varying dispersion.
 #' Truncated nbinom1 currently requires `type = "response"` because glmmTMB
 #' does not supply its Pearson residuals. Other unavailable residual types fail
-#' explicitly. Supported fitted response distributions also provide randomized
+#' explicitly. Supported fitted response distributions also provide randomised
 #' PIT/quantile residuals and inverse-CDF QQ references, including their
 #' zero-inflation and truncation probabilities. Posterior predictive checks draw
 #' coefficients and fitted random effects together from their approximate
@@ -244,11 +244,11 @@ glmmtmb_smooth_model <- function(object, component = NULL, covariance = TRUE) {
 #' See [diagnostic_support] for conditioning choices and remaining limitations.
 #'
 #' @return Smooth estimates, coefficients, or plots, as for the GAM methods.
-#'   `assemble()` returns a named list of ggplot objects, of class
-#'   `"assembled_plots"`. `draw()` combines these plots into a patchwork unless
+#'   [assemble()] returns a named list of ggplot objects, of class
+#'   `"assembled_plots"`. [draw()] combines these plots into a patchwork unless
 #'   `wrap = FALSE`, which returns the individual plots instead.
 #'   All smooths, native random effects and parametric terms are plotted by
-#'   default, as for `draw.gam()`. Smooths in later
+#'   default, as for [draw.gam()]. Smooths in later
 #'   linear predictors use mgcv-style labels such as `s.1(x)` and `s.2(x)`.
 #'   Predictor order is conditional, zero-inflation (if present), then dispersion
 #'   (if present). Use `smooths(object)` and `select` to select individual smooths.

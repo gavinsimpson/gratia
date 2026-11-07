@@ -28,18 +28,18 @@ Inspect the meaning and order of distribution parameters independently of
 the numerical representation used by the fitting package.
 }
 \details{
-\code{fitted_values()} and \code{fitted_samples()} default to the parameters marked
+\code{\link[=fitted_values]{fitted_values()}} and \code{\link[=fitted_samples]{fitted_samples()}} default to the parameters marked
 \code{returned}. On the response scale these are natural distribution parameters,
 which can differ from the fitting package's native response predictions.
 For example, Gaussian LSS output contains standard deviation, whereas mgcv
 predicts reciprocal standard deviation. GEV location is not its expectation.
-\code{link} describes the native representation: for example, \code{ziplss()} uses
+\code{link} describes the native representation: for example, \code{\link[mgcv:ziplss]{mgcv::ziplss()}} uses
 an identity link for log rate, while natural rate is the exponential of
 that predictor.
 The sinh-arcsinh skewness and tailweight parameters control distribution
-shape; they are not the response's standardized skewness and kurtosis.
+shape; they are not the response's standardised skewness and kurtosis.
 
-\code{link()} and \code{inv_link()} retain the fitting package's native conventions
+\code{\link[=link]{link()}} and \code{\link[=inv_link]{inv_link()}} retain the fitting package's native conventions
 and their existing aliases. Use the definitions here to interpret them.
 }
 \examples{

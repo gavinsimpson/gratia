@@ -68,12 +68,12 @@ variance_comp(object, ...)
 of smooths are rescaled before fitting. If \code{rescale = TRUE}, this rescaling
 is undone, resulting in variance components that are on their original
 scale. This is needed if comparing with other mixed model software, such as
-\code{lmer()}.}
+\code{\link[lme4:lmer]{lme4::lmer()}}.}
 
 \item{coverage}{numeric; a value between 0 and 1 indicating the (approximate)
 coverage of the confidence interval that is returned.}
 
-\item{interval_method}{character; for \code{gamm4()} fits, \code{"profile"} computes
+\item{interval_method}{character; for \code{\link[gamm4:gamm4]{gamm4::gamm4()}} fits, \code{"profile"} computes
 likelihood profile intervals and \code{"none"} returns estimates only.}
 
 \item{type}{character; \code{"penalty"} (the default) returns variance parameters
@@ -95,7 +95,7 @@ uncorrected covariance is used. SCAM fits require \code{FALSE}.}
 \item{include_total}{logical; include total rows for \code{type = "terms"}?
 Defaults to \code{TRUE}. Ignored for \code{type = "penalty"}.}
 
-\item{...}{arguments passed to other methods. For \code{gamm4()} fits, additional
+\item{...}{arguments passed to other methods. For \code{\link[gamm4:gamm4]{gamm4::gamm4()}} fits, additional
 arguments are passed to \code{\link[stats:profile]{stats::profile()}}, for example \code{maxpts}. With
 \code{type = "terms"}, no additional arguments are accepted.}
 }
@@ -126,7 +126,7 @@ With \code{type = "penalty"}, models fitted by \code{\link[mgcv:gam]{mgcv::gam()
 \code{paraPen}.
 Fixed smoothing parameters are included, and terms sharing a smoothing
 parameter each have their own rows. A smooth with several penalties has
-several rows. Unpenalized parametric terms have no variance parameter and
+several rows. Unpenalised parametric terms have no variance parameter and
 are omitted.
 
 The variance component is the fitted scale parameter divided by the
@@ -143,8 +143,8 @@ estimated. The scale is included as a separate row when its uncertainty is
 available. Unavailable intervals are \code{NA}.
 
 For \code{\link[mgcv:gamm]{mgcv::gamm()}} fits, components are extracted from \code{lme}. Smooth
-variances are expressed on the same penalty scale as for \code{gam()} and
-\code{bam()}, with one row per penalty. Additional random effects have one row
+variances are expressed on the same penalty scale as for \code{\link[mgcv:gam]{mgcv::gam()}} and
+\code{\link[mgcv:bam]{mgcv::bam()}}, with one row per penalty. Additional random effects have one row
 per coefficient variance, labelled by grouping factor and coefficient;
 their covariances are omitted. Intervals use \code{\link[nlme:intervals]{nlme::intervals()}} when the
 fitted covariance parameters support this calculation. Bounds are \code{NA}
@@ -152,7 +152,7 @@ when that information is unavailable, including fits containing \code{pdTens}
 tensor-product blocks. The estimated residual scale is labelled \code{scale};
 a fixed scale is omitted. With residual variance weights, \code{scale} is the
 baseline variance before those weights are applied. For models fitted by
-penalized quasi-likelihood (PQL), these are approximate components of the
+penalised quasi-likelihood (PQL), these are approximate components of the
 working mixed model.
 
 For \code{\link[gamm4:gamm4]{gamm4::gamm4()}} fits, components are extracted from \code{mer}. Smooth
@@ -173,7 +173,7 @@ the linear predictor, evaluated over the observations used to fit the model.
 Parametric formula terms are included, with all coefficients of a factor,
 polynomial or interaction combined into one term. Each smooth has one row,
 including smooths with several penalties. Additional random effects in
-\code{gamm()} and \code{gamm4()} contribute one component per grouping factor and
+\code{\link[mgcv:gamm]{mgcv::gamm()}} and \code{\link[gamm4:gamm4]{gamm4::gamm4()}} contribute one component per grouping factor and
 coefficient, evaluated at their fitted values. Formula terms follow the
 model's contrast coding. Duplicated component labels receive numeric suffixes.
 

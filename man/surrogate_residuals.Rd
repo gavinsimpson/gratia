@@ -25,11 +25,11 @@ preserves the caller's state, including when none was previously initialised.}
 The default, \code{NULL}, holds fitted random effects fixed in the same way.}
 }
 \value{
-For \code{ocat()}, a numeric vector with one residual per observation.
+For \code{\link[mgcv:ocat]{mgcv::ocat()}}, a numeric vector with one residual per observation.
 For \code{multinom(K)}, a numeric matrix with one row per observation and \code{K+1}
 columns named \code{"0"}, ..., \code{"K"}, identifying the category utilities.
-With \code{na.exclude}, excluded fitting rows are restored as \code{NA}; with
-\code{na.omit}, only observations used for fitting are returned.
+With \code{\link[stats:na.exclude]{stats::na.exclude()}}, excluded fitting rows are restored as \code{NA}; with
+\code{\link[stats:na.omit]{stats::na.omit()}}, only observations used for fitting are returned.
 }
 \description{
 Draw continuous residuals for models fitted with \code{\link[mgcv:ocat]{mgcv::ocat()}} or
@@ -48,10 +48,10 @@ Equivalently, draw a probability uniformly between the fitted probabilities
 model with known parameters, the residuals have a logistic distribution with
 location zero and scale one: mean zero and variance \code{pi^2 / 3}. Fitted
 parameters affect this reference approximation. The identity link reported by
-\code{ocat()} describes the latent mean; its latent distribution is logistic.
+\code{\link[mgcv:ocat]{mgcv::ocat()}} describes the latent mean; its latent distribution is logistic.
 
 This calculation shares the randomised probabilities used by
-\code{\link[=quantile_residuals]{quantile_residuals()}}, which instead applies \code{qnorm()} for normal scores.
+\code{\link[=quantile_residuals]{quantile_residuals()}}, which instead applies \code{\link[stats:qnorm]{stats::qnorm()}} for normal scores.
 Both tails are calculated using log probabilities to retain accuracy when
 ordinary probabilities round to zero or one. Fitting weights do not change
 the scale of the latent logistic distribution.
@@ -77,17 +77,17 @@ this identity directly, with log calculations that retain accuracy for rare
 observed categories and extreme predictors, without rejection or Gibbs
 iterations. This construction does not impose an ordering on categories.
 
-Supported fits are \code{gam} and \code{bam} models with a single \code{ocat()} family,
-and \code{gam} models with \code{multinom()}. Grouped families and other model classes
+Supported fits are \code{gam} and \code{bam} models with a single \code{\link[mgcv:ocat]{mgcv::ocat()}} family,
+and \code{gam} models with \code{\link[mgcv:multinom]{mgcv::multinom()}}. Grouped families and other model classes
 are not supported. Fitted random effects are held fixed. Use
 \code{type = "surrogate"} in \code{\link[=appraise]{appraise()}}, \code{\link[=qq_plot]{qq_plot()}}, \code{\link[=worm_plot]{worm_plot()}} and
 residual plots. QQ and worm plots require \code{method = NULL}, with logistic
-references for \code{ocat()} and centred Gumbel references for \code{multinom()}.
+references for \code{\link[mgcv:ocat]{mgcv::ocat()}} and centred Gumbel references for \code{\link[mgcv:multinom]{mgcv::multinom()}}.
 Pointwise order-statistic bands apply separately to each utility component,
 treating fitted parameters as fixed. They do not give simultaneous coverage
 across categories. Components are always shown separately, including when
-\code{by_family = FALSE}. For \code{ocat()}, \code{\link[=residuals_linpred_plot]{residuals_linpred_plot()}} uses the fitted
-latent mean. For \code{multinom()}, it uses each category's fitted probability;
+\code{by_family = FALSE}. For \code{\link[mgcv:ocat]{mgcv::ocat()}}, \code{\link[=residuals_linpred_plot]{residuals_linpred_plot()}} uses the fitted
+latent mean. For \code{\link[mgcv:multinom]{mgcv::multinom()}}, it uses each category's fitted probability;
 observed-versus-fitted panels compare that probability with its category
 indicator. This also gives category 0 a varying horizontal axis despite its
 fixed utility location. Covariate plots separate the category utilities.

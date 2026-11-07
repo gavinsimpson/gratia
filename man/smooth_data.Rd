@@ -67,7 +67,7 @@ Missing raw inputs or unavailable functions produce an error.
 Numeric \code{by} multipliers are one on automatic grids, including when a
 multiplier shares an original axis name; raw axis coordinates are retained
 separately. If the multiplier is itself an untransformed grid axis, supply
-prediction \code{data} to \code{smooth_estimates()} instead. Typical values added by
+prediction \code{data} to \code{\link[=smooth_estimates]{smooth_estimates()}} instead. Typical values added by
 \code{include_all = TRUE} to model-scale
 grids do not provide raw coordinates for transformed axes.}
 }

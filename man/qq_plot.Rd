@@ -109,7 +109,7 @@ error; a normal approximation must be requested explicitly.}
 
 \item{type}{character or \code{NULL}; residual type: \code{"deviance"}, \code{"response"},
 \code{"pearson"}, \code{"pit"}, \code{"quantile"}, \code{"dharma"}, or \code{"surrogate"} (for
-\code{ocat()} or \code{multinom()} GAMs). \code{NULL} uses the model-specific default:
+\code{\link[mgcv:ocat]{mgcv::ocat()}} or \code{\link[mgcv:multinom]{mgcv::multinom()}} GAMs). \code{NULL} uses the model-specific default:
 deviance for ordinary lm/glm/GAM fits, and quantile for supported grouped
 families, GJRM, sdmTMB and full mixed-model checks. glmmTMB uses Pearson
 residuals conditionally and response residuals marginally. Extracted GAM
@@ -163,7 +163,7 @@ settings instead. Colour used to draw the reference line.}
 \item{by_family}{logical or \code{NULL}; separate indexed grouped-family components
 into facets. The default pools quantile residuals with component colours
 and facets traditional residuals. \code{TRUE} and \code{FALSE} explicitly select the
-layout. In \code{appraise()}, observed-versus-fitted values always use component
+layout. In \code{\link[=appraise]{appraise()}}, observed-versus-fitted values always use component
 facets. Standalone \code{observed_fitted_plot()} facets by default and permits
 explicit pooling. Ignored for ordinary models.}
 
@@ -211,7 +211,7 @@ response distributions or a normal approximation.
 For \code{\link[mgcv:ocat]{mgcv::ocat()}} fits, \code{type = "surrogate"} uses logistic reference
 quantiles with location zero and scale one. Set \code{method = NULL}. Independent
 observations have approximate pointwise bands obtained by applying
-\code{qlogis()} to beta order-statistic limits. Worm plots subtract the same
+\code{\link[stats:qlogis]{stats::qlogis()}} to beta order-statistic limits. Worm plots subtract the same
 logistic reference quantiles from residuals and bands. These references
 treat fitted parameters as fixed. For \code{\link[mgcv:multinom]{mgcv::multinom()}} GAMs, surrogate
 residuals retain a utility component for every category, including 0.
@@ -243,7 +243,7 @@ m <- gam(y / n ~ s(x0) + s(x1) + s(x2) + s(x3),
   method = "REML"
 )
 
-## Q-Q plot; default using direct randomization of uniform quantiles
+## Q-Q plot; default using direct randomisation of uniform quantiles
 qq_plot(m)
 
 ## Alternatively simulate new data from the model, which
@@ -270,7 +270,7 @@ for generalized linear models. \emph{Computational Statistics and Data Analysis}
 \strong{56}, 2404-2409 \doi{doi:10.1016/j.csda.2012.01.026}.
 }
 \seealso{
-\link[mgcv:qq.gam]{mgcv::qq.gam} for more details on the methods used.
+\code{\link[mgcv:qq.gam]{mgcv::qq.gam()}} for more details on the methods used.
 
 \link{gamm4_support}
 }

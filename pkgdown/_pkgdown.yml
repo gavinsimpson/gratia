@@ -65,7 +65,7 @@ reference:
   - title: Plot models and effects
     desc: >
       Visualise fitted models with `draw()` and customise individual plots with
-      `assemble()`; see [Customizing plots](../articles/custom-plotting.html).
+      `assemble()`; see [Customising plots](../articles/custom-plotting.html).
   - contents:
       - draw
       - draw_label_control

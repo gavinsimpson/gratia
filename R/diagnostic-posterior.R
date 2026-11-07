@@ -392,7 +392,7 @@ diagnostic_posterior_observed.glm <- diagnostic_posterior_observed.gam
 #' @export
 #' @rdname posterior_samples
 #' @details
-#' The `lm`, `glm`, `glmmTMB`, `GJRM::gamlss`, `sdmTMB`, and full mixed-model
+#' The `lm`, `glm`, `glmmTMB`, [GJRM::gamlss()], `sdmTMB`, and full mixed-model
 #' diagnostic samplers currently use the fitting observations only. They draw
 #' coefficients together using Gaussian approximations. See
 #' [posterior_predictive_plot()] for which additional distribution parameters

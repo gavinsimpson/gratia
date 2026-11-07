@@ -17,7 +17,7 @@
 #' @param breaks for continuous responses, how to group the response. Can be
 #'   anything that is acceptable as the `breaks` argument of
 #'   [graphics::hist.default()]
-#' @param conditioning for gamm4, `"conditional"` (default) checks the response
+#' @param conditioning for [gamm4::gamm4()], `"conditional"` (default) checks the response
 #'   distribution at all fitted effects, `"marginal"` averages over new effects,
 #'   and `"gam_component"` checks the extracted GAM.
 #' @param ... arguments passed to other methods

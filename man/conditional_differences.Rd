@@ -123,21 +123,21 @@ is reserved by the sampling machinery but is not implemented.}
 coefficient order, used with \code{method = "user"}. At least two are required.}
 
 \item{mvn_method}{character; one of \code{"mvnfast"} or \code{"mgcv"}. The default is
-uses \code{mvnfast::rmvn()}, which can be considerably faster at generate large
-numbers of MVN random values than \code{mgcv::rmvn()}, but which might not work
+uses \code{\link[mvnfast:rmvn]{mvnfast::rmvn()}}, which can be considerably faster at generate large
+numbers of MVN random values than \code{\link[mgcv:rmvn]{mgcv::rmvn()}}, but which might not work
 for some marginal fits, such as those where the covariance matrix is close
 to singular.}
 
 \item{burnin}{numeric; the length of any initial burn in period to discard.
-See \code{mgcv::gam.mh()}.}
+See \code{\link[mgcv:gam.mh]{mgcv::gam.mh()}}.}
 
 \item{thin}{positive integer; retain every \code{thin} iterations after burn-in.}
 
 \item{t_df}{numeric; degrees of freedom for static multivariate \emph{t} proposal.
-See \code{mgcv::gam.mh()}.}
+See \code{\link[mgcv:gam.mh]{mgcv::gam.mh()}}.}
 
 \item{rw_scale}{numeric; factor by which to scale posterior covariance
-matrix when generating random walk proposals. See \code{mgcv::gam.mh()}.}
+matrix when generating random walk proposals. See \code{\link[mgcv:gam.mh]{mgcv::gam.mh()}}.}
 
 \item{envir}{an optional environment supplying functions and constants used
 in model expressions. The available model formula environment is used when
@@ -183,7 +183,7 @@ The estimate is always the difference of fitted predictions. Pointwise
 simulation intervals need not be centred on this estimate.
 
 Simultaneous intervals use the \code{ci_level} quantile of the maximum absolute
-standardized deviation over the selected coverage set. They are symmetric
+standardised deviation over the selected coverage set. They are symmetric
 about \code{.diff}, with half-width \code{.crit * .se}. For \code{uncertainty = "delta"},
 one shared batch of zero-mean Gaussian coefficient deviations is generated
 from the Bayesian covariance matrix. Response-scale
@@ -193,7 +193,7 @@ Sampler arguments \code{method}, \code{draws}, \code{mvn_method}, \code{burnin},
 \code{thin}, \code{t_df}, and \code{rw_scale} apply only to \code{uncertainty = "simulation"}.
 
 For \code{uncertainty = "simulation"}, deviations are posterior difference draws
-minus \code{.diff}, standardized by their sample standard deviations. Draws are
+minus \code{.diff}, standardised by their sample standard deviations. Draws are
 transformed to the response scale before differencing; invalid inverse-link
 domains or response means cause an error rather than discarded draws.
 Zero-variance draws that disagree with \code{.diff} cannot calibrate a band and

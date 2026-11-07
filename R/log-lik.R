@@ -38,7 +38,7 @@
 #' values. Even with `unconditional = TRUE`, those additional parameters are
 #' not jointly sampled. Ordinary PSIS-LOO uses these draws without correcting
 #' their Gaussian approximation. Pareto diagnostics assess reweighting, not the
-#' accuracy of the Gaussian approximation. See [loo.gam] for optional loo methods.
+#' accuracy of the Gaussian approximation. See [loo.gam()] for optional loo methods.
 #'
 #' Independent-response SCAM fits are supported using the coefficient
 #' approximation selected by [post_draws()]. The prediction matrix multiplies

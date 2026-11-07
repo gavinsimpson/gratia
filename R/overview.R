@@ -10,7 +10,7 @@
 
 #' @param parametric logical; include the model parametric terms in the
 #'   overview?
-#' @param random_effects tests of fully penalized smooth terms (those with a
+#' @param random_effects tests of fully penalised smooth terms (those with a
 #'   zero-dimensional null space, e.g. random effects) are computationally
 #'   expensive and for large data sets producing these p values can take a
 #'   very long time. If `random_effects = FALSE`, the tests of the expensive

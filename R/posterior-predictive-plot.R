@@ -20,7 +20,7 @@
 #'   intervals for discrete responses. Must be strictly between zero and one.
 #'   Defaults to `0.9`. Ignored for continuous density overlays.
 #' @param conditioning character or `NULL`; mixed-model conditioning mode.
-#' @param scalable logical or `NULL`; summarize posterior response draws on a
+#' @param scalable logical or `NULL`; summarise posterior response draws on a
 #'   common grid, using temporary disk storage instead of retaining all responses
 #'   in memory. `NULL` enables this at `scalable_threshold` observations.
 #' @param scalable_threshold positive integer; observation count for automatic
@@ -76,7 +76,7 @@
 #' Gaussian `gamm` and `gamm4` models draw fixed and random effects together,
 #' keeping covariance parameters at fitted values; marginal checks draw new
 #' effects.
-#' For gamm fits estimated by penalized quasi-likelihood (PQL), the sampler uses
+#' For [mgcv::gamm()] fits estimated by penalised quasi-likelihood (PQL), the sampler uses
 #' the Gaussian approximation used in fitting and then generates responses from
 #' the fitted response family. This is supported only when the Gaussian working
 #' residuals are uncorrelated. Correlation in those working residuals does not

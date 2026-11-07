@@ -151,11 +151,11 @@ for simultaneous bands. Parallel simulation requires OpenMP support.}
 caller's RNG state. Shared coefficient draws make results independent of
 selected smooth order and parallel evaluation scheduling.}
 
-\item{interval_method}{character; "auto" uses stored scasm bootstrap draws
+\item{interval_method}{character; "auto" uses stored \code{\link[mgcv:scasm]{mgcv::scasm()}} bootstrap draws
 for pointwise intervals when available, and Gaussian intervals otherwise.
 Use "gaussian" to request covariance-based limits or "bootstrap" to
 require stored draws. Simultaneous bootstrap bands are not supported.
-\code{"shape"} applies \code{\link[=shape_intervals]{shape_intervals()}} to supported scasm smooth components,
+\code{"shape"} applies \code{\link[=shape_intervals]{shape_intervals()}} to supported \code{\link[mgcv:scasm]{mgcv::scasm()}} smooth components,
 using the initial limits chosen by \code{shape_source}.}
 
 \item{shape_source}{character; initial uncertainty for \code{interval_method = "shape"}: \code{"gaussian"} (the default) or stored \code{"bootstrap"} pointwise
@@ -208,7 +208,7 @@ and a data table with zero rows in the \code{data} list column.
 Evaluate a smooth at a grid of evenly spaced value over the range of the
 covariate associated with the smooth. Alternatively, a set of points at which
 the smooth should be evaluated can be supplied. \code{smooth_estimates()} is a new
-implementation of \code{evaluate_smooth()}, and replaces that function, which has
+implementation of \code{\link[=evaluate_smooth]{evaluate_smooth()}}, and replaces that function, which has
 been removed from the package.
 }
 \details{
@@ -248,7 +248,7 @@ the covariance of the constrained coefficients. With
 \code{overall_uncertainty = TRUE}, their standard errors also include intercept
 uncertainty and its covariance with the smooth; estimates remain centred.
 Models without an intercept use smooth-only uncertainty for either setting.
-Native scasm fits use component-only uncertainty by default. Explicitly
+Native \code{\link[mgcv:scasm]{mgcv::scasm()}} fits use component-only uncertainty by default. Explicitly
 requesting \code{overall_uncertainty = TRUE} warns once if selected smooths lack
 the centring information needed to add mean uncertainty. Ordinary GAM
 defaults are unchanged.
@@ -283,7 +283,7 @@ constrained posterior. Standard errors describe the initial calculation;
 \code{.crit} is \code{NA} after shape enforcement. Metadata records the initial source,
 correction, named shapes, model coordinates and whole-grid guarantee.
 
-Every selected term must have retained named scasm restrictions. Supported
+Every selected term must have retained named \code{\link[mgcv:scasm]{mgcv::scasm()}} restrictions. Supported
 combinations are positivity, monotonicity in any directions and curvature
 in at most one direction. Tensor smooths require \code{te(..., np = FALSE)} with
 univariate B-spline margins (\code{"sc"} or \code{"bs"}). Normal reparameterisation

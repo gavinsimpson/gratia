@@ -40,12 +40,12 @@
 #' @param by_family logical or `NULL`; separate indexed grouped-family components
 #'   into facets. The default pools quantile residuals with component colours
 #'   and facets traditional residuals. `TRUE` and `FALSE` explicitly select the
-#'   layout. In `appraise()`, observed-versus-fitted values always use component
+#'   layout. In [appraise()], observed-versus-fitted values always use component
 #'   facets. Standalone `observed_fitted_plot()` facets by default and permits
 #'   explicit pooling. Ignored for ordinary models.
 #' @param type character or `NULL`; residual type: `"deviance"`, `"response"`,
 #'   `"pearson"`, `"pit"`, `"quantile"`, `"dharma"`, or `"surrogate"` (for
-#'   `ocat()` or `multinom()` GAMs). `NULL` uses the model-specific default:
+#'   [mgcv::ocat()] or [mgcv::multinom()] GAMs). `NULL` uses the model-specific default:
 #'   deviance for ordinary lm/glm/GAM fits, and quantile for supported grouped
 #'   families, GJRM, sdmTMB and full mixed-model checks. glmmTMB uses Pearson
 #'   residuals conditionally and response residuals marginally. Extracted GAM
@@ -87,7 +87,7 @@
 #'   simulated residuals method (`method = "simulated"`). To avoid confusion,
 #'   `method = "direct"` is deprecated in favour of `method = "uniform"`.
 #'
-#' @seealso [mgcv::qq.gam] for more details on the methods used.
+#' @seealso [mgcv::qq.gam()] for more details on the methods used.
 #'
 #' @details See [appraise()] for grouped-family defaults, supported distributions,
 #'   pooling and separate component panels. PIT and quantile residuals use fixed
@@ -103,7 +103,7 @@
 #'   For [mgcv::ocat()] fits, `type = "surrogate"` uses logistic reference
 #'   quantiles with location zero and scale one. Set `method = NULL`. Independent
 #'   observations have approximate pointwise bands obtained by applying
-#'   `qlogis()` to beta order-statistic limits. Worm plots subtract the same
+#'   [stats::qlogis()] to beta order-statistic limits. Worm plots subtract the same
 #'   logistic reference quantiles from residuals and bands. These references
 #'   treat fitted parameters as fixed. For [mgcv::multinom()] GAMs, surrogate
 #'   residuals retain a utility component for every category, including 0.
@@ -181,7 +181,7 @@ qq_plot.default <- function(model, ...) {
 #'   method = "REML"
 #' )
 #'
-#' ## Q-Q plot; default using direct randomization of uniform quantiles
+#' ## Q-Q plot; default using direct randomisation of uniform quantiles
 #' qq_plot(m)
 #'
 #' ## Alternatively simulate new data from the model, which
@@ -537,7 +537,7 @@ qq_uniform <- function(model, n = 10,
 #' @inheritParams appraise
 #' @param type character or `NULL`; residual type: `"deviance"`, `"pearson"`,
 #'   `"response"`, `"pit"`, `"quantile"`, `"dharma"`, or `"surrogate"` (for
-#'   `ocat()` or `multinom()` GAMs). Grouped models automatically use
+#'   [mgcv::ocat()] or [mgcv::multinom()] GAMs). Grouped models automatically use
 #'   quantile residuals when all active components are supported, otherwise all
 #'   use deviance residuals with a message. Ordinary models retain deviance
 #'   residuals by default. See [appraise()] for distributional support.
@@ -561,7 +561,7 @@ qq_uniform <- function(model, n = 10,
 #' @param by_family logical or `NULL`; separate indexed grouped-family components
 #'   into facets. The default pools quantile residuals with component colours
 #'   and facets traditional residuals. `TRUE` and `FALSE` explicitly select the
-#'   layout. In `appraise()`, observed-versus-fitted values always use component
+#'   layout. In [appraise()], observed-versus-fitted values always use component
 #'   facets. Standalone `observed_fitted_plot()` facets by default and permits
 #'   explicit pooling. Ignored for ordinary models.
 #' @param rank logical or `NULL`; use within-component ranks on the horizontal

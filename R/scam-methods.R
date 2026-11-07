@@ -102,7 +102,7 @@ lp_matrix.scam <- function(model, data = NULL, ...) {
 }
 
 #' @rdname lp_matrix
-#' @param object a fitted SCAM model, for the `model.matrix()` method.
+#' @param object a fitted SCAM model, for the [stats::model.matrix()] method.
 #' @export
 model.matrix.scam <- function(object, ...) {
   predict_model(object, type = "lpmatrix", ...)
@@ -197,7 +197,7 @@ pp_check.scam <- function(object, ...) {
 }
 
 #' @rdname confint.gam
-#' @details For SCAM fits, `confint()` returns intervals for smooth functions,
+#' @details For SCAM fits, [stats::confint()] returns intervals for smooth functions,
 #'   with `parm` selecting smooth labels. It uses transformed-coefficient
 #'   Gaussian uncertainty conditional on the fitted smoothing parameters.
 #'   By default, intercept uncertainty is excluded. These intervals do not

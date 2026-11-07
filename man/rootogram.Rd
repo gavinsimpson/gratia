@@ -21,7 +21,7 @@ rootogram(object, ...)
 
 \item{...}{arguments passed to other methods}
 
-\item{conditioning}{for gamm4, \code{"conditional"} (default) checks the response
+\item{conditioning}{for \code{\link[gamm4:gamm4]{gamm4::gamm4()}}, \code{"conditional"} (default) checks the response
 distribution at all fitted effects, \code{"marginal"} averages over new effects,
 and \code{"gam_component"} checks the extracted GAM.}
 

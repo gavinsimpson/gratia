@@ -207,11 +207,11 @@ smooth_type(smooth)
 \description{
 Soap-film boundary and wiggly components use the \code{sf.film} and \code{sf.wiggly}
 classes introduced in mgcv 1.9-4.
-
-B-spline tensor products (\code{bs = "bt"}, available from mgcv 1.9-5) use
-the short name \code{"B spline tensor"}.
 }
 \details{
+B-spline tensor products (\code{bs = "bt"}, available from mgcv 1.9-5) use
+the short name \code{"B spline tensor"}.
+
 SCAM smooth types use compact constraint descriptions: \code{inc} for
 increasing, \code{dec} for decreasing, and \code{pos} for positive. For tensor
 smooths, the two descriptions follow the covariate order in the smooth

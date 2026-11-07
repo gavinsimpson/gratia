@@ -91,7 +91,7 @@ This implication does not establish nominal coverage for the initial band.
 In particular, transforming separately calibrated pointwise limits does not
 preserve their marginal coverage at each point: sorting moves information
 between coordinates. `interval = "pointwise"` records this source calibration
-without assigning new pointwise coverage to the result. Penalization bias or
+without assigning new pointwise coverage to the result. Penalisation bias or
 an inadequate covariance approximation can also affect initial coverage; the
 shape operation does not correct either problem.
 
@@ -104,12 +104,12 @@ equalities.
 ### What the validation simulations showed
 
 The reproducible experiment in `notes/scasm/shape-coverage.R` separates
-known-variance Gaussian calibration from fitted scasm uncertainty. It uses
-2,000 repetitions per known-Gaussian scenario and 400 attempted fits per scasm
+known-variance Gaussian calibration from fitted `scasm()` uncertainty. It uses
+2,000 repetitions per known-Gaussian scenario and 400 attempted fits per `scasm()`
 scenario, including exactly flat and exactly linear truths. At 95% coverage,
 the binomial Monte Carlo standard error is about 0.5 percentage points for
 2,000 repetitions and 1.1 percentage points for 400 successful fits.
-The scasm experiment applies the low-level operator to fitted response curves
+The `scasm()` experiment applies the low-level operator to fitted response curves
 including their intercepts, giving each simulated truth a fixed reference level.
 
 For a nearly flat increasing truth, the smallest marginal coverage over grid
@@ -120,7 +120,7 @@ coverage in any of the 49,182 paired transformations across the experiment.
 These are empirical checks of the event-inclusion result, rather than a
 reason to interpret transformed pointwise limits as calibrated intervals.
 
-The scasm examples also show that shape enforcement retains limitations of
+The `scasm()` examples also show that shape enforcement retains limitations of
 the initial uncertainty. For a nearly binding increasing, convex truth, the
 transformed Gaussian simultaneous band covered the whole grid in 313 of 342
 returned fits: 91.52%, with Monte Carlo standard error 1.51 percentage points.
@@ -133,7 +133,7 @@ width or separate smoothing bias from the effects of a finite spline basis
 and binding restrictions. Enforcing shape supplies no additional correction
 for smoothing bias.
 
-## An increasing, convex scasm smooth
+## An increasing, convex `scasm()` smooth
 
 For supported `mgcv::scasm()` components, select the transformation explicitly
 with `interval_method = "shape"`. The default initial source is Gaussian:
@@ -156,7 +156,7 @@ draw(curve)
 ```
 
 This displays the smooth component on its model scale. The intercept is not
-added. `scasm` components use component-only uncertainty by default; an explicit
+added. `scasm()` components use component-only uncertainty by default; an explicit
 request for `overall_uncertainty = TRUE` is rejected for shape intervals.
 Arbitrary effect shifts and transformations are also rejected, because they
 can change the asserted shape. Standard errors retained in the result describe
@@ -200,7 +200,7 @@ curvature in that coordinate need not be curvature in `x`.
 
 Tensor restrictions require particular care: retained coefficient inequalities
 alone do not imply the named shape when complementary basis functions can be
-negative. Automatic shape inference therefore accepts unreparameterized
+negative. Automatic shape inference therefore accepts unreparameterised
 univariate B-spline margins, fitted with `np = FALSE`, within their basis
 domains. Both `"sc"` and ordinary `"bs"` margins can be used in this supported
 construction.
@@ -241,7 +241,7 @@ convexification can destroy curvature enforced in an earlier direction.
 
 ## How this differs from stored bootstrap limits
 
-With `bs > 0`, a scasm fit stores feasible bootstrap coefficient columns in
+With `bs > 0`, a `scasm()` fit stores feasible bootstrap coefficient columns in
 `model$bs`. Its bootstrap holds smoothing parameters fixed and perturbs a final
 working likelihood problem. Native intervals evaluate those columns, take
 pointwise percentiles and, when `svar.only` is present, adjust endpoints using
@@ -295,17 +295,17 @@ The level and band type again record the caller's calibration. On a feasible
 true coefficient vector, intersection preserves exactly the initial band's
 coverage event. Pointwise limits alone do not provide a simultaneous region.
 `in_shape_set()` checks candidate vectors with a documented absolute tolerance;
-it neither samples the set nor optimizes over it. Construction does not test
+it neither samples the set nor optimises over it. Construction does not test
 whether the restrictions define an empty set. Coordinatewise extrema of the
 set need not themselves satisfy its equalities.
 
 The set representation supports linear equalities and coupled inequalities
 without replacing them by shaped endpoints. Ellipsoidal initial regions,
-optimization of bounds over the admissible set and constrained posterior
+optimisation of bounds over the admissible set and constrained posterior
 sampling are separate extensions. A Bayesian sampler would need to specify
 and sample a posterior supported on the coefficient restrictions; see
 [Hazelton and Turlach (2011)](https://doi.org/10.1016/j.csda.2011.04.018)
-for shape-constrained penalized splines. Likewise,
+for shape-constrained penalised splines. Likewise,
 [Dümbgen (2003)](https://arxiv.org/abs/1312.6466) constructs calibrated bands
 using multiscale tests in a Gaussian white-noise model. Those calibration
 results are distinct from the finite-grid endpoint transformation implemented

@@ -158,7 +158,7 @@ constant term be included in the standard errors of smooth and parametric
 effects? For parametric effects this includes the intercept variance and
 its covariance with the term, without changing the partial estimates.
 Each term uses the intercept of its own linear predictor.
-Native scasm models are routed to \code{draw.scasm()} with
+Native \code{\link[mgcv:scasm]{mgcv::scasm()}} models are routed to \code{\link[=draw.scasm]{draw.scasm()}} with
 \code{overall_uncertainty = FALSE}. An explicit request for unavailable mean
 uncertainty warns once. The stored model class is unchanged.}
 
@@ -286,7 +286,7 @@ Covariate scale changes that produce irregular spacing use rectangles
 bounded by adjacent coordinate midpoints for flat surfaces.}
 
 \item{surface_3d}{named list of view options passed to \code{\link[ggcube:coord_3d]{ggcube::coord_3d()}},
-for example \code{list(yaw = 45, persp = FALSE)}. The default \code{list()} uses the
+for example \code{list(yaw = 45, persp = FALSE)}. The default \code{\link[base:list]{base::list()}} uses the
 default view with \code{ggcube::light(backface_scale = 1)}, preserving equal
 horizontal units for isotropic smooths. Supply \code{light = ggcube::light(...)}
 in this list to override lighting; \code{ggcube::light(method = "none")} disables
@@ -361,11 +361,11 @@ for simultaneous bands. Parallel simulation requires OpenMP support.}
 \item{seed}{integer or \code{NULL}; an explicit simulation seed preserves the
 caller's RNG state.}
 
-\item{interval_method}{character; "auto" uses stored scasm bootstrap draws
+\item{interval_method}{character; "auto" uses stored \code{\link[mgcv:scasm]{mgcv::scasm()}} bootstrap draws
 for pointwise intervals when available, and Gaussian intervals otherwise.
 Use "gaussian" to request covariance-based limits or "bootstrap" to
 require stored draws. Simultaneous bootstrap bands are not supported.
-\code{"shape"} applies \code{\link[=shape_intervals]{shape_intervals()}} to supported scasm smooth components,
+\code{"shape"} applies \code{\link[=shape_intervals]{shape_intervals()}} to supported \code{\link[mgcv:scasm]{mgcv::scasm()}} smooth components,
 using the initial limits chosen by \code{shape_source}.}
 
 \item{frequentist}{logical; use frequentist covariance for smooth-component
@@ -465,13 +465,13 @@ Smooth and parametric plot subtitles identify the model part or
 distributional parameter as described in \code{\link[=draw.gam]{draw.gam()}}. Custom labels, including
 \code{subtitle}, can be passed through \code{...}. Use \code{cyclic = "polar"} to draw
 one-dimensional cyclic smooths with polar coordinates; \code{polar_args}
-customizes the coordinate display as described in \code{\link[=draw.gam]{draw.gam()}}.
+customises the coordinate display as described in \code{\link[=draw.gam]{draw.gam()}}.
 }
 \note{
 Internally, plots of each smooth are created using \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}}
 and composed into a single plot using \code{\link[patchwork:wrap_plots]{patchwork::wrap_plots()}}. As a
 result, it is not possible to use \code{+} to add to the plots in the way one
-might typically work with \code{ggplot()} plots. Instead, use the \code{&} operator;
+might typically work with \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}} plots. Instead, use the \code{&} operator;
 see the examples.
 }
 \section{Label layout}{

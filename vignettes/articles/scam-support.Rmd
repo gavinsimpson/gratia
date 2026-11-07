@@ -155,5 +155,5 @@ limits for variance components. MH and INLA coefficient sampling are also
 unavailable. `model_edf(type = "unconditional")` follows the shared GAM
 convention: it warns and returns standard EDF when the correction is missing.
 Automatic `interval_method = "shape"` integration remains specific
-to supported scasm smooths; `shape_intervals()` can be used explicitly on
+to supported `scasm()` smooths; `shape_intervals()` can be used explicitly on
 supplied estimates and grids when its named shape restrictions apply.

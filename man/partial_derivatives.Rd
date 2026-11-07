@@ -113,7 +113,7 @@ covariance matrix?}
 
 \item{ncores}{number of cores for generating random variables from a
 multivariate normal distribution. Passed to \code{\link[mvnfast:rmvn]{mvnfast::rmvn()}}.
-Parallelization will take place only if OpenMP is supported (but appears
+Parallelisation will take place only if OpenMP is supported (but appears
 to work on Windows with current \code{R}).}
 
 \item{partial_match}{logical; should smooths be selected by partial matches
@@ -131,7 +131,7 @@ expressions; see \code{\link[=smooth_estimates]{smooth_estimates()}}.}
 smooth expression, such as \code{log(x)}; \code{"covariate"} uses a raw covariate,
 such as \code{x}, and reevaluates expressions at each finite-difference point.}
 
-\item{interval_method}{character; use stored scasm bootstrap draws for
+\item{interval_method}{character; use stored \code{\link[mgcv:scasm]{mgcv::scasm()}} bootstrap draws for
 pointwise intervals with \code{"auto"} (the default), or explicitly select
 \code{"gaussian"} or \code{"bootstrap"}. Bootstrap simultaneous bands are unavailable.}
 
@@ -179,7 +179,7 @@ without adding uncertainty from fitted coefficients.
 \section{Parallel calculation}{
 
 With mirai and carrier installed, configure workers with
-\code{mirai::daemons()} to distribute calculations across selected smooths.
+\code{\link[mirai:daemons]{mirai::daemons()}} to distribute calculations across selected smooths.
 \code{\link[=difference_smooths]{difference_smooths()}} distributes factor-level comparisons instead.
 Without configured workers, or with only one calculation, evaluation is
 serial. These functions leave the caller's worker pool running.
@@ -189,9 +189,9 @@ prepared in the caller. Workers receive the coordinates and coefficient
 columns needed for their calculation. Custom prediction methods are evaluated
 in the caller, including custom tensor margins and factor-smooth bases;
 workers receive their prediction matrices. Simultaneous intervals use successive
-draws in selection order, so \code{set.seed()} gives the same results with or
+draws in selection order, so \code{\link[base:set.seed]{base::set.seed()}} gives the same results with or
 without workers, independently of their number or completion order.
-\code{derivatives()} uses \code{set.seed()}; the other functions also accept \code{seed},
+\code{derivatives()} uses \code{\link[base:set.seed]{base::set.seed()}}; the other functions also accept \code{seed},
 which restores the caller's random number state on exit.
 
 \code{\link[=smooth_samples]{smooth_samples()}} draws coefficients jointly once, then reuses those draws

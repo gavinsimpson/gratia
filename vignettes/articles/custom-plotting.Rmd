@@ -1,12 +1,12 @@
 ---
-title: "Customizing plots"
+title: "Customising plots"
 output: 
   rmarkdown::html_vignette:
     fig_width: 8
     fig_height: 5.3333
     dev: "png"
 vignette: >
-  %\VignetteIndexEntry{Customizing plots}
+  %\VignetteIndexEntry{Customising plots}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -349,7 +349,7 @@ ggcube's original back-face shading, or
 Surface faces have full opacity. Floor observations, boundaries, and contours
 share the surface's depth ordering, so hidden parts are occluded by nearer faces.
 
-For a different view for each term, customize the named plots from `assemble()`:
+For a different view for each term, customise the named plots from `assemble()`:
 
 ```{r surface-3d-per-term, eval = requireNamespace("ggcube", quietly = TRUE)}
 panels <- assemble(m_surface, surface = "3d", n_2d = 20)

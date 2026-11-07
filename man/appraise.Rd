@@ -97,7 +97,9 @@ appraise(model, ...)
 }
 \arguments{
 \item{model}{a fitted model supported by \link{diagnostic_support}, including
-lm, glm, gam/bam, gamm/gamm4, glmmTMB, univariate GJRM and sdmTMB.}
+\code{\link[stats:lm]{stats::lm()}}, \code{\link[stats:glm]{stats::glm()}}, \code{\link[mgcv:gam]{mgcv::gam()}}, \code{\link[mgcv:bam]{mgcv::bam()}},
+\code{\link[mgcv:gamm]{mgcv::gamm()}}, \code{\link[gamm4:gamm4]{gamm4::gamm4()}}, \code{\link[glmmTMB:glmmTMB]{glmmTMB::glmmTMB()}}, univariate
+\code{\link[GJRM:gamlss]{GJRM::gamlss()}} and \code{\link[sdmTMB:sdmTMB]{sdmTMB::sdmTMB()}}.}
 
 \item{...}{arguments passed to \code{\link[patchwork:wrap_plots]{patchwork::wrap_plots()}}.}
 
@@ -146,7 +148,7 @@ posterior predictive draws.}
 
 \item{type}{character or \code{NULL}; residual type: \code{"deviance"}, \code{"response"},
 \code{"pearson"}, \code{"pit"}, \code{"quantile"}, \code{"dharma"}, or \code{"surrogate"} (for
-\code{ocat()} or \code{multinom()} GAMs). \code{NULL} uses the model-specific default:
+\code{\link[mgcv:ocat]{mgcv::ocat()}} or \code{\link[mgcv:multinom]{mgcv::multinom()}} GAMs). \code{NULL} uses the model-specific default:
 deviance for ordinary lm/glm/GAM fits, and quantile for supported grouped
 families, GJRM, sdmTMB and full mixed-model checks. glmmTMB uses Pearson
 residuals conditionally and response residuals marginally. Extracted GAM
@@ -186,7 +188,7 @@ the observed distribution when \code{ppcheck = TRUE}.}
 into facets. The default pools quantile residuals with component colours
 and facets traditional residuals. \code{TRUE} and \code{FALSE} explicitly select the
 layout. In \code{appraise()}, observed-versus-fitted values always use component
-facets. Standalone \code{observed_fitted_plot()} facets by default and permits
+facets. Standalone \code{\link[=observed_fitted_plot]{observed_fitted_plot()}} facets by default and permits
 explicit pooling. Ignored for ordinary models.}
 
 \item{rank}{logical or \code{NULL}; use within-component ranks on the horizontal
@@ -294,9 +296,9 @@ supported. Unrecognised custom-family bounds remain unsupported.
 A custom CDF must also support the probabilities just below discrete
 values and at censoring limits. Replacements for recognised family CDFs
 must use the same arguments and probability conventions. Scalar uncensored
-\code{cnorm()}, \code{clog()} and
-\code{cpois()} components are supported; genuine censoring requires recoverable,
-aligned censoring bounds. Matrix censored responses rejected by \code{gfam()}
+\code{\link[mgcv:cnorm]{mgcv::cnorm()}}, \code{\link[mgcv:clog]{mgcv::clog()}} and
+\code{\link[mgcv:cpois]{mgcv::cpois()}} components are supported; genuine censoring requires recoverable,
+aligned censoring bounds. Matrix censored responses rejected by \code{\link[mgcv:gfam]{mgcv::gfam()}}
 and upstream fitting failures are not repaired.
 
 Use \code{response = NULL} to check every grouped-family component or a single
@@ -338,7 +340,7 @@ heatmaps show conditional density; observed-versus-fitted heatmaps show
 counts. Point styling applies to QQ/worm points, and heatmap fill scales can
 be changed with ggplot scales. QQ references average draws as they are
 generated or compute exact pooled quantiles using temporary files above
-the configured memory threshold; see \link{diagnostic_support}. Supported univariate GJRM::gamlss models use quantile
+the configured memory threshold; see \link{diagnostic_support}. Supported univariate \code{\link[GJRM:gamlss]{GJRM::gamlss()}} models use quantile
 residuals by default.
 
 If the response expectation does not exist, the observed-versus-fitted

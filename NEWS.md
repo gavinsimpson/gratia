@@ -31,7 +31,7 @@
   single plot. For example, replace `smooth_col` with
   `geom.gratia.smooth = element_geom(colour = ...)` and `ci_alpha` with
   `gratia.alpha.interval` inside `theme()`. See `gratia_theme_get()` and
-  the Customizing plots article for migration examples.
+  the Customising plots article for migration examples.
 
   gratia now requires ggplot2 >= 4.0.3 and patchwork >= 1.3.2.
 
@@ -293,7 +293,7 @@
   smooth estimates retain these boundaries; supplied evaluation points are
   unchanged.
 
-  `polar_args` customizes the polar coordinate display. Radial padding
+  `polar_args` customises the polar coordinate display. Radial padding
   separates interval bands from the outer observation rug. Radial axes
   appear inside the circle by default; override their position through
   `polar_args`.
@@ -409,7 +409,7 @@
 
   `shape_intervals()` applies monotone rearrangement and convex or concave
   envelopes to existing interval endpoints on a finite grid. Supported
-  scasm smooths expose this through `interval_method = "shape"` and an
+  `scasm()` smooths expose this through `interval_method = "shape"` and an
   explicit Gaussian or stored-bootstrap initial source. The transformation
   preserves whole-grid containment events; it does not establish nominal
   coverage or preserve marginal coverage of pointwise limits.
@@ -430,7 +430,7 @@
   estimates reject interval computation controls that require the fitted
   model.
 
-  `interval_method` selects native scasm bootstrap or Gaussian pointwise
+  `interval_method` selects native `scasm()` bootstrap or Gaussian pointwise
   intervals for smooths, fitted values, smooth derivatives and
   `confint()`.
 
@@ -442,7 +442,7 @@
   smoothing-bias correction. Simultaneous bootstrap bands remain
   unsupported (#372, #373).
 
-* Scasm captions show retained shape constraints with portable mathematical
+* `scasm()` captions show retained shape constraints with portable mathematical
   arrows. Saved estimates retain constraint metadata for each tensor margin;
   ignored requests, including named constraints replaced by general `pc`
   inequalities, are labelled and produce a warning (#373). Shape-enforced
@@ -450,7 +450,8 @@
   the documentation and metadata.
 
 * Gaussian simultaneous bands now support positive-semidefinite coefficient
-  covariance matrices, including scasm fits with exact equality constraints.
+  covariance matrices, including `scasm()` fits with exact equality
+  constraints.
 
 * `penalty()` extracts stored tensor and `t2()` penalty matrices, including
   marginal penalties via `margins = TRUE` and their original scaling.
@@ -1287,7 +1288,7 @@
 
 * **Missing observations and prediction rows**
 
-  For models fitted with `na.exclude`, default fitted values, partial
+  For models fitted with `na.exclude()`, default fitted values, partial
   residuals, fitted and posterior samples, simulations and
   `quantile_residuals()` now restore excluded rows as `NA`. Diagnostics
   align retained observations with predictors, and histogram bin selection
@@ -1337,7 +1338,7 @@
 * `draw.gamlss()` now sizes its plot layout using the panels actually drawn,
   including parametric effects, avoiding rendering errors for GJRM models.
 
-* Posterior sampling for GAMs, including the GAM component of gamm4 models,
+* Posterior sampling for GAMs, including the GAM component of `gamm4()` models,
   now falls back to `mgcv::rmvn()` with a warning if the default sampler's
   Cholesky decomposition fails (#332).
 
@@ -1431,7 +1432,7 @@
   while `frequentist = TRUE` selects the frequentist covariance (GRA-005).
   Both pointwise and simultaneous intervals respect `overall_uncertainty`,
   including uncertainty in the overall mean by default for ordinary GAMs;
-  native scasm fits default to `FALSE`. Requesting multiple smooths no longer
+  native `scasm()` fits default to `FALSE`. Requesting multiple smooths no longer
   causes an error (GRA-006).
 
 * `simulate.gamm()` now respects the supplied `data` argument.

@@ -25,8 +25,8 @@
 
 #' Extract coefficients from a fitted `scam` model.
 #'
-#' @param object a model object fitted by `scam()`
-#' @param parametrized logical; extract parametrized coefficients, which
+#' @param object a model object fitted by [scam::scam()]
+#' @param parametrized logical; extract parametrised coefficients, which
 #'   respect the linear inequality constraints of the model.
 #' @param ... other arguments.
 #'

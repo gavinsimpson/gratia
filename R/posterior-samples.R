@@ -2,8 +2,8 @@
 #'
 #' @details
 #' With no explicit `data`, observation rows follow the fitted model's
-#' `na.action`. `na.exclude` restores excluded rows as `NA` in every draw;
-#' `na.omit` returns retained rows only. `.row` indexes the fitting data after
+#' `na.action`. [stats::na.exclude()] restores excluded rows as `NA` in every draw;
+#' [stats::na.omit()] returns retained rows only. `.row` indexes the fitting data after
 #' any `subset`. With explicit `data`, `.row` indexes that data, missing
 #' responses do not prevent prediction, and missing required predictors give
 #' `NA` draws. An explicit prediction `na.action` in `...` is honoured without
@@ -21,8 +21,8 @@
 #'   supported `re` and `fs` terms; character vectors select exact smooth labels.
 #'   Fitted predictions integrate response means over new zero-mean Gaussian
 #'   effects. Response samplers draw new effects before sampling responses.
-#'   Smoothing parameters and dispersion remain fixed. Only ordinary `gam()`
-#'   and `bam()` fits with a scalar response mean are supported.
+#'   Smoothing parameters and dispersion remain fixed. Only ordinary [mgcv::gam()]
+#'   and [mgcv::bam()] fits with a scalar response mean are supported.
 #' @param seed numeric; a random seed for the simulations.
 #' @param frequentist logical; `TRUE` to use the frequentist covariance matrix of
 #'   the parameter estimators, `FALSE` to use the Bayesian posterior
@@ -38,14 +38,14 @@
 #'   explicit vector overrides the fitting weights; a single value applies to
 #'   every observation. With `data = NULL`, the default is the fitted prior
 #'   weights, except factor-valued binomial responses retain one Bernoulli trial
-#'   per observation. Native `gaulss()` ignores fitting weights in its likelihood,
+#'   per observation. Native [mgcv::gaulss()] ignores fitting weights in its likelihood,
 #'   so its default response weights are also ones; explicitly supplied sampling
 #'   weights still override this default. With prediction data, weights default
 #'   to a vector of ones.
 #'   For ordinary Gaussian and Gamma responses, larger weights reduce response
 #'   variance (precision weights). For binomial responses, weights give integer
 #'   trial counts. They do not alter the fitted coefficient covariance. Include
-#'   positions restored by `na.exclude` when supplying weights for fitting rows.
+#'   positions restored by [stats::na.exclude()] when supplying weights for fitting rows.
 #' @inheritParams post_draws n_cores n_threads
 #' @param method character; which method should be used to draw samples from
 #'   the posterior distribution. `"gaussian"` uses a Gaussian (Laplace)
@@ -66,12 +66,12 @@
 #' @param ... arguments passed to other methods. For `fitted_samples()`, these
 #'   are passed on to [mgcv::predict.gam()]. For `posterior_samples()` these are
 #'   passed on to `fitted_samples()`. For `predicted_samples()` these are
-#'   passed on to the relevant `simulate()` method.
+#'   passed on to the relevant [stats::simulate()] method.
 #' @param draws matrix; user supplied posterior draws to be used when
 #'   `method = "user"`.
 #' @param mvn_method character; one of `"mvnfast"` or `"mgcv"`. The default is
-#'   uses `mvnfast::rmvn()`, which can be considerably faster at generate large
-#'   numbers of MVN random values than `mgcv::rmvn()`, but which might not work
+#'   uses [mvnfast::rmvn()], which can be considerably faster at generate large
+#'   numbers of MVN random values than [mgcv::rmvn()], but which might not work
 #'   for some marginal fits, such as those where the covariance matrix is close
 #'   to singular.
 #'
@@ -90,7 +90,7 @@
 #' Every distribution parameter is computed from the same joint coefficient
 #' draw. Formula offsets and prescribed smooth contributions are retained.
 #' Evaluation data need predictors and formula-offset variables, but no
-#' observed response. mgcv natively represents the second `gaulss()` parameter
+#' observed response. mgcv natively represents the second [mgcv::gaulss()] parameter
 #' as reciprocal standard deviation: response sampling uses SD, divided by the square
 #' root of the sampling weight. Other LSS generators currently ignore sampling
 #' weights, following their mgcv implementations. Parameters represented by
@@ -103,7 +103,7 @@
 #' Grouped-family posterior response draws support fitting observations and
 #' supplied data with known family membership. Component nuisance parameters
 #' remain fixed. `.parameter` identifies the component used for each row.
-#' Censored grouped components require an observation process; use `simulate()`
+#' Censored grouped components require an observation process; use [stats::simulate()]
 #' for their latent, uncensored responses.
 #'
 #' With `marginalise`, selected random effects are drawn for new groups in
@@ -728,14 +728,14 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
 #' Gaussian LSS returns `mean` and `sd`, GEV returns `location`, `scale` and
 #' `shape`, and sinh-arcsinh returns `location`, `scale`, `skewness` and
 #' `tailweight`. These shape parameters are not response moments. Natural
-#' parameters can differ from native mgcv predictions and `inv_link()` values.
+#' parameters can differ from native mgcv predictions and [inv_link()] values.
 #' Every parameter in one draw uses the same joint coefficient draw. Global
 #' parameters outside the coefficient vector remain fixed and are described
 #' in the metadata, rather than returned as fitted parameters.
 #'
 #' Use `quantity = "expectation"` for expected responses labelled
 #' `"expectation"`. This includes Gumbel, GEV and sinh-arcsinh mean adjustments
-#' and the zero-truncated Poisson adjustment in `ziplss()`. A GEV expectation
+#' and the zero-truncated Poisson adjustment in [mgcv::ziplss()]. A GEV expectation
 #' does not exist at shape >= 1; parameter and response draws remain available.
 #' Categorical expectations are category probabilities, not numeric category
 #' scores. `.category` identifies categories, and `.y` identifies multivariate
@@ -762,12 +762,12 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
 #' probabilities, with `.category` identifying the ordinal category and `NA`
 #' for scalar components. Distributional nuisance parameters are held at
 #' their fitted values. This does not add support for general/location-scale
-#' families that `gfam()` itself rejects, nor repair upstream fitting failures
-#' (including fixed-theta negative-binomial components and some `ziP()` fits
+#' families that [mgcv::gfam()] itself rejects, nor repair upstream fitting failures
+#' (including fixed-theta negative-binomial components and some [mgcv::ziP()] fits
 #' in some mgcv versions).
 #'
 #' Observation rows use the same missing-value convention as
-#' [posterior_samples()]: default results restore `na.exclude` observations in
+#' [posterior_samples()]: default results restore [stats::na.exclude()] observations in
 #' every draw, while explicit `data` are evaluated in their own row order.
 #'
 #' # Note
@@ -1205,7 +1205,7 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
 #' Draw new response values from the conditional distribution of the response
 #'
 #' Predicted values of the response (new response data) are drawn from the
-#' fitted model, created via `simulate()` (e.g. [simulate.gam()]) and returned
+#' fitted model, created via [stats::simulate()] (e.g. [simulate.gam()]) and returned
 #' in a tidy, long, format. These predicted values do not include the
 #' uncertainty in the estimated model; they are simply draws from the
 #' conditional distribution of the response.
@@ -1984,8 +1984,8 @@ calculate_smooth_samples <- function(sm, data, model, betas, label, Xp = NULL) {
 #' @param draws matrix; user supplied posterior draws to be used when
 #'   `method = "user"`.
 #' @param mvn_method character; one of `"mvnfast"` or `"mgcv"`. The default is
-#'   uses `mvnfast::rmvn()`, which can be considerably faster at generate large
-#'   numbers of MVN random values than `mgcv::rmvn()`, but which might not work
+#'   uses [mvnfast::rmvn()], which can be considerably faster at generate large
+#'   numbers of MVN random values than [mgcv::rmvn()], but which might not work
 #'   for some marginal fits, such as those where the covariance matrix is close
 #'   to singular.
 #'

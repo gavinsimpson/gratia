@@ -57,7 +57,7 @@
 #'   `"confidence"` for point-wise intervals, or `"simultaneous"` for
 #'   simultaneous intervals.
 #' @inheritParams smooth_estimates
-#' @param interval_method character; use stored scasm bootstrap draws for
+#' @param interval_method character; use stored [mgcv::scasm()] bootstrap draws for
 #'   pointwise intervals with `"auto"` (the default), or explicitly select
 #'   `"gaussian"` or `"bootstrap"`. Bootstrap simultaneous bands are unavailable.
 #' @param n_sim integer; the number of simulations used in computing the
@@ -71,7 +71,7 @@
 #' @param offset numeric; a value to use for any offset term
 #' @param ncores number of cores for generating random variables from a
 #'   multivariate normal distribution. Passed to [mvnfast::rmvn()].
-#'   Parallelization will take place only if OpenMP is supported (but appears
+#'   Parallelisation will take place only if OpenMP is supported (but appears
 #'   to work on Windows with current `R`).
 #' @param partial_match logical; should smooths be selected by partial matches
 #'   with `term`? If `TRUE`, `term` can only be a single string to match
@@ -120,7 +120,7 @@
 #'
 #' @section Parallel calculation:
 #' With mirai and carrier installed, configure workers with
-#' `mirai::daemons()` to distribute calculations across selected smooths.
+#' [mirai::daemons()] to distribute calculations across selected smooths.
 #' [difference_smooths()] distributes factor-level comparisons instead.
 #' Without configured workers, or with only one calculation, evaluation is
 #' serial. These functions leave the caller's worker pool running.
@@ -130,9 +130,9 @@
 #' columns needed for their calculation. Custom prediction methods are evaluated
 #' in the caller, including custom tensor margins and factor-smooth bases;
 #' workers receive their prediction matrices. Simultaneous intervals use successive
-#' draws in selection order, so `set.seed()` gives the same results with or
+#' draws in selection order, so [base::set.seed()] gives the same results with or
 #' without workers, independently of their number or completion order.
-#' `derivatives()` uses `set.seed()`; the other functions also accept `seed`,
+#' `derivatives()` uses [base::set.seed()]; the other functions also accept `seed`,
 #' which restores the caller's random number state on exit.
 #'
 #' [smooth_samples()] draws coefficients jointly once, then reuses those draws
@@ -825,7 +825,7 @@
 #' @param interval character; the type of interval to compute. One of
 #'   `"confidence"` for point-wise intervals, or `"simultaneous"` for
 #'   simultaneous intervals.
-#' @param interval_method character; use stored scasm bootstrap draws for
+#' @param interval_method character; use stored [mgcv::scasm()] bootstrap draws for
 #'   pointwise intervals with `"auto"` (the default), or explicitly select
 #'   `"gaussian"` or `"bootstrap"`. Bootstrap simultaneous bands are unavailable.
 #' @param n_sim integer; the number of simulations used in computing the
@@ -839,7 +839,7 @@
 #' @param offset numeric; a value to use for any offset term
 #' @param ncores number of cores for generating random variables from a
 #'   multivariate normal distribution. Passed to [mvnfast::rmvn()].
-#'   Parallelization will take place only if OpenMP is supported (but appears
+#'   Parallelisation will take place only if OpenMP is supported (but appears
 #'   to work on Windows with current `R`).
 #' @param partial_match logical; should smooths be selected by partial matches
 #'   with `term`? If `TRUE`, `term` can only be a single string to match
@@ -1189,8 +1189,8 @@
 #'   `ci_level` and `coverage` are not accepted, even when `level` is also supplied.
 #' @param seed numeric; a random seed for the simulations.
 #' @param mvn_method character; one of `"mvnfast"` or `"mgcv"`. The default is
-#'   uses `mvnfast::rmvn()`, which can be considerably faster at generate large
-#'   numbers of MVN random values than `mgcv::rmvn()`, but which might not work
+#'   uses [mvnfast::rmvn()], which can be considerably faster at generate large
+#'   numbers of MVN random values than [mgcv::rmvn()], but which might not work
 #'   for some marginal fits, such as those where the covariance matrix is close
 #'   to singular.
 #'
@@ -1237,8 +1237,8 @@
 #' order. Rows with missing or non-finite required covariates have `NA`
 #' derivatives, standard errors and interval limits. Category, response and
 #' family identifiers are retained. An explicit `na.action` follows the
-#' prediction convention: `na.omit` drops unavailable rows with missing
-#' covariates, `na.exclude` and `na.pass` retain them, and `na.fail` reports
+#' prediction convention: [stats::na.omit()] drops unavailable rows with missing
+#' covariates, [stats::na.exclude()] and [stats::na.pass()] retain them, and [stats::na.fail()] reports
 #' missing covariates as an error. Undefined calculations at available rows,
 #' including in only some coefficient draws, raise an error; draws are never
 #' removed to form a summary.

@@ -122,11 +122,11 @@ Transforming a link-scale ALE curve does not produce response-scale ALE.
 Response-scale effects are differences in natural parameter units, not
 predicted parameter values, and can be negative.
 
-Distributional families \code{gaulss}, \code{gammals}, \code{gumbls}, \code{gevlss}, \code{shash},
-\code{twlss}, and \code{ziplss} are supported. Natural units mean standard deviation
+Distributional families \code{\link[mgcv:gaulss]{mgcv::gaulss()}}, \code{\link[mgcv:gammals]{mgcv::gammals()}}, \code{\link[mgcv:gumbls]{mgcv::gumbls()}}, \code{\link[mgcv:gevlss]{mgcv::gevlss()}}, \code{\link[mgcv:shash]{mgcv::shash()}},
+\code{\link[mgcv:twlss]{mgcv::twlss()}}, and \code{\link[mgcv:ziplss]{mgcv::ziplss()}} are supported. Natural units mean standard deviation
 for Gaussian scale, positive scale or dispersion for logged scales, natural
 Tweedie power, positive sinh-arcsinh tail parameter, and Poisson rate or
-probability of presence for \code{ziplss}. Location parameters need not be response
+probability of presence for \code{\link[mgcv:ziplss]{mgcv::ziplss()}}. Location parameters need not be response
 means. Overall means combining several parameters, multinomial probabilities,
 multivariate covariance parameters and grouped-family outputs are unsupported.
 For other families, link-scale ALE is available for a single linear predictor;
@@ -134,13 +134,13 @@ response-scale ALE requires a supported scalar mean family.
 
 Supported response-scale parameters are:
 \itemize{
-\item \code{gaulss}: location (mean) and scale (standard deviation);
-\item \code{gammals}: location (mean) and scale (dispersion);
-\item \code{gumbls} and \code{gevlss}: location and positive scale, plus GEV shape;
-\item \code{shash}: location, positive scale, skewness and positive tail parameter
+\item \code{\link[mgcv:gaulss]{mgcv::gaulss()}}: location (mean) and scale (standard deviation);
+\item \code{\link[mgcv:gammals]{mgcv::gammals()}}: location (mean) and scale (dispersion);
+\item \code{\link[mgcv:gumbls]{mgcv::gumbls()}} and \code{\link[mgcv:gevlss]{mgcv::gevlss()}}: location and positive scale, plus GEV shape;
+\item \code{\link[mgcv:shash]{mgcv::shash()}}: location, positive scale, skewness and positive tail parameter
 (named \code{kurtosis} to match gratia's parameter names);
-\item \code{twlss}: location (mean), power and scale (dispersion);
-\item \code{ziplss}: location (Poisson rate) and \code{pi} (probability of presence).
+\item \code{\link[mgcv:twlss]{mgcv::twlss()}}: location (mean), power and scale (dispersion);
+\item \code{\link[mgcv:ziplss]{mgcv::ziplss()}}: location (Poisson rate) and \code{pi} (probability of presence).
 }
 
 Raw-data recovery can require \code{envir} when a model was fitted locally and

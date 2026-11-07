@@ -55,18 +55,18 @@ parameter_description <- function(parameter, symbol, definition, predictor,
 #'   `parameterisation` attribute describes the mathematical distribution.
 #'   `expectation_condition` records conditions for a finite expected response.
 #' @details
-#' `fitted_values()` and `fitted_samples()` default to the parameters marked
+#' [fitted_values()] and [fitted_samples()] default to the parameters marked
 #' `returned`. On the response scale these are natural distribution parameters,
 #' which can differ from the fitting package's native response predictions.
 #' For example, Gaussian LSS output contains standard deviation, whereas mgcv
 #' predicts reciprocal standard deviation. GEV location is not its expectation.
-#' `link` describes the native representation: for example, `ziplss()` uses
+#' `link` describes the native representation: for example, [mgcv::ziplss()] uses
 #' an identity link for log rate, while natural rate is the exponential of
 #' that predictor.
 #' The sinh-arcsinh skewness and tailweight parameters control distribution
-#' shape; they are not the response's standardized skewness and kurtosis.
+#' shape; they are not the response's standardised skewness and kurtosis.
 #'
-#' `link()` and `inv_link()` retain the fitting package's native conventions
+#' [link()] and [inv_link()] retain the fitting package's native conventions
 #' and their existing aliases. Use the definitions here to interpret them.
 #' @seealso [fitted_values()], [fitted_samples()]
 #' @export

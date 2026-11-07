@@ -37,22 +37,22 @@ data sets that also include approximate uncertainty in fitted parameters.
 This table applies to the supported response families described below.
 \tabular{llllll}{
 Fitter \tab PIT/quantile \tab Uniform QQ \tab Simulated QQ \tab Scalable plots \tab PPC \cr
-lm/glm \tab Yes \tab Yes \tab Yes \tab Yes \tab Approximate coefficient draws \cr
-mgcv::gam \tab Yes \tab Depends on family \tab Yes \tab Yes \tab Coefficients drawn together \cr
-mgcv::bam \tab Marginal families \tab Marginal or joint \tab Gaussian AR1; otherwise marginal for GEE \tab Yes \tab Excludes GEE AR1 \cr
-gamm/nlme::lme \tab Conditional/marginal \tab Depends on independence \tab Gaussian; PQL limits \tab Yes \tab Gaussian; approximate PQL without residual correlation \cr
-gamm4/lme4::merMod \tab Conditional/marginal \tab Depends on independence \tab Joint, including GLMMs \tab Yes \tab Conditional/marginal \cr
-glmmTMB \tab Conditional/marginal \tab Depends on independence \tab Joint, including non-Gaussian \tab Yes \tab Conditional/marginal \cr
-GJRM::gamlss \tab Supported univariate families \tab Yes \tab Yes \tab Yes \tab Coefficients drawn together \cr
-GJRM::gjrm \tab Per-response families \tab Per response \tab Per response \tab Yes \tab No \cr
-sdmTMB \tab Depends on treatment of fields \tab Depends on independence \tab Joint, including delta \tab Yes \tab Parameters and fields drawn together \cr
+\code{\link[stats:lm]{stats::lm()}}/\code{\link[stats:glm]{stats::glm()}} \tab Yes \tab Yes \tab Yes \tab Yes \tab Approximate coefficient draws \cr
+\code{\link[mgcv:gam]{mgcv::gam()}} \tab Yes \tab Depends on family \tab Yes \tab Yes \tab Coefficients drawn together \cr
+\code{\link[mgcv:bam]{mgcv::bam()}} \tab Marginal families \tab Marginal or joint \tab Gaussian AR1; otherwise marginal for GEE \tab Yes \tab Excludes GEE AR1 \cr
+\code{\link[mgcv:gamm]{mgcv::gamm()}}/\code{\link[nlme:lme]{nlme::lme()}} \tab Conditional/marginal \tab Depends on independence \tab Gaussian; PQL limits \tab Yes \tab Gaussian; approximate PQL without residual correlation \cr
+\code{\link[gamm4:gamm4]{gamm4::gamm4()}}/lme4 \code{"merMod"} fits \tab Conditional/marginal \tab Depends on independence \tab Joint, including GLMMs \tab Yes \tab Conditional/marginal \cr
+\code{\link[glmmTMB:glmmTMB]{glmmTMB::glmmTMB()}} \tab Conditional/marginal \tab Depends on independence \tab Joint, including non-Gaussian \tab Yes \tab Conditional/marginal \cr
+\code{\link[GJRM:gamlss]{GJRM::gamlss()}} \tab Supported univariate families \tab Yes \tab Yes \tab Yes \tab Coefficients drawn together \cr
+\code{\link[GJRM:gjrm]{GJRM::gjrm()}} \tab Per-response families \tab Per response \tab Per response \tab Yes \tab No \cr
+\code{\link[sdmTMB:sdmTMB]{sdmTMB::sdmTMB()}} \tab Depends on treatment of fields \tab Depends on independence \tab Joint, including delta \tab Yes \tab Parameters and fields drawn together \cr
 }
 \itemize{
 \item \code{lm}/\code{glm}: weighted Gaussian and supported response families, with their
 fitted dispersion. Quasi families do not specify a response distribution,
 so they do not support PIT/quantile residuals or PPCs.
 \item \code{gam}/\code{bam}: ordinary, distributional and grouped families, including
-weighted Gamma, inverse Gaussian, \code{twlss}, ordinal and \code{ziP} distributions.
+weighted Gamma, inverse Gaussian, \code{\link[mgcv:twlss]{mgcv::twlss()}}, ordinal and \code{\link[mgcv:ziP]{mgcv::ziP()}} distributions.
 Multivariate-normal PITs check each response separately; simulations retain
 covariance between responses. Multinomial PIT/quantile residuals accumulate
 category probabilities in mgcv's numeric coding order, \verb{0, ..., K}.
@@ -65,7 +65,7 @@ Smoothing-parameter uncertainty is not currently supported for SCAM models;
 use \code{unconditional = FALSE}.
 \item \code{gamm}/\code{gamm4} and direct \code{lme}/\code{merMod} fits use their full predictors.
 Gaussian nlme variance weights and residual covariance are retained.
-Non-Gaussian \code{gamm} fits use penalized quasi-likelihood (PQL). Without residual
+Non-Gaussian \code{gamm} fits use penalised quasi-likelihood (PQL). Without residual
 correlation, these support approximate response checks and PPCs based on
 their fitted working parameters. PQL residual correlation acts on the
 working response used for fitting; it does not specify a joint distribution
@@ -76,10 +76,10 @@ zero inflation and dispersion. Marginal simulations also provide reference
 samples for other families that glmmTMB can simulate. Unsupported conditional
 family CDFs remain unavailable. The package's own joint simulator preserves
 temporal AR1, spatial covariance and correlated random slopes.
-\item Univariate \code{GJRM::gamlss}: uncensored N, LN, GA, GAi, P, NBI, NBII,
+\item Univariate \code{\link[GJRM:gamlss]{GJRM::gamlss()}}: uncensored N, LN, GA, GAi, P, NBI, NBII,
 BE, LO, WEI, IG, GU and rGU. These include beta, logistic, Weibull,
 inverse Gaussian and both Gumbel orientations. GAi is accepted by the
-diagnostic adapter, but some GJRM versions do not offer it in \code{gamlss()}.
+diagnostic adapter, but some GJRM versions do not offer it in \code{\link[GJRM:gamlss]{GJRM::gamlss()}}.
 Probabilities use the final likelihood parameters. This corrects stored NBII
 probabilities that use a Poisson CDF in some upstream versions. Other
 families, censored and survival models are not supported by this adapter.
@@ -94,7 +94,7 @@ and Gumbel corrections. Residuals are plotted against the first predictor,
 which controls Weibull scale or logistic/Gumbel location in those families.
 Posterior predictive checks draw both equations' coefficients together,
 including beta's logit-linked scale parameter.
-\item Joint \code{GJRM::gjrm}: ordinary uncensored bivariate models and ordinary
+\item Joint \code{\link[GJRM:gjrm]{GJRM::gjrm()}}: ordinary uncensored bivariate models and ordinary
 trivariate binary models support checks of each response distribution.
 Supported margins are the univariate GJRM families listed above and binary
 responses with probit, logit or complementary log-log links. Each response
@@ -102,14 +102,14 @@ uses the final fitted parameters from the joint model.
 A supported response can be selected even if another margin is unsupported.
 With a fixed seed, selected-response residuals and reference simulations
 match the same response in an all-response call.
-\code{appraise()} returns four panels, each faceted by response. Standalone
+\code{\link[=appraise]{appraise()}} returns four panels, each faceted by response. Standalone
 diagnostic plots retain these response groups, including when both
 responses have the same family. Use \code{response} to select one response.
 These checks assess the marginal response distributions. Copula checks,
 joint response simulation and posterior predictive checks are unavailable.
 Selection, switching, ordinal, fixed-margin, censored and survival models are not
 supported by these diagnostic methods.
-Diagnostics also reject models that use a modeled response in another
+Diagnostics also reject models that use a modelled response in another
 response's mean formula or in an auxiliary formula. The complete set of
 reference simulations and appraisal panels requires conditioning through
 the fitted copula, which these methods do not provide. Smooth plots remain
@@ -142,7 +142,7 @@ always use component facets. Original component labels and row identities
 remain available after selection.
 
 Selected grouped-family residuals contain retained fitting observations only.
-The all-component call preserves the usual \code{na.exclude} restoration of omitted
+The all-component call preserves the usual \code{\link[stats:na.exclude]{stats::na.exclude()}} restoration of omitted
 rows. With an explicit seed, selected residuals match the corresponding rows
 of the all-component calculation when all components support it. Selecting a
 supported component can also bypass an unsupported component. Grouped-family
@@ -172,7 +172,7 @@ evaluates the underlying beta density at epsilon-adjusted observations.
 Distribution functions supplied by callers are preserved.
 
 GEV and sinh-arcsinh checks use stable response means and correct residual
-centering and signs for both observed and simulated responses. Their deviance
+centring and signs for both observed and simulated responses. Their deviance
 magnitudes follow the fitting package's definitions: GEV uses the square root
 of its saturated log-likelihood contrast; sinh-arcsinh uses zero log density
 as its reference. If a sinh-arcsinh density exceeds one, that contrast is
@@ -202,15 +202,15 @@ effects to zero is not a substitute for this averaging, especially with
 nonlinear response links. sdmTMB has additional field choices described below.
 PPCs separately include approximate uncertainty in fitted parameters.
 
-\code{"gam_component"} explicitly uses the extracted GAM component. gamm and
-gamm4 diagnostics and posterior predictive checks default to the full model
-with conditional conditioning. gamm4 response simulations use the same default;
-the existing gamm response simulator retains its GAM-component default.
+\code{"gam_component"} explicitly uses the extracted GAM component. \code{\link[mgcv:gamm]{mgcv::gamm()}} and
+\code{\link[gamm4:gamm4]{gamm4::gamm4()}} diagnostics and posterior predictive checks default to the full model
+with conditional conditioning. \code{\link[gamm4:gamm4]{gamm4::gamm4()}} response simulations use the same default;
+the existing \code{\link[mgcv:gamm]{mgcv::gamm()}} response simulator retains its GAM-component default.
 Conditional response references hold fitted effects fixed, while conditional
 PPCs include uncertainty in those fitted effects. Specify \code{"marginal"} to
 simulate new effects instead.
 
-Conditional glmmTMB/lme4 response likelihoods factorize given all random
+Conditional glmmTMB/lme4 response likelihoods factorise given all random
 effects, including temporal and spatial effects. Marginal responses may be
 dependent because they share those effects. An independent effect for each
 observation need not create dependence between observations. The calculations
@@ -232,7 +232,7 @@ to assess dependence. Models are not refitted when calculating reference bands.
 Gaussian identity-link AR1 BAM retains joint response simulation, with new
 independent series starting at \code{AR.start} boundaries. For non-Gaussian or
 nonidentity models fitted with \code{discrete = TRUE} and nonzero \code{rho}, BAM applies
-AR1 to working residuals as a generalized estimating equations (GEE)
+AR1 to working residuals as a generalised estimating equations (GEE)
 approximation. This does not specify a unique joint response distribution.
 The restriction applies to supported \code{extended.family} and GLM families.
 See \url{https://stat.ethz.ch/R-manual/R-devel/library/mgcv/html/bam.html}.
@@ -313,7 +313,7 @@ means, variances and residual ranks. With \code{R} reference draws, PIT is
 \verb{(number below + U * (ties + 1))/(R + 1)}, where \code{U} is uniform on \verb{(0, 1)}.
 The extra rank position is for the observation being checked, which keeps
 normal scores finite even outside the simulated range. Observed and simulated
-responses use the same reference sample, centering and residual definitions.
+responses use the same reference sample, centring and residual definitions.
 These ranks need not equal the empirical CDF at an observation.
 
 \code{options(gratia.diagnostics.marginal_draws = 249L)} sets the reference sample
@@ -366,9 +366,9 @@ fitting-package families should supply their parameters to the shared response
 distributions. Censored/survival PPCs need a way to reapply censoring to each
 simulated response. Nominal multivariate PITs need a documented category
 ordering or a different multivariate diagnostic. Unrecognised random-effect
-structures remain unsupported. Diagnostics do not repair \code{na.pass} fits where
+structures remain unsupported. Diagnostics do not repair \code{\link[stats:na.pass]{stats::na.pass()}} fits where
 missing responses cannot be aligned with predictions and residuals; ordinary
-\code{na.omit}/\code{na.exclude} fits are covered. MCMC, model refitting and calibrated
+\code{\link[stats:na.omit]{stats::na.omit()}}/\code{\link[stats:na.exclude]{stats::na.exclude()}} fits are covered. MCMC, model refitting and calibrated
 dependence tests would require additional sampling or refitting methods.
 }
 

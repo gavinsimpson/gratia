@@ -85,9 +85,9 @@ draw(joint, parametric = FALSE)
 
 A positive smooth contribution multiplies the expected count by `exp(effect)`
 and multiplies detection odds by the same quantity. It does not add the same
-amount to the detection probability and count. The fitted smooth rises toward
+amount to the detection probability and count. The fitted smooth rises towards
 intermediate cover and then declines, consistent with the generating response.
-Its centering constraint sets the reference for the partial effect. The
+Its centring constraint sets the reference for the partial effect. The
 different intercepts determine the absolute levels.
 
 The [mgcv grouped-family documentation](https://stat.ethz.ch/R-manual/R-devel/library/mgcv/html/gfam.html)
@@ -233,7 +233,7 @@ of category probabilities; link-scale fitted draws are available. General
 families with several linear predictors are not `gfam()` components.
 
 Missing required predictors or membership give missing predictions. Missing
-responses alone do not prevent prediction. With `na.exclude`, excluded fitting
+responses alone do not prevent prediction. With `na.exclude()`, excluded fitting
 rows are restored as `NA` in fitted draws and simulations, while checks use the
 observations actually fitted. Censored components can simulate latent responses,
 but a posterior predictive comparison of censored observations also needs a

@@ -22,13 +22,13 @@ lp_matrix(model, ...)
 \arguments{
 \item{model}{a fitted model}
 
-\item{...}{arguments passed to other methods and \code{predict} methods including
+\item{...}{arguments passed to other methods and \code{\link[stats:predict]{stats::predict()}} methods including
 \code{\link[mgcv:predict.gam]{mgcv::predict.gam()}} and \code{\link[mgcv:predict.bam]{mgcv::predict.bam()}}}
 
 \item{data}{a data frame of values at which to return the linear prediction
 matrix.}
 
-\item{object}{a fitted SCAM model, for the \code{model.matrix()} method.}
+\item{object}{a fitted SCAM model, for the \code{\link[stats:model.matrix]{stats::model.matrix()}} method.}
 }
 \value{
 The linear prediction matrix is returned as a matrix. The object

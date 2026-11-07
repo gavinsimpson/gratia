@@ -514,7 +514,7 @@ stop_if_not_mgcv_smooth <- function(smooth) {
 #'   for a particular **smooth** term. Only a single term can be selected.
 #' @param by_level character; currently unsued.
 #'
-#' @details For `mgcv::scasm()` fits with linear inequality constraints,
+#' @details For [mgcv::scasm()] fits with linear inequality constraints,
 #'   the Gaussian covariance approximation does not enforce the fitted shapes.
 #'   Pointwise intervals calculated from this matrix can extend outside those
 #'   constraints. See [post_draws()] for sampling and native-bootstrap details.
@@ -791,7 +791,7 @@ get_vcov.scam <- function(object, unconditional = FALSE,
   factor(rep(levs[1L], length.out = n), levels = levs)
 }
 
-#' Vectorized version of `data.class`
+#' Vectorised version of [base::data.class()]
 #'
 #' @param df a data frame or tibble.
 #' @return A named character vector of data classes.
@@ -1359,7 +1359,7 @@ vars_from_label <- function(label) {
 #'
 #' @param model a fitted model from which a `terms` object can be extracted.
 #' @param data a data frame containing variables in the formula of `model`.
-#' @param model_frame logical; if `TRUE`, return as a `model.frame` object with
+#' @param model_frame logical; if `TRUE`, return a [stats::model.frame()] result with
 #'   a `"terms"` attribute. If `FALSE`, return a data frame with the `"terms"`
 #'   attribute removed.
 #'
@@ -1387,7 +1387,7 @@ vars_from_label <- function(label) {
 #' Extract names of all variables needed to fit a GAM or a smooth
 #'
 #' @param object a fitted GAM object (inheriting from class `"gam"` or an
-#'   [mgcv::smooth.construct] smooth object, inheriting from class
+#'   [mgcv::smooth.construct()] smooth object, inheriting from class
 #'   `"mgcv.smooth"`.
 #' @param ... arguments passed to other methods. Not currently used.
 #'

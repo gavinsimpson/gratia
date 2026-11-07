@@ -388,8 +388,8 @@ K logits relative to category 0, as in mgcv's native random generator, rather
 than the K+1 probabilities returned by `predict(type = "response")`.
 
 A PIT for an observed category `j` is `F(j - 1) + V * p_j`, with `V` uniform
-on `(0, 1)`. Thus randomization spans the entire mass of that category.
-This is the ordinary randomized probability transform described by
+on `(0, 1)`. Thus randomisation spans the entire mass of that category.
+This is the ordinary randomised probability transform described by
 [Brockwell (2007)](https://pmc.ncbi.nlm.nih.gov/articles/PMC2211730/).
 Each fixed enumeration gives a uniform transform under the true model.
 Changing the enumeration can change individual residuals and diagnostic

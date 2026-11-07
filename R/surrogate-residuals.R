@@ -7,11 +7,11 @@
 #' @inheritParams quantile_residuals
 #' @param conditioning character or `NULL`; only `"conditional"` is supported.
 #'   The default, `NULL`, holds fitted random effects fixed in the same way.
-#' @return For `ocat()`, a numeric vector with one residual per observation.
+#' @return For [mgcv::ocat()], a numeric vector with one residual per observation.
 #'   For `multinom(K)`, a numeric matrix with one row per observation and `K+1`
 #'   columns named `"0"`, ..., `"K"`, identifying the category utilities.
-#'   With `na.exclude`, excluded fitting rows are restored as `NA`; with
-#'   `na.omit`, only observations used for fitting are returned.
+#'   With [stats::na.exclude()], excluded fitting rows are restored as `NA`; with
+#'   [stats::na.omit()], only observations used for fitting are returned.
 #'
 #' @details
 #' An ordered categorical model represents category `j` by an interval between
@@ -25,10 +25,10 @@
 #' model with known parameters, the residuals have a logistic distribution with
 #' location zero and scale one: mean zero and variance `pi^2 / 3`. Fitted
 #' parameters affect this reference approximation. The identity link reported by
-#' `ocat()` describes the latent mean; its latent distribution is logistic.
+#' [mgcv::ocat()] describes the latent mean; its latent distribution is logistic.
 #'
 #' This calculation shares the randomised probabilities used by
-#' [quantile_residuals()], which instead applies `qnorm()` for normal scores.
+#' [quantile_residuals()], which instead applies [stats::qnorm()] for normal scores.
 #' Both tails are calculated using log probabilities to retain accuracy when
 #' ordinary probabilities round to zero or one. Fitting weights do not change
 #' the scale of the latent logistic distribution.
@@ -54,17 +54,17 @@
 #' observed categories and extreme predictors, without rejection or Gibbs
 #' iterations. This construction does not impose an ordering on categories.
 #'
-#' Supported fits are `gam` and `bam` models with a single `ocat()` family,
-#' and `gam` models with `multinom()`. Grouped families and other model classes
+#' Supported fits are `gam` and `bam` models with a single [mgcv::ocat()] family,
+#' and `gam` models with [mgcv::multinom()]. Grouped families and other model classes
 #' are not supported. Fitted random effects are held fixed. Use
 #' `type = "surrogate"` in [appraise()], [qq_plot()], [worm_plot()] and
 #' residual plots. QQ and worm plots require `method = NULL`, with logistic
-#' references for `ocat()` and centred Gumbel references for `multinom()`.
+#' references for [mgcv::ocat()] and centred Gumbel references for [mgcv::multinom()].
 #' Pointwise order-statistic bands apply separately to each utility component,
 #' treating fitted parameters as fixed. They do not give simultaneous coverage
 #' across categories. Components are always shown separately, including when
-#' `by_family = FALSE`. For `ocat()`, [residuals_linpred_plot()] uses the fitted
-#' latent mean. For `multinom()`, it uses each category's fitted probability;
+#' `by_family = FALSE`. For [mgcv::ocat()], [residuals_linpred_plot()] uses the fitted
+#' latent mean. For [mgcv::multinom()], it uses each category's fitted probability;
 #' observed-versus-fitted panels compare that probability with its category
 #' indicator. This also gives category 0 a varying horizontal axis despite its
 #' fixed utility location. Covariate plots separate the category utilities.

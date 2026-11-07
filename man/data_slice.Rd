@@ -55,7 +55,7 @@ are omitted, and selecting no observed groups is an error.}
 
 \item{data}{an alternative data frame of values containing all the variables
 needed to fit the model. If \code{NULL}, the default, the data used to fit the
-model will be recovered using \code{model.frame}. User-supplied expressions
+model will be recovered using \code{\link[stats:model.frame]{stats::model.frame()}}. User-supplied expressions
 passed in \code{...} will be evaluated in \code{data}.}
 
 \item{envir}{the environment within which to recreate the data used to fit
@@ -82,7 +82,7 @@ or the first level (sorted as per the vector returned by \code{\link[base:levels
 if several levels are observed the same number of times.
 }
 
-These values are already computed when calling \code{gam()} or \code{bam()} for example
+These values are already computed when calling \code{\link[mgcv:gam]{mgcv::gam()}} or \code{\link[mgcv:bam]{mgcv::bam()}} for example
 and can be found in the \code{var.summary} component of the fitted model. Function
 \code{\link[=typical_values]{typical_values()}} will extract these values for you if you are interested.
 
@@ -100,7 +100,7 @@ value instead. Factor levels and ordered status are preserved, and the result
 is an ungrouped tibble. \code{.observed_only} filters exact matches within each
 group; interpolated values need not match observed values.
 
-Grouping limits the default range of \code{evenly()} to each group's marginal
+Grouping limits the default range of \code{\link[=evenly]{evenly()}} to each group's marginal
 range. It does not ensure joint support for multiple continuous covariates.
 Explicit values or \code{lower} and \code{upper} bounds can still request extrapolation.
 }

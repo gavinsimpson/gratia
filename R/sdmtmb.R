@@ -267,8 +267,8 @@ sdmtmb_smooth_model <- function(
 #' Formula effects for sdmTMB models
 #'
 #' Evaluate and plot formula smooths and parametric effects from a fitted
-#' `sdmTMB` model using the same plotting methods as mgcv smooths. Penalized
-#' and unpenalized coefficients and their joint covariance are transformed
+#' `sdmTMB` model using the same plotting methods as mgcv smooths. Penalised
+#' and unpenalised coefficients and their joint covariance are transformed
 #' back to the constrained mgcv basis.
 #'
 #' Use [smooths()] to list smooth names, [get_smooth()] to extract an exact
@@ -311,11 +311,11 @@ sdmtmb_smooth_model <- function(
 #' in their component's overall mean by default; parametric intervals include
 #' the component's intercept. Use `overall_uncertainty = FALSE` for term-only
 #' intervals. `fun` transforms displayed partial effects, not full predictions.
-#' Use `surface = "3d", ci_3d = TRUE` in `draw()` or `assemble()` to add
+#' Use `surface = "3d", ci_3d = TRUE` in [draw()] or [assemble()] to add
 #' interval surfaces to smooths and numeric parametric interactions in either
 #' component. `ci_3d_alpha` and `ci_3d_col` control their opacity and fill colour.
-#' Pass `cyclic = "polar"` and optional `polar_args` to `draw()` or
-#' `assemble()` for polar plots of supported one-dimensional cyclic smooths.
+#' Pass `cyclic = "polar"` and optional `polar_args` to [draw()] or
+#' [assemble()] for polar plots of supported one-dimensional cyclic smooths.
 #' See [draw.gam()] for the coordinate options.
 #'
 #' Delta components have separate smooth and parametric coefficients and are

@@ -1,8 +1,8 @@
 #' Plot smooths of models estimated by GJRM
 #'
 #' Provides [gratia::draw()] and [gratia::assemble()] methods for GAMLSS
-#' and joint models fitted by [GJRM::gamlss()] or [GJRM::gjrm()]. `assemble()` returns the
-#' individual plots; `draw()` arranges them using [patchwork::wrap_plots()].
+#' and joint models fitted by [GJRM::gamlss()] or [GJRM::gjrm()]. [assemble()] returns the
+#' individual plots; [draw()] arranges them using [patchwork::wrap_plots()].
 #'
 #' @inheritParams smooth_estimates
 #'
@@ -17,9 +17,9 @@
 #'
 #' @inheritParams draw.gam
 #'
-#' @return `assemble()` and `draw(wrap = FALSE)` return a flat named list of
+#' @return [assemble()] and `draw(wrap = FALSE)` return a flat named list of
 #'   plots, ordered by equation and then by term within each equation. Smooth
-#'   names use the model-wide labels returned by [smooths()]. `draw()` returns
+#'   names use the model-wide labels returned by [smooths()]. [draw()] returns
 #'   a patchwork by default. Both methods return invisible `NULL` when there
 #'   are no plots to draw.
 #'

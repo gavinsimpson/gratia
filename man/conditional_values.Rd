@@ -89,7 +89,7 @@ Generate predicted values from a GAM, conditional upon supplied values of
 covariates. \code{\link[=conditional_values]{conditional_values()}} is modelled after
 \code{\link[marginaleffects:plot_predictions]{marginaleffects::plot_predictions()}}, but with an intentionally simpler,
 more restrictive functionality. The intended use case is for quickly
-visualizing predicted values from a fitted GAM on the response scale. For
+visualising predicted values from a fitted GAM on the response scale. For
 more complex model predictions, you are strongly encouraged to use
 \code{\link[marginaleffects:plot_predictions]{marginaleffects::plot_predictions()}}.
 }

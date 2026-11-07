@@ -25,7 +25,7 @@ user_draws(model, ..., draws)
 \arguments{
 \item{model}{a fitted model from \code{\link[mgcv:gam]{mgcv::gam()}}, \code{\link[mgcv:bam]{mgcv::bam()}},
 \code{\link[scam:scam]{scam::scam()}}, or \code{\link[gamm4:gamm4]{gamm4::gamm4()}}, or a model inheriting from these
-classes. See \link{gamm4_support} for sampling from gamm4 fits.}
+classes. See \link{gamm4_support} for sampling from \code{\link[gamm4:gamm4]{gamm4::gamm4()}} fits.}
 
 \item{...}{arguments passed to methods.}
 

@@ -41,7 +41,7 @@ with \code{family = poisson()} to sample mgcv's Poisson example.
 \code{dx} and \code{dz} columns give the true partial derivatives.
 
 \code{sc_location_scale} uses log mean \code{sin(pi * x) / 2} and log dispersion
-\code{-2 + z}, returned in \code{f} and \code{f_scale}. It defaults to \code{gammals()} and
+\code{-2 + z}, returned in \code{f} and \code{f_scale}. It defaults to \code{\link[mgcv:gammals]{mgcv::gammals()}} and
 records derivatives in \code{d1}, \code{d2} and \code{d_scale}. Constraints act on the
 specified predictors; in particular the concavity concerns the log mean.
 

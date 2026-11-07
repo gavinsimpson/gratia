@@ -1345,7 +1345,7 @@ detaching ‘package:mgcv’
 > flush(stderr()); flush(stdout())
 > 
 > ### Name: draw.penalty_df
-> ### Title: Display penalty matrices of smooths using 'ggplot'
+> ### Title: Display penalty matrices of smooths using 'ggplot2::ggplot()'
 > ### Aliases: draw.penalty_df
 > 
 > ### ** Examples
@@ -3000,7 +3000,7 @@ detaching ‘package:mgcv’
 +   method = "REML"
 + )
 > 
-> ## Q-Q plot; default using direct randomization of uniform quantiles
+> ## Q-Q plot; default using direct randomisation of uniform quantiles
 > qq_plot(m)
 > 
 > ## Alternatively simulate new data from the model, which

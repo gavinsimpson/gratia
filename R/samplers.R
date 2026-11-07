@@ -3,7 +3,7 @@
 #'
 #' @param model a fitted model from [mgcv::gam()], [mgcv::bam()],
 #'   [scam::scam()], or [gamm4::gamm4()], or a model inheriting from these
-#'   classes. See [gamm4_support] for sampling from gamm4 fits.
+#'   classes. See [gamm4_support] for sampling from [gamm4::gamm4()] fits.
 #' @param n_draws positive integer; total retained draws across all chains.
 #'   Required when generating draws. With `method = "user"`, the supplied
 #'   matrix determines the count; an explicit count must agree with its rows.
@@ -30,7 +30,7 @@
 #'   posterior distribution. `"mh"` uses a simple Metropolis Hastings sampler
 #'   which alternates static proposals based on a Gaussian approximation to the
 #'   posterior, with random walk proposals. Note, setting `t_df` to a low value
-#'   will result in heavier-tailed statistic proposals. See `mgcv::gam.mh()`
+#'   will result in heavier-tailed statistic proposals. See [mgcv::gam.mh()]
 #'   for more details.
 #' @param n_cores positive integer; maximum concurrent MH chains using mirai,
 #'   capped at `chains`. Existing workers are reused; otherwise temporary workers
@@ -38,28 +38,28 @@
 #' @param n_threads positive integer; threads within Gaussian sampling using
 #'   mvnfast. Defaults to one. This is separate from concurrent MH chains.
 #' @param burnin numeric; the length of any initial burn in period to discard.
-#'   See `mgcv::gam.mh()`.
+#'   See [mgcv::gam.mh()].
 #' @param thin positive integer; retain every `thin` iterations after burn-in.
 #' @param t_df numeric; degrees of freedom for static multivariate *t* proposal.
-#'   See `mgcv::gam.mh()`.
+#'   See [mgcv::gam.mh()].
 #' @param rw_scale numeric; factor by which to scale posterior covariance
-#'   matrix when generating random walk proposals. See `mgcv::gam.mh()`.
+#'   matrix when generating random walk proposals. See [mgcv::gam.mh()].
 #' @param index numeric; vector of indices of coefficients to use. Can be used
 #'   to subset the mean vector and covariance matrix extracted from `model`.
 #' @param frequentist logical; if `TRUE`, the frequentist covariance matrix of
 #'   the parameter estimates is used. If `FALSE`, the Bayesian posterior
-#'   covariance matrix of the parameters is used. See `mgcv::vcov.gam()`.
+#'   covariance matrix of the parameters is used. See [mgcv::vcov.gam()].
 #' @param unconditional logical; if `TRUE`  the Bayesian smoothing parameter
 #'   uncertainty corrected covariance matrix is used, *if available* for
-#'   `model`. See `mgcv::vcov.gam()`.
+#'   `model`. See [mgcv::vcov.gam()].
 #'   SCAM models do not support this correction; use `unconditional = FALSE`.
 #' @param parametrized logical; for SCAM fits, transform Gaussian draws from
 #'   the unrestricted fitting coefficients using the fitted positivity transform.
 #'   This preserves the smooth's constraints. With `FALSE`, return Gaussian draws
-#'   in the unrestricted fitting coordinates. Only for `scam::scam()` fits.
+#'   in the unrestricted fitting coordinates. Only for [scam::scam()] fits.
 #' @param mvn_method character; one of `"mvnfast"` or `"mgcv"`. The default is
-#'   uses `mvnfast::rmvn()`, which can be considerably faster at generate large
-#'   numbers of MVN random values than `mgcv::rmvn()`, but which might not work
+#'   uses [mvnfast::rmvn()], which can be considerably faster at generate large
+#'   numbers of MVN random values than [mgcv::rmvn()], but which might not work
 #'   for some marginal fits, such as those where the covariance matrix is close
 #'   to singular.
 #' @param draws matrix; user supplied posterior draws to be used when
@@ -75,7 +75,7 @@
 #'
 #' For SCAM models, Gaussian draws approximate the distribution of the unrestricted
 #' fitting coefficients using `Vp` (or `Ve` with `frequentist = TRUE`), then apply
-#' scam's fitted exponential or `notExp` transformation. This is an approximation
+#' scam's fitted exponential or `notExp()` transformation. This is an approximation
 #' in fitting coordinates, rather than an exact constrained posterior. Supplied
 #' draws must already use the transformed coordinates in `coef(model)` order.
 #' Numerically singular covariance matrices are sampled by eigen decomposition;
@@ -121,7 +121,7 @@
 #' to Gaussian draws only.
 #'
 #' GAM-class fits with linear inequality constraints, including
-#'   `mgcv::scasm()` fits, store these as `Ain %*% coefficients >= bin`.
+#'   [mgcv::scasm()] fits, store these as `Ain %*% coefficients >= bin`.
 #'   Gaussian sampling uses the fitted covariance matrix without enforcing
 #'   these inequalities and issues a warning. Sampled smooths can therefore
 #'   violate the fitted shape constraints. Pointwise intervals computed from
@@ -129,7 +129,7 @@
 #'   shapes. All MH backends are unavailable for these fits because
 #'   the samplers do not enforce their inequalities.
 #'
-#'   If `mgcv::scasm()` was fitted with `bs > 0`, its `bs` component stores
+#'   If [mgcv::scasm()] was fitted with `bs > 0`, its `bs` component stores
 #'   coefficient draws from the native constrained bootstrap in columns. These
 #'   can be supplied explicitly as `draws = t(model$bs)` with `method = "user"`.
 #'   The result then describes bootstrap variation, rather than Gaussian

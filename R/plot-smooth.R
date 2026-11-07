@@ -113,7 +113,7 @@
 #'   by variables have no level suffix.
 #' @param by_level Data classes for which an ungrouped subtitle includes the
 #'   by-variable level. Spherical plots include only unordered factors.
-#' @return A `ggplot2::labs()` object.
+#' @return A [ggplot2::labs()] object.
 #' @keywords internal
 #' @noRd
 `prepare_smooth_labels` <- function(
@@ -202,17 +202,17 @@
 #'
 #' Internal renderer: callers resolve variable names, labels, palettes and
 #' smooth-specific data preparation. No smooth classes or labels are inspected.
-#' Column arguments are strings; labels is a resolved ggplot2::labs() object.
+#' Column arguments are strings; labels is a resolved [ggplot2::labs()] object.
 #' Intervals use .lower_ci and .upper_ci; curves use .estimate. Transformations
-#' apply only through the existing add_constant() and transform_fun() methods.
+#' apply only through the existing [add_constant()] and [transform_fun()] methods.
 #' Residuals and SiZer columns retain their existing, untransformed values.
 #' Set sizer only for callers that already support change overlays. A NULL
 #' ribbon_colour removes the inherited colour mapping (as used by sz smooths).
 #'
 #' @param object Data frame of prepared smooth estimates containing `.estimate`
 #'   and the columns named by the variable arguments. Intervals require
-#'   `.lower_ci` and `.upper_ci`. Retain the classes needed by `add_constant()`
-#'   and `transform_fun()`.
+#'   `.lower_ci` and `.upper_ci`. Retain the classes needed by [add_constant()]
+#'   and [transform_fun()].
 #' @param x_var Character string naming the continuous x-axis column in `object`
 #'   and, when supplied, `rug` and `partial_residuals`.
 #' @param colour_var Character string naming the column mapped to curve colour
@@ -225,7 +225,7 @@
 #' @param rug_colour_var Character string naming a column in `rug` to map to
 #'   rug colour, or `NULL` for an uncoloured rug. Rug layers do not inherit
 #'   the smooth's aesthetics.
-#' @param labels Resolved labels supplied as a `ggplot2::labs()` object. The
+#' @param labels Resolved labels supplied as a [ggplot2::labs()] object. The
 #'   caller supplies axis, plot and legend labels as appropriate.
 #' @param discrete_colour Optional ggplot2 colour scale, added when `colour_var`
 #'   is supplied. `NULL` leaves scale selection to ggplot2.
@@ -237,9 +237,9 @@
 #'   supplied. The default, `NA`, suppresses the outline. `NULL` instead removes
 #'   the inherited colour mapping, preserving the behaviour of `sz` plots.
 #' @param constant Optional numeric constant added to the estimates and interval
-#'   bounds via `add_constant()`, before applying `fun`. `NULL` adds nothing.
-#' @param fun Optional function, or function name accepted by `match.fun()`,
-#'   applied to estimates and interval bounds via `transform_fun()`. `NULL`
+#'   bounds via [add_constant()], before applying `fun`. `NULL` adds nothing.
+#' @param fun Optional function, or function name accepted by [base::match.fun()],
+#'   applied to estimates and interval bounds via [transform_fun()]. `NULL`
 #'   leaves them untransformed. Neither `constant` nor `fun` modifies residuals
 #'   or SiZer columns.
 #' @param ci_alpha Deprecated; use [gratia_theme_get()] theme
@@ -265,11 +265,11 @@
 #'   is `NULL`; otherwise overlays use the mapped curve colours.
 #' @param change_lwd Deprecated; use [gratia_theme_get()] theme
 #'   settings instead. Numeric line width for SiZer overlays, passed to the
-#'   `linewidth` argument of `ggplot2::geom_line()`.
+#'   `linewidth` argument of [ggplot2::geom_line()].
 #' @param angle Optional x-axis tick-label angle, passed to
-#'   `ggplot2::guide_axis()`. `NULL` uses the theme's setting.
+#'   [ggplot2::guide_axis()]. `NULL` uses the theme's setting.
 #' @param ylim Optional numeric values to include in the y-axis range via
-#'   `ggplot2::expand_limits()`. These expand the range rather than clip it.
+#'   [ggplot2::expand_limits()]. These expand the range rather than clip it.
 #'   `NULL` leaves the range determined by the plotted data.
 #' @keywords internal
 #' @noRd
@@ -376,7 +376,7 @@
 #' Prepare values and fill ranges for a smooth surface
 #'
 #' @param object Prepared smooth estimates, retaining classes for
-#'   `add_constant()` and `transform_fun()` dispatch.
+#'   [add_constant()] and [transform_fun()] dispatch.
 #' @param show Character; display the estimate or its standard error.
 #' @param constant Optional numeric shift applied before `fun`.
 #' @param fun Optional transformation of estimates and interval bounds.
@@ -421,9 +421,9 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
 #'   `object` and, if supplied, `rug` and `boundary`.
 #' @param fill_var Character string naming the column mapped to fill and contours.
 #' @param fill_limits Optional values to include in the fill range via
-#'   `ggplot2::expand_limits()`. `NULL` adds no expansion layer.
+#'   [ggplot2::expand_limits()]. `NULL` adds no expansion layer.
 #' @param fill_title Title for the vertical fill colour bar.
-#' @param labels Resolved labels as a `ggplot2::labs()` object.
+#' @param labels Resolved labels as a [ggplot2::labs()] object.
 #' @param surface Character; `"raster"` (default) uses a raster image, while
 #'   `"tile"` uses borderless rectangles sized from the coordinate resolution,
 #'   and `"3d"` uses a polygon mesh.
@@ -434,7 +434,7 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
 #' @param ci_3d_alpha,ci_3d_col Deprecated; use [gratia_theme_get()] theme
 #'   settings instead. Style 3D interval surfaces.
 #' @param facet_vars Column names that identify separate mesh panels.
-#' @param surface_support Recorded support and normalization for masking.
+#' @param surface_support Recorded support and normalisation for masking.
 #' @param isotropic Preserve equal horizontal units by default.
 #' @param z_limits Optional values to include in the vertical 3D range.
 #' @param continuous_fill Optional ggplot2 fill scale. `NULL` uses the diverging
@@ -442,8 +442,8 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
 #' @param contour Logical; add contour lines for `fill_var`?
 #' @param contour_col Deprecated; use [gratia_theme_get()] theme
 #'   settings instead. Fixed colour for contour lines.
-#' @param n_contour Optional number of contour bins passed to `geom_contour()`.
-#' @param angle Optional x-axis tick-label angle passed to `guide_axis()`.
+#' @param n_contour Optional number of contour bins passed to [ggplot2::geom_contour()].
+#' @param angle Optional x-axis tick-label angle passed to [ggplot2::guide_axis()].
 #' @param facet Optional ggplot2 facet specification supplied by the caller.
 #' @param coord Optional ggplot2 coordinate system supplied by the caller.
 #' @param rug Optional observation data drawn as points with alpha 0.1.

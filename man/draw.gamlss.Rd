@@ -161,16 +161,16 @@ Controls display only, independently of \code{interval} and \code{grouped}.
 Ordinary smooths and parametric effects retain their intervals.}
 }
 \value{
-\code{assemble()} and \code{draw(wrap = FALSE)} return a flat named list of
+\code{\link[=assemble]{assemble()}} and \code{draw(wrap = FALSE)} return a flat named list of
 plots, ordered by equation and then by term within each equation. Smooth
-names use the model-wide labels returned by \code{\link[=smooths]{smooths()}}. \code{draw()} returns
+names use the model-wide labels returned by \code{\link[=smooths]{smooths()}}. \code{\link[=draw]{draw()}} returns
 a patchwork by default. Both methods return invisible \code{NULL} when there
 are no plots to draw.
 }
 \description{
 Provides \code{\link[=draw]{draw()}} and \code{\link[=assemble]{assemble()}} methods for GAMLSS
-and joint models fitted by \code{\link[GJRM:gamlss]{GJRM::gamlss()}} or \code{\link[GJRM:gjrm]{GJRM::gjrm()}}. \code{assemble()} returns the
-individual plots; \code{draw()} arranges them using \code{\link[patchwork:wrap_plots]{patchwork::wrap_plots()}}.
+and joint models fitted by \code{\link[GJRM:gamlss]{GJRM::gamlss()}} or \code{\link[GJRM:gjrm]{GJRM::gjrm()}}. \code{\link[=assemble]{assemble()}} returns the
+individual plots; \code{\link[=draw]{draw()}} arranges them using \code{\link[patchwork:wrap_plots]{patchwork::wrap_plots()}}.
 }
 \note{
 For models with multiple linear predictors, smooth and parametric

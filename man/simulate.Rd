@@ -60,16 +60,16 @@ finite positive whole number, no larger than \code{.Machine$integer.max}.}
 \item{seed}{numeric or \code{NULL}; a random seed for the simulations. An explicit
 seed restores the previous random-number state, including its absence,
 when simulation finishes or fails. With \code{NULL}, simulation advances or
-initializes the random-number state.}
+initialises the random-number state.}
 
 \item{conditioning}{character or \code{NULL}; optional mixed-model conditioning
-mode. gamm4 defaults to \code{"conditional"}, holding all fitted effects fixed.
-\code{"gam_component"} explicitly uses its extracted GAM. The existing gamm
+mode. \code{\link[gamm4:gamm4]{gamm4::gamm4()}} defaults to \code{"conditional"}, holding all fitted effects fixed.
+\code{"gam_component"} explicitly uses its extracted GAM. The existing \code{\link[mgcv:gamm]{mgcv::gamm()}}
 simulator retains its GAM-component default. Full mixed-model modes currently
 use fitting observations.}
 
 \item{...}{arguments passed to methods. \code{simulate.gam()} and
-\code{simulate.scam()} pass \code{...} on to \code{predict.gam()}. As such you can pass
+\code{simulate.scam()} pass \code{...} on to \code{\link[mgcv:predict.gam]{mgcv::predict.gam()}}. As such you can pass
 additional arguments such as \code{terms}, \code{exclude}, to select which model
 terms are included in the predictions. This may be useful, for example,
 for excluding the effects of random effect terms.}
@@ -82,12 +82,12 @@ the model will be used for \code{newdata}, if available in \code{object}.}
 overrides the fitting weights; a single value applies to every observation.
 With \code{data = NULL}, the default is the fitted prior weights, except
 factor-valued binomial responses retain one Bernoulli trial per observation.
-Native \code{gaulss()} ignores fitting weights in its likelihood, so its default
+Native \code{\link[mgcv:gaulss]{mgcv::gaulss()}} ignores fitting weights in its likelihood, so its default
 response weights are ones; explicit sampling weights still override this.
 With prediction data, the default is a vector of ones. For ordinary Gaussian
 and Gamma responses, larger weights reduce response variance (precision
 weights). For binomial responses, weights give integer trial counts. Include
-positions restored by \code{na.exclude} when supplying weights for fitting rows.}
+positions restored by \code{\link[stats:na.exclude]{stats::na.exclude()}} when supplying weights for fitting rows.}
 
 \item{newdata}{Deprecated. Use \code{data} instead.}
 
@@ -102,8 +102,8 @@ model's formula environment. Supply raw covariates in \code{data}.}
 supported \code{re} and \code{fs} terms; character vectors select exact smooth labels.
 Fitted predictions integrate response means over new zero-mean Gaussian
 effects. Response samplers draw new effects before sampling responses.
-Smoothing parameters and dispersion remain fixed. Only ordinary \code{gam()}
-and \code{bam()} fits with a scalar response mean are supported.}
+Smoothing parameters and dispersion remain fixed. Only ordinary \code{\link[mgcv:gam]{mgcv::gam()}}
+and \code{\link[mgcv:bam]{mgcv::bam()}} fits with a scalar response mean are supported.}
 }
 \value{
 (Currently) A data frame with \code{nsim} columns.
@@ -125,8 +125,8 @@ repeated group labels share effects within a replicate. Unfamiliar labels
 are allowed only when those factors occur exclusively in selected terms.
 The \code{random_effect_info} attribute records the fixed covariance estimates.
 
-With \code{data = NULL}, \code{na.exclude} restores excluded observations as \code{NA} in
-every simulation; \code{na.omit} returns retained observations only. Positions
+With \code{data = NULL}, \code{\link[stats:na.exclude]{stats::na.exclude()}} restores excluded observations as \code{NA} in
+every simulation; \code{\link[stats:na.omit]{stats::na.omit()}} returns retained observations only. Positions
 refer to the fitting data after any \code{subset}. Explicit \code{data} are evaluated
 independently of training exclusions: missing responses do not prevent
 simulation, while missing required predictors or weights yield \code{NA}.
@@ -151,10 +151,10 @@ invalid indices are errors. Explicit indices must agree with recoverable ones.
 Grouped simulations return one numeric response per observation: binomial
 proportions (with integer trial counts supplied in \code{weights}), count responses,
 or ordered-category codes, as appropriate. Component random generators retain
-their usual treatment of prior weights. Ordered-categorical and \code{ziP} components
+their usual treatment of prior weights. Ordered-categorical and \code{\link[mgcv:ziP]{mgcv::ziP()}} components
 are simulated from their latent predictors. General families with multiple
 linear predictors and matrix responses encoding censoring or binomial counts
-are outside the scope supported by \code{gfam()}. Scalar censored-family components
+are outside the scope supported by \code{\link[mgcv:gfam]{mgcv::gfam()}}. Scalar censored-family components
 produce draws from their uncensored latent distributions.
 }
 \examples{

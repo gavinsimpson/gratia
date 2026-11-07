@@ -105,7 +105,7 @@ calls \code{gaussian_draws()} which uses a Gaussian approximation to the
 posterior distribution. \code{"mh"} uses a simple Metropolis Hastings sampler
 which alternates static proposals based on a Gaussian approximation to the
 posterior, with random walk proposals. Note, setting \code{t_df} to a low value
-will result in heavier-tailed statistic proposals. See \code{mgcv::gam.mh()}
+will result in heavier-tailed statistic proposals. See \code{\link[mgcv:gam.mh]{mgcv::gam.mh()}}
 for more details.}
 
 \item{n_cores}{positive integer; maximum concurrent MH chains using mirai,
@@ -116,23 +116,23 @@ are created and cleaned up. Only used by \code{method = "mh"}.}
 mvnfast. Defaults to one. This is separate from concurrent MH chains.}
 
 \item{burnin}{numeric; the length of any initial burn in period to discard.
-See \code{mgcv::gam.mh()}.}
+See \code{\link[mgcv:gam.mh]{mgcv::gam.mh()}}.}
 
 \item{thin}{positive integer; retain every \code{thin} iterations after burn-in.}
 
 \item{t_df}{numeric; degrees of freedom for static multivariate \emph{t} proposal.
-See \code{mgcv::gam.mh()}.}
+See \code{\link[mgcv:gam.mh]{mgcv::gam.mh()}}.}
 
 \item{rw_scale}{numeric; factor by which to scale posterior covariance
-matrix when generating random walk proposals. See \code{mgcv::gam.mh()}.}
+matrix when generating random walk proposals. See \code{\link[mgcv:gam.mh]{mgcv::gam.mh()}}.}
 
 \item{frequentist}{logical; if \code{TRUE}, the frequentist covariance matrix of
 the parameter estimates is used. If \code{FALSE}, the Bayesian posterior
-covariance matrix of the parameters is used. See \code{mgcv::vcov.gam()}.}
+covariance matrix of the parameters is used. See \code{\link[mgcv:vcov.gam]{mgcv::vcov.gam()}}.}
 
 \item{unconditional}{logical; if \code{TRUE}  the Bayesian smoothing parameter
 uncertainty corrected covariance matrix is used, \emph{if available} for
-\code{model}. See \code{mgcv::vcov.gam()}.
+\code{model}. See \code{\link[mgcv:vcov.gam]{mgcv::vcov.gam()}}.
 SCAM models do not support this correction; use \code{unconditional = FALSE}.}
 
 \item{draws}{matrix; user supplied posterior draws to be used when
@@ -151,8 +151,8 @@ a full design matrix,
 smoothing penalty, and proposal factorisation once for all chains.}
 
 \item{mvn_method}{character; one of \code{"mvnfast"} or \code{"mgcv"}. The default is
-uses \code{mvnfast::rmvn()}, which can be considerably faster at generate large
-numbers of MVN random values than \code{mgcv::rmvn()}, but which might not work
+uses \code{\link[mvnfast:rmvn]{mvnfast::rmvn()}}, which can be considerably faster at generate large
+numbers of MVN random values than \code{\link[mgcv:rmvn]{mgcv::rmvn()}}, but which might not work
 for some marginal fits, such as those where the covariance matrix is close
 to singular.}
 

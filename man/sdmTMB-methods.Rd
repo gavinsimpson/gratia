@@ -106,8 +106,8 @@ or named panels with \code{wrap = FALSE}; \code{\link[=assemble]{assemble()}} re
 }
 \description{
 Evaluate and plot formula smooths and parametric effects from a fitted
-\code{sdmTMB} model using the same plotting methods as mgcv smooths. Penalized
-and unpenalized coefficients and their joint covariance are transformed
+\code{sdmTMB} model using the same plotting methods as mgcv smooths. Penalised
+and unpenalised coefficients and their joint covariance are transformed
 back to the constrained mgcv basis.
 }
 \details{
@@ -124,11 +124,11 @@ retained through the joint covariance. Smooth intervals include uncertainty
 in their component's overall mean by default; parametric intervals include
 the component's intercept. Use \code{overall_uncertainty = FALSE} for term-only
 intervals. \code{fun} transforms displayed partial effects, not full predictions.
-Use \verb{surface = "3d", ci_3d = TRUE} in \code{draw()} or \code{assemble()} to add
+Use \verb{surface = "3d", ci_3d = TRUE} in \code{\link[=draw]{draw()}} or \code{\link[=assemble]{assemble()}} to add
 interval surfaces to smooths and numeric parametric interactions in either
 component. \code{ci_3d_alpha} and \code{ci_3d_col} control their opacity and fill colour.
-Pass \code{cyclic = "polar"} and optional \code{polar_args} to \code{draw()} or
-\code{assemble()} for polar plots of supported one-dimensional cyclic smooths.
+Pass \code{cyclic = "polar"} and optional \code{polar_args} to \code{\link[=draw]{draw()}} or
+\code{\link[=assemble]{assemble()}} for polar plots of supported one-dimensional cyclic smooths.
 See \code{\link[=draw.gam]{draw.gam()}} for the coordinate options.
 
 Delta components have separate smooth and parametric coefficients and are

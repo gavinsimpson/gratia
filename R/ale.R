@@ -54,24 +54,24 @@
 #' Response-scale effects are differences in natural parameter units, not
 #' predicted parameter values, and can be negative.
 #'
-#' Distributional families `gaulss`, `gammals`, `gumbls`, `gevlss`, `shash`,
-#' `twlss`, and `ziplss` are supported. Natural units mean standard deviation
+#' Distributional families [mgcv::gaulss()], [mgcv::gammals()], [mgcv::gumbls()], [mgcv::gevlss()], [mgcv::shash()],
+#' [mgcv::twlss()], and [mgcv::ziplss()] are supported. Natural units mean standard deviation
 #' for Gaussian scale, positive scale or dispersion for logged scales, natural
 #' Tweedie power, positive sinh-arcsinh tail parameter, and Poisson rate or
-#' probability of presence for `ziplss`. Location parameters need not be response
+#' probability of presence for [mgcv::ziplss()]. Location parameters need not be response
 #' means. Overall means combining several parameters, multinomial probabilities,
 #' multivariate covariance parameters and grouped-family outputs are unsupported.
 #' For other families, link-scale ALE is available for a single linear predictor;
 #' response-scale ALE requires a supported scalar mean family.
 #'
 #' Supported response-scale parameters are:
-#' * `gaulss`: location (mean) and scale (standard deviation);
-#' * `gammals`: location (mean) and scale (dispersion);
-#' * `gumbls` and `gevlss`: location and positive scale, plus GEV shape;
-#' * `shash`: location, positive scale, skewness and positive tail parameter
+#' * [mgcv::gaulss()]: location (mean) and scale (standard deviation);
+#' * [mgcv::gammals()]: location (mean) and scale (dispersion);
+#' * [mgcv::gumbls()] and [mgcv::gevlss()]: location and positive scale, plus GEV shape;
+#' * [mgcv::shash()]: location, positive scale, skewness and positive tail parameter
 #'   (named `kurtosis` to match gratia's parameter names);
-#' * `twlss`: location (mean), power and scale (dispersion);
-#' * `ziplss`: location (Poisson rate) and `pi` (probability of presence).
+#' * [mgcv::twlss()]: location (mean), power and scale (dispersion);
+#' * [mgcv::ziplss()]: location (Poisson rate) and `pi` (probability of presence).
 #'
 #' Raw-data recovery can require `envir` when a model was fitted locally and
 #' its formula no longer retains the environment containing the fitting data.

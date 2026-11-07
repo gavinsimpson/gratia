@@ -23,7 +23,7 @@ model_constant(model, ...)
 \method{model_constant}{scam}(model, lp = NULL, ...)
 }
 \arguments{
-\item{model}{a fitted model for which a \code{coef()} method exists.}
+\item{model}{a fitted model for which a \code{\link[stats:coef]{stats::coef()}} method exists.}
 
 \item{...}{arguments passed to other methods.}
 

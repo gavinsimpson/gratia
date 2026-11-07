@@ -15,7 +15,7 @@
 #' @param seed numeric or `NULL`; a random seed for the simulations. An explicit
 #'   seed restores the previous random-number state, including its absence,
 #'   when simulation finishes or fails. With `NULL`, simulation advances or
-#'   initializes the random-number state.
+#'   initialises the random-number state.
 #' @param data data frame; new observations at which the posterior draws
 #'   from the model should be evaluated. If not supplied, the data used to fit
 #'   the model will be used for `newdata`, if available in `object`.
@@ -23,21 +23,21 @@
 #'   overrides the fitting weights; a single value applies to every observation.
 #'   With `data = NULL`, the default is the fitted prior weights, except
 #'   factor-valued binomial responses retain one Bernoulli trial per observation.
-#'   Native `gaulss()` ignores fitting weights in its likelihood, so its default
+#'   Native [mgcv::gaulss()] ignores fitting weights in its likelihood, so its default
 #'   response weights are ones; explicit sampling weights still override this.
 #'   With prediction data, the default is a vector of ones. For ordinary Gaussian
 #'   and Gamma responses, larger weights reduce response variance (precision
 #'   weights). For binomial responses, weights give integer trial counts. Include
-#'   positions restored by `na.exclude` when supplying weights for fitting rows.
+#'   positions restored by [stats::na.exclude()] when supplying weights for fitting rows.
 #' @param ... arguments passed to methods. `simulate.gam()` and
-#'   `simulate.scam()` pass `...` on to `predict.gam()`. As such you can pass
+#'   `simulate.scam()` pass `...` on to [mgcv::predict.gam()]. As such you can pass
 #'   additional arguments such as `terms`, `exclude`, to select which model
 #'   terms are included in the predictions. This may be useful, for example,
 #'   for excluding the effects of random effect terms.
 #' @param newdata Deprecated. Use `data` instead.
 #' @param conditioning character or `NULL`; optional mixed-model conditioning
-#'   mode. gamm4 defaults to `"conditional"`, holding all fitted effects fixed.
-#'   `"gam_component"` explicitly uses its extracted GAM. The existing gamm
+#'   mode. [gamm4::gamm4()] defaults to `"conditional"`, holding all fitted effects fixed.
+#'   `"gam_component"` explicitly uses its extracted GAM. The existing [mgcv::gamm()]
 #'   simulator retains its GAM-component default. Full mixed-model modes currently
 #'   use fitting observations.
 #' @param envir environment or `NULL`; functions and constants needed to
@@ -55,8 +55,8 @@
 #' are allowed only when those factors occur exclusively in selected terms.
 #' The `random_effect_info` attribute records the fixed covariance estimates.
 #'
-#' With `data = NULL`, `na.exclude` restores excluded observations as `NA` in
-#' every simulation; `na.omit` returns retained observations only. Positions
+#' With `data = NULL`, [stats::na.exclude()] restores excluded observations as `NA` in
+#' every simulation; [stats::na.omit()] returns retained observations only. Positions
 #' refer to the fitting data after any `subset`. Explicit `data` are evaluated
 #' independently of training exclusions: missing responses do not prevent
 #' simulation, while missing required predictors or weights yield `NA`.
@@ -81,10 +81,10 @@
 #' Grouped simulations return one numeric response per observation: binomial
 #' proportions (with integer trial counts supplied in `weights`), count responses,
 #' or ordered-category codes, as appropriate. Component random generators retain
-#' their usual treatment of prior weights. Ordered-categorical and `ziP` components
+#' their usual treatment of prior weights. Ordered-categorical and [mgcv::ziP()] components
 #' are simulated from their latent predictors. General families with multiple
 #' linear predictors and matrix responses encoding censoring or binomial counts
-#' are outside the scope supported by `gfam()`. Scalar censored-family components
+#' are outside the scope supported by [mgcv::gfam()]. Scalar censored-family components
 #' produce draws from their uncensored latent distributions.
 #'
 #' @return (Currently) A data frame with `nsim` columns.

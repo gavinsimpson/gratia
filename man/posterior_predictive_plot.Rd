@@ -64,7 +64,7 @@ Defaults to \code{0.9}. Ignored for continuous density overlays.}
 
 \item{conditioning}{character or \code{NULL}; mixed-model conditioning mode.}
 
-\item{scalable}{logical or \code{NULL}; summarize posterior response draws on a
+\item{scalable}{logical or \code{NULL}; summarise posterior response draws on a
 common grid, using temporary disk storage instead of retaining all responses
 in memory. \code{NULL} enables this at \code{scalable_threshold} observations.}
 
@@ -132,7 +132,7 @@ correlation and the series boundaries stored in \code{AR.start}.
 Gaussian \code{gamm} and \code{gamm4} models draw fixed and random effects together,
 keeping covariance parameters at fitted values; marginal checks draw new
 effects.
-For gamm fits estimated by penalized quasi-likelihood (PQL), the sampler uses
+For \code{\link[mgcv:gamm]{mgcv::gamm()}} fits estimated by penalised quasi-likelihood (PQL), the sampler uses
 the Gaussian approximation used in fitting and then generates responses from
 the fitted response family. This is supported only when the Gaussian working
 residuals are uncorrelated. Correlation in those working residuals does not

@@ -67,7 +67,7 @@ diagnostic data. The original model must retain its fitting observations.}
 
 \item{covariates}{character vector of exact covariate names, in plotting
 order. \code{NULL} selects model covariates, excluding variables used only as
-offsets or random-effect groups. \code{character()} selects no individual
+offsets or random-effect groups. \code{\link[base:character]{base::character()}} selects no individual
 panels, for use with \code{pairs}.}
 
 \item{terms}{character vector of exact mgcv smooth labels, as returned by
@@ -90,7 +90,7 @@ fitting call only when needed and verifying them in the same way.}
 
 \item{type}{character or \code{NULL}; residual type: \code{"deviance"}, \code{"pearson"},
 \code{"response"}, \code{"pit"}, \code{"quantile"}, \code{"dharma"}, or \code{"surrogate"} (for
-\code{ocat()} or \code{multinom()} GAMs). Grouped models automatically use
+\code{\link[mgcv:ocat]{mgcv::ocat()}} or \code{\link[mgcv:multinom]{mgcv::multinom()}} GAMs). Grouped models automatically use
 quantile residuals when all active components are supported, otherwise all
 use deviance residuals with a message. Ordinary models retain deviance
 residuals by default. See \code{\link[=appraise]{appraise()}} for distributional support.}

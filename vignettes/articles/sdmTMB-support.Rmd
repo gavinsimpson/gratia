@@ -75,7 +75,7 @@ ggplot(cod, aes(X, Y, colour = density)) +
     colour = "Density (kg/km²)")
 ```
 
-The colour scale uses `log1p`, the logarithm of one plus density, to distinguish
+The colour scale uses `log1p()`, the logarithm of one plus density, to distinguish
 the many smaller catches while retaining zeros and the largest catches.
 There are many exact zeros and a long positive tail. A Gaussian response model
 would allow negative density and impose constant response variance. A Tweedie
@@ -243,7 +243,7 @@ assumptions. Here the smooth includes both depth and year main effects, so
 we do not add the previous `year_f` factor. Centring year at 2011 only changes
 its coordinate origin.
 
-In this example the optimizer converges and the Hessian is positive definite,
+In this example the optimiser converges and the Hessian is positive definite,
 but `sanity()` flags large standard errors for smoothing parameters. Inspect
 the estimated standard deviations controlling the tensor penalties:
 

@@ -25,7 +25,7 @@ residuals_hist_plot(
 
 \item{type}{character or \code{NULL}; residual type: \code{"deviance"}, \code{"pearson"},
 \code{"response"}, \code{"pit"}, \code{"quantile"}, \code{"dharma"}, or \code{"surrogate"} (for
-\code{ocat()} or \code{multinom()} GAMs). Grouped models automatically use
+\code{\link[mgcv:ocat]{mgcv::ocat()}} or \code{\link[mgcv:multinom]{mgcv::multinom()}} GAMs). Grouped models automatically use
 quantile residuals when all active components are supported, otherwise all
 use deviance residuals with a message. Ordinary models retain deviance
 residuals by default. See \code{\link[=appraise]{appraise()}} for distributional support.}
@@ -54,7 +54,7 @@ DHARMa-style residuals.}
 \item{by_family}{logical or \code{NULL}; separate indexed grouped-family components
 into facets. The default pools quantile residuals with component colours
 and facets traditional residuals. \code{TRUE} and \code{FALSE} explicitly select the
-layout. In \code{appraise()}, observed-versus-fitted values always use component
+layout. In \code{\link[=appraise]{appraise()}}, observed-versus-fitted values always use component
 facets. Standalone \code{observed_fitted_plot()} facets by default and permits
 explicit pooling. Ignored for ordinary models.}
 

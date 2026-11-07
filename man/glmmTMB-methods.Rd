@@ -77,7 +77,7 @@ conditional checks and response residuals for marginal checks.}
 \item{object, model}{A fitted \code{glmmTMB} model.}
 
 \item{terms}{Character vector selecting parametric terms, as returned by
-\code{parametric_terms()}. Later predictors append \code{.1}, \code{.2}, etc.}
+\code{\link[=parametric_terms]{parametric_terms()}}. Later predictors append \code{.1}, \code{.2}, etc.}
 
 \item{unconditional, frequentist}{Must be \code{FALSE}; mgcv-specific covariance
 alternatives are not available.}
@@ -87,11 +87,11 @@ alternatives are not available.}
 \item{select}{Smooth or native random-effect coefficient selection, across
 all linear predictors. Numeric indices select smooths first, then native
 random coefficients. Native labels have the form \code{(1 | g)} and \code{(x | g)};
-later predictors append \code{.1}, \code{.2}, etc. \code{smooth_estimates()} and
-\code{smooth_coefs()} select smooths only.}
+later predictors append \code{.1}, \code{.2}, etc. \code{\link[=smooth_estimates]{smooth_estimates()}} and
+\code{\link[=smooth_coefs]{smooth_coefs()}} select smooths only.}
 
 \item{parametric}{Include parametric effect plots? \code{NULL} follows
-\code{draw.gam()}: include them unless \code{select} is supplied. Use \code{terms} to
+\code{\link[=draw.gam]{draw.gam()}}: include them unless \code{select} is supplied. Use \code{terms} to
 choose parametric terms, and \code{parametric = FALSE} to omit them.}
 
 \item{residuals}{Must be \code{FALSE}; partial residual overlays are not supported.}
@@ -106,11 +106,11 @@ slopes and structured covariance terms retain separate QQ plots.}
 }
 \value{
 Smooth estimates, coefficients, or plots, as for the GAM methods.
-\code{assemble()} returns a named list of ggplot objects, of class
-\code{"assembled_plots"}. \code{draw()} combines these plots into a patchwork unless
+\code{\link[=assemble]{assemble()}} returns a named list of ggplot objects, of class
+\code{"assembled_plots"}. \code{\link[=draw]{draw()}} combines these plots into a patchwork unless
 \code{wrap = FALSE}, which returns the individual plots instead.
 All smooths, native random effects and parametric terms are plotted by
-default, as for \code{draw.gam()}. Smooths in later
+default, as for \code{\link[=draw.gam]{draw.gam()}}. Smooths in later
 linear predictors use mgcv-style labels such as \code{s.1(x)} and \code{s.2(x)}.
 Predictor order is conditional, zero-inflation (if present), then dispersion
 (if present). Use \code{smooths(object)} and \code{select} to select individual smooths.
@@ -136,8 +136,8 @@ by glmmTMB; gratia does not expand the smooth types glmmTMB can fit.
 Use \code{draw(model, surface = "3d", ci_3d = TRUE)} for interval surfaces on
 smooths and numeric parametric interactions in any linear predictor.
 \code{ci_3d_alpha} and \code{ci_3d_col} control their opacity and fill colour.
-Pass \code{cyclic = "polar"} and optional \code{polar_args} to \code{draw()} or
-\code{assemble()} for polar plots of supported one-dimensional cyclic smooths.
+Pass \code{cyclic = "polar"} and optional \code{polar_args} to \code{\link[=draw]{draw()}} or
+\code{\link[=assemble]{assemble()}} for polar plots of supported one-dimensional cyclic smooths.
 See \code{\link[=draw.gam]{draw.gam()}} for the coordinate options.
 
 Parametric effects use fitted contrast coding and exclude smooth null-space
@@ -161,7 +161,7 @@ Poisson/nbinom1/2,
 including applicable zero-inflation or hurdle mixtures and varying dispersion.
 Truncated nbinom1 currently requires \code{type = "response"} because glmmTMB
 does not supply its Pearson residuals. Other unavailable residual types fail
-explicitly. Supported fitted response distributions also provide randomized
+explicitly. Supported fitted response distributions also provide randomised
 PIT/quantile residuals and inverse-CDF QQ references, including their
 zero-inflation and truncation probabilities. Posterior predictive checks draw
 coefficients and fitted random effects together from their approximate

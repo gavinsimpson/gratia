@@ -255,7 +255,7 @@ links, fitted nuisance parameters and formula offsets are retained. New-data
 sampling weights default to one; explicit weights override them. Output retains
 `.parameter = "component1"`, `"component2"`, and so on, together with `.row`,
 `.draw` and any chain columns. Missing predictors, membership or sampling weights
-produce missing responses. Fitting rows excluded by `na.exclude` are restored.
+produce missing responses. Fitting rows excluded by `na.exclude()` are restored.
 Smooth samples retain their predictor contributions, and response derivatives
 use each row's component mean. For derivatives, membership must be recoverable
 from `data`; `derivative_samples()` does not accept `family_index`.

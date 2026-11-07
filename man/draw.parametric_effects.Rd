@@ -104,7 +104,7 @@ Covariate scale changes that produce irregular spacing use rectangles
 bounded by adjacent coordinate midpoints for flat surfaces.}
 
 \item{surface_3d}{named list of view options passed to \code{\link[ggcube:coord_3d]{ggcube::coord_3d()}},
-for example \code{list(yaw = 45, persp = FALSE)}. The default \code{list()} uses the
+for example \code{list(yaw = 45, persp = FALSE)}. The default \code{\link[base:list]{base::list()}} uses the
 default view with \code{ggcube::light(backface_scale = 1)}, preserving equal
 horizontal units for isotropic smooths. Supply \code{light = ggcube::light(...)}
 in this list to override lighting; \code{ggcube::light(method = "none")} disables

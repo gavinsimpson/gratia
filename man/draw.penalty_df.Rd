@@ -2,7 +2,7 @@
 % Please edit documentation in R/draw-methods.R
 \name{draw.penalty_df}
 \alias{draw.penalty_df}
-\title{Display penalty matrices of smooths using \code{ggplot}}
+\title{Display penalty matrices of smooths using \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}}}
 \usage{
 \method{draw}{penalty_df}(
   object,
@@ -24,7 +24,7 @@
 \arguments{
 \item{object}{a fitted GAM, the result of a call to \code{\link[mgcv:gam]{mgcv::gam()}}.}
 
-\item{normalize}{logical; normalize the penalty to the range -1, 1?}
+\item{normalize}{logical; normalise the penalty to the range -1, 1?}
 
 \item{as_matrix}{logical; how should the plotted penalty matrix be oriented?
 If \code{TRUE} row 1, column 1 of the penalty matrix is draw in the upper left,
@@ -62,7 +62,7 @@ cells in PDF and SVG output, but can increase file size for large matrices.}
 \item{...}{additional arguments passed to \code{\link[patchwork:wrap_plots]{patchwork::wrap_plots()}}.}
 }
 \description{
-Displays the penalty matrices of smooths as a heatmap using \code{ggplot}
+Displays the penalty matrices of smooths as a heatmap using \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}}
 }
 \section{Label layout}{
 

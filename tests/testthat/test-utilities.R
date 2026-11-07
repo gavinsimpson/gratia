@@ -591,21 +591,18 @@ test_that("n_eta work", {
   expect_identical(n_eta(m_gaulss), 2L)
 })
 
-test_that("rtw works for twlss model", {
-  skip_on_cran()
-  skip_on_ci()
+test_that("rtw() matches native simulation for fitted twlss() parameters", {
   fit <- fitted(m_twlss)
   tw_pars <- get_twlss_bounds(m_twlss)
-  expect_snapshot(
-    with_seed(
-      123,
-      rtw(
-        fit[, 1],
-        theta_2_power(fit[, 2], a = tw_pars[1], b = tw_pars[2]),
-        exp(fit[, 3])
-      ) |> round(digits = 4)
-    )
-  )
+  power <- theta_2_power(fit[, 2], a = tw_pars[1], b = tw_pars[2])
+  dispersion <- exp(fit[, 3])
+  # This shared fit has intercept-only power and dispersion predictors.
+  expect_equal(power, rep(power[[1L]], nrow(fit)), ignore_attr = TRUE)
+  expect_equal(dispersion, rep(dispersion[[1L]], nrow(fit)), ignore_attr = TRUE)
+  expected <- with_seed(123, mgcv::rTweedie(fit[, 1],
+    p = power[[1L]], phi = dispersion[[1L]]))
+  actual <- with_seed(123, rtw(fit[, 1], power, dispersion))
+  expect_equal(actual, expected, tolerance = 1e-12)
 })
 
 test_that("if a multivariate model is identified correctly", {

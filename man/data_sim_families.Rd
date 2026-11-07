@@ -18,18 +18,18 @@ Beta draws use the constructor's \code{eps} endpoint adjustment, matching mgcv's
 generator. This adjustment can matter when the beta law places substantial
 probability very close to zero or one; \code{eps} is recorded in the truth.\tabular{ll}{
    Family \tab Generating parameters \cr
-   \code{gaussian()} \tab \code{dispersion = 1}, the non-negative variance \cr
-   \code{poisson()}, \code{cpois()} \tab None \cr
-   \code{binomial()} \tab \code{trials = 1}, positive integer trial counts \cr
-   \code{Gamma()}, \code{inverse.gaussian()} \tab \code{dispersion = 1} \cr
-   \code{nb()}, \code{negbin()} \tab \code{theta}, positive size; \code{Inf} gives the Poisson limit \cr
-   \code{tw()}, \code{Tweedie()} \tab \code{power} in (1, 2), and \code{dispersion = 1} \cr
-   \code{betar()} \tab Positive \code{precision} \cr
-   \code{scat()} \tab \code{df} above the family's \code{min.df}, and positive t scale \code{sigma} \cr
-   \code{ocat()} \tab Finite increasing \code{cuts}, one fewer than the categories \cr
-   \code{ziP()} \tab \code{intercept} and natural-scale \code{slope} above the constructor's \code{b} \cr
-   \code{cnorm()}, \code{clog()} \tab Positive \code{sigma}, Gaussian SD or logistic scale \cr
-   \code{bcg()} \tab \code{lambda = 0} and positive log-response SD \code{sigma} \cr
+   \code{\link[stats:gaussian]{stats::gaussian()}} \tab \code{dispersion = 1}, the non-negative variance \cr
+   \code{\link[stats:poisson]{stats::poisson()}}, \code{\link[mgcv:cpois]{mgcv::cpois()}} \tab None \cr
+   \code{\link[stats:binomial]{stats::binomial()}} \tab \code{trials = 1}, positive integer trial counts \cr
+   \code{\link[stats:Gamma]{stats::Gamma()}}, \code{\link[stats:inverse.gaussian]{stats::inverse.gaussian()}} \tab \code{dispersion = 1} \cr
+   \code{\link[mgcv:nb]{mgcv::nb()}}, \code{\link[mgcv:negbin]{mgcv::negbin()}} \tab \code{theta}, positive size; \code{Inf} gives the Poisson limit \cr
+   \code{\link[mgcv:tw]{mgcv::tw()}}, \code{\link[mgcv:Tweedie]{mgcv::Tweedie()}} \tab \code{power} in (1, 2), and \code{dispersion = 1} \cr
+   \code{\link[mgcv:betar]{mgcv::betar()}} \tab Positive \code{precision} \cr
+   \code{\link[mgcv:scat]{mgcv::scat()}} \tab \code{df} above the family's \code{min.df}, and positive t scale \code{sigma} \cr
+   \code{\link[mgcv:ocat]{mgcv::ocat()}} \tab Finite increasing \code{cuts}, one fewer than the categories \cr
+   \code{\link[mgcv:ziP]{mgcv::ziP()}} \tab \code{intercept} and natural-scale \code{slope} above the constructor's \code{b} \cr
+   \code{\link[mgcv:cnorm]{mgcv::cnorm()}}, \code{\link[mgcv:clog]{mgcv::clog()}} \tab Positive \code{sigma}, Gaussian SD or logistic scale \cr
+   \code{\link[mgcv:bcg]{mgcv::bcg()}} \tab \code{lambda = 0} and positive log-response SD \code{sigma} \cr
 }
 
 
@@ -42,7 +42,7 @@ cut points for \code{ocat(R = ...)}. For example, both
 for an estimated parameter are not used as generating truth. A size range
 in \code{negbin(c(1, 10))} also requires an explicit generating \code{theta}.
 
-For \code{ziP()}, \code{lambda = exp(eta)} and
+For \code{\link[mgcv:ziP]{mgcv::ziP()}}, \code{lambda = exp(eta)} and
 \code{P(Y > 0) = 1 - exp(-exp(intercept + slope * eta))}.
 Positive observations follow a Poisson distribution conditioned on being
 positive. The natural \code{slope} includes the constructor's lower bound \code{b};
@@ -64,25 +64,25 @@ The columns returned by \code{predictors} follow mgcv's order and links, includi
 their constructor-specific bounds. These are link-scale predictors, not
 the \code{mu} arguments of mgcv's random-number generators.\tabular{ll}{
    Family \tab Predictor order and natural parameters recorded in truth \cr
-   \code{gaulss()} \tab Mean, SD predictor; records \code{mu}, \code{sigma} \cr
-   \code{gammals()} \tab Log mean, log-dispersion predictor; records \code{mu}, \code{dispersion} \cr
-   \code{gumbls()} \tab Location, log-scale predictor; records \code{location}, \code{mu} (mean), \code{sigma} \cr
-   \code{gevlss()} \tab Location, log scale, shape predictor; records \code{location}, \code{sigma}, \code{shape} \cr
-   \code{shash()} \tab Location, scale predictor, skewness, log tail; records \code{location}, \code{sigma}, \code{skewness}, \code{tail} \cr
-   \code{twlss()} \tab Mean predictor, power predictor, log dispersion; records \code{mu}, \code{power}, \code{dispersion} \cr
-   \code{ziplss()} \tab Log Poisson intensity, complementary log-log presence predictor; records \code{lambda}, \code{presence} \cr
+   \code{\link[mgcv:gaulss]{mgcv::gaulss()}} \tab Mean, SD predictor; records \code{mu}, \code{sigma} \cr
+   \code{\link[mgcv:gammals]{mgcv::gammals()}} \tab Log mean, log-dispersion predictor; records \code{mu}, \code{dispersion} \cr
+   \code{\link[mgcv:gumbls]{mgcv::gumbls()}} \tab Location, log-scale predictor; records \code{location}, \code{mu} (mean), \code{sigma} \cr
+   \code{\link[mgcv:gevlss]{mgcv::gevlss()}} \tab Location, log scale, shape predictor; records \code{location}, \code{sigma}, \code{shape} \cr
+   \code{\link[mgcv:shash]{mgcv::shash()}} \tab Location, scale predictor, skewness, log tail; records \code{location}, \code{sigma}, \code{skewness}, \code{tail} \cr
+   \code{\link[mgcv:twlss]{mgcv::twlss()}} \tab Mean predictor, power predictor, log dispersion; records \code{mu}, \code{power}, \code{dispersion} \cr
+   \code{\link[mgcv:ziplss]{mgcv::ziplss()}} \tab Log Poisson intensity, complementary log-log presence predictor; records \code{lambda}, \code{presence} \cr
    \code{multinom(K)} \tab K logits relative to category 0; records category \code{probabilities} \cr
    \code{mvn(d)} \tab d response means; \code{parameters$covariance} defaults to the identity matrix \cr
 }
 
 
-These families need no scalar generating parameters except \code{mvn()}'s
-optional positive definite covariance matrix. In \code{shash()}, the transformed
+These families need no scalar generating parameters except \code{\link[mgcv:mvn]{mgcv::mvn()}}'s
+optional positive definite covariance matrix. In \code{\link[mgcv:shash]{mgcv::shash()}}, the transformed
 normal is multiplied by \code{tail * sigma}, following mgcv's parameterisation.
-In \code{gumbls()}, the mean is location plus Euler's constant times \code{sigma};
-the first predictor specifies the location. For \code{gevlss()}, the default
+In \code{\link[mgcv:gumbls]{mgcv::gumbls()}}, the mean is location plus Euler's constant times \code{sigma};
+the first predictor specifies the location. For \code{\link[mgcv:gevlss]{mgcv::gevlss()}}, the default
 shape link restricts shape to (-1, 0.5); the identity link allows any finite
-shape. In \code{ziplss()}, positive counts follow a zero-truncated Poisson distribution.
+shape. In \code{\link[mgcv:ziplss]{mgcv::ziplss()}}, positive counts follow a zero-truncated Poisson distribution.
 }
 
 \section{Default predictors}{
@@ -90,23 +90,23 @@ shape. In \code{ziplss()}, positive counts follow a zero-truncated Poisson distr
 Let \code{g} be the template's \code{f} before distribution transformations. Scalar
 Gaussian, t, Gaussian-censoring, logistic-censoring and Box-Cox families use
 natural location \code{g}. Binomial and beta means are \code{plogis((g - 5) / 5)};
-ordinal location is \code{g - mean(g)}; the \code{ziP()} predictor is \code{g / 5}.
+ordinal location is \code{g - mean(g)}; the \code{\link[mgcv:ziP]{mgcv::ziP()}} predictor is \code{g / 5}.
 Other scalar means are \code{exp(g / 5)}. Each mean is transformed with the
 supplied family's link. If it is outside that link's domain, supply custom
 predictors rather than relying on a default.
 
-For general families, default predictors are: \verb{(g, 0)} for \code{gaulss()} and
-\code{gumbls()}; \verb{(g / 5, 0)} for \code{gammals()} and \code{ziplss()};
-\verb{(g, 0, linkfun(0))} for \code{gevlss()} (zero shape under the supplied shape link);
-\verb{(g, 0, 0, 0)} for \code{shash()}; and \verb{(g / 5, 0, 0)} for \code{twlss()}.
+For general families, default predictors are: \verb{(g, 0)} for \code{\link[mgcv:gaulss]{mgcv::gaulss()}} and
+\code{\link[mgcv:gumbls]{mgcv::gumbls()}}; \verb{(g / 5, 0)} for \code{\link[mgcv:gammals]{mgcv::gammals()}} and \code{\link[mgcv:ziplss]{mgcv::ziplss()}};
+\verb{(g, 0, linkfun(0))} for \code{\link[mgcv:gevlss]{mgcv::gevlss()}} (zero shape under the supplied shape link);
+\verb{(g, 0, 0, 0)} for \code{\link[mgcv:shash]{mgcv::shash()}}; and \verb{(g / 5, 0, 0)} for \code{\link[mgcv:twlss]{mgcv::twlss()}}.
 Multivariate normal means repeat \code{g}. Multinomial logit j is
 \code{(g - mean(g)) / 5 * j / K}. The \code{sc_location_scale} template instead
-supplies its own log mean and log dispersion for \code{gammals()}.
+supplies its own log mean and log dispersion for \code{\link[mgcv:gammals]{mgcv::gammals()}}.
 }
 
 \section{Censoring and survival}{
 
-For \code{cnorm()}, \code{clog()}, \code{cpois()} and \code{bcg()}, \code{observation} can contain
+For \code{\link[mgcv:cnorm]{mgcv::cnorm()}}, \code{\link[mgcv:clog]{mgcv::clog()}}, \code{\link[mgcv:cpois]{mgcv::cpois()}} and \code{\link[mgcv:bcg]{mgcv::bcg()}}, \code{observation} can contain
 finite \code{left} and \code{right} detection limits and a positive \code{interval_width}.
 Responses outside detection limits are left or right censored. Other
 responses are placed in rounding intervals wholly inside those limits;
@@ -115,12 +115,12 @@ values in intervals crossing a limit are retained exactly. Omitting
 
 Matrix responses use equal entries for exact observations, \verb{(limit, -Inf)}
 for left censoring, \verb{(limit, Inf)} for right censoring, and \verb{(lower, upper)}
-for intervals. \code{bcg()} instead uses zero in the second entry for left
+for intervals. \code{\link[mgcv:bcg]{mgcv::bcg()}} instead uses zero in the second entry for left
 censoring; its limits must be positive. Poisson detection limits must be
 non-integer, and interval widths must be integer numbers of counts. Its
 intervals use half-integer endpoints to avoid ambiguity at count values.
 
-\code{cox.ph()} uses Weibull cumulative baseline hazard
+\code{\link[mgcv:cox.ph]{mgcv::cox.ph()}} uses Weibull cumulative baseline hazard
 \code{H0(t) = (t / baseline_scale)^baseline_shape}, with both baseline parameters
 defaulting to 1. Event times have survival \code{exp(-H0(t) * exp(eta))}.
 Independent exponential censoring has \code{censor_rate = 0.2}; zero disables

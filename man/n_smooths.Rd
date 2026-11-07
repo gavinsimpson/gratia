@@ -36,7 +36,7 @@ to \code{\link[mgcv:gam]{mgcv::gam()}}, \code{\link[mgcv:bam]{mgcv::bam()}}, or 
 How many smooths in a fitted model
 }
 \details{
-For \code{glmmTMB} models, \code{n_smooths()} counts smooth terms across the
+For \code{glmmTMB} models, \code{\link[=n_smooths]{n_smooths()}} counts smooth terms across the
 conditional, zero-inflation and dispersion predictors. Each fitted smooth
 is counted once; native random effects are excluded. Models without smooths
 return integer zero.

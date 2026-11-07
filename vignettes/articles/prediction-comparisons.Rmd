@@ -435,7 +435,7 @@ random effect included, use that plant's assigned origin and treatment.
 
 ### Preserve observation positions when measurements are missing
 
-With `na.exclude`, results evaluated on the fitting data restore excluded rows
+With `na.exclude()`, results evaluated on the fitting data restore excluded rows
 as `NA`. This keeps predictions aligned with the original observation records.
 For illustration, remove one measured response and refit:
 
@@ -467,9 +467,9 @@ fitted_values(m_missing, data = prediction_missing) |>
 ```
 
 The first prediction is available; the second has a missing required predictor
-and retains its row with an `NA` result. `na.omit` retains only fitting rows
+and retains its row with an `NA` result. `na.omit()` retains only fitting rows
 instead. Partial residuals, fitted/posterior samples and simulations likewise
-respect `na.exclude` positions; diagnostic functions align the retained
+respect `na.exclude()` positions; diagnostic functions align the retained
 observations before checking their distributions.
 
 ## Which uncertainty is being propagated?

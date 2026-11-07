@@ -1,7 +1,7 @@
 #' Find the names of model terms
 #'
 #' Returns the names of any terms in a model, without needing to call
-#' `summary()`. The list of model terms is especially useful when predicting
+#' [base::summary()]. The list of model terms is especially useful when predicting
 #' from a [mgcv::gam()] model using the `exclude` or `terms` argument of
 #' [mgcv::predict.gam()] or [mgcv::predict.bam()].
 #'
@@ -79,7 +79,7 @@
 #' the model intercept, from a fitted model object. Predictors without an
 #' intercept return zero.
 #'
-#' @param model a fitted model for which a `coef()` method exists.
+#' @param model a fitted model for which a [stats::coef()] method exists.
 #' @param lp numeric; which linear predictors to extract constant terms for.
 #' @param ... arguments passed to other methods.
 #'

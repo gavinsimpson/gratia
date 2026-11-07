@@ -356,7 +356,7 @@ conditional mixed model, including fitted child and smooth effects. Posterior
 response draws default to uncertainty in those fitted effects. Explicit
 `conditioning = "gam_component"` selects the extracted GAM calculations, and
 is required for posterior response draws at new data or supplied coefficient
-draws. `conditioning = "marginal"` generates new mixed-model effects; for gamm4
+draws. `conditioning = "marginal"` generates new mixed-model effects; for `gamm4()`
 this includes the spline effects represented as random effects, so it asks a
 different question from new measurement errors around a fixed age curve.
 The existing `gamm()` response simulator still defaults to its GAM component;

@@ -9,8 +9,6 @@ test_that("draw works for a simple GJRM gamlss", {
   skip_on_os("win")
 
   # follow example from ?GJRM::gamlss
-  suppressPackageStartupMessages(library("GJRM"))
-
   dataSim <- withr::with_seed(0, {
     n <- 400
     x1 <- round(runif(n))

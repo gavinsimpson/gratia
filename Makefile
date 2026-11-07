@@ -1,5 +1,5 @@
 # Get the version info for later
-.PHONY: docs test test-full test-hgam-paper
+.PHONY: docs build check check-as-cran check-release test test-full test-hgam-paper
 PKGVERS := $(shell sed -n "s/Version: *\([^ ]*\)/\1/p" DESCRIPTION)
 TEST_CPUS ?= 4
 
@@ -41,12 +41,22 @@ build-devel: docs-devel
 
 check: build
 	cd ..; \
-	export NOT_CRAN="true"; \
+	export NOT_CRAN="false"; \
 	export GRATIA_RUN_HGAM="false"; \
 	export TESTTHAT_PARALLEL="true"; \
 	export TESTTHAT_CPUS="$(TEST_CPUS)"; \
 	echo "$${NOT_CRAN}"; \
-	R CMD check gratia_$(PKGVERS).tar.gz
+	R CMD check --as-cran gratia_$(PKGVERS).tar.gz
+
+# Include all local tests, visual snapshots and HGAM paper examples.
+# Limit OpenMP to one thread per R process during building and checking.
+check-release: export OMP_NUM_THREADS = 1
+check-release: export OMP_THREAD_LIMIT = 1
+check-release: build
+	cd .. && \
+	NOT_CRAN=true GRATIA_RUN_HGAM=true VDIFFR_RUN_TESTS=true \
+	TESTTHAT_PARALLEL=true TESTTHAT_CPUS=$(TEST_CPUS) \
+	R CMD check --as-cran gratia_$(PKGVERS).tar.gz
 
 check-openblas: build-openblas
 	cd ..; \
@@ -78,11 +88,7 @@ check-test-cran-atlas: build-atlas
 	echo "$${NOT_CRAN}"; \
 	R-atlas CMD check gratia_$(PKGVERS).tar.gz
 
-check-as-cran: build
-	cd ..;\
-	export NOT_CRAN="false"; \
-	echo "$${NOT_CRAN}"; \
-	R CMD check --as-cran gratia_$(PKGVERS).tar.gz
+check-as-cran: check
 
 check-devel: build-devel
 	cd ..;\

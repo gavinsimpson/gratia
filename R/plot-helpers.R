@@ -56,10 +56,10 @@ prepare_plot_layout <- function(n_plots, ncol = NULL, nrow = NULL) {
 #' @param plots List of ggplot objects.
 #' @param object Data containing `.lower_ci` and `.upper_ci` columns. Fixed
 #'   limits use the entire object, including unselected smooths, as before.
-#' @param scales Either `"fixed"` or `"free"`. Fixed limits use `lims()`, retaining
+#' @param scales Either `"fixed"` or `"free"`. Fixed limits use [ggplot2::lims()], retaining
 #'   its clipping behaviour and existing handling of non-finite bounds.
 #' @param ncol,nrow Requested panel layout dimensions.
-#' @param guides Guide collection policy passed to `patchwork::wrap_plots()`.
+#' @param guides Guide collection policy passed to [patchwork::wrap_plots()].
 #' @param ... Additional patchwork arguments supplied by the public method.
 #' @return A patchwork object.
 #' @keywords internal
@@ -131,7 +131,7 @@ prepare_basis_labels <- function(object, variables, xlab = NULL, ylab = NULL,
 #'
 #' @param object Basis evaluations containing `.by` and `.bf` metadata.
 #' @param variables Up to four covariate names, in plotting order.
-#' @param labeller Facet labeller; `NULL` uses `prefix_label_both`.
+#' @param labeller Facet labeller; `NULL` uses `prefix_label_both()`.
 #' @return A facet specification or `NULL`. Surface plots separate basis
 #'   functions; higher-dimensional plots facet on conditioning covariates.
 #' @keywords internal

@@ -34,7 +34,7 @@ mh_draws(model, ...)
 \arguments{
 \item{model}{a fitted model from \code{\link[mgcv:gam]{mgcv::gam()}}, \code{\link[mgcv:bam]{mgcv::bam()}},
 \code{\link[scam:scam]{scam::scam()}}, or \code{\link[gamm4:gamm4]{gamm4::gamm4()}}, or a model inheriting from these
-classes. See \link{gamm4_support} for sampling from gamm4 fits.}
+classes. See \link{gamm4_support} for sampling from \code{\link[gamm4:gamm4]{gamm4::gamm4()}} fits.}
 
 \item{...}{arguments passed to methods.}
 
@@ -51,15 +51,15 @@ capped at \code{chains}. Existing workers are reused; otherwise temporary worker
 are created and cleaned up. Only used by \code{method = "mh"}.}
 
 \item{burnin}{numeric; the length of any initial burn in period to discard.
-See \code{mgcv::gam.mh()}.}
+See \code{\link[mgcv:gam.mh]{mgcv::gam.mh()}}.}
 
 \item{thin}{positive integer; retain every \code{thin} iterations after burn-in.}
 
 \item{t_df}{numeric; degrees of freedom for static multivariate \emph{t} proposal.
-See \code{mgcv::gam.mh()}.}
+See \code{\link[mgcv:gam.mh]{mgcv::gam.mh()}}.}
 
 \item{rw_scale}{numeric; factor by which to scale posterior covariance
-matrix when generating random walk proposals. See \code{mgcv::gam.mh()}.}
+matrix when generating random walk proposals. See \code{\link[mgcv:gam.mh]{mgcv::gam.mh()}}.}
 
 \item{diagnostics}{logical; calculate coefficient R-hat, effective sample
 sizes, and Monte Carlo standard errors using the optional posterior package.}
@@ -95,7 +95,7 @@ method cannot use are rejected.
 
 For SCAM models, Gaussian draws approximate the distribution of the unrestricted
 fitting coefficients using \code{Vp} (or \code{Ve} with \code{frequentist = TRUE}), then apply
-scam's fitted exponential or \code{notExp} transformation. This is an approximation
+scam's fitted exponential or \code{notExp()} transformation. This is an approximation
 in fitting coordinates, rather than an exact constrained posterior. Supplied
 draws must already use the transformed coordinates in \code{coef(model)} order.
 Numerically singular covariance matrices are sampled by eigen decomposition;
@@ -141,7 +141,7 @@ or covariance coefficients in general families. \code{unconditional} applies
 to Gaussian draws only.
 
 GAM-class fits with linear inequality constraints, including
-\code{mgcv::scasm()} fits, store these as \code{Ain \%*\% coefficients >= bin}.
+\code{\link[mgcv:scasm]{mgcv::scasm()}} fits, store these as \code{Ain \%*\% coefficients >= bin}.
 Gaussian sampling uses the fitted covariance matrix without enforcing
 these inequalities and issues a warning. Sampled smooths can therefore
 violate the fitted shape constraints. Pointwise intervals computed from
@@ -149,7 +149,7 @@ the same Gaussian covariance approximation also need not preserve those
 shapes. All MH backends are unavailable for these fits because
 the samplers do not enforce their inequalities.
 
-If \code{mgcv::scasm()} was fitted with \code{bs > 0}, its \code{bs} component stores
+If \code{\link[mgcv:scasm]{mgcv::scasm()}} was fitted with \code{bs > 0}, its \code{bs} component stores
 coefficient draws from the native constrained bootstrap in columns. These
 can be supplied explicitly as \code{draws = t(model$bs)} with \code{method = "user"}.
 The result then describes bootstrap variation, rather than Gaussian

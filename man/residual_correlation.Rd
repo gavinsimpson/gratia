@@ -43,7 +43,7 @@ used for fitting or of the original observations. BAM's \code{AR.start} boundari
 retained, even if \code{series} is supplied. Other fitters need an explicit series
 and appropriately ordered fitting data when separate time series are present.}
 
-\item{seed}{optional seed for randomized residuals.}
+\item{seed}{optional seed for randomised residuals.}
 
 \item{...}{arguments used to prepare the model for diagnostics, including
 \code{conditioning} and, for sdmTMB, \code{field_method}.}
@@ -64,10 +64,10 @@ bands or significance tests.
 \details{
 Use \code{type = "dharma"} and \code{n_dharma} for simulation-based PIT residuals
 on the uniform scale; see \code{\link[=dharma_residuals]{dharma_residuals()}}.
-Use \code{type = "surrogate"} for \code{ocat()} models to calculate correlations of
+Use \code{type = "surrogate"} for \code{\link[mgcv:ocat]{mgcv::ocat()}} models to calculate correlations of
 residuals on the latent logistic scale; see \code{\link[=surrogate_residuals]{surrogate_residuals()}}.
 
-BAM's generalized estimating equations (GEE) AR1 correction acts on the
+BAM's generalised estimating equations (GEE) AR1 correction acts on the
 weighted working response used for fitting. Whitening
 these working residuals can reveal remaining serial structure. The stored
 \code{std.rsd} in current mgcv adjusts its final residuals for AR1 correlation,

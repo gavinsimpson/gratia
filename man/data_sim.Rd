@@ -58,8 +58,8 @@ categories: \code{length(cuts) == n_cat - 1}.}
 generating data with grouped families for use with \code{family = gfam()}. The
 allowed distributions as as per \code{dist}.}
 
-\item{family}{an instantiated family object, such as \code{poisson()} or
-\code{mgcv::gaulss()}. Cannot be combined with explicitly supplied \code{dist},
+\item{family}{an instantiated family object, such as \code{\link[stats:poisson]{stats::poisson()}} or
+\code{\link[mgcv:gaulss]{mgcv::gaulss()}}. Cannot be combined with explicitly supplied \code{dist},
 \code{scale}, \code{theta}, \code{power}, \code{n_cat}, \code{cuts} or \code{gfam_families}. See
 \link{data_sim_families} for coverage and generating parameters.}
 
@@ -173,7 +173,7 @@ Models named \code{"sc_increasing"}, \code{"sc_decreasing"}, \code{"sc_convex"},
 coordinates; \code{"sc_location_scale"} has a concave log-mean and increasing
 log dispersion. The latter defaults to \code{family = mgcv::gammals()}; other
 shape templates default to Gaussian noise with standard deviation 0.2.
-See \link{data_sim_shapes} for functions, derivatives and \code{mgcv::scasm()} recipes.
+See \link{data_sim_shapes} for functions, derivatives and \code{\link[mgcv:scasm]{mgcv::scasm()}} recipes.
 }
 
 \examples{

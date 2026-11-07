@@ -5,8 +5,8 @@
 #' @param ... arguments passed to other methods.
 #'
 #' @details
-#' With `na.exclude`, excluded observations are restored as `NA` partial
-#' residuals, in fitting order after any `subset`. With `na.omit`, only retained
+#' With [stats::na.exclude()], excluded observations are restored as `NA` partial
+#' residuals, in fitting order after any `subset`. With [stats::na.omit()], only retained
 #' observations are returned. Computation uses aligned working residuals,
 #' working weights and term predictions before restoring excluded positions.
 #'
@@ -167,20 +167,20 @@ check_partial_residuals <- function(object, warn = FALSE) {
 #'   one column per response; selecting one returns a vector. Grouped-family
 #'   residuals are always vectors.
 #' @details
-#' With `na.exclude`, excluded observations are restored as `NA` residuals;
-#' with `na.omit`, only observations used for fitting are returned. Selecting a
+#' With [stats::na.exclude()], excluded observations are restored as `NA` residuals;
+#' with [stats::na.omit()], only observations used for fitting are returned. Selecting a
 #' grouped-family component with `response` returns only its retained fitting
 #' observations, without placeholders for excluded rows whose component
 #' membership is unavailable.
 #'
-#' For `mgcv::cnorm()`, `mgcv::clog()` and `mgcv::cpois()` models, censored
+#' For [mgcv::cnorm()], [mgcv::clog()] and [mgcv::cpois()] models, censored
 #' observations have PIT residuals sampled uniformly between `F(l)` and `F(u)`.
 #' Here `l` and `u` bound the censoring interval and `F` is the fitted cumulative
 #' distribution function (CDF) of the underlying response. Left and right
 #' censoring use probabilities zero and one for the unbounded end, respectively.
-#' Quantile residuals apply `qnorm()` to these PIT values. Uncensored continuous
+#' Quantile residuals apply [stats::qnorm()] to these PIT values. Uncensored continuous
 #' observations use `F(y)`; uncensored Poisson observations are randomised between
-#' `F(y - 1)` and `F(y)`. Use non-integer censoring limits for `cpois()`, as
+#' `F(y - 1)` and `F(y)`. Use non-integer censoring limits for [mgcv::cpois()], as
 #' recommended by mgcv.
 #'
 #' For grouped-family GAMs fitted with [mgcv::gfam()], each observation uses its
@@ -202,7 +202,7 @@ check_partial_residuals <- function(object, warn = FALSE) {
 #' clipped, so true zero-probability tails still give infinite residuals for
 #' ordinary models; grouped diagnostics report non-finite residuals as errors.
 #' PITs are returned as ordinary probabilities and may still round to zero or
-#' one in extreme tails. Applying `qnorm()` to returned PITs can therefore be
+#' one in extreme tails. Applying [stats::qnorm()] to returned PITs can therefore be
 #' less accurate than requesting quantile residuals directly. CDFs without log
 #' probabilities retain ordinary-probability calculations.
 #'
@@ -211,7 +211,7 @@ check_partial_residuals <- function(object, warn = FALSE) {
 #' its PIT is `F(j - 1) + V * p_j`, where `V` is uniform on `(0, 1)`.
 #' This uses one categorical response, rather than a vector of trial counts.
 #' The coding does not change the multinomial likelihood into an ordinal model.
-#' Each fixed enumeration gives a uniform randomized transform under the true
+#' Each fixed enumeration gives a uniform randomised transform under the true
 #' model, but changing the enumeration can change individual residuals and
 #' which departures from the model are easiest to detect.
 #'

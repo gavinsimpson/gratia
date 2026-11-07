@@ -17,7 +17,7 @@
 #'   used for fitting or of the original observations. BAM's `AR.start` boundaries are always
 #'   retained, even if `series` is supplied. Other fitters need an explicit series
 #'   and appropriately ordered fitting data when separate time series are present.
-#' @param seed optional seed for randomized residuals.
+#' @param seed optional seed for randomised residuals.
 #' @inheritParams appraise
 #' @param ... arguments used to prepare the model for diagnostics, including
 #'   `conditioning` and, for sdmTMB, `field_method`.
@@ -26,10 +26,10 @@
 #' @details
 #' Use `type = "dharma"` and `n_dharma` for simulation-based PIT residuals
 #' on the uniform scale; see [dharma_residuals()].
-#' Use `type = "surrogate"` for `ocat()` models to calculate correlations of
+#' Use `type = "surrogate"` for [mgcv::ocat()] models to calculate correlations of
 #' residuals on the latent logistic scale; see [surrogate_residuals()].
 #'
-#' BAM's generalized estimating equations (GEE) AR1 correction acts on the
+#' BAM's generalised estimating equations (GEE) AR1 correction acts on the
 #' weighted working response used for fitting. Whitening
 #' these working residuals can reveal remaining serial structure. The stored
 #' `std.rsd` in current mgcv adjusts its final residuals for AR1 correlation,

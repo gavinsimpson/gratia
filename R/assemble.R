@@ -38,7 +38,7 @@
 #'   distributional parameter as described in [draw.gam()]. Custom labels, including
 #'   `subtitle`, can be passed through `...`. Use `cyclic = "polar"` to draw
 #'   one-dimensional cyclic smooths with polar coordinates; `polar_args`
-#'   customizes the coordinate display as described in [draw.gam()].
+#'   customises the coordinate display as described in [draw.gam()].
 #' @param ... Additional smooth plotting arguments, including `title`,
 #'   `subtitle`, `xlab` and `ylab`. `subtitle` also applies to parametric panels;
 #'   use `NULL` for automatic predictor labels or `""` to suppress them.
@@ -46,7 +46,7 @@
 #' @note Internally, plots of each smooth are created using [ggplot2::ggplot()]
 #'   and composed into a single plot using [patchwork::wrap_plots()]. As a
 #'   result, it is not possible to use `+` to add to the plots in the way one
-#'   might typically work with `ggplot()` plots. Instead, use the `&` operator;
+#'   might typically work with [ggplot2::ggplot()] plots. Instead, use the `&` operator;
 #'   see the examples.
 #'
 #' @return A list of [ggplot2::ggplot()] objects.

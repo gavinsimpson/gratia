@@ -39,7 +39,7 @@ predicted_samples(model, ...)
 \item{...}{arguments passed to other methods. For \code{fitted_samples()}, these
 are passed on to \code{\link[mgcv:predict.gam]{mgcv::predict.gam()}}. For \code{posterior_samples()} these are
 passed on to \code{fitted_samples()}. For \code{predicted_samples()} these are
-passed on to the relevant \code{simulate()} method.}
+passed on to the relevant \code{\link[stats:simulate]{stats::simulate()}} method.}
 
 \item{data}{data frame; new observations at which the posterior draws
 from the model should be evaluated. If not supplied, the data used to fit
@@ -54,21 +54,21 @@ at the fitted parameters. Required; coefficient chains are not used.}
 explicit vector overrides the fitting weights; a single value applies to
 every observation. With \code{data = NULL}, the default is the fitted prior
 weights, except factor-valued binomial responses retain one Bernoulli trial
-per observation. Native \code{gaulss()} ignores fitting weights in its likelihood,
+per observation. Native \code{\link[mgcv:gaulss]{mgcv::gaulss()}} ignores fitting weights in its likelihood,
 so its default response weights are also ones; explicitly supplied sampling
 weights still override this default. With prediction data, weights default
 to a vector of ones.
 For ordinary Gaussian and Gamma responses, larger weights reduce response
 variance (precision weights). For binomial responses, weights give integer
 trial counts. They do not alter the fitted coefficient covariance. Include
-positions restored by \code{na.exclude} when supplying weights for fitting rows.}
+positions restored by \code{\link[stats:na.exclude]{stats::na.exclude()}} when supplying weights for fitting rows.}
 
 \item{marginalise}{\code{NULL} retains the usual predictions. \code{TRUE} selects all
 supported \code{re} and \code{fs} terms; character vectors select exact smooth labels.
 Fitted predictions integrate response means over new zero-mean Gaussian
 effects. Response samplers draw new effects before sampling responses.
-Smoothing parameters and dispersion remain fixed. Only ordinary \code{gam()}
-and \code{bam()} fits with a scalar response mean are supported.}
+Smoothing parameters and dispersion remain fixed. Only ordinary \code{\link[mgcv:gam]{mgcv::gam()}}
+and \code{\link[mgcv:bam]{mgcv::bam()}} fits with a scalar response mean are supported.}
 }
 \value{
 A tibble (data frame) with 3 columns containing the posterior
@@ -83,7 +83,7 @@ relates to,
 }
 \description{
 Predicted values of the response (new response data) are drawn from the
-fitted model, created via \code{simulate()} (e.g. \code{\link[=simulate.gam]{simulate.gam()}}) and returned
+fitted model, created via \code{\link[stats:simulate]{stats::simulate()}} (e.g. \code{\link[=simulate.gam]{simulate.gam()}}) and returned
 in a tidy, long, format. These predicted values do not include the
 uncertainty in the estimated model; they are simply draws from the
 conditional distribution of the response.

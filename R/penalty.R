@@ -38,7 +38,7 @@
 #' * `.value` - double; the value of the penalty matrix for the combination of
 #'   `row` and `col`,
 #'
-#' @note The `print()` method uses [base::zapsmall()] to turn very small numbers
+#' @note The [base::print()] method uses [base::zapsmall()] to turn very small numbers
 #'   into 0s for display purposes only; the underlying values of the penalty
 #'   matrix or matrices are not changed.
 #'

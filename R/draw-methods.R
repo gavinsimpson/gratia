@@ -1263,15 +1263,15 @@ difference_value_label <- function(object) {
       cols = vars(.data[[xvars[4L]]]), labeller = label_both)
 }
 
-#' Display penalty matrices of smooths using `ggplot`
+#' Display penalty matrices of smooths using [ggplot2::ggplot()]
 #'
-#' Displays the penalty matrices of smooths as a heatmap using `ggplot`
+#' Displays the penalty matrices of smooths as a heatmap using [ggplot2::ggplot()]
 #'
 #' @param geom character; either `"raster"` (the default) or `"tile"`.
 #'   Raster rendering uses an image for the matrix, which can keep large PDF
 #'   plots compact. Tile rendering uses individual rectangles, providing vector
 #'   cells in PDF and SVG output, but can increase file size for large matrices.
-#' @param normalize logical; normalize the penalty to the range -1, 1?
+#' @param normalize logical; normalise the penalty to the range -1, 1?
 #' @param as_matrix logical; how should the plotted penalty matrix be oriented?
 #'   If `TRUE` row 1, column 1 of the penalty matrix is draw in the upper left,
 #'   whereas, if `FALSE` it is drawn in the lower left of the plot.

@@ -121,7 +121,7 @@ error; a normal approximation must be requested explicitly.}
 
 \item{type}{Residual type; \code{NULL} follows the model-specific defaults in
 \code{\link[=appraise]{appraise()}}. PIT and quantile residuals are available for supported response
-distributions. \code{"surrogate"} is available for \code{ocat()} and \code{multinom()}
+distributions. \code{"surrogate"} is available for \code{\link[mgcv:ocat]{mgcv::ocat()}} and \code{\link[mgcv:multinom]{mgcv::multinom()}}
 GAMs with \code{method = NULL}: logistic references for ordinal residuals and
 centred Gumbel references for each nominal category utility. Nominal
 components always have separate panels. Their residuals are drawn once
@@ -136,7 +136,7 @@ See \code{\link[=surrogate_residuals]{surrogate_residuals()}} and \link{diagnost
 \item{n_simulate}{numeric; number of data sets to simulate from the estimated
 model when using the simulation method (\code{method = "simulate"}).}
 
-\item{seed}{Random seed for QQ calculations or randomized residuals. Explicit
+\item{seed}{Random seed for QQ calculations or randomised residuals. Explicit
 seeds preserve the caller's RNG state, including an absent state.}
 
 \item{level}{Coverage of pointwise QQ reference intervals, strictly between
@@ -170,7 +170,7 @@ settings instead. Colour used to draw the reference line.}
 \item{by_family}{logical or \code{NULL}; separate indexed grouped-family components
 into facets. The default pools quantile residuals with component colours
 and facets traditional residuals. \code{TRUE} and \code{FALSE} explicitly select the
-layout. In \code{appraise()}, observed-versus-fitted values always use component
+layout. In \code{\link[=appraise]{appraise()}}, observed-versus-fitted values always use component
 facets. Standalone \code{observed_fitted_plot()} facets by default and permits
 explicit pooling. Ignored for ordinary models.}
 
@@ -244,7 +244,7 @@ predictor.
 Grouped-family models retain the residual defaults, component reference
 distributions, predictor ranks and layout controls of \code{\link[=appraise]{appraise()}}. QQ
 bin limits apply separately to each component. Pooled residual
-heatmaps summarize the component mixture rather than colouring individual
+heatmaps summarise the component mixture rather than colouring individual
 observations; observed-versus-fitted appraisals always separate components.
 Pooled histograms use faint component-coloured fills with opaque stepped
 upper boundaries, retaining common bin edges and component densities.
@@ -254,7 +254,7 @@ and show conditioning and field choices in the caption where relevant,
 matching \code{\link[=residuals_linpred_plot]{residuals_linpred_plot()}}. Supply \code{caption = ""} to omit the caption.
 
 Kernel density estimates are calculated on a fixed grid before plotting.
-Each predictor slice is normalized to integrate to one over the displayed
+Each predictor slice is normalised to integrate to one over the displayed
 residual grid. Bandwidths, rather than \code{density_bins}, control smoothing;
 increase grid resolution when using small bandwidths. A square-root fill
 transformation reveals low-density regions while retaining density units

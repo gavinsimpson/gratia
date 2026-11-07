@@ -78,7 +78,7 @@ With \code{NULL}, the current random number state is used and advanced.}
 the Bayesian covariance matrix, if available. Otherwise a warning is
 issued and the uncorrected covariance is used.}
 
-\item{interval_method}{character; \code{"auto"} uses stored scasm bootstrap draws
+\item{interval_method}{character; \code{"auto"} uses stored \code{\link[mgcv:scasm]{mgcv::scasm()}} bootstrap draws
 for pointwise intervals when available and Gaussian intervals otherwise.
 \code{"gaussian"} requests covariance-based limits and \code{"bootstrap"} requires
 stored draws. Simultaneous bootstrap bands are unsupported. Shape-enforced
@@ -100,8 +100,8 @@ An explicit index must agree with membership recoverable from \code{data}.}
 supported \code{re} and \code{fs} terms; character vectors select exact smooth labels.
 Fitted predictions integrate response means over new zero-mean Gaussian
 effects. Response samplers draw new effects before sampling responses.
-Smoothing parameters and dispersion remain fixed. Only ordinary \code{gam()}
-and \code{bam()} fits with a scalar response mean are supported.}
+Smoothing parameters and dispersion remain fixed. Only ordinary \code{\link[mgcv:gam]{mgcv::gam()}}
+and \code{\link[mgcv:bam]{mgcv::bam()}} fits with a scalar response mean are supported.}
 
 \item{integration}{Integration method when \code{marginalise} is supplied:
 \code{"quadrature"} (the default) or \code{"monte_carlo"}. Both integrate
@@ -134,7 +134,7 @@ on the specified scale.
 
 Models fitted with certain families will include additional variables
 \itemize{
-\item \code{mgcv::ocat()} models: when \code{quantity = "expectation"}, the returned object will
+\item \code{\link[mgcv:ocat]{mgcv::ocat()}} models: when \code{quantity = "expectation"}, the returned object will
 contain a \code{.row} column and a \code{.category} column, which indicate to which row
 of the \code{data} each row of the returned object belongs. Additionally, there
 will be \code{nrow(data) * n_categories} rows in the returned object; each row
@@ -179,7 +179,7 @@ link-scale meaning; category-probability and expectation standard errors are
 on the response scale. Unsupported simultaneous or bootstrap transformations
 are rejected rather than combining marginal parameter intervals.
 
-Native scasm fits with stored bootstrap draws use mgcv's pointwise limits
+Native \code{\link[mgcv:scasm]{mgcv::scasm()}} fits with stored bootstrap draws use mgcv's pointwise limits
 by default, including its \code{svar.only} correction for smoothing bias.
 \code{interval_method = "gaussian"} restores covariance-based limits. \code{.se}
 retains its existing covariance-based meaning. No replicates are generated.
@@ -197,16 +197,16 @@ In contrast, \code{\link[=fitted_samples]{fitted_samples()}} retains fitting-arg
 \code{data} argument is \code{NULL}. Put offsets in the formula to evaluate them at
 new observations.
 
-With \code{data = NULL}, results follow the model's \code{na.action}: \code{na.exclude}
+With \code{data = NULL}, results follow the model's \code{na.action}: \code{\link[stats:na.exclude]{stats::na.exclude()}}
 restores excluded observations as \code{NA} fitted values, standard errors and
-interval bounds; \code{na.omit} returns only retained observations. Covariates
+interval bounds; \code{\link[stats:na.omit]{stats::na.omit()}} returns only retained observations. Covariates
 unavailable in the stored model frame are restored as typed \code{NA} values.
 \code{.row} indexes the fitting data after any \code{subset} was applied.
 
 Supplying \code{data} requests predictions at those rows, independently of training
 exclusions. Missing responses do not prevent prediction. Missing required
 predictors produce \code{NA} results by default. An explicit \code{na.action} passed
-through \code{...} is honoured; with \code{na.omit}, \code{.row} retains the positions in the
+through \code{...} is honoured; with \code{\link[stats:na.omit]{stats::na.omit()}}, \code{.row} retains the positions in the
 supplied data, rather than numbering the remaining rows consecutively.
 
 For supplied prediction data, an informative message identifies combinations
@@ -214,7 +214,7 @@ of categorical predictor levels absent from the retained fitting observations.
 Predictions are unchanged: an unobserved combination is not necessarily
 non-estimable, particularly in additive models. Numeric-by-factor range
 extrapolation is not checked. Missing predictors and genuinely new factor
-levels retain their usual prediction behavior.
+levels retain their usual prediction behaviour.
 
 Simultaneous intervals jointly cover the model's underlying expected
 responses, or linear predictors on the link scale, at all valid covariate
@@ -229,13 +229,13 @@ define separate simultaneous sets. These are uncertainty intervals for model
 predictions, not prediction intervals for future observations.
 
 Simultaneous intervals use joint Gaussian coefficient draws and a critical
-value based on the maximum absolute standardized deviation over the supplied
+value based on the maximum absolute standardised deviation over the supplied
 rows. Their limits are computed on the link scale and transformed if
 \code{scale = "response"}; \code{.se} remains on the link scale. The simulation
 covariance may be positive semidefinite. Supported families are Gaussian,
 Poisson, binomial, Gamma, inverse Gaussian, quasi families, negative binomial,
-Tweedie, beta regression, and scaled t, fitted by \code{gam()} or \code{bam()} (including
-the \code{gam} component of a \code{gamm()} fit), and by \code{scam()}. For SCAM models,
+Tweedie, beta regression, and scaled t, fitted by \code{\link[mgcv:gam]{mgcv::gam()}} or \code{\link[mgcv:bam]{mgcv::bam()}} (including
+the \code{gam} component of a \code{\link[mgcv:gamm]{mgcv::gamm()}} fit), and by \code{\link[scam:scam]{scam::scam()}}. For SCAM models,
 the Gaussian approximation uses transformed coefficients conditional on
 the fitted smoothing parameters. Other families support pointwise intervals
 only.

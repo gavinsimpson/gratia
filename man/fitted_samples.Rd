@@ -74,7 +74,7 @@ fitted_samples(model, ...)
 \item{...}{arguments passed to other methods. For \code{fitted_samples()}, these
 are passed on to \code{\link[mgcv:predict.gam]{mgcv::predict.gam()}}. For \code{posterior_samples()} these are
 passed on to \code{fitted_samples()}. For \code{predicted_samples()} these are
-passed on to the relevant \code{simulate()} method.}
+passed on to the relevant \code{\link[stats:simulate]{stats::simulate()}} method.}
 
 \item{data}{data frame; new observations at which the posterior draws
 from the model should be evaluated. If not supplied, the data used to fit
@@ -142,8 +142,8 @@ a full design matrix,
 smoothing penalty, and proposal factorisation once for all chains.}
 
 \item{mvn_method}{character; one of \code{"mvnfast"} or \code{"mgcv"}. The default is
-uses \code{mvnfast::rmvn()}, which can be considerably faster at generate large
-numbers of MVN random values than \code{mgcv::rmvn()}, but which might not work
+uses \code{\link[mvnfast:rmvn]{mvnfast::rmvn()}}, which can be considerably faster at generate large
+numbers of MVN random values than \code{\link[mgcv:rmvn]{mgcv::rmvn()}}, but which might not work
 for some marginal fits, such as those where the covariance matrix is close
 to singular.}
 
@@ -173,8 +173,8 @@ parameter on which it depends, on the response scale only.}
 supported \code{re} and \code{fs} terms; character vectors select exact smooth labels.
 Fitted predictions integrate response means over new zero-mean Gaussian
 effects. Response samplers draw new effects before sampling responses.
-Smoothing parameters and dispersion remain fixed. Only ordinary \code{gam()}
-and \code{bam()} fits with a scalar response mean are supported.}
+Smoothing parameters and dispersion remain fixed. Only ordinary \code{\link[mgcv:gam]{mgcv::gam()}}
+and \code{\link[mgcv:bam]{mgcv::bam()}} fits with a scalar response mean are supported.}
 
 \item{integration}{Integration method when \code{marginalise} is supplied:
 \code{"quadrature"} (the default) or \code{"monte_carlo"}. Both integrate
@@ -228,14 +228,14 @@ Parameter names and definitions are available through \code{\link[=family_parame
 Gaussian LSS returns \code{mean} and \code{sd}, GEV returns \code{location}, \code{scale} and
 \code{shape}, and sinh-arcsinh returns \code{location}, \code{scale}, \code{skewness} and
 \code{tailweight}. These shape parameters are not response moments. Natural
-parameters can differ from native mgcv predictions and \code{inv_link()} values.
+parameters can differ from native mgcv predictions and \code{\link[=inv_link]{inv_link()}} values.
 Every parameter in one draw uses the same joint coefficient draw. Global
 parameters outside the coefficient vector remain fixed and are described
 in the metadata, rather than returned as fitted parameters.
 
 Use \code{quantity = "expectation"} for expected responses labelled
 \code{"expectation"}. This includes Gumbel, GEV and sinh-arcsinh mean adjustments
-and the zero-truncated Poisson adjustment in \code{ziplss()}. A GEV expectation
+and the zero-truncated Poisson adjustment in \code{\link[mgcv:ziplss]{mgcv::ziplss()}}. A GEV expectation
 does not exist at shape >= 1; parameter and response draws remain available.
 Categorical expectations are category probabilities, not numeric category
 scores. \code{.category} identifies categories, and \code{.y} identifies multivariate
@@ -262,12 +262,12 @@ Grouped expectations include scalar fitted means and ordinal category
 probabilities, with \code{.category} identifying the ordinal category and \code{NA}
 for scalar components. Distributional nuisance parameters are held at
 their fitted values. This does not add support for general/location-scale
-families that \code{gfam()} itself rejects, nor repair upstream fitting failures
-(including fixed-theta negative-binomial components and some \code{ziP()} fits
+families that \code{\link[mgcv:gfam]{mgcv::gfam()}} itself rejects, nor repair upstream fitting failures
+(including fixed-theta negative-binomial components and some \code{\link[mgcv:ziP]{mgcv::ziP()}} fits
 in some mgcv versions).
 
 Observation rows use the same missing-value convention as
-\code{\link[=posterior_samples]{posterior_samples()}}: default results restore \code{na.exclude} observations in
+\code{\link[=posterior_samples]{posterior_samples()}}: default results restore \code{\link[stats:na.exclude]{stats::na.exclude()}} observations in
 every draw, while explicit \code{data} are evaluated in their own row order.
 }
 \section{Note}{

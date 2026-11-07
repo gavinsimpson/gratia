@@ -87,14 +87,14 @@ the smooth?}
 
 \item{ncores}{number of cores for generating random variables from a
 multivariate normal distribution. Passed to \code{\link[mvnfast:rmvn]{mvnfast::rmvn()}}.
-Parallelization will take place only if OpenMP is supported (but appears
+Parallelisation will take place only if OpenMP is supported (but appears
 to work on Windows with current \code{R}).}
 
 \item{partial_match}{logical; should matching \code{parm} use a partial match or
 an exact match? Can only be used if \code{length(parm)} is \code{1}.}
 
 \item{...}{additional arguments passed to \code{\link[=smooth_estimates]{smooth_estimates()}}, including
-\code{interval_method} to select Gaussian, stored scasm bootstrap, or
+\code{interval_method} to select Gaussian, stored \code{\link[mgcv:scasm]{mgcv::scasm()}} bootstrap, or
 shape-enforced intervals, and \code{shape_source} to choose their initial source.
 \code{simultaneous_method}, \code{simultaneous_domain}, and \code{tube_control} request
 and configure continuous-interval tube bands; see \link{simultaneous_bands}.}
@@ -125,7 +125,7 @@ Calculates point-wise confidence or simultaneous intervals for the smooth
 terms of a fitted GAM.
 }
 \details{
-For SCAM fits, \code{confint()} returns intervals for smooth functions,
+For SCAM fits, \code{\link[stats:confint]{stats::confint()}} returns intervals for smooth functions,
 with \code{parm} selecting smooth labels. It uses transformed-coefficient
 Gaussian uncertainty conditional on the fitted smoothing parameters.
 By default, intercept uncertainty is excluded. These intervals do not
@@ -136,7 +136,7 @@ enforce shape constraints on their limits.
 intervals. Each simultaneous band covers the evaluation points of one
 fitted smooth by default, or its continuous domain with tube calibration;
 separate smooths do not form a joint coverage set.
-Native scasm fits default to \code{overall_uncertainty = FALSE} and use stored
+Native \code{\link[mgcv:scasm]{mgcv::scasm()}} fits default to \code{overall_uncertainty = FALSE} and use stored
 bootstrap draws for pointwise intervals when available, as in
 \code{\link[=smooth_estimates]{smooth_estimates()}}. Shifting and transforming a smooth preserves its
 interval limits, including asymmetric bootstrap limits.
