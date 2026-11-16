@@ -39,3 +39,45 @@ builder_diagnostic_step <- function(label, code) {
   checkpoint("DONE")
   value
 }
+
+# Keep the last call's arguments on disk for replay in a fresh R session:
+# input <- readRDS("check-spatial-trace.log.rds")
+# do.call(get(input$function_name, asNamespace("sf")), input$arguments)
+local_spatial_trace <- function(file) {
+  if (!nzchar(file)) return(invisible(NULL))
+
+  ns <- asNamespace("sf")
+  version <- as.character(utils::packageVersion("sf"))
+  native_input <- paste0(file, ".rds")
+  functions <- intersect(c("CPL_transform", "CPL_transform_bounds",
+    "CPL_crs_equivalent", "CPL_crs_parameters", "CPL_crs_from_input",
+    "CPL_wrap_dateline", "CPL_gdal_segmentize", "CPL_geos_op",
+    "CPL_geos_op2", "CPL_geos_binop", "CPL_geos_normalize",
+    "CPL_geos_is_valid", "CPL_geos_is_empty", "CPL_get_bbox"), ls(ns))
+
+  record <- function(...) {
+    cat(format(Sys.time(), "%Y-%m-%d %H:%M:%S", tz = "UTC"), ..., "\n",
+      file = file, append = TRUE)
+  }
+  checkpoint <- function(name, frame) {
+    record("ENTER", name)
+    arguments <- mget(names(formals(get(name, ns))), frame, inherits = FALSE)
+    saveRDS(list(package = version, function_name = name, arguments = arguments),
+      native_input, compress = FALSE)
+    record("START", name)
+  }
+
+  record("Tracing sf", version, "in R process", Sys.getpid())
+  traced <- character()
+  withr::defer({
+    for (name in traced) suppressMessages(untrace(name, where = ns))
+    record("Finished tracing sf")
+  }, envir = parent.frame())
+  for (name in functions) {
+    suppressMessages(trace(name, where = ns, print = FALSE,
+      tracer = bquote(.(checkpoint)(.(name), environment())),
+      exit = bquote(.(record)("EXIT", .(name)))))
+    traced <- c(traced, name)
+  }
+  invisible(NULL)
+}
