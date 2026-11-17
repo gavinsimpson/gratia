@@ -7,10 +7,14 @@ on:
     branches: [main, master]
   workflow_dispatch:
     inputs:
-      full_linux_and_windows_arm:
-        description: Run only the full Ubuntu release and Windows ARM checks
-        type: boolean
-        default: false
+      check_targets:
+        description: Package checks to run
+        type: choice
+        options:
+          - default
+          - ubuntu-release-and-windows-arm
+          - windows-arm
+        default: default
   workflow_call:
     inputs:
       config:
@@ -35,7 +39,9 @@ jobs:
       matrix:
         # The weekly workflow supplies the broader compatibility matrix.
         config: >-
-          ${{ fromJSON(inputs.config || (inputs.full_linux_and_windows_arm && '[
+          ${{ fromJSON(inputs.config || (inputs.check_targets == 'windows-arm' && '[
+            {"os": "windows-11-arm", "r": "release", "tests": "full", "not_cran": "true"}
+          ]' || inputs.check_targets == 'ubuntu-release-and-windows-arm' && '[
             {"os": "ubuntu-latest", "r": "release", "tests": "full", "not_cran": "true"},
             {"os": "windows-11-arm", "r": "release", "tests": "full", "not_cran": "true"}
           ]' || '[
@@ -104,6 +110,32 @@ jobs:
         env:
           GRATIA_TEST_PROGRESS: ${{ runner.temp }}/spherical-test-progress.log
         run: Rscript --vanilla tools/test-spherical-plots.R 2>&1 | tee "$RUNNER_TEMP/spherical-test-output.log"
+        shell: bash
+
+      - name: Replay the spherical layer with the vctrs binary
+        if: runner.os == 'Windows' && runner.arch == 'ARM64'
+        continue-on-error: true
+        run: |
+          Rscript --vanilla tools/test-spherical-ptype.R "$RUNNER_TEMP/spherical-test-progress.log-layer.rds" \
+            2>&1 | tee "$RUNNER_TEMP/spherical-ptype-binary.log"
+        shell: bash
+
+      - name: Build the same vctrs release from source on Windows ARM
+        if: runner.os == 'Windows' && runner.arch == 'ARM64'
+        shell: Rscript {0}
+        run: |
+          version <- packageVersion("vctrs")
+          package_library <- dirname(find.package("vctrs"))
+          options(warn = 2)
+          install.packages("vctrs", lib = package_library, type = "source",
+            repos = "https://cloud.r-project.org")
+          stopifnot(packageVersion("vctrs", lib.loc = package_library) == version)
+
+      - name: Replay the spherical layer with source-built vctrs
+        if: runner.os == 'Windows' && runner.arch == 'ARM64'
+        run: |
+          Rscript --vanilla tools/test-spherical-ptype.R "$RUNNER_TEMP/spherical-test-progress.log-layer.rds" \
+            2>&1 | tee "$RUNNER_TEMP/spherical-ptype-source.log"
         shell: bash
 
       - name: Report macOS storage and file limits
@@ -180,6 +212,7 @@ jobs:
             ${{ runner.temp }}/threshold-test-progress.log
             ${{ runner.temp }}/spherical-test-output.log
             ${{ runner.temp }}/spherical-test-progress.log*
+            ${{ runner.temp }}/spherical-ptype-*.log
             ${{ runner.temp }}/check-test-progress.log
             ${{ runner.temp }}/check-spatial-trace.log*
             ${{ runner.temp }}/windows-r-crashes.log

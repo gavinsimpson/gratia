@@ -115,7 +115,7 @@ local_plot_build_trace <- function() {
     }
   }, envir = parent.frame())
 
-  trace_steps <- function(name, where, label) {
+  trace_steps <- function(name, where, label, save_layer = FALSE) {
     fn <- get0(name, where, inherits = FALSE)
     if (!is.function(fn) || !is.call(body(fn)) ||
         !identical(body(fn)[[1L]], as.name("{"))) {
@@ -124,11 +124,17 @@ local_plot_build_trace <- function() {
     }
     steps <- as.list(body(fn))[-1L]
     labels <- vapply(steps, deparse, character(1L), width.cutoff = 100L, nlines = 1L)
+    prototype_step <- if (save_layer) {
+      which(vapply(steps, identical, logical(1L), quote(ptype <- vec_ptype(data))))
+    }
     mark_step <- function(frame) {
       key <- ".gratia_trace_step"
       step <- get0(key, frame, inherits = FALSE, ifnotfound = 0L) + 1L
       assign(key, step, frame)
       record("STEP", label, step, labels[[step]])
+      if (step %in% prototype_step && inherits(frame$data$geometry, "sfc")) {
+        saveRDS(frame$data, paste0(file, "-layer.rds"))
+      }
     }
     suppressMessages(trace(name, where = where, print = FALSE,
       at = as.list(seq_along(steps) + 1L),
@@ -140,13 +146,17 @@ local_plot_build_trace <- function() {
   trace_steps("ggplot_build", gg, "ggplot2::ggplot_build")
   trace_steps("ggplot_build.ggplot2::ggplot", get(".__S3MethodsTable__.", gg),
     "ggplot2 ggplot build method")
+  trace_steps("compute_statistic", get("Layer", gg),
+    "ggplot2::Layer$compute_statistic", save_layer = TRUE)
+  trace_steps("compute_panel", ggplot2::StatSf, "ggplot2::StatSf$compute_panel")
+  trace_steps("sf_transform_xy", gg, "ggplot2::sf_transform_xy")
   for (name in c("setup", "setup_panel_params")) {
     trace_steps(name, ggplot2::Layout, paste0("ggplot2::Layout$", name))
   }
   for (name in c("setup_params", "setup_data", "setup_panel_params")) {
     trace_steps(name, ggplot2::CoordSf, paste0("ggplot2::CoordSf$", name))
   }
-  for (name in c("st_sfc", "st_graticule")) {
+  for (name in c("st_sfc", "st_graticule", "sf_project")) {
     trace_steps(name, sf, paste0("sf::", name))
   }
   invisible(NULL)
