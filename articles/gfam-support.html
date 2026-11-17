@@ -315,7 +315,7 @@ link-scale fitted draws are available. General families with several
 linear predictors are not <code>gfam()</code> components.</p>
 <p>Missing required predictors or membership give missing predictions.
 Missing responses alone do not prevent prediction. With
-<code>na.exclude</code>, excluded fitting rows are restored as
+<code><a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">na.exclude()</a></code>, excluded fitting rows are restored as
 <code>NA</code> in fitted draws and simulations, while checks use the
 observations actually fitted. Censored components can simulate latent
 responses, but a posterior predictive comparison of censored

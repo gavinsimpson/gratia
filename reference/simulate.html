@@ -140,15 +140,15 @@ initializes the random-number state.</p></dd>
 
 <dt id="arg-conditioning">conditioning<a class="anchor" aria-label="anchor" href="#arg-conditioning"></a></dt>
 <dd><p>character or <code>NULL</code>; optional mixed-model conditioning
-mode. gamm4 defaults to <code>"conditional"</code>, holding all fitted effects fixed.
-<code>"gam_component"</code> explicitly uses its extracted GAM. The existing gamm
+mode. <code><a href="https://rdrr.io/pkg/gamm4/man/gamm4.html" class="external-link">gamm4::gamm4()</a></code> defaults to <code>"conditional"</code>, holding all fitted effects fixed.
+<code>"gam_component"</code> explicitly uses its extracted GAM. The existing <code><a href="https://rdrr.io/pkg/mgcv/man/gamm.html" class="external-link">mgcv::gamm()</a></code>
 simulator retains its GAM-component default. Full mixed-model modes currently
 use fitting observations.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>arguments passed to methods. <code>simulate.gam()</code> and
-<code>simulate.scam()</code> pass <code>...</code> on to <code>predict.gam()</code>. As such you can pass
+<code>simulate.scam()</code> pass <code>...</code> on to <code><a href="https://rdrr.io/pkg/mgcv/man/predict.gam.html" class="external-link">mgcv::predict.gam()</a></code>. As such you can pass
 additional arguments such as <code>terms</code>, <code>exclude</code>, to select which model
 terms are included in the predictions. This may be useful, for example,
 for excluding the effects of random effect terms.</p></dd>
@@ -165,12 +165,12 @@ the model will be used for <code>newdata</code>, if available in <code>object</c
 overrides the fitting weights; a single value applies to every observation.
 With <code>data = NULL</code>, the default is the fitted prior weights, except
 factor-valued binomial responses retain one Bernoulli trial per observation.
-Native <code>gaulss()</code> ignores fitting weights in its likelihood, so its default
+Native <code><a href="https://rdrr.io/pkg/mgcv/man/gaulss.html" class="external-link">mgcv::gaulss()</a></code> ignores fitting weights in its likelihood, so its default
 response weights are ones; explicit sampling weights still override this.
 With prediction data, the default is a vector of ones. For ordinary Gaussian
 and Gamma responses, larger weights reduce response variance (precision
 weights). For binomial responses, weights give integer trial counts. Include
-positions restored by <code>na.exclude</code> when supplying weights for fitting rows.</p></dd>
+positions restored by <code><a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">stats::na.exclude()</a></code> when supplying weights for fitting rows.</p></dd>
 
 
 <dt id="arg-newdata">newdata<a class="anchor" aria-label="anchor" href="#arg-newdata"></a></dt>
@@ -193,8 +193,8 @@ model's formula environment. Supply raw covariates in <code>data</code>.</p></dd
 supported <code>re</code> and <code>fs</code> terms; character vectors select exact smooth labels.
 Fitted predictions integrate response means over new zero-mean Gaussian
 effects. Response samplers draw new effects before sampling responses.
-Smoothing parameters and dispersion remain fixed. Only ordinary <code>gam()</code>
-and <code>bam()</code> fits with a scalar response mean are supported.</p></dd>
+Smoothing parameters and dispersion remain fixed. Only ordinary <code><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">mgcv::gam()</a></code>
+and <code><a href="https://rdrr.io/pkg/mgcv/man/bam.html" class="external-link">mgcv::bam()</a></code> fits with a scalar response mean are supported.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -212,8 +212,8 @@ variance parameters stay fixed. Supply grouping columns for new data;
 repeated group labels share effects within a replicate. Unfamiliar labels
 are allowed only when those factors occur exclusively in selected terms.
 The <code>random_effect_info</code> attribute records the fixed covariance estimates.</p>
-<p>With <code>data = NULL</code>, <code>na.exclude</code> restores excluded observations as <code>NA</code> in
-every simulation; <code>na.omit</code> returns retained observations only. Positions
+<p>With <code>data = NULL</code>, <code><a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">stats::na.exclude()</a></code> restores excluded observations as <code>NA</code> in
+every simulation; <code><a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">stats::na.omit()</a></code> returns retained observations only. Positions
 refer to the fitting data after any <code>subset</code>. Explicit <code>data</code> are evaluated
 independently of training exclusions: missing responses do not prevent
 simulation, while missing required predictors or weights yield <code>NA</code>.
@@ -235,10 +235,10 @@ invalid indices are errors. Explicit indices must agree with recoverable ones.</
 <p>Grouped simulations return one numeric response per observation: binomial
 proportions (with integer trial counts supplied in <code>weights</code>), count responses,
 or ordered-category codes, as appropriate. Component random generators retain
-their usual treatment of prior weights. Ordered-categorical and <code>ziP</code> components
+their usual treatment of prior weights. Ordered-categorical and <code><a href="https://rdrr.io/pkg/mgcv/man/ziP.html" class="external-link">mgcv::ziP()</a></code> components
 are simulated from their latent predictors. General families with multiple
 linear predictors and matrix responses encoding censoring or binomial counts
-are outside the scope supported by <code>gfam()</code>. Scalar censored-family components
+are outside the scope supported by <code><a href="https://rdrr.io/pkg/mgcv/man/gfam.html" class="external-link">mgcv::gfam()</a></code>. Scalar censored-family components
 produce draws from their uncensored latent distributions.</p>
     </div>
     <div class="section level2">

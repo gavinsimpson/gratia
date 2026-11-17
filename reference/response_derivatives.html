@@ -266,8 +266,8 @@ The <code>uncertainty</code> attribute records the selected method.</p>
 order. Rows with missing or non-finite required covariates have <code>NA</code>
 derivatives, standard errors and interval limits. Category, response and
 family identifiers are retained. An explicit <code>na.action</code> follows the
-prediction convention: <code>na.omit</code> drops unavailable rows with missing
-covariates, <code>na.exclude</code> and <code>na.pass</code> retain them, and <code>na.fail</code> reports
+prediction convention: <code><a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">stats::na.omit()</a></code> drops unavailable rows with missing
+covariates, <code><a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">stats::na.exclude()</a></code> and <code><a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">stats::na.pass()</a></code> retain them, and <code><a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">stats::na.fail()</a></code> reports
 missing covariates as an error. Undefined calculations at available rows,
 including in only some coefficient draws, raise an error; draws are never
 removed to form a summary.</p>

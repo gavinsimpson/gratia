@@ -487,12 +487,13 @@ Posterior response draws default to uncertainty in those fitted effects.
 Explicit `conditioning = "gam_component"` selects the extracted GAM
 calculations, and is required for posterior response draws at new data
 or supplied coefficient draws. `conditioning = "marginal"` generates new
-mixed-model effects; for gamm4 this includes the spline effects
-represented as random effects, so it asks a different question from new
-measurement errors around a fixed age curve. The existing
-[`gamm()`](https://rdrr.io/pkg/mgcv/man/gamm.html) response simulator
-still defaults to its GAM component; request full-model conditioning
-explicitly there. See
+mixed-model effects; for
+[`gamm4()`](https://rdrr.io/pkg/gamm4/man/gamm4.html) this includes the
+spline effects represented as random effects, so it asks a different
+question from new measurement errors around a fixed age curve. The
+existing [`gamm()`](https://rdrr.io/pkg/mgcv/man/gamm.html) response
+simulator still defaults to its GAM component; request full-model
+conditioning explicitly there. See
 [`gamm4_support`](https://gavinsimpson.github.io/gratia/reference/gamm4_support.md)
 for covariance and sampling restrictions. Use fitting-package prediction
 on the `mer` component for predictions conditional on a particular

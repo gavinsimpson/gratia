@@ -100,7 +100,7 @@
 <dl><dt id="arg-model">model<a class="anchor" aria-label="anchor" href="#arg-model"></a></dt>
 <dd><p>a fitted model from <code><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">mgcv::gam()</a></code>, <code><a href="https://rdrr.io/pkg/mgcv/man/bam.html" class="external-link">mgcv::bam()</a></code>,
 <code><a href="https://rdrr.io/pkg/scam/man/scam.html" class="external-link">scam::scam()</a></code>, or <code><a href="https://rdrr.io/pkg/gamm4/man/gamm4.html" class="external-link">gamm4::gamm4()</a></code>, or a model inheriting from these
-classes. See <a href="gamm4_support.html">gamm4_support</a> for sampling from gamm4 fits.</p></dd>
+classes. See <a href="gamm4_support.html">gamm4_support</a> for sampling from <code><a href="https://rdrr.io/pkg/gamm4/man/gamm4.html" class="external-link">gamm4::gamm4()</a></code> fits.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
@@ -187,7 +187,7 @@ see <code><a href="../articles/sampling-migration.html">vignette("sampling-migra
 method cannot use are rejected.</p>
 <p>For SCAM models, Gaussian draws approximate the distribution of the unrestricted
 fitting coefficients using <code>Vp</code> (or <code>Ve</code> with <code>frequentist = TRUE</code>), then apply
-scam's fitted exponential or <code>notExp</code> transformation. This is an approximation
+scam's fitted exponential or <code>notExp()</code> transformation. This is an approximation
 in fitting coordinates, rather than an exact constrained posterior. Supplied
 draws must already use the transformed coordinates in <code>coef(model)</code> order.
 Numerically singular covariance matrices are sampled by eigen decomposition;

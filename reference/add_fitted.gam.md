@@ -65,8 +65,9 @@ add_fitted(
   Fitted predictions integrate response means over new zero-mean
   Gaussian effects. Response samplers draw new effects before sampling
   responses. Smoothing parameters and dispersion remain fixed. Only
-  ordinary `gam()` and `bam()` fits with a scalar response mean are
-  supported.
+  ordinary [`mgcv::gam()`](https://rdrr.io/pkg/mgcv/man/gam.html) and
+  [`mgcv::bam()`](https://rdrr.io/pkg/mgcv/man/bam.html) fits with a
+  scalar response mean are supported.
 
 - integration:
 

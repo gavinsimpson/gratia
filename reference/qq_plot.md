@@ -129,12 +129,13 @@ qq_plot(
 
   character or `NULL`; residual type: `"deviance"`, `"response"`,
   `"pearson"`, `"pit"`, `"quantile"`, `"dharma"`, or `"surrogate"` (for
-  `ocat()` or `multinom()` GAMs). `NULL` uses the model-specific
-  default: deviance for ordinary lm/glm/GAM fits, and quantile for
-  supported grouped families, GJRM, sdmTMB and full mixed-model checks.
-  glmmTMB uses Pearson residuals conditionally and response residuals
-  marginally. Extracted GAM components follow the ordinary GAM defaults.
-  See
+  [`mgcv::ocat()`](https://rdrr.io/pkg/mgcv/man/ocat.html) or
+  [`mgcv::multinom()`](https://rdrr.io/pkg/mgcv/man/multinom.html)
+  GAMs). `NULL` uses the model-specific default: deviance for ordinary
+  lm/glm/GAM fits, and quantile for supported grouped families, GJRM,
+  sdmTMB and full mixed-model checks. glmmTMB uses Pearson residuals
+  conditionally and response residuals marginally. Extracted GAM
+  components follow the ordinary GAM defaults. See
   [diagnostic_support](https://gavinsimpson.github.io/gratia/reference/diagnostic_support.md).
 
 - n_uniform:
@@ -291,7 +292,7 @@ For [`mgcv::ocat()`](https://rdrr.io/pkg/mgcv/man/ocat.html) fits,
 `type = "surrogate"` uses logistic reference quantiles with location
 zero and scale one. Set `method = NULL`. Independent observations have
 approximate pointwise bands obtained by applying
-[`qlogis()`](https://rdrr.io/r/stats/Logistic.html) to beta
+[`stats::qlogis()`](https://rdrr.io/r/stats/Logistic.html) to beta
 order-statistic limits. Worm plots subtract the same logistic reference
 quantiles from residuals and bands. These references treat fitted
 parameters as fixed. For
@@ -335,7 +336,7 @@ Analysis* **56**, 2404-2409
 
 ## See also
 
-[mgcv::qq.gam](https://rdrr.io/pkg/mgcv/man/qq.gam.html) for more
+[`mgcv::qq.gam()`](https://rdrr.io/pkg/mgcv/man/qq.gam.html) for more
 details on the methods used.
 
 [gamm4_support](https://gavinsimpson.github.io/gratia/reference/gamm4_support.md)

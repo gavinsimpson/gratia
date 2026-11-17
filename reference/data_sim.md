@@ -87,7 +87,7 @@ data_sim(
 - family:
 
   an instantiated family object, such as
-  [`poisson()`](https://rdrr.io/r/stats/family.html) or
+  [`stats::poisson()`](https://rdrr.io/r/stats/family.html) or
   [`mgcv::gaulss()`](https://rdrr.io/pkg/mgcv/man/gaulss.html). Cannot
   be combined with explicitly supplied `dist`, `scale`, `theta`,
   `power`, `n_cat`, `cuts` or `gfam_families`. See

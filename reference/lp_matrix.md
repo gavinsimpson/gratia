@@ -30,7 +30,9 @@ model.matrix(object, ...)
 
 - ...:
 
-  arguments passed to other methods and `predict` methods including
+  arguments passed to other methods and
+  [`stats::predict()`](https://rdrr.io/r/stats/predict.html) methods
+  including
   [`mgcv::predict.gam()`](https://rdrr.io/pkg/mgcv/man/predict.gam.html)
   and
   [`mgcv::predict.bam()`](https://rdrr.io/pkg/mgcv/man/predict.bam.html)
@@ -43,7 +45,8 @@ model.matrix(object, ...)
 - object:
 
   a fitted SCAM model, for the
-  [`model.matrix()`](https://rdrr.io/r/stats/model.matrix.html) method.
+  [`stats::model.matrix()`](https://rdrr.io/r/stats/model.matrix.html)
+  method.
 
 ## Value
 

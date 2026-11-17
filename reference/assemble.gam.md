@@ -200,8 +200,9 @@ assemble(object, ..., overall_uncertainty = FALSE, centre = c("model", "plot"))
   in the standard errors of smooth and parametric effects? For
   parametric effects this includes the intercept variance and its
   covariance with the term, without changing the partial estimates. Each
-  term uses the intercept of its own linear predictor. Native scasm
-  models are routed to
+  term uses the intercept of its own linear predictor. Native
+  [`mgcv::scasm()`](https://rdrr.io/pkg/mgcv/man/scasm.html) models are
+  routed to
   [`draw.scasm()`](https://gavinsimpson.github.io/gratia/reference/draw.gam.md)
   with `overall_uncertainty = FALSE`. An explicit request for
   unavailable mean uncertainty warns once. The stored model class is
@@ -404,15 +405,15 @@ assemble(object, ..., overall_uncertainty = FALSE, centre = c("model", "plot"))
   named list of view options passed to
   [`ggcube::coord_3d()`](https://matthewkling.github.io/ggcube/reference/coord_3d.html),
   for example `list(yaw = 45, persp = FALSE)`. The default
-  [`list()`](https://rdrr.io/r/base/list.html) uses the default view
-  with `ggcube::light(backface_scale = 1)`, preserving equal horizontal
-  units for isotropic smooths. Supply `light = ggcube::light(...)` in
-  this list to override lighting; `ggcube::light(method = "none")`
-  disables it. An explicitly supplied `light` replaces the entire
-  default light. Only the coordinate system is used; ggcube's theme
-  settings are not applied. These options affect all 3D panels in a
-  call. For different views per term, modify individual plots returned
-  by
+  [`base::list()`](https://rdrr.io/r/base/list.html) uses the default
+  view with `ggcube::light(backface_scale = 1)`, preserving equal
+  horizontal units for isotropic smooths. Supply
+  `light = ggcube::light(...)` in this list to override lighting;
+  `ggcube::light(method = "none")` disables it. An explicitly supplied
+  `light` replaces the entire default light. Only the coordinate system
+  is used; ggcube's theme settings are not applied. These options affect
+  all 3D panels in a call. For different views per term, modify
+  individual plots returned by
   [`assemble()`](https://gavinsimpson.github.io/gratia/reference/assemble.md).
   The `dist` entry here controls perspective; the top-level `dist`
   argument controls masking.
@@ -510,14 +511,16 @@ assemble(object, ..., overall_uncertainty = FALSE, centre = c("model", "plot"))
 
 - interval_method:
 
-  character; "auto" uses stored scasm bootstrap draws for pointwise
-  intervals when available, and Gaussian intervals otherwise. Use
-  "gaussian" to request covariance-based limits or "bootstrap" to
-  require stored draws. Simultaneous bootstrap bands are not supported.
-  `"shape"` applies
+  character; "auto" uses stored
+  [`mgcv::scasm()`](https://rdrr.io/pkg/mgcv/man/scasm.html) bootstrap
+  draws for pointwise intervals when available, and Gaussian intervals
+  otherwise. Use "gaussian" to request covariance-based limits or
+  "bootstrap" to require stored draws. Simultaneous bootstrap bands are
+  not supported. `"shape"` applies
   [`shape_intervals()`](https://gavinsimpson.github.io/gratia/reference/shape_intervals.md)
-  to supported scasm smooth components, using the initial limits chosen
-  by `shape_source`.
+  to supported
+  [`mgcv::scasm()`](https://rdrr.io/pkg/mgcv/man/scasm.html) smooth
+  components, using the initial limits chosen by `shape_source`.
 
 - frequentist:
 
@@ -660,8 +663,9 @@ Internally, plots of each smooth are created using
 and composed into a single plot using
 [`patchwork::wrap_plots()`](https://patchwork.data-imaginist.com/reference/wrap_plots.html).
 As a result, it is not possible to use `+` to add to the plots in the
-way one might typically work with `ggplot()` plots. Instead, use the `&`
-operator; see the examples.
+way one might typically work with
+[`ggplot2::ggplot()`](https://ggplot2.tidyverse.org/reference/ggplot.html)
+plots. Instead, use the `&` operator; see the examples.
 
 ## Label layout
 

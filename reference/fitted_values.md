@@ -110,11 +110,13 @@ fitted_values(object, ...)
 
 - interval_method:
 
-  character; `"auto"` uses stored scasm bootstrap draws for pointwise
-  intervals when available and Gaussian intervals otherwise.
-  `"gaussian"` requests covariance-based limits and `"bootstrap"`
-  requires stored draws. Simultaneous bootstrap bands are unsupported.
-  Shape-enforced intervals are available for smooth components through
+  character; `"auto"` uses stored
+  [`mgcv::scasm()`](https://rdrr.io/pkg/mgcv/man/scasm.html) bootstrap
+  draws for pointwise intervals when available and Gaussian intervals
+  otherwise. `"gaussian"` requests covariance-based limits and
+  `"bootstrap"` requires stored draws. Simultaneous bootstrap bands are
+  unsupported. Shape-enforced intervals are available for smooth
+  components through
   [`smooth_estimates()`](https://gavinsimpson.github.io/gratia/reference/smooth_estimates.md).
 
 - quantity:
@@ -141,8 +143,9 @@ fitted_values(object, ...)
   Fitted predictions integrate response means over new zero-mean
   Gaussian effects. Response samplers draw new effects before sampling
   responses. Smoothing parameters and dispersion remain fixed. Only
-  ordinary `gam()` and `bam()` fits with a scalar response mean are
-  supported.
+  ordinary [`mgcv::gam()`](https://rdrr.io/pkg/mgcv/man/gam.html) and
+  [`mgcv::bam()`](https://rdrr.io/pkg/mgcv/man/bam.html) fits with a
+  scalar response mean are supported.
 
 - integration:
 
@@ -232,10 +235,11 @@ expectation standard errors are on the response scale. Unsupported
 simultaneous or bootstrap transformations are rejected rather than
 combining marginal parameter intervals.
 
-Native scasm fits with stored bootstrap draws use mgcv's pointwise
-limits by default, including its `svar.only` correction for smoothing
-bias. `interval_method = "gaussian"` restores covariance-based limits.
-`.se` retains its existing covariance-based meaning. No replicates are
+Native [`mgcv::scasm()`](https://rdrr.io/pkg/mgcv/man/scasm.html) fits
+with stored bootstrap draws use mgcv's pointwise limits by default,
+including its `svar.only` correction for smoothing bias.
+`interval_method = "gaussian"` restores covariance-based limits. `.se`
+retains its existing covariance-based meaning. No replicates are
 generated. Bootstrap limits use existing scalar and location-scale
 parameter transformations. Unsupported nonlinear family outputs give an
 error for an explicit bootstrap request; automatic selection warns and
@@ -252,17 +256,20 @@ internally. In contrast,
 retains fitting-argument offsets when its `data` argument is `NULL`. Put
 offsets in the formula to evaluate them at new observations.
 
-With `data = NULL`, results follow the model's `na.action`: `na.exclude`
-restores excluded observations as `NA` fitted values, standard errors
-and interval bounds; `na.omit` returns only retained observations.
-Covariates unavailable in the stored model frame are restored as typed
-`NA` values. `.row` indexes the fitting data after any `subset` was
-applied.
+With `data = NULL`, results follow the model's `na.action`:
+[`stats::na.exclude()`](https://rdrr.io/r/stats/na.fail.html) restores
+excluded observations as `NA` fitted values, standard errors and
+interval bounds;
+[`stats::na.omit()`](https://rdrr.io/r/stats/na.fail.html) returns only
+retained observations. Covariates unavailable in the stored model frame
+are restored as typed `NA` values. `.row` indexes the fitting data after
+any `subset` was applied.
 
 Supplying `data` requests predictions at those rows, independently of
 training exclusions. Missing responses do not prevent prediction.
 Missing required predictors produce `NA` results by default. An explicit
-`na.action` passed through `...` is honoured; with `na.omit`, `.row`
+`na.action` passed through `...` is honoured; with
+[`stats::na.omit()`](https://rdrr.io/r/stats/na.fail.html), `.row`
 retains the positions in the supplied data, rather than numbering the
 remaining rows consecutively.
 
@@ -294,10 +301,14 @@ transformed if `scale = "response"`; `.se` remains on the link scale.
 The simulation covariance may be positive semidefinite. Supported
 families are Gaussian, Poisson, binomial, Gamma, inverse Gaussian, quasi
 families, negative binomial, Tweedie, beta regression, and scaled t,
-fitted by `gam()` or `bam()` (including the `gam` component of a
-`gamm()` fit), and by `scam()`. For SCAM models, the Gaussian
-approximation uses transformed coefficients conditional on the fitted
-smoothing parameters. Other families support pointwise intervals only.
+fitted by [`mgcv::gam()`](https://rdrr.io/pkg/mgcv/man/gam.html) or
+[`mgcv::bam()`](https://rdrr.io/pkg/mgcv/man/bam.html) (including the
+`gam` component of a
+[`mgcv::gamm()`](https://rdrr.io/pkg/mgcv/man/gamm.html) fit), and by
+[`scam::scam()`](https://rdrr.io/pkg/scam/man/scam.html). For SCAM
+models, the Gaussian approximation uses transformed coefficients
+conditional on the fitted smoothing parameters. Other families support
+pointwise intervals only.
 
 Response-scale simultaneous intervals support the identity, log, logit,
 probit, cloglog, cauchit, square-root, inverse, and inverse-squared

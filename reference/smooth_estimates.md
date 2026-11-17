@@ -207,14 +207,16 @@ smooth_estimates(
 
 - interval_method:
 
-  character; "auto" uses stored scasm bootstrap draws for pointwise
-  intervals when available, and Gaussian intervals otherwise. Use
-  "gaussian" to request covariance-based limits or "bootstrap" to
-  require stored draws. Simultaneous bootstrap bands are not supported.
-  `"shape"` applies
+  character; "auto" uses stored
+  [`mgcv::scasm()`](https://rdrr.io/pkg/mgcv/man/scasm.html) bootstrap
+  draws for pointwise intervals when available, and Gaussian intervals
+  otherwise. Use "gaussian" to request covariance-based limits or
+  "bootstrap" to require stored draws. Simultaneous bootstrap bands are
+  not supported. `"shape"` applies
   [`shape_intervals()`](https://gavinsimpson.github.io/gratia/reference/shape_intervals.md)
-  to supported scasm smooth components, using the initial limits chosen
-  by `shape_source`.
+  to supported
+  [`mgcv::scasm()`](https://rdrr.io/pkg/mgcv/man/scasm.html) smooth
+  components, using the initial limits chosen by `shape_source`.
 
 - shape_source:
 
@@ -321,10 +323,12 @@ use the covariance of the constrained coefficients. With
 `overall_uncertainty = TRUE`, their standard errors also include
 intercept uncertainty and its covariance with the smooth; estimates
 remain centred. Models without an intercept use smooth-only uncertainty
-for either setting. Native scasm fits use component-only uncertainty by
-default. Explicitly requesting `overall_uncertainty = TRUE` warns once
-if selected smooths lack the centring information needed to add mean
-uncertainty. Ordinary GAM defaults are unchanged.
+for either setting. Native
+[`mgcv::scasm()`](https://rdrr.io/pkg/mgcv/man/scasm.html) fits use
+component-only uncertainty by default. Explicitly requesting
+`overall_uncertainty = TRUE` warns once if selected smooths lack the
+centring information needed to add mean uncertainty. Ordinary GAM
+defaults are unchanged.
 
 Bootstrap pointwise limits follow mgcv's percentiles and its `svar.only`
 correction for smoothing bias. The correction can move limits beyond the
@@ -360,7 +364,8 @@ calculation; `.crit` is `NA` after shape enforcement. Metadata records
 the initial source, correction, named shapes, model coordinates and
 whole-grid guarantee.
 
-Every selected term must have retained named scasm restrictions.
+Every selected term must have retained named
+[`mgcv::scasm()`](https://rdrr.io/pkg/mgcv/man/scasm.html) restrictions.
 Supported combinations are positivity, monotonicity in any directions
 and curvature in at most one direction. Tensor smooths require
 `te(..., np = FALSE)` with univariate B-spline margins (`"sc"` or

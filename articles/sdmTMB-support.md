@@ -82,15 +82,16 @@ ggplot(cod, aes(X, Y, colour = density)) +
 ![Observed Pacific cod density at survey tows, separated by
 year.](sdmTMB-support_files/figure-html/observed-cod-1.png)
 
-The colour scale uses `log1p`, the logarithm of one plus density, to
-distinguish the many smaller catches while retaining zeros and the
-largest catches. There are many exact zeros and a long positive tail. A
-Gaussian response model would allow negative density and impose constant
-response variance. A Tweedie model is one useful alternative for zeros
-plus continuous positive values. Here a **delta-Gamma model** makes the
-encounter and positive-density questions explicit. Its first component
-models whether density is positive using a logit link; its second models
-positive density using a Gamma distribution and log link. Thus
+The colour scale uses [`log1p()`](https://rdrr.io/r/base/Log.html), the
+logarithm of one plus density, to distinguish the many smaller catches
+while retaining zeros and the largest catches. There are many exact
+zeros and a long positive tail. A Gaussian response model would allow
+negative density and impose constant response variance. A Tweedie model
+is one useful alternative for zeros plus continuous positive values.
+Here a **delta-Gamma model** makes the encounter and positive-density
+questions explicit. Its first component models whether density is
+positive using a logit link; its second models positive density using a
+Gamma distribution and log link. Thus
 
 E(Y_i) = \Pr(Y_i \> 0)\\E(Y_i\mid Y_i\>0).
 

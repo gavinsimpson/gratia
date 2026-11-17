@@ -167,15 +167,15 @@ draw_parametric_effect(
   named list of view options passed to
   [`ggcube::coord_3d()`](https://matthewkling.github.io/ggcube/reference/coord_3d.html),
   for example `list(yaw = 45, persp = FALSE)`. The default
-  [`list()`](https://rdrr.io/r/base/list.html) uses the default view
-  with `ggcube::light(backface_scale = 1)`, preserving equal horizontal
-  units for isotropic smooths. Supply `light = ggcube::light(...)` in
-  this list to override lighting; `ggcube::light(method = "none")`
-  disables it. An explicitly supplied `light` replaces the entire
-  default light. Only the coordinate system is used; ggcube's theme
-  settings are not applied. These options affect all 3D panels in a
-  call. For different views per term, modify individual plots returned
-  by
+  [`base::list()`](https://rdrr.io/r/base/list.html) uses the default
+  view with `ggcube::light(backface_scale = 1)`, preserving equal
+  horizontal units for isotropic smooths. Supply
+  `light = ggcube::light(...)` in this list to override lighting;
+  `ggcube::light(method = "none")` disables it. An explicitly supplied
+  `light` replaces the entire default light. Only the coordinate system
+  is used; ggcube's theme settings are not applied. These options affect
+  all 3D panels in a call. For different views per term, modify
+  individual plots returned by
   [`assemble()`](https://gavinsimpson.github.io/gratia/reference/assemble.md).
   The `dist` entry here controls perspective; the top-level `dist`
   argument controls masking.

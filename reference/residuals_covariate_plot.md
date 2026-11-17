@@ -77,8 +77,8 @@ scalable_residuals_covariate_plot(
   character vector of exact covariate names, in plotting order. `NULL`
   selects model covariates, excluding variables used only as offsets or
   random-effect groups.
-  [`character()`](https://rdrr.io/r/base/character.html) selects no
-  individual panels, for use with `pairs`.
+  [`base::character()`](https://rdrr.io/r/base/character.html) selects
+  no individual panels, for use with `pairs`.
 
 - terms:
 
@@ -113,10 +113,12 @@ scalable_residuals_covariate_plot(
 
   character or `NULL`; residual type: `"deviance"`, `"pearson"`,
   `"response"`, `"pit"`, `"quantile"`, `"dharma"`, or `"surrogate"` (for
-  `ocat()` or `multinom()` GAMs). Grouped models automatically use
-  quantile residuals when all active components are supported, otherwise
-  all use deviance residuals with a message. Ordinary models retain
-  deviance residuals by default. See
+  [`mgcv::ocat()`](https://rdrr.io/pkg/mgcv/man/ocat.html) or
+  [`mgcv::multinom()`](https://rdrr.io/pkg/mgcv/man/multinom.html)
+  GAMs). Grouped models automatically use quantile residuals when all
+  active components are supported, otherwise all use deviance residuals
+  with a message. Ordinary models retain deviance residuals by default.
+  See
   [`appraise()`](https://gavinsimpson.github.io/gratia/reference/appraise.md)
   for distributional support.
 

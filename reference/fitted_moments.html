@@ -200,11 +200,11 @@ negative binomial, beta, scaled t, Tweedie, all seven location/scale/shape
 families, ordinal, multinomial and multivariate-normal models are supported.
 Censored normal, logistic and Poisson families return moments of the latent
 uncensored response. Beta moments describe the beta likelihood, without the
-epsilon clipping used by some response generators. <code>bcg()</code> supports the
+epsilon clipping used by some response generators. <code><a href="https://rdrr.io/pkg/mgcv/man/bcg.html" class="external-link">mgcv::bcg()</a></code> supports the
 original lognormal response only when its Box-Cox parameter is fixed at zero:
 other powers require a distribution outside the inverse transformation's
 domain that the fitted family does not specify. Quasi and Cox families are
-unsupported. Grouped (<code>gfam</code>) predictions use each row's component family
+unsupported. Grouped (<code><a href="https://rdrr.io/pkg/mgcv/man/gfam.html" class="external-link">mgcv::gfam()</a></code>) predictions use each row's component family
 and the full joint model covariance. Grouped ordinal components require
 explicit category scores; grouped category-indicator output is unsupported.</p>
 <p>The delta method differentiates the complete parameter-to-moment
@@ -235,8 +235,8 @@ simulation with <code>unconditional = TRUE</code> and fixed estimated global par
 the first-order smoothing correction conditional on those fixed parameters:
 native corrected covariance can also include their uncertainty. This requires
 the same saved outer Hessian and sensitivities when smoothing parameters are
-present. Legacy <code>negbin()</code> fits outside ML/REML require explicit
-<code>nuisance = "fixed"</code>; use <code>nb()</code> to estimate and propagate shape uncertainty.
+present. Legacy <code><a href="https://rdrr.io/pkg/mgcv/man/negbin.html" class="external-link">mgcv::negbin()</a></code> fits outside ML/REML require explicit
+<code>nuisance = "fixed"</code>; use <code><a href="https://rdrr.io/pkg/mgcv/man/negbin.html" class="external-link">mgcv::nb()</a></code> to estimate and propagate shape uncertainty.
 The covariance calculation uses a first-order expansion of the coefficient
 means and does not include mgcv's additional correction for changes in the
 conditional coefficient covariance. The <code>moment_info</code> attribute

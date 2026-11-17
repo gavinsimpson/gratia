@@ -38,8 +38,9 @@ rootogram(object, ...)
 
 - conditioning:
 
-  for gamm4, `"conditional"` (default) checks the response distribution
-  at all fitted effects, `"marginal"` averages over new effects, and
+  for [`gamm4::gamm4()`](https://rdrr.io/pkg/gamm4/man/gamm4.html),
+  `"conditional"` (default) checks the response distribution at all
+  fitted effects, `"marginal"` averages over new effects, and
   `"gam_component"` checks the extracted GAM.
 
 - max_count:

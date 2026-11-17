@@ -172,9 +172,11 @@ derivatives(object, ..., unconditional = FALSE)
 
 - interval_method:
 
-  character; use stored scasm bootstrap draws for pointwise intervals
-  with `"auto"` (the default), or explicitly select `"gaussian"` or
-  `"bootstrap"`. Bootstrap simultaneous bands are unavailable.
+  character; use stored
+  [`mgcv::scasm()`](https://rdrr.io/pkg/mgcv/man/scasm.html) bootstrap
+  draws for pointwise intervals with `"auto"` (the default), or
+  explicitly select `"gaussian"` or `"bootstrap"`. Bootstrap
+  simultaneous bands are unavailable.
 
 - simultaneous_method:
 
@@ -247,12 +249,12 @@ columns needed for their calculation. Custom prediction methods are
 evaluated in the caller, including custom tensor margins and
 factor-smooth bases; workers receive their prediction matrices.
 Simultaneous intervals use successive draws in selection order, so
-[`set.seed()`](https://rdrr.io/r/base/Random.html) gives the same
+[`base::set.seed()`](https://rdrr.io/r/base/Random.html) gives the same
 results with or without workers, independently of their number or
 completion order. `derivatives()` uses
-[`set.seed()`](https://rdrr.io/r/base/Random.html); the other functions
-also accept `seed`, which restores the caller's random number state on
-exit.
+[`base::set.seed()`](https://rdrr.io/r/base/Random.html); the other
+functions also accept `seed`, which restores the caller's random number
+state on exit.
 
 [`smooth_samples()`](https://gavinsimpson.github.io/gratia/reference/smooth_samples.md)
 draws coefficients jointly once, then reuses those draws for every

@@ -1,8 +1,8 @@
 # Find the names of model terms
 
 Returns the names of any terms in a model, without needing to call
-[`summary()`](https://rdrr.io/r/base/summary.html). The list of model
-terms is especially useful when predicting from a
+[`base::summary()`](https://rdrr.io/r/base/summary.html). The list of
+model terms is especially useful when predicting from a
 [`mgcv::gam()`](https://rdrr.io/pkg/mgcv/man/gam.html) model using the
 `exclude` or `terms` argument of
 [`mgcv::predict.gam()`](https://rdrr.io/pkg/mgcv/man/predict.gam.html)

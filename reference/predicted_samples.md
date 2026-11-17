@@ -2,8 +2,7 @@
 
 Predicted values of the response (new response data) are drawn from the
 fitted model, created via
-[`simulate()`](https://gavinsimpson.github.io/gratia/reference/simulate.md)
-(e.g.
+[`stats::simulate()`](https://rdrr.io/r/stats/simulate.html) (e.g.
 [`simulate.gam()`](https://gavinsimpson.github.io/gratia/reference/simulate.md))
 and returned in a tidy, long, format. These predicted values do not
 include the uncertainty in the estimated model; they are simply draws
@@ -60,8 +59,7 @@ predicted_samples(
   these are passed on to
   [`fitted_samples()`](https://gavinsimpson.github.io/gratia/reference/fitted_samples.md).
   For `predicted_samples()` these are passed on to the relevant
-  [`simulate()`](https://gavinsimpson.github.io/gratia/reference/simulate.md)
-  method.
+  [`stats::simulate()`](https://rdrr.io/r/stats/simulate.html) method.
 
 - data:
 
@@ -84,15 +82,17 @@ predicted_samples(
   overrides the fitting weights; a single value applies to every
   observation. With `data = NULL`, the default is the fitted prior
   weights, except factor-valued binomial responses retain one Bernoulli
-  trial per observation. Native `gaulss()` ignores fitting weights in
-  its likelihood, so its default response weights are also ones;
-  explicitly supplied sampling weights still override this default. With
-  prediction data, weights default to a vector of ones. For ordinary
-  Gaussian and Gamma responses, larger weights reduce response variance
-  (precision weights). For binomial responses, weights give integer
-  trial counts. They do not alter the fitted coefficient covariance.
-  Include positions restored by `na.exclude` when supplying weights for
-  fitting rows.
+  trial per observation. Native
+  [`mgcv::gaulss()`](https://rdrr.io/pkg/mgcv/man/gaulss.html) ignores
+  fitting weights in its likelihood, so its default response weights are
+  also ones; explicitly supplied sampling weights still override this
+  default. With prediction data, weights default to a vector of ones.
+  For ordinary Gaussian and Gamma responses, larger weights reduce
+  response variance (precision weights). For binomial responses, weights
+  give integer trial counts. They do not alter the fitted coefficient
+  covariance. Include positions restored by
+  [`stats::na.exclude()`](https://rdrr.io/r/stats/na.fail.html) when
+  supplying weights for fitting rows.
 
 - marginalise:
 
@@ -101,8 +101,9 @@ predicted_samples(
   Fitted predictions integrate response means over new zero-mean
   Gaussian effects. Response samplers draw new effects before sampling
   responses. Smoothing parameters and dispersion remain fixed. Only
-  ordinary `gam()` and `bam()` fits with a scalar response mean are
-  supported.
+  ordinary [`mgcv::gam()`](https://rdrr.io/pkg/mgcv/man/gam.html) and
+  [`mgcv::bam()`](https://rdrr.io/pkg/mgcv/man/bam.html) fits with a
+  scalar response mean are supported.
 
 ## Value
 

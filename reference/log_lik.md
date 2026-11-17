@@ -131,7 +131,7 @@ additional parameters are not jointly sampled. Ordinary PSIS-LOO uses
 these draws without correcting their Gaussian approximation. Pareto
 diagnostics assess reweighting, not the accuracy of the Gaussian
 approximation. See
-[loo.gam](https://gavinsimpson.github.io/gratia/reference/loo.gam.md)
+[`loo.gam()`](https://gavinsimpson.github.io/gratia/reference/loo.gam.md)
 for optional loo methods.
 
 Independent-response SCAM fits are supported using the coefficient

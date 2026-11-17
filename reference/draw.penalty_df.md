@@ -1,6 +1,7 @@
-# Display penalty matrices of smooths using `ggplot`
+# Display penalty matrices of smooths using [`ggplot2::ggplot()`](https://ggplot2.tidyverse.org/reference/ggplot.html)
 
-Displays the penalty matrices of smooths as a heatmap using `ggplot`
+Displays the penalty matrices of smooths as a heatmap using
+[`ggplot2::ggplot()`](https://ggplot2.tidyverse.org/reference/ggplot.html)
 
 ## Usage
 

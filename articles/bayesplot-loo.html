@@ -149,8 +149,8 @@ gratia’s own posterior predictive plots use proportions. Multivariate
 and grouped-family models require <code>response</code>, for example
 <code>"response1"</code> or <code>"component2"</code>. These selections
 keep distinct responses and observation families from being pooled. For
-gamm/gamm4 fits, <code>conditioning</code> retains its existing gratia
-meaning.</p>
+<code>gamm()</code>/<code>gamm4()</code> fits, <code>conditioning</code>
+retains its existing gratia meaning.</p>
 </div>
 <div class="section level2">
 <h2 id="evaluate-observed-response-log-likelihoods">Evaluate observed-response log likelihoods<a class="anchor" aria-label="anchor" href="#evaluate-observed-response-log-likelihoods"></a>
@@ -281,12 +281,13 @@ coefficient diagnostics. The likelihood matrix also supports
 <code><a href="../reference/as_mcmc_draws.html">as_mcmc_draws()</a></code> for diagnostics of its observation-wise log
 densities.</p>
 <p>Likelihood and LOO methods initially cover independent GAM/BAM
-responses. They exclude residual-correlated BAMs, full gamm/gamm4 fits,
-quasi families, Cox partial likelihoods and censored observation
-processes. Supported ordinary posterior predictive checks retain their
-existing model coverage. With random-effect smooths, observation-level
-LOO predicts further observations in the fitted groups; it does not
-leave out entire groups.</p>
+responses. They exclude residual-correlated BAMs, full
+<code>gamm()</code>/<code>gamm4()</code> fits, quasi families, Cox
+partial likelihoods and censored observation processes. Supported
+ordinary posterior predictive checks retain their existing model
+coverage. With random-effect smooths, observation-level LOO predicts
+further observations in the fitted groups; it does not leave out entire
+groups.</p>
 <p>The reproducible script <code>inst/validation/loo-refits.R</code>
 compares representative Gaussian, Poisson and binomial PSIS results with
 explicit leave-one-out refits. It distinguishes refits that hold

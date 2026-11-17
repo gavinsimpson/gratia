@@ -224,22 +224,22 @@ unweighted mean over boundaries. Fitting weights do not weight these averages.</
 Transforming a link-scale ALE curve does not produce response-scale ALE.
 Response-scale effects are differences in natural parameter units, not
 predicted parameter values, and can be negative.</p>
-<p>Distributional families <code>gaulss</code>, <code>gammals</code>, <code>gumbls</code>, <code>gevlss</code>, <code>shash</code>,
-<code>twlss</code>, and <code>ziplss</code> are supported. Natural units mean standard deviation
+<p>Distributional families <code><a href="https://rdrr.io/pkg/mgcv/man/gaulss.html" class="external-link">mgcv::gaulss()</a></code>, <code><a href="https://rdrr.io/pkg/mgcv/man/gammals.html" class="external-link">mgcv::gammals()</a></code>, <code><a href="https://rdrr.io/pkg/mgcv/man/gumbls.html" class="external-link">mgcv::gumbls()</a></code>, <code><a href="https://rdrr.io/pkg/mgcv/man/gevlss.html" class="external-link">mgcv::gevlss()</a></code>, <code><a href="https://rdrr.io/pkg/mgcv/man/shash.html" class="external-link">mgcv::shash()</a></code>,
+<code><a href="https://rdrr.io/pkg/mgcv/man/twlss.html" class="external-link">mgcv::twlss()</a></code>, and <code><a href="https://rdrr.io/pkg/mgcv/man/ziplss.html" class="external-link">mgcv::ziplss()</a></code> are supported. Natural units mean standard deviation
 for Gaussian scale, positive scale or dispersion for logged scales, natural
 Tweedie power, positive sinh-arcsinh tail parameter, and Poisson rate or
-probability of presence for <code>ziplss</code>. Location parameters need not be response
+probability of presence for <code><a href="https://rdrr.io/pkg/mgcv/man/ziplss.html" class="external-link">mgcv::ziplss()</a></code>. Location parameters need not be response
 means. Overall means combining several parameters, multinomial probabilities,
 multivariate covariance parameters and grouped-family outputs are unsupported.
 For other families, link-scale ALE is available for a single linear predictor;
 response-scale ALE requires a supported scalar mean family.</p>
-<p>Supported response-scale parameters are:</p><ul><li><p><code>gaulss</code>: location (mean) and scale (standard deviation);</p></li>
-<li><p><code>gammals</code>: location (mean) and scale (dispersion);</p></li>
-<li><p><code>gumbls</code> and <code>gevlss</code>: location and positive scale, plus GEV shape;</p></li>
-<li><p><code>shash</code>: location, positive scale, skewness and positive tail parameter
+<p>Supported response-scale parameters are:</p><ul><li><p><code><a href="https://rdrr.io/pkg/mgcv/man/gaulss.html" class="external-link">mgcv::gaulss()</a></code>: location (mean) and scale (standard deviation);</p></li>
+<li><p><code><a href="https://rdrr.io/pkg/mgcv/man/gammals.html" class="external-link">mgcv::gammals()</a></code>: location (mean) and scale (dispersion);</p></li>
+<li><p><code><a href="https://rdrr.io/pkg/mgcv/man/gumbls.html" class="external-link">mgcv::gumbls()</a></code> and <code><a href="https://rdrr.io/pkg/mgcv/man/gevlss.html" class="external-link">mgcv::gevlss()</a></code>: location and positive scale, plus GEV shape;</p></li>
+<li><p><code><a href="https://rdrr.io/pkg/mgcv/man/shash.html" class="external-link">mgcv::shash()</a></code>: location, positive scale, skewness and positive tail parameter
 (named <code>kurtosis</code> to match gratia's parameter names);</p></li>
-<li><p><code>twlss</code>: location (mean), power and scale (dispersion);</p></li>
-<li><p><code>ziplss</code>: location (Poisson rate) and <code>pi</code> (probability of presence).</p></li>
+<li><p><code><a href="https://rdrr.io/pkg/mgcv/man/twlss.html" class="external-link">mgcv::twlss()</a></code>: location (mean), power and scale (dispersion);</p></li>
+<li><p><code><a href="https://rdrr.io/pkg/mgcv/man/ziplss.html" class="external-link">mgcv::ziplss()</a></code>: location (Poisson rate) and <code>pi</code> (probability of presence).</p></li>
 </ul><p>Raw-data recovery can require <code>envir</code> when a model was fitted locally and
 its formula no longer retains the environment containing the fitting data.
 Alternatively, supply reference <code>data</code> explicitly.</p>

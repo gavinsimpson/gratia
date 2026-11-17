@@ -131,11 +131,12 @@ confint(
 
   additional arguments passed to
   [`smooth_estimates()`](https://gavinsimpson.github.io/gratia/reference/smooth_estimates.md),
-  including `interval_method` to select Gaussian, stored scasm
-  bootstrap, or shape-enforced intervals, and `shape_source` to choose
-  their initial source. `simultaneous_method`, `simultaneous_domain`,
-  and `tube_control` request and configure continuous-interval tube
-  bands; see
+  including `interval_method` to select Gaussian, stored
+  [`mgcv::scasm()`](https://rdrr.io/pkg/mgcv/man/scasm.html) bootstrap,
+  or shape-enforced intervals, and `shape_source` to choose their
+  initial source. `simultaneous_method`, `simultaneous_domain`, and
+  `tube_control` request and configure continuous-interval tube bands;
+  see
   [simultaneous_bands](https://gavinsimpson.github.io/gratia/reference/simultaneous_bands.md).
 
 - newdata:
@@ -172,10 +173,11 @@ a tibble with components:
 
 ## Details
 
-For SCAM fits, [`confint()`](https://rdrr.io/r/stats/confint.html)
-returns intervals for smooth functions, with `parm` selecting smooth
-labels. It uses transformed-coefficient Gaussian uncertainty conditional
-on the fitted smoothing parameters. By default, intercept uncertainty is
+For SCAM fits,
+[`stats::confint()`](https://rdrr.io/r/stats/confint.html) returns
+intervals for smooth functions, with `parm` selecting smooth labels. It
+uses transformed-coefficient Gaussian uncertainty conditional on the
+fitted smoothing parameters. By default, intercept uncertainty is
 excluded. These intervals do not enforce shape constraints on their
 limits.
 
@@ -185,8 +187,9 @@ limits.
 intervals. Each simultaneous band covers the evaluation points of one
 fitted smooth by default, or its continuous domain with tube
 calibration; separate smooths do not form a joint coverage set. Native
-scasm fits default to `overall_uncertainty = FALSE` and use stored
-bootstrap draws for pointwise intervals when available, as in
+[`mgcv::scasm()`](https://rdrr.io/pkg/mgcv/man/scasm.html) fits default
+to `overall_uncertainty = FALSE` and use stored bootstrap draws for
+pointwise intervals when available, as in
 [`smooth_estimates()`](https://gavinsimpson.github.io/gratia/reference/smooth_estimates.md).
 Shifting and transforming a smooth preserves its interval limits,
 including asymmetric bootstrap limits. Shape-enforced intervals describe

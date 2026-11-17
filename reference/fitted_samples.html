@@ -145,7 +145,7 @@ distribution of a fitted model.</p>
 <dd><p>arguments passed to other methods. For <code>fitted_samples()</code>, these
 are passed on to <code><a href="https://rdrr.io/pkg/mgcv/man/predict.gam.html" class="external-link">mgcv::predict.gam()</a></code>. For <code><a href="posterior_samples.html">posterior_samples()</a></code> these are
 passed on to <code>fitted_samples()</code>. For <code><a href="predicted_samples.html">predicted_samples()</a></code> these are
-passed on to the relevant <code><a href="simulate.html">simulate()</a></code> method.</p></dd>
+passed on to the relevant <code><a href="https://rdrr.io/r/stats/simulate.html" class="external-link">stats::simulate()</a></code> method.</p></dd>
 
 
 <dt id="arg-data">data<a class="anchor" aria-label="anchor" href="#arg-data"></a></dt>
@@ -290,8 +290,8 @@ parameter on which it depends, on the response scale only.</p></dd>
 supported <code>re</code> and <code>fs</code> terms; character vectors select exact smooth labels.
 Fitted predictions integrate response means over new zero-mean Gaussian
 effects. Response samplers draw new effects before sampling responses.
-Smoothing parameters and dispersion remain fixed. Only ordinary <code>gam()</code>
-and <code>bam()</code> fits with a scalar response mean are supported.</p></dd>
+Smoothing parameters and dispersion remain fixed. Only ordinary <code><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">mgcv::gam()</a></code>
+and <code><a href="https://rdrr.io/pkg/mgcv/man/bam.html" class="external-link">mgcv::bam()</a></code> fits with a scalar response mean are supported.</p></dd>
 
 
 <dt id="arg-integration">integration<a class="anchor" aria-label="anchor" href="#arg-integration"></a></dt>
@@ -352,7 +352,7 @@ parameters outside the coefficient vector remain fixed and are described
 in the metadata, rather than returned as fitted parameters.</p>
 <p>Use <code>quantity = "expectation"</code> for expected responses labelled
 <code>"expectation"</code>. This includes Gumbel, GEV and sinh-arcsinh mean adjustments
-and the zero-truncated Poisson adjustment in <code>ziplss()</code>. A GEV expectation
+and the zero-truncated Poisson adjustment in <code><a href="https://rdrr.io/pkg/mgcv/man/ziplss.html" class="external-link">mgcv::ziplss()</a></code>. A GEV expectation
 does not exist at shape &gt;= 1; parameter and response draws remain available.
 Categorical expectations are category probabilities, not numeric category
 scores. <code>.category</code> identifies categories, and <code>.y</code> identifies multivariate
@@ -376,11 +376,11 @@ Grouped expectations include scalar fitted means and ordinal category
 probabilities, with <code>.category</code> identifying the ordinal category and <code>NA</code>
 for scalar components. Distributional nuisance parameters are held at
 their fitted values. This does not add support for general/location-scale
-families that <code>gfam()</code> itself rejects, nor repair upstream fitting failures
-(including fixed-theta negative-binomial components and some <code>ziP()</code> fits
+families that <code><a href="https://rdrr.io/pkg/mgcv/man/gfam.html" class="external-link">mgcv::gfam()</a></code> itself rejects, nor repair upstream fitting failures
+(including fixed-theta negative-binomial components and some <code><a href="https://rdrr.io/pkg/mgcv/man/ziP.html" class="external-link">mgcv::ziP()</a></code> fits
 in some mgcv versions).</p>
 <p>Observation rows use the same missing-value convention as
-<code><a href="posterior_samples.html">posterior_samples()</a></code>: default results restore <code>na.exclude</code> observations in
+<code><a href="posterior_samples.html">posterior_samples()</a></code>: default results restore <code><a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">stats::na.exclude()</a></code> observations in
 every draw, while explicit <code>data</code> are evaluated in their own row order.</p>
     </div>
     <div class="section level2">

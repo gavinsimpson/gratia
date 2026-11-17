@@ -102,8 +102,16 @@ appraise(
 
   a fitted model supported by
   [diagnostic_support](https://gavinsimpson.github.io/gratia/reference/diagnostic_support.md),
-  including lm, glm, gam/bam, gamm/gamm4, glmmTMB, univariate GJRM and
-  sdmTMB.
+  including [`stats::lm()`](https://rdrr.io/r/stats/lm.html),
+  [`stats::glm()`](https://rdrr.io/r/stats/glm.html),
+  [`mgcv::gam()`](https://rdrr.io/pkg/mgcv/man/gam.html),
+  [`mgcv::bam()`](https://rdrr.io/pkg/mgcv/man/bam.html),
+  [`mgcv::gamm()`](https://rdrr.io/pkg/mgcv/man/gamm.html),
+  [`gamm4::gamm4()`](https://rdrr.io/pkg/gamm4/man/gamm4.html),
+  [`glmmTMB::glmmTMB()`](https://rdrr.io/pkg/glmmTMB/man/glmmTMB.html),
+  univariate
+  [`GJRM::gamlss()`](https://rdrr.io/pkg/GJRM/man/gamlss.html) and
+  [`sdmTMB::sdmTMB()`](https://sdmTMB.github.io/sdmTMB/reference/sdmTMB.html).
 
 - ...:
 
@@ -174,12 +182,13 @@ appraise(
 
   character or `NULL`; residual type: `"deviance"`, `"response"`,
   `"pearson"`, `"pit"`, `"quantile"`, `"dharma"`, or `"surrogate"` (for
-  `ocat()` or `multinom()` GAMs). `NULL` uses the model-specific
-  default: deviance for ordinary lm/glm/GAM fits, and quantile for
-  supported grouped families, GJRM, sdmTMB and full mixed-model checks.
-  glmmTMB uses Pearson residuals conditionally and response residuals
-  marginally. Extracted GAM components follow the ordinary GAM defaults.
-  See
+  [`mgcv::ocat()`](https://rdrr.io/pkg/mgcv/man/ocat.html) or
+  [`mgcv::multinom()`](https://rdrr.io/pkg/mgcv/man/multinom.html)
+  GAMs). `NULL` uses the model-specific default: deviance for ordinary
+  lm/glm/GAM fits, and quantile for supported grouped families, GJRM,
+  sdmTMB and full mixed-model checks. glmmTMB uses Pearson residuals
+  conditionally and response residuals marginally. Extracted GAM
+  components follow the ordinary GAM defaults. See
   [diagnostic_support](https://gavinsimpson.github.io/gratia/reference/diagnostic_support.md).
 
 - n_bins:
@@ -392,9 +401,13 @@ components are supported. Unrecognised custom-family bounds remain
 unsupported. A custom CDF must also support the probabilities just below
 discrete values and at censoring limits. Replacements for recognised
 family CDFs must use the same arguments and probability conventions.
-Scalar uncensored `cnorm()`, `clog()` and `cpois()` components are
-supported; genuine censoring requires recoverable, aligned censoring
-bounds. Matrix censored responses rejected by `gfam()` and upstream
+Scalar uncensored
+[`mgcv::cnorm()`](https://rdrr.io/pkg/mgcv/man/cnorm.html),
+[`mgcv::clog()`](https://rdrr.io/pkg/mgcv/man/clog.html) and
+[`mgcv::cpois()`](https://rdrr.io/pkg/mgcv/man/cpois.html) components
+are supported; genuine censoring requires recoverable, aligned censoring
+bounds. Matrix censored responses rejected by
+[`mgcv::gfam()`](https://rdrr.io/pkg/mgcv/man/gfam.html) and upstream
 fitting failures are not repaired.
 
 Use `response = NULL` to check every grouped-family component or a
@@ -443,8 +456,9 @@ can be changed with ggplot scales. QQ references average draws as they
 are generated or compute exact pooled quantiles using temporary files
 above the configured memory threshold; see
 [diagnostic_support](https://gavinsimpson.github.io/gratia/reference/diagnostic_support.md).
-Supported univariate GJRM::gamlss models use quantile residuals by
-default.
+Supported univariate
+[`GJRM::gamlss()`](https://rdrr.io/pkg/GJRM/man/gamlss.html) models use
+quantile residuals by default.
 
 If the response expectation does not exist, the observed-versus-fitted
 panel explains why it is unavailable. Other supported panels remain

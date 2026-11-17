@@ -42,9 +42,11 @@ dharma_residuals(model, n = 250L, seed = NULL, conditioning = NULL, ...)
 
 ## Value
 
-A numeric vector in observation order. With `na.exclude`, excluded
-observations are restored as `NA`; with `na.omit`, only fitting rows
-remain.
+A numeric vector in observation order. With
+[`stats::na.exclude()`](https://rdrr.io/r/stats/na.fail.html), excluded
+observations are restored as `NA`; with
+[`stats::na.omit()`](https://rdrr.io/r/stats/na.fail.html), only fitting
+rows remain.
 
 ## Details
 

@@ -271,8 +271,8 @@ posterior predictive checks remain available when this variance is infinite.</p>
 </dl></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>With <code>na.exclude</code>, excluded observations are restored as <code>NA</code> residuals;
-with <code>na.omit</code>, only observations used for fitting are returned. Selecting a
+    <p>With <code><a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">stats::na.exclude()</a></code>, excluded observations are restored as <code>NA</code> residuals;
+with <code><a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">stats::na.omit()</a></code>, only observations used for fitting are returned. Selecting a
 grouped-family component with <code>response</code> returns only its retained fitting
 observations, without placeholders for excluded rows whose component
 membership is unavailable.</p>
@@ -281,9 +281,9 @@ observations have PIT residuals sampled uniformly between <code>F(l)</code> and 
 Here <code>l</code> and <code>u</code> bound the censoring interval and <code>F</code> is the fitted cumulative
 distribution function (CDF) of the underlying response. Left and right
 censoring use probabilities zero and one for the unbounded end, respectively.
-Quantile residuals apply <code><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">qnorm()</a></code> to these PIT values. Uncensored continuous
+Quantile residuals apply <code><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">stats::qnorm()</a></code> to these PIT values. Uncensored continuous
 observations use <code>F(y)</code>; uncensored Poisson observations are randomised between
-<code>F(y - 1)</code> and <code>F(y)</code>. Use non-integer censoring limits for <code>cpois()</code>, as
+<code>F(y - 1)</code> and <code>F(y)</code>. Use non-integer censoring limits for <code><a href="https://rdrr.io/pkg/mgcv/man/cpois.html" class="external-link">mgcv::cpois()</a></code>, as
 recommended by mgcv.</p>
 <p>For grouped-family GAMs fitted with <code><a href="https://rdrr.io/pkg/mgcv/man/gfam.html" class="external-link">mgcv::gfam()</a></code>, each observation uses its
 component's CDF, fitted nuisance parameters, dispersion and weights. Residuals
@@ -303,7 +303,7 @@ caused by rounding probabilities to zero or one. Probabilities are not
 clipped, so true zero-probability tails still give infinite residuals for
 ordinary models; grouped diagnostics report non-finite residuals as errors.
 PITs are returned as ordinary probabilities and may still round to zero or
-one in extreme tails. Applying <code><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">qnorm()</a></code> to returned PITs can therefore be
+one in extreme tails. Applying <code><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">stats::qnorm()</a></code> to returned PITs can therefore be
 less accurate than requesting quantile residuals directly. CDFs without log
 probabilities retain ordinary-probability calculations.</p>
 <p>For <code><a href="https://rdrr.io/pkg/mgcv/man/multinom.html" class="external-link">mgcv::multinom()</a></code> models, probabilities accumulate in the existing

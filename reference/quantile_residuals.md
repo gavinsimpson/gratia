@@ -212,11 +212,13 @@ quantile_residuals(
 
 ## Details
 
-With `na.exclude`, excluded observations are restored as `NA` residuals;
-with `na.omit`, only observations used for fitting are returned.
-Selecting a grouped-family component with `response` returns only its
-retained fitting observations, without placeholders for excluded rows
-whose component membership is unavailable.
+With [`stats::na.exclude()`](https://rdrr.io/r/stats/na.fail.html),
+excluded observations are restored as `NA` residuals; with
+[`stats::na.omit()`](https://rdrr.io/r/stats/na.fail.html), only
+observations used for fitting are returned. Selecting a grouped-family
+component with `response` returns only its retained fitting
+observations, without placeholders for excluded rows whose component
+membership is unavailable.
 
 For [`mgcv::cnorm()`](https://rdrr.io/pkg/mgcv/man/cnorm.html),
 [`mgcv::clog()`](https://rdrr.io/pkg/mgcv/man/clog.html) and
@@ -226,10 +228,12 @@ censored observations have PIT residuals sampled uniformly between
 is the fitted cumulative distribution function (CDF) of the underlying
 response. Left and right censoring use probabilities zero and one for
 the unbounded end, respectively. Quantile residuals apply
-[`qnorm()`](https://rdrr.io/r/stats/Normal.html) to these PIT values.
-Uncensored continuous observations use `F(y)`; uncensored Poisson
-observations are randomised between `F(y - 1)` and `F(y)`. Use
-non-integer censoring limits for `cpois()`, as recommended by mgcv.
+[`stats::qnorm()`](https://rdrr.io/r/stats/Normal.html) to these PIT
+values. Uncensored continuous observations use `F(y)`; uncensored
+Poisson observations are randomised between `F(y - 1)` and `F(y)`. Use
+non-integer censoring limits for
+[`mgcv::cpois()`](https://rdrr.io/pkg/mgcv/man/cpois.html), as
+recommended by mgcv.
 
 For grouped-family GAMs fitted with
 [`mgcv::gfam()`](https://rdrr.io/pkg/mgcv/man/gfam.html), each
@@ -256,10 +260,10 @@ Probabilities are not clipped, so true zero-probability tails still give
 infinite residuals for ordinary models; grouped diagnostics report
 non-finite residuals as errors. PITs are returned as ordinary
 probabilities and may still round to zero or one in extreme tails.
-Applying [`qnorm()`](https://rdrr.io/r/stats/Normal.html) to returned
-PITs can therefore be less accurate than requesting quantile residuals
-directly. CDFs without log probabilities retain ordinary-probability
-calculations.
+Applying [`stats::qnorm()`](https://rdrr.io/r/stats/Normal.html) to
+returned PITs can therefore be less accurate than requesting quantile
+residuals directly. CDFs without log probabilities retain
+ordinary-probability calculations.
 
 For [`mgcv::multinom()`](https://rdrr.io/pkg/mgcv/man/multinom.html)
 models, probabilities accumulate in the existing category coding order

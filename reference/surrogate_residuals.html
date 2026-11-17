@@ -105,11 +105,11 @@ The default, <code>NULL</code>, holds fitted random effects fixed in the same wa
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>For <code>ocat()</code>, a numeric vector with one residual per observation.
+    <p>For <code><a href="https://rdrr.io/pkg/mgcv/man/ocat.html" class="external-link">mgcv::ocat()</a></code>, a numeric vector with one residual per observation.
 For <code>multinom(K)</code>, a numeric matrix with one row per observation and <code>K+1</code>
 columns named <code>"0"</code>, ..., <code>"K"</code>, identifying the category utilities.
-With <code>na.exclude</code>, excluded fitting rows are restored as <code>NA</code>; with
-<code>na.omit</code>, only observations used for fitting are returned.</p>
+With <code><a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">stats::na.exclude()</a></code>, excluded fitting rows are restored as <code>NA</code>; with
+<code><a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">stats::na.omit()</a></code>, only observations used for fitting are returned.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -123,9 +123,9 @@ from this surrogate response.</p>
 model with known parameters, the residuals have a logistic distribution with
 location zero and scale one: mean zero and variance <code>pi^2 / 3</code>. Fitted
 parameters affect this reference approximation. The identity link reported by
-<code>ocat()</code> describes the latent mean; its latent distribution is logistic.</p>
+<code><a href="https://rdrr.io/pkg/mgcv/man/ocat.html" class="external-link">mgcv::ocat()</a></code> describes the latent mean; its latent distribution is logistic.</p>
 <p>This calculation shares the randomised probabilities used by
-<code><a href="quantile_residuals.html">quantile_residuals()</a></code>, which instead applies <code><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">qnorm()</a></code> for normal scores.
+<code><a href="quantile_residuals.html">quantile_residuals()</a></code>, which instead applies <code><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">stats::qnorm()</a></code> for normal scores.
 Both tails are calculated using log probabilities to retain accuracy when
 ordinary probabilities round to zero or one. Fitting weights do not change
 the scale of the latent logistic distribution.</p>
@@ -148,17 +148,17 @@ have independent upper-truncated Gumbel distributions. The sampler uses
 this identity directly, with log calculations that retain accuracy for rare
 observed categories and extreme predictors, without rejection or Gibbs
 iterations. This construction does not impose an ordering on categories.</p>
-<p>Supported fits are <code>gam</code> and <code>bam</code> models with a single <code>ocat()</code> family,
-and <code>gam</code> models with <code>multinom()</code>. Grouped families and other model classes
+<p>Supported fits are <code>gam</code> and <code>bam</code> models with a single <code><a href="https://rdrr.io/pkg/mgcv/man/ocat.html" class="external-link">mgcv::ocat()</a></code> family,
+and <code>gam</code> models with <code><a href="https://rdrr.io/pkg/mgcv/man/multinom.html" class="external-link">mgcv::multinom()</a></code>. Grouped families and other model classes
 are not supported. Fitted random effects are held fixed. Use
 <code>type = "surrogate"</code> in <code><a href="appraise.html">appraise()</a></code>, <code><a href="qq_plot.html">qq_plot()</a></code>, <code><a href="worm_plot.html">worm_plot()</a></code> and
 residual plots. QQ and worm plots require <code>method = NULL</code>, with logistic
-references for <code>ocat()</code> and centred Gumbel references for <code>multinom()</code>.
+references for <code><a href="https://rdrr.io/pkg/mgcv/man/ocat.html" class="external-link">mgcv::ocat()</a></code> and centred Gumbel references for <code><a href="https://rdrr.io/pkg/mgcv/man/multinom.html" class="external-link">mgcv::multinom()</a></code>.
 Pointwise order-statistic bands apply separately to each utility component,
 treating fitted parameters as fixed. They do not give simultaneous coverage
 across categories. Components are always shown separately, including when
-<code>by_family = FALSE</code>. For <code>ocat()</code>, <code><a href="residuals_linpred_plot.html">residuals_linpred_plot()</a></code> uses the fitted
-latent mean. For <code>multinom()</code>, it uses each category's fitted probability;
+<code>by_family = FALSE</code>. For <code><a href="https://rdrr.io/pkg/mgcv/man/ocat.html" class="external-link">mgcv::ocat()</a></code>, <code><a href="residuals_linpred_plot.html">residuals_linpred_plot()</a></code> uses the fitted
+latent mean. For <code><a href="https://rdrr.io/pkg/mgcv/man/multinom.html" class="external-link">mgcv::multinom()</a></code>, it uses each category's fitted probability;
 observed-versus-fitted panels compare that probability with its category
 indicator. This also gives category 0 a varying horizontal axis despite its
 fixed utility location. Covariate plots separate the category utilities.

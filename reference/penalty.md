@@ -151,7 +151,7 @@ positivity. The `parameterisation` attribute records this distinction.
 
 ## Note
 
-The [`print()`](https://rdrr.io/r/base/print.html) method uses
+The [`base::print()`](https://rdrr.io/r/base/print.html) method uses
 [`base::zapsmall()`](https://rdrr.io/r/base/zapsmall.html) to turn very
 small numbers into 0s for display purposes only; the underlying values
 of the penalty matrix or matrices are not changed.

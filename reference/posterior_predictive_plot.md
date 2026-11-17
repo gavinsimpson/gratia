@@ -174,20 +174,20 @@ scalable predictive checks using transformed coefficient draws. Gaussian
 identity-link AR1 fits retain the fitted response correlation and the
 series boundaries stored in `AR.start`. Gaussian `gamm` and `gamm4`
 models draw fixed and random effects together, keeping covariance
-parameters at fitted values; marginal checks draw new effects. For gamm
-fits estimated by penalized quasi-likelihood (PQL), the sampler uses the
-Gaussian approximation used in fitting and then generates responses from
-the fitted response family. This is supported only when the Gaussian
-working residuals are uncorrelated. Correlation in those working
-residuals does not specify a joint distribution for responses from the
-fitted family. `gamm4` defaults to `conditioning = "conditional"`,
-checking the full fitted mixed model while including uncertainty in
-fitted effects. Use the explicit `"gam_component"` option for the
-extracted GAM calculations. GJRM draws the final distributional
-coefficients jointly for supported uncensored univariate families,
-including BE, LO, WEI, IG, GU and rGU. Both distributional equations
-retain their coefficient covariance; beta scale draws use its logit
-link. See
+parameters at fitted values; marginal checks draw new effects. For
+[`mgcv::gamm()`](https://rdrr.io/pkg/mgcv/man/gamm.html) fits estimated
+by penalized quasi-likelihood (PQL), the sampler uses the Gaussian
+approximation used in fitting and then generates responses from the
+fitted response family. This is supported only when the Gaussian working
+residuals are uncorrelated. Correlation in those working residuals does
+not specify a joint distribution for responses from the fitted family.
+`gamm4` defaults to `conditioning = "conditional"`, checking the full
+fitted mixed model while including uncertainty in fitted effects. Use
+the explicit `"gam_component"` option for the extracted GAM
+calculations. GJRM draws the final distributional coefficients jointly
+for supported uncensored univariate families, including BE, LO, WEI, IG,
+GU and rGU. Both distributional equations retain their coefficient
+covariance; beta scale draws use its logit link. See
 [diagnostic_support](https://gavinsimpson.github.io/gratia/reference/diagnostic_support.md)
 for the family list. These are approximate predictive checks; no
 refitting is performed.

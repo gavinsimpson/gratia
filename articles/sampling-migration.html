@@ -470,7 +470,7 @@ override them. Output retains <code>.parameter = "component1"</code>,
 <code>"component2"</code>, and so on, together with <code>.row</code>,
 <code>.draw</code> and any chain columns. Missing predictors, membership
 or sampling weights produce missing responses. Fitting rows excluded by
-<code>na.exclude</code> are restored. Smooth samples retain their
+<code><a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">na.exclude()</a></code> are restored. Smooth samples retain their
 predictor contributions, and response derivatives use each row’s
 component mean. For derivatives, membership must be recoverable from
 <code>data</code>; <code><a href="../reference/derivative_samples.html">derivative_samples()</a></code> does not accept

@@ -35,7 +35,8 @@ user_draws(
   [`gamm4::gamm4()`](https://rdrr.io/pkg/gamm4/man/gamm4.html), or a
   model inheriting from these classes. See
   [gamm4_support](https://gavinsimpson.github.io/gratia/reference/gamm4_support.md)
-  for sampling from gamm4 fits.
+  for sampling from
+  [`gamm4::gamm4()`](https://rdrr.io/pkg/gamm4/man/gamm4.html) fits.
 
 - ...:
 

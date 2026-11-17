@@ -71,7 +71,9 @@ pp_check.scam(object, ...)
 
 - object:
 
-  a fitted GAM, BAM, gamm, or gamm4 model.
+  a fitted GAM, BAM,
+  [`mgcv::gamm()`](https://rdrr.io/pkg/mgcv/man/gamm.html), or
+  [`gamm4::gamm4()`](https://rdrr.io/pkg/gamm4/man/gamm4.html) model.
 
 - ...:
 
@@ -139,17 +141,22 @@ coefficient draws. For a multivariate response, the weights leave out
 the entire response vector. Grouped-family checks use only the selected
 component's observations.
 
-Some bayesplot plotting functions, including `error_binned` and LOO-PIT
-plots, also require bayesplot's optional rstantools package. Install it
-with `install.packages("rstantools")` to use those plots.
+Some bayesplot plotting functions, including
+[`bayesplot::ppc_error_binned()`](https://mc-stan.org/bayesplot/reference/PPC-errors.html)
+and LOO-PIT plots, also require bayesplot's optional rstantools package.
+Install it with `install.packages("rstantools")` to use those plots.
 
 Binomial observations and replicated responses are shown as numbers of
 successes with fitted trial counts. Other gratia predictive plots use
-proportions. The `error_binned` plot uses expected responses rather than
-response simulations and requires an available finite response mean. For
-gamm and gamm4 it currently requires `conditioning = "gam_component"`.
-Plotting functions requiring additional inputs, such as censoring
-indicators, receive those inputs through `...`.
+proportions. The
+[`bayesplot::ppc_error_binned()`](https://mc-stan.org/bayesplot/reference/PPC-errors.html)
+plot uses expected responses rather than response simulations and
+requires an available finite response mean. For
+[`mgcv::gamm()`](https://rdrr.io/pkg/mgcv/man/gamm.html) and
+[`gamm4::gamm4()`](https://rdrr.io/pkg/gamm4/man/gamm4.html) it
+currently requires `conditioning = "gam_component"`. Plotting functions
+requiring additional inputs, such as censoring indicators, receive those
+inputs through `...`.
 
 Coefficient draws use a Gaussian approximation by default; additional
 family parameters remain at fitted values. See

@@ -271,11 +271,11 @@ selected smooth order and parallel evaluation scheduling.</p></dd>
 
 
 <dt id="arg-interval-method">interval_method<a class="anchor" aria-label="anchor" href="#arg-interval-method"></a></dt>
-<dd><p>character; "auto" uses stored scasm bootstrap draws
+<dd><p>character; "auto" uses stored <code><a href="https://rdrr.io/pkg/mgcv/man/scasm.html" class="external-link">mgcv::scasm()</a></code> bootstrap draws
 for pointwise intervals when available, and Gaussian intervals otherwise.
 Use "gaussian" to request covariance-based limits or "bootstrap" to
 require stored draws. Simultaneous bootstrap bands are not supported.
-<code>"shape"</code> applies <code><a href="shape_intervals.html">shape_intervals()</a></code> to supported scasm smooth components,
+<code>"shape"</code> applies <code><a href="shape_intervals.html">shape_intervals()</a></code> to supported <code><a href="https://rdrr.io/pkg/mgcv/man/scasm.html" class="external-link">mgcv::scasm()</a></code> smooth components,
 using the initial limits chosen by <code>shape_source</code>.</p></dd>
 
 
@@ -371,7 +371,7 @@ the covariance of the constrained coefficients. With
 <code>overall_uncertainty = TRUE</code>, their standard errors also include intercept
 uncertainty and its covariance with the smooth; estimates remain centred.
 Models without an intercept use smooth-only uncertainty for either setting.
-Native scasm fits use component-only uncertainty by default. Explicitly
+Native <code><a href="https://rdrr.io/pkg/mgcv/man/scasm.html" class="external-link">mgcv::scasm()</a></code> fits use component-only uncertainty by default. Explicitly
 requesting <code>overall_uncertainty = TRUE</code> warns once if selected smooths lack
 the centring information needed to add mean uncertainty. Ordinary GAM
 defaults are unchanged.</p>
@@ -401,7 +401,7 @@ source uses approximate Bayesian covariance and does not construct a
 constrained posterior. Standard errors describe the initial calculation;
 <code>.crit</code> is <code>NA</code> after shape enforcement. Metadata records the initial source,
 correction, named shapes, model coordinates and whole-grid guarantee.</p>
-<p>Every selected term must have retained named scasm restrictions. Supported
+<p>Every selected term must have retained named <code><a href="https://rdrr.io/pkg/mgcv/man/scasm.html" class="external-link">mgcv::scasm()</a></code> restrictions. Supported
 combinations are positivity, monotonicity in any directions and curvature
 in at most one direction. Tensor smooths require <code>te(..., np = FALSE)</code> with
 univariate B-spline margins (<code>"sc"</code> or <code>"bs"</code>). Normal reparameterisation

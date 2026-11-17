@@ -81,7 +81,7 @@ variance_comp(
   rescaling is undone, resulting in variance components that are on
   their original scale. This is needed if comparing with other mixed
   model software, such as
-  [`lmer()`](https://rdrr.io/pkg/lme4/man/lmer.html).
+  [`lme4::lmer()`](https://rdrr.io/pkg/lme4/man/lmer.html).
 
 - coverage:
 
@@ -90,8 +90,10 @@ variance_comp(
 
 - interval_method:
 
-  character; for `gamm4()` fits, `"profile"` computes likelihood profile
-  intervals and `"none"` returns estimates only.
+  character; for
+  [`gamm4::gamm4()`](https://rdrr.io/pkg/gamm4/man/gamm4.html) fits,
+  `"profile"` computes likelihood profile intervals and `"none"` returns
+  estimates only.
 
 - type:
 
@@ -125,8 +127,9 @@ variance_comp(
 
 - ...:
 
-  arguments passed to other methods. For `gamm4()` fits, additional
-  arguments are passed to
+  arguments passed to other methods. For
+  [`gamm4::gamm4()`](https://rdrr.io/pkg/gamm4/man/gamm4.html) fits,
+  additional arguments are passed to
   [`stats::profile()`](https://rdrr.io/r/stats/profile.html), for
   example `maxpts`. With `type = "terms"`, no additional arguments are
   accepted.
@@ -175,7 +178,9 @@ is available. Unavailable intervals are `NA`.
 
 For [`mgcv::gamm()`](https://rdrr.io/pkg/mgcv/man/gamm.html) fits,
 components are extracted from `lme`. Smooth variances are expressed on
-the same penalty scale as for `gam()` and `bam()`, with one row per
+the same penalty scale as for
+[`mgcv::gam()`](https://rdrr.io/pkg/mgcv/man/gam.html) and
+[`mgcv::bam()`](https://rdrr.io/pkg/mgcv/man/bam.html), with one row per
 penalty. Additional random effects have one row per coefficient
 variance, labelled by grouping factor and coefficient; their covariances
 are omitted. Intervals use
@@ -209,10 +214,11 @@ the linear predictor, evaluated over the observations used to fit the
 model. Parametric formula terms are included, with all coefficients of a
 factor, polynomial or interaction combined into one term. Each smooth
 has one row, including smooths with several penalties. Additional random
-effects in `gamm()` and `gamm4()` contribute one component per grouping
-factor and coefficient, evaluated at their fitted values. Formula terms
-follow the model's contrast coding. Duplicated component labels receive
-numeric suffixes.
+effects in [`mgcv::gamm()`](https://rdrr.io/pkg/mgcv/man/gamm.html) and
+[`gamm4::gamm4()`](https://rdrr.io/pkg/gamm4/man/gamm4.html) contribute
+one component per grouping factor and coefficient, evaluated at their
+fitted values. Formula terms follow the model's contrast coding.
+Duplicated component labels receive numeric suffixes.
 
 Term variances and covariances use equal observation weights and the
 sample denominator, the number of fitting observations minus one.

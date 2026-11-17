@@ -494,11 +494,11 @@ fitted effects. Explicit <code>conditioning = "gam_component"</code>
 selects the extracted GAM calculations, and is required for posterior
 response draws at new data or supplied coefficient draws.
 <code>conditioning = "marginal"</code> generates new mixed-model
-effects; for gamm4 this includes the spline effects represented as
-random effects, so it asks a different question from new measurement
-errors around a fixed age curve. The existing <code><a href="https://rdrr.io/pkg/mgcv/man/gamm.html" class="external-link">gamm()</a></code>
-response simulator still defaults to its GAM component; request
-full-model conditioning explicitly there. See <a href="../reference/gamm4_support.html"><code>gamm4_support</code></a>
+effects; for <code><a href="https://rdrr.io/pkg/gamm4/man/gamm4.html" class="external-link">gamm4()</a></code> this includes the spline effects
+represented as random effects, so it asks a different question from new
+measurement errors around a fixed age curve. The existing
+<code><a href="https://rdrr.io/pkg/mgcv/man/gamm.html" class="external-link">gamm()</a></code> response simulator still defaults to its GAM
+component; request full-model conditioning explicitly there. See <a href="../reference/gamm4_support.html"><code>gamm4_support</code></a>
 for covariance and sampling restrictions. Use fitting-package prediction
 on the <code>mer</code> component for predictions conditional on a
 particular child’s effects.</p>

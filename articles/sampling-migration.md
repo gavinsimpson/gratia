@@ -302,7 +302,8 @@ are retained. New-data sampling weights default to one; explicit weights
 override them. Output retains `.parameter = "component1"`,
 `"component2"`, and so on, together with `.row`, `.draw` and any chain
 columns. Missing predictors, membership or sampling weights produce
-missing responses. Fitting rows excluded by `na.exclude` are restored.
+missing responses. Fitting rows excluded by
+[`na.exclude()`](https://rdrr.io/r/stats/na.fail.html) are restored.
 Smooth samples retain their predictor contributions, and response
 derivatives use each row’s component mean. For derivatives, membership
 must be recoverable from `data`;

@@ -552,11 +552,12 @@
 
   [`shape_intervals()`](https://gavinsimpson.github.io/gratia/reference/shape_intervals.md)
   applies monotone rearrangement and convex or concave envelopes to
-  existing interval endpoints on a finite grid. Supported scasm smooths
-  expose this through `interval_method = "shape"` and an explicit
-  Gaussian or stored-bootstrap initial source. The transformation
-  preserves whole-grid containment events; it does not establish nominal
-  coverage or preserve marginal coverage of pointwise limits.
+  existing interval endpoints on a finite grid. Supported
+  [`scasm()`](https://rdrr.io/pkg/mgcv/man/scasm.html) smooths expose
+  this through `interval_method = "shape"` and an explicit Gaussian or
+  stored-bootstrap initial source. The transformation preserves
+  whole-grid containment events; it does not establish nominal coverage
+  or preserve marginal coverage of pointwise limits.
 
   [`shape_confidence_set()`](https://gavinsimpson.github.io/gratia/reference/shape_confidence_set.md)
   and
@@ -582,9 +583,10 @@
   estimates reject interval computation controls that require the fitted
   model.
 
-  `interval_method` selects native scasm bootstrap or Gaussian pointwise
-  intervals for smooths, fitted values, smooth derivatives and
-  [`confint()`](https://rdrr.io/r/stats/confint.html).
+  `interval_method` selects native
+  [`scasm()`](https://rdrr.io/pkg/mgcv/man/scasm.html) bootstrap or
+  Gaussian pointwise intervals for smooths, fitted values, smooth
+  derivatives and [`confint()`](https://rdrr.io/r/stats/confint.html).
 
   Shifting or transforming smooth confidence intervals retains
   asymmetric limits. Replacing saved intervals with
@@ -597,16 +599,18 @@
   ([\#372](https://github.com/gavinsimpson/gratia/issues/372),
   [\#373](https://github.com/gavinsimpson/gratia/issues/373)).
 
-- Scasm captions show retained shape constraints with portable
-  mathematical arrows. Saved estimates retain constraint metadata for
-  each tensor margin; ignored requests, including named constraints
-  replaced by general `pc` inequalities, are labelled and produce a
-  warning ([\#373](https://github.com/gavinsimpson/gratia/issues/373)).
+- [`scasm()`](https://rdrr.io/pkg/mgcv/man/scasm.html) captions show
+  retained shape constraints with portable mathematical arrows. Saved
+  estimates retain constraint metadata for each tensor margin; ignored
+  requests, including named constraints replaced by general `pc`
+  inequalities, are labelled and produce a warning
+  ([\#373](https://github.com/gavinsimpson/gratia/issues/373)).
   Shape-enforced intervals keep the basis and constraint caption, with
   interval details in the documentation and metadata.
 
 - Gaussian simultaneous bands now support positive-semidefinite
-  coefficient covariance matrices, including scasm fits with exact
+  coefficient covariance matrices, including
+  [`scasm()`](https://rdrr.io/pkg/mgcv/man/scasm.html) fits with exact
   equality constraints.
 
 - [`penalty()`](https://gavinsimpson.github.io/gratia/reference/penalty.md)
@@ -1673,8 +1677,10 @@
 
 - **Missing observations and prediction rows**
 
-  For models fitted with `na.exclude`, default fitted values, partial
-  residuals, fitted and posterior samples, simulations and
+  For models fitted with
+  [`na.exclude()`](https://rdrr.io/r/stats/na.fail.html), default fitted
+  values, partial residuals, fitted and posterior samples, simulations
+  and
   [`quantile_residuals()`](https://gavinsimpson.github.io/gratia/reference/quantile_residuals.md)
   now restore excluded rows as `NA`. Diagnostics align retained
   observations with predictors, and histogram bin selection handles
@@ -1744,10 +1750,10 @@
   now sizes its plot layout using the panels actually drawn, including
   parametric effects, avoiding rendering errors for GJRM models.
 
-- Posterior sampling for GAMs, including the GAM component of gamm4
-  models, now falls back to
-  [`mgcv::rmvn()`](https://rdrr.io/pkg/mgcv/man/rmvn.html) with a
-  warning if the default sampler’s Cholesky decomposition fails
+- Posterior sampling for GAMs, including the GAM component of
+  [`gamm4()`](https://rdrr.io/pkg/gamm4/man/gamm4.html) models, now
+  falls back to [`mgcv::rmvn()`](https://rdrr.io/pkg/mgcv/man/rmvn.html)
+  with a warning if the default sampler’s Cholesky decomposition fails
   ([\#332](https://github.com/gavinsimpson/gratia/issues/332)).
 
 - [`smooth_estimates()`](https://gavinsimpson.github.io/gratia/reference/smooth_estimates.md)
@@ -1885,8 +1891,10 @@
   `frequentist = TRUE` selects the frequentist covariance (GRA-005).
   Both pointwise and simultaneous intervals respect
   `overall_uncertainty`, including uncertainty in the overall mean by
-  default for ordinary GAMs; native scasm fits default to `FALSE`.
-  Requesting multiple smooths no longer causes an error (GRA-006).
+  default for ordinary GAMs; native
+  [`scasm()`](https://rdrr.io/pkg/mgcv/man/scasm.html) fits default to
+  `FALSE`. Requesting multiple smooths no longer causes an error
+  (GRA-006).
 
 - [`simulate.gamm()`](https://gavinsimpson.github.io/gratia/reference/simulate.md)
   now respects the supplied `data` argument. `smooth_samples.gamm()` and

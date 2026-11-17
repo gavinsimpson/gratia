@@ -84,7 +84,8 @@ generate_draws(model, ...)
   [`gamm4::gamm4()`](https://rdrr.io/pkg/gamm4/man/gamm4.html), or a
   model inheriting from these classes. See
   [gamm4_support](https://gavinsimpson.github.io/gratia/reference/gamm4_support.md)
-  for sampling from gamm4 fits.
+  for sampling from
+  [`gamm4::gamm4()`](https://rdrr.io/pkg/gamm4/man/gamm4.html) fits.
 
 - ...:
 
@@ -229,18 +230,19 @@ Explicit controls that the selected method cannot use are rejected.
 
 For SCAM models, Gaussian draws approximate the distribution of the
 unrestricted fitting coefficients using `Vp` (or `Ve` with
-`frequentist = TRUE`), then apply scam's fitted exponential or `notExp`
-transformation. This is an approximation in fitting coordinates, rather
-than an exact constrained posterior. Supplied draws must already use the
-transformed coordinates in `coef(model)` order. Numerically singular
-covariance matrices are sampled by eigen decomposition; negative
-eigenvalues within `100 * .Machine$double.eps * ncol(V)` times the
-largest absolute eigenvalue are treated as zero. Larger negatives are
-errors. For weakly identified exponential coefficients, a very large
-fitting-coordinate variance can yield non-finite transformed draws.
-Sampling then reports an error because this Gaussian approximation
-cannot provide usable draws; supply finite transformed draws from a
-suitable alternative sampler.
+`frequentist = TRUE`), then apply scam's fitted exponential or
+`notExp()` transformation. This is an approximation in fitting
+coordinates, rather than an exact constrained posterior. Supplied draws
+must already use the transformed coordinates in `coef(model)` order.
+Numerically singular covariance matrices are sampled by eigen
+decomposition; negative eigenvalues within
+`100 * .Machine$double.eps * ncol(V)` times the largest absolute
+eigenvalue are treated as zero. Larger negatives are errors. For weakly
+identified exponential coefficients, a very large fitting-coordinate
+variance can yield non-finite transformed draws. Sampling then reports
+an error because this Gaussian approximation cannot provide usable
+draws; supply finite transformed draws from a suitable alternative
+sampler.
 
 For multiple chains, `n_draws` is the total retained count and must be
 divisible by `chains`. Coefficient matrices carry a chain mapping; use

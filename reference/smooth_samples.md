@@ -62,8 +62,7 @@ smooth_samples(
   For
   [`predicted_samples()`](https://gavinsimpson.github.io/gratia/reference/predicted_samples.md)
   these are passed on to the relevant
-  [`simulate()`](https://gavinsimpson.github.io/gratia/reference/simulate.md)
-  method.
+  [`stats::simulate()`](https://rdrr.io/r/stats/simulate.html) method.
 
 - data:
 
@@ -271,11 +270,11 @@ columns needed for their calculation. Custom prediction methods are
 evaluated in the caller, including custom tensor margins and
 factor-smooth bases; workers receive their prediction matrices.
 Simultaneous intervals use successive draws in selection order, so
-[`set.seed()`](https://rdrr.io/r/base/Random.html) gives the same
+[`base::set.seed()`](https://rdrr.io/r/base/Random.html) gives the same
 results with or without workers, independently of their number or
 completion order.
 [`derivatives()`](https://gavinsimpson.github.io/gratia/reference/derivatives.md)
-uses [`set.seed()`](https://rdrr.io/r/base/Random.html); the other
+uses [`base::set.seed()`](https://rdrr.io/r/base/Random.html); the other
 functions also accept `seed`, which restores the caller's random number
 state on exit.
 

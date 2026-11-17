@@ -589,7 +589,10 @@ parameters.
   : Provides an overview of a model and the terms in that model
 
 - [`gamm4_support`](https://gavinsimpson.github.io/gratia/reference/gamm4_support.md)
-  : Support for models fitted by gamm4
+  :
+
+  Support for models fitted by
+  [`gamm4::gamm4()`](https://rdrr.io/pkg/gamm4/man/gamm4.html)
 
 - [`edf()`](https://gavinsimpson.github.io/gratia/reference/edf.md)
   [`model_edf()`](https://gavinsimpson.github.io/gratia/reference/edf.md)
@@ -727,7 +730,8 @@ smooths.
 - [`draw(`*`<penalty_df>`*`)`](https://gavinsimpson.github.io/gratia/reference/draw.penalty_df.md)
   :
 
-  Display penalty matrices of smooths using `ggplot`
+  Display penalty matrices of smooths using
+  [`ggplot2::ggplot()`](https://ggplot2.tidyverse.org/reference/ggplot.html)
 
 - [`boundary()`](https://gavinsimpson.github.io/gratia/reference/boundary.md)
   **\[experimental\]** : Extract the boundary of a soap film smooth

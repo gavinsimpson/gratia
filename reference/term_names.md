@@ -28,7 +28,7 @@ term_names(object, ...)
 - object:
 
   a fitted GAM object (inheriting from class `"gam"` or an
-  [mgcv::smooth.construct](https://rdrr.io/pkg/mgcv/man/smooth.construct.html)
+  [`mgcv::smooth.construct()`](https://rdrr.io/pkg/mgcv/man/smooth.construct.html)
   smooth object, inheriting from class `"mgcv.smooth"`.
 
 - ...:

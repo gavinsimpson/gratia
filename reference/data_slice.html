@@ -129,7 +129,7 @@ are omitted, and selecting no observed groups is an error.</p></dd>
 <dt id="arg-data">data<a class="anchor" aria-label="anchor" href="#arg-data"></a></dt>
 <dd><p>an alternative data frame of values containing all the variables
 needed to fit the model. If <code>NULL</code>, the default, the data used to fit the
-model will be recovered using <code>model.frame</code>. User-supplied expressions
+model will be recovered using <code><a href="https://rdrr.io/r/stats/model.frame.html" class="external-link">stats::model.frame()</a></code>. User-supplied expressions
 passed in <code>...</code> will be evaluated in <code>data</code>.</p></dd>
 
 
@@ -152,7 +152,7 @@ the median value is used,</p></li>
 <li><p>for factor covariates, the modal (most frequently observed) level is used,
 or the first level (sorted as per the vector returned by <code><a href="https://rdrr.io/r/base/levels.html" class="external-link">base::levels()</a></code>
 if several levels are observed the same number of times.</p></li>
-</ul><p>These values are already computed when calling <code>gam()</code> or <code>bam()</code> for example
+</ul><p>These values are already computed when calling <code><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">mgcv::gam()</a></code> or <code><a href="https://rdrr.io/pkg/mgcv/man/bam.html" class="external-link">mgcv::bam()</a></code> for example
 and can be found in the <code>var.summary</code> component of the fitted model. Function
 <code><a href="typical_values.html">typical_values()</a></code> will extract these values for you if you are interested.</p>
 <p>Convenience functions <code><a href="evenly.html">evenly()</a></code>, <code><a href="ref_level.html">ref_level()</a></code>, and <code><a href="ref_level.html">level()</a></code> are provided

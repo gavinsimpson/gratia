@@ -132,7 +132,7 @@ of bayesplot. Call <code><a href="https://mc-stan.org/bayesplot/reference/pp_che
 
 
 <dl><dt id="arg-object">object<a class="anchor" aria-label="anchor" href="#arg-object"></a></dt>
-<dd><p>a fitted GAM, BAM, gamm, or gamm4 model.</p></dd>
+<dd><p>a fitted GAM, BAM, <code><a href="https://rdrr.io/pkg/mgcv/man/gamm.html" class="external-link">mgcv::gamm()</a></code>, or <code><a href="https://rdrr.io/pkg/gamm4/man/gamm4.html" class="external-link">gamm4::gamm4()</a></code> model.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
@@ -196,14 +196,14 @@ require loo and a likelihood supported by <code><a href="log_lik.html">log_lik()
 likelihood calculations use exactly the same coefficient draws. For a
 multivariate response, the weights leave out the entire response vector.
 Grouped-family checks use only the selected component's observations.</p>
-<p>Some bayesplot plotting functions, including <code>error_binned</code> and LOO-PIT
+<p>Some bayesplot plotting functions, including <code><a href="https://mc-stan.org/bayesplot/reference/PPC-errors.html" class="external-link">bayesplot::ppc_error_binned()</a></code> and LOO-PIT
 plots, also require bayesplot's optional rstantools package. Install it with
 <code>install.packages("rstantools")</code> to use those plots.</p>
 <p>Binomial observations and replicated responses are shown as numbers of
 successes with fitted trial counts. Other gratia predictive plots use
-proportions. The <code>error_binned</code> plot uses expected responses rather than
+proportions. The <code><a href="https://mc-stan.org/bayesplot/reference/PPC-errors.html" class="external-link">bayesplot::ppc_error_binned()</a></code> plot uses expected responses rather than
 response simulations and requires an available finite response mean. For
-gamm and gamm4 it currently requires <code>conditioning = "gam_component"</code>.
+<code><a href="https://rdrr.io/pkg/mgcv/man/gamm.html" class="external-link">mgcv::gamm()</a></code> and <code><a href="https://rdrr.io/pkg/gamm4/man/gamm4.html" class="external-link">gamm4::gamm4()</a></code> it currently requires <code>conditioning = "gam_component"</code>.
 Plotting functions requiring additional inputs, such
 as censoring indicators, receive those inputs through <code>...</code>.</p>
 <p>Coefficient draws use a Gaussian approximation by default; additional family

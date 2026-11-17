@@ -147,14 +147,16 @@ location/scale/shape families, ordinal, multinomial and
 multivariate-normal models are supported. Censored normal, logistic and
 Poisson families return moments of the latent uncensored response. Beta
 moments describe the beta likelihood, without the epsilon clipping used
-by some response generators. `bcg()` supports the original lognormal
-response only when its Box-Cox parameter is fixed at zero: other powers
-require a distribution outside the inverse transformation's domain that
-the fitted family does not specify. Quasi and Cox families are
-unsupported. Grouped (`gfam`) predictions use each row's component
-family and the full joint model covariance. Grouped ordinal components
-require explicit category scores; grouped category-indicator output is
-unsupported.
+by some response generators.
+[`mgcv::bcg()`](https://rdrr.io/pkg/mgcv/man/bcg.html) supports the
+original lognormal response only when its Box-Cox parameter is fixed at
+zero: other powers require a distribution outside the inverse
+transformation's domain that the fitted family does not specify. Quasi
+and Cox families are unsupported. Grouped
+([`mgcv::gfam()`](https://rdrr.io/pkg/mgcv/man/gfam.html)) predictions
+use each row's component family and the full joint model covariance.
+Grouped ordinal components require explicit category scores; grouped
+category-indicator output is unsupported.
 
 The delta method differentiates the complete parameter-to-moment
 transformation and uses its full joint covariance. Gaussian, Poisson,
@@ -189,11 +191,13 @@ machinery is used. Delta intervals and Gaussian simulation with
 first-order smoothing correction conditional on those fixed parameters:
 native corrected covariance can also include their uncertainty. This
 requires the same saved outer Hessian and sensitivities when smoothing
-parameters are present. Legacy `negbin()` fits outside ML/REML require
-explicit `nuisance = "fixed"`; use `nb()` to estimate and propagate
-shape uncertainty. The covariance calculation uses a first-order
-expansion of the coefficient means and does not include mgcv's
-additional correction for changes in the conditional coefficient
+parameters are present. Legacy
+[`mgcv::negbin()`](https://rdrr.io/pkg/mgcv/man/negbin.html) fits
+outside ML/REML require explicit `nuisance = "fixed"`; use
+[`mgcv::nb()`](https://rdrr.io/pkg/mgcv/man/negbin.html) to estimate and
+propagate shape uncertainty. The covariance calculation uses a
+first-order expansion of the coefficient means and does not include
+mgcv's additional correction for changes in the conditional coefficient
 covariance. The `moment_info` attribute records which approximation was
 used.
 

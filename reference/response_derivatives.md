@@ -220,11 +220,15 @@ By default, all supplied prediction rows are returned in their original
 order. Rows with missing or non-finite required covariates have `NA`
 derivatives, standard errors and interval limits. Category, response and
 family identifiers are retained. An explicit `na.action` follows the
-prediction convention: `na.omit` drops unavailable rows with missing
-covariates, `na.exclude` and `na.pass` retain them, and `na.fail`
-reports missing covariates as an error. Undefined calculations at
-available rows, including in only some coefficient draws, raise an
-error; draws are never removed to form a summary.
+prediction convention:
+[`stats::na.omit()`](https://rdrr.io/r/stats/na.fail.html) drops
+unavailable rows with missing covariates,
+[`stats::na.exclude()`](https://rdrr.io/r/stats/na.fail.html) and
+[`stats::na.pass()`](https://rdrr.io/r/stats/na.fail.html) retain them,
+and [`stats::na.fail()`](https://rdrr.io/r/stats/na.fail.html) reports
+missing covariates as an error. Undefined calculations at available
+rows, including in only some coefficient draws, raise an error; draws
+are never removed to form a summary.
 
 Response-scale derivatives require the expected response to exist. For a
 scaled t family, fitted degrees of freedom must exceed one, whether

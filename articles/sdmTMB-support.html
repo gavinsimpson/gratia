@@ -160,7 +160,7 @@ it is not an area-standardised biomass index.</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Easting (km)"</span>, y <span class="op">=</span> <span class="st">"Northing (km)"</span>,</span>
 <span>    colour <span class="op">=</span> <span class="st">"Density (kg/km²)"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="sdmTMB-support_files/figure-html/observed-cod-1.png" class="r-plt" alt="Observed Pacific cod density at survey tows, separated by year." width="700"></p>
-<p>The colour scale uses <code>log1p</code>, the logarithm of one plus
+<p>The colour scale uses <code><a href="https://rdrr.io/r/base/Log.html" class="external-link">log1p()</a></code>, the logarithm of one plus
 density, to distinguish the many smaller catches while retaining zeros
 and the largest catches. There are many exact zeros and a long positive
 tail. A Gaussian response model would allow negative density and impose

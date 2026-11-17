@@ -138,7 +138,7 @@ calculate the variances and covariances of fitted term contributions.</p>
 of smooths are rescaled before fitting. If <code>rescale = TRUE</code>, this rescaling
 is undone, resulting in variance components that are on their original
 scale. This is needed if comparing with other mixed model software, such as
-<code><a href="https://rdrr.io/pkg/lme4/man/lmer.html" class="external-link">lmer()</a></code>.</p></dd>
+<code><a href="https://rdrr.io/pkg/lme4/man/lmer.html" class="external-link">lme4::lmer()</a></code>.</p></dd>
 
 
 <dt id="arg-coverage">coverage<a class="anchor" aria-label="anchor" href="#arg-coverage"></a></dt>
@@ -147,7 +147,7 @@ coverage of the confidence interval that is returned.</p></dd>
 
 
 <dt id="arg-interval-method">interval_method<a class="anchor" aria-label="anchor" href="#arg-interval-method"></a></dt>
-<dd><p>character; for <code>gamm4()</code> fits, <code>"profile"</code> computes
+<dd><p>character; for <code><a href="https://rdrr.io/pkg/gamm4/man/gamm4.html" class="external-link">gamm4::gamm4()</a></code> fits, <code>"profile"</code> computes
 likelihood profile intervals and <code>"none"</code> returns estimates only.</p></dd>
 
 
@@ -181,7 +181,7 @@ Defaults to <code>TRUE</code>. Ignored for <code>type = "penalty"</code>.</p></d
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
-<dd><p>arguments passed to other methods. For <code>gamm4()</code> fits, additional
+<dd><p>arguments passed to other methods. For <code><a href="https://rdrr.io/pkg/gamm4/man/gamm4.html" class="external-link">gamm4::gamm4()</a></code> fits, additional
 arguments are passed to <code><a href="https://rdrr.io/r/stats/profile.html" class="external-link">stats::profile()</a></code>, for example <code>maxpts</code>. With
 <code>type = "terms"</code>, no additional arguments are accepted.</p></dd>
 
@@ -224,8 +224,8 @@ smoothing parameter can still have an interval when the model scale is
 estimated. The scale is included as a separate row when its uncertainty is
 available. Unavailable intervals are <code>NA</code>.</p>
 <p>For <code><a href="https://rdrr.io/pkg/mgcv/man/gamm.html" class="external-link">mgcv::gamm()</a></code> fits, components are extracted from <code>lme</code>. Smooth
-variances are expressed on the same penalty scale as for <code>gam()</code> and
-<code>bam()</code>, with one row per penalty. Additional random effects have one row
+variances are expressed on the same penalty scale as for <code><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">mgcv::gam()</a></code> and
+<code><a href="https://rdrr.io/pkg/mgcv/man/bam.html" class="external-link">mgcv::bam()</a></code>, with one row per penalty. Additional random effects have one row
 per coefficient variance, labelled by grouping factor and coefficient;
 their covariances are omitted. Intervals use <code><a href="https://rdrr.io/pkg/nlme/man/intervals.html" class="external-link">nlme::intervals()</a></code> when the
 fitted covariance parameters support this calculation. Bounds are <code>NA</code>
@@ -252,7 +252,7 @@ the linear predictor, evaluated over the observations used to fit the model.
 Parametric formula terms are included, with all coefficients of a factor,
 polynomial or interaction combined into one term. Each smooth has one row,
 including smooths with several penalties. Additional random effects in
-<code>gamm()</code> and <code>gamm4()</code> contribute one component per grouping factor and
+<code><a href="https://rdrr.io/pkg/mgcv/man/gamm.html" class="external-link">mgcv::gamm()</a></code> and <code><a href="https://rdrr.io/pkg/gamm4/man/gamm4.html" class="external-link">gamm4::gamm4()</a></code> contribute one component per grouping factor and
 coefficient, evaluated at their fitted values. Formula terms follow the
 model's contrast coding. Duplicated component labels receive numeric suffixes.</p>
 <p>Term variances and covariances use equal observation weights and the sample

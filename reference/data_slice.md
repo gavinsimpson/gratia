@@ -71,8 +71,9 @@ data_slice(object, ...)
 
   an alternative data frame of values containing all the variables
   needed to fit the model. If `NULL`, the default, the data used to fit
-  the model will be recovered using `model.frame`. User-supplied
-  expressions passed in `...` will be evaluated in `data`.
+  the model will be recovered using
+  [`stats::model.frame()`](https://rdrr.io/r/stats/model.frame.html).
+  User-supplied expressions passed in `...` will be evaluated in `data`.
 
 - envir:
 
@@ -100,9 +101,11 @@ follows:
   [`base::levels()`](https://rdrr.io/r/base/levels.html) if several
   levels are observed the same number of times.
 
-These values are already computed when calling `gam()` or `bam()` for
-example and can be found in the `var.summary` component of the fitted
-model. Function
+These values are already computed when calling
+[`mgcv::gam()`](https://rdrr.io/pkg/mgcv/man/gam.html) or
+[`mgcv::bam()`](https://rdrr.io/pkg/mgcv/man/bam.html) for example and
+can be found in the `var.summary` component of the fitted model.
+Function
 [`typical_values()`](https://gavinsimpson.github.io/gratia/reference/typical_values.md)
 will extract these values for you if you are interested.
 

@@ -108,8 +108,7 @@ posterior_samples(
   For
   [`predicted_samples()`](https://gavinsimpson.github.io/gratia/reference/predicted_samples.md)
   these are passed on to the relevant
-  [`simulate()`](https://gavinsimpson.github.io/gratia/reference/simulate.md)
-  method.
+  [`stats::simulate()`](https://rdrr.io/r/stats/simulate.html) method.
 
 - n_draws:
 
@@ -239,15 +238,17 @@ posterior_samples(
   overrides the fitting weights; a single value applies to every
   observation. With `data = NULL`, the default is the fitted prior
   weights, except factor-valued binomial responses retain one Bernoulli
-  trial per observation. Native `gaulss()` ignores fitting weights in
-  its likelihood, so its default response weights are also ones;
-  explicitly supplied sampling weights still override this default. With
-  prediction data, weights default to a vector of ones. For ordinary
-  Gaussian and Gamma responses, larger weights reduce response variance
-  (precision weights). For binomial responses, weights give integer
-  trial counts. They do not alter the fitted coefficient covariance.
-  Include positions restored by `na.exclude` when supplying weights for
-  fitting rows.
+  trial per observation. Native
+  [`mgcv::gaulss()`](https://rdrr.io/pkg/mgcv/man/gaulss.html) ignores
+  fitting weights in its likelihood, so its default response weights are
+  also ones; explicitly supplied sampling weights still override this
+  default. With prediction data, weights default to a vector of ones.
+  For ordinary Gaussian and Gamma responses, larger weights reduce
+  response variance (precision weights). For binomial responses, weights
+  give integer trial counts. They do not alter the fitted coefficient
+  covariance. Include positions restored by
+  [`stats::na.exclude()`](https://rdrr.io/r/stats/na.fail.html) when
+  supplying weights for fitting rows.
 
 - family_index:
 
@@ -264,8 +265,9 @@ posterior_samples(
   Fitted predictions integrate response means over new zero-mean
   Gaussian effects. Response samplers draw new effects before sampling
   responses. Smoothing parameters and dispersion remain fixed. Only
-  ordinary `gam()` and `bam()` fits with a scalar response mean are
-  supported.
+  ordinary [`mgcv::gam()`](https://rdrr.io/pkg/mgcv/man/gam.html) and
+  [`mgcv::bam()`](https://rdrr.io/pkg/mgcv/man/bam.html) fits with a
+  scalar response mean are supported.
 
 ## Value
 
@@ -284,7 +286,7 @@ A tibble (data frame) in long format, with columns:
 ## Details
 
 The `lm`, `glm`, `glmmTMB`,
-[`GJRM::gamlss`](https://rdrr.io/pkg/GJRM/man/gamlss.html), `sdmTMB`,
+[`GJRM::gamlss()`](https://rdrr.io/pkg/GJRM/man/gamlss.html), `sdmTMB`,
 and full mixed-model diagnostic samplers currently use the fitting
 observations only. They draw coefficients together using Gaussian
 approximations. See
@@ -293,13 +295,15 @@ for which additional distribution parameters remain fixed and how random
 effects are treated for each fitter.
 
 With no explicit `data`, observation rows follow the fitted model's
-`na.action`. `na.exclude` restores excluded rows as `NA` in every draw;
-`na.omit` returns retained rows only. `.row` indexes the fitting data
-after any `subset`. With explicit `data`, `.row` indexes that data,
-missing responses do not prevent prediction, and missing required
-predictors give `NA` draws. An explicit prediction `na.action` in `...`
-is honoured without renumbering retained rows. Restoration does not
-consume random numbers.
+`na.action`.
+[`stats::na.exclude()`](https://rdrr.io/r/stats/na.fail.html) restores
+excluded rows as `NA` in every draw;
+[`stats::na.omit()`](https://rdrr.io/r/stats/na.fail.html) returns
+retained rows only. `.row` indexes the fitting data after any `subset`.
+With explicit `data`, `.row` indexes that data, missing responses do not
+prevent prediction, and missing required predictors give `NA` draws. An
+explicit prediction `na.action` in `...` is honoured without renumbering
+retained rows. Restoration does not consume random numbers.
 
 For Gaussian identity-link `bam` and `scam` fits, first-order
 autoregressive (AR1) errors make consecutive responses correlated.
@@ -322,9 +326,10 @@ fitting observations, subsets and new covariates. Every distribution
 parameter is computed from the same joint coefficient draw. Formula
 offsets and prescribed smooth contributions are retained. Evaluation
 data need predictors and formula-offset variables, but no observed
-response. mgcv natively represents the second `gaulss()` parameter as
-reciprocal standard deviation: response sampling uses SD, divided by the
-square root of the sampling weight. Other LSS generators currently
+response. mgcv natively represents the second
+[`mgcv::gaulss()`](https://rdrr.io/pkg/mgcv/man/gaulss.html) parameter
+as reciprocal standard deviation: response sampling uses SD, divided by
+the square root of the sampling weight. Other LSS generators currently
 ignore sampling weights, following their mgcv implementations.
 Parameters represented by coefficients vary jointly; other family
 parameters remain fixed.
@@ -338,8 +343,8 @@ fitting observations and supplied data with known family membership.
 Component nuisance parameters remain fixed. `.parameter` identifies the
 component used for each row. Censored grouped components require an
 observation process; use
-[`simulate()`](https://gavinsimpson.github.io/gratia/reference/simulate.md)
-for their latent, uncensored responses.
+[`stats::simulate()`](https://rdrr.io/r/stats/simulate.html) for their
+latent, uncensored responses.
 
 With `marginalise`, selected random effects are drawn for new groups in
 each response replicate. Group labels must be supplied for new data. See

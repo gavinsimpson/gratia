@@ -42,8 +42,10 @@ partial_residuals(object, ...)
 
 ## Details
 
-With `na.exclude`, excluded observations are restored as `NA` partial
-residuals, in fitting order after any `subset`. With `na.omit`, only
+With [`stats::na.exclude()`](https://rdrr.io/r/stats/na.fail.html),
+excluded observations are restored as `NA` partial residuals, in fitting
+order after any `subset`. With
+[`stats::na.omit()`](https://rdrr.io/r/stats/na.fail.html), only
 retained observations are returned. Computation uses aligned working
 residuals, working weights and term predictions before restoring
 excluded positions.

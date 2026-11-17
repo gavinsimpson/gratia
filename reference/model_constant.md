@@ -30,7 +30,7 @@ model_constant(model, lp = NULL, ...)
 - model:
 
   a fitted model for which a
-  [`coef()`](https://rdrr.io/r/stats/coef.html) method exists.
+  [`stats::coef()`](https://rdrr.io/r/stats/coef.html) method exists.
 
 - ...:
 

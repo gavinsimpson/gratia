@@ -162,7 +162,7 @@
 <dd><p>arguments passed to other methods. For <code><a href="fitted_samples.html">fitted_samples()</a></code>, these
 are passed on to <code><a href="https://rdrr.io/pkg/mgcv/man/predict.gam.html" class="external-link">mgcv::predict.gam()</a></code>. For <code>posterior_samples()</code> these are
 passed on to <code><a href="fitted_samples.html">fitted_samples()</a></code>. For <code><a href="predicted_samples.html">predicted_samples()</a></code> these are
-passed on to the relevant <code><a href="simulate.html">simulate()</a></code> method.</p></dd>
+passed on to the relevant <code><a href="https://rdrr.io/r/stats/simulate.html" class="external-link">stats::simulate()</a></code> method.</p></dd>
 
 
 <dt id="arg-n-draws">n_draws<a class="anchor" aria-label="anchor" href="#arg-n-draws"></a></dt>
@@ -290,14 +290,14 @@ for the gratia MH backend. Use zero to force blockwise evaluation.</p></dd>
 explicit vector overrides the fitting weights; a single value applies to
 every observation. With <code>data = NULL</code>, the default is the fitted prior
 weights, except factor-valued binomial responses retain one Bernoulli trial
-per observation. Native <code>gaulss()</code> ignores fitting weights in its likelihood,
+per observation. Native <code><a href="https://rdrr.io/pkg/mgcv/man/gaulss.html" class="external-link">mgcv::gaulss()</a></code> ignores fitting weights in its likelihood,
 so its default response weights are also ones; explicitly supplied sampling
 weights still override this default. With prediction data, weights default
 to a vector of ones.
 For ordinary Gaussian and Gamma responses, larger weights reduce response
 variance (precision weights). For binomial responses, weights give integer
 trial counts. They do not alter the fitted coefficient covariance. Include
-positions restored by <code>na.exclude</code> when supplying weights for fitting rows.</p></dd>
+positions restored by <code><a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">stats::na.exclude()</a></code> when supplying weights for fitting rows.</p></dd>
 
 
 <dt id="arg-family-index">family_index<a class="anchor" aria-label="anchor" href="#arg-family-index"></a></dt>
@@ -312,8 +312,8 @@ in <code>data</code>; observed response values are not required.</p></dd>
 supported <code>re</code> and <code>fs</code> terms; character vectors select exact smooth labels.
 Fitted predictions integrate response means over new zero-mean Gaussian
 effects. Response samplers draw new effects before sampling responses.
-Smoothing parameters and dispersion remain fixed. Only ordinary <code>gam()</code>
-and <code>bam()</code> fits with a scalar response mean are supported.</p></dd>
+Smoothing parameters and dispersion remain fixed. Only ordinary <code><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">mgcv::gam()</a></code>
+and <code><a href="https://rdrr.io/pkg/mgcv/man/bam.html" class="external-link">mgcv::bam()</a></code> fits with a scalar response mean are supported.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -327,14 +327,14 @@ coefficient diagnostics are available through <code><a href="sampling_diagnostic
 </ul></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>The <code>lm</code>, <code>glm</code>, <code>glmmTMB</code>, <code><a href="https://rdrr.io/pkg/GJRM/man/gamlss.html" class="external-link">GJRM::gamlss</a></code>, <code>sdmTMB</code>, and full mixed-model
+    <p>The <code>lm</code>, <code>glm</code>, <code>glmmTMB</code>, <code><a href="https://rdrr.io/pkg/GJRM/man/gamlss.html" class="external-link">GJRM::gamlss()</a></code>, <code>sdmTMB</code>, and full mixed-model
 diagnostic samplers currently use the fitting observations only. They draw
 coefficients together using Gaussian approximations. See
 <code><a href="posterior_predictive_plot.html">posterior_predictive_plot()</a></code> for which additional distribution parameters
 remain fixed and how random effects are treated for each fitter.</p>
 <p>With no explicit <code>data</code>, observation rows follow the fitted model's
-<code>na.action</code>. <code>na.exclude</code> restores excluded rows as <code>NA</code> in every draw;
-<code>na.omit</code> returns retained rows only. <code>.row</code> indexes the fitting data after
+<code>na.action</code>. <code><a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">stats::na.exclude()</a></code> restores excluded rows as <code>NA</code> in every draw;
+<code><a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">stats::na.omit()</a></code> returns retained rows only. <code>.row</code> indexes the fitting data after
 any <code>subset</code>. With explicit <code>data</code>, <code>.row</code> indexes that data, missing
 responses do not prevent prediction, and missing required predictors give
 <code>NA</code> draws. An explicit prediction <code>na.action</code> in <code>...</code> is honoured without
@@ -352,7 +352,7 @@ an error.</p>
 Every distribution parameter is computed from the same joint coefficient
 draw. Formula offsets and prescribed smooth contributions are retained.
 Evaluation data need predictors and formula-offset variables, but no
-observed response. mgcv natively represents the second <code>gaulss()</code> parameter
+observed response. mgcv natively represents the second <code><a href="https://rdrr.io/pkg/mgcv/man/gaulss.html" class="external-link">mgcv::gaulss()</a></code> parameter
 as reciprocal standard deviation: response sampling uses SD, divided by the square
 root of the sampling weight. Other LSS generators currently ignore sampling
 weights, following their mgcv implementations. Parameters represented by
@@ -364,7 +364,7 @@ an observation process and remains unsupported in posterior predictive checks.
 Grouped-family posterior response draws support fitting observations and
 supplied data with known family membership. Component nuisance parameters
 remain fixed. <code>.parameter</code> identifies the component used for each row.
-Censored grouped components require an observation process; use <code><a href="simulate.html">simulate()</a></code>
+Censored grouped components require an observation process; use <code><a href="https://rdrr.io/r/stats/simulate.html" class="external-link">stats::simulate()</a></code>
 for their latent, uncensored responses.</p>
 <p>With <code>marginalise</code>, selected random effects are drawn for new groups in
 each response replicate. Group labels must be supplied for new data.

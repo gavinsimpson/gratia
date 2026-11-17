@@ -575,7 +575,7 @@ assigned origin and treatment.</p>
 <div class="section level3">
 <h3 id="preserve-observation-positions-when-measurements-are-missing">Preserve observation positions when measurements are missing<a class="anchor" aria-label="anchor" href="#preserve-observation-positions-when-measurements-are-missing"></a>
 </h3>
-<p>With <code>na.exclude</code>, results evaluated on the fitting data
+<p>With <code><a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">na.exclude()</a></code>, results evaluated on the fitting data
 restore excluded rows as <code>NA</code>. This keeps predictions aligned
 with the original observation records. For illustration, remove one
 measured response and refit:</p>
@@ -616,9 +616,9 @@ present:</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>     3   250   34.8    35.6</span></span></code></pre></div>
 <p>The first prediction is available; the second has a missing required
 predictor and retains its row with an <code>NA</code> result.
-<code>na.omit</code> retains only fitting rows instead. Partial
+<code><a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">na.omit()</a></code> retains only fitting rows instead. Partial
 residuals, fitted/posterior samples and simulations likewise respect
-<code>na.exclude</code> positions; diagnostic functions align the
+<code><a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">na.exclude()</a></code> positions; diagnostic functions align the
 retained observations before checking their distributions.</p>
 </div>
 </div>

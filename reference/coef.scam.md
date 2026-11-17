@@ -13,7 +13,8 @@ coef(object, parametrized = TRUE, ...)
 
 - object:
 
-  a model object fitted by `scam()`
+  a model object fitted by
+  [`scam::scam()`](https://rdrr.io/pkg/scam/man/scam.html)
 
 - parametrized:
 

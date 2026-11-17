@@ -174,31 +174,46 @@ differencing. Transforming a link-scale ALE curve does not produce
 response-scale ALE. Response-scale effects are differences in natural
 parameter units, not predicted parameter values, and can be negative.
 
-Distributional families `gaulss`, `gammals`, `gumbls`, `gevlss`,
-`shash`, `twlss`, and `ziplss` are supported. Natural units mean
-standard deviation for Gaussian scale, positive scale or dispersion for
-logged scales, natural Tweedie power, positive sinh-arcsinh tail
-parameter, and Poisson rate or probability of presence for `ziplss`.
-Location parameters need not be response means. Overall means combining
-several parameters, multinomial probabilities, multivariate covariance
+Distributional families
+[`mgcv::gaulss()`](https://rdrr.io/pkg/mgcv/man/gaulss.html),
+[`mgcv::gammals()`](https://rdrr.io/pkg/mgcv/man/gammals.html),
+[`mgcv::gumbls()`](https://rdrr.io/pkg/mgcv/man/gumbls.html),
+[`mgcv::gevlss()`](https://rdrr.io/pkg/mgcv/man/gevlss.html),
+[`mgcv::shash()`](https://rdrr.io/pkg/mgcv/man/shash.html),
+[`mgcv::twlss()`](https://rdrr.io/pkg/mgcv/man/twlss.html), and
+[`mgcv::ziplss()`](https://rdrr.io/pkg/mgcv/man/ziplss.html) are
+supported. Natural units mean standard deviation for Gaussian scale,
+positive scale or dispersion for logged scales, natural Tweedie power,
+positive sinh-arcsinh tail parameter, and Poisson rate or probability of
+presence for
+[`mgcv::ziplss()`](https://rdrr.io/pkg/mgcv/man/ziplss.html). Location
+parameters need not be response means. Overall means combining several
+parameters, multinomial probabilities, multivariate covariance
 parameters and grouped-family outputs are unsupported. For other
 families, link-scale ALE is available for a single linear predictor;
 response-scale ALE requires a supported scalar mean family.
 
 Supported response-scale parameters are:
 
-- `gaulss`: location (mean) and scale (standard deviation);
+- [`mgcv::gaulss()`](https://rdrr.io/pkg/mgcv/man/gaulss.html): location
+  (mean) and scale (standard deviation);
 
-- `gammals`: location (mean) and scale (dispersion);
+- [`mgcv::gammals()`](https://rdrr.io/pkg/mgcv/man/gammals.html):
+  location (mean) and scale (dispersion);
 
-- `gumbls` and `gevlss`: location and positive scale, plus GEV shape;
+- [`mgcv::gumbls()`](https://rdrr.io/pkg/mgcv/man/gumbls.html) and
+  [`mgcv::gevlss()`](https://rdrr.io/pkg/mgcv/man/gevlss.html): location
+  and positive scale, plus GEV shape;
 
-- `shash`: location, positive scale, skewness and positive tail
-  parameter (named `kurtosis` to match gratia's parameter names);
+- [`mgcv::shash()`](https://rdrr.io/pkg/mgcv/man/shash.html): location,
+  positive scale, skewness and positive tail parameter (named `kurtosis`
+  to match gratia's parameter names);
 
-- `twlss`: location (mean), power and scale (dispersion);
+- [`mgcv::twlss()`](https://rdrr.io/pkg/mgcv/man/twlss.html): location
+  (mean), power and scale (dispersion);
 
-- `ziplss`: location (Poisson rate) and `pi` (probability of presence).
+- [`mgcv::ziplss()`](https://rdrr.io/pkg/mgcv/man/ziplss.html): location
+  (Poisson rate) and `pi` (probability of presence).
 
 Raw-data recovery can require `envir` when a model was fitted locally
 and its formula no longer retains the environment containing the fitting

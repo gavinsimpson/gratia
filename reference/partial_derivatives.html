@@ -242,7 +242,7 @@ such as <code>x</code>, and reevaluates expressions at each finite-difference po
 
 
 <dt id="arg-interval-method">interval_method<a class="anchor" aria-label="anchor" href="#arg-interval-method"></a></dt>
-<dd><p>character; use stored scasm bootstrap draws for
+<dd><p>character; use stored <code><a href="https://rdrr.io/pkg/mgcv/man/scasm.html" class="external-link">mgcv::scasm()</a></code> bootstrap draws for
 pointwise intervals with <code>"auto"</code> (the default), or explicitly select
 <code>"gaussian"</code> or <code>"bootstrap"</code>. Bootstrap simultaneous bands are unavailable.</p></dd>
 
@@ -303,9 +303,9 @@ prepared in the caller. Workers receive the coordinates and coefficient
 columns needed for their calculation. Custom prediction methods are evaluated
 in the caller, including custom tensor margins and factor-smooth bases;
 workers receive their prediction matrices. Simultaneous intervals use successive
-draws in selection order, so <code><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed()</a></code> gives the same results with or
+draws in selection order, so <code><a href="https://rdrr.io/r/base/Random.html" class="external-link">base::set.seed()</a></code> gives the same results with or
 without workers, independently of their number or completion order.
-<code><a href="derivatives.html">derivatives()</a></code> uses <code><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed()</a></code>; the other functions also accept <code>seed</code>,
+<code><a href="derivatives.html">derivatives()</a></code> uses <code><a href="https://rdrr.io/r/base/Random.html" class="external-link">base::set.seed()</a></code>; the other functions also accept <code>seed</code>,
 which restores the caller's random number state on exit.</p>
 <p><code><a href="smooth_samples.html">smooth_samples()</a></code> draws coefficients jointly once, then reuses those draws
 for every smooth, preserving dependence and chain identities. Sampling

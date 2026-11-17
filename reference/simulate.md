@@ -77,19 +77,23 @@ simulate(
 
 - conditioning:
 
-  character or `NULL`; optional mixed-model conditioning mode. gamm4
-  defaults to `"conditional"`, holding all fitted effects fixed.
-  `"gam_component"` explicitly uses its extracted GAM. The existing gamm
-  simulator retains its GAM-component default. Full mixed-model modes
-  currently use fitting observations.
+  character or `NULL`; optional mixed-model conditioning mode.
+  [`gamm4::gamm4()`](https://rdrr.io/pkg/gamm4/man/gamm4.html) defaults
+  to `"conditional"`, holding all fitted effects fixed.
+  `"gam_component"` explicitly uses its extracted GAM. The existing
+  [`mgcv::gamm()`](https://rdrr.io/pkg/mgcv/man/gamm.html) simulator
+  retains its GAM-component default. Full mixed-model modes currently
+  use fitting observations.
 
 - ...:
 
   arguments passed to methods. `simulate.gam()` and `simulate.scam()`
-  pass `...` on to `predict.gam()`. As such you can pass additional
-  arguments such as `terms`, `exclude`, to select which model terms are
-  included in the predictions. This may be useful, for example, for
-  excluding the effects of random effect terms.
+  pass `...` on to
+  [`mgcv::predict.gam()`](https://rdrr.io/pkg/mgcv/man/predict.gam.html).
+  As such you can pass additional arguments such as `terms`, `exclude`,
+  to select which model terms are included in the predictions. This may
+  be useful, for example, for excluding the effects of random effect
+  terms.
 
 - data:
 
@@ -103,14 +107,16 @@ simulate(
   fitting weights; a single value applies to every observation. With
   `data = NULL`, the default is the fitted prior weights, except
   factor-valued binomial responses retain one Bernoulli trial per
-  observation. Native `gaulss()` ignores fitting weights in its
-  likelihood, so its default response weights are ones; explicit
-  sampling weights still override this. With prediction data, the
-  default is a vector of ones. For ordinary Gaussian and Gamma
+  observation. Native
+  [`mgcv::gaulss()`](https://rdrr.io/pkg/mgcv/man/gaulss.html) ignores
+  fitting weights in its likelihood, so its default response weights are
+  ones; explicit sampling weights still override this. With prediction
+  data, the default is a vector of ones. For ordinary Gaussian and Gamma
   responses, larger weights reduce response variance (precision
   weights). For binomial responses, weights give integer trial counts.
-  Include positions restored by `na.exclude` when supplying weights for
-  fitting rows.
+  Include positions restored by
+  [`stats::na.exclude()`](https://rdrr.io/r/stats/na.fail.html) when
+  supplying weights for fitting rows.
 
 - newdata:
 
@@ -134,8 +140,9 @@ simulate(
   Fitted predictions integrate response means over new zero-mean
   Gaussian effects. Response samplers draw new effects before sampling
   responses. Smoothing parameters and dispersion remain fixed. Only
-  ordinary `gam()` and `bam()` fits with a scalar response mean are
-  supported.
+  ordinary [`mgcv::gam()`](https://rdrr.io/pkg/mgcv/man/gam.html) and
+  [`mgcv::bam()`](https://rdrr.io/pkg/mgcv/man/bam.html) fits with a
+  scalar response mean are supported.
 
 ## Value
 
@@ -156,13 +163,16 @@ labels are allowed only when those factors occur exclusively in selected
 terms. The `random_effect_info` attribute records the fixed covariance
 estimates.
 
-With `data = NULL`, `na.exclude` restores excluded observations as `NA`
-in every simulation; `na.omit` returns retained observations only.
-Positions refer to the fitting data after any `subset`. Explicit `data`
-are evaluated independently of training exclusions: missing responses do
-not prevent simulation, while missing required predictors or weights
-yield `NA`. Prediction `na.action` in `...` is honoured. Missing rows
-are never passed to the response random-number generator.
+With `data = NULL`,
+[`stats::na.exclude()`](https://rdrr.io/r/stats/na.fail.html) restores
+excluded observations as `NA` in every simulation;
+[`stats::na.omit()`](https://rdrr.io/r/stats/na.fail.html) returns
+retained observations only. Positions refer to the fitting data after
+any `subset`. Explicit `data` are evaluated independently of training
+exclusions: missing responses do not prevent simulation, while missing
+required predictors or weights yield `NA`. Prediction `na.action` in
+`...` is honoured. Missing rows are never passed to the response
+random-number generator.
 
 Inverse Gaussian models use a native generator with observation
 dispersion equal to the model dispersion divided by the prior weight,
@@ -187,11 +197,14 @@ Grouped simulations return one numeric response per observation:
 binomial proportions (with integer trial counts supplied in `weights`),
 count responses, or ordered-category codes, as appropriate. Component
 random generators retain their usual treatment of prior weights.
-Ordered-categorical and `ziP` components are simulated from their latent
-predictors. General families with multiple linear predictors and matrix
-responses encoding censoring or binomial counts are outside the scope
-supported by `gfam()`. Scalar censored-family components produce draws
-from their uncensored latent distributions.
+Ordered-categorical and
+[`mgcv::ziP()`](https://rdrr.io/pkg/mgcv/man/ziP.html) components are
+simulated from their latent predictors. General families with multiple
+linear predictors and matrix responses encoding censoring or binomial
+counts are outside the scope supported by
+[`mgcv::gfam()`](https://rdrr.io/pkg/mgcv/man/gfam.html). Scalar
+censored-family components produce draws from their uncensored latent
+distributions.
 
 ## See also
 

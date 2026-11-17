@@ -208,10 +208,11 @@ draw(
   in the standard errors of smooth and parametric effects? For
   parametric effects this includes the intercept variance and its
   covariance with the term, without changing the partial estimates. Each
-  term uses the intercept of its own linear predictor. Native scasm
-  models are routed to `draw.scasm()` with
-  `overall_uncertainty = FALSE`. An explicit request for unavailable
-  mean uncertainty warns once. The stored model class is unchanged.
+  term uses the intercept of its own linear predictor. Native
+  [`mgcv::scasm()`](https://rdrr.io/pkg/mgcv/man/scasm.html) models are
+  routed to `draw.scasm()` with `overall_uncertainty = FALSE`. An
+  explicit request for unavailable mean uncertainty warns once. The
+  stored model class is unchanged.
 
 - constant:
 
@@ -410,15 +411,15 @@ draw(
   named list of view options passed to
   [`ggcube::coord_3d()`](https://matthewkling.github.io/ggcube/reference/coord_3d.html),
   for example `list(yaw = 45, persp = FALSE)`. The default
-  [`list()`](https://rdrr.io/r/base/list.html) uses the default view
-  with `ggcube::light(backface_scale = 1)`, preserving equal horizontal
-  units for isotropic smooths. Supply `light = ggcube::light(...)` in
-  this list to override lighting; `ggcube::light(method = "none")`
-  disables it. An explicitly supplied `light` replaces the entire
-  default light. Only the coordinate system is used; ggcube's theme
-  settings are not applied. These options affect all 3D panels in a
-  call. For different views per term, modify individual plots returned
-  by
+  [`base::list()`](https://rdrr.io/r/base/list.html) uses the default
+  view with `ggcube::light(backface_scale = 1)`, preserving equal
+  horizontal units for isotropic smooths. Supply
+  `light = ggcube::light(...)` in this list to override lighting;
+  `ggcube::light(method = "none")` disables it. An explicitly supplied
+  `light` replaces the entire default light. Only the coordinate system
+  is used; ggcube's theme settings are not applied. These options affect
+  all 3D panels in a call. For different views per term, modify
+  individual plots returned by
   [`assemble()`](https://gavinsimpson.github.io/gratia/reference/assemble.md).
   The `dist` entry here controls perspective; the top-level `dist`
   argument controls masking.
@@ -516,14 +517,16 @@ draw(
 
 - interval_method:
 
-  character; "auto" uses stored scasm bootstrap draws for pointwise
-  intervals when available, and Gaussian intervals otherwise. Use
-  "gaussian" to request covariance-based limits or "bootstrap" to
-  require stored draws. Simultaneous bootstrap bands are not supported.
-  `"shape"` applies
+  character; "auto" uses stored
+  [`mgcv::scasm()`](https://rdrr.io/pkg/mgcv/man/scasm.html) bootstrap
+  draws for pointwise intervals when available, and Gaussian intervals
+  otherwise. Use "gaussian" to request covariance-based limits or
+  "bootstrap" to require stored draws. Simultaneous bootstrap bands are
+  not supported. `"shape"` applies
   [`shape_intervals()`](https://gavinsimpson.github.io/gratia/reference/shape_intervals.md)
-  to supported scasm smooth components, using the initial limits chosen
-  by `shape_source`.
+  to supported
+  [`mgcv::scasm()`](https://rdrr.io/pkg/mgcv/man/scasm.html) smooth
+  components, using the initial limits chosen by `shape_source`.
 
 - frequentist:
 
@@ -653,17 +656,19 @@ subtitles identify the model part for glmmTMB models or the
 distributional parameter for mgcv models. Single-predictor models omit
 these automatic labels; by-variable information and custom subtitles are
 still shown. Constant glmmTMB dispersion alone does not count as an
-additional predictor. For example, `gaulss()` uses "Mean (mu)" and
-"Standard deviation (sigma)", while `twlss()` uses "Mean (mu)", "Power
-(p)" and "Dispersion (phi)". Shared smooths name each predictor to which
-they contribute. Families without a known parameter mapping use numbered
-linear predictors. The existing smooth titles and `select` values are
-unchanged, and all smooths are drawn by default. By-variable information
-is appended to the default subtitle. Supply `subtitle` through `...` to
-replace it, or `subtitle = ""` to suppress it; `NULL` uses the default.
-Custom `title`, `xlab` and `ylab` can also be supplied through `...`.
-Parametric terms use the same predictor labels, including terms shared
-across predictors. Saved
+additional predictor. For example,
+[`mgcv::gaulss()`](https://rdrr.io/pkg/mgcv/man/gaulss.html) uses "Mean
+(mu)" and "Standard deviation (sigma)", while
+[`mgcv::twlss()`](https://rdrr.io/pkg/mgcv/man/twlss.html) uses "Mean
+(mu)", "Power (p)" and "Dispersion (phi)". Shared smooths name each
+predictor to which they contribute. Families without a known parameter
+mapping use numbered linear predictors. The existing smooth titles and
+`select` values are unchanged, and all smooths are drawn by default.
+By-variable information is appended to the default subtitle. Supply
+`subtitle` through `...` to replace it, or `subtitle = ""` to suppress
+it; `NULL` uses the default. Custom `title`, `xlab` and `ylab` can also
+be supplied through `...`. Parametric terms use the same predictor
+labels, including terms shared across predictors. Saved
 [`parametric_effects()`](https://gavinsimpson.github.io/gratia/reference/parametric_effects.md)
 retain these labels.
 
@@ -690,15 +695,17 @@ transformed cyclic covariates require `back_transform = FALSE`.
 
 Random-effect tensor plots put continuous covariates before factors. Two
 continuous covariates form a surface, with remaining factor levels and
-numeric slices forming conditioning panels, consistently for `te()`,
-`ti()` and `t2()`. One continuous covariate gives curves for categorical
-combinations; categorical-only terms give point ranges. Up to four
-covariates are supported. Numeric conditioning slices use `n_3d` or
-`n_4d`. For factor conditioning dimensions, these controls retain at
-most that many levels, taking the first levels in fitted order. Explicit
-`re_levels` selections take precedence. Supplied `data` and precomputed
-estimates retain their rows; select specific factor levels with
-`re_levels`, or use
+numeric slices forming conditioning panels, consistently for
+[`mgcv::te()`](https://rdrr.io/pkg/mgcv/man/te.html),
+[`mgcv::ti()`](https://rdrr.io/pkg/mgcv/man/te.html) and
+[`mgcv::t2()`](https://rdrr.io/pkg/mgcv/man/t2.html). One continuous
+covariate gives curves for categorical combinations; categorical-only
+terms give point ranges. Up to four covariates are supported. Numeric
+conditioning slices use `n_3d` or `n_4d`. For factor conditioning
+dimensions, these controls retain at most that many levels, taking the
+first levels in fitted order. Explicit `re_levels` selections take
+precedence. Supplied `data` and precomputed estimates retain their rows;
+select specific factor levels with `re_levels`, or use
 [`data_slice()`](https://gavinsimpson.github.io/gratia/reference/data_slice.md)
 to fix conditioning covariates. Observation layers do not introduce
 additional surface panels.
@@ -740,8 +747,8 @@ and composed into a single plot using
 [`patchwork::wrap_plots()`](https://patchwork.data-imaginist.com/reference/wrap_plots.html).
 As a result, it is not possible to use `+` to add to the plots in the
 way one might typically work with
-[`ggplot()`](https://ggplot2.tidyverse.org/reference/ggplot.html) plots.
-Instead, use the `&` operator; see the examples.
+[`ggplot2::ggplot()`](https://ggplot2.tidyverse.org/reference/ggplot.html)
+plots. Instead, use the `&` operator; see the examples.
 
 ## Label layout
 

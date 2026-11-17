@@ -259,7 +259,7 @@ constant term be included in the standard errors of smooth and parametric
 effects? For parametric effects this includes the intercept variance and
 its covariance with the term, without changing the partial estimates.
 Each term uses the intercept of its own linear predictor.
-Native scasm models are routed to <code><a href="draw.gam.html">draw.scasm()</a></code> with
+Native <code><a href="https://rdrr.io/pkg/mgcv/man/scasm.html" class="external-link">mgcv::scasm()</a></code> models are routed to <code><a href="draw.gam.html">draw.scasm()</a></code> with
 <code>overall_uncertainty = FALSE</code>. An explicit request for unavailable mean
 uncertainty warns once. The stored model class is unchanged.</p></dd>
 
@@ -449,7 +449,7 @@ bounded by adjacent coordinate midpoints for flat surfaces.</p></dd>
 
 <dt id="arg-surface-d">surface_3d<a class="anchor" aria-label="anchor" href="#arg-surface-d"></a></dt>
 <dd><p>named list of view options passed to <code><a href="https://matthewkling.github.io/ggcube/reference/coord_3d.html" class="external-link">ggcube::coord_3d()</a></code>,
-for example <code>list(yaw = 45, persp = FALSE)</code>. The default <code><a href="https://rdrr.io/r/base/list.html" class="external-link">list()</a></code> uses the
+for example <code>list(yaw = 45, persp = FALSE)</code>. The default <code><a href="https://rdrr.io/r/base/list.html" class="external-link">base::list()</a></code> uses the
 default view with <code>ggcube::light(backface_scale = 1)</code>, preserving equal
 horizontal units for isotropic smooths. Supply <code>light = ggcube::light(...)</code>
 in this list to override lighting; <code>ggcube::light(method = "none")</code> disables
@@ -544,11 +544,11 @@ caller's RNG state.</p></dd>
 
 
 <dt id="arg-interval-method">interval_method<a class="anchor" aria-label="anchor" href="#arg-interval-method"></a></dt>
-<dd><p>character; "auto" uses stored scasm bootstrap draws
+<dd><p>character; "auto" uses stored <code><a href="https://rdrr.io/pkg/mgcv/man/scasm.html" class="external-link">mgcv::scasm()</a></code> bootstrap draws
 for pointwise intervals when available, and Gaussian intervals otherwise.
 Use "gaussian" to request covariance-based limits or "bootstrap" to
 require stored draws. Simultaneous bootstrap bands are not supported.
-<code>"shape"</code> applies <code><a href="shape_intervals.html">shape_intervals()</a></code> to supported scasm smooth components,
+<code>"shape"</code> applies <code><a href="shape_intervals.html">shape_intervals()</a></code> to supported <code><a href="https://rdrr.io/pkg/mgcv/man/scasm.html" class="external-link">mgcv::scasm()</a></code> smooth components,
 using the initial limits chosen by <code>shape_source</code>.</p></dd>
 
 
@@ -678,7 +678,7 @@ customizes the coordinate display as described in <code><a href="draw.gam.html">
     <p>Internally, plots of each smooth are created using <code><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot2::ggplot()</a></code>
 and composed into a single plot using <code><a href="https://patchwork.data-imaginist.com/reference/wrap_plots.html" class="external-link">patchwork::wrap_plots()</a></code>. As a
 result, it is not possible to use <code>+</code> to add to the plots in the way one
-might typically work with <code>ggplot()</code> plots. Instead, use the <code>&amp;</code> operator;
+might typically work with <code><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot2::ggplot()</a></code> plots. Instead, use the <code>&amp;</code> operator;
 see the examples.</p>
     </div>
     <div class="section level2">

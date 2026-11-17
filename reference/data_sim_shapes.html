@@ -92,7 +92,7 @@ with <code>family = poisson()</code> to sample mgcv's Poisson example.</p>
 <p><code>sc_tensor</code> uses <code>f = x + z + x * z</code>, increasing in both covariates. Its
 <code>dx</code> and <code>dz</code> columns give the true partial derivatives.</p>
 <p><code>sc_location_scale</code> uses log mean <code>sin(pi * x) / 2</code> and log dispersion
-<code>-2 + z</code>, returned in <code>f</code> and <code>f_scale</code>. It defaults to <code>gammals()</code> and
+<code>-2 + z</code>, returned in <code>f</code> and <code>f_scale</code>. It defaults to <code><a href="https://rdrr.io/pkg/mgcv/man/gammals.html" class="external-link">mgcv::gammals()</a></code> and
 records derivatives in <code>d1</code>, <code>d2</code> and <code>d_scale</code>. Constraints act on the
 specified predictors; in particular the concavity concerns the log mean.</p>
 <p>The recipes use the default <code>bs = 0</code> for fitting without bootstrap

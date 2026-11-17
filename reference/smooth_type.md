@@ -3,9 +3,6 @@
 Soap-film boundary and wiggly components use the `sf.film` and
 `sf.wiggly` classes introduced in mgcv 1.9-4.
 
-B-spline tensor products (`bs = "bt"`, available from mgcv 1.9-5) use
-the short name `"B spline tensor"`.
-
 ## Usage
 
 ``` r
@@ -214,6 +211,9 @@ smooth_type(smooth)
   an object inheriting from class `mgcv.smooth`.
 
 ## Details
+
+B-spline tensor products (`bs = "bt"`, available from mgcv 1.9-5) use
+the short name `"B spline tensor"`.
 
 SCAM smooth types use compact constraint descriptions: `inc` for
 increasing, `dec` for decreasing, and `pos` for positive. For tensor

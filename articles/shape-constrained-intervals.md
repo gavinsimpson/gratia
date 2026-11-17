@@ -137,14 +137,16 @@ basis or satisfy its centring equalities.
 ### What the validation simulations showed
 
 The reproducible experiment in `notes/scasm/shape-coverage.R` separates
-known-variance Gaussian calibration from fitted scasm uncertainty. It
+known-variance Gaussian calibration from fitted
+[`scasm()`](https://rdrr.io/pkg/mgcv/man/scasm.html) uncertainty. It
 uses 2,000 repetitions per known-Gaussian scenario and 400 attempted
-fits per scasm scenario, including exactly flat and exactly linear
-truths. At 95% coverage, the binomial Monte Carlo standard error is
-about 0.5 percentage points for 2,000 repetitions and 1.1 percentage
-points for 400 successful fits. The scasm experiment applies the
-low-level operator to fitted response curves including their intercepts,
-giving each simulated truth a fixed reference level.
+fits per [`scasm()`](https://rdrr.io/pkg/mgcv/man/scasm.html) scenario,
+including exactly flat and exactly linear truths. At 95% coverage, the
+binomial Monte Carlo standard error is about 0.5 percentage points for
+2,000 repetitions and 1.1 percentage points for 400 successful fits. The
+[`scasm()`](https://rdrr.io/pkg/mgcv/man/scasm.html) experiment applies
+the low-level operator to fitted response curves including their
+intercepts, giving each simulated truth a fixed reference level.
 
 For a nearly flat increasing truth, the smallest marginal coverage over
 grid points fell from 93.65% to 38.00% after transforming Gaussian
@@ -155,20 +157,21 @@ transformations across the experiment. These are empirical checks of the
 event-inclusion result, rather than a reason to interpret transformed
 pointwise limits as calibrated intervals.
 
-The scasm examples also show that shape enforcement retains limitations
-of the initial uncertainty. For a nearly binding increasing, convex
-truth, the transformed Gaussian simultaneous band covered the whole grid
-in 313 of 342 returned fits: 91.52%, with Monte Carlo standard error
-1.51 percentage points. The other 58 attempts raised upstream fitting
-errors, so this estimate is conditional on a model being returned. The
-saved reports record all errors and warnings and distinguish them from
+The [`scasm()`](https://rdrr.io/pkg/mgcv/man/scasm.html) examples also
+show that shape enforcement retains limitations of the initial
+uncertainty. For a nearly binding increasing, convex truth, the
+transformed Gaussian simultaneous band covered the whole grid in 313 of
+342 returned fits: 91.52%, with Monte Carlo standard error 1.51
+percentage points. The other 58 attempts raised upstream fitting errors,
+so this estimate is conditional on a model being returned. The saved
+reports record all errors and warnings and distinguish them from
 interval calculations. Comparing selected smoothing with a small fixed
 penalty also changed local bias. The small-penalty comparison records
 estimates only; it does not assess interval width or separate smoothing
 bias from the effects of a finite spline basis and binding restrictions.
 Enforcing shape supplies no additional correction for smoothing bias.
 
-## An increasing, convex scasm smooth
+## An increasing, convex `scasm()` smooth
 
 For supported [`mgcv::scasm()`](https://rdrr.io/pkg/mgcv/man/scasm.html)
 components, select the transformation explicitly with
@@ -195,9 +198,10 @@ draw(curve)
 ![](shape-constrained-intervals_files/figure-html/fit-curve-1.png)
 
 This displays the smooth component on its model scale. The intercept is
-not added. `scasm` components use component-only uncertainty by default;
-an explicit request for `overall_uncertainty = TRUE` is rejected for
-shape intervals. Arbitrary effect shifts and transformations are also
+not added. [`scasm()`](https://rdrr.io/pkg/mgcv/man/scasm.html)
+components use component-only uncertainty by default; an explicit
+request for `overall_uncertainty = TRUE` is rejected for shape
+intervals. Arbitrary effect shifts and transformations are also
 rejected, because they can change the asserted shape. Standard errors
 retained in the result describe the initial uncertainty calculation;
 transformed endpoints are not reconstructed from a standard error and a
@@ -291,13 +295,14 @@ curvature enforced in an earlier direction.
 
 ## How this differs from stored bootstrap limits
 
-With `bs > 0`, a scasm fit stores feasible bootstrap coefficient columns
-in `model$bs`. Its bootstrap holds smoothing parameters fixed and
-perturbs a final working likelihood problem. Native intervals evaluate
-those columns, take pointwise percentiles and, when `svar.only` is
-present, adjust endpoints using the mean difference between Bayesian and
-frequentist standard errors. Percentiles of convex functions need not be
-convex, and the endpoint adjustment can alter restrictions further.
+With `bs > 0`, a [`scasm()`](https://rdrr.io/pkg/mgcv/man/scasm.html)
+fit stores feasible bootstrap coefficient columns in `model$bs`. Its
+bootstrap holds smoothing parameters fixed and perturbs a final working
+likelihood problem. Native intervals evaluate those columns, take
+pointwise percentiles and, when `svar.only` is present, adjust endpoints
+using the mean difference between Bayesian and frequentist standard
+errors. Percentiles of convex functions need not be convex, and the
+endpoint adjustment can alter restrictions further.
 
 `interval_method = "shape", shape_source = "bootstrap"` applies the same
 shape operators to these native pointwise limits. It requires valid

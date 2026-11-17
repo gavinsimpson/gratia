@@ -219,7 +219,7 @@ coefficient sampling are also unavailable.
 `model_edf(type = "unconditional")` follows the shared GAM convention:
 it warns and returns standard EDF when the correction is missing.
 Automatic `interval_method = "shape"` integration remains specific to
-supported scasm smooths;
+supported [`scasm()`](https://rdrr.io/pkg/mgcv/man/scasm.html) smooths;
 [`shape_intervals()`](https://gavinsimpson.github.io/gratia/reference/shape_intervals.md)
 can be used explicitly on supplied estimates and grids when its named
 shape restrictions apply.
