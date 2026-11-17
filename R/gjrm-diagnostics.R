@@ -51,7 +51,7 @@ gjrm_diagnostic_model <- function(model) {
   if (length(distribution$mean) != length(y) || length(model$eta1) != length(y))
     stop("GJRM fitted distribution is not aligned with its response.", call. = FALSE)
   fam <- switch(model$margins[1L], N = stats::gaussian(), LN = stats::gaussian(),
-    GA =, GAi = stats::Gamma(link = if (model$margins[1L] == "GAi") "identity" else "log"),
+    GA = stats::Gamma(link = "log"), GAi = stats::Gamma(link = "identity"),
     P = stats::poisson(), list(family = distribution$family))
   # A lognormal response does not have Gaussian response deviance.
   if (model$margins[1L] == "LN") fam$dev.resids <- NULL
@@ -191,7 +191,7 @@ gjrm_joint_margin_proxy <- function(model, i) {
     class(single) <- "SemiParBIV"
     distribution <- gjrm_response_distribution(single)
     fam <- switch(margin, N = stats::gaussian(), LN = stats::gaussian(),
-      GA =, GAi = stats::Gamma(link = if (margin == "GAi") "identity" else "log"),
+      GA = stats::Gamma(link = "log"), GAi = stats::Gamma(link = "identity"),
       P = stats::poisson(), list(family = distribution$family))
     if (margin == "LN") {
       fam$family <- "lognormal"

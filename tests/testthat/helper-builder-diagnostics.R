@@ -4,6 +4,26 @@ builder_diagnostics_enabled <- function() {
   identical(Sys.getenv("GRATIA_TEST_DIAGNOSTICS"), "true")
 }
 
+builder_isolate_spatial_tests <- function() {
+  identical(Sys.getenv("GRATIA_ISOLATE_SPATIAL_TESTS"), "true")
+}
+
+builder_spatial_test_filter <- function() {
+  paste0("^(compare-smooths|plot-helpers|spherical-geometry|",
+    "prepare-surface-plot|surface-3d|draw-smooth-estimates)$")
+}
+
+builder_test_check <- function(filter = NULL, invert = FALSE) {
+  progress <- Sys.getenv("GRATIA_TEST_PROGRESS")
+  if (!nzchar(progress)) {
+    return(testthat::test_check("gratia", filter = filter, invert = invert))
+  }
+  print(sessionInfo())
+  reporter <- testthat::MultiReporter$new(list(
+    testthat::CheckReporter$new(), builder_progress_reporter(progress)))
+  testthat::test_check("gratia", filter = filter, invert = invert, reporter = reporter)
+}
+
 # cli formatting changes the spacing of later messages, even with a file.
 # Write directly so progress reporting does not change message snapshots.
 builder_progress_reporter <- function(file) {

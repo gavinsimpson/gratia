@@ -90,15 +90,6 @@ jobs:
         run: Rscript --vanilla tools/test-sdmtmb-thresholds.R
         shell: bash
 
-      # Build against the R toolchain used by the package check on this runner.
-      - name: Build vctrs from source on Windows ARM
-        if: runner.os == 'Windows' && runner.arch == 'ARM64'
-        shell: Rscript {0}
-        run: |
-          options(warn = 2)
-          install.packages("vctrs", lib = dirname(find.package("vctrs")),
-            type = "source", repos = "https://cloud.r-project.org")
-
       - name: Report macOS storage and file limits
         if: runner.os == 'macOS'
         run: |
@@ -108,6 +99,7 @@ jobs:
 
       - uses: r-lib/actions/check-r-package@v2
         env:
+          GRATIA_ISOLATE_SPATIAL_TESTS: ${{ runner.os == 'Windows' && runner.arch == 'ARM64' && 'true' || 'false' }}
           GRATIA_TEST_PROGRESS: ${{ (runner.os == 'macOS' && matrix.config.r == 'oldrel' || runner.os == 'Windows' && runner.arch == 'ARM64') && format('{0}/check-test-progress.log', runner.temp) || '' }}
         with:
           upload-snapshots: true
@@ -137,7 +129,7 @@ jobs:
             fi
           done
           if [ -d check ]; then
-            find check -type f \( -name 'test-all.Rout*' -o -name '00check.log' \) \
+            find check -type f \( -name 'test-*.Rout*' -o -name '00check.log' \) \
               -print -exec tail -n 100 '{}' \;
           fi
 
@@ -150,6 +142,6 @@ jobs:
           path: |
             ${{ runner.temp }}/threshold-test-progress.log
             ${{ runner.temp }}/check-test-progress.log
-            check/**/tests/test-all.Rout*
+            check/**/tests/test-*.Rout*
             check/**/00check.log
             check/**/00install.out

@@ -5,12 +5,9 @@ library("testthat")
 library("gratia")
 
 ## Runs the tests in tests/testthat
-progress <- Sys.getenv("GRATIA_TEST_PROGRESS")
-if (nzchar(progress)) {
-  source("testthat/helper-builder-diagnostics.R")
-  print(sessionInfo())
-  test_check("gratia", reporter = MultiReporter$new(list(
-    CheckReporter$new(), builder_progress_reporter(progress))))
+source("testthat/helper-builder-diagnostics.R")
+if (builder_isolate_spatial_tests()) {
+  builder_test_check(filter = builder_spatial_test_filter(), invert = TRUE)
 } else {
-  test_check("gratia")
+  builder_test_check()
 }
