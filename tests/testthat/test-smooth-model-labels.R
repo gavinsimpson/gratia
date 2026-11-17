@@ -152,12 +152,18 @@ test_that("glmmTMB smooths use the agreed component subtitles", {
 test_that("single-predictor glmmTMB smooths omit model subtitles", {
   skip_if_not_installed("glmmTMB", minimum_version = "1.1.15.2")
   d <- subtitle_data()
+  # Both smooths need a nonlinear signal to estimate their variances reliably.
+  eta <- .7 + .8 * sin(2 * pi * d$x) + .8 * cos(2 * pi * d$z)
   for (fam in list(gaussian(), poisson(), glmmTMB::nbinom2())) {
-    if (fam$family != "gaussian") {
-      d$y <- withr::with_seed(29, rnbinom(nrow(d), mu = exp(d$x), size = 2))
-    }
+    d$y <- withr::with_seed(29, switch(fam$family,
+      gaussian = rnorm(nrow(d), mean = eta, sd = .3),
+      poisson = rpois(nrow(d), lambda = exp(eta)),
+      nbinom2 = rnbinom(nrow(d), mu = exp(eta), size = 2)))
     m <- glmmTMB::glmmTMB(y ~ s(x, k = 4) + s(z, k = 4),
       family = fam, data = d)
+    label <- paste("glmmTMB", fam$family, "fit")
+    expect_identical(m$fit$convergence, 0L, info = label)
+    expect_true(m$sdr$pdHess, info = label)
     expect_false(".model" %in% names(smooth_estimates(m)))
     expect_true(all(vapply(draw(m, wrap = FALSE),
       function(p) is.null(p$labels$subtitle), logical(1))))
