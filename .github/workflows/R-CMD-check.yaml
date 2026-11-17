@@ -90,13 +90,14 @@ jobs:
         run: Rscript --vanilla tools/test-sdmtmb-thresholds.R
         shell: bash
 
-      - name: Run focused Windows ARM spherical plot tests
+      # Build against the R toolchain used by the package check on this runner.
+      - name: Build vctrs from source on Windows ARM
         if: runner.os == 'Windows' && runner.arch == 'ARM64'
-        timeout-minutes: 15
-        env:
-          GRATIA_TEST_PROGRESS: ${{ runner.temp }}/spherical-test-progress.log
-        run: Rscript --vanilla tools/test-spherical-plots.R 2>&1 | tee "$RUNNER_TEMP/spherical-test-output.log"
-        shell: bash
+        shell: Rscript {0}
+        run: |
+          options(warn = 2)
+          install.packages("vctrs", lib = dirname(find.package("vctrs")),
+            type = "source", repos = "https://cloud.r-project.org")
 
       - name: Report macOS storage and file limits
         if: runner.os == 'macOS'
@@ -129,7 +130,7 @@ jobs:
         if: always() && (runner.os == 'macOS' && matrix.config.r == 'oldrel' || runner.os == 'Windows' && runner.arch == 'ARM64')
         shell: bash
         run: |
-          for log in "$RUNNER_TEMP/threshold-test-progress.log" "$RUNNER_TEMP/spherical-test-output.log" "$RUNNER_TEMP/spherical-test-progress.log" "$RUNNER_TEMP/check-test-progress.log"; do
+          for log in "$RUNNER_TEMP/threshold-test-progress.log" "$RUNNER_TEMP/check-test-progress.log"; do
             if [ -f "$log" ]; then
               printf '\n%s\n' "$log"
               tail -n 100 "$log"
@@ -148,8 +149,6 @@ jobs:
           if-no-files-found: ignore
           path: |
             ${{ runner.temp }}/threshold-test-progress.log
-            ${{ runner.temp }}/spherical-test-output.log
-            ${{ runner.temp }}/spherical-test-progress.log*
             ${{ runner.temp }}/check-test-progress.log
             check/**/tests/test-all.Rout*
             check/**/00check.log
