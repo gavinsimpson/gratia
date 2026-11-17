@@ -342,6 +342,7 @@ test_that("spherical comparisons retain each conditioning surface and its contou
   cs <- compare_smooths(m, Same = m, data = nd)
   expect_silent(p <- draw(cs)[[1]])
   expect_equal(nrow(p$data), 2L * nrow(nd))
+  local_plot_build_trace()
   expect_silent(b <- ggplot_build(p))
   expect_equal(nrow(b$layout$layout), 4L)
   labels <- data.frame(.model = c("m", "Same"))

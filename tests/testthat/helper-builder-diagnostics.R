@@ -66,6 +66,7 @@ local_spatial_trace <- function(file) {
     version <- as.character(getNamespaceVersion(ns))
     functions <- intersect(c("CPL_transform", "CPL_transform_bounds",
       "CPL_crs_equivalent", "CPL_crs_parameters", "CPL_crs_from_input",
+      "CPL_proj_direct", "CPL_axis_order_authority_compliant",
       "CPL_wrap_dateline", "CPL_gdal_segmentize", "CPL_geos_op",
       "CPL_geos_op2", "CPL_geos_binop", "CPL_geos_normalize",
       "CPL_geos_is_valid", "CPL_geos_is_empty", "CPL_get_bbox"), ls(ns))
@@ -91,6 +92,62 @@ local_spatial_trace <- function(file) {
     install()
   } else {
     setHook(hook, install)
+  }
+  invisible(NULL)
+}
+
+# Record the expressions that ggplot2 and sf are about to evaluate. Limit this
+# to the spherical builds that stopped during the Windows ARM package check.
+local_plot_build_trace <- function() {
+  file <- Sys.getenv("GRATIA_SPATIAL_TRACE")
+  if (!nzchar(file)) return(invisible(NULL))
+
+  record <- function(...) {
+    line <- paste(format(Sys.time(), "%Y-%m-%d %H:%M:%OS3", tz = "UTC"), ...)
+    cat(line, "\n", sep = "", file = file, append = TRUE)
+  }
+  gg <- asNamespace("ggplot2")
+  sf <- asNamespace("sf")
+  cleanup <- list()
+  withr::defer({
+    for (entry in rev(cleanup)) {
+      suppressMessages(untrace(entry$name, where = entry$where))
+    }
+  }, envir = parent.frame())
+
+  trace_steps <- function(name, where, label) {
+    fn <- get0(name, where, inherits = FALSE)
+    if (!is.function(fn) || !is.call(body(fn)) ||
+        !identical(body(fn)[[1L]], as.name("{"))) {
+      record("Cannot trace", label)
+      return(invisible(NULL))
+    }
+    steps <- as.list(body(fn))[-1L]
+    labels <- vapply(steps, deparse, character(1L), width.cutoff = 100L, nlines = 1L)
+    mark_step <- function(frame) {
+      key <- ".gratia_trace_step"
+      step <- get0(key, frame, inherits = FALSE, ifnotfound = 0L) + 1L
+      assign(key, step, frame)
+      record("STEP", label, step, labels[[step]])
+    }
+    suppressMessages(trace(name, where = where, print = FALSE,
+      at = as.list(seq_along(steps) + 1L),
+      tracer = bquote(.(mark_step)(environment())),
+      exit = bquote(.(record)("EXIT", .(label)))))
+    cleanup[[length(cleanup) + 1L]] <<- list(name = name, where = where)
+  }
+
+  trace_steps("ggplot_build", gg, "ggplot2::ggplot_build")
+  trace_steps("ggplot_build.ggplot2::ggplot", get(".__S3MethodsTable__.", gg),
+    "ggplot2 ggplot build method")
+  for (name in c("setup", "setup_panel_params")) {
+    trace_steps(name, ggplot2::Layout, paste0("ggplot2::Layout$", name))
+  }
+  for (name in c("setup_params", "setup_data", "setup_panel_params")) {
+    trace_steps(name, ggplot2::CoordSf, paste0("ggplot2::CoordSf$", name))
+  }
+  for (name in c("st_sfc", "st_graticule")) {
+    trace_steps(name, sf, paste0("sf::", name))
   }
   invisible(NULL)
 }

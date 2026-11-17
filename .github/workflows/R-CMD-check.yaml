@@ -6,6 +6,11 @@ on:
   pull_request:
     branches: [main, master]
   workflow_dispatch:
+    inputs:
+      full_linux_and_windows_arm:
+        description: Run only the full Ubuntu release and Windows ARM checks
+        type: boolean
+        default: false
   workflow_call:
     inputs:
       config:
@@ -30,11 +35,14 @@ jobs:
       matrix:
         # The weekly workflow supplies the broader compatibility matrix.
         config: >-
-          ${{ fromJSON(inputs.config || '[
+          ${{ fromJSON(inputs.config || (inputs.full_linux_and_windows_arm && '[
+            {"os": "ubuntu-latest", "r": "release", "tests": "full", "not_cran": "true"},
+            {"os": "windows-11-arm", "r": "release", "tests": "full", "not_cran": "true"}
+          ]' || '[
             {"os": "macOS-latest", "r": "release", "tests": "CRAN core", "not_cran": "false"},
             {"os": "windows-latest", "r": "release", "tests": "CRAN core", "not_cran": "false"},
             {"os": "ubuntu-latest", "r": "release", "tests": "CRAN core", "not_cran": "false"}
-          ]') }}
+          ]')) }}
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}

@@ -11,11 +11,12 @@ run_spherical_tests <- function() {
   if (!nzchar(progress)) stop("Set GRATIA_TEST_PROGRESS to a log file path.")
 
   source("tests/testthat/helper-builder-diagnostics.R")
+  withr::local_envvar(GRATIA_SPATIAL_TRACE = progress)
   local_spatial_trace(progress)
   reporter <- testthat::MultiReporter$new(list(
     testthat::SummaryReporter$new(), builder_progress_reporter(progress)))
-  testthat::test_local(filter = "^compare-smooths$", reporter = reporter,
-    stop_on_failure = TRUE, stop_on_warning = TRUE)
+  testthat::test_local(filter = "^(compare-smooths|plot-helpers)$",
+    reporter = reporter, stop_on_failure = TRUE, stop_on_warning = TRUE)
 }
 
 run_spherical_tests()
