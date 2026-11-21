@@ -281,9 +281,18 @@
   plots of smooth and parametric contributions. It shares preparation of the
   fitted GAM component with `draw()`.
 
-* `assemble()` now supports models fitted by `GJRM::gamlss()`, returning a
+* **Plots and smooth estimates for `GJRM::gamlss()`**
+
+  `assemble()` now supports models fitted by `GJRM::gamlss()`, returning a
   named list of smooth and parametric plots across equations. It shares model
   preparation, selection and scale handling with `draw()`.
+
+  Direct calls to `smooth_estimates()` now work for `GJRM::gamlss()` models
+  (#352). Estimates use the final fitted coefficients and covariance, with
+  smooth selection across equations and parameter labels retained for drawing
+  saved estimates. Frequentist covariance also comes from the final fit, and
+  gratia warns and uses the fitted Bayesian covariance when the requested
+  smoothing-parameter correction is unavailable.
 
 * `assemble()` now supports glmmTMB models, returning named plots for
   smooths, native random effects and parametric terms. It shares model
@@ -1155,13 +1164,6 @@
 * `n_smooths()` now counts smooth terms in glmmTMB models across the
   conditional, zero-inflation and dispersion predictors, excluding native
   random effects. Models without smooths return zero (#240).
-
-* Direct calls to `smooth_estimates()` now work for `GJRM::gamlss()` models
-  (#352). Estimates use the final fitted coefficients and covariance, with
-  smooth selection across equations and parameter labels retained for drawing
-  saved estimates. Frequentist covariance also comes from the final fit;
-  unavailable smoothing-parameter corrections warn and use its Bayesian
-  covariance.
 
 * B-spline evaluation handles empty data and factor-by calls whose evaluation
   data omit fitted levels, including constrained tensor products.
