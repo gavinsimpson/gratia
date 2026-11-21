@@ -29,13 +29,19 @@ fixed_effects(object, ...)
 }
 \arguments{
 \item{object}{a fitted model. Supported classes are models fitted by
-\code{\link[mgcv:gam]{mgcv::gam()}}, \code{\link[mgcv:bam]{mgcv::bam()}}, \code{\link[mgcv:gamm]{mgcv::gamm()}}, \code{\link[mgcv:gam]{mgcv::gam()}},
-\code{\link[gamm4:gamm4]{gamm4::gamm4()}}, \code{\link[stats:glm]{stats::glm()}}, and \code{\link[stats:lm]{stats::lm()}}.}
+\code{\link[mgcv:gam]{mgcv::gam()}}, \code{\link[mgcv:bam]{mgcv::bam()}}, \code{\link[mgcv:gamm]{mgcv::gamm()}}, \code{\link[gamm4:gamm4]{gamm4::gamm4()}},
+\code{\link[scam:scam]{scam::scam()}}, \code{\link[stats:glm]{stats::glm()}}, and \code{\link[stats:lm]{stats::lm()}}.}
 
 \item{...}{arguments passed to other methods}
 }
 \description{
 Extract fixed effects estimates from a fitted model
+}
+\details{
+Starting with gratia 0.12.0, use \code{fixed_effects()} for the models listed
+above if you previously called \code{gratia::fixef()} or a \code{fixef()} method
+supplied by gratia. For models fitted directly with nlme or lme4, use
+\code{\link[nlme:fixef]{nlme::fixef()}} or \code{\link[lme4:fixef]{lme4::fixef()}}, respectively.
 }
 \examples{
 load_mgcv()

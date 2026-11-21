@@ -7,9 +7,15 @@
 #' Extract fixed effects estimates from a fitted model
 #'
 #' @param object a fitted model. Supported classes are models fitted by
-#'   [mgcv::gam()], [mgcv::bam()], [mgcv::gamm()], [mgcv::gam()],
-#'   [gamm4::gamm4()], [stats::glm()], and [stats::lm()].
+#'   [mgcv::gam()], [mgcv::bam()], [mgcv::gamm()], [gamm4::gamm4()],
+#'   [scam::scam()], [stats::glm()], and [stats::lm()].
 #' @param ... arguments passed to other methods
+#'
+#' @details
+#' Starting with gratia 0.12.0, use `fixed_effects()` for the models listed
+#' above if you previously called `gratia::fixef()` or a `fixef()` method
+#' supplied by gratia. For models fitted directly with nlme or lme4, use
+#' [nlme::fixef()] or [lme4::fixef()], respectively.
 #'
 #' @export
 #'

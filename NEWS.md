@@ -2,6 +2,11 @@
 
 ## User visible changes
 
+* **Breaking change:** gratia has removed its `fixef()` re-export and the
+  methods it registered for that generic. Use `gratia::fixed_effects()` for
+  GAMs, GAMMs, GLMs and linear models supported by gratia. For models fitted
+  directly with nlme or lme4, use `nlme::fixef()` or `lme4::fixef()`, respectively.
+
 * Help examples use fewer model fits and repeated plots to focus on each
   function's main use and reduce execution time.
 
