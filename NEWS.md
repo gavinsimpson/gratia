@@ -1,4 +1,4 @@
-# gratia 0.12.0
+# gratia (development version)
 
 ## User visible changes
 
