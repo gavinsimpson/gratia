@@ -440,8 +440,9 @@ Separate those curves and include their intervals with:</p>
 <p><img src="custom-plotting_files/figure-html/fs-separate-intervals-1.png" class="r-plt" alt="" width="700"></p>
 <p>The same controls work with saved estimates. Grouping the curves or
 hiding their intervals leaves the saved estimates and interval limits
-intact. Here we draw each group deviation separately and omit its
-interval ribbon.</p>
+intact. A saved simultaneous band still applies to the grid used to
+calculate it, even if the plot shows only some of those curves. Here we
+draw each group deviation separately and omit its interval ribbon.</p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sz_estimates</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/smooth_estimates.html">smooth_estimates</a></span><span class="op">(</span><span class="va">m_sz</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">sz_estimates</span>, grouped <span class="op">=</span> <span class="cn">FALSE</span>, show_ci <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>

@@ -45,6 +45,23 @@ documented in the same file or functions without their own help topic.
 Keep executable code, roxygen metadata, argument names, class names and
 non-function documentation topics in their required syntax.
 
+## Package names in articles and vignettes
+
+Wrap the first prose mention of each R package in braces, for example
+{gratia}, {mgcv} or {ggplot2}. Use the plain package name for later
+mentions in the same article or vignette. Apply this rule separately to
+each document.
+
+Keep package names in titles, headings and quoted article titles free of
+braces; these do not count as the first prose mention. Keep executable
+code, inline code, function references and metadata in their required
+syntax: for example,
+[`library("mgcv")`](https://rdrr.io/r/base/library.html) and
+[`mgcv::gam()`](https://rdrr.io/pkg/mgcv/man/gam.html). References in
+code do not count as prose mentions. Distinguish package names from
+ordinary words, statistical terms and class names, such as posterior
+distributions and tibbles.
+
 ## Release notes
 
 Keep each individual `NEWS.md` entry to 1–3 sentences, including each

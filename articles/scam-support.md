@@ -44,9 +44,15 @@ draw(m)
 
 The captions identify the spline basis and its shape constraints. Arrows
 indicate increasing or decreasing effects. For a tensor product smooth,
-the caption identifies the constraint on each covariate. The same
-captions appear when drawing estimates saved with
+the caption identifies the constraint on each covariate. For the local
+constraints `bs = "lmpi"` and `bs = "lipl"`, it shows the change point
+you specified as `xc` in `xt`. The same captions appear when drawing
+estimates saved with
 [`smooth_estimates()`](https://gavinsimpson.github.io/gratia/reference/smooth_estimates.md).
+Use
+[`smooth_type()`](https://gavinsimpson.github.io/gratia/reference/smooth_type.md)
+or the `.type` column of the saved estimates to get a short label such
+as `P spline (inc)`.
 
 By default,
 [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md) uses
@@ -56,6 +62,7 @@ scam subtracts the average across the plotted grid. Use
 `centre = "plot"` to match that convention in
 [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md) or
 [`assemble()`](https://gavinsimpson.github.io/gratia/reference/assemble.md).
+gratia computes the standard errors after applying the same centring.
 The following example fits a surface that increases with both covariates
 and centres it on the plotted grid.
 

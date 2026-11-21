@@ -124,14 +124,19 @@ estimated contributions.</p>
 </h2>
 <p>The captions identify the spline basis and its shape constraints.
 Arrows indicate increasing or decreasing effects. For a tensor product
-smooth, the caption identifies the constraint on each covariate. The
-same captions appear when drawing estimates saved with
-<code><a href="../reference/smooth_estimates.html">smooth_estimates()</a></code>.</p>
+smooth, the caption identifies the constraint on each covariate. For the
+local constraints <code>bs = "lmpi"</code> and <code>bs = "lipl"</code>,
+it shows the change point you specified as <code>xc</code> in
+<code>xt</code>. The same captions appear when drawing estimates saved
+with <code><a href="../reference/smooth_estimates.html">smooth_estimates()</a></code>. Use <code><a href="../reference/smooth_type.html">smooth_type()</a></code> or
+the <code>.type</code> column of the saved estimates to get a short
+label such as <code>P spline (inc)</code>.</p>
 <p>By default, <code><a href="../reference/draw.html">draw()</a></code> uses the fitted smooth’s centring, so
 the plotted value at a given location stays the same if you change the
 evaluation grid. For bivariate smooths, scam subtracts the average
 across the plotted grid. Use <code>centre = "plot"</code> to match that
-convention in <code><a href="../reference/draw.html">draw()</a></code> or <code><a href="../reference/assemble.html">assemble()</a></code>. The
+convention in <code><a href="../reference/draw.html">draw()</a></code> or <code><a href="../reference/assemble.html">assemble()</a></code>. gratia
+computes the standard errors after applying the same centring. The
 following example fits a surface that increases with both covariates and
 centres it on the plotted grid.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">

@@ -108,6 +108,10 @@ can help describe how records vary with woodland cover. We fit them
 together using <code><a href="https://rdrr.io/pkg/mgcv/man/gfam.html" class="external-link">mgcv::gfam()</a></code> and assign a binomial or
 Poisson family to each observation. gratia uses those assignments for
 predictions, simulations and checks of the fitted model.</p>
+<p>The two surveys provide separate observations. For a single response
+with zeros and positive values, a delta model estimates the probability
+of a positive response and the distribution of the positive values. See
+the <a href="sdmTMB-support.html">worked delta-model example</a>.</p>
 <p>We simulate fixed-effort surveys at independent sites. The log odds
 of detection and the log expected count have different intercepts but
 share the same smooth response to woodland cover. Sharing the curve
@@ -318,10 +322,14 @@ General families with several linear predictors are not
 Missing responses alone do not prevent prediction. With
 <code><a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">na.exclude()</a></code>, excluded fitting rows are restored as
 <code>NA</code> in fitted draws and simulations, while checks use the
-observations actually fitted. Scalar censored-family components can
-simulate uncensored responses. Matrix responses that encode censoring or
-binomial success and failure counts are outside the scope of
-<code><a href="https://rdrr.io/pkg/mgcv/man/gfam.html" class="external-link">gfam()</a></code>.</p>
+observations actually fitted.</p>
+<p>For scalar censored components, <code><a href="../reference/simulate.html">simulate()</a></code> generates
+uncensored responses. For a custom comparison with censored
+observations, apply the same censoring rule to each simulated dataset
+before comparing the distributions.
+<code><a href="../reference/posterior_predictive_plot.html">posterior_predictive_plot()</a></code> is unavailable for censored
+components. Matrix responses that encode censoring or binomial success
+and failure counts are outside the scope of <code><a href="https://rdrr.io/pkg/mgcv/man/gfam.html" class="external-link">gfam()</a></code>.</p>
 <p>For grouped binomial proportions, supply the number of trials in
 <code>weights</code>; for Gaussian and Gamma components these weights
 represent response precision. Prediction data default to weights of one

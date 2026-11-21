@@ -213,7 +213,10 @@ undefined. See <code><a href="../reference/fitted_moments.html">fitted_moments()
 and uncertainty calculations.</p>
 <p>Finally, compare the observed acceleration distribution with
 replicated datasets. This check draws the mean and scale coefficients
-together, retaining their covariance:</p>
+together, retaining their covariance. The smoothing parameters stay
+fixed at their fitted values in this check. If a GAM estimates
+dispersion or shape outside the coefficient vector, the check also holds
+those parameters fixed.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/posterior_predictive_plot.html">posterior_predictive_plot</a></span><span class="op">(</span><span class="va">varying</span>, n <span class="op">=</span> <span class="fl">50</span>, seed <span class="op">=</span> <span class="fl">402</span><span class="op">)</span></span></code></pre></div>
 <p><img src="response-distributions_files/figure-html/impact-ppc-1.png" class="r-plt" alt="" width="700"></p>
@@ -346,13 +349,16 @@ replicated response distributions:</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/posterior_predictive_plot.html">posterior_predictive_plot</a></span><span class="op">(</span><span class="va">rain_fit</span>, n <span class="op">=</span> <span class="fl">50</span>, seed <span class="op">=</span> <span class="fl">410</span><span class="op">)</span></span></code></pre></div>
 <p><img src="response-distributions_files/figure-html/tweedie-3.png" class="r-plt" alt="" width="700"></p>
-<p>The default QQ reference for traditional Tweedie residuals uses
-simulation. At zero, PIT residuals draw a uniform value between zero and
-the fitted probability of a zero. The posterior predictive plot smooths
-the zeros into a peak with the kernel density estimate. To check the
-zeros directly, compare their expected and observed proportions. We also
-check that every PIT residual for a zero falls within its allowed
-range.</p>
+<p>For PIT residuals, gratia evaluates the cumulative distribution
+function (CDF) of the fitted Poisson–Gamma mixture. At zero, it draws a
+uniform value between zero and the fitted probability of a zero. For
+traditional Tweedie residuals, the default QQ reference uses simulation
+to avoid calculating the inverse CDF, which can be slow for large
+datasets.</p>
+<p>The posterior predictive plot smooths the zeros into a peak with the
+kernel density estimate. To check the zeros directly, compare their
+expected and observed proportions. We also check that every PIT residual
+for a zero falls within its allowed range.</p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="va">rain_fit</span><span class="op">$</span><span class="va">family</span><span class="op">$</span><span class="fu">getTheta</span><span class="op">(</span><span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="va">phi</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">rain_fit</span><span class="op">)</span><span class="op">$</span><span class="va">scale</span></span>
@@ -365,9 +371,7 @@ range.</p>
 <span><span class="co">#&gt;   observed_zero_fraction fitted_zero_fraction largest_zero_probability_rank</span></span>
 <span><span class="co">#&gt; 1                  0.125            0.1253626                     0.9931912</span></span></code></pre></div>
 <p>Dividing a zero’s PIT residual by its fitted probability of zero
-gives a number between zero and one. Tweedie inverse-CDF calculations
-can be expensive for large datasets. Simulated QQ references are often
-quicker.</p>
+gives a number between zero and one.</p>
 </div>
 <div class="section level2">
 <h2 id="observations-below-a-detection-limit">Observations below a detection limit<a class="anchor" aria-label="anchor" href="#observations-below-a-detection-limit"></a>

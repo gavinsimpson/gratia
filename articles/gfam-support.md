@@ -18,6 +18,12 @@ and assign a binomial or Poisson family to each observation. gratia uses
 those assignments for predictions, simulations and checks of the fitted
 model.
 
+The two surveys provide separate observations. For a single response
+with zeros and positive values, a delta model estimates the probability
+of a positive response and the distribution of the positive values. See
+the [worked delta-model
+example](https://gavinsimpson.github.io/gratia/articles/sdmTMB-support.md).
+
 We simulate fixed-effort surveys at independent sites. The log odds of
 detection and the log expected count have different intercepts but share
 the same smooth response to woodland cover. Sharing the curve assumes
@@ -287,8 +293,15 @@ Missing required predictors or membership give missing predictions.
 Missing responses alone do not prevent prediction. With
 [`na.exclude()`](https://rdrr.io/r/stats/na.fail.html), excluded fitting
 rows are restored as `NA` in fitted draws and simulations, while checks
-use the observations actually fitted. Scalar censored-family components
-can simulate uncensored responses. Matrix responses that encode
+use the observations actually fitted.
+
+For scalar censored components,
+[`simulate()`](https://gavinsimpson.github.io/gratia/reference/simulate.md)
+generates uncensored responses. For a custom comparison with censored
+observations, apply the same censoring rule to each simulated dataset
+before comparing the distributions.
+[`posterior_predictive_plot()`](https://gavinsimpson.github.io/gratia/reference/posterior_predictive_plot.md)
+is unavailable for censored components. Matrix responses that encode
 censoring or binomial success and failure counts are outside the scope
 of [`gfam()`](https://rdrr.io/pkg/mgcv/man/gfam.html).
 

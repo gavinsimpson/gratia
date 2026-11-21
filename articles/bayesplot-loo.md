@@ -191,10 +191,12 @@ diagnostics](https://mc-stan.org/loo/reference/pareto-k-diagnostic.html)
 
 The leave-one-out probability integral transform (LOO-PIT) measures
 where each observation falls in its own leave-one-out predictive
-distribution. If those distributions are well calibrated, the PIT values
-should be approximately uniform. The calculation uses randomisation to
-handle ties for counts. The overlay compares the distribution of the
-resulting PIT values with simulated uniform references.
+distribution. The response simulations and the likelihoods used to
+compute the PSIS weights come from the same coefficient draws. If the
+predictive distributions are well calibrated, the PIT values should be
+approximately uniform. The calculation uses randomisation to handle ties
+for counts. The overlay compares the distribution of the resulting PIT
+values with simulated uniform references.
 
 ``` r
 

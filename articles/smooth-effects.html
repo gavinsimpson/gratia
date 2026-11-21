@@ -114,9 +114,10 @@ on each of twelve plants, with three plants per combination of origin
 and treatment. The Gamma model with a log link keeps the fitted means
 positive and lets the spread increase with the mean. In the model below,
 <code>s(log_conc)</code> allows the shared uptake curve to level off as
-concentration increases. The <code><a href="https://rdrr.io/pkg/mgcv/man/t2.html" class="external-link">t2()</a></code> term combines a spline
-for concentration with a plant random effect so that each plant can have
-its own smooth departure from the shared curve.</p>
+concentration increases. With a random slope, each plant’s departure
+from the shared curve is a straight line in centred log concentration.
+Here the <code><a href="https://rdrr.io/pkg/mgcv/man/t2.html" class="external-link">t2()</a></code> term combines a concentration spline with a
+plant random effect so each departure can also bend.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">plant</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">CO2</span><span class="op">)</span></span>
 <span><span class="va">plant</span><span class="op">$</span><span class="va">Plant</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">plant</span><span class="op">$</span><span class="va">Plant</span>, ordered <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>

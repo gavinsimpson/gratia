@@ -138,7 +138,9 @@ Drawing methods use the model’s covariate coordinates by default. For
 example, `log(x)` is plotted against `log(x)`, with a matching axis
 label, whether it is inside a smooth or a parametric term. Set
 `back_transform = TRUE` to display `x` instead. The estimated smooth
-contribution remains on the model’s linear predictor scale. The
+contribution remains on the model’s linear predictor scale. Use `fun` in
+[`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md) to
+transform the plotted contribution and its interval limits. The
 following calls request an axis in the original units, first from the
 fitted model and then from saved smooth estimates.
 

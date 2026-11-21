@@ -150,7 +150,8 @@ penalty matrix, undoing the rescaling mgcv applies during fitting. For a
 given penalty, a larger variance corresponds to less shrinkage. There is
 one row per penalty, so a smooth can have several rows. For this
 Gaussian model the <code>scale</code> row gives the estimated residual
-variance.</p>
+variance. The unpenalised terms <code>x</code> and <code>z</code> appear
+in the fitted term table below.</p>
 <p>With <code>type = "terms"</code>, we measure how much each term’s
 fitted contribution varies across the observations used to fit the
 model. We use 1,000 draws of the coefficients to calculate intervals and

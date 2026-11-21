@@ -449,10 +449,12 @@ distribution. For zero catches, the calculation draws a value uniformly
 between zero and the fitted probability of a zero, then converts it to a
 normal score. The model treats responses as independent for the selected
 fields, so the QQ plot uses a standard normal reference and pointwise
-bands conditional on that draw. The upper tail rises above the
-reference, suggesting that some positive catches are larger than
-expected under the fitted model. The positive-component check below
-helps locate this departure. Change
+bands conditional on that draw. To check how much catches vary across
+possible fields, use the marginal check below, which draws new
+fields.</p>
+<p>The upper tail rises above the reference, suggesting that some
+positive catches are larger than expected under the fitted model. The
+positive-component check below helps locate this departure. Change
 <code>gratia.diagnostics.field_seed</code> to see whether it persists
 across draws. The <code>seed</code> argument controls randomisation at
 the zeros.</p>
@@ -559,6 +561,10 @@ sample.</p>
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/posterior_predictive_plot.html">posterior_predictive_plot</a></span><span class="op">(</span><span class="va">cod_fit</span>, component <span class="op">=</span> <span class="st">"binomial"</span>,</span>
 <span>  n <span class="op">=</span> <span class="fl">25</span>, seed <span class="op">=</span> <span class="fl">1405</span><span class="op">)</span></span></code></pre></div>
 <p><img src="sdmTMB-support_files/figure-html/cod-component-checks-2.png" class="r-plt" alt="" width="700"></p>
+<p>The upper tail still rises above the reference in the positive-catch
+QQ plot. To see whether a heavier tail describes the largest catches
+better, refit with <code><a href="https://sdmTMB.github.io/sdmTMB/reference/families.html" class="external-link">sdmTMB::delta_lognormal()</a></code> and repeat the
+positive-component check.</p>
 <p>The occurrence plot compares the observed proportions at 0 and 1 with
 proportions in replicated data. Its intervals include parameter and
 fitted-field uncertainty. This checks the overall occurrence frequency;
@@ -608,8 +614,8 @@ fields; marginal draws generate new fields.</p>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> New fields              density_95th    187.    143.    214.     157.   </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> New fields              proportion_zero   0.518   0.414   0.630    0.538</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> Uncertain fitted fields density_95th    153.    139.    180.     157.   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> Uncertain fitted fields proportion_zero   0.542   0.517   0.556    0.538</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> Uncertain fitted fields density_95th    160.    144.    183.     157.   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> Uncertain fitted fields proportion_zero   0.542   0.526   0.559    0.538</span></span></code></pre></div>
 <p>The conditional comparison asks whether new responses around the
 inferred survey fields reproduce these summaries. The marginal
 comparison asks whether new field realisations at the survey locations

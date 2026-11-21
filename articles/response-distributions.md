@@ -165,7 +165,10 @@ for the supported families and uncertainty calculations.
 
 Finally, compare the observed acceleration distribution with replicated
 datasets. This check draws the mean and scale coefficients together,
-retaining their covariance:
+retaining their covariance. The smoothing parameters stay fixed at their
+fitted values in this check. If a GAM estimates dispersion or shape
+outside the coefficient vector, the check also holds those parameters
+fixed.
 
 ``` r
 
@@ -352,12 +355,16 @@ posterior_predictive_plot(rain_fit, n = 50, seed = 410)
 
 ![](response-distributions_files/figure-html/tweedie-3.png)
 
-The default QQ reference for traditional Tweedie residuals uses
-simulation. At zero, PIT residuals draw a uniform value between zero and
-the fitted probability of a zero. The posterior predictive plot smooths
-the zeros into a peak with the kernel density estimate. To check the
-zeros directly, compare their expected and observed proportions. We also
-check that every PIT residual for a zero falls within its allowed range.
+For PIT residuals, gratia evaluates the cumulative distribution function
+(CDF) of the fitted Poisson–Gamma mixture. At zero, it draws a uniform
+value between zero and the fitted probability of a zero. For traditional
+Tweedie residuals, the default QQ reference uses simulation to avoid
+calculating the inverse CDF, which can be slow for large datasets.
+
+The posterior predictive plot smooths the zeros into a peak with the
+kernel density estimate. To check the zeros directly, compare their
+expected and observed proportions. We also check that every PIT residual
+for a zero falls within its allowed range.
 
 ``` r
 
@@ -374,8 +381,7 @@ data.frame(observed_zero_fraction = mean(rain$amount == 0),
 ```
 
 Dividing a zero’s PIT residual by its fitted probability of zero gives a
-number between zero and one. Tweedie inverse-CDF calculations can be
-expensive for large datasets. Simulated QQ references are often quicker.
+number between zero and one.
 
 ## Observations below a detection limit
 

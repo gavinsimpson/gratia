@@ -383,8 +383,9 @@ draw(m_fs, grouped = FALSE, show_ci = "fs")
 
 The same controls work with saved estimates. Grouping the curves or
 hiding their intervals leaves the saved estimates and interval limits
-intact. Here we draw each group deviation separately and omit its
-interval ribbon.
+intact. A saved simultaneous band still applies to the grid used to
+calculate it, even if the plot shows only some of those curves. Here we
+draw each group deviation separately and omit its interval ribbon.
 
 ``` r
 

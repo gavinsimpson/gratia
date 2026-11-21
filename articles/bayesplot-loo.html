@@ -255,10 +255,12 @@ analysis. <a href="https://mc-stan.org/loo/reference/pareto-k-diagnostic.html" c
 Pareto-k diagnostics</a></p>
 <p>The leave-one-out probability integral transform (LOO-PIT) measures
 where each observation falls in its own leave-one-out predictive
-distribution. If those distributions are well calibrated, the PIT values
-should be approximately uniform. The calculation uses randomisation to
-handle ties for counts. The overlay compares the distribution of the
-resulting PIT values with simulated uniform references.</p>
+distribution. The response simulations and the likelihoods used to
+compute the PSIS weights come from the same coefficient draws. If the
+predictive distributions are well calibrated, the PIT values should be
+approximately uniform. The calculation uses randomisation to handle ties
+for counts. The overlay compares the distribution of the resulting PIT
+values with simulated uniform references.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">bayesplot</span><span class="fu">::</span><span class="fu"><a href="https://mc-stan.org/bayesplot/reference/pp_check.html" class="external-link">pp_check</a></span><span class="op">(</span><span class="va">smooth</span>, type <span class="op">=</span> <span class="st">"loo_pit_overlay"</span>, n_draws <span class="op">=</span> <span class="fl">2000</span>, seed <span class="op">=</span> <span class="fl">42</span><span class="op">)</span></span>
 <span><span class="co">#&gt; NOTE: The kernel density estimate assumes continuous observations and is not</span></span>

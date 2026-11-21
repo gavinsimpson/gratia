@@ -454,12 +454,14 @@ distribution. For zero catches, the calculation draws a value uniformly
 between zero and the fitted probability of a zero, then converts it to a
 normal score. The model treats responses as independent for the selected
 fields, so the QQ plot uses a standard normal reference and pointwise
-bands conditional on that draw. The upper tail rises above the
-reference, suggesting that some positive catches are larger than
-expected under the fitted model. The positive-component check below
-helps locate this departure. Change `gratia.diagnostics.field_seed` to
-see whether it persists across draws. The `seed` argument controls
-randomisation at the zeros.
+bands conditional on that draw. To check how much catches vary across
+possible fields, use the marginal check below, which draws new fields.
+
+The upper tail rises above the reference, suggesting that some positive
+catches are larger than expected under the fitted model. The
+positive-component check below helps locate this departure. Change
+`gratia.diagnostics.field_seed` to see whether it persists across draws.
+The `seed` argument controls randomisation at the zeros.
 
 Examine geographical patterns as well as the pooled residual
 distribution:
@@ -567,6 +569,12 @@ posterior_predictive_plot(cod_fit, component = "binomial",
 
 ![](sdmTMB-support_files/figure-html/cod-component-checks-2.png)
 
+The upper tail still rises above the reference in the positive-catch QQ
+plot. To see whether a heavier tail describes the largest catches
+better, refit with
+[`sdmTMB::delta_lognormal()`](https://sdmTMB.github.io/sdmTMB/reference/families.html)
+and repeat the positive-component check.
+
 The occurrence plot compares the observed proportions at 0 and 1 with
 proportions in replicated data. Its intervals include parameter and
 fitted-field uncertainty. This checks the overall occurrence frequency;
@@ -620,8 +628,8 @@ summary_draws |>
 #>   <chr>                   <chr>             <dbl>   <dbl>   <dbl>    <dbl>
 #> 1 New fields              density_95th    187.    143.    214.     157.   
 #> 2 New fields              proportion_zero   0.518   0.414   0.630    0.538
-#> 3 Uncertain fitted fields density_95th    153.    139.    180.     157.   
-#> 4 Uncertain fitted fields proportion_zero   0.542   0.517   0.556    0.538
+#> 3 Uncertain fitted fields density_95th    160.    144.    183.     157.   
+#> 4 Uncertain fitted fields proportion_zero   0.542   0.526   0.559    0.538
 ```
 
 The conditional comparison asks whether new responses around the

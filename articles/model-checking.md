@@ -356,7 +356,7 @@ growth_fit <- lme(distance ~ Sex * age_c, random = ~ age_c | Subject,
 summary(growth_fit)$tTable
 #>                      Value  Std.Error DF   t-value      p-value
 #> (Intercept)     24.9687500 0.48600071 79 51.375953 1.812713e-62
-#> SexFemale       -2.3210227 0.76141678 25 -3.048295 5.375053e-03
+#> SexFemale       -2.3210227 0.76141679 25 -3.048295 5.375053e-03
 #> age_c            0.7843750 0.08599951 79  9.120691 5.654754e-14
 #> SexFemale:age_c -0.3048295 0.13473534 79 -2.262432 2.641752e-02
 ```
@@ -554,8 +554,10 @@ Gaussian errors follow a first-order autoregressive (AR1) process, with
 a correlation of 0.6 between successive errors in the same series. We
 pass this known correlation as `rho` so
 [`bam()`](https://rdrr.io/pkg/mgcv/man/bam.html) uses it during fitting.
-We then inspect the QQ plot and look for correlation in the adjusted
-residuals.
+For your own data, sort the rows by series and then by time within each
+series. Set `AR.start` to `TRUE` at the first observation of each
+series. After fitting, we inspect the QQ plot and look for correlation
+in the adjusted residuals.
 
 ``` r
 
