@@ -16,33 +16,35 @@ vignette: >
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>", message = FALSE)
 ```
 
-A survey tow that catches no fish and a tow that catches a large biomass tell
-us different things about habitat. Does depth affect the chance of encountering
-Pacific cod, the density when cod are caught, or both? Can a depth curve explain
-the geographical patterns in these observations?
+Use {gratia} to extract and plot effects and check response distributions from
+models fitted with {sdmTMB}. Effect plots show individual terms, such as a
+smooth or a contrast between survey years. For predictions and model checks,
+we show how to account for spatial and temporal random effects.
 
-This article uses gratia to examine those questions after fitting a spatial
-model with sdmTMB. The smooth extraction and effect plots are new gratia methods
-for sdmTMB models. The diagnostics also use the spatial and temporal fields in
-the complete model. See [Checking a fitted model](model-checking.html) for shared
-ideas about residuals, dependence and posterior predictive checks.
+We use a Pacific cod survey to demonstrate smooths, survey-year effects,
+prediction maps and residual checks. Smaller simulated examples then show
+breakpoint curves, logistic curves and coefficients that vary over time.
+The [diagnostics article](model-checking.html) explains the shared ideas behind
+residuals, dependence and posterior predictive checks.
 
-## Data and a model for two parts of the survey response
+## Fit a delta-Gamma model to survey catches
 
 We adapt the Pacific cod survey examples in sdmTMB's
 [introduction](https://sdmtmb.github.io/sdmTMB/articles/basic-intro.html) and
 [delta-model article](https://sdmtmb.github.io/sdmTMB/articles/delta-models.html).
 The data are trawl tows in Queen Charlotte Sound, British Columbia. Biomass
 density is measured in kg/km²; `X` and `Y` are UTM coordinates in kilometres.
-We retain all survey years and the spatial and year-specific fields. Our
-adaptations add a separate mean for each survey year, use six basis functions
-for the depth smooth, and use the introduction's 10 km mesh cutoff.
+We retain all survey years and use a persistent spatial field and separate
+year-specific fields. We add a factor for survey year, set the depth smooth's
+basis dimension to six, and use the introduction's 10 km mesh cutoff.
 
 You need the optional package **sdmTMB >= 1.2.0** and models fitted with its
-RTMB backend, which is the default. Refit older models or TMB fits with
-`control = sdmTMBcontrol(backend = "rtmb")`. mgcv supplies the smooth
-syntax. The example also uses dplyr, tidyr, ggplot2 and patchwork. Fitting and simulation
+{RTMB} backend, which is the default. Refit older models or {TMB} fits with
+`control = sdmTMBcontrol(backend = "rtmb")`. {mgcv} supplies the smooth
+syntax. The example also uses {dplyr}, {tidyr}, {ggplot2} and {patchwork}. Fitting and simulation
 cost more than plotting an ordinary GAM, so we use modest simulation counts.
+Load the packages and survey data, then summarise the number of tows, fraction
+of zero catches and mean density in each year.
 
 ```{r packages}
 library("sdmTMB")
@@ -63,7 +65,8 @@ cod |>
 
 The zero proportions and means vary between years. A mean calculated from the
 observed tows is also influenced by where those tows occurred; it is not an
-area-standardised biomass index.
+area-standardised biomass index. Map the observations by year to see where the
+survey sampled and how catches vary across its area.
 
 ```{r observed-cod, fig.height = 6, fig.alt = "Observed Pacific cod density at survey tows, separated by year."}
 ggplot(cod, aes(X, Y, colour = density)) +
@@ -77,13 +80,11 @@ ggplot(cod, aes(X, Y, colour = density)) +
 
 The colour scale uses `log1p()`, the logarithm of one plus density, to distinguish
 the many smaller catches while retaining zeros and the largest catches.
-There are many exact zeros and a long positive tail. A Gaussian response model
-would allow negative density and impose constant response variance. A Tweedie
-model is one useful alternative for zeros plus continuous positive values.
-Here a **delta-Gamma model** makes the encounter and positive-density questions
-explicit. Its first component models whether density is positive using a logit
-link; its second models positive density using a Gamma distribution and log
-link. Thus
+There are many exact zeros and a long positive tail. A **delta-Gamma model**
+separates the chance of catching cod from the density when cod are caught.
+Its first component models whether density is positive using a binomial
+distribution with a logit link. Its second models positive density using a
+Gamma distribution with a log link. The expected density over all tows is
 
 \[
  E(Y_i) = \Pr(Y_i > 0)\,E(Y_i\mid Y_i>0).
@@ -96,7 +97,9 @@ represents additional geographical variation in that year. These fields allow
 nearby tows to share unexplained variation. We choose independent year fields
 because this survey did not run every year. An AR1 model would require an
 explicit decision about missing time steps and assumptions about correlation
-between years.
+between years. Build a mesh for the spatial fields, then fit a depth smooth and
+separate survey-year means in each response component. The mesh cutoff is in
+kilometres, matching `X` and `Y`.
 
 ```{r fit-cod}
 cod_mesh <- make_mesh(cod, c("X", "Y"), cutoff = 10)
@@ -108,24 +111,28 @@ cod_fit <- sdmTMB(
 sanity(cod_fit)
 ```
 
-The factor accounts for changes in average encounter probability and positive
-catch density between surveys. It prevents the year-specific fields from being
-the only way to represent a change in the overall mean. Both components use
-the same formula and smooth basis, as required by sdmTMB for delta models with
-smooths, but their fitted curves can differ. Smoothing is estimated during
-fitting. `sanity()` checks estimation and convergence. The fitted positive-density
-field has a range of about 12 km, close to the 10 km mesh cutoff, so compare a
-finer mesh before relying on its geographical predictions. The residual checks
-below examine the response distribution and remaining spatial patterns.
+The year factor gives each survey year a different intercept in each response
+component. The two components use the same smooth basis and estimate their
+own coefficients, so the depth curves can differ. If you specify two formulas
+for a delta model, sdmTMB requires the smooth terms to match.
 
-## Which part of the response changes with depth?
+`sanity()` checks estimation and convergence. The fitted positive-density
+field has a range of about 12 km, close to the 10 km mesh cutoff. That suggests
+checking whether predictions change when the mesh is finer.
+
+## Extract and plot depth effects
+
+Start with `smooths()` to find the labels used to select the depth smooth in
+each response component.
 
 ```{r smooth-names}
 smooths(cod_fit)
 ```
 
 `s(depth)` belongs to the encounter component and `s.1(depth)` to the positive
-component. The `.1` suffix identifies the second predictor.
+component. The `.1` suffix identifies the second predictor. Pass both labels
+to `draw()` and use `wrap = FALSE` to obtain separate plots whose axis labels
+can be customised before combining them.
 
 ```{r cod-depth-effects, fig.alt = "Estimated depth smooths for encounter log odds and log positive density, with uncertainty bands and component subtitles."}
 depth_panels <- draw(cod_fit, select = smooths(cod_fit), n = 100,
@@ -134,32 +141,25 @@ depth_panels <- draw(cod_fit, select = smooths(cod_fit), n = 100,
   (depth_panels[[2]] + labs(x = "Depth (m)", y = "Contribution to log density"))
 ```
 
-The first curve is a contribution to **log odds of encounter**, the second to
-**log mean positive density**. In this fit both curves peak near 140--150 m.
-The encounter curve falls especially sharply in deeper water. The positive
-component also favours intermediate depths, but its vertical scale and units
-differ; compare shapes within each panel rather than comparing heights across
-panels. Few observations support the deepest part of the fitted range, as the
-rugs show.
+The first curve contributes to the **log odds of encounter** and the second
+to the **log of mean positive density**. Both curves peak near 140–150 m.
+The encounter curve falls especially sharply in deeper water. The rug marks
+along the axes show how few tows support the curves at the greatest depths.
 
-These are partial effects. They omit intercepts, survey-year effects and
-spatial fields, so their heights are not encounter probabilities or predicted
-densities. `fun = exp` would exponentiate a partial effect, not create a full
-prediction. The bands use the joint fitted covariance, retaining the effect of
-spatial modelling on coefficient uncertainty. By default, smooth bands also
-include uncertainty in the component's overall mean. They are pointwise bands,
-not a simultaneous claim about the entire curve. Use `overall_uncertainty =
-FALSE` for uncertainty in the term alone.
+These plots show the depth term alone on each component's link scale. A full
+prediction also includes the intercept, survey-year effect and fields. The
+pointwise bands include the uncertainty in the intercept by default. Use
+`overall_uncertainty = FALSE` for uncertainty in the depth term alone.
 
-For your own plots or calculations, retain the estimates rather than extracting
-values from the figure:
+Use `smooth_estimates()` to save the estimated effects and their standard
+errors. Here we locate the largest contribution on each smooth's evaluation
+grid to summarise the depth at its peak.
 
 ```{r cod-smooth-table}
 depth_effects <- smooth_estimates(cod_fit, n = 100, interval = "confidence")
 depth_effects |>
   group_by(.smooth, .model) |>
-  slice_max(.estimate, n = 1) |>
-  select(.smooth, .model, depth, .estimate, .se)
+  slice_max(.estimate, n = 1)
 ```
 
 The reported peak depths locate the maxima on the 100-point evaluation grid.
@@ -175,7 +175,12 @@ coefficients do not have the interpretation of a linear depth slope:
 smooth_coefs(cod_fit, select = "s(depth)")
 ```
 
-## How did survey years differ?
+## Compare survey-year effects
+
+Use `parametric_terms()` to find the year-effect labels and
+`parametric_effects()` to extract them. Select `year_f` and `year_f.1` to
+compare changes in encounter and positive density separately. Setting
+`overall_uncertainty = FALSE` requests uncertainty in the year contrasts alone.
 
 ```{r cod-year-effects, fig.alt = "Survey year contributions to log odds of encounter and log positive density, relative to 2003."}
 parametric_terms(cod_fit)
@@ -206,7 +211,7 @@ no uncertainty interval for its *contrast with itself*. Request the default
 `overall_uncertainty = TRUE` to include intercept uncertainty in the plotted
 parametric contributions. Use full predictions to estimate actual densities.
 
-## Did the association with depth change over survey years?
+## Plot a smooth interaction between depth and survey year
 
 The delta model above gives each component a common depth curve and separate
 year means. A different question is whether the *shape* of the depth
@@ -218,12 +223,10 @@ every survey tow. This extension focuses on encounter; the delta model remains
 the analysis for combined encounter and positive catch density.
 
 A [tensor product smooth](https://stat.ethz.ch/R-manual/R-devel/library/mgcv/html/t2.html)
-combines bases for the two covariates and estimates smoothing for different
-parts of the surface separately. This is useful when depth is measured in
-metres and time in years: there is no reason to equate a metre of depth with
-a year of time. The `t2()` basis has several penalties; gratia now retains
-all their fitted coefficient blocks and joint uncertainty when extracting and
-plotting sdmTMB effects.
+uses a separate basis for each covariate and combines them to fit a surface.
+This lets us control smoothness along depth (in metres) and time (in years)
+separately. Fit the encounter model with `t2()` to allow the depth curve
+to change smoothly across survey years.
 
 ```{r cod-depth-year-fit}
 cod$year_centered <- cod$year - 2011
@@ -243,21 +246,19 @@ assumptions. Here the smooth includes both depth and year main effects, so
 we do not add the previous `year_f` factor. Centring year at 2011 only changes
 its coordinate origin.
 
-In this example the optimizer converges and the Hessian is positive definite,
-but `sanity()` flags large standard errors for smoothing parameters. Inspect
-the estimated standard deviations controlling the tensor penalties:
+The optimiser converges, but `sanity()` flags large standard errors for
+smoothing parameters. Inspect the standard deviations that determine how
+strongly different parts of the surface are penalised.
 
 ```{r cod-tensor-penalties}
 sdmTMB::tidy(cod_encounter, effects = "ran_pars") |>
-  filter(grepl("sd__", term)) |>
-  select(term, estimate, conf.low, conf.high)
+  filter(grepl("sd__", term))
 ```
 
-Two standard deviations are close to zero and their intervals are uninformative.
-Some directions of curvature are being strongly penalised, and these data
-weakly identify the corresponding smoothing parameters. If changes in the
-depth relationship are secondary to the main survey question, the simpler
-common-depth-curve model above provides a useful starting point.
+Two standard deviations are close to zero, indicating strong smoothing for
+those parts of the surface. The wide intervals show that the data give little
+information about those smoothing parameters. Plot the estimated surface with
+`draw()` and label the vertical axis with the actual survey years.
 
 ```{r cod-tensor-surface, fig.alt = "Tensor smooth contribution to encounter log odds over depth and survey year. Contours are almost vertical, with unsupported deep-water combinations masked."}
 tensor_panel <- draw(cod_encounter, n_2d = 30, dist = 0.1,
@@ -274,10 +275,9 @@ association; the preferred intermediate-depth region changes little through
 time. The surface is a contribution to log odds, without the intercept or
 fields. Its colours show fitted contributions; standard errors are available
 from `smooth_estimates()`. `dist = 0.1` masks combinations far from the observed
-depth-year pairs after scaling both covariates to a unit square. The nearly
-stable intermediate-depth region is the main pattern here. The smoothing
-warning and sparse deep-water observations limit the temporal changes we can
-resolve in the tails.
+depth-year pairs after rescaling each variable to range from zero to one.
+The sparse deep-water observations limit what we can say about changes
+at those depths.
 
 For custom calculations, `get_smooths_by_id()` retrieves the fitted mgcv smooth
 object. Its penalty list records the independently smoothed parts of the
@@ -334,39 +334,36 @@ variation. A location can have low expected density through either a low
 encounter probability or a low positive mean. The maps show fitted mean
 surfaces. sdmTMB's `predict(..., nsim = ...)` supplies joint prediction draws
 for estimating uncertainty at each location or in derived quantities.
-Setting `re_form = NA` removes spatial fields from predictions. That is a
-prediction with zero fields, not an average over new fields; the nonlinear
-links make these different calculations.
+Setting `re_form = NA` predicts with the spatial and spatiotemporal fields
+set to zero. With nonlinear links this can give different expected densities
+from averaging predictions over new field draws.
 
-## What should be held fixed when checking the model?
+## Choose how residual checks use spatial and temporal effects
 
-The depth effects above omit fields from the displayed contribution, but
-residual checks must use the whole fitted predictor. The sdmTMB
+Residual checks use the response distribution implied by the full model
+and need to specify how to handle the random fields. The sdmTMB
 [residual-checking article](https://sdmtmb.github.io/sdmTMB/articles/residual-checking.html)
 demonstrates why the choice of fields matters. gratia's default follows its
 approach of drawing the fitted effects once from their approximate joint
 posterior, with fixed coefficients and covariance parameters held at their
-estimates. The observed residuals and reference responses use that same draw.
+estimates. Set `gratia.diagnostics.field_seed` to reproduce the same draw
+across diagnostic plots.
 
 ```{r cod-field-seeds}
 cod_field_options <- options(gratia.diagnostics.field_seed = 1402L)
 qq_plot(cod_fit, type = "quantile", seed = 1404)
 ```
 
-The PIT calculation randomises zeros over their fitted probability mass, then
-transforms probabilities to normal scores for this QQ plot. Given the selected
-fields, response errors are independent, so the reference is standard normal
-and its bands condition on those fields. A departure can indicate problems
-with the observation distribution or predictor. It is not a calibrated test
-of the estimated field covariance. Here, the upper tail rises above the
-reference: some positive catches are larger than this fitted response
-distribution anticipates. This motivates checking the positive component and
-considering, for example, a delta-lognormal model, whose positive tail differs
-from the Gamma distribution. Fit that alternative and repeat the positive-tail
-checks to assess whether it represents the large catches better. Repeat with
-other `field_seed` values to
-see whether a feature of the plot depends on one fitted-field draw; the
-`seed` argument separately controls randomisation at the zeros.
+Quantile residuals locate each observation within its fitted response
+distribution. For zero catches, the calculation draws a value uniformly
+between zero and the fitted probability of a zero, then converts it to a
+normal score. The model treats responses as independent for the selected
+fields, so the QQ plot uses a standard normal reference and pointwise bands
+conditional on that draw. The upper tail rises above the reference, suggesting
+that some positive catches are larger than expected under the fitted model.
+The positive-component check below helps locate this departure. Change
+`gratia.diagnostics.field_seed` to see whether it persists across draws.
+The `seed` argument controls randomisation at the zeros.
 
 Examine geographical patterns as well as the pooled residual distribution:
 
@@ -393,14 +390,16 @@ Three further choices answer different questions:
 
 | Choice | What varies between reference data sets? | Useful interpretation |
 |:--|:--|:--|
-| `field_method = "mle-eb"` | Response errors; estimated fields are fixed | Inspect errors at estimated fields, with shrinkage affecting calibration |
-| `field_method = "mle-mvn-integrated"` | Response errors and approximate uncertainty in fitted effects | Check variation around the inferred fields, averaged across their uncertainty |
+| `field_method = "mle-eb"` | Response errors with fitted effects fixed at their estimates | Inspect errors at the estimated fields |
+| `field_method = "mle-mvn-integrated"` | Response errors and draws of the fitted effects | Check variation allowing for uncertainty in the fitted effects |
 | `conditioning = "marginal"` | Response errors and new spatial and year fields from the fitted field distribution | Check the variation implied by new field realisations |
 
 The default `field_method = "mle-mvn"` draws fitted effects once and then fixes
-them; it is different from all three. Empirical-Bayes (`mle-eb`) residuals can
-look too concentrated because fields were estimated from these same responses.
-sdmTMB does not recommend them for goodness-of-fit testing.
+them. Empirical-Bayes (`mle-eb`) residuals instead use the estimated fields
+directly. They can look too concentrated because those fields were estimated
+from the same responses; sdmTMB does not recommend them for goodness-of-fit
+testing. Compare the three alternatives with separate QQ plots below. We use
+49 reference draws to keep this comparison quick.
 
 ```{r cod-other-field-checks, fig.height = 7}
 cod_reference_options <- options(gratia.diagnostics.marginal_draws = 49L,
@@ -412,27 +411,22 @@ qq_plot(cod_fit, type = "quantile", conditioning = "marginal",
   n_simulate = 49, seed = 1404)
 ```
 
-The integrated and marginal calculations use ranks in joint response
-simulations. The former includes approximate uncertainty in fitted latent
-effects (including penalised smooth coefficients), while holding fixed
-coefficients and covariance parameters at their estimates. The latter
-simulates new native spatial and temporal effects, retaining fitted smooths.
-Changing `field_method` does not add another fitted-field draw to a marginal
-check. These responses share field contributions, so gratia generates the
-reference bands from complete simulated data sets that preserve dependence.
-Independent uniform order-statistic bands would answer the wrong question.
+The integrated and marginal calculations compare observations with simulated
+responses. The integrated calculation draws uncertain fitted effects,
+including penalised smooth coefficients, while holding fixed coefficients and
+covariance parameters at their estimates. The marginal calculation generates
+new spatial and temporal effects while retaining the fitted smooths. gratia
+simulates complete response datasets to retain the dependence induced by
+shared fields when calculating reference bands.
 
-Compare the captions as well as the curves: each plot identifies its
-conditioning. In this example the integrated QQ plot describes errors around
-estimated survey fields, whereas the marginal plot also reflects the wide
-variation in density between possible geographical surfaces. The integrated
-plot has narrower residual spread. Because integration reuses the fitting data,
-apparent agreement in that plot can be conservative.
-With 49 reference draws, tail resolution and Monte Carlo accuracy are limited.
-Increase `gratia.diagnostics.marginal_draws` and `n_simulate` to check that a
-conclusion persists; the defaults use more reference draws.
+The integrated and marginal QQ plots rank each observation against its own
+simulated responses. Which responses it is compared with depends on whether
+the simulations draw fitted or new fields. With 49 reference draws, the
+most extreme ranks can only distinguish a few levels of tail probability.
+Increase `gratia.diagnostics.marginal_draws` and `n_simulate` if you need
+more precise tail comparisons.
 
-## Is a problem in occurrence or in positive density?
+## Check encounter and positive-density components separately
 
 Component checks help locate a mismatch hidden in a full-response check.
 For the positive component, only observed positive tows are retained; the
@@ -445,22 +439,21 @@ posterior_predictive_plot(cod_fit, component = "binomial",
 ```
 
 The occurrence plot compares the observed proportions at 0 and 1 with
-replicated proportions. Its intervals describe variation across posterior
-replicates, including parameter and fitted-field uncertainty. These are not
-the intervals for independent proportions from a binomial sample. A good
-aggregate proportion can conceal geographical mismatch, so retain the spatial
-residual map and inspect component maps if necessary.
+proportions in replicated data. Its intervals include parameter and
+fitted-field uncertainty. This checks the overall occurrence frequency; the
+residual map can identify geographical patterns that cancel in that overall
+proportion.
 
-Unlike residual references with coefficients fixed at their estimates,
-posterior predictive checks draw fixed coefficients, nuisance parameters,
-smooth coefficients and fields together from the approximate joint
-posterior. Conditional checks draw uncertain *fitted* fields; marginal checks
-replace these with *new* fields at each parameter draw. `field_method` selects
-residual calculations and is not an option for PPCs.
+Posterior predictive checks draw the fixed and smooth coefficients, other
+distribution parameters and fitted fields together from the approximate
+joint posterior. With `conditioning = "marginal"`, they simulate new fields
+using the covariance parameters from each draw. Use `field_method` for the
+residual checks above.
 
-For the complete density distribution, smoothing a kernel density curve over
-an exact-zero spike is hard to interpret. Raw public `posterior_samples()`
-allow a targeted comparison of zero frequency and a positive-tail summary:
+Use `posterior_samples()` for checks of quantities important to the survey
+analysis. Here we compare the observed fraction of zero tows and 95th
+percentile of density with their values in replicated data. Conditional draws
+allow uncertainty in the fitted fields; marginal draws generate new fields.
 
 ```{r cod-posterior-summaries}
 cod_summaries <- function(x) {
@@ -496,18 +489,14 @@ The conditional comparison asks whether new responses around the inferred
 survey fields reproduce these summaries. The marginal comparison asks whether
 new field realisations at the survey locations reproduce them. About 54% of
 observed tows are zero, and the observed 95th percentile is about 157 kg/km².
-Both fall within the displayed predictive ranges. This agrees with reproducing
-these aggregate summaries, while the conditional QQ plot still flags the
-more extreme positive tail. Passing a check of the 95th percentile does not
-establish that the largest catches are well represented. Wider marginal
-variation is scientifically plausible because these summaries change when a
-large part of the area happens to have high or low density. The displayed
-intervals are descriptive 90% predictive ranges from just 25 replicates.
-Increase the draw count before interpreting an apparent tail discrepancy.
-These summaries describe the sampling locations; an area-standardised biomass
-index requires predictions across the survey domain.
+Both fall within the displayed predictive ranges, while the conditional QQ
+plot still identifies unusually large catches further into the positive tail.
+The 95th percentile and the largest catches describe different parts of that
+tail. Marginal ranges are wider because the simulated fields can give a large
+part of the area high or low density. These are 90% predictive ranges from
+just 25 replicates; increase `n_draws` to assess whether a discrepancy persists.
 
-## Breakpoint and logistic curves
+## Plot breakpoint and logistic curves
 
 sdmTMB also offers two structured alternatives to a smooth. `breakpt(x)` fits
 a line up to an estimated breakpoint and a constant beyond it. `logistic(x)`
@@ -515,12 +504,12 @@ fits a sigmoid curve. gratia draws these as parametric effects, with one
 curve for each component of a delta model. The argument of either term must
 name a column in the fitting data, following sdmTMB's formula restrictions.
 
-A small simulated example shows both shapes without refitting the survey
-model. Starting values place the breakpoint within the observed range and
-give the logistic curve a positive distance between its 50% and 95% locations.
-sdmTMB stores the logarithm of this distance as the second logistic parameter.
+We simulate two Gaussian responses to a covariate `x`, sampled uniformly
+between zero and two. One mean increases linearly to `x = 0.9` and then
+levels off; the other follows a logistic curve with midpoint `x = 0.8`.
+Both have independent noise with standard deviation 0.15.
 
-```{r fit-threshold-curves}
+```{r threshold-data}
 set.seed(312)
 threshold_data <- data.frame(x = runif(400, 0, 2))
 threshold_data$breakpt_y <- 0.4 + 1.8 * pmin(threshold_data$x, 0.9) +
@@ -528,6 +517,14 @@ threshold_data$breakpt_y <- 0.4 + 1.8 * pmin(threshold_data$x, 0.9) +
 threshold_data$logistic_y <- 0.4 +
   2.2 * plogis(log(19) * (threshold_data$x - 0.8) / 0.6) +
   rnorm(nrow(threshold_data), sd = 0.15)
+```
+
+Fit a breakpoint model to the first response and a logistic model to the
+second. Spatial fields are switched off so these fits isolate the curve
+shapes. Starting values place the breakpoint within the observed range and
+give the logistic curve a positive distance between its 50% and 95% locations.
+
+```{r fit-threshold-curves}
 breakpt_fit <- sdmTMB(
   breakpt_y ~ breakpt(x), data = threshold_data, spatial = "off",
   control = sdmTMBcontrol(backend = "rtmb",
@@ -567,13 +564,10 @@ uncertainty and its covariance with those parameters. Use
 alone. Threshold bands remain pointwise when `interval = "simultaneous"`
 is requested for smooths in the same model.
 
-The default evaluation grid contains `n` equally spaced values over the
-fitted covariate range. For a breakpoint curve, it also contains the fitted
-breakpoint when that lies within the range, so the plotted line changes slope
-at the fitted location. Supply `data` to choose evaluation locations instead.
-Rugs continue to show fitting observations. The threshold covariate is
-already on its original scale, so `back_transform` does not change its axis.
-`constant` shifts the curve and interval together; `fun` then transforms both.
+By default, `n` controls the number of plotted covariate values; breakpoint
+plots also include the estimated breakpoint so the line changes slope at the
+fitted location. Supply `data` to evaluate the effect at particular locations.
+For example, extract the logistic contribution at three chosen values of `x`.
 
 ```{r threshold-values}
 parametric_effects(logistic_fit, terms = "logistic(x)",
@@ -581,7 +575,7 @@ parametric_effects(logistic_fit, terms = "logistic(x)",
   overall_uncertainty = FALSE)
 ```
 
-## Coefficients that vary through time
+## Plot coefficients that vary through time
 
 A covariate's coefficient can change through time in sdmTMB. For example,
 temperature may have a stronger association with abundance in some years
@@ -595,17 +589,19 @@ The three processes differ in how they represent the coefficient's level:
 * `"rw"` estimates the first coefficient freely and penalises changes
   between time steps. Omit its corresponding ordinary term from the main
   formula. If the intercept varies, omit the main formula's intercept too.
-* `"rw0"` estimates deviations whose first value is shrunk towards zero,
-  followed by a random walk. Include an ordinary coefficient for the baseline.
-* `"ar1"` estimates correlated deviations around zero. Include an ordinary
-  coefficient for the average effect.
+* `"rw0"` uses a random walk with a mean-zero normal prior on its first
+  value. Include an ordinary coefficient for the baseline effect.
+* `"ar1"` uses a first-order autoregressive process for deviations around
+  zero. Include an ordinary coefficient for the average effect.
 
-This simulated example fits all three specifications to the same data. The
-temperature coefficient changes over 20 years, with 35 observations per year.
-Spatial and spatiotemporal fields are switched off so that the example focuses
-on the changing coefficient.
+We simulate a temperature coefficient that changes over 20 years, with
+35 observations per year. Its departures from 0.8 follow an AR1 process, so
+neighbouring years tend to have similar coefficients. Temperature varies
+independently between observations. The Gaussian response has mean 0.6 plus
+that year's coefficient times temperature, with independent noise of standard
+deviation 0.65.
 
-```{r fit-time-varying-coefficients}
+```{r time-varying-coefficient-data}
 set.seed(420)
 coefficient_years <- 2005:2024
 temperature_coefficient <- 0.8 +
@@ -617,6 +613,13 @@ coefficient_data <- data.frame(
 coefficient_data$response <- 0.6 +
   rep(temperature_coefficient, each = 35) * coefficient_data$temperature +
   rnorm(nrow(coefficient_data), sd = 0.65)
+```
+
+Fit the `rw`, `rw0` and `ar1` coefficient processes to the same simulated data
+to compare their estimated trajectories. Spatial fields are switched off so
+that the example focuses on the changing temperature association.
+
+```{r fit-time-varying-coefficients}
 coefficient_fits <- lapply(c("rw", "rw0", "ar1"), function(process) {
   main_formula <- if (process == "rw") response ~ 1 else response ~ temperature
   sdmTMB(
@@ -662,32 +665,14 @@ For a coefficient written as $b_t = \beta + \gamma_t$, the variance is
 gratia uses this joint covariance when combining the ordinary coefficient
 and temporal deviations. A slope's interval includes uncertainty in that
 slope's ordinary coefficient, without adding uncertainty from a separate
-response intercept. `overall_uncertainty` continues to control ordinary
-partial effects; time-varying panels always retain the full coefficient's
-uncertainty. These intervals remain pointwise when simultaneous bands are
-requested for smooths in the same model. `ci_level` changes their coverage;
-`constant` shifts estimates and intervals together, then `fun` transforms both.
+response intercept. The time-varying panels always retain uncertainty in the
+full coefficient, with pointwise intervals at each modelled year.
 
-`parametric_terms()` lists the available labels. Use
-`time_varying(Intercept)` for a varying intercept, and append `.1` to select
-a trajectory in the second delta component. Each fitted coefficient gets
-its own panel, including separate factor contrasts, transformed variables
-and interaction coefficients. The ordinary and time-varying design columns
-must have compatible coding when the corresponding ordinary term is present.
-An absent ordinary coefficient contributes zero to the full coefficient.
-
-By default, the ordinary-effect panel is omitted when its coefficients are
-included in a trajectory. Request its original selector explicitly to draw
-it, for example `draw(coefficient_fits$ar1, terms = "temperature")`.
-`parametric = FALSE` suppresses trajectories; selecting smooths with
-`select` excludes them unless `parametric = TRUE` is also supplied.
-
-The estimates use the stored modelled time steps, including `extra_time`
-values supplied when fitting. `n` does not create additional coefficient
-states. The stored time spacing is retained. A `data` frame containing the
-time column selects stored times; missing or unknown requested times give an
-error. If `data` has no
-time column, the complete trajectory is retained.
+Use `parametric_terms()` to find the available selectors. To extract selected
+years, supply their values in the model's time column through `data`. These
+must be modelled time steps; `n` does not create new coefficient estimates
+between them. The following call extracts the temperature coefficient for
+2005, 2010 and 2020 from the AR1 fit.
 
 ```{r time-varying-coefficient-selection}
 parametric_terms(coefficient_fits$ar1)
@@ -696,28 +681,22 @@ parametric_effects(coefficient_fits$ar1,
   data = data.frame(year = c(2005, 2010, 2020)))
 ```
 
-## Applying the workflow to another survey
+## Choose methods for your own sdmTMB model
 
-Retain the scientific unit of the response and its zeros when selecting a
-family. Consider whether encounter and positive-density processes need
-separate predictors, and justify temporal dependence from the survey schedule.
-Check convergence before interpreting partial effects. Use effect plots for
-formula contributions and full fitting-package predictions for maps and
-indices. Match each diagnostic to whether the scientific question concerns
-the observed fields or new fields, and examine spatial patterns alongside
-marginal distribution plots.
+Use `smooth_estimates()` to save smooth contributions and
+`parametric_effects()` for regression terms, threshold curves and changing
+coefficients. Both return estimates that `draw()` can plot. For complete
+predictions, including spatial and temporal fields, use sdmTMB's prediction
+method as in the density-map example. Use `qq_plot()` to examine residuals
+and `posterior_predictive_plot()` to compare replicated response summaries
+with the observations.
 
-The support has deliberate limits. gratia does not supply partial residual
-overlays or random-field effect plots for sdmTMB. Formula-effect extraction
-does not cover dispersion formulas, other multi-predictor families,
-or nonlocal effects. It cannot use mapped or profiled coefficients needed for
-extraction, unavailable smooth metadata, or a covariance from a
-non-positive-definite Hessian. `unconditional = TRUE` and `frequentist = TRUE`
-are mgcv covariance choices and do not apply to these joint RTMB intervals.
-Use sdmTMB's prediction and plotting methods for fields and unsupported
-formula effects. If the covariance is unavailable, investigate convergence
-before interpreting intervals. Diagnostic families and additional limits
-are listed in `?diagnostic_support`.
+Use sdmTMB's prediction and plotting methods to display the spatial and
+temporal fields themselves. The gratia effect plots in this article describe
+formula terms. Their intervals use sdmTMB's joint covariance; the mgcv options
+`unconditional = TRUE` and `frequentist = TRUE` are unavailable. See the
+`diagnostic_support` help topic for supported response families and diagnostic
+options.
 
 ```{r restore-options, include = FALSE}
 options(cod_field_options)

@@ -1,5 +1,5 @@
 ---
-title: "Data slices"
+title: "Creating prediction grids with data_slice()"
 output: 
   rmarkdown::html_vignette:
     fig_width: 8
@@ -7,7 +7,7 @@ output:
     dev: "png"
     dpi: 96
 vignette: >
-  %\VignetteIndexEntry{Data slices}
+  %\VignetteIndexEntry{Creating prediction grids with data_slice()}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -19,23 +19,31 @@ knitr::opts_chunk$set(
 )
 ```
 
-Having fitted a GAM or other model containing penalised splines, we often want to evaluate the model at some pre-specified values of the covariates. For more complex models, this will typically involve holding some covariates at fixed, representative values while visualising the change in the response or effect of a smooth over supplied values of one or more other covariates. The values of the covariates at which we evaluate a smooth or a model are called a *data slice*^[at least that's what I'm calling them.].
+A prediction curve needs a set of covariate values at which to evaluate the
+model. For example, to plot a treatment group's response to concentration,
+we vary concentration and hold the treatment and other covariates fixed.
+`data_slice()` creates this prediction grid, called a *data slice*, from a
+fitted model or a data frame.
 
-This article will explain how to create data slices with {gratia} and its `data_slice()` function, and how to use them to visualise features of your fitted GAMs.
+This article builds grids for treatment comparisons and for curves through a
+two-dimensional smooth. We load {gratia} for prediction grids, {mgcv} for model
+fitting, {dplyr} and {forcats} for data preparation, and {ggplot2} for plotting.
 
-We'll need the following packages for this article
 ```{r load-packages, results = "hide"}
 library("gratia")
-load_mgcv()
+library("mgcv")
 library("dplyr")
 library("ggplot2")
 library("forcats")
 library("datasets")
 ```
 
-## Carbon Dioxide Uptake in Grass Plants
+## Predict uptake for selected plant groups
 
-The first example uses a small data set from an experimental study of the cold tolerance of the grass *Echinochloa crusgalli*. The data are in data frame `CO2` and provided with the {datasets} package that ships with R.
+The `CO2` data from {datasets} record uptake at seven carbon dioxide
+concentrations for each of twelve grass plants from Quebec and Mississippi.
+The plants received either a chilled or nonchilled treatment. We rename the grouping
+variables and make the plant identifier an unordered factor for modelling.
 
 ```{r load-co2}
 ## data load and prep
@@ -46,46 +54,75 @@ plant <- CO2 |>
   mutate(plant = factor(plant, ordered = FALSE))
 ```
 
+Plot the measurements by origin and treatment to see the curves we want to
+predict. Uptake is measured in micromoles per square metre per second and
+concentration in microlitres per litre ($\mu\mathrm{L}\,\mathrm{L}^{-1}$).
+See Table 1 in the [original study](https://biology.mcgill.ca/faculty/potvin/articles/PotvinLech_90.pdf).
+
 ```{r plot-plant-data}
-plant_ylab <- expression(CO[2] ~ uptake ~ (mu * mol ~ m^{-3}))
-plant_xlab <- expression(CO[2] ~ concentration ~ (mL ~ L^{-1}))
+plant_ylab <- expression(CO[2] ~ uptake ~ (mu * mol ~ m^{-2} ~ s^{-1}))
+plant_xlab <- expression(CO[2] ~ concentration ~ (mu * L ~ L^{-1}))
 
 plant |>
-  ggplot(aes(x = conc, y = uptake, group = plant, colour = treatment)) +
+  ggplot(
+    aes(x = conc, y = uptake, group = plant, colour = treatment)
+  ) +
   geom_point() +
   geom_line() +
   facet_wrap(~type) +
   labs(y = plant_ylab, x = plant_xlab, colour = "Treatment")
 ```
 
-One way to model these data is to allow for different smooths for all combinations of the `treatment` and `type` covariates
+Fit a separate concentration smooth for each combination of treatment and
+origin. `tt` identifies those combinations. The plant random intercept allows
+each plant to have a different overall uptake level and accounts for dependence
+between measurements on the same plant. The Gamma family models a positive,
+continuous response, and the log link keeps the fitted mean positive.
 ```{r fit-plant-gam}
 plant <- plant |>
   mutate(tt = fct_cross(treatment, type))
-m_plant <- gam(uptake ~ treatment * type + s(conc, by = tt, k = 6) +
+m_plant <- gam(
+  uptake ~ treatment * type + s(conc, by = tt, k = 6) +
     s(plant, bs = "re"),
   data = plant, method = "REML", family = Gamma(link = "log")
 )
 overview(m_plant)
 ```
 
-We can look at the fitted smooths using `draw()`
-```{r draw-plant-model}
-draw(m_plant, residuals = TRUE, scales = "fixed")
+Plot the smooth contributions on common scales to compare their shapes. The
+panels show contributions to the log of mean uptake. Partial residuals add the
+model's weighted working residuals to each smooth, making it easier to see
+where the data depart from the fitted curve. We use {patchwork} to collect the
+legend in the empty lower-right panel.
+```{r draw-plant-model, fig.width = 10, fig.height = 8}
+draw(
+  m_plant, residuals = TRUE, scales = "fixed",
+  ncol = 3, guides = "collect"
+) +
+  patchwork::guide_area()
 ```
 
-We might want to compare model fitted values for the treatment for each of the types (origins), ignoring the random effect component. For this we want to evaluate the model at a range of values of covariate `conc` for some combinations of the other factors. This is a data slice through the covariate space, which we can create using `data_slice()`. To create a data slice for `conc` for the `Quebec` `type` in the `chilled` `treatment` we would use
+To predict uptake for chilled Quebec plants, vary `conc` over 100 evenly
+spaced values and fix `type` and `treatment`. Unspecified predictors receive
+representative values. First inspect this grid to see what that means for
+the derived factor `tt`.
 ```{r plant-ds-1}
-ds1 <- data_slice(m_plant,
+ds1 <- data_slice(
+  m_plant,
   conc = evenly(conc, n = 100),
-  type = level(type, "Quebec"), treatment = level(treatment, "chilled")
+  type = level(type, "Quebec"),
+  treatment = level(treatment, "chilled")
 )
 ds1
 ```
 
-Notice how `data_slice()` has filled in something for the remaining covariates that we didn't mention? In this case, `data_slice()` doesn't know how `tt` was created, so it has chosen the modal level for the `tt` factor, which is not the correct choice in this case. Instead, we need to specify the correct level explicitly for `tt`
+`data_slice()` uses the most common level for an unspecified factor, with
+ties resolved by choosing the first tied level. It treats `tt` as a separate
+factor, so supply the level that matches `treatment` and `type` before using
+this grid for prediction.
 ```{r plant-ds-1a}
-ds1 <- data_slice(m_plant,
+ds1 <- data_slice(
+  m_plant,
   conc = evenly(conc, n = 100),
   treatment = level(treatment, "chilled"), type = level(type, "Quebec"),
   tt = level(tt, "chilled:Quebec")
@@ -93,15 +130,27 @@ ds1 <- data_slice(m_plant,
 ds1
 ```
 
-Having created the data slice, we can predict from the model using the combination of covariate values specified in our slice. We could use `predict.gam()` for this, but the `fitted_values()` function in {gratia} is easier to use, especially for non-Gaussian models
+Pass the grid to `fitted_values()` for predictions and credible intervals for
+mean uptake with the plant random intercept set to zero.
 ```{r plant-fitted-1}
-fv1 <- fitted_values(m_plant, data = ds1, scale = "response", exclude = "s(plant)")
+fv1 <- fitted_values(
+  m_plant,
+  data = ds1,
+  scale = "response",
+  exclude = "s(plant)"
+)
 fv1
 ```
 
-Notice how we excluded the random effect term; even though we had to specify something for the `plant` covariate we can ignore this term in the model using the `exclude` argument. `fitted_values()` creates the credible interval on the scale of the link function and then back-transforms to the response scale when `scale = "response"`, which is also the default.
+`exclude` removes the random intercept's contribution even though the grid
+contains a plant identifier. With the default `scale = "response"`, the fitted
+values and intervals are in uptake units. With a log link, setting the random
+intercept to zero gives a prediction for a plant at that reference level.
+Averaging over the distribution of plant effects would give a different mean.
 
-Plotting the fitted values for the data slice now only requires some simple {ggplot2} knowledge
+Plot that curve and interval alongside the observed measurements for chilled
+Quebec plants. The observations include variation between individual plants,
+while the curve holds the plant-specific intercept at zero.
 ```{r plot-plant-fitted-1}
 fv1 |>
   ggplot(aes(x = conc, y = .fitted)) +
@@ -111,7 +160,10 @@ fv1 |>
     mapping = aes(y = uptake),
     alpha = 0.8, colour = "steelblue"
   ) +
-  geom_ribbon(aes(ymin = .lower_ci, ymax = .upper_ci), alpha = 0.2) +
+  geom_ribbon(
+    aes(ymin = .lower_ci, ymax = .upper_ci),
+    alpha = 0.2
+  ) +
   geom_line() +
   labs(
     x = plant_xlab, y = plant_ylab,
@@ -120,62 +172,96 @@ fv1 |>
   )
 ```
 
-Next, let's compare the fitted effects of the treatment in the Mississippi origin plants
+## Compare treatments on the same concentration grid
+
+To compare treatments for Mississippi plants, request all treatment levels
+and one origin. Recreate `tt` from those values so that each prediction row
+selects the appropriate smooth.
 ```{r plant-data-slice-2}
-ds2 <- data_slice(m_plant,
+ds2 <- data_slice(
+  m_plant,
   conc = evenly(conc, n = 100),
-  treatment = evenly(treatment), type = level(type, "Mississippi")
+  treatment = evenly(treatment),
+  type = level(type, "Mississippi")
 ) |>
-  mutate(tt = fct_cross(treatment, type, keep_empty = TRUE))
+  mutate(
+    tt = fct_cross(treatment, type, keep_empty = TRUE)
+  )
 ds2
 ```
 
-Here, we replaced the automatically-generated `tt` variable with the correctly specified call to `fct_cross()`, retaining the levels of the `type` and `treatment` factors. This insures that we have the correct combinations corresponding to the `treatment` and `type` factors but also that we preserve the original levels of the `tt` covariate we created.
+`fct_cross()` replaces the automatically chosen `tt` value with the correct
+treatment-origin combination. `keep_empty = TRUE` retains the factor levels
+used when fitting, including combinations absent from this prediction grid.
 
-We can again visualise the fitted values for this data slice
+Predict both treatment curves with the plant-specific intercept set to zero,
+then overlay the measurements for Mississippi plants.
 ```{r draw-plant-fitted-values-2}
-fitted_values(m_plant,
+fitted_values(
+  m_plant,
   data = ds2, scale = "response",
   exclude = "s(plant)"
 ) |>
-  ggplot(aes(x = conc, y = .fitted, group = treatment)) +
+  ggplot(
+    aes(x = conc, y = .fitted, group = treatment)
+  ) +
   geom_point(
     data = plant |> filter(type == "Mississippi"),
     mapping = aes(y = uptake, colour = treatment),
     alpha = 0.8
   ) +
-  geom_ribbon(aes(ymin = .lower_ci, ymax = .upper_ci, fill = treatment),
+  geom_ribbon(
+    aes(ymin = .lower_ci, ymax = .upper_ci, fill = treatment),
     alpha = 0.2
   ) +
-  geom_line(aes(colour = treatment)) +
+  geom_line(
+    aes(colour = treatment)
+  ) +
   labs(
-    x = plant_xlab, y = plant_ylab,
+    x = plant_xlab,
+    y = plant_ylab,
     title = expression(Estimated ~ CO[2] ~ uptake),
     subtitle = "Comparison of treatment in plants of the Mississippi type",
-    colour = "Treatment", fill = "Treatment"
+    colour = "Treatment",
+    fill = "Treatment"
   )
 ```
 
-When we were creating our data slices, we used some helper functions to specify covariate values for the slice. {gratia} provides several such helper functions:
+## Choose values for a prediction grid
 
-* `evenly(x, n = 100)` --- creates `n` evenly spaced values over the range of the covariate,
-* `evenly(x, by = 5` --- creates evenly spaced values over the range of the covariate in increments of 5,
-* `evenly(x, ..., lower = 5, upper = 10)` --- either of the two uses of `evenly()` shown above will use the lower and upper limits of the vector `x`. Arguments `lower` and `upper` can be used to change one or both of the upper or lower bounds.
-* `evenly(fct)` (alias `all_levels(fct)`) --- produces a new factor containing each level of the specified factor `fct` just once,
-* `ref_level(fct)` --- creates a new factor containing just the reference level of the specified factor covariate `fct`, and
-* `level(fct, "level")` --- creates a factor with requested `"level"` from the factor `fct`.
+Use these helpers to select numeric values or factor levels for a grid.
 
-In all cases involving factors, the helper functions set the levels of the factor to match those in the original model fit^[Depending on the value of argument `drop.unused.levels` passed to `gam()` when you fitted the model. The default will drop any unused levels before fitting the model, and as a result the helpers will not include those levels either.].
+* `evenly(x, n = 100)` returns 100 evenly spaced values from the minimum to the maximum of `x`.
+* `evenly(x, by = 5)` takes steps of 5 from the minimum of `x` up to its maximum.
+* Supply `lower`, `upper` or both to use different bounds, as in `evenly(x, n = 100, lower = 5, upper = 10)`.
+* `evenly(fct)` and `all_levels(fct)` return each level of `fct` once.
+* `ref_level(fct)` returns the first level of `fct`. For an unordered factor, this is the reference under R's default contrasts.
+* `level(fct, "B")` returns the requested level `"B"`.
 
-The second argument to `data_slice()` is `...`
-```{r data-slice-args}
-args(gratia:::data_slice.gam)
+Factor helpers preserve the levels used in the fitted model, so a prediction
+grid uses the same coding as the fitting data.
+
+`data_slice()` also accepts named R expressions, evaluated using variables
+from the fitted model's data or from supplied `data`. Here we select the
+lower quartile, median and upper quartile of concentration. Other covariates
+retain their representative values.
+
+```{r data-slice-expressions}
+data_slice(
+  m_plant,
+  conc = quantile(conc, probs = c(0.25, 0.5, 0.75))
+)
 ```
-The `...` argument allows you to provide expressions to create the covariate values you want for your data slice. Expressions passed to `...` are evaluated within the model frame of the fitted model (argument `object`) or in `data` (if supplied). You are not restricted either to using only the helper functions provide by {gratia}; any R function could be used as long as it makes sense in the context of the model frame, and it returns something that can be combined using `tidyr::expand_grid()`.
 
-## Slices within groups
+When several variables have multiple requested values, the grid contains
+every combination of those values.
 
-When a covariate has a different observed range in each group defined by a factor, a sequence over its overall range across all levels can extrapolate for some groups. Use `.by` to evaluate slice expressions separately within each observed group:
+## Keep prediction ranges within each group
+
+When a covariate has a different observed range in each group, a grid spanning
+the full range can lead to extrapolation for some groups. Use `.by` to evaluate
+expressions separately within each observed group. Here the range of `x` differs
+between groups A and B.
 
 ```{r grouped-data-slice}
 group_data <- data.frame(
@@ -183,7 +269,11 @@ group_data <- data.frame(
   fac = factor(rep(c("A", "B"), each = 3)),
   z = c(1, 2, 3, 7, 8, 9)
 )
-data_slice(group_data, x = evenly(x, n = 5), .by = fac)
+data_slice(
+  group_data,
+  x = evenly(x, n = 5),
+  .by = fac
+)
 ```
 
 This generates five values from 0 to 10 for A, and five from 5 to 20 for B.
@@ -192,8 +282,9 @@ variables are included automatically, and only observed groups are used.
 Select multiple grouping variables with `.by = c(site, treatment)` to work
 within their observed combinations.
 
-Expressions for grouping variables select which groups to use. They are
-evaluated once, before the remaining expressions are evaluated within groups:
+Use `fac = level(fac, "B")` to create a grid for B alone. With `.by = fac`,
+`data_slice()` selects B before evaluating `evenly(x, n = 5)`, so it uses
+that group's range of 5 to 20.
 
 ```{r selected-group-data-slice}
 data_slice(group_data,
@@ -208,31 +299,42 @@ values. To use group-specific values, supply an expression explicitly:
 data_slice(group_data, x = evenly(x, n = 5), z = mean(z), .by = fac)
 ```
 
-Factor levels and ordered status are preserved, and the result is an ungrouped
-tibble. Without `.by`, the existing full-grid behaviour is unchanged.
+The returned tibble is ungrouped and preserves the original factor levels and
+their ordered status.
 
-Grouping constrains the default sequences to each group's marginal ranges; it
-does not ensure joint support for multiple continuous covariates. Explicit
-values and `evenly()` bounds can still request extrapolation. The separate
-`.observed_only` option filters exact matches within groups, so it can remove
-interpolated values that do not occur in the observed data.
+With several continuous predictors, a combination can be unobserved even
+when each value is within its group's range. Set `.observed_only = TRUE` to
+retain only combinations of the specified covariates that occur in the data.
+This also removes interpolated points, so leave it off to draw a continuous
+curve and check that the chosen grid is supported by observations.
 
-## Slices through a 2D smooth
+## Plot curves through a two-dimensional smooth
 
-In the second example, I'll use the bivariate example data set from {mgcv} but fit a tensor product of covariates `x` and `z`
-```{r data-sim-and-fit}
+For a surface depending on `x` and `z`, we can plot how the smooth changes
+with `x` at selected values of `z`. We simulate a mean surface with two peaks
+and sample `x` and `z` independently and uniformly between zero and one.
+The response adds independent Gaussian noise of standard deviation 0.25.
+
+```{r bivariate-data}
 # simulate data from the bivariate surface
 df <- data_sim("eg2", n = 1000, scale = 0.25, seed = 2)
+```
 
+Fit a tensor product smooth to estimate the surface. We will then evaluate
+it along `x` at selected values of `z`.
+
+```{r data-sim-and-fit}
 # fit the GAM
 m_biv <- gam(y ~ te(x, z), data = df, method = "REML")
 ```
 
-The aim of the example will be to create a univariate data slice through the 2D smooth at user-specified values of `x` while holding `z` at one or more fixed values. We could visualise the effect at the smooth level, using `smooth_estimates()`, or at the response level, as we did above using `fitted_values()`.
+We will use the same grids to compare smooth contributions from
+`smooth_estimates()` with full fitted means from `fitted_values()`.
 
 ### Using `smooth_estimates()`
 
-We begin by creating a slice through the data space. We also create a label at this point for a nice axis label.
+Create a grid over `x` with `z` fixed at its lower quartile. The axis label
+records that fixed value so the resulting curve is easy to identify.
 ```{r data-slice-biv-1}
 ds3 <- data_slice(m_biv,
   x = evenly(x, n = 100),
@@ -243,14 +345,14 @@ z_val <- with(ds3, round(quantile(z, probs = 0.25), 2))
 ylab <- bquote(hat(f)(x, .(z_val)))
 ```
 
-Then we evaluate the smooth at the desired values and add a confidence interval
+Evaluate the smooth on the grid and add pointwise credible intervals.
 ```{r smooth-estimates-bivar}
 sm <- smooth_estimates(m_biv, select = "te(x,z)", data = ds3) |>
   add_confint()
 sm
 ```
 
-We can plot `sm` using {ggplot2}
+Use ggplot2 to plot the estimated curve and its intervals.
 ```{r plot-smooth-estimates-bivar}
 sm |>
   ggplot(aes(x = x, y = .estimate)) +
@@ -262,9 +364,14 @@ sm |>
   )
 ```
 
-`smooth_estimates()` defaults to `overall_uncertainty = TRUE`, so the interval above includes uncertainty in the overall mean (the model constant here). The plotted estimate is still the centred smooth contribution; the constant is not added to `.estimate`. Set `overall_uncertainty = FALSE` to construct an interval using only the smooth's coefficient uncertainty.
+With `overall_uncertainty = TRUE`, the default, the interval includes
+uncertainty in the intercept even though the plotted estimate is the centred
+smooth contribution. Set `overall_uncertainty = FALSE` to base the interval
+only on uncertainty in the smooth's coefficients.
 
-This extends to multiple slices by asking for several discrete `z`
+To compare curves at low, middle and high values of `z`, request its lower
+quartile, median and upper quartile. Each value gets a separate colour and
+interval ribbon.
 ```{r data-slice-biv-2}
 ds4 <- data_slice(m_biv,
   x = evenly(x, n = 100),
@@ -289,11 +396,13 @@ sm |>
 
 ### Using `fitted_values()`
 
-`fitted_values()` evaluates the full fitted model at the supplied covariate values and returns estimates with intervals. For this Gaussian identity-link model, the default response-scale quantity is the conditional mean, including the model constant and smooth contribution. Its interval describes uncertainty in that mean, rather than variation in new observations.
+`fitted_values()` evaluates the full model on the grid. For this Gaussian
+identity-link model, the fitted mean at each row is the intercept plus the
+smooth contribution. The interval quantifies uncertainty in that mean.
 
 We first plot the fitted mean over `x` at the single fixed value of `z`.
 ```{r data-slice-biv-1-fitted-values}
-fitted_values(m_biv, data = ds3) |> # default is response scale, not link
+fitted_values(m_biv, data = ds3) |>
   ggplot(aes(x = x, y = .fitted)) +
   geom_ribbon(aes(ymin = .lower_ci, ymax = .upper_ci), alpha = 0.2) +
   geom_line() +
@@ -317,4 +426,3 @@ fitted_values(m_biv, data = ds4) |>
     y = expression(hat(y)), colour = "z", fill = "z"
   )
 ```
-The fitted means include the model constant, whereas the earlier plots show only the centred smooth contribution. Both sets of intervals include overall-mean uncertainty with the defaults used here.

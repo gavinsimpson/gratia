@@ -65,7 +65,7 @@ reference:
   - title: Plot models and effects
     desc: >
       Visualise fitted models with `draw()` and customise individual plots with
-      `assemble()`; see [Customizing plots](../articles/custom-plotting.html).
+      `assemble()`. See [Customising plots](../articles/custom-plotting.html).
   - contents:
       - draw
       - draw_label_control
@@ -176,7 +176,7 @@ reference:
     desc: >
       Choose covariate values at which to evaluate a model and restrict
       evaluation to regions supported by the data; see
-      [Data slices](../articles/data-slices.html).
+      [Creating prediction grids with `data_slice()`](../articles/data-slices.html).
   - contents:
       - data_slice
       - data_combos
