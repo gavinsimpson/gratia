@@ -1039,6 +1039,10 @@
 
 ## Bug fixes
 
+* `draw()`, `assemble()` and `smooth_estimates()` again work with smooths
+  that provide their own `eval_smooth()` method, such as monotone smooths
+  fitted with mvgam.
+
 * `add_fitted()` no longer emits a tibble deprecation warning for multinomial
   predictions with unnamed columns. The existing `V1`, `V2`, ... column names
   are preserved (#443).

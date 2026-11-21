@@ -474,11 +474,12 @@
 
   tube_records <- attr(sm_list, 'tube_records')
 
-  # Tensor products of the two soap components can share both label and type.
-  # Retain fitted indices only for otherwise indistinguishable output terms.
-  identities <- paste(vapply(smooths, smooth_label, character(1)),
-    vapply(smooths, smooth_type, character(1)), sep = "\r")
-  if (anyDuplicated(identities)) {
+  # Use the labels and types supplied by each evaluator. Tensor products of
+  # the two soap components can share both, in which case we retain their IDs.
+  identities <- lapply(sm_list, function(estimates) {
+    unique(estimates[intersect(c(".smooth", ".type"), names(estimates))])
+  })
+  if (anyDuplicated(bind_rows(identities))) {
     for (i in seq_along(sm_list)) sm_list[[i]]$.smooth_id <- smooth_ids[[i]]
   }
 

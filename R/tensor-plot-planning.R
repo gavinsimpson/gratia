@@ -48,8 +48,7 @@ plan_tensor_plots <- function(model, ids, data, re_levels) {
   templates <- list()
   for (id in ids) {
     sm <- model$smooth[[id]]
-    if (!is_tensor_plot_type(smooth_type(sm)) ||
-        !any(vapply(sm$margin, inherits, logical(1), "random.effect"))) next
+    if (!involves_ranef_smooth(sm) || identical(smooth_dim(sm), 1L)) next
     fitted <- prepare_smooth_data(model, sm)
     vars <- tensor_plot_variables(reorder_tensor_smooth_terms(sm), fitted)
     factors <- vars[vapply(fitted[vars], is.factor, logical(1))]

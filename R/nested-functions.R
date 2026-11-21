@@ -215,8 +215,7 @@ nested_component_observations <- function(object, ids, data = NULL,
     get_obs_data_for_smooth(smooths[[i]], object, data, extra = extra,
       distinct = !partial && distinct)
   })
-  out <- tibble(.smooth = vapply(smooths, smooth_label, character(1)),
-    .type = vapply(smooths, smooth_type, character(1)), .smooth_id = ids)
+  out <- tibble(.smooth_id = ids)
   out[[if (partial) "partial_residual" else "rug_data"]] <- observations
   out
 }

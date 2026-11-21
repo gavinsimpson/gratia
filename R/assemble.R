@@ -205,8 +205,9 @@
       partial_match = partial_match,
       model_name = expr_label(substitute(object))
     )
+  smooth_ids <- which(select)
   object <- with_model_envir(object, envir)
-  object <- plan_tensor_plots(object, which(select), data, re_levels)
+  object <- plan_tensor_plots(object, smooth_ids, data, re_levels)
   attr(object, "gratia.cyclic_polar") <- identical(cyclic, "polar")
 
   # this is needed for the parametric terms below
@@ -221,7 +222,7 @@
     # evaluate all requested smooths
     sm_eval <- smooth_estimates(object,
       envir = envir, back_transform = back_transform,
-      select = which(select),
+      select = smooth_ids,
       n = n,
       n_2d = n_2d,
       n_3d = n_3d,
@@ -264,7 +265,7 @@
     observation_data <- NULL
     if (back_transform && (isTRUE(rug) || isTRUE(residuals))) {
       observation_data <- model.frame(object)
-      labels <- unique(unlist(lapply(get_smooths_by_id(object, which(select)), smooth_variable)))
+      labels <- unique(unlist(lapply(get_smooths_by_id(object, smooth_ids), smooth_variable)))
       raw_vars <- unique(unlist(lapply(labels, function(label) {
         smooth_coordinate_info(label, object)$original
       })))
@@ -283,14 +284,22 @@
       }
     }
 
+    # Join observations by fitted index when a label names several components.
+    # The nested estimates have one row per fitted smooth in selection order.
+    had_smooth_ids <- ".smooth_id" %in% names(sm_eval)
+    join_by_index <- (isTRUE(residuals) || isTRUE(rug)) &&
+      (had_smooth_ids || anyDuplicated(S) > 0L)
+    observation_key <- if (join_by_index) ".smooth_id" else ".smooth"
+    if (join_by_index && !had_smooth_ids) sm_eval$.smooth_id <- smooth_ids
+
     # Add partial residuals if requested - by default they are
     # At the end of this, sm_eval will have a new list column containing the
     # partial residuals, `partial_residual`
     p_resids_rng <- NULL
     if (isTRUE(residuals)) {
       # get residuals in a suitable format
-      p_resids <- if (anyDuplicated(S)) {
-        nested_component_observations(object, which(select),
+      p_resids <- if (join_by_index) {
+        nested_component_observations(object, smooth_ids,
           data = observation_data, partial = TRUE)
       } else {
         nested_partial_residuals(object, terms = S[select], data = observation_data)
@@ -317,40 +326,29 @@
           ) |>
           pluck("rng")
       }
-      if (".smooth_id" %in% names(sm_eval)) {
-        p_resids <- select(p_resids, all_of(c(".smooth_id", "partial_residual")))
-      } else p_resids$.smooth_id <- NULL
       # merge with the evaluated smooth
       sm_eval <- suppress_matches_multiple_warning(
-        left_join(sm_eval, p_resids,
-          by = if (".smooth_id" %in% names(sm_eval)) ".smooth_id" else {
-          if (anyDuplicated(S)) c(".smooth", ".type") else ".smooth"
-        })
+        left_join(sm_eval, p_resids, by = observation_key)
       )
     }
 
     # add rug data?
     if (isTRUE(rug)) {
       # get rug data in a suitable format
-      rug_data <- if (anyDuplicated(S)) {
-        nested_component_observations(object, which(select),
+      rug_data <- if (join_by_index) {
+        nested_component_observations(object, smooth_ids,
           data = observation_data, distinct = distinct_rug)
       } else {
         nested_rug_values(object,
           terms = S[select], data = observation_data, distinct = distinct_rug)
       }
 
-      if (".smooth_id" %in% names(sm_eval)) {
-        rug_data <- select(rug_data, all_of(c(".smooth_id", "rug_data")))
-      } else rug_data$.smooth_id <- NULL
       # merge with the evaluated smooth
       sm_eval <- suppress_matches_multiple_warning(
-        left_join(sm_eval, rug_data,
-          by = if (".smooth_id" %in% names(sm_eval)) ".smooth_id" else {
-            if (anyDuplicated(S)) c(".smooth", ".type") else ".smooth"
-          })
+        left_join(sm_eval, rug_data, by = observation_key)
       )
     }
+    if (join_by_index && !had_smooth_ids) sm_eval$.smooth_id <- NULL
 
     # need to figure out scales if "fixed"
     if (isTRUE(identical(scales, "fixed"))) {
