@@ -26,7 +26,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-73</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-75</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -55,13 +55,13 @@
     <li><a class="dropdown-item" href="../articles/shape-constrained-intervals.html">Intervals for shape-constrained smooths</a></li>
     <li><a class="dropdown-item" href="../articles/spatial-smooths.html">Choose a smooth for the spatial question</a></li>
     <li><a class="dropdown-item" href="../articles/response-distributions.html">Checking different response distributions</a></li>
-    <li><a class="dropdown-item" href="../articles/transformed-covariates.html">Functions of covariates and evaluation environments</a></li>
+    <li><a class="dropdown-item" href="../articles/transformed-covariates.html">Predictions, plots and derivatives with transformed covariates</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Essentials</h6></li>
-    <li><a class="dropdown-item" href="../articles/data-slices.html">Data slices</a></li>
-    <li><a class="dropdown-item" href="../articles/custom-plotting.html">Customizing plots</a></li>
+    <li><a class="dropdown-item" href="../articles/data-slices.html">Creating prediction grids with data_slice()</a></li>
+    <li><a class="dropdown-item" href="../articles/custom-plotting.html">Customising plots</a></li>
     <li><a class="dropdown-item" href="../articles/posterior-simulation.html">Posterior Simulation</a></li>
-    <li><a class="dropdown-item" href="../articles/sampling-migration.html">Migrating posterior sampling calls</a></li>
+    <li><a class="dropdown-item" href="../articles/sampling-migration.html">Updating sampling code for gratia 0.12.0</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
@@ -93,34 +93,35 @@
 
     
     
-<p>Spatial proximity is not always a straight-line distance.
-Observations might represent adjacent districts, locations separated by
-a peninsula, or points on the globe. The appropriate smooth depends on
-that geometry. This article uses three examples to show how to fit those
-models and interpret gratia’s effect displays.</p>
+<p>What counts as nearby depends on the setting. Districts can be
+neighbours because their boundaries touch. Locations in a lake can be
+close on a map but separated by land. On a globe, points with longitudes
+near 180° E and 180° W can lie next to each other. This article fits and
+plots a smooth for each setting.</p>
+<p>Load {gratia}, {mgcv} and {ggplot2} for fitting the models and
+plotting their effects.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://gavinsimpson.github.io/gratia/">"gratia"</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/load_mgcv.html">load_mgcv</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://ggplot2.tidyverse.org" class="external-link">"ggplot2"</a></span><span class="op">)</span></span></code></pre></div>
-<p>The examples require mgcv 1.9-4 or later. Spherical plotting also
-needs the optional sf package. Three-dimensional views need ggcube. The
-district and soap-film analyses run without either optional display
-package.</p>
+<p>The examples require mgcv 1.9-4 or later. Drawing the spherical map
+also needs the optional {sf} package.</p>
 <div class="section level2">
-<h2 id="are-high-crime-rates-explained-by-district-income-or-location">Are high crime rates explained by district income or location?<a class="anchor" aria-label="anchor" href="#are-high-crime-rates-explained-by-district-income-or-location"></a>
+<h2 id="markov-random-fields-for-district-effects">Markov random fields for district effects<a class="anchor" aria-label="anchor" href="#markov-random-fields-for-district-effects"></a>
 </h2>
 <p>The Columbus data supplied with mgcv record residential burglary and
-auto theft rates per 1,000 households in 49 districts. They also record
+car theft rates per 1,000 households in 49 districts. They also record
 household income in thousands of dollars and provide district polygons.
-These are <strong>rates</strong>, not counts, so fitting a Poisson
-distribution to <code>crime</code> would misrepresent the response. A
-Gaussian model is a starting approximation for variation in rates; a
-count model would require counts and exposure data. See the <a href="https://stat.ethz.ch/R-manual/R-devel/library/mgcv/html/columb.html" class="external-link">data
+We use a Gaussian model for the rates. A Poisson model would need the
+original crime counts and the number of households in each district. See
+the <a href="https://stat.ethz.ch/R-manual/R-devel/library/mgcv/html/columb.html" class="external-link">data
 documentation</a> for the original source.</p>
 <p>We adapt the worked examples in mgcv’s <a href="https://stat.ethz.ch/R-manual/R-devel/library/mgcv/html/smooth.construct.mrf.smooth.spec.html" class="external-link">Markov
 random field documentation</a>. The smooth gives each district an effect
-and penalises differences between neighbours. Neighbourhoods are derived
-from polygons that share vertices.</p>
+and penalises differences between neighbours. Here, districts are
+neighbours if their polygons have at least one vertex in common. Load
+the measurements and district polygons, then plot crime rate against
+income.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"columb"</span>, package <span class="op">=</span> <span class="st">"mgcv"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"columb.polys"</span>, package <span class="op">=</span> <span class="st">"mgcv"</span><span class="op">)</span></span>
@@ -129,8 +130,9 @@ from polygons that share vertices.</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Household income (thousands of dollars)"</span>,</span>
 <span>    y <span class="op">=</span> <span class="st">"Burglaries and auto thefts per 1,000 households"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="spatial-smooths_files/figure-html/columbus-data-1.png" class="r-plt" alt="" width="700"></p>
-<p>Start with the spatial pattern alone, and compare a full
-representation with a smaller one before adding income:</p>
+<p>First fit the district effects alone, using either one coefficient
+per district or a smaller basis. Then add an income smooth to ask how
+much geographical variation remains after accounting for income.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">district_full</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="va">crime</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">district</span>, bs <span class="op">=</span> <span class="st">"mrf"</span>,</span>
 <span>  xt <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>polys <span class="op">=</span> <span class="va">columb.polys</span><span class="op">)</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">columb</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span>
@@ -148,17 +150,20 @@ representation with a smaller one before adding income:</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> Intercept   parametric    <span style="color: #BB0000;">NA</span>  1       1       22.2   &lt;0.001 </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> s(district) MRF           19  5.43   19        0.512 0.0766 </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> s(income)   TPRS           5  1.00    1.00    28.5   &lt;0.001</span></span></code></pre></div>
-<p>The full model has a district coefficient for every area, subject to
-centring and the estimated penalty. The reduced representation uses
-fewer coefficients to represent the same 49 area effects.
-<code>k = 20</code> restricts the available spatial patterns; it does
-not mean only twenty districts are fitted. Adding income asks how much
-spatial variation remains after accounting for its association with
-crime rate.</p>
+<p>The full basis starts with one coefficient per district, and the
+smooth is centred to separate it from the intercept. With
+<code>k = 20</code>, the smooth still estimates an effect for all 49
+districts. It uses fewer coefficients, which limits the spatial patterns
+it can represent. Including income shows how the district effects change
+after accounting for its association with crime rate.</p>
 </div>
 <div class="section level2">
-<h2 id="read-district-effects-rather-than-basis-coefficients">Read district effects rather than basis coefficients<a class="anchor" aria-label="anchor" href="#read-district-effects-rather-than-basis-coefficients"></a>
+<h2 id="estimate-and-plot-district-effects">Estimate and plot district effects<a class="anchor" aria-label="anchor" href="#estimate-and-plot-district-effects"></a>
 </h2>
+<p>Use <code><a href="../reference/smooth_estimates.html">smooth_estimates()</a></code> to obtain each district’s
+estimated contribution and uncertainty. The output identifies districts
+even when the fitted basis has fewer coefficients than there are
+districts.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">area_effects</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/smooth_estimates.html">smooth_estimates</a></span><span class="op">(</span><span class="va">district_income</span>, select <span class="op">=</span> <span class="st">"s(district)"</span>,</span>
 <span>  interval <span class="op">=</span> <span class="st">"credible"</span><span class="op">)</span></span>
@@ -172,12 +177,11 @@ crime rate.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> s(district) MRF   <span style="color: #BB0000;">NA</span>       -<span style="color: #BB0000;">2.46</span>   4.06 3         1.96    -<span style="color: #BB0000;">10.4</span>       5.50</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> s(district) MRF   <span style="color: #BB0000;">NA</span>        0.614  2.73 4         1.96     -<span style="color: #BB0000;">4.74</span>      5.97</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> s(district) MRF   <span style="color: #BB0000;">NA</span>       -<span style="color: #BB0000;">0.481</span>  5.62 5         1.96    -<span style="color: #BB0000;">11.5</span>      10.5</span></span></code></pre></div>
-<p>The rows are effects for <strong>areas</strong>, even for a
-reduced-rank fit. They are not the coefficients of its smaller basis.
-The same area labels identify predictions supplied with
-<code>data</code>; a previously unknown district is not a valid
-prediction location merely because it is adjacent to one in the
-model.</p>
+<p>The same district labels identify prediction locations supplied with
+<code>data</code>. Predictions require districts included in the fitted
+model; adjacency alone does not supply an effect for a new district.</p>
+<p>Plot the saved district estimates, then the income smooth. The two
+plots show the separate contributions to the fitted crime rate.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">area_effects</span>, angle <span class="op">=</span> <span class="fl">90</span>,</span>
 <span>  ylab <span class="op">=</span> <span class="st">"District contribution to crime rate"</span>, xlab <span class="op">=</span> <span class="st">"District"</span><span class="op">)</span></span></code></pre></div>
@@ -187,14 +191,14 @@ model.</p>
 <span>  xlab <span class="op">=</span> <span class="st">"Household income (thousands of dollars)"</span>,</span>
 <span>  ylab <span class="op">=</span> <span class="st">"Income contribution to crime rate"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="spatial-smooths_files/figure-html/district-effects-2.png" class="r-plt" alt="" width="700"></p>
-<p>Positive area effects indicate rates above the fitted intercept and
-income contribution. The income association is downward over this
-dataset’s range, while individual adjusted district effects have
-substantial uncertainty. Use their intervals when comparing districts.
-Neighbouring districts borrow information through the penalty on the
-mean effects. The Gaussian response errors are still assumed
-independent, so inspect residual spatial patterns before relying on
-these intervals.</p>
+<p>A positive district effect raises the fitted rate above the sum of
+the intercept and the income contribution. Fitted rates decline with
+income, and many individual district effects have wide intervals. An
+interval for the difference between two districts needs to account for
+the covariance of their estimated effects. The penalty encourages
+similar fitted effects for neighbours. The model assumes independent
+errors around those fitted rates, so check the residuals for remaining
+spatial patterns.</p>
 <p>To see how much the smaller spatial representation changes the fitted
 pattern, compare its area effects on the same district labels:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
@@ -208,43 +212,43 @@ pattern, compare its area effects on the same district labels:</p>
 <span>    colour <span class="op">=</span> <span class="st">"Representation"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>axis.text.x <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">90</span>, hjust <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="spatial-smooths_files/figure-html/district-rank-comparison-1.png" class="r-plt" alt="" width="700"></p>
-<p>The comparison shows how reducing the basis changes the spatial-only
-fits. Use it to assess whether the smaller representation retains the
-district patterns of interest. The neighbourhood graph determines which
-area effects borrow information from each other, so check that it
-represents the connections relevant to your analysis.</p>
+<p>Use this comparison to assess whether the smaller basis retains the
+district patterns of interest. To inspect the distribution of the
+estimated district effects, use a normal QQ plot.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">district_income</span>, select <span class="op">=</span> <span class="st">"s(district)"</span>, mrf_plot <span class="op">=</span> <span class="st">"qq"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="spatial-smooths_files/figure-html/district-qq-1.png" class="r-plt" alt="" width="700"></p>
-<p>This QQ view describes the distribution of fitted area effects. They
-are correlated and can have unequal marginal variances, so this is not a
-test of independent normal effects or a response-distribution
-diagnostic. For response checks use <code><a href="../reference/appraise.html">appraise()</a></code> and consult
-<a href="model-checking.html">Choosing diagnostic references</a>.</p>
-<p>One can also inspect the neighbourhood penalty itself:</p>
+<p>The QQ plot compares the distribution of the fitted district effects
+with a normal distribution. Read it as a description of these estimates,
+which can be correlated and have different variances. To check the
+response distribution, use <code><a href="../reference/appraise.html">appraise()</a></code> as shown in the <a href="model-checking.html">model diagnostics article</a>.</p>
+<p>Use <code><a href="../reference/penalty.html">penalty()</a></code> to inspect how the model penalises its
+fitted coefficients. For the reduced basis used here, the matrix is
+expressed in basis coefficients rather than one row and column per
+district.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="fu"><a href="../reference/penalty.html">penalty</a></span><span class="op">(</span><span class="va">district_income</span>, select <span class="op">=</span> <span class="st">"s(district)"</span><span class="op">)</span>, geom <span class="op">=</span> <span class="st">"tile"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="spatial-smooths_files/figure-html/district-penalty-1.png" class="r-plt" alt="" width="672"></p>
-<p>This is the penalty expressed in the fitted reduced basis; its rows
-are basis coefficients rather than districts. Larger diagonal entries
-indicate coefficient directions that are penalised more strongly. Before
-its basis transformation, the MRF penalty counts neighbours on the
-diagonal and uses negative off-diagonal entries for neighbours. Use the
-area plots above to inspect district labels and intervals; the penalty
-plot explains how their underlying coefficients are regularised.</p>
+<p>In district coordinates, the unscaled penalty matrix has the number
+of neighbours on the diagonal and a value of −1 for each neighbouring
+pair. Those entries penalise squared differences between neighbouring
+district effects. The plot shows the penalty after it has been expressed
+in the smaller basis.</p>
 </div>
 <div class="section level2">
-<h2 id="how-should-a-surface-behave-across-a-peninsula">How should a surface behave across a peninsula?<a class="anchor" aria-label="anchor" href="#how-should-a-surface-behave-across-a-peninsula"></a>
+<h2 id="soap-film-smooths-for-bounded-regions">Soap-film smooths for bounded regions<a class="anchor" aria-label="anchor" href="#soap-film-smooths-for-bounded-regions"></a>
 </h2>
-<p>For a bounded region such as a water body, locations on opposite
-sides of land can be close in Euclidean distance and distant along the
-water. A soap-film smooth respects the supplied boundary. We use a
+<p>Across a peninsula, the straight-line distance between two locations
+can be much shorter than the distance by water. A soap-film smooth uses
+the water boundary to avoid smoothing directly across the land. We use a
 simulation from mgcv’s <a href="https://stat.ethz.ch/R-manual/R-devel/library/mgcv/html/smooth.construct.so.smooth.spec.html" class="external-link">soap-film
 example</a>, retaining its curved boundary, interior knots and simulated
-test surface. The question is whether a boundary-aware smoother can
-recover a field without joining opposite sides across the excluded
-region. We use REML instead of the example’s default smoothing
-selection.</p>
+test surface. The boundary represents a water body around a peninsula;
+<code>v</code> and <code>w</code> are its spatial coordinates. We sample
+locations inside it and add independent Gaussian noise with standard
+deviation 0.3 to a known mean surface. This lets us check how well the
+fitted smooth recovers the surface while keeping its predictions within
+the water body.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">bnd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu">mgcv</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/fs.test.html" class="external-link">fs.boundary</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">bnd</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"v"</span>, <span class="st">"w"</span><span class="op">)</span></span>
@@ -265,13 +269,14 @@ selection.</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_equal</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"v coordinate"</span>, y <span class="op">=</span> <span class="st">"w coordinate"</span>, colour <span class="op">=</span> <span class="st">"Observed field"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="spatial-smooths_files/figure-html/soap-data-1.png" class="r-plt" alt="" width="700"></p>
-<p>The errors were generated as independent Gaussian noise with standard
-deviation 0.3, matching the Gaussian identity-link model fitted
-below.</p>
 </div>
 <div class="section level2">
-<h2 id="separate-boundary-variation-from-interior-variation">Separate boundary variation from interior variation<a class="anchor" aria-label="anchor" href="#separate-boundary-variation-from-interior-variation"></a>
+<h2 id="separate-boundary-and-interior-effects">Separate boundary and interior effects<a class="anchor" aria-label="anchor" href="#separate-boundary-and-interior-effects"></a>
 </h2>
+<p>Fit a Gaussian model with two soap-film components: <code>sf</code>
+describes variation around the boundary and its extension into the
+interior, while <code>sw</code> adds variation inside the boundary. We
+estimate both components together using REML.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">water_fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">v</span>, <span class="va">w</span>, bs <span class="op">=</span> <span class="st">"sf"</span>, k <span class="op">=</span> <span class="fl">30</span>, xt <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>bnd <span class="op">=</span> <span class="va">bnd</span>, nmax <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
@@ -288,31 +293,27 @@ below.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> s.v.w..1  Soap film (wiggly)      32  0.001<span style="text-decoration: underline;">41</span>      32   0.000<span style="text-decoration: underline;">039</span>7 0.458</span></span>
 <span><span class="fu"><a href="../reference/smooths.html">smooths</a></span><span class="op">(</span><span class="va">water_fit</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "s(v,w)" "s(v,w)"</span></span></code></pre></div>
-<p><code>sf</code> estimates a cyclic smooth around the closed boundary
-and extends it into the interior as a surface satisfying Laplace’s
-equation. The first panel shows that surface, rather than just the
-values along the boundary. <code>sw</code> adds interior variation that
-is zero on the boundary. Both components are estimated jointly; their
-sum plus the intercept gives the complete fitted mean. The boundary
-basis size is <code>k</code>; the interior basis size comes from the
-number of supplied knots. <code>nmax = 100</code> sets the numerical
-solution grid, rather than the plotting grid. Both component types now
-have distinct labels in gratia.</p>
-<p>Both terms happen to have the same <code>s(v,w)</code> label. Select
-them by numerical position when you need one component rather than
-both:</p>
+<p><code>sf</code> fits a cyclic smooth around the closed boundary and
+extends it into the interior as a surface satisfying Laplace’s equation.
+<code>sw</code> adds variation in the interior and is zero on the
+boundary. Adding the two contributions and the intercept gives the
+fitted mean. <code>k</code> sets the boundary basis size, and the number
+of supplied knots sets the interior basis size. <code>nmax = 100</code>
+sets the resolution of the grid used to compute the basis.</p>
+<p>Plot the two components on the same colour scale to compare the size
+of their contributions. The boundary is drawn on each panel so the
+locations are clear.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">water_fit</span>, n_2d <span class="op">=</span> <span class="fl">35</span>, surface <span class="op">=</span> <span class="st">"tile"</span>, caption <span class="op">=</span> <span class="cn">TRUE</span>, ncol <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  scales <span class="op">=</span> <span class="st">"fixed"</span>, contour <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  xlab <span class="op">=</span> <span class="st">"v coordinate"</span>, ylab <span class="op">=</span> <span class="st">"w coordinate"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="spatial-smooths_files/figure-html/soap-components-1.png" class="r-plt" alt="" width="700"></p>
-<p>In this simulation REML shrinks the interior adjustment almost to
-zero, so the second panel is nearly flat on the shared colour scale. The
-surface induced by the boundary accounts for almost all the fitted
-variation. Effect colours display each centred contribution; add them
-and the intercept to recover the fitted mean field. Boundary loops
-remain visible and predictions outside the supplied domain are
-unavailable.</p>
+<p>In this simulation the interior adjustment is close to zero, so the
+second panel is nearly flat on the shared colour scale. Almost all the
+fitted variation comes from the surface that extends the boundary
+smooth. To save the interior component, select it by position with
+<code>select = 2</code> because both components share the label
+<code>s(v,w)</code>.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">interior_effect</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/smooth_estimates.html">smooth_estimates</a></span><span class="op">(</span><span class="va">water_fit</span>, select <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  n_2d <span class="op">=</span> <span class="fl">30</span>, clip <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
@@ -326,12 +327,11 @@ unavailable.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> s(v,w)  Soap film (wiggly) <span style="color: #BB0000;">NA</span>      7.99<span style="color: #949494;">e</span><span style="color: #BB0000;">-8</span> 4.79<span style="color: #949494;">e</span><span style="color: #BB0000;">-5</span> FALSE     <span style="color: #BB0000;">NA</span> -<span style="color: #BB0000;">0.886</span>  0.031<span style="text-decoration: underline;">5</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> s(v,w)  Soap film (wiggly) <span style="color: #BB0000;">NA</span>      5.54<span style="color: #949494;">e</span><span style="color: #BB0000;">-9</span> 4.37<span style="color: #949494;">e</span><span style="color: #BB0000;">-5</span> FALSE     <span style="color: #BB0000;">NA</span> -<span style="color: #BB0000;">0.886</span>  0.093<span style="text-decoration: underline;">5</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> s(v,w)  Soap film (wiggly) <span style="color: #BB0000;">NA</span>      9.20<span style="color: #949494;">e</span><span style="color: #BB0000;">-7</span> 9.37<span style="color: #949494;">e</span><span style="color: #BB0000;">-5</span> FALSE     <span style="color: #BB0000;">NA</span> -<span style="color: #BB0000;">0.739</span> -<span style="color: #BB0000;">0.464</span></span></span></code></pre></div>
-<p><code>clip = TRUE</code> removes evaluation cells outside the
-boundary. Without clipping, those locations retain missing estimates.
-Boundary rows are retained as plotting information and are identified by
-<code>.bndry</code>; they are not additional observations. Saved
-estimates retain the component identity so <code><a href="../reference/draw.html">draw()</a></code> can
-reproduce its boundary-aware display.</p>
+<p><code>clip = TRUE</code> drops evaluation points outside the
+boundary. With <code>clip = FALSE</code>, those estimates are
+<code>NA</code>. Rows marked <code>.bndry = TRUE</code> record the
+outline so that <code><a href="../reference/draw.html">draw()</a></code> can show it with the saved
+estimates.</p>
 <p>The simulated truth makes it possible to assess the complete fitted
 surface:</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
@@ -344,26 +344,20 @@ surface:</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Simulated mean field"</span>, y <span class="op">=</span> <span class="st">"Estimated mean field"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="spatial-smooths_files/figure-html/soap-recovery-1.png" class="r-plt" alt="" width="700"></p>
 <p>The fitted values follow the simulated mean closely at the sampled
-locations. When adapting this model to a water body, place interior
-knots across the domain and include boundary features that must prevent
-smoothing across land. sf/sw components can also form space-by-time
-tensor products; the flat-surface display uses numeric conditioning
-slices for time. Transformed soap-film boundaries currently cannot be
-drawn on a recovered raw covariate scale: retain the model-scale display
-rather than silently dropping the boundary.</p>
+locations. When adapting this model to a water body, spread the interior
+knots across the water and keep boundary features, such as peninsulas,
+that should block smoothing across land.</p>
 </div>
 <div class="section level2">
-<h2 id="how-do-we-avoid-a-seam-at-the-date-line">How do we avoid a seam at the date line?<a class="anchor" aria-label="anchor" href="#how-do-we-avoid-a-seam-at-the-date-line"></a>
+<h2 id="spherical-smooths-for-global-locations">Spherical smooths for global locations<a class="anchor" aria-label="anchor" href="#spherical-smooths-for-global-locations"></a>
 </h2>
-<p>A plane is a poor representation for a global surface: points
-immediately either side of the date line are neighbours, and all
-longitudes meet at a pole. A spline on the sphere uses that geometry. We
-adapt mgcv’s <a href="https://stat.ethz.ch/R-manual/R-devel/library/mgcv/html/smooth.construct.sos.smooth.spec.html" class="external-link">spherical
-smooth example</a> as a synthetic sensor survey. Sampling latitude
-through <code><a href="https://rdrr.io/r/base/Trig.html" class="external-link">asin()</a></code> gives uniform area density directly. We
-remove the example’s latitude shift in the test function so the
-simulated field is continuous at both poles, and use REML. The units are
-arbitrary; this is a controlled field-recovery exercise.</p>
+<p>A spline on the sphere accounts for the way longitude wraps at 180°
+and converges at the poles. We adapt mgcv’s <a href="https://stat.ethz.ch/R-manual/R-devel/library/mgcv/html/smooth.construct.sos.smooth.spec.html" class="external-link">spherical
+smooth example</a> to simulate measurements at 400 locations distributed
+uniformly over the globe. The mean surface varies with latitude and
+longitude and is continuous at the poles. We add independent Gaussian
+noise with standard deviation 0.2. The coordinates are in degrees and
+the response units are arbitrary.</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">90</span><span class="op">)</span></span>
 <span><span class="va">globe</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
@@ -372,34 +366,31 @@ arbitrary; this is a controlled field-recovery exercise.</p>
 <span><span class="op">)</span></span>
 <span><span class="va">globe</span><span class="op">$</span><span class="va">truth</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/with.html" class="external-link">with</a></span><span class="op">(</span><span class="va">globe</span>,</span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">sin</a></span><span class="op">(</span><span class="va">longitude</span> <span class="op">*</span> <span class="va">pi</span> <span class="op">/</span> <span class="fl">180</span><span class="op">)</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">cos</a></span><span class="op">(</span><span class="va">latitude</span> <span class="op">*</span> <span class="va">pi</span> <span class="op">/</span> <span class="fl">180</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">globe</span><span class="op">$</span><span class="va">observed</span> <span class="op">&lt;-</span> <span class="va">globe</span><span class="op">$</span><span class="va">truth</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">400</span>, sd <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span></span>
-<span><span class="va">globe_fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="va">observed</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">latitude</span>, <span class="va">longitude</span>, bs <span class="op">=</span> <span class="st">"sos"</span>, k <span class="op">=</span> <span class="fl">60</span><span class="op">)</span>,</span>
+<span><span class="va">globe</span><span class="op">$</span><span class="va">observed</span> <span class="op">&lt;-</span> <span class="va">globe</span><span class="op">$</span><span class="va">truth</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">400</span>, sd <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span></span></code></pre></div>
+<p>Fit a Gaussian model with a spherical smooth of latitude and
+longitude, using REML to estimate its smoothness. Calculate the root
+mean squared error between the fitted values and the known mean surface
+to assess recovery at the sampled locations.</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">globe_fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="va">observed</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">latitude</span>, <span class="va">longitude</span>, bs <span class="op">=</span> <span class="st">"sos"</span>, k <span class="op">=</span> <span class="fl">60</span><span class="op">)</span>,</span>
 <span>  data <span class="op">=</span> <span class="va">globe</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/fitted.values.html" class="external-link">fitted</a></span><span class="op">(</span><span class="va">globe_fit</span><span class="op">)</span> <span class="op">-</span> <span class="va">globe</span><span class="op">$</span><span class="va">truth</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 0.04255861</span></span></code></pre></div>
-<p>The smooth requires latitude first and longitude second, in degrees.
-A Gaussian fit matches the generated observation errors. The recovery
-error summarises the difference between the fitted and simulated mean at
-the sampled locations.</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<p>The smooth requires latitude first and longitude second, both in
+degrees. Use <code>crs</code> to choose a map projection. This
+orthographic projection shows the hemisphere centred on latitude 20° and
+longitude 0°.</p>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"sf"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">globe_fit</span>, n_2d <span class="op">=</span> <span class="fl">35</span>, rug <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>    crs <span class="op">=</span> <span class="st">"+proj=ortho +lat_0=20 +lon_0=0"</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <p><img src="spatial-smooths_files/figure-html/sphere-map-1.png" class="r-plt" alt="" width="700"></p>
-<p>The orthographic view shows one hemisphere. Surface cells, contours
-and observation points are clipped to that visible hemisphere before
-projection, so locations on the far side cannot leak into the display.
-Cells at poles and the date line retain valid geographic boundaries.
-Changing the projection changes which locations are visible while
-retaining the fitted spherical surface. Factor-by spherical effects use
-separate panels for each level. Supply a regular prediction grid for a
-cell map; a scattered prediction dataset is drawn as points.</p>
-<p>Choose the geometry from the question: district neighbourhoods for
-aggregated area measurements, soap films for a bounded continuous
-domain, and spherical splines for global locations. The boundary and
-projection controls then let the displayed surface follow the geometry
-used in fitting.</p>
+<p>This projection clips the map to the visible hemisphere. You can
+choose a different projection to view the same fitted surface. Factor-by
+spherical effects use separate panels for each level. Supply a regular
+prediction grid to draw a map with cells. For scattered prediction
+locations, <code><a href="../reference/draw.html">draw()</a></code> uses points.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

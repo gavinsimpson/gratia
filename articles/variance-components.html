@@ -26,7 +26,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-73</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-75</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -55,13 +55,13 @@
     <li><a class="dropdown-item" href="../articles/shape-constrained-intervals.html">Intervals for shape-constrained smooths</a></li>
     <li><a class="dropdown-item" href="../articles/spatial-smooths.html">Choose a smooth for the spatial question</a></li>
     <li><a class="dropdown-item" href="../articles/response-distributions.html">Checking different response distributions</a></li>
-    <li><a class="dropdown-item" href="../articles/transformed-covariates.html">Functions of covariates and evaluation environments</a></li>
+    <li><a class="dropdown-item" href="../articles/transformed-covariates.html">Predictions, plots and derivatives with transformed covariates</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Essentials</h6></li>
-    <li><a class="dropdown-item" href="../articles/data-slices.html">Data slices</a></li>
-    <li><a class="dropdown-item" href="../articles/custom-plotting.html">Customizing plots</a></li>
+    <li><a class="dropdown-item" href="../articles/data-slices.html">Creating prediction grids with data_slice()</a></li>
+    <li><a class="dropdown-item" href="../articles/custom-plotting.html">Customising plots</a></li>
     <li><a class="dropdown-item" href="../articles/posterior-simulation.html">Posterior Simulation</a></li>
-    <li><a class="dropdown-item" href="../articles/sampling-migration.html">Migrating posterior sampling calls</a></li>
+    <li><a class="dropdown-item" href="../articles/sampling-migration.html">Updating sampling code for gratia 0.12.0</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
@@ -93,12 +93,17 @@
 
     
     
-<p>This example uses <code><a href="../reference/variance_comp.html">variance_comp()</a></code> to compare penalty
-variances with variances of fitted terms.</p>
-<p>We simulate 360 observations in 12 groups of 30. The covariate
-<code>z</code> is a noisy version of <code>x</code>, so the two are
-positively correlated. We generate <code>w</code> independently for the
-nonlinear effect.</p>
+<p>Use <code><a href="../reference/variance_comp.html">variance_comp()</a></code> to answer two questions. How
+strongly does the model penalise its smooth and random-effect
+coefficients? How much do the fitted contributions of its terms vary
+across the observations? The first is about the model’s coefficients.
+The second also depends on the observed covariate values. A linear term,
+for example, varies more across observations that cover a wider range of
+its covariate, even with the same coefficient.</p>
+<p>Load {gratia} and {mgcv}, then simulate 360 observations in 12 groups
+of 30. We generate <code>z</code> from <code>x</code> plus noise so the
+two are positively correlated. We generate <code>w</code> independently
+for the nonlinear effect.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://gavinsimpson.github.io/gratia/">"gratia"</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/load_mgcv.html">load_mgcv</a></span><span class="op">(</span><span class="op">)</span></span>
@@ -108,27 +113,28 @@ nonlinear effect.</p>
 <span>  group <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fl">12</span><span class="op">)</span>, each <span class="op">=</span> <span class="fl">30</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">dat</span><span class="op">$</span><span class="va">z</span> <span class="op">&lt;-</span> <span class="fl">0.8</span> <span class="op">*</span> <span class="va">dat</span><span class="op">$</span><span class="va">x</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">360</span>, sd <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span></span></code></pre></div>
 <p>The response combines positive linear effects of <code>x</code> and
-<code>z</code>, a sine wave in <code>w</code>, differences between
-groups and Gaussian noise. Every observation in a group shares the same
-random intercept. Because the two linear effects tend to increase
-together, their covariance will contribute to the total variance.</p>
+<code>z</code> with a sine wave in <code>w</code>. Add a Gaussian random
+intercept with standard deviation 0.6, shared by all observations in the
+same group, and independent Gaussian noise with standard deviation 0.4
+for each observation. The two linear effects tend to increase together,
+so their covariance increases the variance of their sum.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">group_effect</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">12</span>, sd <span class="op">=</span> <span class="fl">0.6</span><span class="op">)</span></span>
 <span><span class="va">dat</span><span class="op">$</span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fl">2</span> <span class="op">*</span> <span class="va">dat</span><span class="op">$</span><span class="va">x</span> <span class="op">+</span> <span class="fl">1.5</span> <span class="op">*</span> <span class="va">dat</span><span class="op">$</span><span class="va">z</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">sin</a></span><span class="op">(</span><span class="fl">2</span> <span class="op">*</span> <span class="va">pi</span> <span class="op">*</span> <span class="va">dat</span><span class="op">$</span><span class="va">w</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="va">group_effect</span><span class="op">[</span><span class="va">dat</span><span class="op">$</span><span class="va">group</span><span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">360</span>, sd <span class="op">=</span> <span class="fl">0.4</span><span class="op">)</span></span></code></pre></div>
-<p>We fit linear terms for <code>x</code> and <code>z</code>, a smooth
-for <code>w</code> and a random intercept for <code>group</code>. This
-gives us both unpenalised terms and terms with penalties to compare:</p>
+<p>Fit a model with unpenalised linear terms for <code>x</code> and
+<code>z</code>, a smooth for <code>w</code> and a random intercept for
+<code>group</code>.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="va">x</span> <span class="op">+</span> <span class="va">z</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">w</span>, k <span class="op">=</span> <span class="fl">8</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">group</span>, bs <span class="op">=</span> <span class="st">"re"</span><span class="op">)</span>,</span>
 <span>  data <span class="op">=</span> <span class="va">dat</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
-<h2 id="two-kinds-of-variance">Two kinds of variance<a class="anchor" aria-label="anchor" href="#two-kinds-of-variance"></a>
+<h2 id="extract-penalty-variances-and-variances-of-fitted-terms">Extract penalty variances and variances of fitted terms<a class="anchor" aria-label="anchor" href="#extract-penalty-variances-and-variances-of-fitted-terms"></a>
 </h2>
-<p>We first extract the penalty variances, which describe shrinkage of
-the penalised coefficients. The <code>.lower_ci</code> and
-<code>.upper_ci</code> columns give interval limits for standard
-deviations:</p>
+<p>First extract the penalty variances, which describe shrinkage of the
+penalised coefficients. The <code>.lower_ci</code> and
+<code>.upper_ci</code> columns give interval limits on the standard
+deviation scale.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">vc_penalty</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/variance_comp.html">variance_comp</a></span><span class="op">(</span><span class="va">model</span>, type <span class="op">=</span> <span class="st">"penalty"</span><span class="op">)</span></span>
 <span><span class="va">vc_penalty</span></span>
@@ -138,18 +144,17 @@ deviations:</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> s(w)         139.      11.8       6.51     21.3  </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> s(group)       0.293    0.542     0.354     0.829</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> scale          0.157    0.397     0.368     0.428</span></span></code></pre></div>
-<p>Penalty variances are <span class="math inline">\phi /
-\lambda_j</span>: the model scale divided by the smoothing parameter. By
-default, the calculation undoes the rescaling that <code>mgcv</code>
-applies to penalties during fitting. Larger variances mean less
-shrinkage of the coefficients affected by that penalty. A smooth can
-have several penalties, each with its own row. Unpenalised terms such as
-<code>x</code> and <code>z</code> are omitted. For this Gaussian model,
-<code>scale</code> is the estimated residual variance.</p>
-<p>With <code>type = "terms"</code>, we instead measure how much each
-term’s fitted values vary across the observations used to fit the model.
-We use 1,000 coefficient draws for intervals and set a seed to make them
-reproducible:</p>
+<p>A penalty variance is the model scale <span class="math inline">\phi</span> divided by the smoothing parameter <span class="math inline">\lambda_j</span>. By default, the function expresses
+<span class="math inline">\lambda_j</span> on the scale of the original
+penalty matrix, undoing the rescaling mgcv applies during fitting. For a
+given penalty, a larger variance corresponds to less shrinkage. There is
+one row per penalty, so a smooth can have several rows. For this
+Gaussian model the <code>scale</code> row gives the estimated residual
+variance.</p>
+<p>With <code>type = "terms"</code>, we measure how much each term’s
+fitted contribution varies across the observations used to fit the
+model. We use 1,000 draws of the coefficients to calculate intervals and
+set a seed to make the draws reproducible.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">vc_terms</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/variance_comp.html">variance_comp</a></span><span class="op">(</span><span class="va">model</span>, type <span class="op">=</span> <span class="st">"terms"</span>, n_draws <span class="op">=</span> <span class="fl">1000</span>, seed <span class="op">=</span> <span class="fl">42</span><span class="op">)</span></span>
 <span><span class="va">vc_terms</span></span>
@@ -163,20 +168,23 @@ reproducible:</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> total          3.83     1.96      1.91      2.00       1     </span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 2 more variables: .proportion_lower_ci &lt;dbl&gt;, .proportion_upper_ci &lt;dbl&gt;</span></span></span></code></pre></div>
 <p>These are sample variances on the linear predictor scale, with each
-observation counted equally. The output includes parametric terms and
-one row for each smooth, regardless of how many penalties it has. It
-excludes intercepts, offsets and residual variation.</p>
+observation counted equally. The output includes unpenalised terms and
+has one row for each smooth, even if it has several penalties.
+Intercepts, offsets and residual variation are excluded from the
+calculation.</p>
 </div>
 <div class="section level2">
-<h2 id="totals-and-proportions">Totals and proportions<a class="anchor" aria-label="anchor" href="#totals-and-proportions"></a>
+<h2 id="account-for-covariance-when-comparing-terms">Account for covariance when comparing terms<a class="anchor" aria-label="anchor" href="#account-for-covariance-when-comparing-terms"></a>
 </h2>
 <p>The variance of the sum depends on both the term variances and their
 covariances. Let <span class="math inline">f_j</span> be term <span class="math inline">j</span>’s fitted values, <span class="math inline">F = \sum_j f_j</span> their sum, and <span class="math inline">C</span> their covariance matrix. Then</p>
 <p><span class="math display">
 \operatorname{Var}(F) = \sum_j C_{jj} + 2\sum_{j&lt;k} C_{jk}.
 </span></p>
-<p>We retrieve the covariance matrix stored in the result to compare the
-sum of term variances with the total, which includes covariance:</p>
+<p>The result stores the covariance matrix of the fitted contributions
+across observations. Summing its diagonal gives the sum of the term
+variances. Summing all entries also accounts for covariance, so it gives
+the total variance of the combined contributions.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">C</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">vc_terms</span>, <span class="st">"covariance"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>sum_of_term_variances <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="va">C</span><span class="op">)</span><span class="op">)</span>,</span>
@@ -185,34 +193,36 @@ sum of term variances with the total, which includes covariance:</p>
 <span><span class="co">#&gt;                   2.588591                   3.829474</span></span></code></pre></div>
 <p>To divide the total among terms, we split each covariance
 contribution, <span class="math inline">2C_{jk}</span>, equally between
-the two terms. Each term’s proportion is then <span class="math inline">p_j = \operatorname{Cov}(f_j, F) /
-\operatorname{Var}(F)</span>. The individual terms’ proportions sum to
-one. We check this using <code>include_total = FALSE</code> to omit the
-total row and <code>n_draws = 0</code> to skip interval
-calculations:</p>
+the two terms. Each term receives its own variance plus its covariance
+with every other term, expressed as the proportion <span class="math inline">p_j = \operatorname{Cov}(f_j, F) /
+\operatorname{Var}(F)</span>. When the total variance is positive, the
+proportions sum to one. Check this by computing only the individual
+proportions with <code>include_total = FALSE</code> and skipping
+interval calculation with <code>n_draws = 0</code>.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">vc_no_total</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/variance_comp.html">variance_comp</a></span><span class="op">(</span><span class="va">model</span>, type <span class="op">=</span> <span class="st">"terms"</span>, include_total <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  n_draws <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">vc_no_total</span><span class="op">$</span><span class="va">.proportion</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 1</span></span></code></pre></div>
-<p>Penalty intervals use uncertainty in the estimated smoothing
-parameters and model scale. For term intervals, we draw all coefficients
-together from their approximate Gaussian posterior distribution. We
-recompute fitted values, variances and proportions for each draw,
-preserving dependence between terms. By default, the smoothing
-parameters stay fixed at their estimates.
-<code>unconditional = TRUE</code> adjusts for their uncertainty when
-that adjustment is available for the fitted model. The proportions from
-each draw are in <code>attr(vc_terms, "proportion_draws")$total</code>.
-Interval limits summarise each term separately and need not sum to
+<p>Intervals for the penalty variances account for uncertainty in the
+estimated smoothing parameters and model scale. For intervals on the
+fitted term variances, we draw all coefficients together from their
+approximate Gaussian posterior distribution. We recompute the fitted
+contributions and their variances and proportions for each draw. The
+smoothing parameters stay fixed at their estimates by default. Use
+<code>unconditional = TRUE</code> to include a correction for
+uncertainty in smoothing parameter estimates when the fitted model
+supports it. The proportions from each draw are in
+<code>attr(vc_terms, "proportion_draws")$total</code>. The interval
+limits describe each term separately, so the limits need not sum to
 one.</p>
 </div>
 <div class="section level2">
-<h2 id="plotting">Plotting<a class="anchor" aria-label="anchor" href="#plotting"></a>
+<h2 id="plot-term-variances-and-their-proportions">Plot term variances and their proportions<a class="anchor" aria-label="anchor" href="#plot-term-variances-and-their-proportions"></a>
 </h2>
-<p>We plot variances, including the total, alongside proportions for the
-individual terms. Both plots show intervals, with terms on the
-x-axis:</p>
+<p>Use {patchwork} to show the variances, including the total, alongside
+the proportions for the individual terms. Both plots show intervals,
+with terms on the x-axis.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">patchwork</span><span class="fu">::</span><span class="fu"><a href="https://patchwork.data-imaginist.com/reference/wrap_plots.html" class="external-link">wrap_plots</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">vc_terms</span><span class="op">)</span>,</span>
@@ -228,17 +238,17 @@ standard deviation limits when plotting variances. Use
 to rotate them, or <code>flip = TRUE</code> to put terms on the
 y-axis.</p>
 <div class="section level3">
-<h3 id="negative-proportions">Negative proportions<a class="anchor" aria-label="anchor" href="#negative-proportions"></a>
+<h3 id="why-a-terms-proportion-can-be-negative">Why a term’s proportion can be negative<a class="anchor" aria-label="anchor" href="#why-a-terms-proportion-can-be-negative"></a>
 </h3>
 <p>To show how a proportion can be negative, we reuse the correlated
 <code>x</code> and <code>z</code> but give their effects opposite signs.
 The new response combines <code>2 * x - z</code> with Gaussian noise of
-standard deviation 0.1, so the two effects partly cancel each other:</p>
+standard deviation 0.1, so the two effects partly cancel each other.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">208</span><span class="op">)</span></span>
 <span><span class="va">dat</span><span class="op">$</span><span class="va">contrast</span> <span class="op">&lt;-</span> <span class="fl">2</span> <span class="op">*</span> <span class="va">dat</span><span class="op">$</span><span class="va">x</span> <span class="op">-</span> <span class="va">dat</span><span class="op">$</span><span class="va">z</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">dat</span><span class="op">)</span>, sd <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span></span></code></pre></div>
-<p>We fit both linear terms and plot their proportions with intervals,
-omitting the total row:</p>
+<p>Fit both linear terms and plot their proportions with intervals,
+omitting the total row.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">opposing</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="va">contrast</span> <span class="op">~</span> <span class="va">x</span> <span class="op">+</span> <span class="va">z</span>, data <span class="op">=</span> <span class="va">dat</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span>
 <span><span class="va">vc_opposing</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/variance_comp.html">variance_comp</a></span><span class="op">(</span><span class="va">opposing</span>, type <span class="op">=</span> <span class="st">"terms"</span>, n_draws <span class="op">=</span> <span class="fl">1000</span>, seed <span class="op">=</span> <span class="fl">43</span><span class="op">)</span></span>
@@ -246,9 +256,12 @@ omitting the total row:</p>
 <p><img src="variance-components_files/figure-html/opposing-terms-1.png" class="r-plt" alt="" width="700"></p>
 <p>Their negative covariance reduces the variance of their sum.
 Accounting for this covariance gives <code>x</code> a share of 1.5 and
-<code>z</code> a share of -0.5. Proportions can therefore exceed one or
-be negative. They are undefined (<code>NA</code>) when the total
-variance is zero.</p>
+<code>z</code> a share of -0.5. In this example <code>z</code> gets a
+negative proportion because its covariance with the contribution of
+<code>x</code> is more negative than its own variance is positive. The
+proportions still sum to one, so <code>x</code> gets a proportion
+greater than one. When the total variance is zero, the proportions are
+undefined (<code>NA</code>).</p>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

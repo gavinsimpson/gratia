@@ -26,7 +26,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-73</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-75</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -55,13 +55,13 @@
     <li><a class="dropdown-item" href="../articles/shape-constrained-intervals.html">Intervals for shape-constrained smooths</a></li>
     <li><a class="dropdown-item" href="../articles/spatial-smooths.html">Choose a smooth for the spatial question</a></li>
     <li><a class="dropdown-item" href="../articles/response-distributions.html">Checking different response distributions</a></li>
-    <li><a class="dropdown-item" href="../articles/transformed-covariates.html">Functions of covariates and evaluation environments</a></li>
+    <li><a class="dropdown-item" href="../articles/transformed-covariates.html">Predictions, plots and derivatives with transformed covariates</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Essentials</h6></li>
-    <li><a class="dropdown-item" href="../articles/data-slices.html">Data slices</a></li>
-    <li><a class="dropdown-item" href="../articles/custom-plotting.html">Customizing plots</a></li>
+    <li><a class="dropdown-item" href="../articles/data-slices.html">Creating prediction grids with data_slice()</a></li>
+    <li><a class="dropdown-item" href="../articles/custom-plotting.html">Customising plots</a></li>
     <li><a class="dropdown-item" href="../articles/posterior-simulation.html">Posterior Simulation</a></li>
-    <li><a class="dropdown-item" href="../articles/sampling-migration.html">Migrating posterior sampling calls</a></li>
+    <li><a class="dropdown-item" href="../articles/sampling-migration.html">Updating sampling code for gratia 0.12.0</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
@@ -93,16 +93,12 @@
 
     
     
-<p>gratia supports scam’s univariate and bivariate shape-constrained
-smooth constructors, including cyclic margins, endpoint constraints,
-local constraints, <code>by</code> smooths and smooth interactions. This
-includes the <code>tedi</code> and <code>teid</code> tensor constructors
-introduced in scam 1.2-23, which constrain one covariate’s effect to
-increase and the other’s to decrease. These two constructors require a
-scam version that provides them. Ordinary mgcv smooths fitted through
-<code><a href="https://rdrr.io/pkg/scam/man/scam.html" class="external-link">scam()</a></code> are also supported. The same fitted coefficient
-mapping is used for smooth estimates, bases, derivatives, predictions
-and sampled smooths.</p>
+<p>This article shows how to plot smooths fitted with {scam}, extract
+estimates and intervals, sample fitted functions, and check predictions.
+We use increasing effects of two covariates to illustrate these
+operations. {gratia} also supports scam’s other one- and two-dimensional
+shape-constrained smooths and ordinary {mgcv} smooths fitted through
+<code><a href="https://rdrr.io/pkg/scam/man/scam.html" class="external-link">scam()</a></code>.</p>
 <p>We load gratia and scam before simulating the example.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://gavinsimpson.github.io/gratia/">"gratia"</a></span><span class="op">)</span></span>
@@ -124,45 +120,45 @@ estimated contributions.</p>
 <span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span></span></code></pre></div>
 <p><img src="scam-support_files/figure-html/fit-model-1.png" class="r-plt" alt="" width="700"></p>
 <div class="section level2">
-<h2 id="fitted-functions-and-native-plots">Fitted functions and native plots<a class="anchor" aria-label="anchor" href="#fitted-functions-and-native-plots"></a>
+<h2 id="plot-smooth-contributions">Plot smooth contributions<a class="anchor" aria-label="anchor" href="#plot-smooth-contributions"></a>
 </h2>
-<p>Plot captions describe basis and shape separately. Increasing and
-decreasing constraints use arrows; tensor captions name the covariate
-for each constraint. Local constraints show their fitted change point.
-These captions are also available when drawing saved
-<code><a href="../reference/smooth_estimates.html">smooth_estimates()</a></code>. The <code>.type</code> column and
-<code><a href="../reference/smooth_type.html">smooth_type()</a></code> retain compact ASCII labels such as
-<code>P spline (inc)</code> and <code>Tensor (inc, free)</code>.</p>
-<p>By default, <code><a href="../reference/draw.html">draw()</a></code> retains the fitted function’s
-centring. Evaluating a smooth on a different grid therefore evaluates
-the same function. This agrees with scam’s univariate plots. Its
-bivariate plots instead subtract the mean of the evaluated surface. Use
-<code>centre = "plot"</code> to match that convention; both estimates
-and their covariance receive the same centring operation.
-<code><a href="../reference/assemble.html">assemble()</a></code> accepts the same argument. Match grids and
-exclusion distances when comparing plots from the two packages.</p>
+<p>The captions identify the spline basis and its shape constraints.
+Arrows indicate increasing or decreasing effects. For a tensor product
+smooth, the caption identifies the constraint on each covariate. The
+same captions appear when drawing estimates saved with
+<code><a href="../reference/smooth_estimates.html">smooth_estimates()</a></code>.</p>
+<p>By default, <code><a href="../reference/draw.html">draw()</a></code> uses the fitted smooth’s centring, so
+the plotted value at a given location stays the same if you change the
+evaluation grid. For bivariate smooths, scam subtracts the average
+across the plotted grid. Use <code>centre = "plot"</code> to match that
+convention in <code><a href="../reference/draw.html">draw()</a></code> or <code><a href="../reference/assemble.html">assemble()</a></code>. The
+following example fits a surface that increases with both covariates and
+centres it on the plotted grid.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">b</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scam/man/scam.html" class="external-link">scam</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">z</span>, bs <span class="op">=</span> <span class="st">"tedmi"</span>, k <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">5</span><span class="op">)</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">d</span>,</span>
 <span>  not.exp <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">b</span>, centre <span class="op">=</span> <span class="st">"plot"</span>, n_2d <span class="op">=</span> <span class="fl">40</span><span class="op">)</span></span></code></pre></div>
 <p><img src="scam-support_files/figure-html/surface-1.png" class="r-plt" alt="" width="700"></p>
-<p>scam’s default univariate limits use two standard errors; gratia’s
-default 95% normal limits use <code>qnorm(0.975)</code>. Some scam
-smooth classes also use a different coefficient gradient for the
-displayed function and its standard error. gratia computes uncertainty
-for the actual function it returns, using its coefficient gradient. This
-can produce different limits even when the fitted curves agree.</p>
+<p>For univariate smooths, scam uses two standard errors for its default
+limits. gratia uses <code>qnorm(0.975)</code> for 95% normal limits. The
+packages can also calculate different standard errors for the same
+curve. gratia uses the derivative of the plotted function with respect
+to the fitted coefficients to calculate how their uncertainty affects
+the curve.</p>
 </div>
 <div class="section level2">
-<h2 id="conditional-uncertainty-and-sampled-functions">Conditional uncertainty and sampled functions<a class="anchor" aria-label="anchor" href="#conditional-uncertainty-and-sampled-functions"></a>
+<h2 id="estimate-intervals-derivatives-and-sampled-functions">Estimate intervals, derivatives and sampled functions<a class="anchor" aria-label="anchor" href="#estimate-intervals-derivatives-and-sampled-functions"></a>
 </h2>
-<p>Pointwise intervals, simultaneous smooth bands, smooth derivatives
-and contrasts use scam’s covariance for the transformed coefficients
-(<code>Vp.t</code>, or <code>Ve.t</code> with
-<code>frequentist = TRUE</code>). These are local Gaussian or delta
-approximations, conditional on the fitted smoothing parameters.
-Including intercept uncertainty is controlled by
-<code>overall_uncertainty</code>.</p>
+<p>For intervals and derivatives, gratia uses the covariance of the
+coefficients after scam applies its shape constraints. The intervals use
+local normal approximations, with the smoothing parameters held at their
+fitted values. <code>frequentist = TRUE</code> selects the frequentist
+covariance. Use <code>overall_uncertainty = FALSE</code> to leave out
+the intercept’s uncertainty. First extract pointwise smooth intervals,
+estimate the slope of the <code>x</code> smooth, and request a
+simultaneous band for that smooth. A simultaneous band describes
+uncertainty over the evaluated curve, whereas the pointwise limits apply
+to each location separately.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">e</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/smooth_estimates.html">smooth_estimates</a></span><span class="op">(</span><span class="va">m</span>, overall_uncertainty <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="va">e</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_confint.html">add_confint</a></span><span class="op">(</span><span class="va">e</span><span class="op">)</span></span>
@@ -206,22 +202,24 @@ Including intercept uncertainty is controlled by
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> s(x)    P spline (i… <span style="color: #BB0000;">NA</span>    0.085<span style="text-decoration: underline;">6</span>     -<span style="color: #BB0000;">0.641</span> 0.028<span style="text-decoration: underline;">3</span>  2.85    -<span style="color: #BB0000;">0.722</span>    -<span style="color: #BB0000;">0.560</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> s(x)    P spline (i… <span style="color: #BB0000;">NA</span>    0.095<span style="text-decoration: underline;">5</span>     -<span style="color: #BB0000;">0.631</span> 0.028<span style="text-decoration: underline;">1</span>  2.85    -<span style="color: #BB0000;">0.712</span>    -<span style="color: #BB0000;">0.551</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 90 more rows</span></span></span></code></pre></div>
-<p>Coefficient sampling uses a different approximation: draw a Gaussian
-vector in the unrestricted fitting coordinates using <code>Vp</code> (or
-<code>Ve</code>), then apply the positivity transformation used in the
-fit. This preserves the fitted shape constraints. This is a Gaussian
-approximation in fitting coordinates, rather than an exact constrained
-posterior. Because the transformation is nonlinear, these samples need
-not have the mean or covariance used for analytic intervals. Individual
-analytic interval endpoints need not satisfy the shape constraint.</p>
-<p>Fitted, smooth, derivative and response sampling functions project
-these same transformed coefficient draws.
-<code><a href="../reference/response_derivatives.html">response_derivatives()</a></code> also uses them with its default
-<code>uncertainty = "simulation"</code>;
-<code>uncertainty = "delta"</code> instead uses the local
-transformed-coefficient covariance.</p>
+<p>scam fits unconstrained parameters and transforms some of them to
+positive coefficients to enforce the smooth’s shape. Coefficient
+sampling draws from a normal approximation for those unconstrained
+parameters, then applies the same transformation. This preserves the
+shape constraints in every sampled curve. Because the transformation is
+nonlinear, the samples and the analytic intervals use different
+uncertainty approximations. In particular, the endpoints of an analytic
+interval need not satisfy the fitted shape constraint.</p>
+<p>Use <code><a href="../reference/gaussian_draws.html">gaussian_draws()</a></code> to obtain a matrix with one
+coefficient vector per row. Check its dimensions to confirm the number
+of draws and coefficients. <code><a href="../reference/smooth_samples.html">smooth_samples()</a></code> evaluates
+sampled smooth curves directly. We produce five draws of each smooth and
+plot them with <code><a href="../reference/draw.html">draw()</a></code> to see how the curves vary while
+retaining the fitted shape constraints.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">draws</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/gaussian_draws.html">gaussian_draws</a></span><span class="op">(</span><span class="va">m</span>, n_draws <span class="op">=</span> <span class="fl">100</span>, seed <span class="op">=</span> <span class="fl">54</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">draws</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 100  15</span></span>
 <span><span class="va">samples</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/smooth_samples.html">smooth_samples</a></span><span class="op">(</span><span class="va">m</span>, n_draws <span class="op">=</span> <span class="fl">5</span>, seed <span class="op">=</span> <span class="fl">55</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">samples</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 9</span></span></span>
@@ -232,57 +230,88 @@ transformed-coefficient covariance.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> s(x)    s(x)  P spline (inc) <span style="color: #BB0000;">NA</span>        1     3 -<span style="color: #BB0000;">0.749</span> 0.005<span style="text-decoration: underline;">91</span>    <span style="color: #BB0000;">NA</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> s(x)    s(x)  P spline (inc) <span style="color: #BB0000;">NA</span>        1     4 -<span style="color: #BB0000;">0.922</span> 0.005<span style="text-decoration: underline;">91</span>    <span style="color: #BB0000;">NA</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> s(x)    s(x)  P spline (inc) <span style="color: #BB0000;">NA</span>        1     5 -<span style="color: #BB0000;">0.898</span> 0.005<span style="text-decoration: underline;">91</span>    <span style="color: #BB0000;">NA</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> s(x)    s(x)  P spline (inc) <span style="color: #BB0000;">NA</span>        2     1 -<span style="color: #BB0000;">0.985</span> 0.010<span style="text-decoration: underline;">9</span>     <span style="color: #BB0000;">NA</span></span></span></code></pre></div>
-<p><code>method = "user"</code> requires finite draws in the transformed
-coordinates, with columns in <code>coef(m)</code> order and nonnegative
-constrained coefficients.
-<code>gaussian_draws(m, parametrized = FALSE)</code> returns
-unrestricted draws for inspection; these cannot be supplied as
-transformed draws. A singular positive semidefinite covariance is
-supported. A materially indefinite covariance is rejected. When a very
-large unrestricted variance causes the exponential transformation to
-overflow, sampling reports an error; it does not truncate those draws.
-Finite transformed draws from an appropriate alternative sampler can
-still be supplied.</p>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> s(x)    s(x)  P spline (inc) <span style="color: #BB0000;">NA</span>        2     1 -<span style="color: #BB0000;">0.985</span> 0.010<span style="text-decoration: underline;">9</span>     <span style="color: #BB0000;">NA</span></span></span>
+<span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">samples</span><span class="op">)</span></span></code></pre></div>
+<p><img src="scam-support_files/figure-html/samples-1.png" class="r-plt" alt="" width="700"></p>
+<p>The <code>.smooth</code> column identifies the smooth,
+<code>.draw</code> identifies the coefficient draw, and
+<code>.value</code> gives the sampled function’s value at each covariate
+value. Fitted, derivative and response sampling functions use the same
+coefficient transformation. See <code><a href="../reference/smooth_samples.html">smooth_samples()</a></code> and
+<code><a href="../reference/gaussian_draws.html">gaussian_draws()</a></code> for the returned columns and options for
+supplying your own coefficient draws.</p>
+</div>
+<div class="section level2">
+<h2 id="predictions-and-model-checks">Predictions and model checks<a class="anchor" aria-label="anchor" href="#predictions-and-model-checks"></a>
+</h2>
+<p>To predict the mean response as <code>x</code> varies, use
+<code><a href="../reference/conditional_values.html">conditional_values()</a></code>. It combines both smooths and the
+intercept, holding <code>z</code> at the observed value closest to its
+median. The bands show uncertainty in the mean response.</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">predictions</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/conditional_values.html">conditional_values</a></span><span class="op">(</span><span class="va">m</span>, condition <span class="op">=</span> <span class="st">"x"</span><span class="op">)</span></span>
+<span><span class="va">predictions</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 100 × 8</span></span></span>
+<span><span class="co">#&gt;     .row       x     z .parameter .fitted    .se .lower_ci .upper_ci</span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>     1 0.005<span style="text-decoration: underline;">91</span> 0.555 mean          1.52 0.057<span style="text-decoration: underline;">2</span>      1.41      1.63</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>     2 0.015<span style="text-decoration: underline;">9</span>  0.555 mean          1.53 0.050<span style="text-decoration: underline;">2</span>      1.43      1.63</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>     3 0.025<span style="text-decoration: underline;">8</span>  0.555 mean          1.54 0.044<span style="text-decoration: underline;">4</span>      1.45      1.63</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>     4 0.035<span style="text-decoration: underline;">8</span>  0.555 mean          1.55 0.039<span style="text-decoration: underline;">8</span>      1.47      1.63</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>     5 0.045<span style="text-decoration: underline;">7</span>  0.555 mean          1.56 0.036<span style="text-decoration: underline;">2</span>      1.49      1.63</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>     6 0.055<span style="text-decoration: underline;">7</span>  0.555 mean          1.57 0.033<span style="text-decoration: underline;">6</span>      1.50      1.63</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>     7 0.065<span style="text-decoration: underline;">7</span>  0.555 mean          1.58 0.031<span style="text-decoration: underline;">9</span>      1.51      1.64</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>     8 0.075<span style="text-decoration: underline;">6</span>  0.555 mean          1.59 0.030<span style="text-decoration: underline;">8</span>      1.53      1.65</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>     9 0.085<span style="text-decoration: underline;">6</span>  0.555 mean          1.59 0.030<span style="text-decoration: underline;">3</span>      1.54      1.65</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>    10 0.095<span style="text-decoration: underline;">5</span>  0.555 mean          1.60 0.030<span style="text-decoration: underline;">2</span>      1.55      1.66</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 90 more rows</span></span></span>
+<span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">predictions</span><span class="op">)</span></span></code></pre></div>
+<p><img src="scam-support_files/figure-html/conditional-predictions-1.png" class="r-plt" alt="" width="700"></p>
+<p>Use <code><a href="../reference/appraise.html">appraise()</a></code> to check how the model describes the
+observed responses. Here, quantile residuals compare each observation
+with its fitted Gaussian distribution. Look for departures from the
+reference line in the QQ plot and for changes in the spread of residuals
+across the linear predictor.</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/appraise.html">appraise</a></span><span class="op">(</span><span class="va">m</span>, type <span class="op">=</span> <span class="st">"quantile"</span>, seed <span class="op">=</span> <span class="fl">56</span><span class="op">)</span></span></code></pre></div>
+<p><img src="scam-support_files/figure-html/model-checks-1.png" class="r-plt" alt="" width="700"></p>
+<p>The <a href="model-checking.html">model diagnostics article</a>
+explains how to interpret the panels and their reference bands.</p>
 </div>
 <div class="section level2">
 <h2 id="other-gam-operations">Other GAM operations<a class="anchor" aria-label="anchor" href="#other-gam-operations"></a>
 </h2>
-<p>Supported methods include model summaries and term extraction,
-parametric effects, fitted and conditional predictions, smooth
-differences, analytic response derivatives, accumulated local effects,
-residual helpers, concurvity, penalties and response diagnostics.
-<code><a href="../reference/lp_matrix.html">lp_matrix()</a></code> and <code><a href="https://rdrr.io/r/stats/model.matrix.html" class="external-link">model.matrix()</a></code> return a design
-whose columns match <code>coef(m)</code>. Formula expressions retain
-their fitted prediction parameters, formula offsets are evaluated on new
-data, and training predictions also retain an <code>offset</code>
-argument used in fitting. Missing-row handling is shared across these
-methods.</p>
-<p>Likelihood evaluation and LOO/WAIC use the supported
-independent-response family adapters, conditional on smoothing and other
-fitted family parameters. They use the same coefficient sampling
-approximation described above. <code><a href="../reference/variance_comp.html">variance_comp()</a></code> reports
-response scale divided by smoothing parameters; these ratios describe
-penalties on unrestricted fitting parameters. They are not Gaussian
-variances of the transformed smooth coefficients, and their confidence
-limits are unavailable.</p>
+<p>Many gratia methods for GAMs also work with scam fits, including
+smooth differences, response derivatives and concurvity. For custom
+predictions, <code><a href="../reference/lp_matrix.html">lp_matrix()</a></code> and <code><a href="https://rdrr.io/r/stats/model.matrix.html" class="external-link">model.matrix()</a></code>
+return a model matrix whose columns match <code>coef(m)</code>. When
+predicting with new data, gratia reuses any constants estimated when
+evaluating formula terms, such as means from <code><a href="https://rdrr.io/r/base/scale.html" class="external-link">scale()</a></code>, and
+evaluates offsets specified in the formula. Predictions at the original
+observations also retain offsets supplied through the
+<code>offset</code> argument.</p>
+<p>For supported response families with independent observations,
+leave-one-out cross-validation (LOO) and WAIC use the coefficient
+sampling approximation described above. Smoothing parameters and other
+fitted family parameters stay fixed. <code><a href="../reference/variance_comp.html">variance_comp()</a></code>
+reports the fitted response scale divided by each smoothing parameter.
+These ratios describe the penalties on the coefficients before
+transformation.</p>
 <p>For Gaussian identity-link fits with AR1 dependence, response
 simulation uses the fitted correlation and <code>AR.start</code> series
-boundaries, including observation weights. It requires the fitting
-observations: a joint correlation structure for arbitrary new data is
-not defined. Other families with scam’s working AR1 correction do not
-automatically have a joint response simulator. Independent pointwise
-likelihood adapters reject correlated fits.</p>
-<p>GCV and UBRE fits do not supply the smoothing-parameter covariance
-needed for <code>unconditional = TRUE</code>, unconditional EDF, or
-likelihood-based confidence limits for variance components. MH and INLA
-coefficient sampling are also unavailable.
-<code>model_edf(type = "unconditional")</code> follows the shared GAM
-convention: it warns and returns standard EDF when the correction is
-missing. Automatic <code>interval_method = "shape"</code> integration
-remains specific to supported <code><a href="https://rdrr.io/pkg/mgcv/man/scasm.html" class="external-link">scasm()</a></code> smooths;
-<code><a href="../reference/shape_intervals.html">shape_intervals()</a></code> can be used explicitly on supplied
-estimates and grids when its named shape restrictions apply.</p>
+boundaries, including observation weights. Supply the original
+observations so that the simulator can use their order and series
+boundaries. For other families, scam’s working AR1 correction alone does
+not define a joint response distribution. The likelihood methods for
+independent observations require a fit without AR1 dependence.</p>
+<p>For GCV and UBRE fits, the covariance needed to include smoothing
+parameter uncertainty is unavailable. If you request
+<code>model_edf(type = "unconditional")</code> for these fits, gratia
+warns and returns the usual effective degrees of freedom. Confidence
+limits for the penalty-based variance components and MH and INLA
+coefficient sampling are unavailable for scam fits. To impose a
+supported shape restriction on an interval for a scam smooth, supply
+estimates and a grid directly to <code><a href="../reference/shape_intervals.html">shape_intervals()</a></code>.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

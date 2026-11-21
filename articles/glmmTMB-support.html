@@ -26,7 +26,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-73</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-75</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -55,13 +55,13 @@
     <li><a class="dropdown-item" href="../articles/shape-constrained-intervals.html">Intervals for shape-constrained smooths</a></li>
     <li><a class="dropdown-item" href="../articles/spatial-smooths.html">Choose a smooth for the spatial question</a></li>
     <li><a class="dropdown-item" href="../articles/response-distributions.html">Checking different response distributions</a></li>
-    <li><a class="dropdown-item" href="../articles/transformed-covariates.html">Functions of covariates and evaluation environments</a></li>
+    <li><a class="dropdown-item" href="../articles/transformed-covariates.html">Predictions, plots and derivatives with transformed covariates</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Essentials</h6></li>
-    <li><a class="dropdown-item" href="../articles/data-slices.html">Data slices</a></li>
-    <li><a class="dropdown-item" href="../articles/custom-plotting.html">Customizing plots</a></li>
+    <li><a class="dropdown-item" href="../articles/data-slices.html">Creating prediction grids with data_slice()</a></li>
+    <li><a class="dropdown-item" href="../articles/custom-plotting.html">Customising plots</a></li>
     <li><a class="dropdown-item" href="../articles/posterior-simulation.html">Posterior Simulation</a></li>
-    <li><a class="dropdown-item" href="../articles/sampling-migration.html">Migrating posterior sampling calls</a></li>
+    <li><a class="dropdown-item" href="../articles/sampling-migration.html">Updating sampling code for gratia 0.12.0</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
@@ -94,26 +94,26 @@
     
     
 <p>A smooth describes a relationship without requiring it to be linear.
-glmmTMB can estimate these relationships alongside its other model
-components, and gratia can now extract and display their effects. The
+{glmmTMB} can estimate these relationships alongside its other model
+components, and {gratia} can extract and display their effects. The
 examples below ask how annual river flow changes over time and how
 plants respond to increasing carbon dioxide concentration. The second
 example also accounts for measurements on the same plant.</p>
 <p>This article needs the optional package glmmTMB, with support for
 <code><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">mgcv::s()</a></code> terms; the examples require glmmTMB 1.1.15.2 or
-later and mgcv 1.9-4. Smooth fitting remains experimental in glmmTMB.
+later and {mgcv} 1.9-4. Smooth fitting remains experimental in glmmTMB.
 Its <a href="https://glmmtmb.github.io/glmmTMB/reference/glmmTMB.html" class="external-link">fitting
-documentation</a> recommends <code>REML = TRUE</code>. Use an
-unqualified <code>s()</code> in the formula after attaching mgcv, rather
-than replacing the smooth with an unpenalised spline basis. The
-smoothing penalty is estimated during fitting.</p>
+documentation</a> recommends <code>REML = TRUE</code>. Attach mgcv and
+write <code><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s()</a></code> in the model formula so glmmTMB can recognise the
+smooth and estimate its smoothing penalty. We also load {ggplot2} to
+plot the data and predictions.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://gavinsimpson.github.io/gratia/">"gratia"</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/load_mgcv.html">load_mgcv</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://github.com/glmmTMB/glmmTMB" class="external-link">"glmmTMB"</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://ggplot2.tidyverse.org" class="external-link">"ggplot2"</a></span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
-<h2 id="how-did-the-mean-annual-flow-of-the-nile-change">How did the mean annual flow of the Nile change?<a class="anchor" aria-label="anchor" href="#how-did-the-mean-annual-flow-of-the-nile-change"></a>
+<h2 id="fit-a-smooth-trend-in-annual-river-flow">Fit a smooth trend in annual river flow<a class="anchor" aria-label="anchor" href="#fit-a-smooth-trend-in-annual-river-flow"></a>
 </h2>
 <p>The <a href="https://stat.ethz.ch/R-manual/R-devel/library/datasets/html/Nile.html" class="external-link">Nile
 data</a> contain 100 annual flow measurements at Aswan from 1871 to
@@ -135,10 +135,11 @@ glmmTMB documentation, name the variables <code>year</code> and
 point for departures around a smooth mean, provided its residual spread
 is reasonably stable. The observations are a time series, so
 independence needs checking; year appearing in a smooth does not itself
-model residual serial dependence.</p>
+model residual serial dependence. Fit the same Gaussian smooth with mgcv
+and glmmTMB so we can compare the extracted effects and predictions.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">nile_gam</span> <span class="op">&lt;-</span> <span class="fu">gam</span><span class="op">(</span><span class="va">flow</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">year</span>, k <span class="op">=</span> <span class="fl">10</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">nile</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span>
-<span><span class="va">nile_tmb</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/glmmTMB/man/glmmTMB.html" class="external-link">glmmTMB</a></span><span class="op">(</span><span class="va">flow</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">year</span>, k <span class="op">=</span> <span class="fl">10</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">nile</span>,</span>
+<code class="sourceCode R"><span><span class="va">nile_gam</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="va">flow</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">year</span>, k <span class="op">=</span> <span class="fl">10</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">nile</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span>
+<span><span class="va">nile_tmb</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/glmmTMB/man/glmmTMB.html" class="external-link">glmmTMB</a></span><span class="op">(</span><span class="va">flow</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">year</span>, k <span class="op">=</span> <span class="fl">10</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">nile</span>,</span>
 <span>  family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">gaussian</a></span><span class="op">(</span><span class="op">)</span>, REML <span class="op">=</span> <span class="cn">TRUE</span>, start <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>theta <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">nile_tmb</span><span class="op">)</span></span>
 <span><span class="co">#&gt;  Family: gaussian  ( identity )</span></span>
@@ -164,23 +165,26 @@ model residual serial dependence.</p>
 <span><span class="co">#&gt; s(year)1       99.30      86.34    1.15     0.25    </span></span>
 <span><span class="co">#&gt; ---</span></span>
 <span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span></code></pre></div>
-<p><code>k = 10</code> sets the size of the available spline basis,
-rather than fixing ten effective degrees of freedom. The fitted penalty
-discourages unnecessary wiggliness. <code>start</code> follows the
-package’s Nile example and supplies an initial log standard deviation
-for the spline’s random coefficients; it does not fix their fitted
-variance. The <code>dummy</code> random effect in the printed summary is
-part of the spline representation, not an additional sampled group.</p>
+<p><code>k = 10</code> sets the size of the spline basis. The fitted
+penalty determines how much the curve can bend within that basis. The
+<code>start</code> argument supplies an initial log standard deviation
+for the spline’s random coefficients, which glmmTMB estimates during
+fitting. The <code>dummy</code> random effect in the summary represents
+those spline coefficients.</p>
 </div>
 <div class="section level2">
-<h2 id="extract-the-trend-and-read-its-uncertainty">Extract the trend and read its uncertainty<a class="anchor" aria-label="anchor" href="#extract-the-trend-and-read-its-uncertainty"></a>
+<h2 id="extract-the-smooth-and-its-uncertainty">Extract the smooth and its uncertainty<a class="anchor" aria-label="anchor" href="#extract-the-smooth-and-its-uncertainty"></a>
 </h2>
+<p>List the available smooths with <code><a href="../reference/smooths.html">smooths()</a></code>, then extract
+the year effect with <code><a href="../reference/smooth_estimates.html">smooth_estimates()</a></code>. Save the estimates
+so they can be inspected and passed to <code><a href="../reference/draw.html">draw()</a></code> without
+evaluating the model again.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/smooths.html">smooths</a></span><span class="op">(</span><span class="va">nile_tmb</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "s(year)"</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="../reference/smooth_coefs.html">smooth_coefs</a></span><span class="op">(</span><span class="va">nile_tmb</span>, select <span class="op">=</span> <span class="st">"s(year)"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;   s(year).1   s(year).2   s(year).3   s(year).4   s(year).5   s(year).6 </span></span>
-<span><span class="co">#&gt;   18.174609 -115.231114   -2.991595  -24.387354  -15.572794   13.125102</span></span>
+<span><span class="co">#&gt;   13.965792 -111.874312  -11.759876  -21.067622   -6.673338    9.788104</span></span>
 <span><span class="va">trend</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/smooth_estimates.html">smooth_estimates</a></span><span class="op">(</span><span class="va">nile_tmb</span>, select <span class="op">=</span> <span class="st">"s(year)"</span>,</span>
 <span>  interval <span class="op">=</span> <span class="st">"credible"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">trend</span><span class="op">)</span></span>
@@ -195,18 +199,15 @@ part of the spline representation, not an additional sampled group.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> s(year) TPRS  <span style="color: #BB0000;">NA</span>         196.  35.6  <span style="text-decoration: underline;">1</span>876  1.96      127.      266.</span></span>
 <span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">trend</span>, xlab <span class="op">=</span> <span class="st">"Year"</span>, ylab <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="va">Flow</span> <span class="op">~</span> <span class="va">contribution</span> <span class="op">~</span> <span class="op">(</span><span class="fl">10</span><span class="op">^</span><span class="fl">8</span> <span class="op">~</span> <span class="va">m</span><span class="op">^</span><span class="fl">3</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="glmmTMB-support_files/figure-html/nile-extraction-1.png" class="r-plt" alt="" width="700"></p>
-<p>The curve is the smooth’s contribution relative to its centring
-constraint, not the full expected flow. Positive values indicate flow
-above the fitted intercept. The broad decline from the late nineteenth
-century to the early twentieth century is much clearer than the small
-subsequent undulations. The shaded region concerns uncertainty in the
-fitted mean contribution; it does not describe the spread of individual
-annual observations.</p>
-<p>The default interval uses the joint TMB covariance, transformed back
-to the mgcv smooth coefficients. It includes covariance between fixed
-and fitted random coefficients. This is not mgcv’s frequentist
-covariance or its optional correction for uncertainty in smoothing
-parameters: <code>frequentist = TRUE</code> and
+<p>The curve shows the smooth’s contribution to expected flow. In this
+model a positive value means that expected flow is above the fitted
+intercept. The broad decline around the turn of the twentieth century is
+clearer than the smaller changes that follow. The shaded region shows
+uncertainty in the estimated trend at each year and includes uncertainty
+in the intercept by default.</p>
+<p>The interval uses glmmTMB’s covariance for the fitted coefficients,
+including covariance between fixed and random coefficients. The mgcv
+covariance options <code>frequentist = TRUE</code> and
 <code>unconditional = TRUE</code> are unavailable for glmmTMB
 effects.</p>
 <p>At any particular year a pointwise interval is useful. If the claim
@@ -217,16 +218,12 @@ instead:</p>
 <span>  n <span class="op">=</span> <span class="fl">120</span>, n_sim <span class="op">=</span> <span class="fl">3000</span>, seed <span class="op">=</span> <span class="fl">71</span>,</span>
 <span>  xlab <span class="op">=</span> <span class="st">"Year"</span>, ylab <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="va">Flow</span> <span class="op">~</span> <span class="va">contribution</span> <span class="op">~</span> <span class="op">(</span><span class="fl">10</span><span class="op">^</span><span class="fl">8</span> <span class="op">~</span> <span class="va">m</span><span class="op">^</span><span class="fl">3</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="glmmTMB-support_files/figure-html/nile-simultaneous-1.png" class="r-plt" alt="" width="700"></p>
-<p>The wider band has approximate coverage over the finite evaluation
-grid of this smooth. It is not a prediction interval, and it does not
-claim joint coverage across all model terms.
-<code>interval = "credible"</code> is an alias for the pointwise
-<code>"confidence"</code> option. With mgcv models,
-<code><a href="../reference/smooth_estimates.html">smooth_estimates()</a></code> also allows
-<code>frequentist = TRUE</code>; that changes the covariance used,
-rather than changing a pointwise statement into a simultaneous one.
-<code><a href="../reference/get_vcov.html">get_vcov()</a></code> makes the chosen model covariance available for
-custom calculations.</p>
+<p>The wider band is designed to cover the trend jointly across the
+years where the smooth was evaluated. The earlier
+<code>interval = "credible"</code> is an alias for the pointwise option,
+<code>interval = "confidence"</code>. For mgcv models, choose
+<code>frequentist = TRUE</code> to change the covariance used to
+calculate either type of interval.</p>
 <p>For the full expected flow, add the intercept. Here the model has
 just one smooth and an identity link, so this gives a direct comparison
 with both packages’ predictions:</p>
@@ -271,17 +268,22 @@ of interest while leaving the estimated trend unchanged:</p>
 <span><span class="co">#&gt; 1 1880    172.99113    29.51978       28.36395</span></span>
 <span><span class="co">#&gt; 2 1920    -77.82668    25.22793       22.21411</span></span>
 <span><span class="va">gam_covariance</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_vcov.html">get_vcov</a></span><span class="op">(</span><span class="va">nile_gam</span>, frequentist <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<p>The frequentist covariance concerns sampling variability of the
-penalised coefficient estimator with smoothing parameters held fixed.
-Smaller standard errors do not account for the bias introduced by
-penalisation. The default approximate Bayesian covariance is usually the
-useful starting point for smooth-effect intervals. The final line
-extracts the chosen covariance for custom calculations.</p>
+<p>The frequentist covariance describes how the estimated coefficients
+would vary across repeated samples with the smoothing parameters held
+fixed. Its standard errors describe sampling variation and can be small
+even when smoothing pulls the estimate away from the true curve. The
+default for smooth-effect intervals is the approximate Bayesian
+covariance. Use <code><a href="../reference/get_vcov.html">get_vcov()</a></code> to extract the covariance for
+your own calculations.</p>
 </div>
 <div class="section level2">
-<h2 id="does-the-fitted-distribution-explain-variation-around-the-trend">Does the fitted distribution explain variation around the
-trend?<a class="anchor" aria-label="anchor" href="#does-the-fitted-distribution-explain-variation-around-the-trend"></a>
+<h2 id="check-residual-variation-and-serial-correlation">Check residual variation and serial correlation<a class="anchor" aria-label="anchor" href="#check-residual-variation-and-serial-correlation"></a>
 </h2>
+<p>Use <code><a href="../reference/appraise.html">appraise()</a></code> to compare the residual distribution with
+simulations from the fitted model. Then use
+<code><a href="../reference/residual_correlation.html">residual_correlation_plot()</a></code> to look for similar departures
+in successive years, which the independent Gaussian errors do not
+represent.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/appraise.html">appraise</a></span><span class="op">(</span><span class="va">nile_tmb</span>, type <span class="op">=</span> <span class="st">"pearson"</span>, method <span class="op">=</span> <span class="st">"simulate"</span>,</span>
 <span>  n_simulate <span class="op">=</span> <span class="fl">100</span>, seed <span class="op">=</span> <span class="fl">72</span><span class="op">)</span></span></code></pre></div>
@@ -289,8 +291,8 @@ trend?<a class="anchor" aria-label="anchor" href="#does-the-fitted-distribution-
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/residual_correlation.html">residual_correlation_plot</a></span><span class="op">(</span><span class="va">nile_tmb</span>, type <span class="op">=</span> <span class="st">"pearson"</span>, lag_max <span class="op">=</span> <span class="fl">15</span><span class="op">)</span></span></code></pre></div>
 <p><img src="glmmTMB-support_files/figure-html/nile-checks-2.png" class="r-plt" alt="" width="700"></p>
-<p>The panel uses glmmTMB’s native Pearson residuals. For this Gaussian
-fit they remain on the scale of the flow response, rather than
+<p>The panel uses glmmTMB’s Pearson residuals. For this Gaussian fit
+they remain on the scale of the flow response, rather than
 standard-normal scores. Simulated QQ references hold the fitted smooth
 fixed and generate new annual responses. They check the response
 distribution under this fitted model; they do not refit the trend. The
@@ -309,33 +311,35 @@ removing the smooth trend. A time-series model can represent that
 remaining correlation when estimating trend uncertainty. The smooth
 describes a broad decline in mean flow, while the residual check
 identifies variation that its independent Gaussian errors leave
-unexplained. See <a href="model-checking.html">Choosing diagnostic
-references</a> for checks of dependence and for the distinction between
+unexplained. See <a href="model-checking.html">the model diagnostics
+article</a> for checks of dependence and for the distinction between
 holding effects fixed, drawing their uncertainty and simulating new
 effects.</p>
 </div>
 <div class="section level2">
-<h2 id="do-repeated-measurements-change-how-we-read-plant-responses">Do repeated measurements change how we read plant responses?<a class="anchor" aria-label="anchor" href="#do-repeated-measurements-change-how-we-read-plant-responses"></a>
+<h2 id="plot-smooth-and-random-effects-for-repeated-plant-measurements">Plot smooth and random effects for repeated plant measurements<a class="anchor" aria-label="anchor" href="#plot-smooth-and-random-effects-for-repeated-plant-measurements"></a>
 </h2>
 <p>The <code>CO2</code> experiment recorded carbon dioxide uptake by
 twelve plants of <em>Echinochloa crus-galli</em> at seven
-concentrations. Plants came from Quebec or Mississippi and received
-chilled or nonchilled treatment. See <code><a href="https://rdrr.io/r/datasets/zCO2.html" class="external-link">?datasets::CO2</a></code> for the
-experiment and units. Uptake is positive, and a Gamma model with a log
-link allows its residual variance to grow with the mean. Measurements
-from one plant share individual characteristics. The 84 measurements
-provide only twelve independently treated plants.</p>
+concentrations. The researchers paired plants within each origin (Quebec
+or Mississippi). One plant in each pair received the chilling treatment
+and the other served as a control. Table 1 of the <a href="https://biology.mcgill.ca/faculty/potvin/articles/PotvinLech_90.pdf" class="external-link">original
+study</a> gives concentrations in <span class="math inline">\mu\mathrm{L}\,\mathrm{L}^{-1}</span>. We use these
+data to illustrate repeated measurements, with a Gamma model to let the
+variance of positive uptake increase with its mean.</p>
 <p>We use a shared smooth response to concentration, an
-origin-by-treatment interaction, and plant-specific intercepts and
-slopes. These slopes allow individual plants to differ in their response
-to concentration without assuming that the population response itself is
-linear.</p>
+origin-by-treatment interaction and plant-specific intercepts and
+slopes. The shared smooth describes the curved response, and the slopes
+allow plants to differ in their response to concentration. The model
+accounts for repeated measurements within each plant. The treatment
+terms illustrate how to plot an interaction in this fit, which omits the
+pairing used in the experiment.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">plant</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">CO2</span><span class="op">)</span></span>
 <span><span class="va">plant</span><span class="op">$</span><span class="va">Plant</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">plant</span><span class="op">$</span><span class="va">Plant</span>, ordered <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="va">plant</span><span class="op">$</span><span class="va">log_conc</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">plant</span><span class="op">$</span><span class="va">conc</span><span class="op">)</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">plant</span><span class="op">$</span><span class="va">conc</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">plant_tmb</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/glmmTMB/man/glmmTMB.html" class="external-link">glmmTMB</a></span><span class="op">(</span></span>
-<span>  <span class="va">uptake</span> <span class="op">~</span> <span class="va">Type</span> <span class="op">*</span> <span class="va">Treatment</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">log_conc</span>, k <span class="op">=</span> <span class="fl">5</span><span class="op">)</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span> <span class="op">+</span> <span class="va">log_conc</span> <span class="op">|</span> <span class="va">Plant</span><span class="op">)</span>,</span>
+<span>  <span class="va">uptake</span> <span class="op">~</span> <span class="va">Type</span> <span class="op">*</span> <span class="va">Treatment</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">log_conc</span>, k <span class="op">=</span> <span class="fl">5</span><span class="op">)</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span> <span class="op">+</span> <span class="va">log_conc</span> <span class="op">|</span> <span class="va">Plant</span><span class="op">)</span>,</span>
 <span>  data <span class="op">=</span> <span class="va">plant</span>, family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">Gamma</a></span><span class="op">(</span>link <span class="op">=</span> <span class="st">"log"</span><span class="op">)</span>, REML <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">plant_tmb</span><span class="op">)</span></span>
 <span><span class="co">#&gt;  Family: Gamma  ( log )</span></span>
@@ -363,39 +367,46 @@ linear.</p>
 <span><span class="co">#&gt; TypeMississippi                  -0.31784    0.09327   -3.41 0.000655 ***</span></span>
 <span><span class="co">#&gt; Treatmentchilled                 -0.13966    0.09931   -1.41 0.159638    </span></span>
 <span><span class="co">#&gt; TypeMississippi:Treatmentchilled -0.27192    0.18888   -1.44 0.149972    </span></span>
-<span><span class="co">#&gt; s(log_conc)1                     -0.46392    0.04158  -11.16  &lt; 2e-16 ***</span></span>
+<span><span class="co">#&gt; s(log_conc)1                      0.46392    0.04158   11.16  &lt; 2e-16 ***</span></span>
 <span><span class="co">#&gt; ---</span></span>
 <span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span></code></pre></div>
 <p>For non-Gaussian responses, glmmTMB recommends simulations for the
 intended design to check REML estimates and interval coverage.</p>
-<p>The centred log concentration improves the interpretation of plant
-intercepts: they apply at the geometric mean concentration. The shared
-curve represents rapid change at low concentrations and slower change at
-high concentrations. The treatment interaction allows its shift in log
-mean uptake to differ by origin. With only three plants in each
-origin-treatment combination, the treatment estimates remain
-uncertain.</p>
+<p>Each plant’s random intercept gives its departure from the shared
+predictor at the geometric mean concentration, where
+<code>log_conc</code> is zero. The shared curve represents rapid change
+at low concentrations and slower change at high concentrations. The
+interaction allows the treatment difference in log mean uptake to vary
+by origin.</p>
+<p>Plot the model effects to see the shared concentration curve,
+treatment contributions, and differences between plants in one
+figure.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">plant_tmb</span>, ncol <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
 <p><img src="glmmTMB-support_files/figure-html/plant-effects-1.png" class="r-plt" alt="" width="700"></p>
-<p><code><a href="../reference/draw.html">draw()</a></code> includes smooths, native random effects and
-parametric effects by default. The Gaussian QQ panels for plant
-intercepts and slopes show fitted plant deviations, not response
-residuals. The random coefficients that encode the spline are excluded
-from these panels. <code>parametric = FALSE</code> omits parametric
-panels; an explicit <code>select</code> draws only selected effects
-unless <code>parametric = TRUE</code> is also supplied.</p>
+<p><code><a href="../reference/draw.html">draw()</a></code> includes smooths, random effects and parametric
+effects by default. The Gaussian QQ panels for plant intercepts and
+slopes show fitted plant deviations, not response residuals. The random
+coefficients that encode the spline are excluded from these panels.
+<code>parametric = FALSE</code> omits parametric panels; an explicit
+<code>select</code> draws only selected effects unless
+<code>parametric = TRUE</code> is also supplied. To see each plant’s
+combined intercept and slope contribution, select both random-effect
+terms and set <code>ranef_lines = TRUE</code>.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">plant_tmb</span>, select <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"(1 | Plant)"</span>, <span class="st">"(log_conc | Plant)"</span><span class="op">)</span>,</span>
 <span>  ranef_lines <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="glmmTMB-support_files/figure-html/plant-random-lines-1.png" class="r-plt" alt="" width="700"></p>
-<p>These lines are each plant’s random contribution <span class="math inline">b_{0j} + x b_{1j}</span> on the log scale. They do
-not include the shared curve or treatment means and have no uncertainty
-bands. This display requires a simple numeric intercept-slope pair from
-the same formula term. Multiple slopes, transformed or factor slopes,
-and structured covariance terms retain separate QQ panels.</p>
-<p>The interaction deserves a focused view rather than interpreting two
-main effects separately:</p>
+<p>Each line shows plant <span class="math inline">j</span>’s departure
+from the shared predictor, <span class="math inline">b_{0j} + x
+b_{1j}</span>, where <span class="math inline">x</span> is the centred
+log concentration. This display requires an intercept and a single
+numeric slope in the same formula term. Terms with multiple slopes,
+transformed or factor slopes, or structured covariance use separate QQ
+panels.</p>
+<p>Use <code><a href="../reference/parametric_effects.html">parametric_effects()</a></code> to isolate the
+origin-by-treatment interaction. This shows how treatment differences
+vary between the two origins.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/parametric_terms.html">parametric_terms</a></span><span class="op">(</span><span class="va">plant_tmb</span><span class="op">)</span></span>
 <span><span class="co">#&gt;             Type        Treatment   Type:Treatment </span></span>
@@ -405,58 +416,39 @@ main effects separately:</p>
 <p>These are contrast-coded partial contributions on the log scale.
 Contrast coding gives the reference category a zero contribution; full
 predictions add the intercept and the other model terms. Parametric
-intervals now include intercept uncertainty and its covariance with the
-term by default; use <code>overall_uncertainty = FALSE</code> for
-uncertainty in the term alone. The estimated partial contributions do
-not change. Full predictions combine all terms:</p>
+intervals include intercept uncertainty and its covariance with the term
+by default; use <code>overall_uncertainty = FALSE</code> for uncertainty
+in the term alone. The estimated partial contributions do not change.
+Full predictions combine all terms:</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">plant</span><span class="op">$</span><span class="va">expected</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">plant_tmb</span>, type <span class="op">=</span> <span class="st">"response"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">plant</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">conc</span>, <span class="va">uptake</span>, group <span class="op">=</span> <span class="va">Plant</span>, colour <span class="op">=</span> <span class="va">Treatment</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">expected</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span> <span class="va">Type</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Carbon dioxide concentration (mL/L)"</span>,</span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="va">CO</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span> <span class="op">~</span> <span class="va">concentration</span> <span class="op">~</span> <span class="op">(</span><span class="va">mu</span> <span class="op">*</span> <span class="va">L</span> <span class="op">~</span> <span class="va">L</span><span class="op">^</span><span class="op">{</span><span class="op">-</span><span class="fl">1</span><span class="op">}</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>    y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="va">CO</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span> <span class="op">~</span> <span class="va">uptake</span> <span class="op">~</span> <span class="op">(</span><span class="va">mu</span> <span class="op">*</span> <span class="va">mol</span> <span class="op">~</span> <span class="va">m</span><span class="op">^</span><span class="op">{</span><span class="op">-</span><span class="fl">2</span><span class="op">}</span> <span class="op">~</span> <span class="va">s</span><span class="op">^</span><span class="op">{</span><span class="op">-</span><span class="fl">1</span><span class="op">}</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="glmmTMB-support_files/figure-html/plant-full-predictions-1.png" class="r-plt" alt="" width="700"></p>
 <p>The curves describe these observed plants, including their fitted
-deviations. They are not marginal mean curves for a new plant. The Gamma
-model and common nonlinear shape are working assumptions that should be
-checked:</p>
+deviations. Use <code><a href="../reference/appraise.html">appraise()</a></code> to assess whether the Gamma
+response distribution and shared concentration curve describe the
+observations adequately.</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/appraise.html">appraise</a></span><span class="op">(</span><span class="va">plant_tmb</span>, type <span class="op">=</span> <span class="st">"quantile"</span>, seed <span class="op">=</span> <span class="fl">73</span><span class="op">)</span></span></code></pre></div>
 <p><img src="glmmTMB-support_files/figure-html/plant-diagnostics-1.png" class="r-plt" alt="" width="700"></p>
 <p>The lowest quantile score stands out below the normal reference: one
 measurement is substantially lower than its fitted distribution would
-typically produce. Inspect that observation and the fitted curve for its
-plant to decide whether its individual concentration response needs more
-flexibility. <a href="smooth-effects.html">Read smooth effects,
-interactions and surfaces</a> explores more flexible plant-specific
-curves.</p>
-<p>A conditional check holds the fitted plant effects and smooth fixed.
-Quantile residuals use a fixed standard-normal reference to assess the
-distribution of individual scores conditional on those effects; the
-reference does not preserve dependence between scores. A marginal check
-instead draws new plant effects <strong>and new spline random
-coefficients</strong> with glmmTMB’s simulator. It therefore checks a
-broader distribution than that of new plants around a fixed shared
-concentration curve. The same scope applies to marginal posterior
-predictive checks. Conditional posterior predictive checks draw
-uncertainty in fitted coefficients and effects together. These answer
-different questions; see <a href="model-checking.html">Choosing
-diagnostic references</a>. Partial-residual overlays are not supported
-for glmmTMB smooth plots. For supported response families, model parts
-and current limitations, consult <code><a href="../reference/glmmTMB-methods.html">?"glmmTMB-methods"</a></code>.
-Multiple linear predictors retain model-wide smooth selection and
-identify the conditional, zero-inflation or dispersion model in their
-plot subtitles; constant dispersion alone does not add these
-subtitles.</p>
-<p>gratia cannot make a smooth type available if glmmTMB cannot fit it.
-Effects require the stored smooth and random-effect information;
-unsupported structures with several penalties, models that fix or share
-joint parameters through <code>map</code>, and rank-deficient smooth
-models give explicit errors. For a GAM that does not require glmmTMB’s
-additional model components, mgcv offers a broader range of spline
-constructions.</p>
+typically produce. Inspect the fitted curve for that plant to see
+whether other measurements show a similar departure. <a href="smooth-effects.html">Read smooth effects, interactions and
+surfaces</a> explores more flexible plant-specific curves.</p>
+<p>The check above holds the fitted plant effects and smooth fixed. With
+<code>conditioning = "marginal"</code>, glmmTMB instead simulates new
+plant effects <strong>and new spline random coefficients</strong>. That
+checks the distribution of both plant variation and the shared curve.
+See the <a href="model-checking.html">diagnostics article</a> for
+choosing between these checks and posterior predictive checks. The
+<code>glmmTMB-methods</code> help topic lists supported response
+families, model components and current restrictions.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

@@ -102,9 +102,10 @@ gratia_theme_set(old)
 
 pal <- gratia_palette("tol_banded_16")
 theme(palette.colour.discrete = pal, palette.fill.discrete = pal)
-#> <theme> List of 2
+#> <theme>List of 2
 #>  $ palette.colour.discrete:function (n)  
 #>  $ palette.fill.discrete  :function (n)  
+#>  - attr(*, "class")= chr "gg"
 #>  @ complete: logi FALSE
 #>  @ validate: logi TRUE
 ```

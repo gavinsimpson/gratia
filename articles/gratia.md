@@ -1,18 +1,24 @@
 # Getting started with gratia
 
+{gratia} provides plots, predictions and diagnostics for generalized
+additive models (GAMs). This introduction fits a GAM, plots its smooth
+terms, extracts the values behind those plots and checks the model’s
+residuals.
+
+First load gratia and make {mgcv}’s model-fitting functions available.
+
 ``` r
 
 library("gratia")
 load_mgcv()
 ```
 
-gratia is a package to make working with generalized additive models
-(GAMs) in R easier, including producing plots of estimated smooths using
-the ggplot2 📦.
-
-This introduction will cover some of the basic functionality of gratia
-to get you started. We’ll work with some classic simulated data often
-used to illustrate properties of GAMs
+We simulate 400 observations with four independent covariates sampled
+uniformly between zero and one. The response combines nonlinear effects
+of `x0`, `x1` and `x2` with independent Gaussian noise of standard
+deviation 2. `x3` has no effect on the response. This gives us known
+patterns to look for in the fitted smooths, including a covariate whose
+contribution should be close to zero.
 
 ``` r
 
@@ -34,7 +40,9 @@ df
 #> # ℹ 390 more rows
 ```
 
-and the following GAM
+Fit one smooth for each covariate. Restricted maximum likelihood (REML)
+estimates the smoothing parameters, which control how strongly the fit
+penalises wiggliness in each smooth.
 
 ``` r
 
@@ -66,12 +74,11 @@ summary(m)
 #> -REML = 886.93  Scale est. = 4.4144    n = 400
 ```
 
-### Plotting
+## Plot the contribution of each smooth
 
-gratia provides the
-[`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)
-function to produce plots using the ggplot2 📦. To plot the estimated
-smooths from the GAM we fitted above, use
+Use [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)
+to plot the four fitted smooths. The pointwise credible intervals show
+uncertainty at each plotted value of the covariate.
 
 ``` r
 
@@ -80,25 +87,20 @@ draw(m)
 
 ![](gratia_files/figure-html/draw-gam-1.png)
 
-The plots produced are *partial effect* plots, which show the component
-contributions, on the link scale, of each model term to the linear
-predictor. The y axis on these plots is typically centred around 0 due
-to most smooths having a sum-to-zero identifiability constraint applied
-to them. This constraint is what allows the model to include multiple
-smooths and remain identifiable. These plots allow you to read off the
-contributions of each smooth to the fitted response (on the link scale);
-they show link-scale predictions of the response for each smooth,
-conditional upon all other terms in the model, including any parametric
-effects and the intercept, having zero contribution. In the parlance of
-the marginaleffects package (Arel-Bundock et al. Forthcoming), these
-plots show adjusted predictions, just where the adjustment includes
-setting the contribution of all other model terms to the predicted value
-to zero. For partial derivatives (what *marginaleffects* would call a
-marginal effect or slope), gratia provides
-[`derivatives()`](https://gavinsimpson.github.io/gratia/reference/derivatives.md).
+Each panel shows one smooth’s contribution. Add the four contributions
+and the model intercept to obtain the fitted mean for this Gaussian
+identity-link model. The smooths are centred so that the intercept
+represents the overall level. For models with other links, add the
+contributions and intercept on the link scale, then apply the inverse
+link to obtain the fitted mean.
 
-Use a ggplot2 theme to change the appearance of the plots. The `&`
-operator applies the settings to every panel:
+The smooth for `x3` lets us check how the model handles a covariate with
+no true effect. Its fitted curve can depart from zero because of
+sampling variation, and its interval shows the uncertainty in that
+departure.
+
+Use a {ggplot2} theme to change the appearance of the plots. The `&`
+operator applies the settings to every panel.
 
 ``` r
 
@@ -111,10 +113,12 @@ draw(m) & theme(
 
 ![](gratia_files/figure-html/theme-smooths-1.png)
 
-To choose different layers or map other variables to plot aesthetics,
-obtain the estimates with
+## Extract smooth estimates and build a plot
+
 [`smooth_estimates()`](https://gavinsimpson.github.io/gratia/reference/smooth_estimates.md)
-and build a plot yourself.
+returns the values used to draw the curves, so you can inspect them or
+choose your own ggplot2 layers. By default it evaluates each smooth over
+an evenly spaced covariate grid.
 
 ``` r
 
@@ -136,11 +140,9 @@ sm
 #> # ℹ 390 more rows
 ```
 
-which will evaluate all smooths at values that are evenly spaced over
-the range of the covariate(s). If you want to evaluate only selected
-smooths, you can specify which via the `select` argument. This takes the
-*smooth labels* which are the names of the smooths as they are known to
-mgcv. To list the labels for the smooths in use
+To work with one smooth, supply its label through `select`. Use
+[`smooths()`](https://gavinsimpson.github.io/gratia/reference/smooths.md)
+to find the labels accepted by the fitted model.
 
 ``` r
 
@@ -148,7 +150,7 @@ smooths(m)
 #> [1] "s(x0)" "s(x1)" "s(x2)" "s(x3)"
 ```
 
-To evaluate only f(x_2) use
+Select `s(x2)` to extract the contribution of `x2` alone.
 
 ``` r
 
@@ -170,21 +172,13 @@ sm
 #> # ℹ 90 more rows
 ```
 
-Then you can generate your own plot using the ggplot2 package, for
-example
+Add interval limits with
+[`add_confint()`](https://gavinsimpson.github.io/gratia/reference/add_confint.md),
+then draw the estimates as a line and the interval as a ribbon. The
+output columns map directly to the ggplot2 aesthetics in this example.
 
 ``` r
 
-library("ggplot2")
-library("dplyr")
-#> 
-#> Attaching package: 'dplyr'
-#> The following objects are masked from 'package:stats':
-#> 
-#>     filter, lag
-#> The following objects are masked from 'package:base':
-#> 
-#>     intersect, setdiff, setequal, union
 sm |>
   add_confint() |>
   ggplot(aes(y = .estimate, x = x2)) +
@@ -201,11 +195,12 @@ sm |>
 
 ![](gratia_files/figure-html/ggplot-smooth-1.png)
 
-### Model diagnostics
+## Check the fitted model
 
-The
+Use
 [`appraise()`](https://gavinsimpson.github.io/gratia/reference/appraise.md)
-function provides standard diagnostic plots for GAMs
+to look for features the model has failed to describe, such as residual
+spread changing with the fitted mean or departures in the tails.
 
 ``` r
 
@@ -214,16 +209,24 @@ appraise(m)
 
 ![](gratia_files/figure-html/appraise-1.png)
 
-The plots produced are (from left-to-right, top-to-bottom),
+Read the panels from left to right, starting with the top row.
 
 - a quantile-quantile (QQ) plot of deviance residuals,
 - a scatterplot of deviance residuals against the linear predictor,
 - a histogram of deviance residuals, and
 - a scatterplot of observed vs fitted values.
 
-Adding partial residuals to the partial effect plots produced by
-[`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md) can
-also help diagnose problems with the model, such as oversmoothing
+The data were simulated with Gaussian errors of constant variance, so we
+expect roughly constant residual spread and no systematic pattern
+against the linear predictor. Departures from the reference in the QQ
+plot can reveal where the observed residuals differ from what the fitted
+model would produce.
+
+Add partial residuals to a smooth plot to compare the fitted curve with
+the observations after removing the estimated contributions of the other
+terms. For example, a consistent bend in the points around a flatter
+fitted curve can suggest that the smooth has missed part of the
+relationship.
 
 ``` r
 
@@ -232,16 +235,18 @@ draw(m, residuals = TRUE)
 
 ![](gratia_files/figure-html/draw-partial-residuals-1.png)
 
-### Want to learn more?
+## More on plotting, prediction and model checking
 
-*gratia* is in very active development and an area of development that
-is currently lacking is documentation. To find out more about the
-package, look at the [help pages for the
-package](https://gavinsimpson.github.io/gratia/reference/index.html) and
-look at the examples for more code to help you get going.
+- [Customise
+  plots](https://gavinsimpson.github.io/gratia/articles/custom-plotting.html)
+  with themes, labels, legends and your own layers.
+- [Create prediction
+  grids](https://gavinsimpson.github.io/gratia/articles/data-slices.html)
+  to evaluate smooths and fitted responses at chosen covariate values.
+- [Check a fitted
+  model](https://gavinsimpson.github.io/gratia/articles/model-checking.html)
+  using residual diagnostics and posterior predictive checks.
 
-## References
-
-Arel-Bundock, Vincent, Noah Greifer, and Andrew Heiss. Forthcoming. “How
-to Interpret Statistical Models Using marginaleffects in R and Python.”
-*Journal of Statistical Software*, Forthcoming.
+The [function
+reference](https://gavinsimpson.github.io/gratia/reference/index.html)
+provides argument descriptions and examples for individual functions.

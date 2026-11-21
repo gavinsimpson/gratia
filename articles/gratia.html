@@ -26,7 +26,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-73</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-75</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -55,13 +55,13 @@
     <li><a class="dropdown-item" href="../articles/shape-constrained-intervals.html">Intervals for shape-constrained smooths</a></li>
     <li><a class="dropdown-item" href="../articles/spatial-smooths.html">Choose a smooth for the spatial question</a></li>
     <li><a class="dropdown-item" href="../articles/response-distributions.html">Checking different response distributions</a></li>
-    <li><a class="dropdown-item" href="../articles/transformed-covariates.html">Functions of covariates and evaluation environments</a></li>
+    <li><a class="dropdown-item" href="../articles/transformed-covariates.html">Predictions, plots and derivatives with transformed covariates</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Essentials</h6></li>
-    <li><a class="dropdown-item" href="../articles/data-slices.html">Data slices</a></li>
-    <li><a class="dropdown-item" href="../articles/custom-plotting.html">Customizing plots</a></li>
+    <li><a class="dropdown-item" href="../articles/data-slices.html">Creating prediction grids with data_slice()</a></li>
+    <li><a class="dropdown-item" href="../articles/custom-plotting.html">Customising plots</a></li>
     <li><a class="dropdown-item" href="../articles/posterior-simulation.html">Posterior Simulation</a></li>
-    <li><a class="dropdown-item" href="../articles/sampling-migration.html">Migrating posterior sampling calls</a></li>
+    <li><a class="dropdown-item" href="../articles/sampling-migration.html">Updating sampling code for gratia 0.12.0</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
@@ -93,15 +93,22 @@
 
     
     
+<p>{gratia} provides plots, predictions and diagnostics for generalized
+additive models (GAMs). This introduction fits a GAM, plots its smooth
+terms, extracts the values behind those plots and checks the model’s
+residuals.</p>
+<p>First load gratia and make {mgcv}’s model-fitting functions
+available.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://gavinsimpson.github.io/gratia/">"gratia"</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/load_mgcv.html">load_mgcv</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p>gratia is a package to make working with generalized additive models
-(GAMs) in R easier, including producing plots of estimated smooths using
-the ggplot2 📦.</p>
-<p>This introduction will cover some of the basic functionality of
-gratia to get you started. We’ll work with some classic simulated data
-often used to illustrate properties of GAMs</p>
+<p>We simulate 400 observations with four independent covariates sampled
+uniformly between zero and one. The response combines nonlinear effects
+of <code>x0</code>, <code>x1</code> and <code>x2</code> with independent
+Gaussian noise of standard deviation 2. <code>x3</code> has no effect on
+the response. This gives us known patterns to look for in the fitted
+smooths, including a covariate whose contribution should be close to
+zero.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/data_sim.html">data_sim</a></span><span class="op">(</span><span class="st">"eg1"</span>, seed <span class="op">=</span> <span class="fl">42</span><span class="op">)</span></span>
 <span><span class="va">df</span></span>
@@ -119,9 +126,11 @@ often used to illustrate properties of GAMs</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> 13.8  0.657 0.084<span style="text-decoration: underline;">3</span> 0.282 0.254 11.1  1.76   1.18 8.20       0</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>  7.51 0.705 0.386  0.504 0.667  6.50 1.60   2.16 2.74       0</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 390 more rows</span></span></span></code></pre></div>
-<p>and the following GAM</p>
+<p>Fit one smooth for each covariate. Restricted maximum likelihood
+(REML) estimates the smoothing parameters, which control how strongly
+the fit penalises wiggliness in each smooth.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu">gam</span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">x0</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x1</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x2</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x3</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">df</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x0</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x1</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x2</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x3</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">df</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Family: gaussian </span></span>
@@ -147,33 +156,27 @@ often used to illustrate properties of GAMs</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; R-sq.(adj) =  0.685   Deviance explained = 69.8%</span></span>
 <span><span class="co">#&gt; -REML = 886.93  Scale est. = 4.4144    n = 400</span></span></code></pre></div>
-<div class="section level3">
-<h3 id="plotting">Plotting<a class="anchor" aria-label="anchor" href="#plotting"></a>
-</h3>
-<p>gratia provides the <code><a href="../reference/draw.html">draw()</a></code> function to produce plots
-using the ggplot2 📦. To plot the estimated smooths from the GAM we
-fitted above, use</p>
+<div class="section level2">
+<h2 id="plot-the-contribution-of-each-smooth">Plot the contribution of each smooth<a class="anchor" aria-label="anchor" href="#plot-the-contribution-of-each-smooth"></a>
+</h2>
+<p>Use <code><a href="../reference/draw.html">draw()</a></code> to plot the four fitted smooths. The
+pointwise credible intervals show uncertainty at each plotted value of
+the covariate.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span></span></code></pre></div>
 <p><img src="gratia_files/figure-html/draw-gam-1.png" class="r-plt" alt="" width="700"></p>
-<p>The plots produced are <em>partial effect</em> plots, which show the
-component contributions, on the link scale, of each model term to the
-linear predictor. The y axis on these plots is typically centred around
-0 due to most smooths having a sum-to-zero identifiability constraint
-applied to them. This constraint is what allows the model to include
-multiple smooths and remain identifiable. These plots allow you to read
-off the contributions of each smooth to the fitted response (on the link
-scale); they show link-scale predictions of the response for each
-smooth, conditional upon all other terms in the model, including any
-parametric effects and the intercept, having zero contribution. In the
-parlance of the marginaleffects package <span class="citation">(Arel-Bundock et al. Forthcoming)</span>, these plots
-show adjusted predictions, just where the adjustment includes setting
-the contribution of all other model terms to the predicted value to
-zero. For partial derivatives (what <em>marginaleffects</em> would call
-a marginal effect or slope), gratia provides
-<code><a href="../reference/derivatives.html">derivatives()</a></code>.</p>
-<p>Use a ggplot2 theme to change the appearance of the plots. The
-<code>&amp;</code> operator applies the settings to every panel:</p>
+<p>Each panel shows one smooth’s contribution. Add the four
+contributions and the model intercept to obtain the fitted mean for this
+Gaussian identity-link model. The smooths are centred so that the
+intercept represents the overall level. For models with other links, add
+the contributions and intercept on the link scale, then apply the
+inverse link to obtain the fitted mean.</p>
+<p>The smooth for <code>x3</code> lets us check how the model handles a
+covariate with no true effect. Its fitted curve can depart from zero
+because of sampling variation, and its interval shows the uncertainty in
+that departure.</p>
+<p>Use a {ggplot2} theme to change the appearance of the plots. The
+<code>&amp;</code> operator applies the settings to every panel.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://ggplot2.tidyverse.org" class="external-link">"ggplot2"</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span> <span class="op">&amp;</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span></span>
@@ -181,9 +184,14 @@ a marginal effect or slope), gratia provides
 <span>  geom.gratia.interval <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_geom</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="st">"forestgreen"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p><img src="gratia_files/figure-html/theme-smooths-1.png" class="r-plt" alt="" width="700"></p>
-<p>To choose different layers or map other variables to plot aesthetics,
-obtain the estimates with <code><a href="../reference/smooth_estimates.html">smooth_estimates()</a></code> and build a
-plot yourself.</p>
+</div>
+<div class="section level2">
+<h2 id="extract-smooth-estimates-and-build-a-plot">Extract smooth estimates and build a plot<a class="anchor" aria-label="anchor" href="#extract-smooth-estimates-and-build-a-plot"></a>
+</h2>
+<p><code><a href="../reference/smooth_estimates.html">smooth_estimates()</a></code> returns the values used to draw the
+curves, so you can inspect them or choose your own ggplot2 layers. By
+default it evaluates each smooth over an evenly spaced covariate
+grid.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/smooth_estimates.html">smooth_estimates</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span></span>
 <span><span class="va">sm</span></span>
@@ -201,15 +209,14 @@ plot yourself.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> s(x0)   TPRS  <span style="color: #BB0000;">NA</span>       -<span style="color: #BB0000;">0.732</span> 0.237 0.080<span style="text-decoration: underline;">7</span>      <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> s(x0)   TPRS  <span style="color: #BB0000;">NA</span>       -<span style="color: #BB0000;">0.662</span> 0.228 0.090<span style="text-decoration: underline;">8</span>      <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 390 more rows</span></span></span></code></pre></div>
-<p>which will evaluate all smooths at values that are evenly spaced over
-the range of the covariate(s). If you want to evaluate only selected
-smooths, you can specify which via the <code>select</code> argument.
-This takes the <em>smooth labels</em> which are the names of the smooths
-as they are known to mgcv. To list the labels for the smooths in use</p>
+<p>To work with one smooth, supply its label through
+<code>select</code>. Use <code><a href="../reference/smooths.html">smooths()</a></code> to find the labels
+accepted by the fitted model.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/smooths.html">smooths</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "s(x0)" "s(x1)" "s(x2)" "s(x3)"</span></span></code></pre></div>
-<p>To evaluate only <span class="math inline">f(x_2)</span> use</p>
+<p>Select <code>s(x2)</code> to extract the contribution of
+<code>x2</code> alone.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/smooth_estimates.html">smooth_estimates</a></span><span class="op">(</span><span class="va">m</span>, select <span class="op">=</span> <span class="st">"s(x2)"</span><span class="op">)</span></span>
 <span><span class="va">sm</span></span>
@@ -227,20 +234,11 @@ as they are known to mgcv. To list the labels for the smooths in use</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> s(x2)   TPRS  <span style="color: #BB0000;">NA</span>      -<span style="color: #BB0000;">0.564</span>  0.278 0.084<span style="text-decoration: underline;">1</span> </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> s(x2)   TPRS  <span style="color: #BB0000;">NA</span>      -<span style="color: #BB0000;">0.036</span><span style="color: #BB0000; text-decoration: underline;">4</span> 0.289 0.094<span style="text-decoration: underline;">1</span> </span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 90 more rows</span></span></span></code></pre></div>
-<p>Then you can generate your own plot using the ggplot2 package, for
-example</p>
+<p>Add interval limits with <code><a href="../reference/add_confint.html">add_confint()</a></code>, then draw the
+estimates as a line and the interval as a ribbon. The output columns map
+directly to the ggplot2 aesthetics in this example.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://ggplot2.tidyverse.org" class="external-link">"ggplot2"</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://dplyr.tidyverse.org" class="external-link">"dplyr"</a></span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Attaching package: 'dplyr'</span></span>
-<span><span class="co">#&gt; The following objects are masked from 'package:stats':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     filter, lag</span></span>
-<span><span class="co">#&gt; The following objects are masked from 'package:base':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     intersect, setdiff, setequal, union</span></span>
-<span><span class="va">sm</span> <span class="op">|&gt;</span></span>
+<code class="sourceCode R"><span><span class="va">sm</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/add_confint.html">add_confint</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">.estimate</span>, x <span class="op">=</span> <span class="va">x2</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_ribbon.html" class="external-link">geom_ribbon</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>ymin <span class="op">=</span> <span class="va">.lower_ci</span>, ymax <span class="op">=</span> <span class="va">.upper_ci</span><span class="op">)</span>,</span>
@@ -254,15 +252,16 @@ example</p>
 <span>  <span class="op">)</span></span></code></pre></div>
 <p><img src="gratia_files/figure-html/ggplot-smooth-1.png" class="r-plt" alt="" width="700"></p>
 </div>
-<div class="section level3">
-<h3 id="model-diagnostics">Model diagnostics<a class="anchor" aria-label="anchor" href="#model-diagnostics"></a>
-</h3>
-<p>The <code><a href="../reference/appraise.html">appraise()</a></code> function provides standard diagnostic
-plots for GAMs</p>
+<div class="section level2">
+<h2 id="check-the-fitted-model">Check the fitted model<a class="anchor" aria-label="anchor" href="#check-the-fitted-model"></a>
+</h2>
+<p>Use <code><a href="../reference/appraise.html">appraise()</a></code> to look for features the model has failed
+to describe, such as residual spread changing with the fitted mean or
+departures in the tails.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/appraise.html">appraise</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span></span></code></pre></div>
 <p><img src="gratia_files/figure-html/appraise-1.png" class="r-plt" alt="" width="700"></p>
-<p>The plots produced are (from left-to-right, top-to-bottom),</p>
+<p>Read the panels from left to right, starting with the top row.</p>
 <ul>
 <li>a quantile-quantile (QQ) plot of deviance residuals,</li>
 <li>a scatterplot of deviance residuals against the linear
@@ -270,33 +269,39 @@ predictor,</li>
 <li>a histogram of deviance residuals, and</li>
 <li>a scatterplot of observed vs fitted values.</li>
 </ul>
-<p>Adding partial residuals to the partial effect plots produced by
-<code><a href="../reference/draw.html">draw()</a></code> can also help diagnose problems with the model, such
-as oversmoothing</p>
+<p>The data were simulated with Gaussian errors of constant variance, so
+we expect roughly constant residual spread and no systematic pattern
+against the linear predictor. Departures from the reference in the QQ
+plot can reveal where the observed residuals differ from what the fitted
+model would produce.</p>
+<p>Add partial residuals to a smooth plot to compare the fitted curve
+with the observations after removing the estimated contributions of the
+other terms. For example, a consistent bend in the points around a
+flatter fitted curve can suggest that the smooth has missed part of the
+relationship.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">m</span>, residuals <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="gratia_files/figure-html/draw-partial-residuals-1.png" class="r-plt" alt="" width="700"></p>
 </div>
-<div class="section level3">
-<h3 id="want-to-learn-more">Want to learn more?<a class="anchor" aria-label="anchor" href="#want-to-learn-more"></a>
-</h3>
-<p><em>gratia</em> is in very active development and an area of
-development that is currently lacking is documentation. To find out more
-about the package, look at the <a href="https://gavinsimpson.github.io/gratia/reference/index.html">help
-pages for the package</a> and look at the examples for more code to help
-you get going.</p>
-</div>
 <div class="section level2">
-<h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
+<h2 id="more-on-plotting-prediction-and-model-checking">More on plotting, prediction and model checking<a class="anchor" aria-label="anchor" href="#more-on-plotting-prediction-and-model-checking"></a>
 </h2>
-<div id="refs" class="references csl-bib-body hanging-indent">
-<div id="ref-Arel-BundockGreiferHeiss:2024" class="csl-entry">
-Arel-Bundock, Vincent, Noah Greifer, and Andrew Heiss. Forthcoming.
-<span>“How to Interpret Statistical Models Using <span class="nocase">marginaleffects</span> in <span>R</span> and
-<span>Python</span>.”</span> <em>Journal of Statistical Software</em>,
-Forthcoming.
-</div>
-</div>
+<ul>
+<li>
+<a href="https://gavinsimpson.github.io/gratia/articles/custom-plotting.html">Customise
+plots</a> with themes, labels, legends and your own layers.</li>
+<li>
+<a href="https://gavinsimpson.github.io/gratia/articles/data-slices.html">Create
+prediction grids</a> to evaluate smooths and fitted responses at chosen
+covariate values.</li>
+<li>
+<a href="https://gavinsimpson.github.io/gratia/articles/model-checking.html">Check
+a fitted model</a> using residual diagnostics and posterior predictive
+checks.</li>
+</ul>
+<p>The <a href="https://gavinsimpson.github.io/gratia/reference/index.html">function
+reference</a> provides argument descriptions and examples for individual
+functions.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

@@ -5,8 +5,8 @@
 Visualise fitted models with
 [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md) and
 customise individual plots with
-[`assemble()`](https://gavinsimpson.github.io/gratia/reference/assemble.md);
-see [Customizing
+[`assemble()`](https://gavinsimpson.github.io/gratia/reference/assemble.md).
+See [Customising
 plots](https://gavinsimpson.github.io/gratia/articles/custom-plotting.md).
 
 - [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md) :
@@ -272,8 +272,9 @@ individual diagnostic plots, residuals, and measures of concurvity.
 ## Prepare data for prediction and evaluation
 
 Choose covariate values at which to evaluate a model and restrict
-evaluation to regions supported by the data; see [Data
-slices](https://gavinsimpson.github.io/gratia/articles/data-slices.md).
+evaluation to regions supported by the data; see [Creating prediction
+grids with
+`data_slice()`](https://gavinsimpson.github.io/gratia/articles/data-slices.md).
 
 - [`data_slice()`](https://gavinsimpson.github.io/gratia/reference/data_slice.md)
   : Prepare a data slice through model covariates

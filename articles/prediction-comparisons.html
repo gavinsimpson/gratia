@@ -26,7 +26,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-73</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-75</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -55,13 +55,13 @@
     <li><a class="dropdown-item" href="../articles/shape-constrained-intervals.html">Intervals for shape-constrained smooths</a></li>
     <li><a class="dropdown-item" href="../articles/spatial-smooths.html">Choose a smooth for the spatial question</a></li>
     <li><a class="dropdown-item" href="../articles/response-distributions.html">Checking different response distributions</a></li>
-    <li><a class="dropdown-item" href="../articles/transformed-covariates.html">Functions of covariates and evaluation environments</a></li>
+    <li><a class="dropdown-item" href="../articles/transformed-covariates.html">Predictions, plots and derivatives with transformed covariates</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Essentials</h6></li>
-    <li><a class="dropdown-item" href="../articles/data-slices.html">Data slices</a></li>
-    <li><a class="dropdown-item" href="../articles/custom-plotting.html">Customizing plots</a></li>
+    <li><a class="dropdown-item" href="../articles/data-slices.html">Creating prediction grids with data_slice()</a></li>
+    <li><a class="dropdown-item" href="../articles/custom-plotting.html">Customising plots</a></li>
     <li><a class="dropdown-item" href="../articles/posterior-simulation.html">Posterior Simulation</a></li>
-    <li><a class="dropdown-item" href="../articles/sampling-migration.html">Migrating posterior sampling calls</a></li>
+    <li><a class="dropdown-item" href="../articles/sampling-migration.html">Updating sampling code for gratia 0.12.0</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
@@ -100,34 +100,35 @@ questions require comparisons of fitted responses and their rates of
 change, rather than inspection of individual smooths alone. This article
 uses the same model to answer each question and to explain how the
 choice of interval changes the conclusion.</p>
-<p>The examples use the small <code>CO2</code> data set distributed with
-R, plus mgcv, gratia, dplyr and ggplot2. No additional modelling package
-is needed. We use 2,000 coefficient draws for the illustrated bands and
-posterior calculations. If a conclusion depends on an interval limit,
-increase this count and check that the limit is stable.</p>
+<p>The examples use the <code>CO2</code> dataset distributed with R,
+plus {mgcv}, {gratia}, {dplyr} and {ggplot2}. We use 2,000 coefficient
+draws for the bands and posterior calculations. If a conclusion depends
+on an interval limit, increase this count and check that the limit is
+stable. We load the packages before preparing the data.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://gavinsimpson.github.io/gratia/">"gratia"</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/load_mgcv.html">load_mgcv</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://dplyr.tidyverse.org" class="external-link">"dplyr"</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://ggplot2.tidyverse.org" class="external-link">"ggplot2"</a></span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
-<h2 id="what-was-measured-and-what-model-is-useful">What was measured, and what model is useful?<a class="anchor" aria-label="anchor" href="#what-was-measured-and-what-model-is-useful"></a>
+<h2 id="fit-treatment-curves-to-the-plant-experiment">Fit treatment curves to the plant experiment<a class="anchor" aria-label="anchor" href="#fit-treatment-curves-to-the-plant-experiment"></a>
 </h2>
-<p>The <a href="https://stat.ethz.ch/R-manual/R-devel/library/datasets/help/CO2.html" class="external-link">R
-documentation for CO2</a> describes an experiment on cold tolerance in
-<em>Echinochloa crus-galli</em>. Uptake was measured at seven
-concentrations in each of twelve plants, with three plants in each
-origin and treatment combination. Chilled plants were cooled overnight.
-The response is uptake in micromoles per square metre per second;
-<code>conc</code> records ambient concentration in the units supplied
-with the data (mL/L). These repeated measurements describe curves for
-individual plants.</p>
+<p>The <code>CO2</code> data come from an experiment on cold tolerance
+in <em>Echinochloa crus-galli</em>. The researchers measured uptake at
+seven concentrations in each of twelve plants, with three plants per
+combination of origin and treatment. The chilled plants were cooled
+during the day and allowed to recover overnight before measurement.
+Uptake is measured in micromoles per square metre per second. The
+original study reports <code>conc</code> in microlitres per litre (<span class="math inline">\mu\mathrm{L}\,\mathrm{L}^{-1}</span>), which we use
+for the axes and rates of change below. <a href="https://doi.org/10.2307/1938276" class="external-link">Potvin et al. (1990)</a></p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">plant</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="fu">datasets</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/r/datasets/zCO2.html" class="external-link">CO2</a></span><span class="op">)</span></span>
 <span><span class="va">plant</span><span class="op">$</span><span class="va">Plant</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">plant</span><span class="op">$</span><span class="va">Plant</span>, ordered <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">uptake_label</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="va">CO</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span><span class="op">~</span><span class="va">uptake</span><span class="op">~</span><span class="op">(</span><span class="va">mu</span><span class="op">*</span><span class="va">mol</span><span class="op">~</span><span class="va">m</span><span class="op">^</span><span class="op">{</span><span class="op">-</span><span class="fl">2</span><span class="op">}</span><span class="op">~</span><span class="va">s</span><span class="op">^</span><span class="op">{</span><span class="op">-</span><span class="fl">1</span><span class="op">}</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">concentration_label</span> <span class="op">&lt;-</span> <span class="st">"Ambient CO2 concentration (data units: mL/L)"</span></span>
+<span><span class="va">concentration_label</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span></span>
+<span>  <span class="va">Ambient</span> <span class="op">~</span> <span class="va">CO</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span> <span class="op">~</span> <span class="va">concentration</span> <span class="op">~</span> <span class="op">(</span><span class="va">mu</span> <span class="op">*</span> <span class="va">L</span> <span class="op">~</span> <span class="va">L</span><span class="op">^</span><span class="op">{</span><span class="op">-</span><span class="fl">1</span><span class="op">}</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">plant</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">conc</span>, <span class="va">uptake</span>, colour <span class="op">=</span> <span class="va">Treatment</span>, group <span class="op">=</span> <span class="va">Plant</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
@@ -141,13 +142,13 @@ We fit a separate smooth concentration response for each treatment, and
 allow the treatment contrast in average log uptake to differ by origin.
 A plant random intercept allows measurements from the same plant to
 share a persistent deviation from the fitted curve.</p>
-<p>All responses are positive. A Gamma distribution with a log link
-preserves positive fitted means and assumes that residual variability
-grows with the mean. The model assumes that the <em>shape</em> of each
-treatment curve on the log scale is shared between origins. The origin
-interaction changes its height. With three plants per combination,
-sharing those shapes lets us estimate treatment curves without fitting a
-separate shape to every origin and treatment combination.</p>
+<p>All responses are positive. The log link ensures positive fitted
+means, and the Gamma model assumes that residual standard deviation is
+proportional to the mean. On the log scale the model uses the same
+concentration smooth for both origins within a treatment. The
+origin-by-treatment interaction allows the difference in curve height
+between origins to vary by treatment. Sharing smooths lets both origins
+inform the estimated shape for each treatment.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">m_uptake</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span></span>
 <span>  <span class="va">uptake</span> <span class="op">~</span> <span class="va">Type</span> <span class="op">*</span> <span class="va">Treatment</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">conc</span>, by <span class="op">=</span> <span class="va">Treatment</span>, k <span class="op">=</span> <span class="fl">5</span><span class="op">)</span> <span class="op">+</span></span>
@@ -167,18 +168,19 @@ separate shape to every origin and treatment combination.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> s(conc):Treatmentnonchilled      TPRS        4  3.91    3.99    102.   &lt; 0.001</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> s(conc):Treatmentchilled         TPRS        4  3.88    3.99     69.9  &lt; 0.001</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">7</span> s(Plant)                         Random…    12  6.92    8         6.96 &lt; 0.001</span></span></code></pre></div>
-<p><code>k = 5</code> limits each treatment curve’s complexity; REML
-estimates the penalties that control its smoothness. It does not force
-five effective degrees of freedom. The plant intercept accounts for
-persistent differences in curve height. Residual patterns against
-concentration can show whether plant differences also involve curve
-shape; the <a href="model-checking.html">diagnostic workflow</a>
-explains checks with fitted effects and simulated effects. The treatment
-comparison has three independent plants per combination, even though
-each plant contributes seven measurements.</p>
+<p><code>k = 5</code> sets the basis dimension for each treatment
+smooth. REML estimates how strongly to penalise wiggliness within that
+basis. The plant intercept accounts for persistent differences in curve
+height. Residual patterns against concentration can show whether plant
+differences also involve curve shape. See the <a href="model-checking.html">diagnostic workflow</a> for checks with
+fitted and simulated effects. The experiment paired chilled and control
+plants within each origin. This example accounts for the seven repeated
+measurements per plant and treats plants as independent in the model. An
+analysis using the full experimental design would also account for the
+pairing.</p>
 </div>
 <div class="section level2">
-<h2 id="compare-expected-uptake-on-a-supported-grid">Compare expected uptake on a supported grid<a class="anchor" aria-label="anchor" href="#compare-expected-uptake-on-a-supported-grid"></a>
+<h2 id="compare-expected-uptake-over-the-observed-concentration-range">Compare expected uptake over the observed concentration range<a class="anchor" aria-label="anchor" href="#compare-expected-uptake-over-the-observed-concentration-range"></a>
 </h2>
 <p>For each origin and treatment, evaluate concentration across its
 observed range. <code>.by</code> evaluates expressions within observed
@@ -202,12 +204,14 @@ concentration range is the same in all four groups.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> Mississippi nonchilled    95  <span style="text-decoration: underline;">1</span>000</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> Mississippi chilled       95  <span style="text-decoration: underline;">1</span>000</span></span></code></pre></div>
 <p>The <code>Plant</code> expression supplies one actual plant
-identifier in each group. We exclude its random effect below, so every
-curve describes a plant whose random intercept is zero. With a log link,
-this does <strong>not</strong> give the mean obtained by averaging over
-the population distribution of random intercepts. It also excludes
-measurement noise: the bands concern conditional expected uptake, not
-future measurements.</p>
+identifier in each group. We set its random effect to zero with
+<code>exclude = "s(Plant)"</code>, so every curve describes expected
+uptake for a plant with a zero random intercept. Averaging over the
+population of plants would give a higher expected uptake because a
+positive random intercept raises uptake by more than an equally large
+negative intercept lowers it. The bands describe uncertainty in the
+curves of expected uptake. Prediction intervals for new measurements
+would also include variation around those curves.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">uptake_fitted</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fitted_values.html">fitted_values</a></span><span class="op">(</span><span class="va">m_uptake</span>,</span>
 <span>  data <span class="op">=</span> <span class="va">uptake_grid</span>, exclude <span class="op">=</span> <span class="st">"s(Plant)"</span>,</span>
@@ -227,14 +231,14 @@ For the Quebec plants the treatment curves are closer. Overlap between
 two prediction bands is not a direct test of their difference: both
 curves depend on the same estimated coefficients, and their errors are
 correlated.</p>
-<p>The default <code>interval = "confidence"</code> gives a separate,
+<p>The default <code>interval = "confidence"</code> gives a separate
 pointwise interval at each row. <code>interval = "simultaneous"</code>
-instead calibrates one band across all 240 supplied rows, including both
-origins and treatments. It uses the joint coefficient covariance on the
-link scale and then transforms the limits. Coverage is approximate
-posterior coverage on this finite grid. It does not extend outside the
-grid, or guarantee coverage between its points. The returned
-<code>.se</code> remains a standard error on the link scale.</p>
+constructs one band with approximate posterior coverage across all 240
+supplied rows together, including both origins and treatments. This
+joint coverage applies to the evaluated rows.
+<code><a href="../reference/fitted_values.html">fitted_values()</a></code> constructs the band on the link scale and
+then transforms the limits to the uptake scale. The returned
+<code>.se</code> is on the link scale.</p>
 </div>
 <div class="section level2">
 <h2 id="estimate-the-treatment-difference-directly">Estimate the treatment difference directly<a class="anchor" aria-label="anchor" href="#estimate-the-treatment-difference-directly"></a>
@@ -255,18 +259,18 @@ origin.</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">concentration_label</span>,</span>
 <span>    y <span class="op">=</span> <span class="st">"Expected uptake: nonchilled minus chilled"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="prediction-comparisons_files/figure-html/treatment-differences-1.png" class="r-plt" alt="" width="700"></p>
-<p>The factor level order determines subtraction: nonchilled minus
-chilled here. A positive difference means lower uptake after chilling.
-The Mississippi difference becomes clearly positive over much of the
-range; the evidence for a difference in Quebec is weaker. The zero
-reference line and interval limits show which evaluated concentrations
-support a positive contrast. Where the interval contains zero, the
-direction of the treatment difference remains unresolved.</p>
-<p>The delta method approximates a response-scale difference by its
-local linear change with the coefficients, then propagates their joint
-covariance. On the link scale the contrast calculation is linear; on the
-response scale it is an approximation. Simulation can better describe
-asymmetric uncertainty after a nonlinear inverse link:</p>
+<p>The factor level order makes this the nonchilled mean minus the
+chilled mean. A positive difference means lower expected uptake after
+chilling. Where the band lies above zero, the fitted model supports a
+positive difference. It does so over much of the concentration range in
+Mississippi, with weaker evidence in Quebec. The band covers
+concentrations for both origins jointly because there is one treatment
+contrast.</p>
+<p>The default delta method uses a linear approximation to how changes
+in the coefficients affect predicted differences on the response scale.
+We next apply the inverse link to the predictions from each draw and
+then take the difference. This can give asymmetric intervals on the
+response scale.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">treatment_simulation</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/conditional_differences.html">conditional_differences</a></span><span class="op">(</span><span class="va">m_uptake</span>,</span>
 <span>  by <span class="op">=</span> <span class="st">"Treatment"</span>,</span>
@@ -274,17 +278,16 @@ asymmetric uncertainty after a nonlinear inverse link:</p>
 <span>  exclude <span class="op">=</span> <span class="st">"s(Plant)"</span>, scale <span class="op">=</span> <span class="st">"response"</span>, uncertainty <span class="op">=</span> <span class="st">"simulation"</span>,</span>
 <span>  n_sim <span class="op">=</span> <span class="fl">2000</span>, seed <span class="op">=</span> <span class="fl">2026</span></span>
 <span><span class="op">)</span></span>
-<span><span class="va">treatment_simulation</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">Type</span>, <span class="va">conc</span>, <span class="va">.level_1</span>, <span class="va">.level_2</span>, <span class="va">.diff</span>, <span class="va">.se</span>, <span class="va">.lower_ci</span>, <span class="va">.upper_ci</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 8</span></span></span>
-<span><span class="co">#&gt;   Type         conc .level_1   .level_2 .diff   .se .lower_ci .upper_ci</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> Quebec        250 nonchilled chilled   5.00  3.45     -<span style="color: #BB0000;">1.45</span>      12.1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> Mississippi   250 nonchilled chilled  10.8   2.17      6.70      15.2</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> Quebec        500 nonchilled chilled   5.92  3.82     -<span style="color: #BB0000;">1.42</span>      13.4</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> Mississippi   500 nonchilled chilled  11.7   2.45      7.29      16.7</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> Quebec        750 nonchilled chilled   5.32  4.61     -<span style="color: #BB0000;">3.55</span>      14.4</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> Mississippi   750 nonchilled chilled  12.3   2.88      6.60      18.1</span></span></code></pre></div>
+<span><span class="va">treatment_simulation</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 10</span></span></span>
+<span><span class="co">#&gt;   .contrast .level_1  .level_2 .diff   .se .lower_ci .upper_ci  conc Type  Plant</span></span>
+<span><span class="co">#&gt;       <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>         1 nonchill… chilled   5.00  3.45     -<span style="color: #BB0000;">1.45</span>      12.1   250 Queb… Qn1  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>         1 nonchill… chilled  10.8   2.17      6.70      15.2   250 Miss… Qn1  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>         1 nonchill… chilled   5.92  3.82     -<span style="color: #BB0000;">1.42</span>      13.4   500 Queb… Qn1  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>         1 nonchill… chilled  11.7   2.45      7.29      16.7   500 Miss… Qn1  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>         1 nonchill… chilled   5.32  4.61     -<span style="color: #BB0000;">3.55</span>      14.4   750 Queb… Qn1  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span>         1 nonchill… chilled  12.3   2.88      6.60      18.1   750 Miss… Qn1</span></span></code></pre></div>
 <p>For each posterior draw, gratia predicts both treatments with the
 <strong>same</strong> coefficient vector and subtracts within that draw.
 Sampling treatments independently would lose their covariance. These
@@ -292,12 +295,12 @@ pointwise intervals are equal-tailed posterior quantiles; they need not
 be symmetric about <code>.diff</code>, which is always the difference of
 the fitted predictions.</p>
 <p>The choice of what is covered jointly matters when comparing more
-than two groups. Putting both factors in <code>by</code> compares the
-four joint combinations, giving six pairwise contrasts.
-<code>simultaneous_scope = "contrast"</code> covers each pair separately
-across every concentration and conditioning stratum; <code>"all"</code>
-covers all returned pairs together. Use the latter when the scientific
-claim concerns any of those six comparisons.</p>
+than two groups. Putting both factors in <code>by</code> compares all
+four combinations of origin and treatment, giving six pairwise
+contrasts. <code>simultaneous_scope = "contrast"</code> constructs a
+separate band for each pair across the concentration grid. Choose
+<code>"all"</code> if you plan to inspect all six comparisons and want
+joint coverage across both the pairs and the concentrations.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">all_differences</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/conditional_differences.html">conditional_differences</a></span><span class="op">(</span><span class="va">m_uptake</span>,</span>
 <span>  by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Type"</span>, <span class="st">"Treatment"</span><span class="op">)</span>, condition <span class="op">=</span> <span class="st">"conc"</span>, exclude <span class="op">=</span> <span class="st">"s(Plant)"</span>,</span>
@@ -307,36 +310,29 @@ claim concerns any of those six comparisons.</p>
 <span><span class="va">all_differences</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">.contrast</span>, <span class="va">Type_1</span>, <span class="va">Treatment_1</span>, <span class="va">Type_2</span>, <span class="va">Treatment_2</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/slice.html" class="external-link">slice_min</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">conc</span> <span class="op">-</span> <span class="fl">500</span><span class="op">)</span>, n <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">ungroup</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">Type_1</span>, <span class="va">Treatment_1</span>, <span class="va">Type_2</span>, <span class="va">Treatment_2</span>, <span class="va">conc</span>,</span>
-<span>    <span class="va">.diff</span>, <span class="va">.lower_ci</span>, <span class="va">.upper_ci</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 8</span></span></span>
-<span><span class="co">#&gt;   Type_1      Treatment_1 Type_2     Treatment_2  conc .diff .lower_ci .upper_ci</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> Quebec      nonchilled  Quebec     chilled      494.  5.97    -<span style="color: #BB0000;">5.70</span>       17.6</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> Quebec      nonchilled  Mississip… nonchilled   494. 10.6      0.793      20.4</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> Quebec      nonchilled  Mississip… chilled      494. 22.4     12.7        32.0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> Quebec      chilled     Mississip… nonchilled   494.  4.61    -<span style="color: #BB0000;">5.25</span>       14.5</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> Quebec      chilled     Mississip… chilled      494. 16.4      8.78       24.0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> Mississippi nonchilled  Mississip… chilled      494. 11.8      4.29       19.3</span></span></code></pre></div>
-<p>Simultaneous simulation bands are symmetric calibrated bands about
-<code>.diff</code>, not equal-tailed pointwise intervals. Both
-uncertainty methods concern mean differences, not observation noise.
-They support ordinary single-predictor GAM and BAM families, including
-Gamma, negative binomial and Tweedie. General families with multiple
-linear predictors remain unsupported by
-<code><a href="../reference/conditional_differences.html">conditional_differences()</a></code>.</p>
-<p>SCAM fits with supported single-predictor families also support link-
-and response-scale differences, with delta or simulation uncertainty and
-pointwise or simultaneous intervals. Delta intervals use the local
-covariance of the transformed coefficients. With
-<code>uncertainty = "simulation"</code>, the default
-<code>method = "gaussian"</code> draws unrestricted fitting coefficients
-and applies the fitted positivity transformation.
-<code>method = "user"</code> accepts transformed coefficient draws that
-satisfy the fitted coefficient constraints; MH sampling is unavailable
-for SCAM fits. Smoothing-parameter uncertainty is unavailable for both
-uncertainty methods, so retain <code>unconditional = FALSE</code>.</p>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">ungroup</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 12</span></span></span>
+<span><span class="co">#&gt;   .contrast Type_1      Type_2     Treatment_1 Treatment_2 .diff   .se .lower_ci</span></span>
+<span><span class="co">#&gt;       <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>         1 Quebec      Quebec     nonchilled  chilled      5.97  3.83    -<span style="color: #BB0000;">5.70</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>         2 Quebec      Mississip… nonchilled  nonchilled  10.6   3.22     0.793</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>         3 Quebec      Mississip… nonchilled  chilled     22.4   3.17    12.7  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>         4 Quebec      Mississip… chilled     nonchilled   4.61  3.24    -<span style="color: #BB0000;">5.25</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>         5 Quebec      Mississip… chilled     chilled     16.4   2.50     8.78 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span>         6 Mississippi Mississip… nonchilled  chilled     11.8   2.46     4.29 </span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 4 more variables: .upper_ci &lt;dbl&gt;, conc &lt;dbl&gt;, Plant &lt;fct&gt;, .crit &lt;dbl&gt;</span></span></span></code></pre></div>
+<p>Simultaneous simulation bands are symmetric about <code>.diff</code>;
+their widths are chosen for joint coverage. Both uncertainty methods
+describe differences in mean responses, excluding observation noise.
+<code><a href="../reference/conditional_differences.html">conditional_differences()</a></code> supports ordinary GAM and BAM
+families with one linear predictor, including Gamma, negative binomial
+and Tweedie. Families with several linear predictors remain
+unsupported.</p>
+<p>The same comparisons are available for supported {scam} models. Their
+intervals condition on the fitted smoothing parameters, so retain
+<code>unconditional = FALSE</code>. The <a href="scam-support.html">scam
+article</a> explains the coefficient transformations used for their
+analytic intervals and simulation draws.</p>
 <div class="section level3">
 <h3 id="compare-shape-separately-from-complete-responses">Compare shape separately from complete responses<a class="anchor" aria-label="anchor" href="#compare-shape-separately-from-complete-responses"></a>
 </h3>
@@ -364,11 +360,12 @@ several pairs.</p>
 <div class="section level2">
 <h2 id="where-does-uptake-change-fastest">Where does uptake change fastest?<a class="anchor" aria-label="anchor" href="#where-does-uptake-change-fastest"></a>
 </h2>
-<p>The derivative of expected uptake answers how much uptake changes for
-a small increase in concentration. This is different from
-differentiating a centred log-uptake smooth. Hold origin and treatment
-fixed, and evaluate within the range rather than perturbing an endpoint
-beyond it.</p>
+<p>The derivative of expected uptake measures how much the mean response
+changes for a small increase in concentration, in uptake units per
+concentration unit. We compare delta-method and simulation intervals
+while holding origin and treatment fixed. Evaluation points lie inside
+the observed range so the finite differences do not require predictions
+beyond its endpoints.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">rate_grid</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/data_slice.html">data_slice</a></span><span class="op">(</span><span class="va">m_uptake</span>,</span>
 <span>  conc <span class="op">=</span> <span class="fu"><a href="../reference/evenly.html">evenly</a></span><span class="op">(</span><span class="va">conc</span>, n <span class="op">=</span> <span class="fl">60</span>, lower <span class="op">=</span> <span class="fl">110</span>, upper <span class="op">=</span> <span class="fl">990</span><span class="op">)</span>,</span>
@@ -392,7 +389,7 @@ beyond it.</p>
 <span>    colour <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">concentration_label</span>,</span>
-<span>    y <span class="op">=</span> <span class="st">"Change in expected uptake per concentration unit"</span><span class="op">)</span></span></code></pre></div>
+<span>    y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="st">"Change in expected uptake per"</span> <span class="op">~</span> <span class="va">mu</span> <span class="op">*</span> <span class="va">L</span> <span class="op">~</span> <span class="va">L</span><span class="op">^</span><span class="op">{</span><span class="op">-</span><span class="fl">1</span><span class="op">}</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="prediction-comparisons_files/figure-html/response-rates-1.png" class="r-plt" alt="" width="700"></p>
 <p>For the nonchilled Quebec curve, the fastest fitted increase is at
 low concentrations; further increases have a smaller effect over much of
@@ -421,13 +418,14 @@ boundary or with unusual scales, supply a positive absolute
 is the rate of uptake change.</p>
 </div>
 <div class="section level2">
-<h2 id="keep-covariate-transformations-and-derivative-units-distinct">Keep covariate transformations and derivative units distinct<a class="anchor" aria-label="anchor" href="#keep-covariate-transformations-and-derivative-units-distinct"></a>
+<h2 id="plot-transformed-covariates-and-differentiate-in-the-intended-units">Plot transformed covariates and differentiate in the intended
+units<a class="anchor" aria-label="anchor" href="#plot-transformed-covariates-and-differentiate-in-the-intended-units"></a>
 </h2>
-<p>An alternative model uses a smooth of log concentration. This gives
-more resolution to the lower concentrations where uptake changes
-quickly. It also assumes a common concentration shape across treatments.
-We use it to show how a transformed covariate changes the plotting
-coordinates and derivative units.</p>
+<p>An alternative model uses a smooth of log concentration. The log
+transformation stretches differences among lower concentrations, where
+uptake changes quickly. This example also uses a common concentration
+smooth across treatments. We use it to show how a transformed covariate
+affects the plotting coordinates and derivative units.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">m_log_conc</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span></span>
 <span>  <span class="va">uptake</span> <span class="op">~</span> <span class="va">Type</span> <span class="op">*</span> <span class="va">Treatment</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">conc</span><span class="op">)</span>, k <span class="op">=</span> <span class="fl">6</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">Plant</span>, bs <span class="op">=</span> <span class="st">"re"</span><span class="op">)</span>,</span>
@@ -469,6 +467,10 @@ contribution to log uptake. Drawing the same object with
 changing the estimates. The straight relationship in log concentration
 appears curved when drawn against concentration in its original
 units.</p>
+<p>For a smooth of log concentration, the derivative can be taken with
+respect to either log concentration or concentration itself. We compute
+both and use the chain rule to check that they agree after converting
+units.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">log_coordinate_rate</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/derivatives.html">derivatives</a></span><span class="op">(</span><span class="va">m_log_conc</span>,</span>
 <span>  select <span class="op">=</span> <span class="st">"s(log(conc))"</span>, data <span class="op">=</span> <span class="va">rate_grid</span>, type <span class="op">=</span> <span class="st">"central"</span></span>
@@ -502,14 +504,14 @@ instead. For tensor smooths such as
 <code>te(log(conc), temperature)</code>, use
 <code><a href="../reference/partial_derivatives.html">partial_derivatives()</a></code> with
 <code>wrt = "covariate", focal = "conc"</code> while holding temperature
-fixed. See <a href="transformed-covariates.html">Functions of covariates
-and evaluation environments</a> for worked tensor, transformed-offset
-and local-function examples. Preserve the fitting environment, or pass
-<code>envir</code>, if expressions need local functions or constants at
-new data.</p>
+fixed. See <a href="transformed-covariates.html">Predictions, plots and
+derivatives with transformed covariates</a> for worked tensor,
+transformed-offset and local-function examples. Preserve the fitting
+environment, or pass <code>envir</code>, if expressions need local
+functions or constants at new data.</p>
 </div>
 <div class="section level2">
-<h2 id="respect-the-study-design-when-generating-predictions">Respect the study design when generating predictions<a class="anchor" aria-label="anchor" href="#respect-the-study-design-when-generating-predictions"></a>
+<h2 id="keep-each-plant-with-its-observed-origin-and-treatment">Keep each plant with its observed origin and treatment<a class="anchor" aria-label="anchor" href="#keep-each-plant-with-its-observed-origin-and-treatment"></a>
 </h2>
 <p><code><a href="../reference/evenly.html">all_levels()</a></code> is a clearly named alias of
 <code><a href="../reference/evenly.html">evenly()</a></code> for factors. It keeps their fitted levels, which
@@ -591,14 +593,14 @@ measured response and refit:</p>
 <span><span class="va">fitted_missing</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fitted_values.html">fitted_values</a></span><span class="op">(</span><span class="va">m_missing</span><span class="op">)</span></span>
 <span><span class="va">fitted_missing</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>uptake <span class="op">=</span> <span class="va">plant_missing</span><span class="op">$</span><span class="va">uptake</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">.row</span>, <span class="va">conc</span>, <span class="va">uptake</span>, <span class="va">.fitted</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/slice.html" class="external-link">slice_head</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3 × 4</span></span></span>
-<span><span class="co">#&gt;    .row  conc uptake .fitted</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>     1    <span style="color: #BB0000;">NA</span>   <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>     2   175   30.4    25.5</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>     3   250   34.8    35.6</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3 × 11</span></span></span>
+<span><span class="co">#&gt;    .row Type   Treatment   conc Plant .parameter .fitted     .se .lower_ci</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>     1 <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span>            <span style="color: #BB0000;">NA</span> <span style="color: #BB0000;">NA</span>    mean          <span style="color: #BB0000;">NA</span>   <span style="color: #BB0000;">NA</span>           <span style="color: #BB0000;">NA</span>  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>     2 Quebec nonchilled   175 Qn1   mean          25.5  0.048<span style="text-decoration: underline;">4</span>      23.2</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>     3 Quebec nonchilled   250 Qn1   mean          35.6  0.048<span style="text-decoration: underline;">9</span>      32.4</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 2 more variables: .upper_ci &lt;dbl&gt;, uptake &lt;dbl&gt;</span></span></span></code></pre></div>
 <p>The first observation was excluded from fitting, so its default
 fitted result is missing. In contrast, explicit prediction data with a
 missing response can still give a fitted mean when their predictors are
@@ -606,14 +608,14 @@ present:</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">prediction_missing</span> <span class="op">&lt;-</span> <span class="va">plant_missing</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span>, <span class="op">]</span></span>
 <span><span class="va">prediction_missing</span><span class="op">$</span><span class="va">conc</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="cn">NA_real_</span></span>
-<span><span class="fu"><a href="../reference/fitted_values.html">fitted_values</a></span><span class="op">(</span><span class="va">m_missing</span>, data <span class="op">=</span> <span class="va">prediction_missing</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">.row</span>, <span class="va">conc</span>, <span class="va">uptake</span>, <span class="va">.fitted</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3 × 4</span></span></span>
-<span><span class="co">#&gt;    .row  conc uptake .fitted</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>     1    95   <span style="color: #BB0000;">NA</span>      15.3</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>     2    <span style="color: #BB0000;">NA</span>   30.4    <span style="color: #BB0000;">NA</span>  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>     3   250   34.8    35.6</span></span></code></pre></div>
+<span><span class="fu"><a href="../reference/fitted_values.html">fitted_values</a></span><span class="op">(</span><span class="va">m_missing</span>, data <span class="op">=</span> <span class="va">prediction_missing</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3 × 11</span></span></span>
+<span><span class="co">#&gt;    .row Plant Type   Treatment  conc uptake .parameter .fitted     .se .lower_ci</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>     1 Qn1   Quebec nonchill…    95   <span style="color: #BB0000;">NA</span>   mean          15.3  0.062<span style="text-decoration: underline;">9</span>      13.5</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>     2 Qn1   Quebec nonchill…    <span style="color: #BB0000;">NA</span>   30.4 mean          <span style="color: #BB0000;">NA</span>   <span style="color: #BB0000;">NA</span>           <span style="color: #BB0000;">NA</span>  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>     3 Qn1   Quebec nonchill…   250   34.8 mean          35.6  0.048<span style="text-decoration: underline;">9</span>      32.4</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 1 more variable: .upper_ci &lt;dbl&gt;</span></span></span></code></pre></div>
 <p>The first prediction is available; the second has a missing required
 predictor and retains its row with an <code>NA</code> result.
 <code><a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">na.omit()</a></code> retains only fitting rows instead. Partial
@@ -623,7 +625,7 @@ retained observations before checking their distributions.</p>
 </div>
 </div>
 <div class="section level2">
-<h2 id="which-uncertainty-is-being-propagated">Which uncertainty is being propagated?<a class="anchor" aria-label="anchor" href="#which-uncertainty-is-being-propagated"></a>
+<h2 id="choose-the-coefficient-covariance-for-intervals">Choose the coefficient covariance for intervals<a class="anchor" aria-label="anchor" href="#choose-the-coefficient-covariance-for-intervals"></a>
 </h2>
 <p>The examples use mgcv’s approximate Bayesian coefficient covariance,
 conditional on estimated smoothing parameters.
@@ -637,7 +639,7 @@ calculations:</p>
 <span><span class="co">#&gt; [1] 24 24</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="fu"><a href="../reference/get_vcov.html">get_vcov</a></span><span class="op">(</span><span class="va">m_uptake</span>, term <span class="op">=</span> <span class="st">"s(conc):Treatmentnonchilled"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 4 4</span></span></code></pre></div>
-<p>For APIs that provide <code>frequentist</code>, including
+<p>For functions that provide <code>frequentist</code>, including
 <code><a href="../reference/difference_smooths.html">difference_smooths()</a></code>, <code><a href="../reference/derivatives.html">derivatives()</a></code> and
 <code><a href="../reference/smooth_estimates.html">smooth_estimates()</a></code>, setting it to <code>TRUE</code> selects
 the covariance of the penalised coefficient estimators instead. This
@@ -664,12 +666,6 @@ gaulss documentation</a>, the second inverse link returns
 labelled standard deviation without taking its reciprocal. These
 utilities do not remove the multiple-predictor restrictions of the
 comparison or delta derivative methods.</p>
-<p>The fitted model supports lower expected uptake for chilled
-Mississippi plants over much of the measured range. The Quebec
-comparison has wider intervals relative to its estimated difference,
-leaving its direction less clear. For nonchilled Quebec plants, uptake
-rises fastest at low concentrations and changes more slowly over the
-remaining range.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

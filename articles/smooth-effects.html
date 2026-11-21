@@ -26,7 +26,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-73</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-75</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -55,13 +55,13 @@
     <li><a class="dropdown-item" href="../articles/shape-constrained-intervals.html">Intervals for shape-constrained smooths</a></li>
     <li><a class="dropdown-item" href="../articles/spatial-smooths.html">Choose a smooth for the spatial question</a></li>
     <li><a class="dropdown-item" href="../articles/response-distributions.html">Checking different response distributions</a></li>
-    <li><a class="dropdown-item" href="../articles/transformed-covariates.html">Functions of covariates and evaluation environments</a></li>
+    <li><a class="dropdown-item" href="../articles/transformed-covariates.html">Predictions, plots and derivatives with transformed covariates</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Essentials</h6></li>
-    <li><a class="dropdown-item" href="../articles/data-slices.html">Data slices</a></li>
-    <li><a class="dropdown-item" href="../articles/custom-plotting.html">Customizing plots</a></li>
+    <li><a class="dropdown-item" href="../articles/data-slices.html">Creating prediction grids with data_slice()</a></li>
+    <li><a class="dropdown-item" href="../articles/custom-plotting.html">Customising plots</a></li>
     <li><a class="dropdown-item" href="../articles/posterior-simulation.html">Posterior Simulation</a></li>
-    <li><a class="dropdown-item" href="../articles/sampling-migration.html">Migrating posterior sampling calls</a></li>
+    <li><a class="dropdown-item" href="../articles/sampling-migration.html">Updating sampling code for gratia 0.12.0</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
@@ -93,26 +93,30 @@
 
     
     
-<p>An effect plot isolates one contribution to a model. It helps explain
-how the model works, but it need not show the expected response. This
-distinction matters especially with interactions, random effects and
-nonlinear links. We use the plant experiment from <a href="glmmTMB-support.html">Smooth trends and repeated measurements with
-glmmTMB</a> to explore flexible individual curves, then daily air
-quality measurements to read interaction surfaces.</p>
+<p>Effect plots show how one smooth or parametric term contributes to
+the linear predictor. To obtain the expected response in these examples,
+add the model terms and intercept, then apply the inverse link. In the
+log-link model below, that means exponentiating the sum to get mean
+carbon dioxide uptake. We use the plant experiment from <a href="glmmTMB-support.html">Smooth trends and repeated measurements with
+glmmTMB</a> to plot curves for individual plants, then use daily air
+quality measurements to plot interactions between continuous and
+categorical predictors.</p>
+<p>Load {gratia}, {mgcv} and {ggplot2} for the examples.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://gavinsimpson.github.io/gratia/">"gratia"</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/load_mgcv.html">load_mgcv</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://ggplot2.tidyverse.org" class="external-link">"ggplot2"</a></span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
-<h2 id="do-plants-need-different-curve-shapes">Do plants need different curve shapes?<a class="anchor" aria-label="anchor" href="#do-plants-need-different-curve-shapes"></a>
+<h2 id="fit-and-plot-plant-specific-smooth-curves">Fit and plot plant-specific smooth curves<a class="anchor" aria-label="anchor" href="#fit-and-plot-plant-specific-smooth-curves"></a>
 </h2>
-<p>The carbon dioxide experiment has seven measurements on each of
-twelve plants, with three plants in each origin-treatment combination.
-Positive uptake and increasing residual spread motivate a Gamma model
-with a log link. A shared smooth captures saturation with increasing
-concentration. We now allow plant-specific <em>smooth</em> deviations,
-rather than the straight-line deviations used in the glmmTMB
-article.</p>
+<p>The carbon dioxide experiment measured uptake at seven concentrations
+on each of twelve plants, with three plants per combination of origin
+and treatment. The Gamma model with a log link keeps the fitted means
+positive and lets the spread increase with the mean. In the model below,
+<code>s(log_conc)</code> allows the shared uptake curve to level off as
+concentration increases. The <code><a href="https://rdrr.io/pkg/mgcv/man/t2.html" class="external-link">t2()</a></code> term combines a spline
+for concentration with a plant random effect so that each plant can have
+its own smooth departure from the shared curve.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">plant</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">CO2</span><span class="op">)</span></span>
 <span><span class="va">plant</span><span class="op">$</span><span class="va">Plant</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">plant</span><span class="op">$</span><span class="va">Plant</span>, ordered <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
@@ -133,15 +137,12 @@ article.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> TypeMississippi:Treatmentchilled parame…    <span style="color: #BB0000;">NA</span>  1       1        -<span style="color: #BB0000;">2.57</span> 0.01349</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> s(log_conc)                      TPRS        4  3.85    3.96     79.2  &lt; 0.001</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> t2(log_conc,Plant)               Tensor…    48 30.3    43         8.76 &lt; 0.001</span></span></code></pre></div>
-<p>The tensor product combines a cubic regression spline over
-concentration with a random-effect basis over plants. It penalises
-plant-specific departures and shares information across plants.
-<code>full = TRUE</code> keeps separate penalties for the parts of this
-tensor construction. With only seven observations per plant, the small
-concentration basis is deliberate. Each plant’s concentration
-contribution is the sum of the common curve and its smooth deviation.
-The intercept, origin and treatment terms supply the remaining
-contributions to its fitted log uptake.</p>
+<p>The penalties pull plant-specific departures towards zero. With
+<code>full = TRUE</code>, the model can penalise different parts of the
+tensor product separately. The concentration basis is small because
+there are only seven observations per plant. Use <code>re_levels</code>
+to plot the departures for three named plants from the nonchilled Quebec
+group.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/smooths.html">smooths</a></span><span class="op">(</span><span class="va">plant_gam</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "s(log_conc)"        "t2(log_conc,Plant)"</span></span>
@@ -150,28 +151,32 @@ contributions to its fitted log uptake.</p>
 <span>  xlab <span class="op">=</span> <span class="st">"Centred log concentration"</span>, ylab <span class="op">=</span> <span class="st">"Plant contribution to log uptake"</span><span class="op">)</span> <span class="op">&amp;</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"right"</span><span class="op">)</span> <span class="op">&amp;</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="st">"Plant"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="smooth-effects_files/figure-html/plant-tensor-curves-1.png" class="r-plt" alt="" width="700"></p>
-<p>The numeric covariate is always the horizontal axis even if the
-factor was specified first in the tensor formula. <code>re_levels</code>
-chooses plants by name; it does not refit the model or remove their
-contributions from predictions. The fitted factor ordering is retained.
-Selecting plants of one treatment makes the variation among biological
-replicates visible. Treatment comparisons require the origin and
-treatment terms as well as these plant deviations.</p>
+<p>The concentration goes on the horizontal axis even if the plant
+factor comes first in the tensor formula. <code>re_levels</code> selects
+which plants to display and keeps their order from the fitted factor. To
+see the fitted mean for each plant, plot the fitted values against the
+observations. These values combine the shared curve, the plant’s
+departure, the intercept and the terms for origin and treatment before
+applying the inverse link. The concentration units are microlitres per
+litre (<span class="math inline">\mu\mathrm{L}\,\mathrm{L}^{-1}</span>),
+as reported in Table 1 of the <a href="https://biology.mcgill.ca/faculty/potvin/articles/PotvinLech_90.pdf" class="external-link">original
+study</a>.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">plant</span><span class="op">$</span><span class="va">mean_uptake</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/fitted.values.html" class="external-link">fitted</a></span><span class="op">(</span><span class="va">plant_gam</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">plant</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">conc</span>, <span class="va">uptake</span>, group <span class="op">=</span> <span class="va">Plant</span>, colour <span class="op">=</span> <span class="va">Treatment</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">mean_uptake</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span> <span class="va">Type</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Carbon dioxide concentration (mL/L)"</span>,</span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="va">CO</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span> <span class="op">~</span> <span class="va">concentration</span> <span class="op">~</span> <span class="op">(</span><span class="va">mu</span> <span class="op">*</span> <span class="va">L</span> <span class="op">~</span> <span class="va">L</span><span class="op">^</span><span class="op">{</span><span class="op">-</span><span class="fl">1</span><span class="op">}</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>    y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="va">CO</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span> <span class="op">~</span> <span class="va">uptake</span> <span class="op">~</span> <span class="op">(</span><span class="va">mu</span> <span class="op">*</span> <span class="va">mol</span> <span class="op">~</span> <span class="va">m</span><span class="op">^</span><span class="op">{</span><span class="op">-</span><span class="fl">2</span><span class="op">}</span> <span class="op">~</span> <span class="va">s</span><span class="op">^</span><span class="op">{</span><span class="op">-</span><span class="fl">1</span><span class="op">}</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="smooth-effects_files/figure-html/plant-full-curves-1.png" class="r-plt" alt="" width="700"></p>
-<p>The model explains rapid increases and subsequent flattening in these
-observed plants. This is conditional on their fitted deviations, rather
-than a forecast for a new plant. The smooth deviations allow each
-plant’s curve to bend, whereas straight random slopes only change its
-tilt. For treatment comparisons, each plant supplies one independent
-curve: three replicates per origin and treatment combination.</p>
+<p>The fitted curves rise rapidly and then flatten for these plants.
+They include each plant’s estimated departure. At the group level, the
+model assumes the same concentration response shape for all combinations
+of origin and treatment, with group differences entering as multipliers
+of mean uptake. Use <code><a href="../reference/variance_comp.html">variance_comp()</a></code> to extract the variance
+components for the penalties on the shared smooth and the plant-specific
+departures.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/variance_comp.html">variance_comp</a></span><span class="op">(</span><span class="va">plant_gam</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 5 × 5</span></span></span>
@@ -182,30 +187,13 @@ curve: three replicates per origin and treatment combination.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> t2(log_conc,Plant)1r  0.000<span style="text-decoration: underline;">957</span>   0.030<span style="text-decoration: underline;">9</span>   0.018<span style="text-decoration: underline;">6</span>     0.051<span style="text-decoration: underline;">5</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> t2(log_conc,Plant)2r  0.000<span style="text-decoration: underline;">502</span>   0.022<span style="text-decoration: underline;">4</span>   0.014<span style="text-decoration: underline;">1</span>     0.035<span style="text-decoration: underline;">5</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> scale                 0.003<span style="text-decoration: underline;">46</span>    0.058<span style="text-decoration: underline;">8</span>   0.047<span style="text-decoration: underline;">1</span>     0.073<span style="text-decoration: underline;">4</span></span></span></code></pre></div>
-<p>These are variance components in the random-effect representation of
-the penalised splines. Different tensor components can have different
-estimated variances, so one variance alone does not describe all
-plant-curve variation. The spline rows are not observation variances;
-the <code>scale</code> row estimates Gamma dispersion, which multiplies
-the squared mean to give response variance. Fits selected by GCV may
-lack confidence intervals; the estimates remain available. A model with
-no extractable variance components returns an empty table.</p>
-<p>Tensor plots follow the same principle in higher dimensions. Two
-continuous covariates make a surface; additional numerical dimensions
-become conditioning slices and factor dimensions become facets.
-<code>n_2d</code> controls each surface axis, while <code>n_3d</code>
-and <code>n_4d</code> limit conditioning dimensions. The latter also
-limit factor levels to the first levels in fitted order. Use named
-<code>re_levels</code> or explicit evaluation <code>data</code> to
-choose meaningful groups. With two factor margins, the display is
-categorical estimates and intervals, faceted by the second factor; there
-is no numeric axis to interpolate between categories. These rules apply
-to <code><a href="https://rdrr.io/pkg/mgcv/man/te.html" class="external-link">te()</a></code>, <code><a href="https://rdrr.io/pkg/mgcv/man/te.html" class="external-link">ti()</a></code> and <code><a href="https://rdrr.io/pkg/mgcv/man/t2.html" class="external-link">t2()</a></code>
-random-effect tensor terms.</p>
+<p>The spline rows describe how strongly the model penalises different
+parts of the fitted curves. The <code>scale</code> row estimates the
+Gamma dispersion. Multiplying it by the squared fitted mean gives the
+estimated variance of uptake around that mean.</p>
 </div>
 <div class="section level2">
-<h2 id="is-the-temperature-association-different-on-calm-and-windy-days">Is the temperature association different on calm and windy
-days?<a class="anchor" aria-label="anchor" href="#is-the-temperature-association-different-on-calm-and-windy-days"></a>
+<h2 id="fit-temperature-wind-and-month-interactions">Fit temperature, wind and month interactions<a class="anchor" aria-label="anchor" href="#fit-temperature-wind-and-month-interactions"></a>
 </h2>
 <p>The <code>airquality</code> data contain daily New York measurements
 from May to September 1973. Ozone is in parts per billion, temperature
@@ -221,6 +209,7 @@ interaction.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ozone</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">na.omit</a></span><span class="op">(</span><span class="va">airquality</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Ozone"</span>, <span class="st">"Solar.R"</span>, <span class="st">"Wind"</span>, <span class="st">"Temp"</span>, <span class="st">"Month"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="va">ozone</span><span class="op">$</span><span class="va">month</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">ozone</span><span class="op">$</span><span class="va">Month</span>, labels <span class="op">=</span> <span class="va">month.abb</span><span class="op">[</span><span class="fl">5</span><span class="op">:</span><span class="fl">9</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/contrasts.html" class="external-link">contrasts</a></span><span class="op">(</span><span class="va">ozone</span><span class="op">$</span><span class="va">month</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/contrast.html" class="external-link">contr.treatment</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/levels.html" class="external-link">levels</a></span><span class="op">(</span><span class="va">ozone</span><span class="op">$</span><span class="va">month</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">ozone_gam</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">Ozone</span><span class="op">)</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">Solar.R</span>, k <span class="op">=</span> <span class="fl">6</span><span class="op">)</span> <span class="op">+</span> <span class="va">Temp</span> <span class="op">*</span> <span class="va">Wind</span> <span class="op">*</span> <span class="va">month</span>,</span>
 <span>  data <span class="op">=</span> <span class="va">ozone</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">ozone</span><span class="op">$</span><span class="va">month</span><span class="op">)</span></span>
@@ -245,10 +234,9 @@ interaction.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> Temp:monthJul parametric    <span style="color: #BB0000;">NA</span>     1       1     -<span style="color: #BB0000;">2.41</span> 0.01808</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 11 more rows</span></span></span></code></pre></div>
 <p>A three-way interaction gives each month its own temperature-by-wind
-surface. That flexibility makes the model useful for exploring
-stability, but estimates in sparsely sampled parts of a month’s weather
-range may be imprecise. Inspect the distribution of observations before
-interpreting a surface:</p>
+surface. Estimates can be imprecise where a month has few observations
+at similar temperatures and wind speeds. Plot those observations before
+interpreting the fitted surfaces.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">ozone</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">Temp</span>, <span class="va">Wind</span>, colour <span class="op">=</span> <span class="va">Ozone</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
@@ -258,8 +246,12 @@ interpreting a surface:</p>
 <p><img src="smooth-effects_files/figure-html/ozone-support-1.png" class="r-plt" alt="" width="700"></p>
 </div>
 <div class="section level2">
-<h2 id="start-with-the-interaction-then-reconstruct-the-model">Start with the interaction, then reconstruct the model<a class="anchor" aria-label="anchor" href="#start-with-the-interaction-then-reconstruct-the-model"></a>
+<h2 id="plot-the-separate-interaction-contributions">Plot the separate interaction contributions<a class="anchor" aria-label="anchor" href="#plot-the-separate-interaction-contributions"></a>
 </h2>
+<p>Start with the temperature-by-wind interaction for May, the reference
+month. <code><a href="../reference/parametric_terms.html">parametric_terms()</a></code> lists the available terms;
+<code><a href="../reference/parametric_effects.html">parametric_effects()</a></code> evaluates the chosen contribution on a
+grid for plotting.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/parametric_terms.html">parametric_terms</a></span><span class="op">(</span><span class="va">ozone_gam</span><span class="op">)</span></span>
 <span><span class="co">#&gt;              Temp              Wind             month         Temp:Wind </span></span>
@@ -270,39 +262,32 @@ interpreting a surface:</p>
 <span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">weather_effect</span>, surface <span class="op">=</span> <span class="st">"tile"</span><span class="op">)</span> <span class="op">&amp;</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Temperature (degrees F)"</span>, y <span class="op">=</span> <span class="st">"Wind speed (mph)"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="smooth-effects_files/figure-html/ozone-numeric-interaction-1.png" class="r-plt" alt="" width="700"></p>
-<p>This surface shows the coefficient-weighted temperature-by-wind
-contribution for the reference month, May. Its colours are partial
-contributions to <strong>log</strong> ozone. They exclude the intercept,
-the temperature and wind main effects, the solar smooth, and other
-interaction terms. The diverging palette centres at zero, making the
-contribution’s sign visible. To interpret the complete temperature
-association, combine this interaction with the main temperature effect
-and the monthly adjustments below.</p>
+<p>Each point on the surface shows the fitted coefficient for
+<code>Temp:Wind</code> multiplied by the temperature and wind speed. The
+colours show how much this term adds to or subtracts from fitted
+<strong>log</strong> ozone. This is the interaction for May and the
+starting point for the other months’ interactions.</p>
 <p><code>surface = "tile"</code> uses vector rectangles, which can be
 useful in a vector figure. The default <code>"raster"</code> keeps large
 plots compact. <code>n_2d = 30</code> evaluates 30 points along each
-surface axis, rather than borrowing the 100-point curve resolution.
-Increase <code>n_2d</code> when you need a finer display of the same
-fitted surface.</p>
+surface axis. Increase <code>n_2d</code> for a finer display of the same
+fitted surface. Next plot how each month’s temperature-by-wind
+interaction differs from May’s.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="fu"><a href="../reference/parametric_effects.html">parametric_effects</a></span><span class="op">(</span><span class="va">ozone_gam</span>, terms <span class="op">=</span> <span class="st">"Temp:Wind:month"</span>, n_2d <span class="op">=</span> <span class="fl">25</span><span class="op">)</span>,</span>
 <span>  surface <span class="op">=</span> <span class="st">"tile"</span><span class="op">)</span> <span class="op">&amp;</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Temperature (degrees F)"</span>, y <span class="op">=</span> <span class="st">"Wind speed (mph)"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="smooth-effects_files/figure-html/ozone-month-interactions-1.png" class="r-plt" alt="" width="700"></p>
-<p>The additional monthly contributions appear in conditioning facets.
-Under treatment contrast coding the reference month’s contribution is
-zero. The other panels are adjustments to the May interaction, not
-complete monthly surfaces. Fill limits are shared across facets and
-centred at zero. If a surface varies mainly because of poor covariate
-support, masking helps avoid giving extrapolation the same visual
-prominence as interpolation: <code>dist</code> uses distance after
-scaling the displayed axes into the unit square. Support is pooled
-across months, so a location left visible may still lie outside an
-individual month’s observed weather conditions. Use the monthly
-observation plot above to decide which parts of each surface have local
-data support.</p>
-<p>Numeric-by-factor interactions are grouped curves rather than
-surfaces:</p>
+<p>The model uses treatment contrasts with May as the reference month,
+so the adjustment is zero in May. The panels share a colour scale
+centred at zero. <code>dist</code> controls how far a grid point can be
+from the observations before it is hidden, after scaling the two axes to
+range from zero to one. This uses observations from all months. Use the
+monthly scatterplots above to see which parts of each surface are
+supported by observations from that month.</p>
+<p>Plot the temperature-by-month interaction to see how it adjusts the
+main temperature slope. Each month has its own straight line because the
+term is linear in temperature.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="fu"><a href="../reference/parametric_effects.html">parametric_effects</a></span><span class="op">(</span><span class="va">ozone_gam</span>, terms <span class="op">=</span> <span class="st">"Temp:month"</span><span class="op">)</span><span class="op">)</span> <span class="op">&amp;</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Temperature (degrees F)"</span>, y <span class="op">=</span> <span class="st">"Additional contribution to log ozone"</span><span class="op">)</span></span></code></pre></div>
@@ -321,18 +306,18 @@ conditions:</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Observed log ozone"</span>, y <span class="op">=</span> <span class="st">"Fitted log ozone"</span>, colour <span class="op">=</span> <span class="st">"Month"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="smooth-effects_files/figure-html/ozone-full-predictions-1.png" class="r-plt" alt="" width="700"></p>
-<p>The fitted values concern mean <strong>log</strong> ozone.
-Exponentiating them gives the conditional median under the lognormal
-assumption, not the arithmetic mean ozone concentration. The
-observed-versus-fitted plot shows how the combined terms reproduce log
-ozone on the sampled days. Because these are daily measurements, also
-check residuals in time order: remaining serial dependence would affect
-uncertainty in the monthly comparisons.</p>
+<p>The plot shows how closely the fitted mean <strong>log</strong> ozone
+follows the observed log concentrations. Under this model,
+exponentiating the fitted values gives the conditional median ozone
+concentration. To calculate the conditional arithmetic mean on the
+original scale, also account for the residual variance on the log scale.
+Similar residuals on nearby days could affect the uncertainty in monthly
+comparisons, so check residuals against the observation dates.</p>
 </div>
 <div class="section level2">
-<h2 id="choose-a-display-without-changing-its-statistical-meaning">Choose a display without changing its statistical meaning<a class="anchor" aria-label="anchor" href="#choose-a-display-without-changing-its-statistical-meaning"></a>
+<h2 id="show-an-interaction-surface-in-three-dimensions">Show an interaction surface in three dimensions<a class="anchor" aria-label="anchor" href="#show-an-interaction-surface-in-three-dimensions"></a>
 </h2>
-<p>The optional ggcube package can show the same numerical surface in
+<p>The optional {ggcube} package can show the same numerical surface in
 three dimensions:</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"ggcube"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
@@ -341,30 +326,24 @@ three dimensions:</p>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Temperature (degrees F)"</span>, y <span class="op">=</span> <span class="st">"Wind speed (mph)"</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <p><img src="smooth-effects_files/figure-html/ozone-3d-1.png" class="r-plt" alt="" width="700"></p>
-<p>Height and fill both represent the same partial contribution. A
-three-dimensional view can emphasise its shape, while a flat surface is
-often easier to compare across months. View settings change the
-rendering, not estimates or uncertainty. Curves, factor estimates and
-spherical maps retain their usual displays. The conditional chunk runs
-only when ggcube is installed; the flat plots contain the complete
-analysis.</p>
-<p>Parametric effect coordinates now use the model’s covariate scale by
-default. For example, a term involving <code>log(x)</code> uses
+<p>Height and fill both represent the same partial contribution. Use the
+flat plots with their common colour scale to compare surfaces across
+months.</p>
+<p>Parametric effect plots use the model’s covariate scale by default.
+For example, a term involving <code>log(x)</code> uses
 <code>log(x)</code> on the horizontal axis.
 <code>back_transform = TRUE</code> displays original covariate
 coordinates without changing effect values or intervals. With saved
 smooth estimates, prepare them using
 <code>smooth_estimates(model, back_transform = TRUE)</code> before
-asking <code><a href="../reference/draw.html">draw()</a></code> to use that scale. See <a href="transformed-covariates.html">Transformed covariates</a> for worked
-examples, including functions without analytic inverses.</p>
-<p>Effect intervals include uncertainty in their model intercept by
-default, including its covariance with a parametric term. Setting
-<code>overall_uncertainty = FALSE</code> changes that uncertainty
-calculation without adding or subtracting the intercept from the
-displayed partial contribution. For contrasts between complete model
-predictions, use a method that includes all relevant terms and their
-covariance rather than subtracting interval endpoints from these
-plots.</p>
+asking <code><a href="../reference/draw.html">draw()</a></code> to use that scale. See the <a href="transformed-covariates.html">article on transformed covariates</a>
+for worked examples, including transformations without an analytic
+inverse.</p>
+<p>By default, the intervals include uncertainty in the intercept and
+its covariance with the plotted term. Set
+<code>overall_uncertainty = FALSE</code> for intervals that reflect
+uncertainty in the term alone. An interval for the difference between
+two predictions needs to account for their covariance.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

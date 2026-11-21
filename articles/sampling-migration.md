@@ -1,24 +1,23 @@
-# Migrating posterior sampling calls
+# Updating sampling code for gratia 0.12.0
 
-The multiple-chain release gives sampling arguments the same meaning
-across
+{gratia} 0.12.0 gives sampling arguments the same meaning across
 [`posterior_samples()`](https://gavinsimpson.github.io/gratia/reference/posterior_samples.md),
 [`fitted_samples()`](https://gavinsimpson.github.io/gratia/reference/fitted_samples.md),
 [`smooth_samples()`](https://gavinsimpson.github.io/gratia/reference/smooth_samples.md),
 [`derivative_samples()`](https://gavinsimpson.github.io/gratia/reference/derivative_samples.md),
-their `add_*()` helpers, and coefficient draw functions. Obsolete
-arguments now produce errors with migration guidance. Controls must be
-named; only the model, or the data and model in `add_*()` helpers, can
-be passed by position. This prevents old positional calls from changing
-meaning.
+their `add_*()` helpers, and coefficient draw functions. Name the
+sampling arguments in your calls. You can still pass the model by
+position, or both data and model in `add_*()` helpers. If you use an
+obsolete argument, the error message names its replacement where
+available.
 
-## Draw counts and evaluation points
+## Replace the draw-count and grid arguments
 
-`n_draws` always means the total retained draws across all chains. It
-must be divisible by `chains`. Generating draws requires an explicit
-count: the previous defaults ranged from one draw to 10,000 draws.
-`chains = NULL` uses one chain, or infers the chains from supplied
-coefficient draws.
+`n_draws` is the total number of draws to retain across all chains. For
+example, `n_draws = 1000` with `chains = 4` retains 250 draws per chain.
+Supply `n_draws` explicitly when generating samples and choose a
+multiple of the number of chains. `chains = NULL` uses one chain or
+reads the chain identities from supplied coefficient draws.
 
 | Previous argument | Replacement |
 |:---|:---|
@@ -60,7 +59,13 @@ locations instead of `n_grid`. Use explicit `data` when the exact grid
 matters. Fitted and response sampling use fitting observations when
 `data = NULL` and do not construct a grid.
 
-## Multiple chains and parallel work
+## Run several sampling chains
+
+The example below runs four Metropolis–Hastings (MH) chains, each
+starting its own sampling sequence. It retains 1,000 draws in total and
+requests diagnostics to check how well the chains explore the
+coefficient distribution. These examples use placeholder model objects;
+substitute your own fitted models when updating an analysis.
 
 ``` r
 
@@ -76,27 +81,29 @@ draw(diagnostics, select = 1:2)
 draw(diagnostics, type = "rank", select = 1:2)
 ```
 
-This retains 250 draws per chain. Every chain discards its own 1,000
-burn-in iterations; parallel chains repeat this warmup work. `thin = 2`
-retains every second iteration after burn-in and still returns `n_draws`
-draws in total. `n_cores` limits concurrent MH chains using mirai,
-capped at `chains`. An existing worker pool is reused; otherwise
-temporary workers are cleaned up automatically. Given the same seed and
-sampler backend, retained draws agree between serial and parallel runs.
+Each chain discards its first 1,000 iterations (the burn-in), whether
+run in parallel or in sequence. `thin = 2` retains every second
+iteration after burn-in and still returns `n_draws` draws in total.
+`n_cores` limits concurrent MH chains using {mirai}, capped at `chains`.
+An existing worker pool is reused; otherwise temporary workers are
+cleaned up automatically. Given the same seed and sampler backend,
+retained draws agree between serial and parallel runs.
 
-Gaussian sampling uses `n_threads` to control threads inside mvnfast. It
-does not run concurrent MH chains. A control explicitly supplied to a
+Gaussian sampling uses `n_threads` to control threads inside {mvnfast}.
+It does not run concurrent MH chains. A control explicitly supplied to a
 method that cannot use it produces an error, including MH controls for
 Gaussian draws or Gaussian covariance controls for MH. `block_size` and
 `dense_limit` apply only to `method = "mh", mh_backend = "gratia"`.
 
-The default MH backend remains `"mgcv"`. The three options are:
+`mh_backend` chooses the implementation used to evaluate the model
+likelihood and run MH sampling. The default is `"mgcv"`; the
+alternatives extend the supported models or reduce memory use:
 
 | `mh_backend` | Evaluation | Model support |
 |:---|:---|:---|
 | `"mgcv"` | [`mgcv::gam.mh()`](https://rdrr.io/pkg/mgcv/man/gam.mh.html) | Its existing `gam` support |
 | `"gratia"` | Compiled likelihoods and MH loop | Gaussian identity, Poisson log, binomial logit, Gamma log, and negative binomial log `gam` and independent-observation `bam` fits |
-| `"family"` | Compiled MH loop with callbacks to the fitted family | Compatible standard, extended, and general mgcv families, including independent-observation `bam` fits |
+| `"family"` | Compiled MH loop with callbacks to the fitted family | Compatible standard, extended, and general {mgcv} families, including independent-observation `bam` fits |
 
 For example, a multinomial fit can use the family evaluator without a
 separate compiled multinomial likelihood:
@@ -110,27 +117,33 @@ samples <- posterior_samples(
 )
 ```
 
-The family backend prepares its full design matrix, fitted smoothing
-penalty, and proposal factorisation once and reuses them across chains.
-It calls the fitted family’s `dev.resids()` and `linkinv()`, or `ll()`
-for multiple predictors, preserving response attributes and coefficient
-mappings. It retains the full design matrix even for `bam`: use the
-gratia backend’s block evaluation when that matrix is too large and its
-family is supported. Both evaluate bases at the original covariates for
-discrete `bam` fits.
+The `"family"` implementation uses the fitted family’s likelihood
+functions and retains the full model matrix in memory, including for
+models fitted by [`bam()`](https://rdrr.io/pkg/mgcv/man/bam.html). For a
+supported family with a model matrix too large to retain, choose
+`"gratia"` to evaluate subsets of rows in turn. Both implementations
+evaluate discrete [`bam()`](https://rdrr.io/pkg/mgcv/man/bam.html)
+models at the original covariate values.
 
-The gratia and family evaluators reject GAMM components and AR1
-dependence; they do not evaluate fitted observation correlations. They
-also reject `paraPen`, `H`, pre-fit `G` objects, and singular
-coefficient covariances. The family backend additionally rejects quasi
-families, which do not provide a likelihood, and Cox proportional
-hazards models. All three MH backends condition on fitted smoothing,
-dispersion, and any family parameters outside the coefficient vector.
-Parameters represented by coefficients are sampled, including scale or
-covariance coefficients in general families. `unconditional = TRUE`
-applies to Gaussian sampling only.
+The `"gratia"` and `"family"` backends require a model likelihood for
+independent observations and reject fits with AR1 dependence or GAMM
+components. They also reject fits using `paraPen`, `H` or a pre-fit `G`
+object, or with a singular coefficient covariance matrix. The family
+backend additionally rejects quasi families, which do not provide a
+likelihood, and Cox proportional hazards models. All three MH backends
+condition on fitted smoothing, dispersion, and any family parameters
+outside the coefficient vector. Parameters represented by coefficients
+are sampled, including scale or covariance coefficients in general
+families. `unconditional = TRUE` applies to Gaussian sampling only.
 
-## Reusing coefficient draws
+## Reuse the same coefficient draws for several quantities
+
+Generate coefficients once when you want smooth contributions or
+predictions to share the same draws. Here `method = "user"` passes an
+existing coefficient matrix to
+[`smooth_samples()`](https://gavinsimpson.github.io/gratia/reference/smooth_samples.md)
+and
+[`fitted_samples()`](https://gavinsimpson.github.io/gratia/reference/fitted_samples.md):
 
 ``` r
 
@@ -156,24 +169,21 @@ Multiple-chain tables retain `.chain`, `.iteration`, and globally unique
 Attached diagnostics refer to coefficients before transformation or
 response simulation.
 [`as_mcmc_draws()`](https://gavinsimpson.github.io/gratia/reference/as_mcmc_draws.md)
-converts coefficient matrices or sampled quantities for posterior or
-coda diagnostics. Optional packages are required only when their formats
-or diagnostics are requested.
+converts coefficient matrices or sampled quantities for {posterior} or
+{coda} diagnostics. Optional packages are required only when their
+formats or diagnostics are requested.
 
-`draw(sampling_diagnostics(x))` uses native gratia plotting code. Trace
-plots show retained iteration within each chain; `type = "rank"`
-compares histogram outlines of ranks pooled across chains, with a
-reference line for equal counts per bin. Ranks use average ranks for
-ties and no random jitter. Use `select` to choose coefficient names or
-positions. Rank plots require at least two chains. Discarded burn-in is
-unavailable, and thinning is represented by the retained iteration
-count. Coefficient matrices provide their own draws; fitted, response,
-smooth and derivative outputs require `diagnostics = TRUE` when sampling
-to retain coefficient draws for these plots. Plotting itself needs
-neither posterior nor bayesplot. Numerical summaries still use
-posterior.
+`draw(sampling_diagnostics(x))` displays the retained coefficient draws
+in iteration order for each chain. Use `type = "rank"` with at least two
+chains to see whether each chain covers the full range of pooled ranks.
+Each chain gets a histogram, with a reference line for equal counts
+across bins. Use `select` to choose coefficients by name or position. If
+`x` contains sampled fitted values, responses, smooths or derivatives,
+set `diagnostics = TRUE` when generating them to retain their
+coefficient draws. The plots are provided by gratia. Numerical summaries
+require posterior.
 
-## Which response sampling function to use
+## Choose between expected values and simulated observations
 
 [`fitted_samples()`](https://gavinsimpson.github.io/gratia/reference/fitted_samples.md)
 draws distribution parameters by default; use `quantity = "expectation"`
@@ -203,28 +213,32 @@ and
 keep their existing grid and simulation-count arguments; their internal
 sampling calls use this interface.
 
-## Likelihoods and external diagnostic wrappers
+## Update likelihood, model comparison and predictive check calls
 
 [`log_lik()`](https://gavinsimpson.github.io/gratia/reference/log_lik.md),
 [`loo::loo()`](https://mc-stan.org/loo/reference/loo.html),
 [`loo::waic()`](https://mc-stan.org/loo/reference/waic.html) and
 [`bayesplot::pp_check()`](https://mc-stan.org/bayesplot/reference/pp_check.html)
-use the same `n_draws` convention. Likelihood and LOO/WAIC wrappers
-default to 4,000 draws; bayesplot uses 50 for ordinary checks and 4,000
-for leave-one-out plots. Supplied coefficient matrices determine their
-own counts. Pass `chains`, `diagnostics`, `method` and backend controls
+use the same `n_draws` convention. Likelihood, leave-one-out
+cross-validation (LOO) and WAIC calls default to 4,000 draws. For
+{bayesplot}, gratia uses 50 for ordinary checks and 4,000 for
+leave-one-out plots. Supplied coefficient matrices determine their own
+counts. Pass `chains`, `diagnostics`, `method` and backend controls
 directly to
 [`log_lik()`](https://gavinsimpson.github.io/gratia/reference/log_lik.md),
 or through `sampling_args` for LOO, WAIC and bayesplot. Likelihood
 matrices and these diagnostic results retain the coefficient sampling
-metadata. LOO reads stored chain iterations when estimating relative
-efficiency, while keeping likelihood and response draws in the same
-original order. Unlabelled supplied matrices still require explicit
-`chain_id` or `r_eff` for LOO. The old `n` argument and explicit
-controls for a different sampler produce errors.
+metadata. LOO reads stored chain iterations when estimating how much
+autocorrelation affects the effective sample size, while keeping
+likelihood and response draws in their original order. Unlabelled
+supplied matrices still require explicit `chain_id` or `r_eff` for LOO.
+The old `n` argument and explicit controls for a different sampler
+produce errors.
 
-## Location-scale-shape models
+## Sample models with several distribution parameters
 
+Location-scale-shape (LSS) models can use separate predictors for
+distribution parameters such as the mean and standard deviation.
 [`posterior_samples()`](https://gavinsimpson.github.io/gratia/reference/posterior_samples.md)
 now accepts evaluation data for
 [`gaulss()`](https://rdrr.io/pkg/mgcv/man/gaulss.html),
@@ -250,7 +264,7 @@ The functions return different quantities:
 
 | Function | Quantity for an LSS model |
 |:---|:---|
-| `fitted_samples(scale = "response")` | All natural distribution parameters represented by predictors |
+| `fitted_samples(scale = "response")` | Distribution parameters in their usual units, such as mean and standard deviation |
 | `fitted_samples(scale = "linear_predictor")` | All parameter predictors, in family order |
 | `fitted_samples(quantity = "expectation")` | Expected response, using every parameter on which it depends |
 | [`posterior_samples()`](https://gavinsimpson.github.io/gratia/reference/posterior_samples.md) | Responses conditional on each joint coefficient draw |
@@ -281,7 +295,7 @@ installed mgcv version rejects offsets when fitting
 call-level offsets for general-family fits; gratia cannot reconstruct
 offsets never applied by the fitter. Prefer supported formula offsets.
 
-## Grouped response families
+## Identify the response family for each prediction row
 
 [`posterior_samples()`](https://gavinsimpson.github.io/gratia/reference/posterior_samples.md)
 also accepts fitting-data subsets and new covariates for
@@ -296,10 +310,11 @@ posterior_samples(grouped_model, data = evaluation_data,
   family_index = component_index, n_draws = 1000, chains = 4, seed = 281)
 ```
 
-The same joint coefficient draw is used for every component.
-Component-specific links, fitted nuisance parameters and formula offsets
-are retained. New-data sampling weights default to one; explicit weights
-override them. Output retains `.parameter = "component1"`,
+The same joint coefficient draw is used for every component. Each
+component uses its own link and any other fitted family parameters, such
+as dispersion. Offsets in the model formula are evaluated at the
+supplied covariates. New-data sampling weights default to one; explicit
+weights override them. Output retains `.parameter = "component1"`,
 `"component2"`, and so on, together with `.row`, `.draw` and any chain
 columns. Missing predictors, membership or sampling weights produce
 missing responses. Fitting rows excluded by
@@ -321,12 +336,13 @@ prediction can use different offsets for those fits. Supplied
 coefficient draws can still be evaluated with the native prediction
 conventions.
 
-## Censoring and survival responses
+## Interpret draws for censored and survival responses
 
-Censored-family generators return latent uncensored responses; posterior
-predictive checks need a censoring observation process. Cox survival
-models lack a response generator for this interface, and expected
-survival times cannot be obtained from a location parameter alone.
+Censored-family generators draw the underlying response before
+censoring. To compare simulated and observed responses in a posterior
+predictive check, apply the same censoring process to the simulated
+data. Response sampling through this interface is unavailable for Cox
+proportional hazards models.
 
 ## Distribution parameters and expected responses
 
@@ -334,19 +350,26 @@ survival times cannot be obtained from a location parameter alone.
 and
 [`fitted_samples()`](https://gavinsimpson.github.io/gratia/reference/fitted_samples.md)
 now default to `quantity = "parameters"`. They return each parameter
-represented by a predictor, including an intercept-only predictor, with
-its natural meaning. Use `family_parameters(model)` to inspect the
-names, definitions, predictor order and native representation. Global
+represented by a predictor, including an intercept-only predictor, in
+its usual units. Use `family_parameters(model)` to inspect the names,
+definitions, predictor order and native representation. Global
 parameters appear in that description but remain fixed during
 coefficient sampling.
 
 Use `quantity = "expectation"` to request the expected response.
 Expectations are available only on the response scale. Use
-`scale = "link"` with parameter output for the model predictors.
-Gaussian LSS returns `mean` and `sd`; GEV returns `location`, `scale`
-and `shape`. GEV location is generally not its expectation.
-Zero-inflated Poisson returns `rate` and `presence_probability`; its
-expectation includes the zero-truncation adjustment.
+`scale = "link"` with parameter output for the model predictors. A
+Gaussian location-scale model returns `mean` and `sd`. A GEV model
+returns `location`, `scale` and `shape`, and its location generally
+differs from its expectation. The hurdle Poisson model fitted with
+[`ziplss()`](https://rdrr.io/pkg/mgcv/man/ziplss.html) returns `rate`
+and `presence_probability`. Its expectation accounts for the fact that
+the count distribution describes positive counts only.
+
+The following calls contrast parameter output with expected responses.
+For a Gaussian location-scale model, the latter returns only the mean.
+For a [`ziplss()`](https://rdrr.io/pkg/mgcv/man/ziplss.html) model, the
+mean depends on both predictors.
 
 ``` r
 
@@ -368,24 +391,26 @@ substitute for draws of an expectation.
 
 ### Location, rate and expectation
 
-The following models illustrate why the quantity must be explicit:
+For these calls, assume you have fitted `gev_fit` with
+[`mgcv::gevlss()`](https://rdrr.io/pkg/mgcv/man/gevlss.html), `zip_fit`
+with [`mgcv::ziplss()`](https://rdrr.io/pkg/mgcv/man/ziplss.html), and
+`tw_fit` with [`mgcv::twlss()`](https://rdrr.io/pkg/mgcv/man/twlss.html)
+to appropriate response data. The calls show which output to request
+from each model: its distribution parameters or its expected response.
+The [response-distributions
+article](https://gavinsimpson.github.io/gratia/articles/response-distributions.html)
+explains how distributional predictors affect predictions and model
+checks.
 
 ``` r
 
-load_mgcv()
-set.seed(426)
-d <- data.frame(x = runif(200), y = rnorm(200))
-gev_fit <- gam(list(y ~ x, ~1, ~1), data = d, family = gevlss())
 family_parameters(gev_fit)
 fitted_values(gev_fit) # location, scale and shape
 fitted_values(gev_fit, quantity = "expectation")
 
-d$y <- rpois(200, exp(1 + d$x))
-zip_fit <- gam(list(y ~ x, ~1), data = d, family = ziplss())
 fitted_samples(zip_fit, n_draws = 5) # rate and presence probability
 fitted_samples(zip_fit, n_draws = 5, quantity = "expectation")
 
-tw_fit <- gam(list(y ~ x, ~1, ~1), data = d, family = twlss())
 fitted_values(tw_fit) # mean, power and dispersion
 fitted_values(tw_fit, quantity = "expectation") # equals the mean parameter
 ```

@@ -1,20 +1,21 @@
 # Smooth trends and repeated measurements with glmmTMB
 
 A smooth describes a relationship without requiring it to be linear.
-glmmTMB can estimate these relationships alongside its other model
-components, and gratia can now extract and display their effects. The
+{glmmTMB} can estimate these relationships alongside its other model
+components, and {gratia} can extract and display their effects. The
 examples below ask how annual river flow changes over time and how
 plants respond to increasing carbon dioxide concentration. The second
 example also accounts for measurements on the same plant.
 
 This article needs the optional package glmmTMB, with support for
 [`mgcv::s()`](https://rdrr.io/pkg/mgcv/man/s.html) terms; the examples
-require glmmTMB 1.1.15.2 or later and mgcv 1.9-4. Smooth fitting remains
-experimental in glmmTMB. Its [fitting
+require glmmTMB 1.1.15.2 or later and {mgcv} 1.9-4. Smooth fitting
+remains experimental in glmmTMB. Its [fitting
 documentation](https://glmmtmb.github.io/glmmTMB/reference/glmmTMB.html)
-recommends `REML = TRUE`. Use an unqualified `s()` in the formula after
-attaching mgcv, rather than replacing the smooth with an unpenalised
-spline basis. The smoothing penalty is estimated during fitting.
+recommends `REML = TRUE`. Attach mgcv and write
+[`s()`](https://rdrr.io/pkg/mgcv/man/s.html) in the model formula so
+glmmTMB can recognise the smooth and estimate its smoothing penalty. We
+also load {ggplot2} to plot the data and predictions.
 
 ``` r
 
@@ -24,7 +25,7 @@ library("glmmTMB")
 library("ggplot2")
 ```
 
-## How did the mean annual flow of the Nile change?
+## Fit a smooth trend in annual river flow
 
 The [Nile
 data](https://stat.ethz.ch/R-manual/R-devel/library/datasets/html/Nile.html)
@@ -52,7 +53,8 @@ Annual flow is continuous. A Gaussian model is a reasonable starting
 point for departures around a smooth mean, provided its residual spread
 is reasonably stable. The observations are a time series, so
 independence needs checking; year appearing in a smooth does not itself
-model residual serial dependence.
+model residual serial dependence. Fit the same Gaussian smooth with mgcv
+and glmmTMB so we can compare the extracted effects and predictions.
 
 ``` r
 
@@ -85,15 +87,21 @@ summary(nile_tmb)
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
-`k = 10` sets the size of the available spline basis, rather than fixing
-ten effective degrees of freedom. The fitted penalty discourages
-unnecessary wiggliness. `start` follows the package’s Nile example and
-supplies an initial log standard deviation for the spline’s random
-coefficients; it does not fix their fitted variance. The `dummy` random
-effect in the printed summary is part of the spline representation, not
-an additional sampled group.
+`k = 10` sets the size of the spline basis. The fitted penalty
+determines how much the curve can bend within that basis. The `start`
+argument supplies an initial log standard deviation for the spline’s
+random coefficients, which glmmTMB estimates during fitting. The `dummy`
+random effect in the summary represents those spline coefficients.
 
-## Extract the trend and read its uncertainty
+## Extract the smooth and its uncertainty
+
+List the available smooths with
+[`smooths()`](https://gavinsimpson.github.io/gratia/reference/smooths.md),
+then extract the year effect with
+[`smooth_estimates()`](https://gavinsimpson.github.io/gratia/reference/smooth_estimates.md).
+Save the estimates so they can be inspected and passed to
+[`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)
+without evaluating the model again.
 
 ``` r
 
@@ -101,7 +109,7 @@ smooths(nile_tmb)
 #> [1] "s(year)"
 head(smooth_coefs(nile_tmb, select = "s(year)"))
 #>   s(year).1   s(year).2   s(year).3   s(year).4   s(year).5   s(year).6 
-#>   18.174609 -115.231114   -2.991595  -24.387354  -15.572794   13.125102
+#>   13.965792 -111.874312  -11.759876  -21.067622   -6.673338    9.788104
 trend <- smooth_estimates(nile_tmb, select = "s(year)",
   interval = "credible")
 head(trend)
@@ -119,20 +127,17 @@ draw(trend, xlab = "Year", ylab = expression(Flow ~ contribution ~ (10^8 ~ m^3))
 
 ![](glmmTMB-support_files/figure-html/nile-extraction-1.png)
 
-The curve is the smooth’s contribution relative to its centring
-constraint, not the full expected flow. Positive values indicate flow
-above the fitted intercept. The broad decline from the late nineteenth
-century to the early twentieth century is much clearer than the small
-subsequent undulations. The shaded region concerns uncertainty in the
-fitted mean contribution; it does not describe the spread of individual
-annual observations.
+The curve shows the smooth’s contribution to expected flow. In this
+model a positive value means that expected flow is above the fitted
+intercept. The broad decline around the turn of the twentieth century is
+clearer than the smaller changes that follow. The shaded region shows
+uncertainty in the estimated trend at each year and includes uncertainty
+in the intercept by default.
 
-The default interval uses the joint TMB covariance, transformed back to
-the mgcv smooth coefficients. It includes covariance between fixed and
-fitted random coefficients. This is not mgcv’s frequentist covariance or
-its optional correction for uncertainty in smoothing parameters:
-`frequentist = TRUE` and `unconditional = TRUE` are unavailable for
-glmmTMB effects.
+The interval uses glmmTMB’s covariance for the fitted coefficients,
+including covariance between fixed and random coefficients. The mgcv
+covariance options `frequentist = TRUE` and `unconditional = TRUE` are
+unavailable for glmmTMB effects.
 
 At any particular year a pointwise interval is useful. If the claim
 concerns the entire plotted trend, ask for a simultaneous band instead:
@@ -146,15 +151,11 @@ draw(nile_tmb, select = "s(year)", interval = "simultaneous",
 
 ![](glmmTMB-support_files/figure-html/nile-simultaneous-1.png)
 
-The wider band has approximate coverage over the finite evaluation grid
-of this smooth. It is not a prediction interval, and it does not claim
-joint coverage across all model terms. `interval = "credible"` is an
-alias for the pointwise `"confidence"` option. With mgcv models,
-[`smooth_estimates()`](https://gavinsimpson.github.io/gratia/reference/smooth_estimates.md)
-also allows `frequentist = TRUE`; that changes the covariance used,
-rather than changing a pointwise statement into a simultaneous one.
-[`get_vcov()`](https://gavinsimpson.github.io/gratia/reference/get_vcov.md)
-makes the chosen model covariance available for custom calculations.
+The wider band is designed to cover the trend jointly across the years
+where the smooth was evaluated. The earlier `interval = "credible"` is
+an alias for the pointwise option, `interval = "confidence"`. For mgcv
+models, choose `frequentist = TRUE` to change the covariance used to
+calculate either type of interval.
 
 For the full expected flow, add the intercept. Here the model has just
 one smooth and an identity link, so this gives a direct comparison with
@@ -209,14 +210,24 @@ data.frame(year = comparison_years$year,
 gam_covariance <- get_vcov(nile_gam, frequentist = TRUE)
 ```
 
-The frequentist covariance concerns sampling variability of the
-penalised coefficient estimator with smoothing parameters held fixed.
-Smaller standard errors do not account for the bias introduced by
-penalisation. The default approximate Bayesian covariance is usually the
-useful starting point for smooth-effect intervals. The final line
-extracts the chosen covariance for custom calculations.
+The frequentist covariance describes how the estimated coefficients
+would vary across repeated samples with the smoothing parameters held
+fixed. Its standard errors describe sampling variation and can be small
+even when smoothing pulls the estimate away from the true curve. The
+default for smooth-effect intervals is the approximate Bayesian
+covariance. Use
+[`get_vcov()`](https://gavinsimpson.github.io/gratia/reference/get_vcov.md)
+to extract the covariance for your own calculations.
 
-## Does the fitted distribution explain variation around the trend?
+## Check residual variation and serial correlation
+
+Use
+[`appraise()`](https://gavinsimpson.github.io/gratia/reference/appraise.md)
+to compare the residual distribution with simulations from the fitted
+model. Then use
+[`residual_correlation_plot()`](https://gavinsimpson.github.io/gratia/reference/residual_correlation.md)
+to look for similar departures in successive years, which the
+independent Gaussian errors do not represent.
 
 ``` r
 
@@ -233,16 +244,15 @@ residual_correlation_plot(nile_tmb, type = "pearson", lag_max = 15)
 
 ![](glmmTMB-support_files/figure-html/nile-checks-2.png)
 
-The panel uses glmmTMB’s native Pearson residuals. For this Gaussian fit
-they remain on the scale of the flow response, rather than
-standard-normal scores. Simulated QQ references hold the fitted smooth
-fixed and generate new annual responses. They check the response
-distribution under this fitted model; they do not refit the trend. The
-separate autocorrelation plot asks whether successive departures still
-resemble one another. Its correlations describe ordered residual
-structure, with no significance bands that assume independent residuals.
-Lags are observation positions; here each position corresponds to one
-year.
+The panel uses glmmTMB’s Pearson residuals. For this Gaussian fit they
+remain on the scale of the flow response, rather than standard-normal
+scores. Simulated QQ references hold the fitted smooth fixed and
+generate new annual responses. They check the response distribution
+under this fitted model; they do not refit the trend. The separate
+autocorrelation plot asks whether successive departures still resemble
+one another. Its correlations describe ordered residual structure, with
+no significance bands that assume independent residuals. Lags are
+observation positions; here each position corresponds to one year.
 
 Most of the QQ points follow their simulated reference, with the
 lowest-flow observation standing out in the lower tail. The
@@ -255,26 +265,30 @@ removing the smooth trend. A time-series model can represent that
 remaining correlation when estimating trend uncertainty. The smooth
 describes a broad decline in mean flow, while the residual check
 identifies variation that its independent Gaussian errors leave
-unexplained. See [Choosing diagnostic
-references](https://gavinsimpson.github.io/gratia/articles/model-checking.md)
+unexplained. See [the model diagnostics
+article](https://gavinsimpson.github.io/gratia/articles/model-checking.md)
 for checks of dependence and for the distinction between holding effects
 fixed, drawing their uncertainty and simulating new effects.
 
-## Do repeated measurements change how we read plant responses?
+## Plot smooth and random effects for repeated plant measurements
 
 The `CO2` experiment recorded carbon dioxide uptake by twelve plants of
-*Echinochloa crus-galli* at seven concentrations. Plants came from
-Quebec or Mississippi and received chilled or nonchilled treatment. See
-[`?datasets::CO2`](https://rdrr.io/r/datasets/zCO2.html) for the
-experiment and units. Uptake is positive, and a Gamma model with a log
-link allows its residual variance to grow with the mean. Measurements
-from one plant share individual characteristics. The 84 measurements
-provide only twelve independently treated plants.
+*Echinochloa crus-galli* at seven concentrations. The researchers paired
+plants within each origin (Quebec or Mississippi). One plant in each
+pair received the chilling treatment and the other served as a control.
+Table 1 of the [original
+study](https://biology.mcgill.ca/faculty/potvin/articles/PotvinLech_90.pdf)
+gives concentrations in \mu\mathrm{L}\\\mathrm{L}^{-1}. We use these
+data to illustrate repeated measurements, with a Gamma model to let the
+variance of positive uptake increase with its mean.
 
 We use a shared smooth response to concentration, an origin-by-treatment
-interaction, and plant-specific intercepts and slopes. These slopes
-allow individual plants to differ in their response to concentration
-without assuming that the population response itself is linear.
+interaction and plant-specific intercepts and slopes. The shared smooth
+describes the curved response, and the slopes allow plants to differ in
+their response to concentration. The model accounts for repeated
+measurements within each plant. The treatment terms illustrate how to
+plot an interaction in this fit, which omits the pairing used in the
+experiment.
 
 ``` r
 
@@ -310,7 +324,7 @@ summary(plant_tmb)
 #> TypeMississippi                  -0.31784    0.09327   -3.41 0.000655 ***
 #> Treatmentchilled                 -0.13966    0.09931   -1.41 0.159638    
 #> TypeMississippi:Treatmentchilled -0.27192    0.18888   -1.44 0.149972    
-#> s(log_conc)1                     -0.46392    0.04158  -11.16  < 2e-16 ***
+#> s(log_conc)1                      0.46392    0.04158   11.16  < 2e-16 ***
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
@@ -318,12 +332,14 @@ summary(plant_tmb)
 For non-Gaussian responses, glmmTMB recommends simulations for the
 intended design to check REML estimates and interval coverage.
 
-The centred log concentration improves the interpretation of plant
-intercepts: they apply at the geometric mean concentration. The shared
-curve represents rapid change at low concentrations and slower change at
-high concentrations. The treatment interaction allows its shift in log
-mean uptake to differ by origin. With only three plants in each
-origin-treatment combination, the treatment estimates remain uncertain.
+Each plant’s random intercept gives its departure from the shared
+predictor at the geometric mean concentration, where `log_conc` is zero.
+The shared curve represents rapid change at low concentrations and
+slower change at high concentrations. The interaction allows the
+treatment difference in log mean uptake to vary by origin.
+
+Plot the model effects to see the shared concentration curve, treatment
+contributions, and differences between plants in one figure.
 
 ``` r
 
@@ -333,12 +349,14 @@ draw(plant_tmb, ncol = 2)
 ![](glmmTMB-support_files/figure-html/plant-effects-1.png)
 
 [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)
-includes smooths, native random effects and parametric effects by
-default. The Gaussian QQ panels for plant intercepts and slopes show
-fitted plant deviations, not response residuals. The random coefficients
-that encode the spline are excluded from these panels.
-`parametric = FALSE` omits parametric panels; an explicit `select` draws
-only selected effects unless `parametric = TRUE` is also supplied.
+includes smooths, random effects and parametric effects by default. The
+Gaussian QQ panels for plant intercepts and slopes show fitted plant
+deviations, not response residuals. The random coefficients that encode
+the spline are excluded from these panels. `parametric = FALSE` omits
+parametric panels; an explicit `select` draws only selected effects
+unless `parametric = TRUE` is also supplied. To see each plant’s
+combined intercept and slope contribution, select both random-effect
+terms and set `ranef_lines = TRUE`.
 
 ``` r
 
@@ -348,15 +366,16 @@ draw(plant_tmb, select = c("(1 | Plant)", "(log_conc | Plant)"),
 
 ![](glmmTMB-support_files/figure-html/plant-random-lines-1.png)
 
-These lines are each plant’s random contribution b\_{0j} + x b\_{1j} on
-the log scale. They do not include the shared curve or treatment means
-and have no uncertainty bands. This display requires a simple numeric
-intercept-slope pair from the same formula term. Multiple slopes,
-transformed or factor slopes, and structured covariance terms retain
-separate QQ panels.
+Each line shows plant j’s departure from the shared predictor, b\_{0j} +
+x b\_{1j}, where x is the centred log concentration. This display
+requires an intercept and a single numeric slope in the same formula
+term. Terms with multiple slopes, transformed or factor slopes, or
+structured covariance use separate QQ panels.
 
-The interaction deserves a focused view rather than interpreting two
-main effects separately:
+Use
+[`parametric_effects()`](https://gavinsimpson.github.io/gratia/reference/parametric_effects.md)
+to isolate the origin-by-treatment interaction. This shows how treatment
+differences vary between the two origins.
 
 ``` r
 
@@ -371,9 +390,9 @@ draw(parametric_effects(plant_tmb, terms = "Type:Treatment"))
 These are contrast-coded partial contributions on the log scale.
 Contrast coding gives the reference category a zero contribution; full
 predictions add the intercept and the other model terms. Parametric
-intervals now include intercept uncertainty and its covariance with the
-term by default; use `overall_uncertainty = FALSE` for uncertainty in
-the term alone. The estimated partial contributions do not change. Full
+intervals include intercept uncertainty and its covariance with the term
+by default; use `overall_uncertainty = FALSE` for uncertainty in the
+term alone. The estimated partial contributions do not change. Full
 predictions combine all terms:
 
 ``` r
@@ -383,16 +402,17 @@ ggplot(plant, aes(conc, uptake, group = Plant, colour = Treatment)) +
   geom_point() +
   geom_line(aes(y = expected)) +
   facet_wrap(~ Type) +
-  labs(x = "Carbon dioxide concentration (mL/L)",
+  labs(x = expression(CO[2] ~ concentration ~ (mu * L ~ L^{-1})),
     y = expression(CO[2] ~ uptake ~ (mu * mol ~ m^{-2} ~ s^{-1})))
 ```
 
 ![](glmmTMB-support_files/figure-html/plant-full-predictions-1.png)
 
 The curves describe these observed plants, including their fitted
-deviations. They are not marginal mean curves for a new plant. The Gamma
-model and common nonlinear shape are working assumptions that should be
-checked:
+deviations. Use
+[`appraise()`](https://gavinsimpson.github.io/gratia/reference/appraise.md)
+to assess whether the Gamma response distribution and shared
+concentration curve describe the observations adequately.
 
 ``` r
 
@@ -403,35 +423,17 @@ appraise(plant_tmb, type = "quantile", seed = 73)
 
 The lowest quantile score stands out below the normal reference: one
 measurement is substantially lower than its fitted distribution would
-typically produce. Inspect that observation and the fitted curve for its
-plant to decide whether its individual concentration response needs more
-flexibility. [Read smooth effects, interactions and
+typically produce. Inspect the fitted curve for that plant to see
+whether other measurements show a similar departure. [Read smooth
+effects, interactions and
 surfaces](https://gavinsimpson.github.io/gratia/articles/smooth-effects.md)
 explores more flexible plant-specific curves.
 
-A conditional check holds the fitted plant effects and smooth fixed.
-Quantile residuals use a fixed standard-normal reference to assess the
-distribution of individual scores conditional on those effects; the
-reference does not preserve dependence between scores. A marginal check
-instead draws new plant effects **and new spline random coefficients**
-with glmmTMB’s simulator. It therefore checks a broader distribution
-than that of new plants around a fixed shared concentration curve. The
-same scope applies to marginal posterior predictive checks. Conditional
-posterior predictive checks draw uncertainty in fitted coefficients and
-effects together. These answer different questions; see [Choosing
-diagnostic
-references](https://gavinsimpson.github.io/gratia/articles/model-checking.md).
-Partial-residual overlays are not supported for glmmTMB smooth plots.
-For supported response families, model parts and current limitations,
-consult
-[`?"glmmTMB-methods"`](https://gavinsimpson.github.io/gratia/reference/glmmTMB-methods.md).
-Multiple linear predictors retain model-wide smooth selection and
-identify the conditional, zero-inflation or dispersion model in their
-plot subtitles; constant dispersion alone does not add these subtitles.
-
-gratia cannot make a smooth type available if glmmTMB cannot fit it.
-Effects require the stored smooth and random-effect information;
-unsupported structures with several penalties, models that fix or share
-joint parameters through `map`, and rank-deficient smooth models give
-explicit errors. For a GAM that does not require glmmTMB’s additional
-model components, mgcv offers a broader range of spline constructions.
+The check above holds the fitted plant effects and smooth fixed. With
+`conditioning = "marginal"`, glmmTMB instead simulates new plant effects
+**and new spline random coefficients**. That checks the distribution of
+both plant variation and the shared curve. See the [diagnostics
+article](https://gavinsimpson.github.io/gratia/articles/model-checking.md)
+for choosing between these checks and posterior predictive checks. The
+`glmmTMB-methods` help topic lists supported response families, model
+components and current restrictions.

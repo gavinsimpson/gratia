@@ -8,11 +8,11 @@ rather than inspection of individual smooths alone. This article uses
 the same model to answer each question and to explain how the choice of
 interval changes the conclusion.
 
-The examples use the small `CO2` data set distributed with R, plus mgcv,
-gratia, dplyr and ggplot2. No additional modelling package is needed. We
-use 2,000 coefficient draws for the illustrated bands and posterior
-calculations. If a conclusion depends on an interval limit, increase
-this count and check that the limit is stable.
+The examples use the `CO2` dataset distributed with R, plus {mgcv},
+{gratia}, {dplyr} and {ggplot2}. We use 2,000 coefficient draws for the
+bands and posterior calculations. If a conclusion depends on an interval
+limit, increase this count and check that the limit is stable. We load
+the packages before preparing the data.
 
 ``` r
 
@@ -22,17 +22,17 @@ library("dplyr")
 library("ggplot2")
 ```
 
-## What was measured, and what model is useful?
+## Fit treatment curves to the plant experiment
 
-The [R documentation for
-CO2](https://stat.ethz.ch/R-manual/R-devel/library/datasets/help/CO2.html)
-describes an experiment on cold tolerance in *Echinochloa crus-galli*.
-Uptake was measured at seven concentrations in each of twelve plants,
-with three plants in each origin and treatment combination. Chilled
-plants were cooled overnight. The response is uptake in micromoles per
-square metre per second; `conc` records ambient concentration in the
-units supplied with the data (mL/L). These repeated measurements
-describe curves for individual plants.
+The `CO2` data come from an experiment on cold tolerance in *Echinochloa
+crus-galli*. The researchers measured uptake at seven concentrations in
+each of twelve plants, with three plants per combination of origin and
+treatment. The chilled plants were cooled during the day and allowed to
+recover overnight before measurement. Uptake is measured in micromoles
+per square metre per second. The original study reports `conc` in
+microlitres per litre (\mu\mathrm{L}\\\mathrm{L}^{-1}), which we use for
+the axes and rates of change below. [Potvin et
+al. (1990)](https://doi.org/10.2307/1938276)
 
 ``` r
 
@@ -40,7 +40,9 @@ plant <- as.data.frame(datasets::CO2)
 plant$Plant <- factor(plant$Plant, ordered = FALSE)
 
 uptake_label <- expression(CO[2]~uptake~(mu*mol~m^{-2}~s^{-1}))
-concentration_label <- "Ambient CO2 concentration (data units: mL/L)"
+concentration_label <- expression(
+  Ambient ~ CO[2] ~ concentration ~ (mu * L ~ L^{-1})
+)
 
 ggplot(plant, aes(conc, uptake, colour = Treatment, group = Plant)) +
   geom_point() +
@@ -58,13 +60,13 @@ the treatment contrast in average log uptake to differ by origin. A
 plant random intercept allows measurements from the same plant to share
 a persistent deviation from the fitted curve.
 
-All responses are positive. A Gamma distribution with a log link
-preserves positive fitted means and assumes that residual variability
-grows with the mean. The model assumes that the *shape* of each
-treatment curve on the log scale is shared between origins. The origin
-interaction changes its height. With three plants per combination,
-sharing those shapes lets us estimate treatment curves without fitting a
-separate shape to every origin and treatment combination.
+All responses are positive. The log link ensures positive fitted means,
+and the Gamma model assumes that residual standard deviation is
+proportional to the mean. On the log scale the model uses the same
+concentration smooth for both origins within a treatment. The
+origin-by-treatment interaction allows the difference in curve height
+between origins to vary by treatment. Sharing smooths lets both origins
+inform the estimated shape for each treatment.
 
 ``` r
 
@@ -88,17 +90,19 @@ overview(m_uptake)
 #> 7 s(Plant)                         Random…    12  6.92    8         6.96 < 0.001
 ```
 
-`k = 5` limits each treatment curve’s complexity; REML estimates the
-penalties that control its smoothness. It does not force five effective
-degrees of freedom. The plant intercept accounts for persistent
-differences in curve height. Residual patterns against concentration can
-show whether plant differences also involve curve shape; the [diagnostic
+`k = 5` sets the basis dimension for each treatment smooth. REML
+estimates how strongly to penalise wiggliness within that basis. The
+plant intercept accounts for persistent differences in curve height.
+Residual patterns against concentration can show whether plant
+differences also involve curve shape. See the [diagnostic
 workflow](https://gavinsimpson.github.io/gratia/articles/model-checking.md)
-explains checks with fitted effects and simulated effects. The treatment
-comparison has three independent plants per combination, even though
-each plant contributes seven measurements.
+for checks with fitted and simulated effects. The experiment paired
+chilled and control plants within each origin. This example accounts for
+the seven repeated measurements per plant and treats plants as
+independent in the model. An analysis using the full experimental design
+would also account for the pairing.
 
-## Compare expected uptake on a supported grid
+## Compare expected uptake over the observed concentration range
 
 For each origin and treatment, evaluate concentration across its
 observed range. `.by` evaluates expressions within observed groups. This
@@ -126,11 +130,14 @@ uptake_grid |>
 ```
 
 The `Plant` expression supplies one actual plant identifier in each
-group. We exclude its random effect below, so every curve describes a
-plant whose random intercept is zero. With a log link, this does **not**
-give the mean obtained by averaging over the population distribution of
-random intercepts. It also excludes measurement noise: the bands concern
-conditional expected uptake, not future measurements.
+group. We set its random effect to zero with `exclude = "s(Plant)"`, so
+every curve describes expected uptake for a plant with a zero random
+intercept. Averaging over the population of plants would give a higher
+expected uptake because a positive random intercept raises uptake by
+more than an equally large negative intercept lowers it. The bands
+describe uncertainty in the curves of expected uptake. Prediction
+intervals for new measurements would also include variation around those
+curves.
 
 ``` r
 
@@ -156,14 +163,14 @@ prediction bands is not a direct test of their difference: both curves
 depend on the same estimated coefficients, and their errors are
 correlated.
 
-The default `interval = "confidence"` gives a separate, pointwise
-interval at each row. `interval = "simultaneous"` instead calibrates one
-band across all 240 supplied rows, including both origins and
-treatments. It uses the joint coefficient covariance on the link scale
-and then transforms the limits. Coverage is approximate posterior
-coverage on this finite grid. It does not extend outside the grid, or
-guarantee coverage between its points. The returned `.se` remains a
-standard error on the link scale.
+The default `interval = "confidence"` gives a separate pointwise
+interval at each row. `interval = "simultaneous"` constructs one band
+with approximate posterior coverage across all 240 supplied rows
+together, including both origins and treatments. This joint coverage
+applies to the evaluated rows.
+[`fitted_values()`](https://gavinsimpson.github.io/gratia/reference/fitted_values.md)
+constructs the band on the link scale and then transforms the limits to
+the uptake scale. The returned `.se` is on the link scale.
 
 ## Estimate the treatment difference directly
 
@@ -187,19 +194,19 @@ draw(treatment_difference) +
 
 ![](prediction-comparisons_files/figure-html/treatment-differences-1.png)
 
-The factor level order determines subtraction: nonchilled minus chilled
-here. A positive difference means lower uptake after chilling. The
-Mississippi difference becomes clearly positive over much of the range;
-the evidence for a difference in Quebec is weaker. The zero reference
-line and interval limits show which evaluated concentrations support a
-positive contrast. Where the interval contains zero, the direction of
-the treatment difference remains unresolved.
+The factor level order makes this the nonchilled mean minus the chilled
+mean. A positive difference means lower expected uptake after chilling.
+Where the band lies above zero, the fitted model supports a positive
+difference. It does so over much of the concentration range in
+Mississippi, with weaker evidence in Quebec. The band covers
+concentrations for both origins jointly because there is one treatment
+contrast.
 
-The delta method approximates a response-scale difference by its local
-linear change with the coefficients, then propagates their joint
-covariance. On the link scale the contrast calculation is linear; on the
-response scale it is an approximation. Simulation can better describe
-asymmetric uncertainty after a nonlinear inverse link:
+The default delta method uses a linear approximation to how changes in
+the coefficients affect predicted differences on the response scale. We
+next apply the inverse link to the predictions from each draw and then
+take the difference. This can give asymmetric intervals on the response
+scale.
 
 ``` r
 
@@ -209,17 +216,16 @@ treatment_simulation <- conditional_differences(m_uptake,
   exclude = "s(Plant)", scale = "response", uncertainty = "simulation",
   n_sim = 2000, seed = 2026
 )
-treatment_simulation |>
-  select(Type, conc, .level_1, .level_2, .diff, .se, .lower_ci, .upper_ci)
-#> # A tibble: 6 × 8
-#>   Type         conc .level_1   .level_2 .diff   .se .lower_ci .upper_ci
-#>   <fct>       <dbl> <fct>      <fct>    <dbl> <dbl>     <dbl>     <dbl>
-#> 1 Quebec        250 nonchilled chilled   5.00  3.45     -1.45      12.1
-#> 2 Mississippi   250 nonchilled chilled  10.8   2.17      6.70      15.2
-#> 3 Quebec        500 nonchilled chilled   5.92  3.82     -1.42      13.4
-#> 4 Mississippi   500 nonchilled chilled  11.7   2.45      7.29      16.7
-#> 5 Quebec        750 nonchilled chilled   5.32  4.61     -3.55      14.4
-#> 6 Mississippi   750 nonchilled chilled  12.3   2.88      6.60      18.1
+treatment_simulation
+#> # A tibble: 6 × 10
+#>   .contrast .level_1  .level_2 .diff   .se .lower_ci .upper_ci  conc Type  Plant
+#>       <int> <fct>     <fct>    <dbl> <dbl>     <dbl>     <dbl> <dbl> <fct> <fct>
+#> 1         1 nonchill… chilled   5.00  3.45     -1.45      12.1   250 Queb… Qn1  
+#> 2         1 nonchill… chilled  10.8   2.17      6.70      15.2   250 Miss… Qn1  
+#> 3         1 nonchill… chilled   5.92  3.82     -1.42      13.4   500 Queb… Qn1  
+#> 4         1 nonchill… chilled  11.7   2.45      7.29      16.7   500 Miss… Qn1  
+#> 5         1 nonchill… chilled   5.32  4.61     -3.55      14.4   750 Queb… Qn1  
+#> 6         1 nonchill… chilled  12.3   2.88      6.60      18.1   750 Miss… Qn1
 ```
 
 For each posterior draw, gratia predicts both treatments with the
@@ -230,12 +236,12 @@ symmetric about `.diff`, which is always the difference of the fitted
 predictions.
 
 The choice of what is covered jointly matters when comparing more than
-two groups. Putting both factors in `by` compares the four joint
-combinations, giving six pairwise contrasts.
-`simultaneous_scope = "contrast"` covers each pair separately across
-every concentration and conditioning stratum; `"all"` covers all
-returned pairs together. Use the latter when the scientific claim
-concerns any of those six comparisons.
+two groups. Putting both factors in `by` compares all four combinations
+of origin and treatment, giving six pairwise contrasts.
+`simultaneous_scope = "contrast"` constructs a separate band for each
+pair across the concentration grid. Choose `"all"` if you plan to
+inspect all six comparisons and want joint coverage across both the
+pairs and the concentrations.
 
 ``` r
 
@@ -247,39 +253,33 @@ all_differences <- conditional_differences(m_uptake,
 all_differences |>
   group_by(.contrast, Type_1, Treatment_1, Type_2, Treatment_2) |>
   slice_min(abs(conc - 500), n = 1) |>
-  ungroup() |>
-  select(Type_1, Treatment_1, Type_2, Treatment_2, conc,
-    .diff, .lower_ci, .upper_ci)
-#> # A tibble: 6 × 8
-#>   Type_1      Treatment_1 Type_2     Treatment_2  conc .diff .lower_ci .upper_ci
-#>   <fct>       <fct>       <fct>      <fct>       <dbl> <dbl>     <dbl>     <dbl>
-#> 1 Quebec      nonchilled  Quebec     chilled      494.  5.97    -5.70       17.6
-#> 2 Quebec      nonchilled  Mississip… nonchilled   494. 10.6      0.793      20.4
-#> 3 Quebec      nonchilled  Mississip… chilled      494. 22.4     12.7        32.0
-#> 4 Quebec      chilled     Mississip… nonchilled   494.  4.61    -5.25       14.5
-#> 5 Quebec      chilled     Mississip… chilled      494. 16.4      8.78       24.0
-#> 6 Mississippi nonchilled  Mississip… chilled      494. 11.8      4.29       19.3
+  ungroup()
+#> # A tibble: 6 × 12
+#>   .contrast Type_1      Type_2     Treatment_1 Treatment_2 .diff   .se .lower_ci
+#>       <int> <fct>       <fct>      <fct>       <fct>       <dbl> <dbl>     <dbl>
+#> 1         1 Quebec      Quebec     nonchilled  chilled      5.97  3.83    -5.70 
+#> 2         2 Quebec      Mississip… nonchilled  nonchilled  10.6   3.22     0.793
+#> 3         3 Quebec      Mississip… nonchilled  chilled     22.4   3.17    12.7  
+#> 4         4 Quebec      Mississip… chilled     nonchilled   4.61  3.24    -5.25 
+#> 5         5 Quebec      Mississip… chilled     chilled     16.4   2.50     8.78 
+#> 6         6 Mississippi Mississip… nonchilled  chilled     11.8   2.46     4.29 
+#> # ℹ 4 more variables: .upper_ci <dbl>, conc <dbl>, Plant <fct>, .crit <dbl>
 ```
 
-Simultaneous simulation bands are symmetric calibrated bands about
-`.diff`, not equal-tailed pointwise intervals. Both uncertainty methods
-concern mean differences, not observation noise. They support ordinary
-single-predictor GAM and BAM families, including Gamma, negative
-binomial and Tweedie. General families with multiple linear predictors
-remain unsupported by
-[`conditional_differences()`](https://gavinsimpson.github.io/gratia/reference/conditional_differences.md).
+Simultaneous simulation bands are symmetric about `.diff`; their widths
+are chosen for joint coverage. Both uncertainty methods describe
+differences in mean responses, excluding observation noise.
+[`conditional_differences()`](https://gavinsimpson.github.io/gratia/reference/conditional_differences.md)
+supports ordinary GAM and BAM families with one linear predictor,
+including Gamma, negative binomial and Tweedie. Families with several
+linear predictors remain unsupported.
 
-SCAM fits with supported single-predictor families also support link-
-and response-scale differences, with delta or simulation uncertainty and
-pointwise or simultaneous intervals. Delta intervals use the local
-covariance of the transformed coefficients. With
-`uncertainty = "simulation"`, the default `method = "gaussian"` draws
-unrestricted fitting coefficients and applies the fitted positivity
-transformation. `method = "user"` accepts transformed coefficient draws
-that satisfy the fitted coefficient constraints; MH sampling is
-unavailable for SCAM fits. Smoothing-parameter uncertainty is
-unavailable for both uncertainty methods, so retain
-`unconditional = FALSE`.
+The same comparisons are available for supported {scam} models. Their
+intervals condition on the fitted smoothing parameters, so retain
+`unconditional = FALSE`. The [scam
+article](https://gavinsimpson.github.io/gratia/articles/scam-support.md)
+explains the coefficient transformations used for their analytic
+intervals and simulation draws.
 
 ### Compare shape separately from complete responses
 
@@ -310,10 +310,12 @@ joint coverage across several pairs.
 
 ## Where does uptake change fastest?
 
-The derivative of expected uptake answers how much uptake changes for a
-small increase in concentration. This is different from differentiating
-a centred log-uptake smooth. Hold origin and treatment fixed, and
-evaluate within the range rather than perturbing an endpoint beyond it.
+The derivative of expected uptake measures how much the mean response
+changes for a small increase in concentration, in uptake units per
+concentration unit. We compare delta-method and simulation intervals
+while holding origin and treatment fixed. Evaluation points lie inside
+the observed range so the finite differences do not require predictions
+beyond its endpoints.
 
 ``` r
 
@@ -339,7 +341,7 @@ ggplot(rates, aes(conc, .derivative, colour = Uncertainty, fill = Uncertainty)) 
     colour = NA) +
   geom_line() +
   labs(x = concentration_label,
-    y = "Change in expected uptake per concentration unit")
+    y = expression("Change in expected uptake per" ~ mu * L ~ L^{-1}))
 ```
 
 ![](prediction-comparisons_files/figure-html/response-rates-1.png)
@@ -370,13 +372,13 @@ boundary or with unusual scales, supply a positive absolute `eps` and
 check stability using nearby values. Set `order = 2` to estimate
 curvature; the first derivative above is the rate of uptake change.
 
-## Keep covariate transformations and derivative units distinct
+## Plot transformed covariates and differentiate in the intended units
 
-An alternative model uses a smooth of log concentration. This gives more
-resolution to the lower concentrations where uptake changes quickly. It
-also assumes a common concentration shape across treatments. We use it
-to show how a transformed covariate changes the plotting coordinates and
-derivative units.
+An alternative model uses a smooth of log concentration. The log
+transformation stretches differences among lower concentrations, where
+uptake changes quickly. This example also uses a common concentration
+smooth across treatments. We use it to show how a transformed covariate
+affects the plotting coordinates and derivative units.
 
 ``` r
 
@@ -429,6 +431,11 @@ contribution to log uptake. Drawing the same object with
 estimates. The straight relationship in log concentration appears curved
 when drawn against concentration in its original units.
 
+For a smooth of log concentration, the derivative can be taken with
+respect to either log concentration or concentration itself. We compute
+both and use the chain rule to check that they agree after converting
+units.
+
 ``` r
 
 log_coordinate_rate <- derivatives(m_log_conc,
@@ -463,13 +470,13 @@ complete fitted responses in raw concentration units instead. For tensor
 smooths such as `te(log(conc), temperature)`, use
 [`partial_derivatives()`](https://gavinsimpson.github.io/gratia/reference/partial_derivatives.md)
 with `wrt = "covariate", focal = "conc"` while holding temperature
-fixed. See [Functions of covariates and evaluation
-environments](https://gavinsimpson.github.io/gratia/articles/transformed-covariates.md)
+fixed. See [Predictions, plots and derivatives with transformed
+covariates](https://gavinsimpson.github.io/gratia/articles/transformed-covariates.md)
 for worked tensor, transformed-offset and local-function examples.
 Preserve the fitting environment, or pass `envir`, if expressions need
 local functions or constants at new data.
 
-## Respect the study design when generating predictions
+## Keep each plant with its observed origin and treatment
 
 [`all_levels()`](https://gavinsimpson.github.io/gratia/reference/evenly.md)
 is a clearly named alias of
@@ -565,14 +572,14 @@ m_missing <- gam(
 fitted_missing <- fitted_values(m_missing)
 fitted_missing |>
   mutate(uptake = plant_missing$uptake) |>
-  select(.row, conc, uptake, .fitted) |>
   slice_head(n = 3)
-#> # A tibble: 3 × 4
-#>    .row  conc uptake .fitted
-#>   <int> <dbl>  <dbl>   <dbl>
-#> 1     1    NA   NA      NA  
-#> 2     2   175   30.4    25.5
-#> 3     3   250   34.8    35.6
+#> # A tibble: 3 × 11
+#>    .row Type   Treatment   conc Plant .parameter .fitted     .se .lower_ci
+#>   <int> <fct>  <fct>      <dbl> <fct> <chr>        <dbl>   <dbl>     <dbl>
+#> 1     1 NA     NA            NA NA    mean          NA   NA           NA  
+#> 2     2 Quebec nonchilled   175 Qn1   mean          25.5  0.0484      23.2
+#> 3     3 Quebec nonchilled   250 Qn1   mean          35.6  0.0489      32.4
+#> # ℹ 2 more variables: .upper_ci <dbl>, uptake <dbl>
 ```
 
 The first observation was excluded from fitting, so its default fitted
@@ -583,14 +590,14 @@ response can still give a fitted mean when their predictors are present:
 
 prediction_missing <- plant_missing[1:3, ]
 prediction_missing$conc[2] <- NA_real_
-fitted_values(m_missing, data = prediction_missing) |>
-  select(.row, conc, uptake, .fitted)
-#> # A tibble: 3 × 4
-#>    .row  conc uptake .fitted
-#>   <int> <dbl>  <dbl>   <dbl>
-#> 1     1    95   NA      15.3
-#> 2     2    NA   30.4    NA  
-#> 3     3   250   34.8    35.6
+fitted_values(m_missing, data = prediction_missing)
+#> # A tibble: 3 × 11
+#>    .row Plant Type   Treatment  conc uptake .parameter .fitted     .se .lower_ci
+#>   <int> <fct> <fct>  <fct>     <dbl>  <dbl> <chr>        <dbl>   <dbl>     <dbl>
+#> 1     1 Qn1   Quebec nonchill…    95   NA   mean          15.3  0.0629      13.5
+#> 2     2 Qn1   Quebec nonchill…    NA   30.4 mean          NA   NA           NA  
+#> 3     3 Qn1   Quebec nonchill…   250   34.8 mean          35.6  0.0489      32.4
+#> # ℹ 1 more variable: .upper_ci <dbl>
 ```
 
 The first prediction is available; the second has a missing required
@@ -602,7 +609,7 @@ simulations likewise respect
 diagnostic functions align the retained observations before checking
 their distributions.
 
-## Which uncertainty is being propagated?
+## Choose the coefficient covariance for intervals
 
 The examples use mgcv’s approximate Bayesian coefficient covariance,
 conditional on estimated smoothing parameters. `unconditional = TRUE`
@@ -620,7 +627,7 @@ dim(get_vcov(m_uptake, term = "s(conc):Treatmentnonchilled"))
 #> [1] 4 4
 ```
 
-For APIs that provide `frequentist`, including
+For functions that provide `frequentist`, including
 [`difference_smooths()`](https://gavinsimpson.github.io/gratia/reference/difference_smooths.md),
 [`derivatives()`](https://gavinsimpson.github.io/gratia/reference/derivatives.md)
 and
@@ -654,9 +661,3 @@ the second inverse link returns **inverse standard deviation**, so it
 should not be labelled standard deviation without taking its reciprocal.
 These utilities do not remove the multiple-predictor restrictions of the
 comparison or delta derivative methods.
-
-The fitted model supports lower expected uptake for chilled Mississippi
-plants over much of the measured range. The Quebec comparison has wider
-intervals relative to its estimated difference, leaving its direction
-less clear. For nonchilled Quebec plants, uptake rises fastest at low
-concentrations and changes more slowly over the remaining range.

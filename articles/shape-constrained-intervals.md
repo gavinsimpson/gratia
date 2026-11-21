@@ -1,12 +1,18 @@
 # Intervals for shape-constrained smooths
 
-A fitted increasing or convex smooth can have interval endpoints that
-lack the fitted shape. gratia provides two ways to use shape
-restrictions in uncertainty calculations: transform the endpoints of an
-initial band, or retain an explicit set of admissible coefficient
-vectors. These answer different questions. The first supplies shaped
-endpoint curves on an evaluation grid; the second describes whole
-functions satisfying coefficient restrictions, including equalities.
+A smooth fitted with an increasing or convex shape constraint can still
+have interval endpoints that lack that shape.
+[`shape_intervals()`](https://gavinsimpson.github.io/gratia/reference/shape_intervals.md)
+adjusts the endpoints to satisfy the chosen restrictions at the
+evaluation points. For restrictions that apply to a whole function, such
+as requiring its integral to equal one,
+[`shape_confidence_set()`](https://gavinsimpson.github.io/gratia/reference/shape_confidence_set.md)
+instead records the coefficient vectors satisfying those restrictions
+and the supplied uncertainty bounds.
+
+We first apply these functions to supplied intervals and fitted smooths,
+then explain what the transformations imply for coverage. The examples
+use {gratia}, {mgcv} and {ggplot2}, which we load below.
 
 ``` r
 
@@ -15,18 +21,21 @@ load_mgcv()
 library("ggplot2")
 ```
 
-## Shape enforcement and initial uncertainty
+## Apply shape restrictions to existing intervals
 
 [`shape_intervals()`](https://gavinsimpson.github.io/gratia/reference/shape_intervals.md)
-accepts estimates and existing endpoints independently of any model. It
-first applies a zero lower bound when requested, then sorts values along
-each monotone coordinate, then takes the greatest convex minorant along
-one curvature coordinate. The greatest convex minorant is the largest
-convex curve lying below the supplied values. Concavity uses its
-negative counterpart. This follows the operator approach of [Chen and
-colleagues (2021)](https://www.jmlr.org/papers/v22/20-513.html),
-building on [monotone
-rearrangement](https://doi.org/10.1093/biomet/asp030).
+works directly on estimates and interval limits that you supply. It can
+impose non-negative values, increasing or decreasing values, and convex
+or concave curvature. To impose increasing values it sorts the supplied
+values along the relevant coordinate. To impose convexity it finds the
+largest convex curve lying below those values; this is called the
+*greatest convex minorant*. Concavity uses the corresponding operation
+with signs reversed. These operations follow [Chen and colleagues
+(2021)](https://www.jmlr.org/papers/v22/20-513.html), building on
+[monotone rearrangement](https://doi.org/10.1093/biomet/asp030). The
+following small example requests endpoints that are both increasing and
+convex over `x`. The deliberately uneven initial estimates make the
+adjustment visible in the returned values.
 
 ``` r
 
@@ -86,12 +95,13 @@ attr(shaped, "interval_info")
 #> [1] "inherited from input"
 ```
 
-The interval type and level describe the supplied band; this
-illustrative input has no statistical calibration. The returned table
-contains `.estimate`, `.lower_ci` and `.upper_ci`, with method
-information in `interval_info`.
+The returned table contains `.estimate`, `.lower_ci` and `.upper_ci`,
+with method information in `interval_info`. Here `level = 0.95` labels
+the starting limits. For an analysis, supply limits from an uncertainty
+calculation that supports the stated coverage. The final section shows
+how the adjustment can change that coverage.
 
-The supported codes are `"+"` for nonnegative values, `"m+"` and `"m-"`
+The supported codes are `"+"` for non-negative values, `"m+"` and `"m-"`
 for increasing and decreasing values, and `"c+"` and `"c-"` for
 convexity and concavity. Increasing and decreasing include flat
 sections. A complete Cartesian grid can have monotonicity in several
@@ -100,83 +110,20 @@ restrictions: convexity along one coordinate does not establish joint
 convexity of a surface.
 
 Rows may be unordered and coordinates may be irregularly spaced.
-Convexity uses slopes computed from actual coordinate differences.
-Sorting assigns equal mass to each distinct grid coordinate; on an
-irregular grid this is an empirical rearrangement, with no claim about
-distance measured uniformly across the coordinate domain. Duplicate grid
-rows and incomplete product grids are rejected.
+Convexity uses slopes computed from the actual coordinate differences.
+The sorting step gives each distinct coordinate equal weight, even when
+distances between coordinates differ. Duplicate grid rows and incomplete
+combinations of coordinates are rejected.
 
-### What the transformation guarantees
-
-Write T for the complete shape operator and f for target values
-satisfying the requested shape on the grid. The operator preserves order
-and fixes f. Consequently,
-
-L \leq f \leq U \quad\Longrightarrow\quad T(L) \leq T(f)=f \leq T(U),
-
-where each inequality holds at every grid point together. Thus every
-instance in which the initial band covers the entire grid remains
-covered after transformation. The maximum width over the grid cannot
-increase, although the width at an individual point can increase.
-
-This implication does not establish nominal coverage for the initial
-band. In particular, transforming separately calibrated pointwise limits
-does not preserve their marginal coverage at each point: sorting moves
-information between coordinates. `interval = "pointwise"` records this
-source calibration without assigning new pointwise coverage to the
-result. Penalization bias or an inadequate covariance approximation can
-also affect initial coverage; the shape operation does not correct
-either problem.
-
-The coverage statement concerns the evaluation grid. Connecting the
-returned points by straight lines preserves the named curve shapes, but
-does not extend coverage to every point between them. Nor do the
-transformed values necessarily represent a spline in the original fitted
-basis or satisfy its centring equalities.
-
-### What the validation simulations showed
-
-The reproducible experiment in `notes/scasm/shape-coverage.R` separates
-known-variance Gaussian calibration from fitted
-[`scasm()`](https://rdrr.io/pkg/mgcv/man/scasm.html) uncertainty. It
-uses 2,000 repetitions per known-Gaussian scenario and 400 attempted
-fits per [`scasm()`](https://rdrr.io/pkg/mgcv/man/scasm.html) scenario,
-including exactly flat and exactly linear truths. At 95% coverage, the
-binomial Monte Carlo standard error is about 0.5 percentage points for
-2,000 repetitions and 1.1 percentage points for 400 successful fits. The
-[`scasm()`](https://rdrr.io/pkg/mgcv/man/scasm.html) experiment applies
-the low-level operator to fitted response curves including their
-intercepts, giving each simulated truth a fixed reference level.
-
-For a nearly flat increasing truth, the smallest marginal coverage over
-grid points fell from 93.65% to 38.00% after transforming Gaussian
-pointwise limits. Using an initially calibrated simultaneous band,
-whole-grid coverage instead changed from 94.85% to 95.75%. No originally
-covering whole-grid band lost coverage in any of the 49,182 paired
-transformations across the experiment. These are empirical checks of the
-event-inclusion result, rather than a reason to interpret transformed
-pointwise limits as calibrated intervals.
-
-The [`scasm()`](https://rdrr.io/pkg/mgcv/man/scasm.html) examples also
-show that shape enforcement retains limitations of the initial
-uncertainty. For a nearly binding increasing, convex truth, the
-transformed Gaussian simultaneous band covered the whole grid in 313 of
-342 returned fits: 91.52%, with Monte Carlo standard error 1.51
-percentage points. The other 58 attempts raised upstream fitting errors,
-so this estimate is conditional on a model being returned. The saved
-reports record all errors and warnings and distinguish them from
-interval calculations. Comparing selected smoothing with a small fixed
-penalty also changed local bias. The small-penalty comparison records
-estimates only; it does not assess interval width or separate smoothing
-bias from the effects of a finite spline basis and binding restrictions.
-Enforcing shape supplies no additional correction for smoothing bias.
-
-## An increasing, convex `scasm()` smooth
+## Add shape-constrained intervals to a fitted smooth
 
 For supported [`mgcv::scasm()`](https://rdrr.io/pkg/mgcv/man/scasm.html)
-components, select the transformation explicitly with
-`interval_method = "shape"`. The default initial source is Gaussian:
-`shape_source = "gaussian"`. Existing interval defaults are unchanged.
+smooths, request the adjustment with `interval_method = "shape"`. Here
+`x` ranges over the unit interval and the mean response is an
+increasing, convex quadratic function of `x`. Independent Gaussian noise
+has standard deviation 0.2. We fit those two shape restrictions and
+construct a simultaneous band using a Gaussian approximation to
+coefficient uncertainty, selected by `shape_source = "gaussian"`.
 
 ``` r
 
@@ -197,29 +144,24 @@ draw(curve)
 
 ![](shape-constrained-intervals_files/figure-html/fit-curve-1.png)
 
-This displays the smooth component on its model scale. The intercept is
-not added. [`scasm()`](https://rdrr.io/pkg/mgcv/man/scasm.html)
-components use component-only uncertainty by default; an explicit
-request for `overall_uncertainty = TRUE` is rejected for shape
-intervals. Arbitrary effect shifts and transformations are also
-rejected, because they can change the asserted shape. Standard errors
-retained in the result describe the initial uncertainty calculation;
-transformed endpoints are not reconstructed from a standard error and a
-Gaussian critical value.
+This displays the smooth on the model scale, with the centring used in
+the fit. Its band describes uncertainty in the smooth itself. Use
+`overall_uncertainty = FALSE` if you set that argument explicitly. Shape
+intervals apply to the fitted smooth in its original units and require
+any effect shifts and transformations to be omitted. The standard errors
+in `curve` describe the calculation before the shape adjustment. Read
+the adjusted limits directly from `.lower_ci` and `.upper_ci`.
 
 Default plot captions show the basis and named shapes. The interval
 source, level and coverage information remain in the result’s
 `interval_info` attribute and in this documentation.
 
-By default the Gaussian source uses the model’s approximate Bayesian
-covariance. `frequentist = TRUE` instead requests the frequentist
-covariance. Neither choice constructs a posterior restricted to the
-feasible coefficient space. An interpretation as posterior probability
-requires an initially calibrated posterior region and a posterior
-supported on the stated shapes. `unconditional` retains its existing
-meaning for the initial covariance calculation, including the model’s
-availability of smoothing-parameter uncertainty corrections; it adds no
-new calibration to shape enforcement.
+The Gaussian source uses the model’s approximate Bayesian covariance by
+default. Set `frequentist = TRUE` to use the covariance of the
+coefficient estimators. `unconditional = TRUE` requests the correction
+for smoothing parameter uncertainty when available. The chosen
+covariance determines the starting band. The shape adjustment changes
+its limits and leaves the underlying coefficient distribution as it was.
 
 The same method selection is available through
 [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md),
@@ -227,32 +169,37 @@ The same method selection is available through
 and [`confint()`](https://rdrr.io/r/stats/confint.html) for supported
 smooth components. For example,
 `draw(m, interval = "simultaneous", interval_method = "shape", n_sim = 2000, seed = 1702)`
-computes and displays the intervals in one call. Select only eligible
-terms: every selected smooth must have named restrictions actually
-retained by the fitted model. General coefficient constraints belong in
-an explicit set, as described below. Numeric `by` variables are
-unsupported, because multiplying a component by a varying value changes
-its shape.
+computes and displays the intervals in one call. Select smooths whose
+named restrictions are still in force after fitting. Use an explicit
+confidence set for more general coefficient constraints, as described
+below. Numeric `by` variables are unsupported because multiplying the
+smooth by a varying value can change its shape.
 
-General `pc` inequalities can replace the named coefficient restrictions
-in mgcv while leaving the original `xt` request in the fitted object.
-Captions identify that request as not retained, and automatic shape
-intervals reject it. Ordinary point equalities that leave the named
-inequalities intact are supported. Derivative-valued bases are rejected:
-their values do not inherit the named shape of the original spline.
+If you supply general coefficient inequalities in `pc`, mgcv can use
+those in place of the named restrictions in `xt`. In that case, the plot
+caption identifies the requested restrictions as dropped and shape
+intervals are unavailable. Point equality constraints are supported when
+the named restrictions still apply. A constraint on the smooth itself
+need not imply the same constraint on its derivative, so bases that
+evaluate derivatives are unsupported.
 
 For transformed covariates, shape is asserted in the coordinates used by
 the model. For example, a restriction on `s(log(x), ...)` concerns
 `log(x)`; curvature in that coordinate need not be curvature in `x`.
 
-## A tensor with a constrained direction
+## Constrain one direction of a smooth surface
 
-Tensor restrictions require particular care: retained coefficient
-inequalities alone do not imply the named shape when complementary basis
-functions can be negative. Automatic shape inference therefore accepts
-unreparameterized univariate B-spline margins, fitted with `np = FALSE`,
-within their basis domains. Both `"sc"` and ordinary `"bs"` margins can
-be used in this supported construction.
+For a surface, shape restrictions can apply along one covariate while
+the other remains unrestricted. The example below has an increasing
+exponential effect of `x`, a quadratic effect of `z`, and independent
+Gaussian noise with standard deviation 0.15. We constrain the fitted
+surface to increase with `x` at each fixed `z`.
+
+This construction requires B-spline margins fitted with `np = FALSE`,
+which keeps their original parameterisation, and evaluation within their
+fitted domains. Both `"sc"` and ordinary `"bs"` margins are supported.
+These requirements ensure that the coefficient restrictions imply the
+stated shape of the surface.
 
 ``` r
 
@@ -275,11 +222,10 @@ draw(surface)
 
 ![](shape-constrained-intervals_files/figure-html/fit-tensor-1.png)
 
-The surface and its endpoints increase with `x` at fixed `z`; no
-restriction is imposed in `z`. `dist = 0` retains the complete product
-grid needed by the operator. Removing points distant from observations
-would leave missing slices. Evaluation outside the fitted B-spline
-domains is rejected.
+The surface and its interval limits increase with `x` at each fixed `z`.
+`dist = 0` keeps every combination of the two grid coordinates, as
+required for the adjustment. Keep the evaluation grid within the fitted
+B-spline domains.
 
 Automatic curvature inference additionally requires regular knots and a
 sufficient spline degree. In mgcv 1.9-4, the raw second coefficient
@@ -293,30 +239,28 @@ shape implied by fitted inequalities. Requests for multiple curvature
 directions are also rejected because a later convexification can destroy
 curvature enforced in an earlier direction.
 
-## How this differs from stored bootstrap limits
+## Use bootstrap limits as the starting intervals
 
 With `bs > 0`, a [`scasm()`](https://rdrr.io/pkg/mgcv/man/scasm.html)
-fit stores feasible bootstrap coefficient columns in `model$bs`. Its
-bootstrap holds smoothing parameters fixed and perturbs a final working
-likelihood problem. Native intervals evaluate those columns, take
-pointwise percentiles and, when `svar.only` is present, adjust endpoints
-using the mean difference between Bayesian and frequentist standard
-errors. Percentiles of convex functions need not be convex, and the
-endpoint adjustment can alter restrictions further.
+fit stores bootstrap coefficient vectors that satisfy the fitted
+constraints in `model$bs`. The bootstrap holds smoothing parameters
+fixed and perturbs the working likelihood from the final fit. The
+intervals from mgcv use percentiles of curves evaluated at each grid
+point. When `svar.only` is present, mgcv also adjusts the limits using
+the mean difference between Bayesian and frequentist standard errors.
+Percentiles of convex functions need not be convex, and the endpoint
+adjustment can alter restrictions further.
 
-`interval_method = "shape", shape_source = "bootstrap"` applies the same
-shape operators to these native pointwise limits. It requires valid
-stored draws; simultaneous bootstrap bands remain unsupported. No
-additional bias correction is introduced. This source requires
-`frequentist = FALSE` and `unconditional = FALSE`, matching the stored
-draws and native correction. Feasibility of the draws does not establish
-coverage of their percentiles: [Andrews
-(2000)](https://doi.org/10.1111/1468-0262.00114) shows that bootstrap
-calibration can fail at parameter boundaries. Applying a shape operator
-preserves whole-grid coverage events already present, without repairing
-their probability.
+`interval_method = "shape", shape_source = "bootstrap"` adjusts these
+pointwise limits using the same shape rules. Supply a model with stored
+bootstrap draws and keep `frequentist = FALSE` and
+`unconditional = FALSE` to match the mgcv calculation. This option
+supports pointwise starting limits only. Bootstrap coverage can be poor
+at the boundary of the allowed shapes, for instance when a curve
+constrained to be increasing is actually flat. [Andrews
+(2000)](https://doi.org/10.1111/1468-0262.00114).
 
-## Equalities and coupled coefficient restrictions
+## Keep an integral or other coefficient restriction fixed
 
 An integral equality cannot generally be assigned to two different
 ordered endpoint curves. If both have integral one and their difference
@@ -329,11 +273,17 @@ stores the intersection
 \\b: L\leq Xb\leq U,\quad A\_{\mathrm{in}}b\geq b\_{\mathrm{in}}, \quad
 Cb=d\\.
 
-Here is a three-coefficient example representing the values of a
+Here b is a candidate coefficient vector. The prediction matrix X maps
+it to curve values, which must lie between the supplied limits L and U.
+The other two conditions specify inequalities and equalities on b.
+
+In the following example, the three coefficients give the values of a
 piecewise linear curve at `x = c(0, 0.5, 1)`. The positive weights below
-give its exact integral over `[0, 1]`, which is required to equal one. A
-spline analysis would supply its own prediction matrix and integrals of
-basis functions.
+give its exact integral over `[0, 1]`, which is required to equal one.
+We combine that equality with non-negative coefficients and bounds from
+zero to two, then test two candidate curves for membership of the
+resulting set. A spline analysis would supply its own prediction matrix
+and integrals of basis functions.
 
 ``` r
 
@@ -350,25 +300,97 @@ in_shape_set(region, c(0.5, 1, 1))
 #> [1] FALSE
 ```
 
-The level and band type again record the caller’s calibration. On a
-feasible true coefficient vector, intersection preserves exactly the
-initial band’s coverage event. Pointwise limits alone do not provide a
-simultaneous region.
+The first candidate satisfies the integral equality; the second does
+not.
 [`in_shape_set()`](https://gavinsimpson.github.io/gratia/reference/shape_confidence_set.md)
-checks candidate vectors with a documented absolute tolerance; it
-neither samples the set nor optimizes over it. Construction does not
-test whether the restrictions define an empty set. Coordinatewise
-extrema of the set need not themselves satisfy its equalities.
+checks membership with a documented absolute tolerance. It does not
+generate draws or find the largest and smallest possible values. The
+restrictions can also be inconsistent, leaving an empty set, so check
+that they express the intended scientific constraints.
 
-The set representation supports linear equalities and coupled
-inequalities without replacing them by shaped endpoints. Ellipsoidal
-initial regions, optimization of bounds over the admissible set and
-constrained posterior sampling are separate extensions. A Bayesian
-sampler would need to specify and sample a posterior supported on the
-coefficient restrictions; see [Hazelton and Turlach
+As in the earlier interval example, `level` and `band_type` describe the
+bounds you supply. If the true coefficients satisfy the restrictions,
+intersecting their allowed values with a simultaneous band preserves
+that band’s coverage event. Pointwise limits alone do not provide a
+simultaneous confidence region.
+
+The set retains linear equalities and inequalities involving several
+coefficients together. It describes which functions are allowed by the
+restrictions and supplied bounds. To draw functions from a Bayesian
+posterior, one would also need to specify that posterior on the allowed
+coefficients; see [Hazelton and Turlach
 (2011)](https://doi.org/10.1016/j.csda.2011.04.018) for
-shape-constrained penalized splines. Likewise, [Dümbgen
+shape-constrained penalised splines. Likewise, [Dümbgen
 (2003)](https://arxiv.org/abs/1312.6466) constructs calibrated bands
 using multiscale tests in a Gaussian white-noise model. Those
 calibration results are distinct from the finite-grid endpoint
 transformation implemented here.
+
+## How shape restrictions affect coverage
+
+Write T for the complete shape operator and f for target values
+satisfying the requested shape on the grid. The operator preserves order
+and fixes f. Consequently,
+
+L \leq f \leq U \quad\Longrightarrow\quad T(L) \leq T(f)=f \leq T(U),
+
+where each inequality holds at every grid point together. Thus if the
+original band contains the target at every grid point, the adjusted band
+also contains it at every point. The same preservation of coverage
+applies to a credible band if the posterior is defined on curves that
+satisfy the constraints. The band’s greatest width over the grid cannot
+increase, although it can become wider at individual points.
+
+This implication does not establish nominal coverage for the initial
+band. In particular, transforming separately calibrated pointwise limits
+does not preserve their marginal coverage at each point: sorting moves
+information between coordinates. `interval = "pointwise"` records this
+source calibration without assigning new pointwise coverage to the
+result. Penalisation bias or an inadequate covariance approximation can
+also affect initial coverage; the shape operation does not correct
+either problem.
+
+Connecting the returned points by straight lines preserves the curve
+shape, but the coverage statement concerns the grid points only. An
+adjusted limit curve can also differ from any spline in the original
+basis, so the limits need not satisfy the centring conditions imposed on
+the fitted spline.
+
+### Coverage in simulation studies
+
+The experiment in `notes/scasm/shape-coverage.R` examines two settings:
+Gaussian intervals with known variance, and intervals estimated from
+fitted [`scasm()`](https://rdrr.io/pkg/mgcv/man/scasm.html) models. It
+uses 2,000 repetitions per known-variance scenario and 400 attempted
+fits per [`scasm()`](https://rdrr.io/pkg/mgcv/man/scasm.html) scenario,
+including exactly flat and exactly linear true functions. At 95%
+coverage, the binomial Monte Carlo standard error is about 0.5
+percentage points for 2,000 repetitions and 1.1 percentage points for
+400 successful fits. The
+[`scasm()`](https://rdrr.io/pkg/mgcv/man/scasm.html) experiment applies
+[`shape_intervals()`](https://gavinsimpson.github.io/gratia/reference/shape_intervals.md)
+to fitted response curves including their intercepts, so the true and
+fitted curves use the same reference level.
+
+For a nearly flat increasing truth, the smallest marginal coverage over
+grid points fell from 93.65% to 38.00% after transforming Gaussian
+pointwise limits. Using an initially calibrated simultaneous band,
+whole-grid coverage instead changed from 94.85% to 95.75%. No originally
+covering whole-grid band lost coverage in any of the 49,182 paired
+transformations across the experiment. These results illustrate why the
+distinction between pointwise intervals and simultaneous bands matters:
+preserving an already covering whole band does not preserve coverage at
+each individual point after sorting.
+
+The [`scasm()`](https://rdrr.io/pkg/mgcv/man/scasm.html) examples also
+show that the initial uncertainty calculation still matters after
+imposing shape restrictions. For a true curve close to the boundary of
+the increasing, convex restrictions, the transformed Gaussian
+simultaneous band covered the whole grid in 313 of 342 returned fits:
+91.52%, with Monte Carlo standard error 1.51 percentage points. The
+other 58 attempts raised upstream fitting errors, so this estimate is
+conditional on a model being returned. The saved reports record the
+fitting errors and warnings separately. Changing the smoothing penalty
+also changed local bias, but that comparison did not assess interval
+coverage or width. The shape adjustment itself does not correct
+smoothing bias.

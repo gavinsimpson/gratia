@@ -1,24 +1,52 @@
-# Functions of covariates and evaluation environments
+# Predictions, plots and derivatives with transformed covariates
 
-A smooth can depend on a function of a covariate rather than on the raw
-covariate. The same distinction arises with offsets, such as logged
-effort in a count model.
+A model fitted with `s(log(x))` uses a transformed covariate, but we may
+want to predict at supplied values of `x`, plot the result against `x`,
+or estimate change per unit of `x`. This vignette shows how to make
+those choices while keeping the model’s transformation intact.
+
+We load {gratia} and {mgcv} for the examples:
+
+``` r
+
+library("gratia")
+load_mgcv()
+```
+
+## Fit a count model with a transformed covariate and an effort offset
+
+We simulate independent Poisson counts. The rate per unit of effort
+varies nonlinearly with `log(x)`, and multiplying that rate by effort
+gives each observation’s expected count. Thus, twice the effort gives
+twice the expected count at the same value of `x`.
 
 ``` r
 
 set.seed(42)
 dat <- data.frame(x = runif(150, 1, 5), effort = runif(150, 1, 3))
 dat$y <- rpois(nrow(dat), dat$effort * exp(sin(log(dat$x))))
+```
+
+With a log link, the multiplicative effort term becomes an additive
+`offset(log(effort))`. We fit a smooth of `log(x)` to estimate the
+remaining variation in the log expected count:
+
+``` r
+
 m <- gam(y ~ s(log(x), k = 6) + offset(log(effort)),
   family = poisson(), data = dat, method = "REML")
 ```
 
-## Raw data and smooth coordinates
+## Predict at values of the original covariates
 
-Supply raw covariates to evaluate the model at new observations. Gratia
-computes `log(x)` and, for full predictions, `offset(log(effort))`. An
-isolated smooth does not require unrelated predictors or the model
-offset.
+Supply the original `x` and `effort` values when predicting at new
+observations; gratia evaluates their transformations. Here we hold
+effort at two units and compare the contribution of the smooth with the
+complete fitted mean.
+[`smooth_estimates()`](https://gavinsimpson.github.io/gratia/reference/smooth_estimates.md)
+needs only `x`, whereas
+[`fitted_values()`](https://gavinsimpson.github.io/gratia/reference/fitted_values.md)
+also needs the effort offset:
 
 ``` r
 
@@ -49,10 +77,10 @@ fitted_values(m, data = nd)
 #> 8     8  4.8       2 mean          5.92 0.0561      5.30      6.61
 ```
 
-Automatic smooth grids are evenly spaced in the **smooth coordinate**,
-here `log(x)`, and the output and plot axes use that name. They use
-stored evaluated covariates, so they do not need to reconstruct an
-inverse transformation.
+Without supplied prediction data,
+[`smooth_estimates()`](https://gavinsimpson.github.io/gratia/reference/smooth_estimates.md)
+creates an evenly spaced grid on the scale used in the smooth: here,
+`log(x)`. We can plot the estimated contribution directly on that scale:
 
 ``` r
 
@@ -62,7 +90,8 @@ draw(sm)
 
 ![](transformed-covariates_files/figure-html/coordinates-1.png)
 
-An explicitly evaluated column is also accepted:
+If you already have values on the transformed scale, supply a column
+named exactly as it appears in the model, here `log(x)`:
 
 ``` r
 
@@ -81,14 +110,11 @@ smooth_estimates(m, data = evaluated)
 #> 8 s(log(x)) TPRS  NA       0.315  0.0561    1.57
 ```
 
-If raw inputs and evaluated columns are both supplied, expressions are
-recomputed from the raw inputs. Stored model frames and automatically
-prepared grids retain their evaluated coordinates.
-
+If both `x` and `log(x)` are supplied, gratia computes the
+transformation from `x`. To build a grid on the original scale, use
 [`data_slice()`](https://gavinsimpson.github.io/gratia/reference/data_slice.md)
-works with raw variables. Supply reference `data` if the original raw
-covariates cannot be recovered; transformed values are not renamed as
-raw variables or automatically inverted.
+with the original fitting data. The following call creates eight evenly
+spaced `x` values while holding effort at two:
 
 ``` r
 
@@ -106,15 +132,15 @@ data_slice(m, x = evenly(x, n = 8), effort = 2, data = dat)
 #> 8  4.96      2
 ```
 
-## Choosing the plotted covariate scale
+## Plot against the original covariates
 
 Drawing methods use the model’s covariate coordinates by default. For
 example, `log(x)` is plotted against `log(x)`, with a matching axis
 label, whether it is inside a smooth or a parametric term. Set
-`back_transform = TRUE` to display `x` instead. This changes the
-plotting coordinates and labels; the estimated partial effect and its
-interval keep their meaning. Use `fun` to transform the partial effect
-itself.
+`back_transform = TRUE` to display `x` instead. The estimated smooth
+contribution remains on the model’s linear predictor scale. The
+following calls request an axis in the original units, first from the
+fitted model and then from saved smooth estimates.
 
 ``` r
 
@@ -131,21 +157,27 @@ draw(sm_raw, back_transform = TRUE)
 
 ![](transformed-covariates_files/figure-html/back-transform-2.png)
 
+The same option works for transformed covariates in parametric terms. We
+fit a Poisson model with a linear effect of `log(x)` and the same effort
+offset. Plot the effect against `log(x)` and `x`, then make the plot in
+the original units using the output of
+[`parametric_effects()`](https://gavinsimpson.github.io/gratia/reference/parametric_effects.md).
+
 ``` r
 
-
-m_parametric <- gam(y ~ log(x), family = poisson(), data = dat)
+m_parametric <- gam(y ~ log(x) + offset(log(effort)),
+  family = poisson(), data = dat)
 draw(m_parametric)
 ```
 
-![](transformed-covariates_files/figure-html/back-transform-3.png)
+![](transformed-covariates_files/figure-html/back-transform-parametric-1.png)
 
 ``` r
 
 draw(m_parametric, back_transform = TRUE)
 ```
 
-![](transformed-covariates_files/figure-html/back-transform-4.png)
+![](transformed-covariates_files/figure-html/back-transform-parametric-2.png)
 
 ``` r
 
@@ -153,46 +185,55 @@ pe <- parametric_effects(m_parametric)
 draw(pe, back_transform = TRUE)
 ```
 
-![](transformed-covariates_files/figure-html/back-transform-5.png)
+![](transformed-covariates_files/figure-html/back-transform-parametric-3.png)
 
-The same rule applies to each covariate in tensor products and
-parametric interactions, including covariates used for conditioning
-facets. Rugs and partial-residual locations follow the displayed scale.
-Surface coordinates can become irregularly spaced after changing scale;
-these plots use rectangles bounded by adjacent coordinate midpoints to
-avoid shifting raster pixels.
+For a surface, `back_transform = TRUE` changes both displayed axes. To
+illustrate this, we add an independent covariate `z` and fit a
+tensor-product smooth using `log(x)` and `sqrt(z)`. The simulated counts
+still depend only on `x` and effort; `z` supplies a second axis for this
+display example:
 
 ``` r
 
 dat_surface <- transform(dat, z = runif(nrow(dat), 1, 4))
-m_surface <- gam(y ~ te(log(x), sqrt(z)), family = poisson(),
+```
+
+Fit a smooth over the transformed coordinates, then request
+original-scale axes for both covariates when drawing it.
+
+``` r
+
+m_surface <- gam(y ~ te(log(x), sqrt(z)) + offset(log(effort)), family = poisson(),
   data = dat_surface, method = "REML")
 draw(m_surface, back_transform = TRUE, contour = FALSE)
 ```
 
 ![](transformed-covariates_files/figure-html/back-transform-surface-1.png)
 
-Smooth grids are evenly spaced on the model scale by default. For
-example, three points for `s(log(x))` with `x` ranging from 1 to 100
-correspond to raw values 1, 10, and 100. With
-`smooth_estimates(..., back_transform = TRUE)`, the grid is evenly
-spaced in raw `x`: 1, 50.5, and 100. The expressions are then evaluated
-forwards and estimates computed at those points.
-`draw(m, back_transform = TRUE)` performs this preparation
-automatically.
+`back_transform = TRUE` also changes where a smooth is evaluated when
+the grid is generated automatically. For example, consider `s(log(x))`
+with `x` ranging from 1 to 100. By default, three equally spaced points
+on the log scale correspond to 1, 10 and 100 in the original units. With
+`smooth_estimates(..., back_transform = TRUE)`, the same grid size gives
+1, 50.5 and 100 in the original units. The smooth is evaluated at the
+logs of these values. `draw(m, back_transform = TRUE)` prepares this
+grid automatically.
 
 Precomputed estimates retain their chosen evaluation points. An object
 created on a transformed-only grid cannot be drawn on the original
 scale: its raw coordinates are unavailable. Recompute it with
-`back_transform = TRUE`, or supply raw prediction rows through `data`.
-Returned estimates retain model coordinates and auxiliary
-`.gratia_raw_*` columns, so either drawing scale can be selected without
-changing the estimates. Subsets and confidence intervals retain these
-coordinates.
+`back_transform = TRUE`, or supply original covariate values through
+`data` when calculating the estimates.
 
-There is no list of supported inverse functions. Each smooth axis must
-depend on one distinct original model covariate, and gratia must be able
-to recover that covariate and evaluate the expression. For example:
+### Use your own transformation functions
+
+The transformation need not be named
+[`log()`](https://rdrr.io/r/base/Log.html) or
+[`sqrt()`](https://rdrr.io/r/base/MathFun.html). Each smooth axis must
+depend on one distinct original model covariate, and the transformation
+must be available when calculating predictions. Here `foo()` is another
+name for [`sqrt()`](https://rdrr.io/r/base/MathFun.html); we supply its
+environment through `envir`:
 
 ``` r
 
@@ -204,42 +245,30 @@ draw(sm_foo, back_transform = TRUE)
 
 ![](transformed-covariates_files/figure-html/back-transform-alias-1.png)
 
-Raw fitting rows are recovered and checked against the stored fitting
-observations. If the fitting data are unavailable, or changed functions
-or constants no longer reproduce the fit, recovery fails. Supply raw
-prediction rows in `data` and functions or constants in `envir` as
-needed. Already prepared estimates can be drawn without recovering data
-or evaluating functions again. When prediction `data` are supplied,
-unavailable raw fitting observations omit rugs and partial residuals.
-Prediction rows are not substituted for observed data. `envir` is used
-for both predictions and observation recovery.
-
-Typical values added by `smooth_data(..., include_all = TRUE)` do not
-identify the original coordinates of a model-scale grid. Prepare that
-grid with `back_transform = TRUE` to retain raw axes. For numeric `by`
-smooths, automatic grids evaluate the smooth with multiplier one, even
-for `s(log(x), by = x)`; the original axis is retained separately.
-Supplied raw prediction rows use their actual `by` values.
+Keep the original fitting data and transformation functions available
+when creating automatic original-scale grids. If the fitting data are
+unavailable, supply prediction rows in `data`; if a function or constant
+is missing, supply its environment in `envir`. Saved estimates can then
+be plotted without evaluating the transformation again. Rugs and partial
+residuals require the original observations and are omitted when those
+observations cannot be recovered.
 
 Soap-film boundary coordinates are stored on the model scale. A
 transformed boundary has no retained raw coordinates, so raw-scale
 drawing raises an error. Draw these soap films with
 `back_transform = FALSE` to retain their boundaries.
 
-Parametric effects likewise retain both coordinate scales by row,
-including for many-to-one functions. Multi-column basis terms such as
-`poly(x, 2)` and parametric expressions with no single coordinate per
-input retain raw axes.
-
 The old `parametric_effects(transform = ...)` argument is deprecated.
 Replace `transform = TRUE` with `back_transform = FALSE`, and
 `transform = FALSE` with `back_transform = TRUE`.
 
-## Local functions
+## Preserve functions defined inside a model-fitting function
 
 A fitted model may retain the formula expression without retaining the
-local environment in which it was evaluated. Preserve that environment
-when fitting if you will need a local function at new observations.
+local environment in which it was evaluated. In the example below,
+`transform_x()` needs the local constant `shift`. We return the fitted
+model and that environment together, then use `envir` when predicting at
+new observations:
 
 ``` r
 
@@ -277,18 +306,19 @@ fitted_values(bundle$model, data = nd, envir = bundle$envir)
 #> 8     8  4.8       2 mean          5.88 0.0619      5.21      6.64
 ```
 
-Automatic smooth plots can still use stored `transform_x(x)` values
-without this environment. New raw observations require the function.
-Evaluation errors identify the expression and explain how to supply the
-missing context; stored training values are never substituted for
-arbitrary new observations.
+New predictions require the original definition of `transform_x()` and
+the same value of `shift`. Retaining `bundle$envir` makes both available
+after `fit_local()` has returned.
 
-## Which derivative?
+## Choose whether derivatives describe change in `x` or `log(x)`
 
 For a contribution f(\log x), the default derivative is with respect to
 \log x. Set `wrt = "covariate"` to differentiate with respect to x
-instead. The latter includes the chain-rule factor 1/x because the
-transformation is reevaluated after each perturbation of x.
+instead. The latter includes the chain-rule factor 1/x. We compare both
+derivatives at the prediction rows created earlier. Both describe change
+in the smooth’s contribution to the log expected count; use
+[`response_derivatives()`](https://gavinsimpson.github.io/gratia/reference/response_derivatives.md)
+for change in the complete response mean.
 
 ``` r
 
@@ -318,23 +348,23 @@ derivatives(m, data = nd, type = "central", wrt = "covariate")
 #> 8 s(log(x)) NA    NA          0.129 0.0209  1.96    0.0880     0.170  4.8
 ```
 
-For a smooth of several raw inputs, such as `s(I(x / z))`, name the raw
-`focal` variable explicitly. Other inputs are held at the supplied
-values, or at typical values when generating a slice. Use
-[`I()`](https://rdrr.io/r/base/AsIs.html) for arithmetic that R would
-otherwise interpret as formula syntax. For tensor smooths, use
-[`partial_derivatives()`](https://gavinsimpson.github.io/gratia/reference/partial_derivatives.md)
-and specify the smooth or raw focal coordinate consistently with `wrt`:
-**`wrt` chooses the differentiation scale, and `focal` names the
-coordinate to differentiate along on that scale**.
+### Differentiate a surface with respect to one covariate
 
-For example, `te(log(x), sqrt(z))` represents a contribution f(\log x,
-\sqrt z). The two choices have the following meanings:
+For a surface,
+[`partial_derivatives()`](https://gavinsimpson.github.io/gratia/reference/partial_derivatives.md)
+varies the coordinate named in `focal` while holding the other
+coordinates fixed. `wrt` chooses the scale of that coordinate. For
+example, `te(log(x), sqrt(z))` represents a contribution f(\log x, \sqrt
+z), with the following choices:
 
 | Arguments | Derivative |
 |:---|:---|
 | `wrt = "smooth", focal = "log(x)"` | With respect to \log x, holding \sqrt z fixed |
 | `wrt = "covariate", focal = "x"` | With respect to x, holding z fixed |
+
+We simulate a Gaussian response with mean `sin(log(x)) * sqrt(z)`. The
+positive covariates are sampled independently, and independent Gaussian
+errors have standard deviation 0.1.
 
 ``` r
 
@@ -342,8 +372,22 @@ set.seed(43)
 tensor_dat <- data.frame(x = runif(150, 1, 5), z = runif(150, 1, 3))
 tensor_dat$y <- sin(log(tensor_dat$x)) * sqrt(tensor_dat$z) +
   rnorm(nrow(tensor_dat), sd = 0.1)
+```
+
+We fit a tensor-product smooth using the transformed covariates to
+estimate that surface:
+
+``` r
+
 tensor_model <- gam(y ~ te(log(x), sqrt(z), k = c(4, 4)),
   data = tensor_dat, method = "REML")
+```
+
+Next, we hold `z` at two and vary `x`. We calculate derivatives with
+respect to `log(x)` and `x`, then compare the latter with the chain-rule
+calculation:
+
+``` r
 
 # Vary x along a slice with z held fixed.
 tensor_nd <- data.frame(x = seq(1.2, 4.8, length.out = 8), z = 2)
@@ -367,26 +411,19 @@ data.frame(x = tensor_nd$x,
 #> 8 4.800000           0.05874753               0.05874753
 ```
 
-The first call perturbs `log(x)` directly. The second perturbs `x` and
-recomputes the smooth expressions, incorporating the chain rule
-numerically. Thus, for these first derivatives, \partial f / \partial x
-= (\partial f / \partial \log x) / x, up to finite-difference
-approximation error.
+The first call estimates the derivative from small changes in `log(x)`.
+The second makes small changes in `x` and recalculates `log(x)` before
+evaluating the smooth. The chain rule gives the relationship \partial f
+/ \partial x = (\partial f / \partial \log x) / x, up to
+finite-difference approximation error.
 
-In
-[`partial_derivatives()`](https://gavinsimpson.github.io/gratia/reference/partial_derivatives.md),
-`wrt = "smooth"` is the default, and omitting `focal` selects the first
-non-factor smooth coordinate. With `wrt = "covariate"`, supply `focal`
-whenever several raw covariates are eligible; for this tensor smooth,
-choose `"x"` or `"z"`. If selecting several smooths, supply one `focal`
-per smooth in their selected order; the same `wrt` applies to all of
-them.
-
-Supplied `data` should describe a slice with the other independent
-numeric inputs held fixed, as `z` is above. Raw-scale differentiation
-requires the raw focal column: stored transformed values alone are
-insufficient. For an untransformed coordinate such as `x` in `te(x, z)`,
-both choices of `wrt` give the same interpretation.
+For this surface, use `focal = "x"` or `"z"` with `wrt = "covariate"`,
+and supply the original covariate values in `data`. Keep the other
+covariate fixed to describe change along a particular slice, as we did
+with `z = 2`. The default `wrt = "smooth"` selects the first numeric
+smooth coordinate if `focal` is omitted. Naming it explicitly makes the
+intended derivative clear. For an untransformed coordinate, such as `x`
+in `te(x, z)`, both values of `wrt` give the same interpretation.
 
 ### Choosing a finite-difference step
 
@@ -397,20 +434,13 @@ range of `log(x)` when differentiating on that smooth coordinate, or of
 in the covariate’s units and normally stays the same when prediction
 data are split into batches.
 
-For derivative order d, the range is multiplied by
-\epsilon\_{\mathrm{machine}}^{1/(d+p)}, where p=2 for central
-differences and p=1 for forward or backward differences. This balances
-the orders of rounding and approximation error; for example, second
-central differences use the fourth root of machine precision. Constant
-coordinates use their magnitude instead of their range, with a fallback
-of one at zero. A lower bound and rounding of the step ensure
-representable perturbations at large coordinates.
-
-This rule does not estimate a universally optimal step: that would also
-need information about higher derivatives of the fitted function. Very
-small steps can amplify rounding errors, particularly for second
-derivatives, while large steps increase approximation error. For unusual
-function scales or domain boundaries, supply a positive absolute `eps`
-and check stability at nearby step sizes. See the [FiniteDiff step-size
-discussion](https://docs.sciml.ai/FiniteDiff/dev/epsilons/) for the
-error-balance principle.
+Start with this default. If estimates appear unstable, supply a positive
+absolute `eps` in the units of the coordinate being differentiated. For
+example, `eps = 1e-4` with `wrt = "covariate"` sets the step in units of
+`x`. Compare estimates using half and twice the chosen step: very small
+steps can amplify rounding errors, while large steps give a poorer local
+approximation. Near a transformation’s domain boundary, choose a step
+and difference type that keep the evaluation points inside the domain.
+The [FiniteDiff step-size
+discussion](https://docs.sciml.ai/FiniteDiff/dev/epsilons/) explains
+this balance.

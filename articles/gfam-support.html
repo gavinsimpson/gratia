@@ -26,7 +26,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-73</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-75</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -55,13 +55,13 @@
     <li><a class="dropdown-item" href="../articles/shape-constrained-intervals.html">Intervals for shape-constrained smooths</a></li>
     <li><a class="dropdown-item" href="../articles/spatial-smooths.html">Choose a smooth for the spatial question</a></li>
     <li><a class="dropdown-item" href="../articles/response-distributions.html">Checking different response distributions</a></li>
-    <li><a class="dropdown-item" href="../articles/transformed-covariates.html">Functions of covariates and evaluation environments</a></li>
+    <li><a class="dropdown-item" href="../articles/transformed-covariates.html">Predictions, plots and derivatives with transformed covariates</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Essentials</h6></li>
-    <li><a class="dropdown-item" href="../articles/data-slices.html">Data slices</a></li>
-    <li><a class="dropdown-item" href="../articles/custom-plotting.html">Customizing plots</a></li>
+    <li><a class="dropdown-item" href="../articles/data-slices.html">Creating prediction grids with data_slice()</a></li>
+    <li><a class="dropdown-item" href="../articles/custom-plotting.html">Customising plots</a></li>
     <li><a class="dropdown-item" href="../articles/posterior-simulation.html">Posterior Simulation</a></li>
-    <li><a class="dropdown-item" href="../articles/sampling-migration.html">Migrating posterior sampling calls</a></li>
+    <li><a class="dropdown-item" href="../articles/sampling-migration.html">Updating sampling code for gratia 0.12.0</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
@@ -93,33 +93,38 @@
 
     
     
+<p>This article shows how {gratia} works with models fitted using
+<code><a href="https://rdrr.io/pkg/mgcv/man/gfam.html" class="external-link">mgcv::gfam()</a></code>. This family lets groups of observations
+follow different distributions in the same model. It covers plotting
+shared and family-specific smooths, predicting and simulating responses
+for each family, and checking the fitted model. A simulated example with
+binary and count observations illustrates these operations.</p>
 <div class="section level2">
-<h2 id="can-two-surveys-inform-the-same-environmental-response">Can two surveys inform the same environmental response?<a class="anchor" aria-label="anchor" href="#can-two-surveys-inform-the-same-environmental-response"></a>
+<h2 id="an-example-with-binary-and-count-responses">An example with binary and count responses<a class="anchor" aria-label="anchor" href="#an-example-with-binary-and-count-responses"></a>
 </h2>
 <p>Suppose one bird survey records whether a species was detected, while
-another records its count during a fixed observation period. Both might
-tell us about the response to woodland cover, but a binary observation
-is not a count. <code><a href="https://rdrr.io/pkg/mgcv/man/gfam.html" class="external-link">mgcv::gfam()</a></code> fits one model in which each
-row has its own response family. The new gratia support provides
-response draws and diagnostics that respect that membership. This
-differs from a delta model: here the two sources supply separate
-observations, rather than occurrence and positive abundance being parts
-of a single response distribution.</p>
+another counts how many birds of that species were seen. Both surveys
+can help describe how records vary with woodland cover. We fit them
+together using <code><a href="https://rdrr.io/pkg/mgcv/man/gfam.html" class="external-link">mgcv::gfam()</a></code> and assign a binomial or
+Poisson family to each observation. gratia uses those assignments for
+predictions, simulations and checks of the fitted model.</p>
 <p>We simulate fixed-effort surveys at independent sites. The log odds
 of detection and the log expected count have different intercepts but
 share the same smooth response to woodland cover. Sharing the curve
 assumes that a change in cover has the same effect on log odds and log
 expected count. We compare this assumption with survey-specific curves
 below.</p>
-<p>The code needs mgcv and gratia, and uses dplyr and ggplot2 for
-presentation. All are gratia dependencies. The example has 600
-observations and uses 200 coefficient draws; increase the latter for
-final interval estimates.</p>
+<p>The example uses {mgcv} for fitting, {dplyr} to summarise results and
+{ggplot2} for plots.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://gavinsimpson.github.io/gratia/">"gratia"</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/load_mgcv.html">load_mgcv</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://dplyr.tidyverse.org" class="external-link">"dplyr"</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://ggplot2.tidyverse.org" class="external-link">"ggplot2"</a></span><span class="op">)</span></span></code></pre></div>
+<p>We generate 300 detection records and 300 count records, then plot
+the observations against woodland cover for each survey. The shared
+<code>habitat()</code> function supplies the curved effect on both
+linear predictors.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">241</span><span class="op">)</span></span>
 <span><span class="va">survey</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
@@ -142,57 +147,52 @@ final interval estimates.</p>
 <p>The binary panel contains only zero and one. The count panel has a
 wider range and variance that grows with the mean. A binomial family
 with one trial and a Poisson family are appropriate for the simulated
-protocols. For real counts, extra variation may require
-<code>nb()</code> instead of Poisson; residual checks help assess that
-choice.</p>
+surveys. For real counts, extra variation may require <code><a href="https://rdrr.io/pkg/mgcv/man/negbin.html" class="external-link">nb()</a></code>
+instead of Poisson; residual checks help assess that choice.</p>
 </div>
 <div class="section level2">
-<h2 id="share-the-smooth-retain-different-intercepts-and-links">Share the smooth, retain different intercepts and links<a class="anchor" aria-label="anchor" href="#share-the-smooth-retain-different-intercepts-and-links"></a>
+<h2 id="fit-a-shared-smooth-with-different-response-families">Fit a shared smooth with different response families<a class="anchor" aria-label="anchor" href="#fit-a-shared-smooth-with-different-response-families"></a>
 </h2>
-<p>The two-column response supplies the observation and its position in
-the family list. Family 1 is binomial and family 2 is Poisson. The
-factor <code>source</code> supplies different intercepts. A single
-<code>s(woodland)</code> supplies the shared effect on both linear
-predictors, and REML estimates its smoothness.</p>
+<p>The first response column holds the observation and the second gives
+its family’s position in the list. Family 1 is binomial and family 2 is
+Poisson. The factor <code>source</code> gives each survey its own
+intercept, and <code>s(woodland)</code> gives both linear predictors the
+same smooth. REML estimates its smoothness.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">joint</span> <span class="op">&lt;-</span> <span class="fu">gam</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">observed</span>, <span class="va">family_id</span><span class="op">)</span> <span class="op">~</span> <span class="va">source</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">woodland</span>, k <span class="op">=</span> <span class="fl">10</span><span class="op">)</span>,</span>
-<span>  data <span class="op">=</span> <span class="va">survey</span>, family <span class="op">=</span> <span class="fu">gfam</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">binomial</a></span><span class="op">(</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">poisson</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">joint</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">observed</span>, <span class="va">family_id</span><span class="op">)</span> <span class="op">~</span> <span class="va">source</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">woodland</span>, k <span class="op">=</span> <span class="fl">10</span><span class="op">)</span>,</span>
+<span>  data <span class="op">=</span> <span class="va">survey</span>, family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gfam.html" class="external-link">gfam</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">binomial</a></span><span class="op">(</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">poisson</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">joint</span>, parametric <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="gfam-support_files/figure-html/fit-1.png" class="r-plt" alt="" width="700"></p>
-<p>A positive smooth contribution multiplies the expected count by
-<code>exp(effect)</code> and multiplies detection odds by the same
-quantity. It does not add the same amount to the detection probability
-and count. The fitted smooth rises toward intermediate cover and then
-declines, consistent with the generating response. Its centering
-constraint sets the reference for the partial effect. The different
-intercepts determine the absolute levels.</p>
+<p>A change of <span class="math inline">d</span> in the smooth
+multiplies both detection odds and expected count by <span class="math inline">\exp(d)</span>. The fitted smooth rises towards
+intermediate cover and then declines, as in the simulation. To recover
+the fitted detection probability or expected count, add the survey’s
+intercept to the smooth and apply that family’s inverse link.</p>
 <p>The <a href="https://stat.ethz.ch/R-manual/R-devel/library/mgcv/html/gfam.html" class="external-link">mgcv
-grouped-family documentation</a> explains the response encoding and
-sharing of terms. This example replaces its generic simulation with two
-explicitly described survey protocols.</p>
+grouped-family documentation</a> explains the response encoding and how
+to share terms.</p>
 <p>Sharing a smooth can improve precision if its assumption is
 reasonable. A model with different smooths provides a useful comparison
 when the surveys have enough information to estimate them:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">separate</span> <span class="op">&lt;-</span> <span class="fu">gam</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">observed</span>, <span class="va">family_id</span><span class="op">)</span> <span class="op">~</span> <span class="va">source</span> <span class="op">+</span></span>
-<span>    <span class="fu">s</span><span class="op">(</span><span class="va">woodland</span>, by <span class="op">=</span> <span class="va">source</span>, k <span class="op">=</span> <span class="fl">10</span><span class="op">)</span>,</span>
-<span>  data <span class="op">=</span> <span class="va">survey</span>, family <span class="op">=</span> <span class="fu">gfam</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">binomial</a></span><span class="op">(</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">poisson</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">separate</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">observed</span>, <span class="va">family_id</span><span class="op">)</span> <span class="op">~</span> <span class="va">source</span> <span class="op">+</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">woodland</span>, by <span class="op">=</span> <span class="va">source</span>, k <span class="op">=</span> <span class="fl">10</span><span class="op">)</span>,</span>
+<span>  data <span class="op">=</span> <span class="va">survey</span>, family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gfam.html" class="external-link">gfam</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">binomial</a></span><span class="op">(</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">poisson</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">separate</span>, parametric <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="gfam-support_files/figure-html/different-responses-1.png" class="r-plt" alt="" width="700"></p>
-<p>Compare the shapes and their uncertainty, particularly at the ends of
-the cover range. The binary survey contains less information about the
-curve than the count survey, so its wider intervals leave more
-uncertainty about its shape. The similar fitted shapes support sharing
-in this simulation. For your own surveys, use separate smooths if the
-protocols imply different responses to cover, and include offsets when
-survey effort varies.</p>
+<p>Both fitted curves peak at intermediate woodland cover. The wider
+intervals for the binary survey show that its curve is estimated less
+precisely. If survey effort varies and the expected count is
+proportional to effort, use a log-effort offset for the Poisson
+observations. Model the effect of effort on detection probability
+separately.</p>
 </div>
 <div class="section level2">
 <h2 id="predict-the-appropriate-quantity-for-each-survey">Predict the appropriate quantity for each survey<a class="anchor" aria-label="anchor" href="#predict-the-appropriate-quantity-for-each-survey"></a>
 </h2>
 <p>Prediction rows must identify their distribution. This matters even
 if their covariates are identical. We generate the same cover grid for
-both protocols and pass <code>family_index</code> explicitly.
+both surveys and pass <code>family_index</code> explicitly.
 Response-scale <code><a href="../reference/fitted_samples.html">fitted_samples()</a></code> applies each row’s inverse
 link to every shared coefficient draw.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
@@ -213,16 +213,14 @@ link to every shared coefficient draw.</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span> <span class="va">source</span>, scales <span class="op">=</span> <span class="st">"free_y"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Proportion of woodland"</span>, y <span class="op">=</span> <span class="st">"Expected survey response"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="gfam-support_files/figure-html/predictions-1.png" class="r-plt" alt="" width="700"></p>
-<p>The first curve estimates detection probability; the second estimates
-expected count. These are pointwise intervals for expected responses,
-not prediction intervals for future observations. Their shared
-coefficient draws also retain uncertainty shared between the two curves.
-The count response peaks near intermediate cover, while the logit
-transform compresses the detection response between zero and one.</p>
-<p>The fitted means can also be checked against mgcv’s native
-prediction. For this response expression, mgcv needs both columns named
-in the response expression so it can evaluate the membership column. The
-placeholder observation is ignored for the prediction:</p>
+<p>The curves show detection probabilities and expected counts, with
+pointwise intervals. Each coefficient draw is used for both surveys, so
+the intervals come from predictions that share the same woodland effect
+in each draw.</p>
+<p>To compare these means with mgcv’s own predictions, supply both
+columns of the response expression in the prediction data.
+<code>family_id</code> selects the response family; the placeholder
+<code>observed</code> value is ignored during prediction:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">native_grid</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/transform.html" class="external-link">transform</a></span><span class="op">(</span><span class="va">grid</span>, observed <span class="op">=</span> <span class="fl">0</span>, family_id <span class="op">=</span> <span class="va">index</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="va">grid</span>, expected <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">joint</span>, <span class="va">native_grid</span>, type <span class="op">=</span> <span class="st">"response"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
@@ -233,11 +231,11 @@ placeholder observation is ignored for the prediction:</p>
 <span><span class="co">#&gt; 4 0.03797468 Detection 0.2780466</span></span>
 <span><span class="co">#&gt; 5 0.05063291 Detection 0.2879976</span></span>
 <span><span class="co">#&gt; 6 0.06329114 Detection 0.2980352</span></span></code></pre></div>
-<p>To predict actual observations at these cover values, use
-<code><a href="../reference/simulate.html">simulate()</a></code>. It holds the fitted coefficients and nuisance
-parameters fixed, then draws binomial or Poisson responses as
-appropriate. Coefficient uncertainty is a separate source of variation:
-<code><a href="../reference/posterior_samples.html">posterior_samples()</a></code> adds that uncertainty.</p>
+<p>Use <code><a href="../reference/simulate.html">simulate()</a></code> to draw future observations at these
+cover values, holding the fitted coefficients and any other distribution
+parameters fixed. These draws show variation in individual observations.
+Use <code><a href="../reference/posterior_samples.html">posterior_samples()</a></code> to include coefficient uncertainty
+in the draws as well.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">replicates</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/simulate.html">simulate</a></span><span class="op">(</span><span class="va">joint</span>, data <span class="op">=</span> <span class="va">grid</span>, family_index <span class="op">=</span> <span class="va">index</span>,</span>
 <span>  nsim <span class="op">=</span> <span class="fl">200</span>, seed <span class="op">=</span> <span class="fl">243</span><span class="op">)</span></span>
@@ -250,44 +248,49 @@ appropriate. Coefficient uncertainty is a separate source of variation:
 <span><span class="co">#&gt; 2 0.5063291 Detection     0 1.000</span></span>
 <span><span class="co">#&gt; 3 0.4936709     Count     1 9.000</span></span>
 <span><span class="co">#&gt; 4 0.5063291     Count     2 9.025</span></span></code></pre></div>
-<p>Even a tightly estimated detection probability yields a future binary
-response of zero or one. Counts vary substantially around their fitted
-mean. The response families supply this variation; drawing only smooth
-coefficients would miss it. Membership is a position in the family list,
-not an arbitrary factor code: retain the same mapping when constructing
-your own prediction data.</p>
+<p>Even a precisely estimated detection probability yields individual
+responses of zero or one. Individual counts also vary around their
+fitted mean. The <code>family_index</code> values must match the
+positions of the response families in the fitted model.</p>
 </div>
 <div class="section level2">
-<h2 id="check-each-observation-process">Check each observation process<a class="anchor" aria-label="anchor" href="#check-each-observation-process"></a>
+<h2 id="check-the-fit-separately-for-each-response-family">Check the fit separately for each response family<a class="anchor" aria-label="anchor" href="#check-the-fit-separately-for-each-response-family"></a>
 </h2>
 <p>Raw residual magnitudes are not comparable between binary and count
 responses. Probability integral transform (PIT) residuals locate each
 observation in its own fitted distribution. At a discrete observation,
 gratia randomises within its probability mass; quantile residuals
 transform those probabilities to standard-normal scores. See <a href="model-checking.html">Model diagnostics</a> for the reference
-calculations and the distinction from posterior predictive checks.</p>
+calculations and the distinction from posterior predictive checks.
+Setting <code>by_family = TRUE</code> gives separate panels for the
+binary and count responses:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/appraise.html">appraise</a></span><span class="op">(</span><span class="va">joint</span>, type <span class="op">=</span> <span class="st">"quantile"</span>, by_family <span class="op">=</span> <span class="cn">TRUE</span>, seed <span class="op">=</span> <span class="fl">244</span><span class="op">)</span></span></code></pre></div>
 <p><img src="gfam-support_files/figure-html/checks-1.png" class="r-plt" alt="" width="700"></p>
-<p>Component facets help find a failure confined to one survey. Look for
-tail departures in QQ plots, changing residual spread across fitted
-values, or disagreement in the observed-versus-fitted panels. Here the
-component scores show approximate agreement with their references
-despite the different scales of the original responses.</p>
+<p>Separate panels help you see whether a pattern is confined to one
+survey. Look for departures in the tails of the QQ plots, changes in
+residual spread across the fitted values, or disagreement between the
+observed and fitted responses. Here the quantile residuals for both
+families broadly agree with their references.</p>
 <p>Pooling standard-normal residuals is also possible. The colours
 retain each component’s identity; histogram densities are calculated
 separately with common bin edges. Traditional deviance or response
 residuals instead default to separate component facets because their
-scales differ.</p>
+scales differ. We draw the pooled histogram, then use a worm plot with
+separate family panels. A worm plot subtracts the reference quantile, so
+a well-fitting model should give points scattered around zero:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/residuals_hist_plot.html">residuals_hist_plot</a></span><span class="op">(</span><span class="va">joint</span>, type <span class="op">=</span> <span class="st">"quantile"</span>, by_family <span class="op">=</span> <span class="cn">FALSE</span>, seed <span class="op">=</span> <span class="fl">244</span><span class="op">)</span></span></code></pre></div>
 <p><img src="gfam-support_files/figure-html/pooled-check-1.png" class="r-plt" alt="" width="700"></p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/worm_plot.html">worm_plot</a></span><span class="op">(</span><span class="va">joint</span>, type <span class="op">=</span> <span class="st">"quantile"</span>, by_family <span class="op">=</span> <span class="cn">TRUE</span>, seed <span class="op">=</span> <span class="fl">244</span><span class="op">)</span></span></code></pre></div>
 <p><img src="gfam-support_files/figure-html/pooled-check-2.png" class="r-plt" alt="" width="700"></p>
-<p>A worm plot subtracts the reference quantile, making curvature and
-departures near zero easier to see. The separate panels show which
-observation process contributes each pattern.</p>
+<p>The worm plot’s separate panels show which response family
+contributes each pattern.</p>
+<p>Next, compare the observed binary and count distributions with
+replicated datasets. <code><a href="../reference/posterior_predictive_plot.html">posterior_predictive_plot()</a></code> includes
+uncertainty in the fitted coefficients when generating these
+replicates:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/posterior_predictive_plot.html">posterior_predictive_plot</a></span><span class="op">(</span><span class="va">joint</span>, n <span class="op">=</span> <span class="fl">50</span>, seed <span class="op">=</span> <span class="fl">245</span><span class="op">)</span></span></code></pre></div>
 <p><img src="gfam-support_files/figure-html/predictive-check-1.png" class="r-plt" alt="" width="700"></p>
@@ -295,41 +298,38 @@ observation process contributes each pattern.</p>
 reasonable overall shape agreement. Its intervals are pointwise and have
 appreciable simulation error with 50 replicates; increase that number
 before judging individual probability masses closely.</p>
-<p>The posterior predictive plot compares separate observed response
-distributions with replicated surveys, including approximate coefficient
-uncertainty. For these discrete responses the bars describe variation in
-replicated probability masses, not intervals on an individual count. A
-pooled response histogram would mix probabilities with counts and answer
-no useful survey question.</p>
+<p>The bars show how the proportion at each response value varies
+between replicated surveys. This checks the detection frequency in the
+binary survey and the distribution of counts in the other survey.</p>
 </div>
 <div class="section level2">
-<h2 id="limits-when-extending-the-model">Limits when extending the model<a class="anchor" aria-label="anchor" href="#limits-when-extending-the-model"></a>
+<h2 id="using-other-families-weights-and-prediction-data">Using other families, weights and prediction data<a class="anchor" aria-label="anchor" href="#using-other-families-weights-and-prediction-data"></a>
 </h2>
-<p><code>gfam()</code> accepts ordinary and extended mgcv families with
+<p><code><a href="https://rdrr.io/pkg/mgcv/man/gfam.html" class="external-link">gfam()</a></code> accepts ordinary and extended mgcv families with
 a scalar response, including negative binomial, Tweedie, beta, scaled-t
-and ordered categories. Gratia response simulation uses each component’s
-fitted parameters and can simulate ordered-category codes.
-Response-scale fitted draws for ordinal components remain unsupported
-because an ordinal response requires a vector of category probabilities;
-link-scale fitted draws are available. General families with several
-linear predictors are not <code>gfam()</code> components.</p>
+and ordered categories. gratia can simulate ordered-category responses.
+For an ordinal component, request
+<code>fitted_samples(..., quantity = "expectation")</code> to obtain
+category probabilities, with categories identified by
+<code>.category</code>. Link-scale fitted draws are also available.
+General families with several linear predictors are not
+<code><a href="https://rdrr.io/pkg/mgcv/man/gfam.html" class="external-link">gfam()</a></code> components.</p>
 <p>Missing required predictors or membership give missing predictions.
 Missing responses alone do not prevent prediction. With
 <code><a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">na.exclude()</a></code>, excluded fitting rows are restored as
 <code>NA</code> in fitted draws and simulations, while checks use the
-observations actually fitted. Censored components can simulate latent
-responses, but a posterior predictive comparison of censored
-observations also needs a censoring mechanism, which is not supplied
-automatically.</p>
+observations actually fitted. Scalar censored-family components can
+simulate uncensored responses. Matrix responses that encode censoring or
+binomial success and failure counts are outside the scope of
+<code><a href="https://rdrr.io/pkg/mgcv/man/gfam.html" class="external-link">gfam()</a></code>.</p>
 <p>For grouped binomial proportions, supply the number of trials in
 <code>weights</code>; for Gaussian and Gamma components these weights
 represent response precision. Prediction data default to weights of one
 unless you supply them. These interpretations differ and should follow
-the measurement protocol.</p>
+how the observations were collected.</p>
 <p>Use the component diagnostics to assess the observation distributions
 and the separate-curve comparison to decide whether to share the cover
-response. Together they address both parts of the model that connect
-these surveys.</p>
+response.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

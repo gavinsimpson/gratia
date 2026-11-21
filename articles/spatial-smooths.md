@@ -1,10 +1,13 @@
 # Choose a smooth for the spatial question
 
-Spatial proximity is not always a straight-line distance. Observations
-might represent adjacent districts, locations separated by a peninsula,
-or points on the globe. The appropriate smooth depends on that geometry.
-This article uses three examples to show how to fit those models and
-interpret gratia’s effect displays.
+What counts as nearby depends on the setting. Districts can be
+neighbours because their boundaries touch. Locations in a lake can be
+close on a map but separated by land. On a globe, points with longitudes
+near 180° E and 180° W can lie next to each other. This article fits and
+plots a smooth for each setting.
+
+Load {gratia}, {mgcv} and {ggplot2} for fitting the models and plotting
+their effects.
 
 ``` r
 
@@ -13,28 +16,26 @@ load_mgcv()
 library("ggplot2")
 ```
 
-The examples require mgcv 1.9-4 or later. Spherical plotting also needs
-the optional sf package. Three-dimensional views need ggcube. The
-district and soap-film analyses run without either optional display
-package.
+The examples require mgcv 1.9-4 or later. Drawing the spherical map also
+needs the optional {sf} package.
 
-## Are high crime rates explained by district income or location?
+## Markov random fields for district effects
 
-The Columbus data supplied with mgcv record residential burglary and
-auto theft rates per 1,000 households in 49 districts. They also record
+The Columbus data supplied with mgcv record residential burglary and car
+theft rates per 1,000 households in 49 districts. They also record
 household income in thousands of dollars and provide district polygons.
-These are **rates**, not counts, so fitting a Poisson distribution to
-`crime` would misrepresent the response. A Gaussian model is a starting
-approximation for variation in rates; a count model would require counts
-and exposure data. See the [data
+We use a Gaussian model for the rates. A Poisson model would need the
+original crime counts and the number of households in each district. See
+the [data
 documentation](https://stat.ethz.ch/R-manual/R-devel/library/mgcv/html/columb.html)
 for the original source.
 
 We adapt the worked examples in mgcv’s [Markov random field
 documentation](https://stat.ethz.ch/R-manual/R-devel/library/mgcv/html/smooth.construct.mrf.smooth.spec.html).
 The smooth gives each district an effect and penalises differences
-between neighbours. Neighbourhoods are derived from polygons that share
-vertices.
+between neighbours. Here, districts are neighbours if their polygons
+have at least one vertex in common. Load the measurements and district
+polygons, then plot crime rate against income.
 
 ``` r
 
@@ -48,8 +49,9 @@ ggplot(columb, aes(income, crime)) +
 
 ![](spatial-smooths_files/figure-html/columbus-data-1.png)
 
-Start with the spatial pattern alone, and compare a full representation
-with a smaller one before adding income:
+First fit the district effects alone, using either one coefficient per
+district or a smaller basis. Then add an income smooth to ask how much
+geographical variation remains after accounting for income.
 
 ``` r
 
@@ -71,14 +73,20 @@ overview(district_income)
 #> 3 s(income)   TPRS           5  1.00    1.00    28.5   <0.001
 ```
 
-The full model has a district coefficient for every area, subject to
-centring and the estimated penalty. The reduced representation uses
-fewer coefficients to represent the same 49 area effects. `k = 20`
-restricts the available spatial patterns; it does not mean only twenty
-districts are fitted. Adding income asks how much spatial variation
-remains after accounting for its association with crime rate.
+The full basis starts with one coefficient per district, and the smooth
+is centred to separate it from the intercept. With `k = 20`, the smooth
+still estimates an effect for all 49 districts. It uses fewer
+coefficients, which limits the spatial patterns it can represent.
+Including income shows how the district effects change after accounting
+for its association with crime rate.
 
-## Read district effects rather than basis coefficients
+## Estimate and plot district effects
+
+Use
+[`smooth_estimates()`](https://gavinsimpson.github.io/gratia/reference/smooth_estimates.md)
+to obtain each district’s estimated contribution and uncertainty. The
+output identifies districts even when the fitted basis has fewer
+coefficients than there are districts.
 
 ``` r
 
@@ -96,11 +104,12 @@ head(area_effects)
 #> 6 s(district) MRF   NA       -0.481  5.62 5         1.96    -11.5      10.5
 ```
 
-The rows are effects for **areas**, even for a reduced-rank fit. They
-are not the coefficients of its smaller basis. The same area labels
-identify predictions supplied with `data`; a previously unknown district
-is not a valid prediction location merely because it is adjacent to one
-in the model.
+The same district labels identify prediction locations supplied with
+`data`. Predictions require districts included in the fitted model;
+adjacency alone does not supply an effect for a new district.
+
+Plot the saved district estimates, then the income smooth. The two plots
+show the separate contributions to the fitted crime rate.
 
 ``` r
 
@@ -119,14 +128,14 @@ draw(district_income, select = "s(income)",
 
 ![](spatial-smooths_files/figure-html/district-effects-2.png)
 
-Positive area effects indicate rates above the fitted intercept and
-income contribution. The income association is downward over this
-dataset’s range, while individual adjusted district effects have
-substantial uncertainty. Use their intervals when comparing districts.
-Neighbouring districts borrow information through the penalty on the
-mean effects. The Gaussian response errors are still assumed
-independent, so inspect residual spatial patterns before relying on
-these intervals.
+A positive district effect raises the fitted rate above the sum of the
+intercept and the income contribution. Fitted rates decline with income,
+and many individual district effects have wide intervals. An interval
+for the difference between two districts needs to account for the
+covariance of their estimated effects. The penalty encourages similar
+fitted effects for neighbours. The model assumes independent errors
+around those fitted rates, so check the residuals for remaining spatial
+patterns.
 
 To see how much the smaller spatial representation changes the fitted
 pattern, compare its area effects on the same district labels:
@@ -146,11 +155,9 @@ ggplot(rank_effects, aes(district, .estimate, colour = representation)) +
 
 ![](spatial-smooths_files/figure-html/district-rank-comparison-1.png)
 
-The comparison shows how reducing the basis changes the spatial-only
-fits. Use it to assess whether the smaller representation retains the
-district patterns of interest. The neighbourhood graph determines which
-area effects borrow information from each other, so check that it
-represents the connections relevant to your analysis.
+Use this comparison to assess whether the smaller basis retains the
+district patterns of interest. To inspect the distribution of the
+estimated district effects, use a normal QQ plot.
 
 ``` r
 
@@ -159,15 +166,19 @@ draw(district_income, select = "s(district)", mrf_plot = "qq")
 
 ![](spatial-smooths_files/figure-html/district-qq-1.png)
 
-This QQ view describes the distribution of fitted area effects. They are
-correlated and can have unequal marginal variances, so this is not a
-test of independent normal effects or a response-distribution
-diagnostic. For response checks use
+The QQ plot compares the distribution of the fitted district effects
+with a normal distribution. Read it as a description of these estimates,
+which can be correlated and have different variances. To check the
+response distribution, use
 [`appraise()`](https://gavinsimpson.github.io/gratia/reference/appraise.md)
-and consult [Choosing diagnostic
-references](https://gavinsimpson.github.io/gratia/articles/model-checking.md).
+as shown in the [model diagnostics
+article](https://gavinsimpson.github.io/gratia/articles/model-checking.md).
 
-One can also inspect the neighbourhood penalty itself:
+Use
+[`penalty()`](https://gavinsimpson.github.io/gratia/reference/penalty.md)
+to inspect how the model penalises its fitted coefficients. For the
+reduced basis used here, the matrix is expressed in basis coefficients
+rather than one row and column per district.
 
 ``` r
 
@@ -176,25 +187,25 @@ draw(penalty(district_income, select = "s(district)"), geom = "tile")
 
 ![](spatial-smooths_files/figure-html/district-penalty-1.png)
 
-This is the penalty expressed in the fitted reduced basis; its rows are
-basis coefficients rather than districts. Larger diagonal entries
-indicate coefficient directions that are penalised more strongly. Before
-its basis transformation, the MRF penalty counts neighbours on the
-diagonal and uses negative off-diagonal entries for neighbours. Use the
-area plots above to inspect district labels and intervals; the penalty
-plot explains how their underlying coefficients are regularised.
+In district coordinates, the unscaled penalty matrix has the number of
+neighbours on the diagonal and a value of −1 for each neighbouring pair.
+Those entries penalise squared differences between neighbouring district
+effects. The plot shows the penalty after it has been expressed in the
+smaller basis.
 
-## How should a surface behave across a peninsula?
+## Soap-film smooths for bounded regions
 
-For a bounded region such as a water body, locations on opposite sides
-of land can be close in Euclidean distance and distant along the water.
-A soap-film smooth respects the supplied boundary. We use a simulation
-from mgcv’s [soap-film
+Across a peninsula, the straight-line distance between two locations can
+be much shorter than the distance by water. A soap-film smooth uses the
+water boundary to avoid smoothing directly across the land. We use a
+simulation from mgcv’s [soap-film
 example](https://stat.ethz.ch/R-manual/R-devel/library/mgcv/html/smooth.construct.so.smooth.spec.html),
 retaining its curved boundary, interior knots and simulated test
-surface. The question is whether a boundary-aware smoother can recover a
-field without joining opposite sides across the excluded region. We use
-REML instead of the example’s default smoothing selection.
+surface. The boundary represents a water body around a peninsula; `v`
+and `w` are its spatial coordinates. We sample locations inside it and
+add independent Gaussian noise with standard deviation 0.3 to a known
+mean surface. This lets us check how well the fitted smooth recovers the
+surface while keeping its predictions within the water body.
 
 ``` r
 
@@ -220,10 +231,12 @@ ggplot(water, aes(v, w, colour = y)) +
 
 ![](spatial-smooths_files/figure-html/soap-data-1.png)
 
-The errors were generated as independent Gaussian noise with standard
-deviation 0.3, matching the Gaussian identity-link model fitted below.
+## Separate boundary and interior effects
 
-## Separate boundary variation from interior variation
+Fit a Gaussian model with two soap-film components: `sf` describes
+variation around the boundary and its extension into the interior, while
+`sw` adds variation inside the boundary. We estimate both components
+together using REML.
 
 ``` r
 
@@ -244,18 +257,17 @@ smooths(water_fit)
 #> [1] "s(v,w)" "s(v,w)"
 ```
 
-`sf` estimates a cyclic smooth around the closed boundary and extends it
-into the interior as a surface satisfying Laplace’s equation. The first
-panel shows that surface, rather than just the values along the
-boundary. `sw` adds interior variation that is zero on the boundary.
-Both components are estimated jointly; their sum plus the intercept
-gives the complete fitted mean. The boundary basis size is `k`; the
-interior basis size comes from the number of supplied knots.
-`nmax = 100` sets the numerical solution grid, rather than the plotting
-grid. Both component types now have distinct labels in gratia.
+`sf` fits a cyclic smooth around the closed boundary and extends it into
+the interior as a surface satisfying Laplace’s equation. `sw` adds
+variation in the interior and is zero on the boundary. Adding the two
+contributions and the intercept gives the fitted mean. `k` sets the
+boundary basis size, and the number of supplied knots sets the interior
+basis size. `nmax = 100` sets the resolution of the grid used to compute
+the basis.
 
-Both terms happen to have the same `s(v,w)` label. Select them by
-numerical position when you need one component rather than both:
+Plot the two components on the same colour scale to compare the size of
+their contributions. The boundary is drawn on each panel so the
+locations are clear.
 
 ``` r
 
@@ -266,13 +278,11 @@ draw(water_fit, n_2d = 35, surface = "tile", caption = TRUE, ncol = 1,
 
 ![](spatial-smooths_files/figure-html/soap-components-1.png)
 
-In this simulation REML shrinks the interior adjustment almost to zero,
-so the second panel is nearly flat on the shared colour scale. The
-surface induced by the boundary accounts for almost all the fitted
-variation. Effect colours display each centred contribution; add them
-and the intercept to recover the fitted mean field. Boundary loops
-remain visible and predictions outside the supplied domain are
-unavailable.
+In this simulation the interior adjustment is close to zero, so the
+second panel is nearly flat on the shared colour scale. Almost all the
+fitted variation comes from the surface that extends the boundary
+smooth. To save the interior component, select it by position with
+`select = 2` because both components share the label `s(v,w)`.
 
 ``` r
 
@@ -290,13 +300,11 @@ head(interior_effect)
 #> 6 s(v,w)  Soap film (wiggly) NA      9.20e-7 9.37e-5 FALSE     NA -0.739 -0.464
 ```
 
-`clip = TRUE` removes evaluation cells outside the boundary. Without
-clipping, those locations retain missing estimates. Boundary rows are
-retained as plotting information and are identified by `.bndry`; they
-are not additional observations. Saved estimates retain the component
-identity so
+`clip = TRUE` drops evaluation points outside the boundary. With
+`clip = FALSE`, those estimates are `NA`. Rows marked `.bndry = TRUE`
+record the outline so that
 [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md) can
-reproduce its boundary-aware display.
+show it with the saved estimates.
 
 The simulated truth makes it possible to assess the complete fitted
 surface:
@@ -315,26 +323,20 @@ ggplot(water, aes(truth, estimated)) +
 ![](spatial-smooths_files/figure-html/soap-recovery-1.png)
 
 The fitted values follow the simulated mean closely at the sampled
-locations. When adapting this model to a water body, place interior
-knots across the domain and include boundary features that must prevent
-smoothing across land. sf/sw components can also form space-by-time
-tensor products; the flat-surface display uses numeric conditioning
-slices for time. Transformed soap-film boundaries currently cannot be
-drawn on a recovered raw covariate scale: retain the model-scale display
-rather than silently dropping the boundary.
+locations. When adapting this model to a water body, spread the interior
+knots across the water and keep boundary features, such as peninsulas,
+that should block smoothing across land.
 
-## How do we avoid a seam at the date line?
+## Spherical smooths for global locations
 
-A plane is a poor representation for a global surface: points
-immediately either side of the date line are neighbours, and all
-longitudes meet at a pole. A spline on the sphere uses that geometry. We
-adapt mgcv’s [spherical smooth
+A spline on the sphere accounts for the way longitude wraps at 180° and
+converges at the poles. We adapt mgcv’s [spherical smooth
 example](https://stat.ethz.ch/R-manual/R-devel/library/mgcv/html/smooth.construct.sos.smooth.spec.html)
-as a synthetic sensor survey. Sampling latitude through
-[`asin()`](https://rdrr.io/r/base/Trig.html) gives uniform area density
-directly. We remove the example’s latitude shift in the test function so
-the simulated field is continuous at both poles, and use REML. The units
-are arbitrary; this is a controlled field-recovery exercise.
+to simulate measurements at 400 locations distributed uniformly over the
+globe. The mean surface varies with latitude and longitude and is
+continuous at the poles. We add independent Gaussian noise with standard
+deviation 0.2. The coordinates are in degrees and the response units are
+arbitrary.
 
 ``` r
 
@@ -346,16 +348,25 @@ globe <- data.frame(
 globe$truth <- with(globe,
   sin(longitude * pi / 180) * cos(latitude * pi / 180))
 globe$observed <- globe$truth + rnorm(400, sd = 0.2)
+```
+
+Fit a Gaussian model with a spherical smooth of latitude and longitude,
+using REML to estimate its smoothness. Calculate the root mean squared
+error between the fitted values and the known mean surface to assess
+recovery at the sampled locations.
+
+``` r
+
 globe_fit <- gam(observed ~ s(latitude, longitude, bs = "sos", k = 60),
   data = globe, method = "REML")
 sqrt(mean((fitted(globe_fit) - globe$truth)^2))
 #> [1] 0.04255861
 ```
 
-The smooth requires latitude first and longitude second, in degrees. A
-Gaussian fit matches the generated observation errors. The recovery
-error summarises the difference between the fitted and simulated mean at
-the sampled locations.
+The smooth requires latitude first and longitude second, both in
+degrees. Use `crs` to choose a map projection. This orthographic
+projection shows the hemisphere centred on latitude 20° and longitude
+0°.
 
 ``` r
 
@@ -367,17 +378,10 @@ if (requireNamespace("sf", quietly = TRUE)) {
 
 ![](spatial-smooths_files/figure-html/sphere-map-1.png)
 
-The orthographic view shows one hemisphere. Surface cells, contours and
-observation points are clipped to that visible hemisphere before
-projection, so locations on the far side cannot leak into the display.
-Cells at poles and the date line retain valid geographic boundaries.
-Changing the projection changes which locations are visible while
-retaining the fitted spherical surface. Factor-by spherical effects use
-separate panels for each level. Supply a regular prediction grid for a
-cell map; a scattered prediction dataset is drawn as points.
-
-Choose the geometry from the question: district neighbourhoods for
-aggregated area measurements, soap films for a bounded continuous
-domain, and spherical splines for global locations. The boundary and
-projection controls then let the displayed surface follow the geometry
-used in fitting.
+This projection clips the map to the visible hemisphere. You can choose
+a different projection to view the same fitted surface. Factor-by
+spherical effects use separate panels for each level. Supply a regular
+prediction grid to draw a map with cells. For scattered prediction
+locations,
+[`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md) uses
+points.

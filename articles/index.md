@@ -33,18 +33,18 @@ complete workflow for grouped surveys, mixed models or spatial surveys.
   question](https://gavinsimpson.github.io/gratia/articles/spatial-smooths.md):
 - [Checking different response
   distributions](https://gavinsimpson.github.io/gratia/articles/response-distributions.md):
-- [Functions of covariates and evaluation
-  environments](https://gavinsimpson.github.io/gratia/articles/transformed-covariates.md):
+- [Predictions, plots and derivatives with transformed
+  covariates](https://gavinsimpson.github.io/gratia/articles/transformed-covariates.md):
 
 ### Getting started and customising an analysis
 
 - [Getting started with
   gratia](https://gavinsimpson.github.io/gratia/articles/gratia.md):
-- [Data
-  slices](https://gavinsimpson.github.io/gratia/articles/data-slices.md):
-- [Customizing
+- [Creating prediction grids with
+  data_slice()](https://gavinsimpson.github.io/gratia/articles/data-slices.md):
+- [Customising
   plots](https://gavinsimpson.github.io/gratia/articles/custom-plotting.md):
 - [Posterior
   Simulation](https://gavinsimpson.github.io/gratia/articles/posterior-simulation.md):
-- [Migrating posterior sampling
-  calls](https://gavinsimpson.github.io/gratia/articles/sampling-migration.md):
+- [Updating sampling code for gratia
+  0.12.0](https://gavinsimpson.github.io/gratia/articles/sampling-migration.md):

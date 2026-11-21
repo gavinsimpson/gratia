@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Functions of covariates and evaluation environments • gratia</title>
+<title>Predictions, plots and derivatives with transformed covariates • gratia</title>
 <!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="../favicon-96x96.png">
 <link rel="icon" type="”image/svg+xml”" href="../favicon.svg">
 <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
@@ -16,7 +16,7 @@
 <script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><link href="../extra.css" rel="stylesheet">
-<meta property="og:title" content="Functions of covariates and evaluation environments">
+<meta property="og:title" content="Predictions, plots and derivatives with transformed covariates">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -26,7 +26,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-73</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-75</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -55,13 +55,13 @@
     <li><a class="dropdown-item" href="../articles/shape-constrained-intervals.html">Intervals for shape-constrained smooths</a></li>
     <li><a class="dropdown-item" href="../articles/spatial-smooths.html">Choose a smooth for the spatial question</a></li>
     <li><a class="dropdown-item" href="../articles/response-distributions.html">Checking different response distributions</a></li>
-    <li><a class="dropdown-item" href="../articles/transformed-covariates.html">Functions of covariates and evaluation environments</a></li>
+    <li><a class="dropdown-item" href="../articles/transformed-covariates.html">Predictions, plots and derivatives with transformed covariates</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Essentials</h6></li>
-    <li><a class="dropdown-item" href="../articles/data-slices.html">Data slices</a></li>
-    <li><a class="dropdown-item" href="../articles/custom-plotting.html">Customizing plots</a></li>
+    <li><a class="dropdown-item" href="../articles/data-slices.html">Creating prediction grids with data_slice()</a></li>
+    <li><a class="dropdown-item" href="../articles/custom-plotting.html">Customising plots</a></li>
     <li><a class="dropdown-item" href="../articles/posterior-simulation.html">Posterior Simulation</a></li>
-    <li><a class="dropdown-item" href="../articles/sampling-migration.html">Migrating posterior sampling calls</a></li>
+    <li><a class="dropdown-item" href="../articles/sampling-migration.html">Updating sampling code for gratia 0.12.0</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
@@ -84,7 +84,7 @@
 
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-      <img src="../logo.png" class="logo" alt=""><h1>Functions of covariates and evaluation environments</h1>
+      <img src="../logo.png" class="logo" alt=""><h1>Predictions, plots and derivatives with transformed covariates</h1>
             
       
       <small class="dont-index">Source: <a href="https://github.com/gavinsimpson/gratia/blob/main/vignettes/transformed-covariates.Rmd" class="external-link"><code>vignettes/transformed-covariates.Rmd</code></a></small>
@@ -93,23 +93,45 @@
 
     
     
-<p>A smooth can depend on a function of a covariate rather than on the
-raw covariate. The same distinction arises with offsets, such as logged
-effort in a count model.</p>
+<p>A model fitted with <code>s(log(x))</code> uses a transformed
+covariate, but we may want to predict at supplied values of
+<code>x</code>, plot the result against <code>x</code>, or estimate
+change per unit of <code>x</code>. This vignette shows how to make those
+choices while keeping the model’s transformation intact.</p>
+<p>We load {gratia} and {mgcv} for the examples:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://gavinsimpson.github.io/gratia/">"gratia"</a></span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/load_mgcv.html">load_mgcv</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<div class="section level2">
+<h2 id="fit-a-count-model-with-a-transformed-covariate-and-an-effort-offset">Fit a count model with a transformed covariate and an effort
+offset<a class="anchor" aria-label="anchor" href="#fit-a-count-model-with-a-transformed-covariate-and-an-effort-offset"></a>
+</h2>
+<p>We simulate independent Poisson counts. The rate per unit of effort
+varies nonlinearly with <code>log(x)</code>, and multiplying that rate
+by effort gives each observation’s expected count. Thus, twice the
+effort gives twice the expected count at the same value of
+<code>x</code>.</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">42</span><span class="op">)</span></span>
 <span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">150</span>, <span class="fl">1</span>, <span class="fl">5</span><span class="op">)</span>, effort <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">150</span>, <span class="fl">1</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">dat</span><span class="op">$</span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Poisson.html" class="external-link">rpois</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">dat</span><span class="op">)</span>, <span class="va">dat</span><span class="op">$</span><span class="va">effort</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">sin</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">dat</span><span class="op">$</span><span class="va">x</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, k <span class="op">=</span> <span class="fl">6</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/offset.html" class="external-link">offset</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">effort</span><span class="op">)</span><span class="op">)</span>,</span>
+<span><span class="va">dat</span><span class="op">$</span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Poisson.html" class="external-link">rpois</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">dat</span><span class="op">)</span>, <span class="va">dat</span><span class="op">$</span><span class="va">effort</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">sin</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">dat</span><span class="op">$</span><span class="va">x</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p>With a log link, the multiplicative effort term becomes an additive
+<code>offset(log(effort))</code>. We fit a smooth of <code>log(x)</code>
+to estimate the remaining variation in the log expected count:</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, k <span class="op">=</span> <span class="fl">6</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/offset.html" class="external-link">offset</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">effort</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">poisson</a></span><span class="op">(</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">dat</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span></code></pre></div>
+</div>
 <div class="section level2">
-<h2 id="raw-data-and-smooth-coordinates">Raw data and smooth coordinates<a class="anchor" aria-label="anchor" href="#raw-data-and-smooth-coordinates"></a>
+<h2 id="predict-at-values-of-the-original-covariates">Predict at values of the original covariates<a class="anchor" aria-label="anchor" href="#predict-at-values-of-the-original-covariates"></a>
 </h2>
-<p>Supply raw covariates to evaluate the model at new observations.
-Gratia computes <code>log(x)</code> and, for full predictions,
-<code>offset(log(effort))</code>. An isolated smooth does not require
-unrelated predictors or the model offset.</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<p>Supply the original <code>x</code> and <code>effort</code> values
+when predicting at new observations; gratia evaluates their
+transformations. Here we hold effort at two units and compare the
+contribution of the smooth with the complete fitted mean.
+<code><a href="../reference/smooth_estimates.html">smooth_estimates()</a></code> needs only <code>x</code>, whereas
+<code><a href="../reference/fitted_values.html">fitted_values()</a></code> also needs the effort offset:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">nd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">1.2</span>, <span class="fl">4.8</span>, length.out <span class="op">=</span> <span class="fl">8</span><span class="op">)</span>, effort <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/smooth_estimates.html">smooth_estimates</a></span><span class="op">(</span><span class="va">m</span>, data <span class="op">=</span> <span class="va">nd</span><span class="op">[</span><span class="st">"x"</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 8 × 7</span></span></span>
@@ -135,16 +157,17 @@ unrelated predictors or the model offset.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span>     6  3.77      2 mean          5.10 0.042<span style="text-decoration: underline;">5</span>      4.69      5.54</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">7</span>     7  4.29      2 mean          5.52 0.048<span style="text-decoration: underline;">7</span>      5.01      6.07</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">8</span>     8  4.8       2 mean          5.92 0.056<span style="text-decoration: underline;">1</span>      5.30      6.61</span></span></code></pre></div>
-<p>Automatic smooth grids are evenly spaced in the <strong>smooth
-coordinate</strong>, here <code>log(x)</code>, and the output and plot
-axes use that name. They use stored evaluated covariates, so they do not
-need to reconstruct an inverse transformation.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<p>Without supplied prediction data, <code><a href="../reference/smooth_estimates.html">smooth_estimates()</a></code>
+creates an evenly spaced grid on the scale used in the smooth: here,
+<code>log(x)</code>. We can plot the estimated contribution directly on
+that scale:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/smooth_estimates.html">smooth_estimates</a></span><span class="op">(</span><span class="va">m</span>, n <span class="op">=</span> <span class="fl">30</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">sm</span><span class="op">)</span></span></code></pre></div>
 <p><img src="transformed-covariates_files/figure-html/coordinates-1.png" class="r-plt" alt="" width="700"></p>
-<p>An explicitly evaluated column is also accepted:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<p>If you already have values on the transformed scale, supply a column
+named exactly as it appears in the model, here <code>log(x)</code>:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">evaluated</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>`log(x)` <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">nd</span><span class="op">$</span><span class="va">x</span><span class="op">)</span>, check.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/smooth_estimates.html">smooth_estimates</a></span><span class="op">(</span><span class="va">m</span>, data <span class="op">=</span> <span class="va">evaluated</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 8 × 6</span></span></span>
@@ -158,14 +181,12 @@ need to reconstruct an inverse transformation.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> s(log(x)) TPRS  <span style="color: #BB0000;">NA</span>       0.166  0.042<span style="text-decoration: underline;">5</span>    1.33 </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">7</span> s(log(x)) TPRS  <span style="color: #BB0000;">NA</span>       0.245  0.048<span style="text-decoration: underline;">7</span>    1.46 </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">8</span> s(log(x)) TPRS  <span style="color: #BB0000;">NA</span>       0.315  0.056<span style="text-decoration: underline;">1</span>    1.57</span></span></code></pre></div>
-<p>If raw inputs and evaluated columns are both supplied, expressions
-are recomputed from the raw inputs. Stored model frames and
-automatically prepared grids retain their evaluated coordinates.</p>
-<p><code><a href="../reference/data_slice.html">data_slice()</a></code> works with raw variables. Supply reference
-<code>data</code> if the original raw covariates cannot be recovered;
-transformed values are not renamed as raw variables or automatically
-inverted.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<p>If both <code>x</code> and <code>log(x)</code> are supplied, gratia
+computes the transformation from <code>x</code>. To build a grid on the
+original scale, use <code><a href="../reference/data_slice.html">data_slice()</a></code> with the original fitting
+data. The following call creates eight evenly spaced <code>x</code>
+values while holding effort at two:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/data_slice.html">data_slice</a></span><span class="op">(</span><span class="va">m</span>, x <span class="op">=</span> <span class="fu"><a href="../reference/evenly.html">evenly</a></span><span class="op">(</span><span class="va">x</span>, n <span class="op">=</span> <span class="fl">8</span><span class="op">)</span>, effort <span class="op">=</span> <span class="fl">2</span>, data <span class="op">=</span> <span class="va">dat</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 8 × 2</span></span></span>
 <span><span class="co">#&gt;       x effort</span></span>
@@ -180,112 +201,112 @@ inverted.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">8</span>  4.96      2</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="choosing-the-plotted-covariate-scale">Choosing the plotted covariate scale<a class="anchor" aria-label="anchor" href="#choosing-the-plotted-covariate-scale"></a>
+<h2 id="plot-against-the-original-covariates">Plot against the original covariates<a class="anchor" aria-label="anchor" href="#plot-against-the-original-covariates"></a>
 </h2>
 <p>Drawing methods use the model’s covariate coordinates by default. For
 example, <code>log(x)</code> is plotted against <code>log(x)</code>,
 with a matching axis label, whether it is inside a smooth or a
 parametric term. Set <code>back_transform = TRUE</code> to display
-<code>x</code> instead. This changes the plotting coordinates and
-labels; the estimated partial effect and its interval keep their
-meaning. Use <code>fun</code> to transform the partial effect
-itself.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code>x</code> instead. The estimated smooth contribution remains on the
+model’s linear predictor scale. The following calls request an axis in
+the original units, first from the fitted model and then from saved
+smooth estimates.</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">m</span>, back_transform <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="transformed-covariates_files/figure-html/back-transform-1.png" class="r-plt" alt="" width="700"></p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sm_raw</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/smooth_estimates.html">smooth_estimates</a></span><span class="op">(</span><span class="va">m</span>, back_transform <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">sm_raw</span>, back_transform <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="transformed-covariates_files/figure-html/back-transform-2.png" class="r-plt" alt="" width="700"></p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span><span class="va">m_parametric</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">poisson</a></span><span class="op">(</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">dat</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">m_parametric</span><span class="op">)</span></span></code></pre></div>
-<p><img src="transformed-covariates_files/figure-html/back-transform-3.png" class="r-plt" alt="" width="700"></p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">m_parametric</span>, back_transform <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="transformed-covariates_files/figure-html/back-transform-4.png" class="r-plt" alt="" width="700"></p>
+<p>The same option works for transformed covariates in parametric terms.
+We fit a Poisson model with a linear effect of <code>log(x)</code> and
+the same effort offset. Plot the effect against <code>log(x)</code> and
+<code>x</code>, then make the plot in the original units using the
+output of <code><a href="../reference/parametric_effects.html">parametric_effects()</a></code>.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">m_parametric</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/offset.html" class="external-link">offset</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">effort</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">poisson</a></span><span class="op">(</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">dat</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">m_parametric</span><span class="op">)</span></span></code></pre></div>
+<p><img src="transformed-covariates_files/figure-html/back-transform-parametric-1.png" class="r-plt" alt="" width="700"></p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">m_parametric</span>, back_transform <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<p><img src="transformed-covariates_files/figure-html/back-transform-parametric-2.png" class="r-plt" alt="" width="700"></p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pe</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/parametric_effects.html">parametric_effects</a></span><span class="op">(</span><span class="va">m_parametric</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">pe</span>, back_transform <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="transformed-covariates_files/figure-html/back-transform-5.png" class="r-plt" alt="" width="700"></p>
-<p>The same rule applies to each covariate in tensor products and
-parametric interactions, including covariates used for conditioning
-facets. Rugs and partial-residual locations follow the displayed scale.
-Surface coordinates can become irregularly spaced after changing scale;
-these plots use rectangles bounded by adjacent coordinate midpoints to
-avoid shifting raster pixels.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">dat_surface</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/transform.html" class="external-link">transform</a></span><span class="op">(</span><span class="va">dat</span>, z <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">dat</span><span class="op">)</span>, <span class="fl">1</span>, <span class="fl">4</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">m_surface</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/te.html" class="external-link">te</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="va">z</span><span class="op">)</span><span class="op">)</span>, family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">poisson</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<p><img src="transformed-covariates_files/figure-html/back-transform-parametric-3.png" class="r-plt" alt="" width="700"></p>
+<p>For a surface, <code>back_transform = TRUE</code> changes both
+displayed axes. To illustrate this, we add an independent covariate
+<code>z</code> and fit a tensor-product smooth using <code>log(x)</code>
+and <code>sqrt(z)</code>. The simulated counts still depend only on
+<code>x</code> and effort; <code>z</code> supplies a second axis for
+this display example:</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">dat_surface</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/transform.html" class="external-link">transform</a></span><span class="op">(</span><span class="va">dat</span>, z <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">dat</span><span class="op">)</span>, <span class="fl">1</span>, <span class="fl">4</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p>Fit a smooth over the transformed coordinates, then request
+original-scale axes for both covariates when drawing it.</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">m_surface</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/te.html" class="external-link">te</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="va">z</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/offset.html" class="external-link">offset</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">effort</span><span class="op">)</span><span class="op">)</span>, family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">poisson</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  data <span class="op">=</span> <span class="va">dat_surface</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">m_surface</span>, back_transform <span class="op">=</span> <span class="cn">TRUE</span>, contour <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="transformed-covariates_files/figure-html/back-transform-surface-1.png" class="r-plt" alt="" width="700"></p>
-<p>Smooth grids are evenly spaced on the model scale by default. For
-example, three points for <code>s(log(x))</code> with <code>x</code>
-ranging from 1 to 100 correspond to raw values 1, 10, and 100. With
-<code>smooth_estimates(..., back_transform = TRUE)</code>, the grid is
-evenly spaced in raw <code>x</code>: 1, 50.5, and 100. The expressions
-are then evaluated forwards and estimates computed at those points.
-<code>draw(m, back_transform = TRUE)</code> performs this preparation
+<p><code>back_transform = TRUE</code> also changes where a smooth is
+evaluated when the grid is generated automatically. For example,
+consider <code>s(log(x))</code> with <code>x</code> ranging from 1 to
+100. By default, three equally spaced points on the log scale correspond
+to 1, 10 and 100 in the original units. With
+<code>smooth_estimates(..., back_transform = TRUE)</code>, the same grid
+size gives 1, 50.5 and 100 in the original units. The smooth is
+evaluated at the logs of these values.
+<code>draw(m, back_transform = TRUE)</code> prepares this grid
 automatically.</p>
 <p>Precomputed estimates retain their chosen evaluation points. An
 object created on a transformed-only grid cannot be drawn on the
 original scale: its raw coordinates are unavailable. Recompute it with
-<code>back_transform = TRUE</code>, or supply raw prediction rows
-through <code>data</code>. Returned estimates retain model coordinates
-and auxiliary <code>.gratia_raw_*</code> columns, so either drawing
-scale can be selected without changing the estimates. Subsets and
-confidence intervals retain these coordinates.</p>
-<p>There is no list of supported inverse functions. Each smooth axis
-must depend on one distinct original model covariate, and gratia must be
-able to recover that covariate and evaluate the expression. For
-example:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code>back_transform = TRUE</code>, or supply original covariate values
+through <code>data</code> when calculating the estimates.</p>
+<div class="section level3">
+<h3 id="use-your-own-transformation-functions">Use your own transformation functions<a class="anchor" aria-label="anchor" href="#use-your-own-transformation-functions"></a>
+</h3>
+<p>The transformation need not be named <code><a href="https://rdrr.io/r/base/Log.html" class="external-link">log()</a></code> or
+<code><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt()</a></code>. Each smooth axis must depend on one distinct
+original model covariate, and the transformation must be available when
+calculating predictions. Here <code>foo()</code> is another name for
+<code><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt()</a></code>; we supply its environment through
+<code>envir</code>:</p>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">foo</span> <span class="op">&lt;-</span> <span class="va">sqrt</span></span>
 <span><span class="va">m_foo</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="fu">foo</span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, k <span class="op">=</span> <span class="fl">6</span><span class="op">)</span>, family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">poisson</a></span><span class="op">(</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">dat</span><span class="op">)</span></span>
 <span><span class="va">sm_foo</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/smooth_estimates.html">smooth_estimates</a></span><span class="op">(</span><span class="va">m_foo</span>, back_transform <span class="op">=</span> <span class="cn">TRUE</span>, envir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">environment</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/draw.html">draw</a></span><span class="op">(</span><span class="va">sm_foo</span>, back_transform <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="transformed-covariates_files/figure-html/back-transform-alias-1.png" class="r-plt" alt="" width="700"></p>
-<p>Raw fitting rows are recovered and checked against the stored fitting
-observations. If the fitting data are unavailable, or changed functions
-or constants no longer reproduce the fit, recovery fails. Supply raw
-prediction rows in <code>data</code> and functions or constants in
-<code>envir</code> as needed. Already prepared estimates can be drawn
-without recovering data or evaluating functions again. When prediction
-<code>data</code> are supplied, unavailable raw fitting observations
-omit rugs and partial residuals. Prediction rows are not substituted for
-observed data. <code>envir</code> is used for both predictions and
-observation recovery.</p>
-<p>Typical values added by
-<code>smooth_data(..., include_all = TRUE)</code> do not identify the
-original coordinates of a model-scale grid. Prepare that grid with
-<code>back_transform = TRUE</code> to retain raw axes. For numeric
-<code>by</code> smooths, automatic grids evaluate the smooth with
-multiplier one, even for <code>s(log(x), by = x)</code>; the original
-axis is retained separately. Supplied raw prediction rows use their
-actual <code>by</code> values.</p>
+<p>Keep the original fitting data and transformation functions available
+when creating automatic original-scale grids. If the fitting data are
+unavailable, supply prediction rows in <code>data</code>; if a function
+or constant is missing, supply its environment in <code>envir</code>.
+Saved estimates can then be plotted without evaluating the
+transformation again. Rugs and partial residuals require the original
+observations and are omitted when those observations cannot be
+recovered.</p>
 <p>Soap-film boundary coordinates are stored on the model scale. A
 transformed boundary has no retained raw coordinates, so raw-scale
 drawing raises an error. Draw these soap films with
 <code>back_transform = FALSE</code> to retain their boundaries.</p>
-<p>Parametric effects likewise retain both coordinate scales by row,
-including for many-to-one functions. Multi-column basis terms such as
-<code>poly(x, 2)</code> and parametric expressions with no single
-coordinate per input retain raw axes.</p>
 <p>The old <code>parametric_effects(transform = ...)</code> argument is
 deprecated. Replace <code>transform = TRUE</code> with
 <code>back_transform = FALSE</code>, and <code>transform = FALSE</code>
 with <code>back_transform = TRUE</code>.</p>
 </div>
+</div>
 <div class="section level2">
-<h2 id="local-functions">Local functions<a class="anchor" aria-label="anchor" href="#local-functions"></a>
+<h2 id="preserve-functions-defined-inside-a-model-fitting-function">Preserve functions defined inside a model-fitting function<a class="anchor" aria-label="anchor" href="#preserve-functions-defined-inside-a-model-fitting-function"></a>
 </h2>
 <p>A fitted model may retain the formula expression without retaining
-the local environment in which it was evaluated. Preserve that
-environment when fitting if you will need a local function at new
-observations.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+the local environment in which it was evaluated. In the example below,
+<code>transform_x()</code> needs the local constant <code>shift</code>.
+We return the fitted model and that environment together, then use
+<code>envir</code> when predicting at new observations:</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fit_local</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">dat</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">shift</span> <span class="op">&lt;-</span> <span class="fl">0.5</span></span>
 <span>  <span class="va">transform_x</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">x</span> <span class="op">+</span> <span class="va">shift</span><span class="op">)</span></span>
@@ -318,24 +339,25 @@ observations.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span>     6  3.77      2 mean          5.12 0.044<span style="text-decoration: underline;">0</span>      4.70      5.58</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">7</span>     7  4.29      2 mean          5.51 0.049<span style="text-decoration: underline;">7</span>      5.00      6.08</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">8</span>     8  4.8       2 mean          5.88 0.061<span style="text-decoration: underline;">9</span>      5.21      6.64</span></span></code></pre></div>
-<p>Automatic smooth plots can still use stored
-<code>transform_x(x)</code> values without this environment. New raw
-observations require the function. Evaluation errors identify the
-expression and explain how to supply the missing context; stored
-training values are never substituted for arbitrary new
-observations.</p>
+<p>New predictions require the original definition of
+<code>transform_x()</code> and the same value of <code>shift</code>.
+Retaining <code>bundle$envir</code> makes both available after
+<code>fit_local()</code> has returned.</p>
 </div>
 <div class="section level2">
-<h2 id="which-derivative">Which derivative?<a class="anchor" aria-label="anchor" href="#which-derivative"></a>
+<h2 id="choose-whether-derivatives-describe-change-in-x-or-logx">Choose whether derivatives describe change in <code>x</code> or
+<code>log(x)</code><a class="anchor" aria-label="anchor" href="#choose-whether-derivatives-describe-change-in-x-or-logx"></a>
 </h2>
 <p>For a contribution <span class="math inline">f(\log x)</span>, the
 default derivative is with respect to <span class="math inline">\log
 x</span>. Set <code>wrt = "covariate"</code> to differentiate with
 respect to <span class="math inline">x</span> instead. The latter
-includes the chain-rule factor <span class="math inline">1/x</span>
-because the transformation is reevaluated after each perturbation of
-<span class="math inline">x</span>.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+includes the chain-rule factor <span class="math inline">1/x</span>. We
+compare both derivatives at the prediction rows created earlier. Both
+describe change in the smooth’s contribution to the log expected count;
+use <code><a href="../reference/response_derivatives.html">response_derivatives()</a></code> for change in the complete
+response mean.</p>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/derivatives.html">derivatives</a></span><span class="op">(</span><span class="va">m</span>, data <span class="op">=</span> <span class="va">nd</span>, type <span class="op">=</span> <span class="st">"central"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 8 × 9</span></span></span>
 <span><span class="co">#&gt;   .smooth   .by   .fs   .derivative   .se .crit .lower_ci .upper_ci `log(x)`</span></span>
@@ -360,18 +382,15 @@ because the transformation is reevaluated after each perturbation of
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> s(log(x)) <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>          0.164 0.026<span style="text-decoration: underline;">6</span>  1.96    0.112      0.216  3.77</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">7</span> s(log(x)) <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>          0.145 0.023<span style="text-decoration: underline;">5</span>  1.96    0.098<span style="text-decoration: underline;">6</span>     0.191  4.29</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">8</span> s(log(x)) <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>          0.129 0.020<span style="text-decoration: underline;">9</span>  1.96    0.088<span style="text-decoration: underline;">0</span>     0.170  4.8</span></span></code></pre></div>
-<p>For a smooth of several raw inputs, such as <code>s(I(x / z))</code>,
-name the raw <code>focal</code> variable explicitly. Other inputs are
-held at the supplied values, or at typical values when generating a
-slice. Use <code><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I()</a></code> for arithmetic that R would otherwise
-interpret as formula syntax. For tensor smooths, use
-<code><a href="../reference/partial_derivatives.html">partial_derivatives()</a></code> and specify the smooth or raw focal
-coordinate consistently with <code>wrt</code>: <strong><code>wrt</code>
-chooses the differentiation scale, and <code>focal</code> names the
-coordinate to differentiate along on that scale</strong>.</p>
-<p>For example, <code>te(log(x), sqrt(z))</code> represents a
-contribution <span class="math inline">f(\log x, \sqrt z)</span>. The
-two choices have the following meanings:</p>
+<div class="section level3">
+<h3 id="differentiate-a-surface-with-respect-to-one-covariate">Differentiate a surface with respect to one covariate<a class="anchor" aria-label="anchor" href="#differentiate-a-surface-with-respect-to-one-covariate"></a>
+</h3>
+<p>For a surface, <code><a href="../reference/partial_derivatives.html">partial_derivatives()</a></code> varies the
+coordinate named in <code>focal</code> while holding the other
+coordinates fixed. <code>wrt</code> chooses the scale of that
+coordinate. For example, <code>te(log(x), sqrt(z))</code> represents a
+contribution <span class="math inline">f(\log x, \sqrt z)</span>, with
+the following choices:</p>
 <table class="table">
 <colgroup>
 <col width="47%">
@@ -394,15 +413,26 @@ holding <span class="math inline">z</span> fixed</td>
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<p>We simulate a Gaussian response with mean
+<code>sin(log(x)) * sqrt(z)</code>. The positive covariates are sampled
+independently, and independent Gaussian errors have standard deviation
+0.1.</p>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">43</span><span class="op">)</span></span>
 <span><span class="va">tensor_dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">150</span>, <span class="fl">1</span>, <span class="fl">5</span><span class="op">)</span>, z <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">150</span>, <span class="fl">1</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">tensor_dat</span><span class="op">$</span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">sin</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">tensor_dat</span><span class="op">$</span><span class="va">x</span><span class="op">)</span><span class="op">)</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="va">tensor_dat</span><span class="op">$</span><span class="va">z</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">tensor_dat</span><span class="op">)</span>, sd <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span></span>
-<span><span class="va">tensor_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/te.html" class="external-link">te</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="va">z</span><span class="op">)</span>, k <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4</span>, <span class="fl">4</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>  data <span class="op">=</span> <span class="va">tensor_dat</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Vary x along a slice with z held fixed.</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">tensor_dat</span><span class="op">)</span>, sd <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span></span></code></pre></div>
+<p>We fit a tensor-product smooth using the transformed covariates to
+estimate that surface:</p>
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">tensor_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/te.html" class="external-link">te</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="va">z</span><span class="op">)</span>, k <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4</span>, <span class="fl">4</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  data <span class="op">=</span> <span class="va">tensor_dat</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span></code></pre></div>
+<p>Next, we hold <code>z</code> at two and vary <code>x</code>. We
+calculate derivatives with respect to <code>log(x)</code> and
+<code>x</code>, then compare the latter with the chain-rule
+calculation:</p>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Vary x along a slice with z held fixed.</span></span>
 <span><span class="va">tensor_nd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">1.2</span>, <span class="fl">4.8</span>, length.out <span class="op">=</span> <span class="fl">8</span><span class="op">)</span>, z <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="va">pd_smooth</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/partial_derivatives.html">partial_derivatives</a></span><span class="op">(</span><span class="va">tensor_model</span>, data <span class="op">=</span> <span class="va">tensor_nd</span>,</span>
 <span>  wrt <span class="op">=</span> <span class="st">"smooth"</span>, focal <span class="op">=</span> <span class="st">"log(x)"</span>, type <span class="op">=</span> <span class="st">"central"</span><span class="op">)</span></span>
@@ -422,26 +452,22 @@ holding <span class="math inline">z</span> fixed</td>
 <span><span class="co">#&gt; 6 3.771429           0.11442885               0.11442885</span></span>
 <span><span class="co">#&gt; 7 4.285714           0.07550389               0.07550389</span></span>
 <span><span class="co">#&gt; 8 4.800000           0.05874753               0.05874753</span></span></code></pre></div>
-<p>The first call perturbs <code>log(x)</code> directly. The second
-perturbs <code>x</code> and recomputes the smooth expressions,
-incorporating the chain rule numerically. Thus, for these first
-derivatives, <span class="math inline">\partial f / \partial x =
-(\partial f / \partial \log x) / x</span>, up to finite-difference
-approximation error.</p>
-<p>In <code><a href="../reference/partial_derivatives.html">partial_derivatives()</a></code>, <code>wrt = "smooth"</code> is
-the default, and omitting <code>focal</code> selects the first
-non-factor smooth coordinate. With <code>wrt = "covariate"</code>,
-supply <code>focal</code> whenever several raw covariates are eligible;
-for this tensor smooth, choose <code>"x"</code> or <code>"z"</code>. If
-selecting several smooths, supply one <code>focal</code> per smooth in
-their selected order; the same <code>wrt</code> applies to all of
-them.</p>
-<p>Supplied <code>data</code> should describe a slice with the other
-independent numeric inputs held fixed, as <code>z</code> is above.
-Raw-scale differentiation requires the raw focal column: stored
-transformed values alone are insufficient. For an untransformed
-coordinate such as <code>x</code> in <code>te(x, z)</code>, both choices
-of <code>wrt</code> give the same interpretation.</p>
+<p>The first call estimates the derivative from small changes in
+<code>log(x)</code>. The second makes small changes in <code>x</code>
+and recalculates <code>log(x)</code> before evaluating the smooth. The
+chain rule gives the relationship <span class="math inline">\partial f /
+\partial x = (\partial f / \partial \log x) / x</span>, up to
+finite-difference approximation error.</p>
+<p>For this surface, use <code>focal = "x"</code> or <code>"z"</code>
+with <code>wrt = "covariate"</code>, and supply the original covariate
+values in <code>data</code>. Keep the other covariate fixed to describe
+change along a particular slice, as we did with <code>z = 2</code>. The
+default <code>wrt = "smooth"</code> selects the first numeric smooth
+coordinate if <code>focal</code> is omitted. Naming it explicitly makes
+the intended derivative clear. For an untransformed coordinate, such as
+<code>x</code> in <code>te(x, z)</code>, both values of <code>wrt</code>
+give the same interpretation.</p>
+</div>
 <div class="section level3">
 <h3 id="choosing-a-finite-difference-step">Choosing a finite-difference step<a class="anchor" aria-label="anchor" href="#choosing-a-finite-difference-step"></a>
 </h3>
@@ -452,21 +478,16 @@ smooth coordinate, or of <code>x</code> when using
 <code>wrt = "covariate"</code>. The step therefore follows changes in
 the covariate’s units and normally stays the same when prediction data
 are split into batches.</p>
-<p>For derivative order <span class="math inline">d</span>, the range is
-multiplied by <span class="math inline">\epsilon_{\mathrm{machine}}^{1/(d+p)}</span>, where
-<span class="math inline">p=2</span> for central differences and <span class="math inline">p=1</span> for forward or backward differences. This
-balances the orders of rounding and approximation error; for example,
-second central differences use the fourth root of machine precision.
-Constant coordinates use their magnitude instead of their range, with a
-fallback of one at zero. A lower bound and rounding of the step ensure
-representable perturbations at large coordinates.</p>
-<p>This rule does not estimate a universally optimal step: that would
-also need information about higher derivatives of the fitted function.
-Very small steps can amplify rounding errors, particularly for second
-derivatives, while large steps increase approximation error. For unusual
-function scales or domain boundaries, supply a positive absolute
-<code>eps</code> and check stability at nearby step sizes. See the <a href="https://docs.sciml.ai/FiniteDiff/dev/epsilons/" class="external-link">FiniteDiff
-step-size discussion</a> for the error-balance principle.</p>
+<p>Start with this default. If estimates appear unstable, supply a
+positive absolute <code>eps</code> in the units of the coordinate being
+differentiated. For example, <code>eps = 1e-4</code> with
+<code>wrt = "covariate"</code> sets the step in units of <code>x</code>.
+Compare estimates using half and twice the chosen step: very small steps
+can amplify rounding errors, while large steps give a poorer local
+approximation. Near a transformation’s domain boundary, choose a step
+and difference type that keep the evaluation points inside the domain.
+The <a href="https://docs.sciml.ai/FiniteDiff/dev/epsilons/" class="external-link">FiniteDiff
+step-size discussion</a> explains this balance.</p>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

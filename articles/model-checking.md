@@ -1,35 +1,34 @@
 # Model diagnostics: distributions, uncertainty and dependence
 
-## What does a diagnostic compare?
+## Choose the model feature you want to check
 
-A model can estimate a plausible mean curve and still describe the
-observations poorly. Counts can vary more than their fitted distribution
-allows; residuals can retain time or spatial structure; or an apparently
-wide response distribution can conceal a missing group effect. Gratia
-now supplies consistent diagnostic calculations for several fitting
-packages, including ordinary linear and generalised linear models. The
-choice of comparison still needs a statistical question.
+A model can estimate a plausible mean curve while missing other patterns
+in the data. Counts can vary more than their fitted distribution allows.
+Residuals from successive measurements can remain correlated.
+Differences between groups can show up as extra variation around the
+mean curve. {gratia} provides residual diagnostics and posterior
+predictive checks to investigate these patterns in GAMs, linear models
+and mixed models.
 
-This article develops three questions: is the response distribution
-adequate, is variation between groups represented, and does serial
-structure remain? [Checking different response
+We check the response distribution, variation between groups and
+dependence between observations made in sequence. [Checking different
+response
 distributions](https://gavinsimpson.github.io/gratia/articles/response-distributions.md)
 extends the examples to distributional parameters, censoring and
-weights. The
-[grouped-survey](https://gavinsimpson.github.io/gratia/articles/gfam-support.md),
-[glmmTMB](https://gavinsimpson.github.io/gratia/articles/glmmTMB-support.md)
+weights. The articles on
+[`mgcv::gfam()`](https://gavinsimpson.github.io/gratia/articles/gfam-support.md),
+[{glmmTMB}](https://gavinsimpson.github.io/gratia/articles/glmmTMB-support.md)
 and
-[spatial-survey](https://gavinsimpson.github.io/gratia/articles/sdmTMB-support.md)
-articles explain their fitting choices.
+[{sdmTMB}](https://gavinsimpson.github.io/gratia/articles/sdmTMB-support.md)
+illustrate diagnostics for those model classes.
 
-These examples require the development functionality introduced after
-gratia 0.11.2, with R \>= 4.4.0 and mgcv \>= 1.9-4. The code uses mgcv
-and gratia, with dplyr and ggplot2 for plots. The growth example also
-needs the optional nlme, lme4 and gamm4 packages (gamm4 \>= 0.2-7). The
-simulation counts are deliberately modest: 50 response draws for plot
-illustrations; simulation ranks use the default 249 reference draws
-where needed to estimate a marginal distribution. Use more and check
-stability before interpreting small tail departures.
+These examples require gratia 0.12.0 or later, R \>= 4.4.0 and {mgcv}
+\>= 1.9-4. We load mgcv and gratia for fitting and diagnostics, and
+{dplyr} and {ggplot2} for working with the results. The growth example
+also needs the optional {nlme}, {lme4} and {gamm4} packages (gamm4 \>=
+0.2-7). The plot examples use 50 replicated datasets to keep them quick
+to run. Use more draws and check that the plots are stable before
+interpreting small departures in the tails.
 
 ``` r
 
@@ -41,11 +40,11 @@ library("ggplot2")
 
 There are three distinct ways to generate a comparison:
 
-| Question | Calculation | What remains fixed? |
+| Question | Calculation | What varies between simulated datasets? |
 |----|----|----|
-| Could new response errors explain these observations at the fitted effects? | Conditional response simulation or QQ reference | Fitted coefficients, effects and distribution parameters |
-| Are these responses plausible after allowing uncertainty in fitted effects? | Conditional posterior predictive check | Covariance parameters usually remain fitted; uncertainty in coefficients and fitted effects is drawn together |
-| What response variation would occur with new groups or fields? | Marginal joint response simulation; optionally a marginal posterior predictive check | New effects are generated from their model distribution; a posterior check also draws parameter uncertainty as supported by the fitter |
+| Is the variation around the fitted values typical for this model? | Conditional response simulation or QQ reference | Responses vary around the same fitted effects. |
+| Can the model reproduce these features of the data once we allow for uncertainty in the fitted effects? | Conditional posterior predictive check | Each dataset uses a new draw of the fitted effects as well as new responses. |
+| How much variation should we expect among new groups or spatial fields? | Marginal response simulation or marginal posterior predictive check | New group or field effects are drawn from their fitted distribution. A posterior predictive check can also draw uncertain parameters, depending on the model. |
 
 A smooth plot’s interval concerns an estimated effect. A QQ reference
 band concerns ordered residuals from replicated responses. A posterior
@@ -61,12 +60,12 @@ identify conditioning only. Use `caption = ""` to omit a caption or
 supply your own text. Scalable QQ and worm plots use the same labels as
 their ordinary counterparts.
 
-## Count variation and mean structure
+## Check the response distribution and the mean of count data
 
 Consider daily insect counts at independently sampled sites. We simulate
 12,000 sites with temperature and wind as covariates. The mean count
-peaks at intermediate temperatures and falls with wind. The simulated
-sites are independent.
+peaks at intermediate temperatures and falls with wind. Conditional on
+these covariates, each count follows a Poisson distribution.
 
 ``` r
 
@@ -75,15 +74,22 @@ insects <- data.frame(temperature = runif(12000, 5, 30),
   wind = runif(12000, 0, 10))
 insects$count <- rpois(nrow(insects),
   exp(2.5 - ((insects$temperature - 19) / 8)^2 - 0.1 * insects$wind))
+```
+
+We fit a smooth temperature effect and a linear wind effect to recover
+these relationships:
+
+``` r
+
 count_fit <- bam(count ~ s(temperature, bs = "cr", k = 12) + wind,
   data = insects, family = poisson(), method = "fREML", discrete = TRUE)
 ```
 
-A Poisson model suits the simulation: it has non-negative integer
-responses and variance equal to the mean. The spline estimates the
-temperature shape, and its penalty prevents the basis size from
-dictating the amount of wiggliness. In real data, unexplained
-heterogeneity could instead motivate a negative binomial model.
+The simulation uses Poisson counts, whose variance equals their mean at
+fixed temperature and wind. We use quantile residuals to check the
+fitted response distribution and look for remaining patterns in the mean
+or spread. In real data, counts can vary more than a Poisson model
+predicts, in which case a negative binomial model may fit better.
 
 ``` r
 
@@ -92,23 +98,25 @@ appraise(count_fit, type = "quantile", seed = 302)
 
 ![](model-checking_files/figure-html/count-appraisal-1.png)
 
-At 10,000 fitted observations
+With 10,000 or more observations used in the fit,
 [`appraise()`](https://gavinsimpson.github.io/gratia/reference/appraise.md)
-switches automatically to scalable plots. These use all observations,
-summarised on grids or into quantile bins. They reveal the response
-distribution without drawing 12,000 overlapping points. A straight QQ
-plot and residual spread that stays roughly similar across fitted values
-are consistent with the simulated Poisson model. The
-observed-versus-fitted panel shows Poisson variation around the fitted
-means.
+switches to scalable plots that summarise all observations in bins. This
+makes the distribution easier to see when many points would overlap. A
+roughly straight QQ plot and similar residual spread across fitted
+values are consistent with the Poisson model. The observed-versus-fitted
+panel shows the amount of variation around the fitted means.
 
-### Put different responses on a common diagnostic scale
+### Calculate PIT and quantile residuals
 
-For a count y with fitted cumulative distribution function F, a PIT
-residual is a random draw between F(y-1) and F(y). Quantile residuals
-apply the standard-normal quantile function to that probability. This
+A probability integral transform (PIT) residual describes an
+observation’s position in its fitted response distribution. For a count
+y with fitted cumulative distribution function (CDF) F, it is a random
+draw between F(y-1) and F(y). Quantile residuals apply the
+standard-normal quantile function to that probability. This
 randomisation avoids artificial steps caused by integer responses. For
-continuous outcomes the probability is simply F(y).
+continuous outcomes the probability is simply F(y). We calculate both
+residual types for the same observations and seed to show how the
+probability becomes a normal score:
 
 ``` r
 
@@ -125,11 +133,11 @@ head(data.frame(observed = insects$count, fitted = fitted(count_fit),
 #> 6        5 4.3668547  0.64330424    0.3673050
 ```
 
-Under a suitable fitted distribution these probabilities should be
-approximately uniform, and their normal scores approximately standard
-normal. A normal reference for quantile residuals is justified by this
-transformation. Traditional Poisson deviance residuals do not have
-exactly a normal distribution.
+These probabilities should be roughly uniform between zero and one if
+the model describes the response distribution well. Their quantile
+residuals should then be approximately standard normal. Poisson deviance
+residuals have a different distribution, so we simulate reference
+quantiles from the fitted model for their QQ plot.
 
 ``` r
 
@@ -141,12 +149,15 @@ qq_plot(count_fit, type = "deviance", method = "simulate",
 
 Here the reference comes from responses simulated at the fitting
 covariates. Each observation’s fitted mean enters its simulated
-response. `method = "uniform"` instead averages ordered residuals
-obtained from the fitted inverse CDF. `method = NULL` chooses this
-method for most independent GAMs and simulation for Tweedie models to
-avoid costly numerical quantile inversion. An explicit method overrides
-that choice where supported. A worm plot subtracts reference quantiles
-from observed ordered residuals.
+response. `method = "uniform"` simulates responses by applying the
+fitted inverse CDF to randomly shuffled uniform quantiles, then averages
+the ordered residuals across replicates. `method = NULL` chooses this
+method for most independent GAMs. For Tweedie models it uses simulation
+from the fitted family because evaluating their inverse CDF is costly.
+You can choose a method explicitly where supported. A worm plot
+subtracts reference quantiles from the ordered residuals. This makes
+small departures easier to see as patterns around zero. Here we use
+quantile residuals and summarise the QQ curve in 80 bins:
 
 ``` r
 
@@ -172,19 +183,18 @@ scalable_residuals_covariate_plot(linear_fit,
 ![](model-checking_files/figure-html/omitted-curve-1.png)
 
 The curved residual mean against temperature shows where the linear
-effect misses the response shape. Pearson residuals account for the
-Poisson mean–variance relationship. Response residuals also target the
-mean but retain the count units. For a broader distributional check, use
+effect misses the response shape. Response residuals subtract the fitted
+mean from the count. Pearson residuals then divide that difference by
+its fitted standard deviation. For a broader distributional check, use
 `type = "quantile"` or `type = "pit"` to examine location, spread and
-tails against each covariate. Non-Gaussian deviance residuals need not
-have zero conditional mean, so their mean curve need not lie on zero
-even when the model fits.
+tails against each covariate. For non-Gaussian deviance residuals, a
+mean away from zero can occur even when the model fits well.
 
-Both versions default to `smooth = NULL`, which fits the residual mean
-trend only for groups with at most 20,000 eligible observations. Use
-`smooth = TRUE` to fit trends for larger groups, or `smooth = FALSE` to
-omit them. The threshold is applied separately within each response,
-family component and `by` group.
+The ordinary and scalable covariate plots default to `smooth = NULL`,
+which fits the residual mean trend only for groups with at most 20,000
+eligible observations. Use `smooth = TRUE` to fit trends for larger
+groups, or `smooth = FALSE` to omit them. The threshold is applied
+separately within each response, family component and `by` group.
 
 The ordinary version shows individual residuals. It is useful for
 smaller teaching examples; both versions use all eligible observations:
@@ -215,14 +225,15 @@ scalable_residuals_covariate_plot(count_fit, terms = "s(temperature)",
 
 For tensor products use labels such as `"te(temperature,wind)"`, without
 adding spaces. `terms` accepts smooth labels only, while `covariates`
-can also select linear predictors or covariates absent from the model.
-Supply the original fitting `data` for omitted covariates or when raw
-transformed covariates are unavailable. For a categorical covariate, the
-functions show residual boxplots and group means; `by = "group"`
-separates patterns into group facets.
+can also select covariates fitted as linear terms or covariates absent
+from the model. Supply the original fitting `data` for omitted
+covariates or when raw transformed covariates are unavailable. For a
+categorical covariate, the functions show residual boxplots and group
+means; `by = "group"` separates patterns into group facets.
 
 Separate panels can miss a remaining interaction. Here the mean contains
-a product of two independent, centred covariates. Averaging over either
+a product of two independent, centred covariates, plus independent
+Gaussian errors with standard deviation one. Averaging over either
 covariate hides the interaction in the other covariate’s residual mean:
 
 ``` r
@@ -230,6 +241,14 @@ covariate hides the interaction in the other covariate’s residual mean:
 set.seed(306)
 interaction_data <- data.frame(x = runif(4000, -1, 1), z = runif(4000, -1, 1))
 interaction_data$y <- 4 * interaction_data$x * interaction_data$z + rnorm(4000)
+```
+
+We deliberately omit the interaction from this model, then compare
+separate residual plots with a map of the residuals over both
+covariates:
+
+``` r
+
 additive_fit <- gam(y ~ s(x) + s(z), data = interaction_data, method = "REML")
 scalable_residuals_covariate_plot(additive_fit, covariates = c("x", "z"),
   pairs = list(c("x", "z")), bins = c(10, 10), type = "pearson")
@@ -237,19 +256,23 @@ scalable_residuals_covariate_plot(additive_fit, covariates = c("x", "z"),
 
 ![](model-checking_files/figure-html/omitted-interaction-1.png)
 
-The joint map shows the mean residual within each occupied covariate
-cell. Opposite corners have residuals with the same sign, suggesting
-that the two covariates need to enter the mean together. Cells with
-fewer than `min_n` observations are blank. Use `statistic = "sd"` to
-inspect changes in spread instead; this is particularly useful with
-quantile or PIT residuals. Joint maps are descriptive summaries, without
-significance tests. Correlated covariates can share residual patterns,
-so check a revised model before attributing the pattern to one
-particular effect. For a fitted smooth, a remaining curve can also
-motivate increasing its basis dimension `k` and checking the refitted
-model.
+The map shows the mean residual within each occupied cell. Opposite
+corners have residuals of the same sign, with the two diagonals
+differing in sign. This is the pattern expected here when the model
+omits the interaction. Cells with fewer than `min_n` observations are
+blank. Use `statistic = "sd"` to inspect changes in spread instead; this
+is particularly useful with quantile or PIT residuals. Correlated
+covariates can share residual patterns, so check a revised model before
+attributing the pattern to one particular effect. If a smooth reaches
+its basis dimension limit, try increasing `k` and check whether that
+reduces the residual pattern in the refitted model.
 
-### Choose compact displays without changing the question
+### Use density and count summaries for large datasets
+
+Scalable plots summarise the observations so dense regions remain
+readable. The first two plots below compare smoothed densities with
+histogram bins; the other two show observed versus fitted counts and the
+residual distribution:
 
 ``` r
 
@@ -287,16 +310,13 @@ smoothing on both axes. Observed-versus-fitted count heatmaps remain
 unsmoothed. The scalable functions also include
 [`scalable_qq_plot()`](https://gavinsimpson.github.io/gratia/reference/scalable_qq_plot.md);
 ordinary plots remain available with `appraise(..., scalable = FALSE)`,
-and `scalable_threshold` changes the automatic cutoff. Plot summaries
-are compact, but simulation still generates a response for every
-observation. QQ calculations average inverse-CDF draws as they are
-generated. When simulated references exceed
-`options(gratia.diagnostics.max_cells = 1e7)`, exact quantiles use
-temporary files, reducing memory at the cost of disk access. One
-response vector and the reference output still need to fit in memory.
-Marginal simulation ranks use `gratia.diagnostics.marginal_draws`
-(default 249, minimum 19); increase it and check stability, especially
-in the tails.
+and `scalable_threshold` changes the automatic cutoff. Simulation still
+generates a response for every observation, so using a compact display
+does not reduce the number of observations checked.
+
+We can also compare the observed count distribution with replicated
+datasets. This posterior predictive check includes coefficient
+uncertainty as well as response variation:
 
 ``` r
 
@@ -305,16 +325,14 @@ posterior_predictive_plot(count_fit, n = 50, seed = 304, scalable = TRUE)
 
 ![](model-checking_files/figure-html/count-ppc-1.png)
 
-The discrete posterior predictive check shows observed probabilities and
-the median and 90% intervals of replicated probability masses. It draws
-approximate coefficient uncertainty as well as response variation. Large
-datasets are summarised on a common grid; more than 512 distinct
-discrete response values use 512 labelled bins. These bars concern
-variation across whole replicated datasets. They are not confidence
-intervals on the fitted mean. `appraise(ppcheck = TRUE, n_ppc = 50)`
-replaces the residual histogram with this comparison. Offsets supplied
-as fitting arguments are retained in posterior response draws. Explicit
-seeds preserve the caller’s random-number state; coefficient draws and
+For each count, the plot compares its observed proportion with the
+median and central 90% of its proportions in the replicated datasets.
+These intervals describe variation across whole datasets. If there are
+more than 512 distinct count values, the plot shows proportions in 512
+labelled bins instead. `appraise(ppcheck = TRUE, n_ppc = 50)` replaces
+the residual histogram with this comparison. Offsets supplied as fitting
+arguments are retained in posterior response draws. Explicit seeds
+preserve the caller’s random-number state; coefficient draws and
 response draws use separate streams.
 
 ## Repeated measurements: fixed effects, fitted groups and new groups
@@ -338,7 +356,7 @@ growth_fit <- lme(distance ~ Sex * age_c, random = ~ age_c | Subject,
 summary(growth_fit)$tTable
 #>                      Value  Std.Error DF   t-value      p-value
 #> (Intercept)     24.9687500 0.48600071 79 51.375953 1.812713e-62
-#> SexFemale       -2.3210227 0.76141678 25 -3.048295 5.375053e-03
+#> SexFemale       -2.3210227 0.76141679 25 -3.048295 5.375053e-03
 #> age_c            0.7843750 0.08599951 79  9.120691 5.654754e-14
 #> SexFemale:age_c -0.3048295 0.13473534 79 -2.262432 2.641752e-02
 ```
@@ -346,7 +364,10 @@ summary(growth_fit)$tTable
 The age coefficient describes mean growth in the reference sex, and the
 interaction describes a difference in age slopes. The fitted random
 effects describe departures for these children. The positive fitted age
-slopes describe growth between ages 8 and 14.
+slopes describe growth between ages 8 and 14. We now compare two
+questions: does the model describe measurement variation around these
+children’s fitted curves, and does it describe the variation expected
+across new children?
 
 ``` r
 
@@ -365,22 +386,39 @@ qq_plot(growth_fit, type = "quantile", conditioning = "marginal",
 
 The conditional comparison holds each child’s fitted intercept and slope
 fixed and checks remaining measurement variation. The marginal
-comparison generates new child trajectories. All four measurements of a
-simulated child share its new intercept and slope; the simulator retains
-their covariance. Setting those effects to zero would give the mean
-trajectory, not this marginal distribution. In this fit the conditional
-scores have a compressed centre and one large positive tail departure.
-The marginal plot averages over different child trajectories and is
-closer to its reference. Investigate the observation responsible for the
-largest conditional score alongside that child’s trajectory.
+comparison generates new child trajectories. All four simulated
+measurements for a child share a new intercept and slope drawn together
+from their fitted distribution. In this fit the conditional scores have
+a compressed centre and one large positive tail departure. The marginal
+plot averages over different child trajectories and is closer to its
+reference. Investigate the observation responsible for the largest
+conditional score alongside that child’s trajectory.
 
-The marginal QQ reference must preserve the shared effects. Gratia uses
-joint response draws for its bands, rather than bands derived for
-independent scores.
+The marginal QQ plot simulates complete sets of measurements to account
+for the dependence among measurements from each child when it constructs
+its reference bands.
 
 The QQ plot pools the ordered residuals. To check the shared child
 effects, also plot trajectories or residuals against age, grouped by
 child: systematic patterns within children can be hidden by pooling.
+
+Each panel below shows one child’s quantile residuals against age
+centred at 11 years. Look for residuals that change systematically with
+age or remain mostly on one side of zero. We omit a smoother because
+each child has only four measurements.
+
+``` r
+
+residuals_covariate_plot(growth_fit, covariates = "age_c", by = "Subject",
+  type = "quantile", conditioning = "conditional", smooth = FALSE, seed = 305,
+  xlab = "Age relative to 11 years")
+```
+
+![](model-checking_files/figure-html/growth-within-child-1.png)
+
+The following posterior predictive checks address the same conditional
+and marginal questions while also allowing uncertainty in the estimated
+effects:
 
 ``` r
 
@@ -398,16 +436,23 @@ posterior_predictive_plot(growth_fit, conditioning = "marginal", n = 50,
 
 ![](model-checking_files/figure-html/growth-ppc-2.png)
 
-The conditional posterior predictive check draws uncertainty in the
-fitted child effects together with fixed effects, allowing more response
-variation than the conditional QQ reference at fixed effect estimates.
-The marginal posterior predictive check draws new effects from their
-fitted population covariance as well. Covariance parameters remain at
-fitted values in these nlme approximations. The density overlays pool
-the measurements across ages and children; use the trajectory plots to
-examine where that variation occurs.
+The conditional posterior predictive check draws the fitted child
+effects and fixed effects together, then simulates measurements around
+the sampled growth curves. The marginal check draws new child effects
+from their fitted population distribution each time it simulates
+measurements. Both nlme calculations hold the covariance parameters at
+their fitted values. The density overlays pool the measurements across
+ages and children. Use the trajectory plots to examine where that
+variation occurs.
 
-### Apply the same distinction to other mixed-model fits
+### Check models fitted with lme4 and gamm4
+
+We first fit the same linear growth model with
+[`lmer()`](https://rdrr.io/pkg/lme4/man/lmer.html) and check its
+conditional quantile residuals. We then fit a shared smooth age curve
+with [`gamm4()`](https://rdrr.io/pkg/gamm4/man/gamm4.html), retaining a
+separate intercept for each child, and inspect its smooth and variance
+components:
 
 ``` r
 
@@ -449,7 +494,8 @@ predictions, derivatives and fitted-value draws describe its population
 GAM component; group terms specified in `random` are excluded from those
 calculations. Variance components include both smooth penalties and
 native group effects, with missing interval bounds where the fit
-provides none.
+provides none. Next we check the complete mixed model and obtain
+predictions from the population GAM component for girls aged 8 to 14:
 
 ``` r
 
@@ -481,8 +527,9 @@ fitted_values(growth_smooth, data = population_grid) |> head()
 #> 6     6  9.03 Female mean          21.4 0.599      20.2      22.5
 ```
 
-Diagnostics and response simulations for `gamm4` now default to the full
-conditional mixed model, including fitted child and smooth effects.
+Diagnostics and response simulations for
+[`gamm4()`](https://rdrr.io/pkg/gamm4/man/gamm4.html) default to the
+full conditional mixed model, including fitted child and smooth effects.
 Posterior response draws default to uncertainty in those fitted effects.
 Explicit `conditioning = "gam_component"` selects the extracted GAM
 calculations, and is required for posterior response draws at new data
@@ -499,13 +546,16 @@ for covariance and sampling restrictions. Use fitting-package prediction
 on the `mer` component for predictions conditional on a particular
 child’s effects.
 
-## Serial observations: a response model or a fitting correction?
+## Check serial dependence in Gaussian and count models
 
-Time order carries information that a histogram discards. The following
-simulation represents regularly spaced measurements from four
-independent monitoring series with a slowly changing mean and Gaussian
-AR1 errors. We supply the simulation’s known correlation, 0.6, through
-`rho`; BAM treats it as fixed during fitting.
+The following simulation represents regularly spaced measurements from
+four independent monitoring series with a slowly changing mean. The
+Gaussian errors follow a first-order autoregressive (AR1) process, with
+a correlation of 0.6 between successive errors in the same series. We
+pass this known correlation as `rho` so
+[`bam()`](https://rdrr.io/pkg/mgcv/man/bam.html) uses it during fitting.
+We then inspect the QQ plot and look for correlation in the adjusted
+residuals.
 
 ``` r
 
@@ -541,28 +591,35 @@ residual_correlation(serial_fit, lag_max = 3)
 #> 4     3    -0.0465      468
 ```
 
-Gaussian identity-link BAM defines a joint response distribution.
-Simulated references preserve the AR1 covariance and start a fresh
-series at each `AR.start`. The ordered check uses the stored
-standardised residuals by default and can reveal correlation remaining
-after adjustment. There are no significance bands based on independence.
-The companion table reports the correlation and number of usable
-observation pairs at each lag; fewer pairs are available at larger lags.
-Lags count observation positions, not elapsed time. Specify series, sort
-the fitting data, and consider a fitting-package covariance model
-appropriate to irregular time intervals.
+For a Gaussian BAM with an identity link, the reference simulations
+preserve the AR1 covariance and start an independent series at each
+`AR.start`. The correlation plot uses residuals standardised by the
+supplied AR1 correlation to look for remaining correlation. The
+companion table reports the correlation and number of usable pairs at
+each lag, with fewer pairs at longer lags. Lags count observation
+positions. With irregular measurements, equal lags can therefore
+represent different lengths of time.
 
-For counts, BAM with `discrete = TRUE` applies nonzero `rho` to its
-*working residuals*, the quantities used during iterative fitting. This
-is a generalised estimating equations (GEE) approximation. It does not
-define a unique joint count distribution. We generate the next dataset
-from a latent correlated process, then use BAM’s working correction when
-fitting its mean.
+For counts, [`bam()`](https://rdrr.io/pkg/mgcv/man/bam.html) with
+`discrete = TRUE` applies `rho` to its *working residuals*, the
+quantities used during iterative fitting. This adjusts the fit for
+correlation using a generalised estimating equations (GEE)
+approximation. It leaves the joint distribution of the counts
+unspecified. We illustrate this with Poisson counts whose log means
+depend on the correlated Gaussian measurements simulated above.
 
 ``` r
 
 set.seed(310)
 monitor$count <- rpois(nrow(monitor), exp(1 + monitor$measurement / 2))
+```
+
+We fit a Poisson BAM with the working correlation correction, then
+inspect its quantile residuals and the remaining correlation in its
+working residuals:
+
+``` r
+
 working_fit <- bam(count ~ s(time, bs = "cr", k = 12), data = monitor,
   family = poisson(), discrete = TRUE, rho = 0.6, AR.start = start)
 qq_plot(working_fit, type = "quantile", seed = 311)
@@ -577,21 +634,23 @@ residual_correlation_plot(working_fit, type = "working.standardized", lag_max = 
 
 ![](model-checking_files/figure-html/count-series-2.png)
 
-The marginal Poisson probabilities still locate each count in its fitted
-univariate distribution. The QQ plot omits dependence bands. A default
-QQ plot of traditional residuals uses a pooled marginal reference; it
-neither assumes independence nor silently switches to a normal
-reference. Comparing whitened working residuals at different lags is an
-approximate serial check. `type = "standardized"` instead uses mgcv’s
-stored `std.rsd`, which is not necessarily the weighted working residual
-used during non-Gaussian fitting. Here the large negative lag-one
-correlation after whitening suggests that the supplied working
-correction is too strong. We supplied the latent Gaussian correlation,
-whereas the correction acts on working residuals from the count model.
-These correlations can differ. The upper-tail departure in the QQ plot
-also reflects variation from the latent process that the Poisson
-distribution omits. Use these two checks to examine the working
-correction and the response distribution separately.
+The fitted Poisson probabilities still locate each count in its own
+response distribution. The QQ plot omits bands because the working
+correlation does not supply a joint distribution for the counts. For
+traditional residuals, the default QQ reference pools the individual
+fitted residual distributions. The correlation plot examines working
+residuals after adjusting for the fitted AR1 correlation; this is an
+approximate check for remaining serial dependence.
+`type = "standardized"` instead uses mgcv’s stored `std.rsd`, which is
+not necessarily the weighted working residual used during non-Gaussian
+fitting. Here the large negative lag-one correlation after that
+adjustment suggests that the supplied working correction is too strong.
+We supplied the latent Gaussian correlation, whereas the correction acts
+on working residuals from the count model. These correlations can
+differ. The upper-tail departure in the QQ plot also reflects variation
+from the latent process that the Poisson distribution omits. Use these
+two checks to examine the working correction and the response
+distribution separately.
 
 `qq_plot(working_fit, method = "simulate")`, joint
 [`simulate()`](https://gavinsimpson.github.io/gratia/reference/simulate.md)
@@ -601,10 +660,10 @@ are explicitly unsupported. The same restriction applies to nonidentity
 Gaussian and extended-family working AR1 BAM fits, and to correlated
 non-Gaussian PQL [`gamm()`](https://rdrr.io/pkg/mgcv/man/gamm.html)
 fits. Approximate PQL checks without residual working correlation remain
-available. A generative non-Gaussian mixed model with a justified
-temporal covariance, for example in glmmTMB, is an alternative when
-joint predictive simulation is the scientific aim. It requires a choice
-of temporal covariance, such as AR1 effects on the log mean.
+available. A non-Gaussian mixed model that specifies how observations
+depend on one another, for example through AR1 effects on the log mean
+in glmmTMB, can provide joint predictive simulations. That choice needs
+to reflect how dependence is thought to arise in the data.
 
 ## Choose checks for the part of the model you want to examine
 
@@ -618,9 +677,9 @@ fields or drawing parameter uncertainty.
 
 [`diagnostic_support`](https://gavinsimpson.github.io/gratia/reference/diagnostic_support.md)
 lists the precise supported families and conditioning modes. Unsupported
-cases remain errors: quasi families have no response probability law,
-censored posterior checks need an observation mechanism, and a working
-correlation alone is insufficient for a joint simulator. Models with
-independent responses use analytic uniform/normal score references where
-available. Dependent responses use joint simulation for bands where
-possible; otherwise the plot explains their omission.
+cases remain errors: quasi families do not specify a full response
+distribution, censored posterior checks need an observation mechanism,
+and a working correlation alone is insufficient for a joint simulator.
+Models with independent responses use analytic uniform/normal score
+references where available. Dependent responses use joint simulation for
+bands where possible; otherwise the plot explains their omission.

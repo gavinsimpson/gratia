@@ -1,22 +1,17 @@
-# Customizing plots
+# Customising plots
 
-## Background
+## Apply a theme to every panel
 
-The [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)
-function combines plots of model terms into a single figure using
-{patchwork}. Some terms need their own facets or coordinate systems, so
-separate plots allow {gratia} to display them together.
+{gratia}’s
+[`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)
+combines the individual plots for model terms into one figure using
+{patchwork}. The `&` operator applies a {ggplot2} theme to every panel,
+so you can style them together.
 
-Use ggplot2 themes to change the appearance of these plots. The `&`
-operator applies a theme to every plot in the figure. This article shows
-how to style {gratia} components and how to build plots from the
-underlying estimates when you need different layers or mappings from
-variables to aesthetics.
-
-## Adding layers to plots with the `&` operator
-
-We start by simulating some data and fitting a GAM with four smooth
-functions
+Load the plotting packages and simulate 400 observations. The covariates
+are independent and range from zero to one. Three have nonlinear effects
+on the mean response; `x3` has no true effect. Independent Gaussian
+noise adds variation with standard deviation 2.
 
 ``` r
 
@@ -37,14 +32,21 @@ library("patchwork")
 # simulate data
 n <- 400
 eg1 <- data_sim("eg1", n = n, seed = 1)
+```
+
+Fit a Gaussian GAM with one smooth for each covariate. REML selects the
+smoothness; we will reuse this fitted model throughout the plotting
+examples.
+
+``` r
 
 # fit model
 m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3),
   data = eg1, method = "REML")
 ```
 
-The default plot produced by
-[`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md) is
+Save the default figure as `p` so we can apply different styles to the
+same fitted smooths.
 
 ``` r
 
@@ -54,9 +56,10 @@ p
 
 ![](custom-plotting_files/figure-html/draw-eg1--1.png)
 
-If we want to change the theme for the plots, we can’t append a
-[`theme()`](https://ggplot2.tidyverse.org/reference/theme.html) layer to
-`p` as this only affects the last plot in the *patchwork*[^1]
+Adding a theme with `+` changes only the last panel in this combined
+figure. The following example makes that behaviour visible: only the
+final smooth receives the white background from
+[`theme_bw()`](https://ggplot2.tidyverse.org/reference/ggtheme.html).
 
 ``` r
 
@@ -65,8 +68,7 @@ p + theme_bw()
 
 ![](custom-plotting_files/figure-html/draw-eg1-wrong-theme-1.png)
 
-One way to apply the theme to all plots in the patchwork is to the the
-`&` operator.
+Use `&` to apply the same theme to all four panels.
 
 ``` r
 
@@ -75,11 +77,11 @@ p & theme_bw()
 
 ![](custom-plotting_files/figure-html/draw-eg1-right-theme-1.png)
 
-## Styling gratia components
+## Change curve colours, intervals and other plot components
 
-Gratia uses ggplot2 themes for its plot components. Defaults retain the
-existing appearance. Change an existing figure with `&` so every panel
-receives the settings:
+gratia has theme settings for smooth curves, interval ribbons, residual
+points and reference lines. Here we make every smooth navy, give it a
+thicker line and use a pale navy interval ribbon.
 
 ``` r
 
@@ -102,8 +104,11 @@ See
 [`?gratia_theme_get`](https://gavinsimpson.github.io/gratia/reference/gratia_theme_get.md)
 for the component list.
 
-Set a package override for subsequent plots without changing other
-ggplot2 plots. The override is attached when the plot is created:
+Use
+[`gratia_theme_set()`](https://gavinsimpson.github.io/gratia/reference/gratia_theme_get.md)
+when you want subsequent gratia figures to share a style. Save its
+return value so you can restore the previous settings after drawing the
+figure.
 
 ``` r
 
@@ -118,13 +123,12 @@ draw(m)
 gratia_theme_set(old_theme)
 ```
 
-For temporary settings, use
+These settings affect gratia plots created afterwards. For a temporary
+change, you can instead use
 [`withr::with_options()`](https://withr.r-lib.org/reference/with_options.html)
-with the option `gratia.plot.theme`. Settings added to an existing plot
-follow normal ggplot2 theme merging. Explicit deprecated aesthetic
-arguments remain fixed overrides, even when they equal the old defaults.
-For example, replace `draw(m, smooth_col = "navy", ci_alpha = 0.15)`
-with the component theme above.
+with the `gratia.plot.theme` option. If you have older code using
+arguments such as `smooth_col` or `ci_alpha`, replace those arguments
+with theme settings as shown above.
 
 Common replacements for deprecated arguments are:
 
@@ -140,12 +144,13 @@ Common replacements for deprecated arguments are:
 | `ci_3d_col`, `ci_3d_alpha` | `geom.gratia.surface.interval = element_geom(fill = ...)`, `gratia.alpha.surface.interval` |
 | `alpha`, `linewidth` in chain diagnostics | `gratia.alpha.chain`, `geom.gratia.chain = element_geom(linewidth = ...)` |
 
-For parametric curves use `geom.gratia.effect`; for derivatives use
-`geom.gratia.derivative`. Rootograms have separate `rootogram.bar`,
-`rootogram.fitted`, `rootogram.reference` and `rootogram.warning`
-elements. MRF interval lines use `geom.gratia.smooth.interval`,
-independently of the points controlled by `geom.gratia.smooth`.
-Diagnostic boxplots use `geom.gratia.diagnostic.boxplot`.
+Use `geom.gratia.effect` for parametric curves and
+`geom.gratia.derivative` for derivatives. Rootograms have separate
+`rootogram.bar`, `rootogram.fitted`, `rootogram.reference` and
+`rootogram.warning` elements. MRF interval lines use
+`geom.gratia.smooth.interval`, independently of the points controlled by
+`geom.gratia.smooth`. Diagnostic boxplots use
+`geom.gratia.diagnostic.boxplot`.
 
 ## Laying out labels, legends and colour bars
 
@@ -155,14 +160,13 @@ to choose wrapping widths and guide layouts, then pass the result as
 `label_control` to
 [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md) or
 [`assemble()`](https://gavinsimpson.github.io/gratia/reference/assemble.md).
-The configuration works across drawing methods. Omitted settings retain
-the existing appearance.
+The configuration works across drawing methods.
 
-For a discrete axis, wrapping breaks long labels into lines and
-`n_dodge` staggers labels across rows. This example uses three fishing
-categories with different mean responses. The continuous covariate
-controls a curved response component, and independent Gaussian noise
-represents variation among observations within each category.
+For a categorical axis, wrapping breaks long labels into lines and
+`n_dodge` staggers labels across rows. We simulate observations in three
+fishing categories so we can illustrate both options. The response
+combines a curved effect of day, a difference between categories and
+independent Gaussian noise of standard deviation 0.3.
 
 ``` r
 
@@ -176,8 +180,8 @@ fishing$y <- sin(fishing$day / 60) +
 ```
 
 Fit a GAM with a smooth effect of day and a parametric effect of fishing
-category. Only the categorical tick labels will wrap or stagger; the day
-and partial-effect axes retain their numeric labels.
+category. Wrap the fishing-category labels and stagger them over two
+rows.
 
 ``` r
 
@@ -189,19 +193,20 @@ draw(fishing_model, label_control = axis_layout, ncol = 2)
 
 ![](custom-plotting_files/figure-html/label-layout-axes-1.png)
 
-Legends have their own wrapping width and can arrange their keys into
-rows or columns. Compare the fitted day smooth with a model allowing
-less curvature in day. The descriptive model names become legend
-entries; the layout wraps those entries and keeps them in one column.
+Legends have their own wrapping width and can arrange their entries into
+rows or columns. Compare the fitted day smooth with one that has a
+smaller basis and no smoothing penalty (`fx = TRUE`). The smaller basis
+limits how much the curve can bend. Use descriptive labels for the two
+fits and wrap the entries in a single legend column.
 
 ``` r
 
-linear_fishing <- gam(y ~ angler_type + s(day, k = 3, fx = TRUE),
+simple_fishing <- gam(y ~ angler_type + s(day, k = 3, fx = TRUE),
   data = fishing, method = "REML")
-comparison <- compare_smooths(fishing_model, linear_fishing, n = 50)
+comparison <- compare_smooths(fishing_model, simple_fishing, n = 50)
 comparison$.model <- factor(comparison$.model,
-  levels = c("fishing_model", "linear_fishing"),
-  labels = c("Flexible seasonal pattern by day", "Low complexity seasonal pattern by day"))
+  levels = c("fishing_model", "simple_fishing"),
+  labels = c("More flexible curve across the season", "Less flexible curve across the season"))
 legend_layout <- draw_label_control(
   legend = list(wrap = 22, title_wrap = 18, ncol = 1)
 )
@@ -211,11 +216,11 @@ draw(comparison, label_control = legend_layout)
 ![](custom-plotting_files/figure-html/label-layout-legend-1.png)
 
 Colour bars can wrap their titles, rotate their tick labels, and change
-their displayed dimensions. The following concurvity plot compares the
-terms in the four-smooth model fitted earlier. Its fill scale supplies
-the descriptive title; the label control wraps the title and sets the
-bar height. The scale continues to control the palette, breaks and
-numeric labels.
+their displayed dimensions. The following pairwise concurvity plot shows
+how closely each smooth can be approximated by another smooth in the
+four-smooth model. The fill scale supplies the title and the label
+control wraps it and sets the bar height. Use the scale to set the
+palette, breaks and numeric labels.
 
 ``` r
 
@@ -231,37 +236,34 @@ draw(model_concurvity(m, pairwise = TRUE),
 ![](custom-plotting_files/figure-html/label-layout-colourbar-1.png)
 
 Wrapping happens after scale labels have been formatted, preserving
-custom label mappings and mathematical expressions. Explicit line breaks
-are retained; long words without spaces are left intact. Axis-title
-wrapping uses `axes = list(title_wrap = ...)`; tick wrapping and
-staggering apply only to discrete axes. Settings for guides absent from
-a plot have no effect. Later ggplot2 scale and guide additions follow
-their normal precedence.
+custom labels, mathematical expressions and explicit line breaks. Use
+`axes = list(title_wrap = ...)` to wrap axis titles. Wrapping and
+staggering tick labels applies only to discrete axes.
 
-## Optional discrete palettes
+## Use a different palette for groups
 
-Grouped curves and ribbons retain the current Okabe–Ito palette and hue
-fallback unless another palette is requested. Use the same function for
-colour and fill to keep groups paired:
+Grouped curves and ribbons use the Okabe–Ito palette for up to nine
+groups, and a hue palette for more than nine. Supply a palette function
+to both the colour and fill theme settings to keep each model’s curve
+and interval the same colour. Here we use Paul Tol’s bright palette for
+the model comparison.
 
 ``` r
 
-tol <- gratia_palette("tol_banded_16")
-theme(palette.colour.discrete = tol, palette.fill.discrete = tol)
-#> <theme> List of 2
-#>  $ palette.colour.discrete:function (n)  
-#>  $ palette.fill.discrete  :function (n)  
-#>  @ complete: logi FALSE
-#>  @ validate: logi TRUE
+tol <- gratia_palette("tol_bright")
+draw(comparison) &
+  theme(palette.colour.discrete = tol, palette.fill.discrete = tol)
 ```
 
+![](custom-plotting_files/figure-html/native-tol-palette-1.png)
+
 Paul Tol choices include bright and vibrant (7 colours), muted (9), dark
-(11), and banded schemes (12, 16 or 20). Dark favours visibility against
-white; colours within larger banded schemes are less distinct. Finite
-palettes error when their capacity is exceeded and do not interpolate or
-recycle colours. See
+(11), and banded schemes (12, 16 or 20). The dark palette is designed
+for a white background. Choose a palette with enough colours for all
+your groups. A request for more colours than the palette provides gives
+an error. See
 [`?gratia_palette`](https://gavinsimpson.github.io/gratia/reference/gratia_palette.md)
-for attribution and available names.
+for available names.
 
 Continuous palettes can also be changed through
 `palette.fill.continuous` and `palette.colour.continuous`. Existing
@@ -270,13 +272,11 @@ transformations, breaks or guides are needed.
 
 ## Combining individual plots produced by `draw()`
 
-[`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)
-methods like
-[`draw.gam()`](https://gavinsimpson.github.io/gratia/reference/draw.gam.md)
-return an object created by
-[`patchwork::wrap_plots()`](https://patchwork.data-imaginist.com/reference/wrap_plots.html),
-and as a result it isn’t straightforward to combine those objects into a
-new patchwork
+Each [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)
+result is already a combined figure, even if it contains only one
+smooth. When combining several results, specify their layout explicitly.
+First, here is the error that can occur when those dimensions are
+omitted.
 
 ``` r
 
@@ -289,9 +289,7 @@ p1 + p2 + p3
 #> ℹ Please increase `ncol` and/or `nrow`.
 ```
 
-To avoid the error, we need to use
-[`patchwork::plot_layout()`](https://patchwork.data-imaginist.com/reference/plot_layout.html)
-to set the dimensions we want
+Add `plot_layout(ncol = 3)` to place the three results in one row.
 
 ``` r
 
@@ -300,8 +298,9 @@ p1 + p2 + p3 + plot_layout(ncol = 3)
 
 ![](custom-plotting_files/figure-html/draw-multiple-patchworks-layout-1.png)
 
-The above could have been achieved directly via
-[`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)
+When all smooths come from the same model, select them in one
+[`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md) call
+and supply `ncol` directly.
 
 ``` r
 
@@ -310,10 +309,8 @@ draw(m, select = c("s(x0)", "s(x1)", "s(x2)"), ncol = 3)
 
 ![](custom-plotting_files/figure-html/draw-multiple-patchworks-draw-1.png)
 
-but it is instructive to know how to combine the outputs of
-[`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md)
-should the need arise, such as when you want to create a patchwork of
-plots from different models.
+The explicit layout is useful when the plots come from different models
+or need to be arranged with other ggplot2 figures.
 
 ## Grouping factor smooths and showing their intervals
 
@@ -329,11 +326,25 @@ The defaults, `grouped = c("sz", "fs")` and
 `show_ci = c("factor-by", "sz")`, retain the existing grouping and
 interval visibility. Use `FALSE` to select none. Separate curves use the
 usual univariate styling: a black fitted line and a translucent black
-interval. Here is a factor-by example:
+interval. We simulate `x2` between zero and one and use `fac` to
+identify three groups. The response combines a different curve of `x2`
+in each group with independent Gaussian noise of standard deviation 2.
+We then fit three ways of representing these relationships. A factor-by
+smooth fits a curve for each group; an `sz` smooth represents group
+deviations from a shared curve; an `fs` smooth estimates group curves
+whose penalties share smoothing parameters.
 
 ``` r
 
 factor_data <- data_sim("eg4", n = 400, seed = 244)
+```
+
+Fit the three representations to the same data so we can compare how
+their group curves are displayed. Each model uses REML to select its
+smoothing parameters.
+
+``` r
+
 m_by <- gam(y ~ fac + s(x2, by = fac), data = factor_data, method = "REML")
 m_sz <- gam(y ~ s(x2) + s(x2, fac, bs = "sz"),
   data = factor_data, method = "REML")
@@ -370,10 +381,10 @@ draw(m_fs, grouped = FALSE, show_ci = "fs")
 
 ![](custom-plotting_files/figure-html/fs-separate-intervals-1.png)
 
-The same controls work with saved estimates. Changing their display does
-not recalculate the estimates or interval bounds. Simultaneous bands
-keep their coverage over the original fitted smooth, including its
-evaluated factor levels:
+The same controls work with saved estimates. Grouping the curves or
+hiding their intervals leaves the saved estimates and interval limits
+intact. Here we draw each group deviation separately and omit its
+interval ribbon.
 
 ``` r
 
@@ -407,101 +418,55 @@ with `grouped = c("sz", "fs")`. During migration, an explicit
 
 ## Drawing surfaces in 3D
 
-Numeric smooth and parametric surfaces can be displayed with
-`surface = "3d"`. The default remains `surface = "raster"`;
-`surface = "tile"` draws vector rectangles. The 3D display retains the
-current diverging RdBu palette, fill ranges, theme, and facet styling.
-Use `palette.fill.continuous` in
-[`theme()`](https://ggplot2.tidyverse.org/reference/theme.html) to
-choose another palette.
+With the optional {ggcube} package installed, use `surface = "3d"` to
+view a two-dimensional smooth as a surface. First simulate a nonlinear
+response over two covariates with independent Gaussian noise of standard
+deviation 0.2, so the surface’s peaks remain visible above the noise.
 
 ``` r
 
-eg2 <- data_sim("eg2", n = 400, seed = 2)
-m_surface <- gam(y ~ te(x, z, k = c(5, 5)) + x:z,
+eg2 <- data_sim("eg2", n = 400, scale = 0.2, seed = 2)
+```
+
+Fit a tensor product smooth with 15 basis functions per covariate to
+allow enough flexibility for the nonlinear surface; REML selects its
+smoothness. Then draw the smooth’s contribution to the linear predictor.
+`n_2d = 50` evaluates the surface on a 50-by-50 grid, and `yaw` controls
+the viewing angle.
+
+``` r
+
+m_surface <- gam(y ~ te(x, z, k = c(15, 15)),
   data = eg2, method = "REML")
-draw(m_surface, surface = "3d", n_2d = 20,
+draw(m_surface, surface = "3d", n_2d = 50,
   surface_3d = list(yaw = 45, persp = FALSE))
 ```
 
 ![](custom-plotting_files/figure-html/surface-3d-1.png)
 
-`surface_3d` is a named list passed to
+Pass camera settings through `surface_3d`, which forwards them to
 [`ggcube::coord_3d()`](https://matthewkling.github.io/ggcube/reference/coord_3d.html).
-gratia uses only the coordinate system from that function, leaving its
-additional theme settings out. Options such as `yaw`, `roll`, `pitch`,
-`persp`, `ratio`, and `light` configure a shared view across all 3D
-panels. `surface_3d = list(dist = 3)` controls viewing distance; the
-top-level `dist` argument still controls exclusion far from data.
+For example, `persp = FALSE` uses a parallel projection so distant parts
+of the surface do not appear smaller.
 
-Lighting defaults to `ggcube::light(backface_scale = 1)`, keeping the
-back faces lit. Supply your own light object to replace this default,
-for example
-`surface_3d = list(light = ggcube::light(backface_scale = -1))` to
-restore ggcube’s original back-face shading, or
-`surface_3d = list(light = ggcube::light(method = "none"))` to disable
-lighting. Surface faces have full opacity. Floor observations,
-boundaries, and contours share the surface’s depth ordering, so hidden
-parts are occluded by nearer faces.
+The covariates form the two horizontal axes and the partial effect forms
+the vertical axis. Use `surface = "tile"` for a flat rectangular display
+or the default `surface = "raster"` for a compact image. These choices
+display the same estimated effect.
 
-For a different view for each term, customize the named plots from
-[`assemble()`](https://gavinsimpson.github.io/gratia/reference/assemble.md):
-
-``` r
-
-panels <- assemble(m_surface, surface = "3d", n_2d = 20)
-# coord_3d() returns a coordinate and a theme; take just the coordinate.
-panels[["te(x,z)"]] <- panels[["te(x,z)"]] +
-  ggcube::coord_3d(yaw = 45, persp = FALSE,
-    light = ggcube::light(backface_scale = 1))[[1]]
-#> Coordinate system already present.
-#> ℹ Adding new coordinate system, which will replace the existing one.
-panels[["x:z"]] <- panels[["x:z"]] +
-  ggcube::coord_3d(yaw = -20, persp = FALSE,
-    light = ggcube::light(backface_scale = 1))[[1]]
-#> Coordinate system already present.
-#> ℹ Adding new coordinate system, which will replace the existing one.
-wrap_plots(panels)
-```
-
-![](custom-plotting_files/figure-html/surface-3d-per-term-1.png)
-
-The two displayed covariates form the horizontal axes, and the partial
-effect forms the vertical axis. Higher-dimensional smooths and
-interactions retain conditioning facets; `n_2d` controls surface
-resolution and `n_3d`/`n_4d` control covariate slices. Contours follow
-the surface, and available observation locations appear on the floor. No
-uncertainty surfaces are added. Direct calls to
-`draw(smooth_estimates(model), surface = "3d")` and
-`draw(parametric_effects(model), surface = "3d")` use the same renderer.
-
-Scattered evaluation data use piecewise-linear Delaunay triangles and
-require `geometry`. Support masking and soap-film domain checks also
-require `sf`. Faces crossing known excluded regions are discarded
-conservatively; a coarse mesh may therefore omit additional faces near a
-boundary. Increase the evaluation density to resolve these areas.
-Spherical smooths retain their geographic display.
-
-## Building your own plot by hand
+## Build a plot from smooth estimates and partial residuals
 
 Themes control the appearance of plots returned by
 [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md). To
 choose different layers or map additional variables to aesthetics, build
-a plot from the estimates returned by {gratia}.
+a plot from the estimates returned by gratia.
 
-Instead, {gratia} also exports the lower-level functions used
-[`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md) so
-that you can create your own plot using whatever {ggplot2} functions
-make sense. In the next few code blocks we’ll see how the plot created
-by `draw(m)` can be recreated by hand using these lower-level building
-blocks.
-
-The main thing we need is to evaluate the smooths at values of their
-covariates. This is done using
-[`smooth_estimates()`](https://gavinsimpson.github.io/gratia/reference/smooth_estimates.md).
-We also need to add a credible interval to the evaluations, which can be
-done *tidyverse*-style via
-[`add_confint()`](https://gavinsimpson.github.io/gratia/reference/add_confint.md)
+First evaluate the fitted smooths with
+[`smooth_estimates()`](https://gavinsimpson.github.io/gratia/reference/smooth_estimates.md)
+and add pointwise interval limits with
+[`add_confint()`](https://gavinsimpson.github.io/gratia/reference/add_confint.md).
+Each row contains a value of the covariate, the estimated smooth at that
+value and its interval limits.
 
 ``` r
 
@@ -526,12 +491,12 @@ sm
 #> # ℹ 1 more variable: .upper_ci <dbl>
 ```
 
-By default
-[`draw.gam()`](https://gavinsimpson.github.io/gratia/reference/draw.gam.md)
-will add partial residuals to the partial effects plots. To achieve the
-same effect, we need to add the partial residuals to the data used to
-fit the model. This can be done via
+To add partial residual points, use
 [`add_partial_residuals()`](https://gavinsimpson.github.io/gratia/reference/add_partial_residuals.md)
+on the fitting data. In this Gaussian model with an identity link, a
+partial residual for a smooth is the observation minus the fitted
+intercept and the contributions of the other terms. These are the points
+shown by `draw(m, residuals = TRUE)`.
 
 ``` r
 
@@ -540,8 +505,9 @@ eg1 <- eg1 |>
   add_partial_residuals(m)
 ```
 
-This will[^2] add columns with names `"s(x0)"`. `"s(x1)"`, etc. to the
-data.
+The new columns use the smooth labels as names, such as `s(x0)` and
+`s(x1)`. Inspect the names so we can select the column matching the
+smooth to plot.
 
 ``` r
 
@@ -550,16 +516,13 @@ names(eg1)
 #> [10] "f3"    "s(x0)" "s(x1)" "s(x2)" "s(x3)"
 ```
 
-Now we have everything we need to recreate the plots created by
-[`draw.gam()`](https://gavinsimpson.github.io/gratia/reference/draw.gam.md).
-In the code block below we filter `sm` to focus on a specific smooth,
-here f(x2) (`"s(x2)"`), then we add
+Plot the smooth for `x2` using five layers:
 
 1.  a rug plot of the observed values of `x2`,
 2.  the credible interval around the estimated smooth,
 3.  the partial residuals as a point layer,
 4.  the estimated smooth as a line layer,
-5.  some annotation
+5.  an axis label and title.
 
 ``` r
 
@@ -583,10 +546,12 @@ p_sx2
 
 ![](custom-plotting_files/figure-html/custom-plot-sx2-1.png)
 
-Assuming we repeat the above steps for the other smooths, creating plot
-objects `p_sx0`, `p_sx1`, `p_sx2`, and `p_sx3` (code not shown), we can
-complete the plot by creating the patchwork with the desired number of
-rows and columns
+We prepare equivalent plots for the other three smooths to combine with
+this one below. Their construction repeats the same steps, so the code
+is hidden.
+
+Combine the four plots and set `ncol = 2` to arrange them in two
+columns.
 
 ``` r
 
@@ -595,12 +560,13 @@ p_sx0 + p_sx1 + p_sx2 + p_sx3 + plot_layout(ncol = 2)
 
 ![](custom-plotting_files/figure-html/custom-plot-final-1.png)
 
-The real benefit of having complete control over how the data are
-plotted is that you can use the power of {ggplot2} to map additional
-variables to plot aesthetics. As an example, let’s assume we have a
-factor variable in the original data and we want to colour the partial
-residuals according to the levels of this factor. Let’s create that
-factor
+## Colour partial residuals by another variable
+
+A custom plot can show information beyond the variables in the fitted
+smooth. To demonstrate grouping, create an arbitrary four-level factor
+and use it to colour the residual points. This factor is unrelated to
+the simulated response and is used only to demonstrate the colour
+mapping.
 
 ``` r
 
@@ -609,9 +575,9 @@ eg1 <- eg1 |>
   mutate(fac = sample(letters[1:4], n(), replace = TRUE))
 ```
 
-Now we can modify our plotting code to map `fac` to the colour aesthetic
-when we plot the partial residuals. To save some typing, we’ll reorder
-the layers in the plot and add the partial residuals last
+Build the curve and interval first, then add the partial residuals with
+`fac` mapped to colour. Adding the points last keeps them visible above
+the interval ribbon.
 
 ``` r
 
@@ -633,19 +599,16 @@ plt +
     aes(
       x = x2, y = `s(x2)`,
       colour = fac
-    ), # <-- map fac to colour aesthetic
+    ),
     data = eg1, size = 1.5
   )
 ```
 
 ![](custom-plotting_files/figure-html/plot-partial-resids-with-colours-by-fac-1.png)
 
-We can also do some simple model checking by plotting the smooth with
-partial residuals coloured according to one of the other covariates (we
-could also do this by plotting the actual residuals against covariates).
-In the code chunk below, we map the covariate `x1` to both the *colour*
-and *size* aesthetics (note we deleted `size = 1.5` to allow the mapping
-to *size*)
+To look for patterns involving another fitted covariate, map `x1` to
+point colour and size. We remove the fixed point size so it can vary
+with `x1`.
 
 ``` r
 
@@ -654,25 +617,16 @@ plt +
     aes(
       x = x2, y = `s(x2)`,
       colour = x1, size = x1
-    ), # <-- map fac to colour aesthetic
+    ),
     data = eg1, alpha = 0.3
-  ) + # <-- deleted cex!!
+  ) +
   scale_colour_viridis_c(option = "plasma")
 ```
 
 ![](custom-plotting_files/figure-html/plot-partial-resids-with-colours-by-x1-1.png)
 
-The resulting plot doesn’t show any particular problems with the model
-because of the way the data were simulated, but hopefully this
-illustrates what can be possible once you use the low-level functions
-provided by {gratia}.
-
-[^1]: A *patchwork* is the name given to the composition of individual
-    plots created by
-    [`patchwork::wrap_plots()`](https://patchwork.data-imaginist.com/reference/wrap_plots.html)
-    or the composition operators `+`, `|` and `/`.
-
-[^2]: currently; I’m not entirely happy with this naming convention as
-    there’s nothing to indicate to the user that these are *partial
-    residuals* for the smooth with name matching the created variable
-    name.
+If points of the same colour consistently fall above or below the fitted
+curve, residuals may still vary with `x1`. The [model diagnostics
+article](https://gavinsimpson.github.io/gratia/articles/model-checking.md)
+shows how to check that pattern by plotting residuals directly against a
+covariate.

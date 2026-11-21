@@ -1,13 +1,17 @@
 # Read smooth effects, interactions and surfaces
 
-An effect plot isolates one contribution to a model. It helps explain
-how the model works, but it need not show the expected response. This
-distinction matters especially with interactions, random effects and
-nonlinear links. We use the plant experiment from [Smooth trends and
-repeated measurements with
+Effect plots show how one smooth or parametric term contributes to the
+linear predictor. To obtain the expected response in these examples, add
+the model terms and intercept, then apply the inverse link. In the
+log-link model below, that means exponentiating the sum to get mean
+carbon dioxide uptake. We use the plant experiment from [Smooth trends
+and repeated measurements with
 glmmTMB](https://gavinsimpson.github.io/gratia/articles/glmmTMB-support.md)
-to explore flexible individual curves, then daily air quality
-measurements to read interaction surfaces.
+to plot curves for individual plants, then use daily air quality
+measurements to plot interactions between continuous and categorical
+predictors.
+
+Load {gratia}, {mgcv} and {ggplot2} for the examples.
 
 ``` r
 
@@ -16,14 +20,17 @@ load_mgcv()
 library("ggplot2")
 ```
 
-## Do plants need different curve shapes?
+## Fit and plot plant-specific smooth curves
 
-The carbon dioxide experiment has seven measurements on each of twelve
-plants, with three plants in each origin-treatment combination. Positive
-uptake and increasing residual spread motivate a Gamma model with a log
-link. A shared smooth captures saturation with increasing concentration.
-We now allow plant-specific *smooth* deviations, rather than the
-straight-line deviations used in the glmmTMB article.
+The carbon dioxide experiment measured uptake at seven concentrations on
+each of twelve plants, with three plants per combination of origin and
+treatment. The Gamma model with a log link keeps the fitted means
+positive and lets the spread increase with the mean. In the model below,
+`s(log_conc)` allows the shared uptake curve to level off as
+concentration increases. The
+[`t2()`](https://rdrr.io/pkg/mgcv/man/t2.html) term combines a spline
+for concentration with a plant random effect so that each plant can have
+its own smooth departure from the shared curve.
 
 ``` r
 
@@ -48,15 +55,11 @@ overview(plant_gam)
 #> 6 t2(log_conc,Plant)               Tensor…    48 30.3    43         8.76 < 0.001
 ```
 
-The tensor product combines a cubic regression spline over concentration
-with a random-effect basis over plants. It penalises plant-specific
-departures and shares information across plants. `full = TRUE` keeps
-separate penalties for the parts of this tensor construction. With only
-seven observations per plant, the small concentration basis is
-deliberate. Each plant’s concentration contribution is the sum of the
-common curve and its smooth deviation. The intercept, origin and
-treatment terms supply the remaining contributions to its fitted log
-uptake.
+The penalties pull plant-specific departures towards zero. With
+`full = TRUE`, the model can penalise different parts of the tensor
+product separately. The concentration basis is small because there are
+only seven observations per plant. Use `re_levels` to plot the
+departures for three named plants from the nonchilled Quebec group.
 
 ``` r
 
@@ -70,13 +73,16 @@ draw(plant_gam, select = "t2(log_conc,Plant)",
 
 ![](smooth-effects_files/figure-html/plant-tensor-curves-1.png)
 
-The numeric covariate is always the horizontal axis even if the factor
-was specified first in the tensor formula. `re_levels` chooses plants by
-name; it does not refit the model or remove their contributions from
-predictions. The fitted factor ordering is retained. Selecting plants of
-one treatment makes the variation among biological replicates visible.
-Treatment comparisons require the origin and treatment terms as well as
-these plant deviations.
+The concentration goes on the horizontal axis even if the plant factor
+comes first in the tensor formula. `re_levels` selects which plants to
+display and keeps their order from the fitted factor. To see the fitted
+mean for each plant, plot the fitted values against the observations.
+These values combine the shared curve, the plant’s departure, the
+intercept and the terms for origin and treatment before applying the
+inverse link. The concentration units are microlitres per litre
+(\mu\mathrm{L}\\\mathrm{L}^{-1}), as reported in Table 1 of the
+[original
+study](https://biology.mcgill.ca/faculty/potvin/articles/PotvinLech_90.pdf).
 
 ``` r
 
@@ -85,18 +91,20 @@ ggplot(plant, aes(conc, uptake, group = Plant, colour = Treatment)) +
   geom_point() +
   geom_line(aes(y = mean_uptake)) +
   facet_wrap(~ Type) +
-  labs(x = "Carbon dioxide concentration (mL/L)",
+  labs(x = expression(CO[2] ~ concentration ~ (mu * L ~ L^{-1})),
     y = expression(CO[2] ~ uptake ~ (mu * mol ~ m^{-2} ~ s^{-1})))
 ```
 
 ![](smooth-effects_files/figure-html/plant-full-curves-1.png)
 
-The model explains rapid increases and subsequent flattening in these
-observed plants. This is conditional on their fitted deviations, rather
-than a forecast for a new plant. The smooth deviations allow each
-plant’s curve to bend, whereas straight random slopes only change its
-tilt. For treatment comparisons, each plant supplies one independent
-curve: three replicates per origin and treatment combination.
+The fitted curves rise rapidly and then flatten for these plants. They
+include each plant’s estimated departure. At the group level, the model
+assumes the same concentration response shape for all combinations of
+origin and treatment, with group differences entering as multipliers of
+mean uptake. Use
+[`variance_comp()`](https://gavinsimpson.github.io/gratia/reference/variance_comp.md)
+to extract the variance components for the penalties on the shared
+smooth and the plant-specific departures.
 
 ``` r
 
@@ -111,30 +119,12 @@ variance_comp(plant_gam)
 #> 5 scale                 0.00346    0.0588   0.0471     0.0734
 ```
 
-These are variance components in the random-effect representation of the
-penalised splines. Different tensor components can have different
-estimated variances, so one variance alone does not describe all
-plant-curve variation. The spline rows are not observation variances;
-the `scale` row estimates Gamma dispersion, which multiplies the squared
-mean to give response variance. Fits selected by GCV may lack confidence
-intervals; the estimates remain available. A model with no extractable
-variance components returns an empty table.
+The spline rows describe how strongly the model penalises different
+parts of the fitted curves. The `scale` row estimates the Gamma
+dispersion. Multiplying it by the squared fitted mean gives the
+estimated variance of uptake around that mean.
 
-Tensor plots follow the same principle in higher dimensions. Two
-continuous covariates make a surface; additional numerical dimensions
-become conditioning slices and factor dimensions become facets. `n_2d`
-controls each surface axis, while `n_3d` and `n_4d` limit conditioning
-dimensions. The latter also limit factor levels to the first levels in
-fitted order. Use named `re_levels` or explicit evaluation `data` to
-choose meaningful groups. With two factor margins, the display is
-categorical estimates and intervals, faceted by the second factor; there
-is no numeric axis to interpolate between categories. These rules apply
-to [`te()`](https://rdrr.io/pkg/mgcv/man/te.html),
-[`ti()`](https://rdrr.io/pkg/mgcv/man/te.html) and
-[`t2()`](https://rdrr.io/pkg/mgcv/man/t2.html) random-effect tensor
-terms.
-
-## Is the temperature association different on calm and windy days?
+## Fit temperature, wind and month interactions
 
 The `airquality` data contain daily New York measurements from May to
 September 1973. Ozone is in parts per billion, temperature in degrees
@@ -154,6 +144,7 @@ interaction.
 
 ozone <- na.omit(airquality[c("Ozone", "Solar.R", "Wind", "Temp", "Month")])
 ozone$month <- factor(ozone$Month, labels = month.abb[5:9])
+contrasts(ozone$month) <- contr.treatment(levels(ozone$month))
 ozone_gam <- gam(log(Ozone) ~ s(Solar.R, k = 6) + Temp * Wind * month,
   data = ozone, method = "REML")
 table(ozone$month)
@@ -180,10 +171,9 @@ overview(ozone_gam)
 ```
 
 A three-way interaction gives each month its own temperature-by-wind
-surface. That flexibility makes the model useful for exploring
-stability, but estimates in sparsely sampled parts of a month’s weather
-range may be imprecise. Inspect the distribution of observations before
-interpreting a surface:
+surface. Estimates can be imprecise where a month has few observations
+at similar temperatures and wind speeds. Plot those observations before
+interpreting the fitted surfaces.
 
 ``` r
 
@@ -196,7 +186,14 @@ ggplot(ozone, aes(Temp, Wind, colour = Ozone)) +
 
 ![](smooth-effects_files/figure-html/ozone-support-1.png)
 
-## Start with the interaction, then reconstruct the model
+## Plot the separate interaction contributions
+
+Start with the temperature-by-wind interaction for May, the reference
+month.
+[`parametric_terms()`](https://gavinsimpson.github.io/gratia/reference/parametric_terms.md)
+lists the available terms;
+[`parametric_effects()`](https://gavinsimpson.github.io/gratia/reference/parametric_effects.md)
+evaluates the chosen contribution on a grid for plotting.
 
 ``` r
 
@@ -212,20 +209,17 @@ draw(weather_effect, surface = "tile") &
 
 ![](smooth-effects_files/figure-html/ozone-numeric-interaction-1.png)
 
-This surface shows the coefficient-weighted temperature-by-wind
-contribution for the reference month, May. Its colours are partial
-contributions to **log** ozone. They exclude the intercept, the
-temperature and wind main effects, the solar smooth, and other
-interaction terms. The diverging palette centres at zero, making the
-contribution’s sign visible. To interpret the complete temperature
-association, combine this interaction with the main temperature effect
-and the monthly adjustments below.
+Each point on the surface shows the fitted coefficient for `Temp:Wind`
+multiplied by the temperature and wind speed. The colours show how much
+this term adds to or subtracts from fitted **log** ozone. This is the
+interaction for May and the starting point for the other months’
+interactions.
 
 `surface = "tile"` uses vector rectangles, which can be useful in a
 vector figure. The default `"raster"` keeps large plots compact.
-`n_2d = 30` evaluates 30 points along each surface axis, rather than
-borrowing the 100-point curve resolution. Increase `n_2d` when you need
-a finer display of the same fitted surface.
+`n_2d = 30` evaluates 30 points along each surface axis. Increase `n_2d`
+for a finer display of the same fitted surface. Next plot how each
+month’s temperature-by-wind interaction differs from May’s.
 
 ``` r
 
@@ -236,19 +230,17 @@ draw(parametric_effects(ozone_gam, terms = "Temp:Wind:month", n_2d = 25),
 
 ![](smooth-effects_files/figure-html/ozone-month-interactions-1.png)
 
-The additional monthly contributions appear in conditioning facets.
-Under treatment contrast coding the reference month’s contribution is
-zero. The other panels are adjustments to the May interaction, not
-complete monthly surfaces. Fill limits are shared across facets and
-centred at zero. If a surface varies mainly because of poor covariate
-support, masking helps avoid giving extrapolation the same visual
-prominence as interpolation: `dist` uses distance after scaling the
-displayed axes into the unit square. Support is pooled across months, so
-a location left visible may still lie outside an individual month’s
-observed weather conditions. Use the monthly observation plot above to
-decide which parts of each surface have local data support.
+The model uses treatment contrasts with May as the reference month, so
+the adjustment is zero in May. The panels share a colour scale centred
+at zero. `dist` controls how far a grid point can be from the
+observations before it is hidden, after scaling the two axes to range
+from zero to one. This uses observations from all months. Use the
+monthly scatterplots above to see which parts of each surface are
+supported by observations from that month.
 
-Numeric-by-factor interactions are grouped curves rather than surfaces:
+Plot the temperature-by-month interaction to see how it adjusts the main
+temperature slope. Each month has its own straight line because the term
+is linear in temperature.
 
 ``` r
 
@@ -279,18 +271,18 @@ ggplot(ozone, aes(log(Ozone), fitted_log, colour = month)) +
 
 ![](smooth-effects_files/figure-html/ozone-full-predictions-1.png)
 
-The fitted values concern mean **log** ozone. Exponentiating them gives
-the conditional median under the lognormal assumption, not the
-arithmetic mean ozone concentration. The observed-versus-fitted plot
-shows how the combined terms reproduce log ozone on the sampled days.
-Because these are daily measurements, also check residuals in time
-order: remaining serial dependence would affect uncertainty in the
-monthly comparisons.
+The plot shows how closely the fitted mean **log** ozone follows the
+observed log concentrations. Under this model, exponentiating the fitted
+values gives the conditional median ozone concentration. To calculate
+the conditional arithmetic mean on the original scale, also account for
+the residual variance on the log scale. Similar residuals on nearby days
+could affect the uncertainty in monthly comparisons, so check residuals
+against the observation dates.
 
-## Choose a display without changing its statistical meaning
+## Show an interaction surface in three dimensions
 
-The optional ggcube package can show the same numerical surface in three
-dimensions:
+The optional {ggcube} package can show the same numerical surface in
+three dimensions:
 
 ``` r
 
@@ -303,29 +295,24 @@ if (requireNamespace("ggcube", quietly = TRUE)) {
 
 ![](smooth-effects_files/figure-html/ozone-3d-1.png)
 
-Height and fill both represent the same partial contribution. A
-three-dimensional view can emphasise its shape, while a flat surface is
-often easier to compare across months. View settings change the
-rendering, not estimates or uncertainty. Curves, factor estimates and
-spherical maps retain their usual displays. The conditional chunk runs
-only when ggcube is installed; the flat plots contain the complete
-analysis.
+Height and fill both represent the same partial contribution. Use the
+flat plots with their common colour scale to compare surfaces across
+months.
 
-Parametric effect coordinates now use the model’s covariate scale by
-default. For example, a term involving `log(x)` uses `log(x)` on the
-horizontal axis. `back_transform = TRUE` displays original covariate
-coordinates without changing effect values or intervals. With saved
-smooth estimates, prepare them using
-`smooth_estimates(model, back_transform = TRUE)` before asking
+Parametric effect plots use the model’s covariate scale by default. For
+example, a term involving `log(x)` uses `log(x)` on the horizontal axis.
+`back_transform = TRUE` displays original covariate coordinates without
+changing effect values or intervals. With saved smooth estimates,
+prepare them using `smooth_estimates(model, back_transform = TRUE)`
+before asking
 [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md) to
-use that scale. See [Transformed
+use that scale. See the [article on transformed
 covariates](https://gavinsimpson.github.io/gratia/articles/transformed-covariates.md)
-for worked examples, including functions without analytic inverses.
+for worked examples, including transformations without an analytic
+inverse.
 
-Effect intervals include uncertainty in their model intercept by
-default, including its covariance with a parametric term. Setting
-`overall_uncertainty = FALSE` changes that uncertainty calculation
-without adding or subtracting the intercept from the displayed partial
-contribution. For contrasts between complete model predictions, use a
-method that includes all relevant terms and their covariance rather than
-subtracting interval endpoints from these plots.
+By default, the intervals include uncertainty in the intercept and its
+covariance with the plotted term. Set `overall_uncertainty = FALSE` for
+intervals that reflect uncertainty in the term alone. An interval for
+the difference between two predictions needs to account for their
+covariance.

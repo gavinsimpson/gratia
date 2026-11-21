@@ -1,16 +1,22 @@
 # Combining surveys with different response distributions
 
-## Can two surveys inform the same environmental response?
+This article shows how {gratia} works with models fitted using
+[`mgcv::gfam()`](https://rdrr.io/pkg/mgcv/man/gfam.html). This family
+lets groups of observations follow different distributions in the same
+model. It covers plotting shared and family-specific smooths, predicting
+and simulating responses for each family, and checking the fitted model.
+A simulated example with binary and count observations illustrates these
+operations.
+
+## An example with binary and count responses
 
 Suppose one bird survey records whether a species was detected, while
-another records its count during a fixed observation period. Both might
-tell us about the response to woodland cover, but a binary observation
-is not a count. [`mgcv::gfam()`](https://rdrr.io/pkg/mgcv/man/gfam.html)
-fits one model in which each row has its own response family. The new
-gratia support provides response draws and diagnostics that respect that
-membership. This differs from a delta model: here the two sources supply
-separate observations, rather than occurrence and positive abundance
-being parts of a single response distribution.
+another counts how many birds of that species were seen. Both surveys
+can help describe how records vary with woodland cover. We fit them
+together using [`mgcv::gfam()`](https://rdrr.io/pkg/mgcv/man/gfam.html)
+and assign a binomial or Poisson family to each observation. gratia uses
+those assignments for predictions, simulations and checks of the fitted
+model.
 
 We simulate fixed-effort surveys at independent sites. The log odds of
 detection and the log expected count have different intercepts but share
@@ -18,10 +24,8 @@ the same smooth response to woodland cover. Sharing the curve assumes
 that a change in cover has the same effect on log odds and log expected
 count. We compare this assumption with survey-specific curves below.
 
-The code needs mgcv and gratia, and uses dplyr and ggplot2 for
-presentation. All are gratia dependencies. The example has 600
-observations and uses 200 coefficient draws; increase the latter for
-final interval estimates.
+The example uses {mgcv} for fitting, {dplyr} to summarise results and
+{ggplot2} for plots.
 
 ``` r
 
@@ -30,6 +34,11 @@ load_mgcv()
 library("dplyr")
 library("ggplot2")
 ```
+
+We generate 300 detection records and 300 count records, then plot the
+observations against woodland cover for each survey. The shared
+`habitat()` function supplies the curved effect on both linear
+predictors.
 
 ``` r
 
@@ -56,17 +65,18 @@ ggplot(survey, aes(woodland, observed)) +
 
 The binary panel contains only zero and one. The count panel has a wider
 range and variance that grows with the mean. A binomial family with one
-trial and a Poisson family are appropriate for the simulated protocols.
-For real counts, extra variation may require `nb()` instead of Poisson;
+trial and a Poisson family are appropriate for the simulated surveys.
+For real counts, extra variation may require
+[`nb()`](https://rdrr.io/pkg/mgcv/man/negbin.html) instead of Poisson;
 residual checks help assess that choice.
 
-## Share the smooth, retain different intercepts and links
+## Fit a shared smooth with different response families
 
-The two-column response supplies the observation and its position in the
-family list. Family 1 is binomial and family 2 is Poisson. The factor
-`source` supplies different intercepts. A single `s(woodland)` supplies
-the shared effect on both linear predictors, and REML estimates its
-smoothness.
+The first response column holds the observation and the second gives its
+family’s position in the list. Family 1 is binomial and family 2 is
+Poisson. The factor `source` gives each survey its own intercept, and
+`s(woodland)` gives both linear predictors the same smooth. REML
+estimates its smoothness.
 
 ``` r
 
@@ -77,19 +87,15 @@ draw(joint, parametric = FALSE)
 
 ![](gfam-support_files/figure-html/fit-1.png)
 
-A positive smooth contribution multiplies the expected count by
-`exp(effect)` and multiplies detection odds by the same quantity. It
-does not add the same amount to the detection probability and count. The
-fitted smooth rises toward intermediate cover and then declines,
-consistent with the generating response. Its centering constraint sets
-the reference for the partial effect. The different intercepts determine
-the absolute levels.
+A change of d in the smooth multiplies both detection odds and expected
+count by \exp(d). The fitted smooth rises towards intermediate cover and
+then declines, as in the simulation. To recover the fitted detection
+probability or expected count, add the survey’s intercept to the smooth
+and apply that family’s inverse link.
 
 The [mgcv grouped-family
 documentation](https://stat.ethz.ch/R-manual/R-devel/library/mgcv/html/gfam.html)
-explains the response encoding and sharing of terms. This example
-replaces its generic simulation with two explicitly described survey
-protocols.
+explains the response encoding and how to share terms.
 
 Sharing a smooth can improve precision if its assumption is reasonable.
 A model with different smooths provides a useful comparison when the
@@ -105,19 +111,18 @@ draw(separate, parametric = FALSE)
 
 ![](gfam-support_files/figure-html/different-responses-1.png)
 
-Compare the shapes and their uncertainty, particularly at the ends of
-the cover range. The binary survey contains less information about the
-curve than the count survey, so its wider intervals leave more
-uncertainty about its shape. The similar fitted shapes support sharing
-in this simulation. For your own surveys, use separate smooths if the
-protocols imply different responses to cover, and include offsets when
-survey effort varies.
+Both fitted curves peak at intermediate woodland cover. The wider
+intervals for the binary survey show that its curve is estimated less
+precisely. If survey effort varies and the expected count is
+proportional to effort, use a log-effort offset for the Poisson
+observations. Model the effect of effort on detection probability
+separately.
 
 ## Predict the appropriate quantity for each survey
 
 Prediction rows must identify their distribution. This matters even if
 their covariates are identical. We generate the same cover grid for both
-protocols and pass `family_index` explicitly. Response-scale
+surveys and pass `family_index` explicitly. Response-scale
 [`fitted_samples()`](https://gavinsimpson.github.io/gratia/reference/fitted_samples.md)
 applies each row’s inverse link to every shared coefficient draw.
 
@@ -143,17 +148,15 @@ ggplot(curves, aes(woodland, estimate)) +
 
 ![](gfam-support_files/figure-html/predictions-1.png)
 
-The first curve estimates detection probability; the second estimates
-expected count. These are pointwise intervals for expected responses,
-not prediction intervals for future observations. Their shared
-coefficient draws also retain uncertainty shared between the two curves.
-The count response peaks near intermediate cover, while the logit
-transform compresses the detection response between zero and one.
+The curves show detection probabilities and expected counts, with
+pointwise intervals. Each coefficient draw is used for both surveys, so
+the intervals come from predictions that share the same woodland effect
+in each draw.
 
-The fitted means can also be checked against mgcv’s native prediction.
-For this response expression, mgcv needs both columns named in the
-response expression so it can evaluate the membership column. The
-placeholder observation is ignored for the prediction:
+To compare these means with mgcv’s own predictions, supply both columns
+of the response expression in the prediction data. `family_id` selects
+the response family; the placeholder `observed` value is ignored during
+prediction:
 
 ``` r
 
@@ -168,13 +171,13 @@ head(data.frame(grid, expected = predict(joint, native_grid, type = "response"))
 #> 6 0.06329114 Detection 0.2980352
 ```
 
-To predict actual observations at these cover values, use
-[`simulate()`](https://gavinsimpson.github.io/gratia/reference/simulate.md).
-It holds the fitted coefficients and nuisance parameters fixed, then
-draws binomial or Poisson responses as appropriate. Coefficient
-uncertainty is a separate source of variation:
+Use
+[`simulate()`](https://gavinsimpson.github.io/gratia/reference/simulate.md)
+to draw future observations at these cover values, holding the fitted
+coefficients and any other distribution parameters fixed. These draws
+show variation in individual observations. Use
 [`posterior_samples()`](https://gavinsimpson.github.io/gratia/reference/posterior_samples.md)
-adds that uncertainty.
+to include coefficient uncertainty in the draws as well.
 
 ``` r
 
@@ -191,14 +194,12 @@ future |>
 #> 4 0.5063291     Count     2 9.025
 ```
 
-Even a tightly estimated detection probability yields a future binary
-response of zero or one. Counts vary substantially around their fitted
-mean. The response families supply this variation; drawing only smooth
-coefficients would miss it. Membership is a position in the family list,
-not an arbitrary factor code: retain the same mapping when constructing
-your own prediction data.
+Even a precisely estimated detection probability yields individual
+responses of zero or one. Individual counts also vary around their
+fitted mean. The `family_index` values must match the positions of the
+response families in the fitted model.
 
-## Check each observation process
+## Check the fit separately for each response family
 
 Raw residual magnitudes are not comparable between binary and count
 responses. Probability integral transform (PIT) residuals locate each
@@ -207,7 +208,8 @@ gratia randomises within its probability mass; quantile residuals
 transform those probabilities to standard-normal scores. See [Model
 diagnostics](https://gavinsimpson.github.io/gratia/articles/model-checking.md)
 for the reference calculations and the distinction from posterior
-predictive checks.
+predictive checks. Setting `by_family = TRUE` gives separate panels for
+the binary and count responses:
 
 ``` r
 
@@ -216,17 +218,19 @@ appraise(joint, type = "quantile", by_family = TRUE, seed = 244)
 
 ![](gfam-support_files/figure-html/checks-1.png)
 
-Component facets help find a failure confined to one survey. Look for
-tail departures in QQ plots, changing residual spread across fitted
-values, or disagreement in the observed-versus-fitted panels. Here the
-component scores show approximate agreement with their references
-despite the different scales of the original responses.
+Separate panels help you see whether a pattern is confined to one
+survey. Look for departures in the tails of the QQ plots, changes in
+residual spread across the fitted values, or disagreement between the
+observed and fitted responses. Here the quantile residuals for both
+families broadly agree with their references.
 
 Pooling standard-normal residuals is also possible. The colours retain
 each component’s identity; histogram densities are calculated separately
 with common bin edges. Traditional deviance or response residuals
 instead default to separate component facets because their scales
-differ.
+differ. We draw the pooled histogram, then use a worm plot with separate
+family panels. A worm plot subtracts the reference quantile, so a
+well-fitting model should give points scattered around zero:
 
 ``` r
 
@@ -242,9 +246,14 @@ worm_plot(joint, type = "quantile", by_family = TRUE, seed = 244)
 
 ![](gfam-support_files/figure-html/pooled-check-2.png)
 
-A worm plot subtracts the reference quantile, making curvature and
-departures near zero easier to see. The separate panels show which
-observation process contributes each pattern.
+The worm plot’s separate panels show which response family contributes
+each pattern.
+
+Next, compare the observed binary and count distributions with
+replicated datasets.
+[`posterior_predictive_plot()`](https://gavinsimpson.github.io/gratia/reference/posterior_predictive_plot.md)
+includes uncertainty in the fitted coefficients when generating these
+replicates:
 
 ``` r
 
@@ -258,40 +267,37 @@ reasonable overall shape agreement. Its intervals are pointwise and have
 appreciable simulation error with 50 replicates; increase that number
 before judging individual probability masses closely.
 
-The posterior predictive plot compares separate observed response
-distributions with replicated surveys, including approximate coefficient
-uncertainty. For these discrete responses the bars describe variation in
-replicated probability masses, not intervals on an individual count. A
-pooled response histogram would mix probabilities with counts and answer
-no useful survey question.
+The bars show how the proportion at each response value varies between
+replicated surveys. This checks the detection frequency in the binary
+survey and the distribution of counts in the other survey.
 
-## Limits when extending the model
+## Using other families, weights and prediction data
 
-`gfam()` accepts ordinary and extended mgcv families with a scalar
-response, including negative binomial, Tweedie, beta, scaled-t and
-ordered categories. Gratia response simulation uses each component’s
-fitted parameters and can simulate ordered-category codes.
-Response-scale fitted draws for ordinal components remain unsupported
-because an ordinal response requires a vector of category probabilities;
-link-scale fitted draws are available. General families with several
-linear predictors are not `gfam()` components.
+[`gfam()`](https://rdrr.io/pkg/mgcv/man/gfam.html) accepts ordinary and
+extended mgcv families with a scalar response, including negative
+binomial, Tweedie, beta, scaled-t and ordered categories. gratia can
+simulate ordered-category responses. For an ordinal component, request
+`fitted_samples(..., quantity = "expectation")` to obtain category
+probabilities, with categories identified by `.category`. Link-scale
+fitted draws are also available. General families with several linear
+predictors are not [`gfam()`](https://rdrr.io/pkg/mgcv/man/gfam.html)
+components.
 
 Missing required predictors or membership give missing predictions.
 Missing responses alone do not prevent prediction. With
 [`na.exclude()`](https://rdrr.io/r/stats/na.fail.html), excluded fitting
 rows are restored as `NA` in fitted draws and simulations, while checks
-use the observations actually fitted. Censored components can simulate
-latent responses, but a posterior predictive comparison of censored
-observations also needs a censoring mechanism, which is not supplied
-automatically.
+use the observations actually fitted. Scalar censored-family components
+can simulate uncensored responses. Matrix responses that encode
+censoring or binomial success and failure counts are outside the scope
+of [`gfam()`](https://rdrr.io/pkg/mgcv/man/gfam.html).
 
 For grouped binomial proportions, supply the number of trials in
 `weights`; for Gaussian and Gamma components these weights represent
 response precision. Prediction data default to weights of one unless you
-supply them. These interpretations differ and should follow the
-measurement protocol.
+supply them. These interpretations differ and should follow how the
+observations were collected.
 
 Use the component diagnostics to assess the observation distributions
 and the separate-curve comparison to decide whether to share the cover
-response. Together they address both parts of the model that connect
-these surveys.
+response.
