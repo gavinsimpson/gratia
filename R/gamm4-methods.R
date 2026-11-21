@@ -36,9 +36,9 @@ gamm4_gam <- function(object) {
 #'
 #' @details Smooths, parametric effects, predictions, derivatives, simulations,
 #' and posterior draws describe the population GAM component. Terms supplied
-#' through `random` are excluded, including their realized effects, predictive
+#' through `random` are excluded, including their realised effects, predictive
 #' variation, and uncertainty. [conditional_values()] and
-#' [conditional_differences()] condition on covariate values, not on realized
+#' [conditional_differences()] condition on covariate values, not on realised
 #' group effects. Group variables occurring only in `random` are not required
 #' in prediction data, so new groups receive the same population predictions.
 #' Use the `mer` component with lme4 for predictions conditional on group

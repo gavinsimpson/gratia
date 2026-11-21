@@ -267,8 +267,8 @@ sdmtmb_smooth_model <- function(
 #' Formula effects for sdmTMB models
 #'
 #' Evaluate and plot formula smooths and parametric effects from a fitted
-#' `sdmTMB` model using the same plotting methods as mgcv smooths. Penalized
-#' and unpenalized coefficients and their joint covariance are transformed
+#' `sdmTMB` model using the same plotting methods as mgcv smooths. Penalised
+#' and unpenalised coefficients and their joint covariance are transformed
 #' back to the constrained mgcv basis.
 #'
 #' Use [smooths()] to list smooth names, [get_smooth()] to extract an exact

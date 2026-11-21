@@ -1,4 +1,4 @@
-# gratia (development version)
+# gratia 0.12.0
 
 ## User visible changes
 
@@ -31,7 +31,7 @@
   single plot. For example, replace `smooth_col` with
   `geom.gratia.smooth = element_geom(colour = ...)` and `ci_alpha` with
   `gratia.alpha.interval` inside `theme()`. See `gratia_theme_get()` and
-  the Customizing plots article for migration examples.
+  the Customising gratia plots article for migration examples.
 
   gratia now requires ggplot2 >= 4.0.3 and patchwork >= 1.3.2.
 
@@ -293,7 +293,7 @@
   smooth estimates retain these boundaries; supplied evaluation points are
   unchanged.
 
-  `polar_args` customizes the polar coordinate display. Radial padding
+  `polar_args` customises the polar coordinate display. Radial padding
   separates interval bands from the outer observation rug. Radial axes
   appear inside the circle by default; override their position through
   `polar_args`.
@@ -606,7 +606,8 @@
   Probability integral transform (PIT) residuals map observations to
   fitted probabilities, randomising over probability mass for discrete
   responses. Quantile residuals convert those probabilities to
-  standard-normal scores.
+  standard-normal scores. QQ and worm-plot subtitles distinguish this fixed
+  normal reference from the normal approximation for traditional residuals.
 
   Prepared diagnostic objects carry the selected conditioning and sdmTMB
   field choices through residual and plotting methods.

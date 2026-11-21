@@ -59,9 +59,9 @@ test_that("unknown joint laws keep marginal checks without independent bands", {
     expect_silent(ggplot2::ggplot_build(p))
     p <- fun(model, type = "quantile", n_simulate = 3, seed = 8)
     expect_false(any(c("lower", "upper") %in% names(p$data)))
-    expect_identical(p$labels$subtitle, "Method: std. normal")
+    expect_identical(p$labels$subtitle, "Quantile residuals; standard normal reference")
   }
   normal <- qq_plot(model, type = "response", method = "normal")
   expect_false("lower" %in% names(normal$data))
-  expect_identical(normal$labels$subtitle, "Method: std. normal")
+  expect_identical(normal$labels$subtitle, "Method: normal approximation")
 })

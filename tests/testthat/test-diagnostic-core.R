@@ -134,7 +134,7 @@ test_that("BAM AR1 simulation and calibrated bands retain residual dependence", 
   expect_equal(cor(as.vector(errors[left, ]), as.vector(errors[left + 1, ])),
     .6, tolerance = .04)
   p <- qq_plot(m, type = "quantile", n_simulate = 20, seed = 4)
-  expect_identical(p$labels$subtitle, "Method: std. normal")
+  expect_identical(p$labels$subtitle, "Quantile residuals; standard normal reference")
   expect_true(all(is.finite(p$data$lower)))
 })
 

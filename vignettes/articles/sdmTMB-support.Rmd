@@ -1,5 +1,5 @@
 ---
-title: "Depth effects and spatial variation in a trawl survey"
+title: "Working with sdmTMB models in gratia"
 output:
   rmarkdown::html_vignette:
     fig_width: 8
@@ -7,7 +7,7 @@ output:
     dev: "png"
     dpi: 96
 vignette: >
-  %\VignetteIndexEntry{Depth effects and spatial variation in a trawl survey}
+  %\VignetteIndexEntry{Working with sdmTMB models in gratia}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

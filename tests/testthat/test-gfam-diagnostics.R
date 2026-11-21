@@ -111,7 +111,7 @@ test_that("grouped defaults choose available reference methods including Tweedie
   expect_message(expect_s3_class(qq_plot(model, method = "normal", seed = 2), "ggplot"),
     "Using deviance residuals")
   expect_identical(qq_plot(model, type = "deviance", method = "normal")$labels$subtitle,
-    "Method: std. normal")
+    "Method: normal approximation")
 })
 
 test_that("full grouped appraisal uses consistent residual and mean panels", {
@@ -229,7 +229,7 @@ test_that("ordinal inverse-CDF references and calibrated residuals are available
     n_uniform = 2)
   expect_identical(p$labels$subtitle, "Method: uniform")
   expect_identical(qq_plot(gfam_ordinal_model, seed = 3)$labels$subtitle,
-    "Method: std. normal")
+    "Quantile residuals; standard normal reference")
 })
 
 test_that("an explicit seed restores the absence of a caller RNG state", {

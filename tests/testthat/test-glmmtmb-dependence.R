@@ -285,5 +285,5 @@ test_that("prepared glmmTMB diagnostics honor conditioning changes", {
   expect_identical(changed$source$distribution$calibration, "simulation ranks")
   plotted <- scalable_qq_plot(prepared, conditioning = "marginal", seed = 5,
     n_simulate = 3)
-  expect_identical(plotted$labels$subtitle, "Method: std. normal")
+  expect_identical(plotted$labels$subtitle, "Quantile residuals; standard normal reference")
 })

@@ -29,6 +29,14 @@ navbar:
     right: [search, github]
 
 articles:
+  - title: Getting started and customising an analysis
+    navbar: Essentials
+    contents:
+      - gratia
+      - articles/data-slices
+      - articles/custom-plotting
+      - articles/posterior-simulation
+      - sampling-migration
   - title: Fit and check models
     navbar: Models
     desc: >
@@ -52,20 +60,12 @@ articles:
       - articles/spatial-smooths
       - articles/response-distributions
       - transformed-covariates
-  - title: Getting started and customising an analysis
-    navbar: Essentials
-    contents:
-      - gratia
-      - articles/data-slices
-      - articles/custom-plotting
-      - articles/posterior-simulation
-      - sampling-migration
 
 reference:
   - title: Plot models and effects
     desc: >
       Visualise fitted models with `draw()` and customise individual plots with
-      `assemble()`. See [Customising plots](../articles/custom-plotting.html).
+      `assemble()`. See [Customising gratia plots](../articles/custom-plotting.html).
   - contents:
       - draw
       - draw_label_control
@@ -198,7 +198,7 @@ reference:
       [as_mcmc_draws()](as_mcmc_draws.html) and
       [sampling_diagnostics()](sampling_diagnostics.html).
       For coefficient draws, use [post_draws()](post_draws.html) in the advanced
-      helpers. See [Posterior Simulation](../articles/posterior-simulation.html)
+      helpers. See [Posterior simulation of GAM smooths, fitted values and responses](../articles/posterior-simulation.html)
       and the [sampling migration guide](../articles/sampling-migration.html).
   - contents:
       - posterior_samples

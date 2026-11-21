@@ -11,9 +11,9 @@ unclassed lists are not supported.
 \details{
 Smooths, parametric effects, predictions, derivatives, simulations,
 and posterior draws describe the population GAM component. Terms supplied
-through \code{random} are excluded, including their realized effects, predictive
+through \code{random} are excluded, including their realised effects, predictive
 variation, and uncertainty. \code{\link[=conditional_values]{conditional_values()}} and
-\code{\link[=conditional_differences]{conditional_differences()}} condition on covariate values, not on realized
+\code{\link[=conditional_differences]{conditional_differences()}} condition on covariate values, not on realised
 group effects. Group variables occurring only in \code{random} are not required
 in prediction data, so new groups receive the same population predictions.
 Use the \code{mer} component with lme4 for predictions conditional on group

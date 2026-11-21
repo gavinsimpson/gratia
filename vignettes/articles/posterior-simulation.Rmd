@@ -1,5 +1,5 @@
 ---
-title: "Posterior Simulation"
+title: "Posterior simulation of GAM smooths, fitted values and responses"
 bibliography: references.bib
 csl: methods-in-ecology-and-evolution.csl
 output: 
@@ -8,7 +8,7 @@ output:
     fig_height: 5.3333
     dev: "png"
 vignette: >
-  %\VignetteIndexEntry{Posterior Simulation}
+  %\VignetteIndexEntry{Posterior simulation of GAM smooths, fitted values and responses}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -112,7 +112,7 @@ By default, coefficient draws use $\mathbf{V}_{\mathrm{b}}$, holding the selecte
 {scam} fits. For the univariate examples here, each column contains one simulated
 response dataset, with rows corresponding to observations. `derivative_samples()` evaluates rates of change using the same
 coefficient draws at neighbouring covariate values. See
-[Comparing treatments and finding rates of change](prediction-comparisons.html)
+[Comparing treatments and estimating rates of change](prediction-comparisons.html)
 for examples of response derivatives.
 
 ## Sample and plot individual smooth contributions

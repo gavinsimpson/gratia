@@ -4,7 +4,7 @@
 #' covariates. [conditional_values()] is modelled after
 #' [marginaleffects::plot_predictions()], but with an intentionally simpler,
 #' more restrictive functionality. The intended use case is for quickly
-#' visualizing predicted values from a fitted GAM on the response scale. For
+#' visualising predicted values from a fitted GAM on the response scale. For
 #' more complex model predictions, you are strongly encouraged to use
 #' [marginaleffects::plot_predictions()].
 #'

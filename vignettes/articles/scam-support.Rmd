@@ -1,5 +1,5 @@
 ---
-title: "Working with shape-constrained additive models"
+title: "Working with scam models in gratia"
 output:
   rmarkdown::html_vignette:
     fig_width: 8
@@ -7,7 +7,7 @@ output:
     dev: png
     dpi: 96
 vignette: >
-  %\VignetteIndexEntry{Working with shape-constrained additive models}
+  %\VignetteIndexEntry{Working with scam models in gratia}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

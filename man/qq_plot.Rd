@@ -221,7 +221,9 @@ worm plots, and pointwise beta order-statistic bands use the centred
 Gumbel quantile function separately for each component. Ordinary and
 scalable displays share their draw. See \code{\link[=surrogate_residuals]{surrogate_residuals()}}.
 
-Subtitles name the method. Captions identify conditioning and field choices,
+Subtitles distinguish quantile residuals with a standard-normal reference
+from the normal approximation for traditional residuals, and otherwise name
+the method. Captions identify conditioning and field choices,
 joint simulation bands or omitted bands. Routine pointwise bands are unlabelled.
 Supply \code{caption} to replace this text, or \code{caption = ""} to omit it.
 Ordinary and scalable QQ and worm plots use the same labels.
@@ -243,7 +245,7 @@ m <- gam(y / n ~ s(x0) + s(x1) + s(x2) + s(x3),
   method = "REML"
 )
 
-## Q-Q plot; default using direct randomization of uniform quantiles
+## Q-Q plot; default using direct randomisation of uniform quantiles
 qq_plot(m)
 
 ## Alternatively simulate new data from the model, which

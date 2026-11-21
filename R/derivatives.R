@@ -71,7 +71,7 @@
 #' @param offset numeric; a value to use for any offset term
 #' @param ncores number of cores for generating random variables from a
 #'   multivariate normal distribution. Passed to [mvnfast::rmvn()].
-#'   Parallelization will take place only if OpenMP is supported (but appears
+#'   Parallelisation will take place only if OpenMP is supported (but appears
 #'   to work on Windows with current `R`).
 #' @param partial_match logical; should smooths be selected by partial matches
 #'   with `term`? If `TRUE`, `term` can only be a single string to match
@@ -839,7 +839,7 @@
 #' @param offset numeric; a value to use for any offset term
 #' @param ncores number of cores for generating random variables from a
 #'   multivariate normal distribution. Passed to [mvnfast::rmvn()].
-#'   Parallelization will take place only if OpenMP is supported (but appears
+#'   Parallelisation will take place only if OpenMP is supported (but appears
 #'   to work on Windows with current `R`).
 #' @param partial_match logical; should smooths be selected by partial matches
 #'   with `term`? If `TRUE`, `term` can only be a single string to match

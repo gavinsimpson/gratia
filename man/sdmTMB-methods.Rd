@@ -106,8 +106,8 @@ or named panels with \code{wrap = FALSE}; \code{\link[=assemble]{assemble()}} re
 }
 \description{
 Evaluate and plot formula smooths and parametric effects from a fitted
-\code{sdmTMB} model using the same plotting methods as mgcv smooths. Penalized
-and unpenalized coefficients and their joint covariance are transformed
+\code{sdmTMB} model using the same plotting methods as mgcv smooths. Penalised
+and unpenalised coefficients and their joint covariance are transformed
 back to the constrained mgcv basis.
 }
 \details{

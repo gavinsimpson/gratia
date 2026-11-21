@@ -434,7 +434,7 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
 #' @param ci_3d_alpha,ci_3d_col Deprecated; use [gratia_theme_get()] theme
 #'   settings instead. Style 3D interval surfaces.
 #' @param facet_vars Column names that identify separate mesh panels.
-#' @param surface_support Recorded support and normalization for masking.
+#' @param surface_support Recorded support and normalisation for masking.
 #' @param isotropic Preserve equal horizontal units by default.
 #' @param z_limits Optional values to include in the vertical 3D range.
 #' @param continuous_fill Optional ggplot2 fill scale. `NULL` uses the diverging

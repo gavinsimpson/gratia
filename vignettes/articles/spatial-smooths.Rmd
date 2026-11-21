@@ -1,5 +1,5 @@
 ---
-title: "Choose a smooth for the spatial question"
+title: "Specialist spatial smooths"
 output:
   rmarkdown::html_vignette:
     fig_width: 8
@@ -7,7 +7,7 @@ output:
     dev: "png"
     dpi: 96
 vignette: >
-  %\VignetteIndexEntry{Choose a smooth for the spatial question}
+  %\VignetteIndexEntry{Specialist spatial smooths}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

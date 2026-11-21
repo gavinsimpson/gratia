@@ -1,5 +1,5 @@
 ---
-title: "Comparing treatments and finding rates of change"
+title: "Comparing treatments and estimating rates of change"
 output:
   rmarkdown::html_vignette:
     fig_width: 8
@@ -7,7 +7,7 @@ output:
     dev: "png"
     dpi: 120
 vignette: >
-  %\VignetteIndexEntry{Comparing treatments and finding rates of change}
+  %\VignetteIndexEntry{Comparing treatments and estimating rates of change}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

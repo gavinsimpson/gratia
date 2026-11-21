@@ -1,9 +1,9 @@
 ---
-title: "Posterior predictive checks and approximate leave-one-out comparisons"
+title: "Posterior predictive checks with bayesplot and model comparisons with loo"
 author: "Gavin L. Simpson"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Posterior predictive checks and approximate leave-one-out comparisons}
+  %\VignetteIndexEntry{Posterior predictive checks with bayesplot and model comparisons with loo}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

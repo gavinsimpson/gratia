@@ -1,6 +1,6 @@
-# Fitted-model SVGs can differ with the linear algebra stack (including TPRS
-# eigenvector signs). Ordinary CI runs numerical/build assertions; the dedicated
-# macOS job checks visual baselines. Keep functional assertions outside skips.
+# Fitted-model SVGs use R's reference BLAS for their visual baselines.
+# Ordinary CI runs numerical/build assertions; the dedicated macOS job verifies
+# the BLAS configuration and checks images. Keep functional assertions outside skips.
 
 # Honour the explicit switch in local runs as well as CI. Functional checks
 # belong before this call (or in their own test), because a skip ends the test.

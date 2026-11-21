@@ -40,7 +40,8 @@ test_that("discrete nonGaussian and extended-family BAM retain marginal diagnost
       p <- qq_plot(model, type = type, seed = 19)
       expect_false(any(c("lower", "upper") %in% names(p$data)))
       expect_identical(p$labels$subtitle,
-        if (type == "pit") "Method: uniform" else "Method: std. normal")
+        if (type == "pit") "Method: uniform" else
+          "Quantile residuals; standard normal reference")
       expect_identical(p$labels$caption, "bands omitted")
       expect_equal(p$data$residuals, sort(residual))
     }

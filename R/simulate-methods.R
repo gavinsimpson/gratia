@@ -15,7 +15,7 @@
 #' @param seed numeric or `NULL`; a random seed for the simulations. An explicit
 #'   seed restores the previous random-number state, including its absence,
 #'   when simulation finishes or fails. With `NULL`, simulation advances or
-#'   initializes the random-number state.
+#'   initialises the random-number state.
 #' @param data data frame; new observations at which the posterior draws
 #'   from the model should be evaluated. If not supplied, the data used to fit
 #'   the model will be used for `newdata`, if available in `object`.

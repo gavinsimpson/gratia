@@ -1,12 +1,12 @@
 ---
-title: "Customising plots"
+title: "Customising gratia plots"
 output: 
   rmarkdown::html_vignette:
     fig_width: 8
     fig_height: 5.3333
     dev: "png"
 vignette: >
-  %\VignetteIndexEntry{Customising plots}
+  %\VignetteIndexEntry{Customising gratia plots}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

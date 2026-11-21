@@ -1,5 +1,5 @@
 ---
-title: "Read smooth effects, interactions and surfaces"
+title: "Plotting group-specific smooths and parametric interactions"
 output:
   rmarkdown::html_vignette:
     fig_width: 8
@@ -7,7 +7,7 @@ output:
     dev: "png"
     dpi: 96
 vignette: >
-  %\VignetteIndexEntry{Read smooth effects, interactions and surfaces}
+  %\VignetteIndexEntry{Plotting group-specific smooths and parametric interactions}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -20,8 +20,8 @@ Effect plots show how one smooth or parametric term contributes to the linear
 predictor. To obtain the expected response in these examples, add the model
 terms and intercept, then apply the inverse link. In the log-link model below,
 that means exponentiating the sum to get mean carbon dioxide uptake. We use
-the plant experiment from [Smooth trends and repeated measurements with
-glmmTMB](glmmTMB-support.html) to plot curves for individual plants, then use
+the plant experiment from [Working with glmmTMB models in gratia](glmmTMB-support.html)
+to plot curves for individual plants, then use
 daily air quality measurements to plot interactions between continuous and
 categorical predictors.
 

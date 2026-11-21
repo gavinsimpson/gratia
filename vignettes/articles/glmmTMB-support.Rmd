@@ -1,5 +1,5 @@
 ---
-title: "Smooth trends and repeated measurements with glmmTMB"
+title: "Working with glmmTMB models in gratia"
 output:
   rmarkdown::html_vignette:
     fig_width: 8
@@ -7,7 +7,7 @@ output:
     dev: "png"
     dpi: 96
 vignette: >
-  %\VignetteIndexEntry{Smooth trends and repeated measurements with glmmTMB}
+  %\VignetteIndexEntry{Working with glmmTMB models in gratia}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -309,7 +309,7 @@ The lowest quantile score stands out below the normal reference: one
 measurement is substantially lower than its fitted distribution would
 typically produce. Inspect the fitted curve for that plant to see whether
 other measurements show a similar departure.
-[Read smooth effects, interactions and surfaces](smooth-effects.html)
+[Plotting group-specific smooths and parametric interactions](smooth-effects.html)
 explores more flexible plant-specific curves.
 
 The check above holds the fitted plant effects and smooth fixed. With

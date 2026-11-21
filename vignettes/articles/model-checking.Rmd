@@ -1,5 +1,5 @@
 ---
-title: "Model diagnostics: distributions, uncertainty and dependence"
+title: "Residual diagnostics and posterior predictive checks with gratia"
 output:
   rmarkdown::html_vignette:
     fig_width: 8
@@ -7,7 +7,7 @@ output:
     dev: png
     dpi: 96
 vignette: >
-  %\VignetteIndexEntry{Model diagnostics: distributions, uncertainty and dependence}
+  %\VignetteIndexEntry{Residual diagnostics and posterior predictive checks with gratia}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -27,8 +27,8 @@ patterns in GAMs, linear models and mixed models.
 
 We check the response distribution, variation between groups and dependence
 between observations made in sequence.
-[Checking different response distributions](response-distributions.html) extends
-the examples to distributional parameters, censoring and weights.
+[Model diagnostics for distributional, discrete and censored responses](response-distributions.html)
+extends the examples to distributional parameters, censoring and weights.
 The articles on [`mgcv::gfam()`](gfam-support.html),
 [{glmmTMB}](glmmTMB-support.html) and [{sdmTMB}](sdmTMB-support.html) illustrate
 diagnostics for those model classes.

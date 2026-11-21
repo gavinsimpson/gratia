@@ -136,7 +136,7 @@ diagnostic_reference_description <- function(distribution, base) {
 }
 
 diagnostic_qq_subtitle <- function(method) {
-  paste("Method:", if (method == "normal") "std. normal" else method)
+  paste("Method:", if (method == "normal") "normal approximation" else method)
 }
 
 diagnostic_caption <- function(context) {
@@ -498,6 +498,7 @@ prepare_diagnostic_data <- function(model, type = NULL, seed = NULL,
 
 
 calibrated_reference_subtitle <- function(type) {
+  if (type == "quantile") return("Quantile residuals; standard normal reference")
   if (type == "surrogate") return(diagnostic_qq_subtitle("logistic"))
   diagnostic_qq_subtitle(if (type %in% c("pit", "dharma")) "uniform" else "normal")
 }

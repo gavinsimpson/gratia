@@ -1,5 +1,5 @@
 ---
-title: "Combining surveys with different response distributions"
+title: "Working with mgcv::gfam() models in gratia"
 output:
   rmarkdown::html_vignette:
     fig_width: 8
@@ -7,7 +7,7 @@ output:
     dev: png
     dpi: 96
 vignette: >
-  %\VignetteIndexEntry{Combining surveys with different response distributions}
+  %\VignetteIndexEntry{Working with mgcv::gfam() models in gratia}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
