@@ -162,13 +162,15 @@ refer to coefficients before transformation or response simulation.
 formats or diagnostics are requested.
 
 `draw(sampling_diagnostics(x))` displays the retained coefficient draws in
-iteration order for each chain. Use `type = "rank"` with at least two chains
-to see whether each chain covers the full range of pooled ranks. Each chain
-gets a histogram, with a reference line for equal counts across bins. Use
-`select` to choose coefficients by name or position. If `x` contains sampled
-fitted values, responses, smooths or derivatives, set `diagnostics = TRUE`
-when generating them to retain their coefficient draws. The plots are provided
-by gratia. Numerical summaries require posterior.
+iteration order for each chain. With thinning, successive points can be
+several sampler iterations apart. Use `type = "rank"` with at least two
+chains to see whether each chain covers the full range of pooled ranks.
+Tied values receive their average rank. Each chain gets a histogram, with a
+reference line for equal counts across bins. Use `select` to choose coefficients
+by name or position. If `x` contains sampled fitted values, responses, smooths
+or derivatives, set `diagnostics = TRUE` when generating them to retain their
+coefficient draws. The plots are provided by gratia. Numerical summaries
+require posterior.
 
 ## Choose between expected values and simulated observations
 

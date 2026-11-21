@@ -39,9 +39,10 @@ The carbon dioxide experiment measured uptake at seven concentrations on each
 of twelve plants, with three plants per combination of origin and treatment.
 The Gamma model with a log link keeps the fitted means positive and lets the
 spread increase with the mean. In the model below, `s(log_conc)` allows the
-shared uptake curve to level off as concentration increases. The `t2()` term
-combines a spline for concentration with a plant random effect so that each
-plant can have its own smooth departure from the shared curve.
+shared uptake curve to level off as concentration increases. With a random
+slope, each plant's departure from the shared curve is a straight line in
+centred log concentration. Here the `t2()` term combines a concentration
+spline with a plant random effect so each departure can also bend.
 
 ```{r plant-flexible-fit}
 plant <- as.data.frame(CO2)

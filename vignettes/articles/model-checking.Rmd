@@ -413,8 +413,10 @@ The following simulation represents regularly spaced measurements from four
 independent monitoring series with a slowly changing mean. The Gaussian
 errors follow a first-order autoregressive (AR1) process, with a correlation
 of 0.6 between successive errors in the same series. We pass this known
-correlation as `rho` so `bam()` uses it during fitting. We then inspect the
-QQ plot and look for correlation in the adjusted residuals.
+correlation as `rho` so `bam()` uses it during fitting. For your own data,
+sort the rows by series and then by time within each series. Set `AR.start`
+to `TRUE` at the first observation of each series. After fitting, we inspect
+the QQ plot and look for correlation in the adjusted residuals.
 
 ```{r gaussian-series}
 set.seed(308)
