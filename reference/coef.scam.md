@@ -18,7 +18,7 @@ coef(object, parametrized = TRUE, ...)
 
 - parametrized:
 
-  logical; extract parametrized coefficients, which respect the linear
+  logical; extract parametrised coefficients, which respect the linear
   inequality constraints of the model.
 
 - ...:

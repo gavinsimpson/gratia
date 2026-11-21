@@ -216,7 +216,7 @@ Visualise fitted models with
 [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md) and
 customise individual plots with
 [`assemble()`](https://gavinsimpson.github.io/gratia/reference/assemble.md).
-See [Customising
+See [Customising gratia
 plots](https://gavinsimpson.github.io/gratia/articles/custom-plotting.md).
 
 - [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md) :
@@ -537,8 +537,9 @@ and
 [sampling_diagnostics()](https://gavinsimpson.github.io/gratia/reference/sampling_diagnostics.md).
 For coefficient draws, use
 [post_draws()](https://gavinsimpson.github.io/gratia/reference/post_draws.md)
-in the advanced helpers. See [Posterior
-Simulation](https://gavinsimpson.github.io/gratia/articles/posterior-simulation.md)
+in the advanced helpers. See [Posterior simulation of GAM smooths,
+fitted values and
+responses](https://gavinsimpson.github.io/gratia/articles/posterior-simulation.md)
 and the [sampling migration
 guide](https://gavinsimpson.github.io/gratia/articles/sampling-migration.md).
 
@@ -862,51 +863,51 @@ for new analyses.
 
 # Articles
 
-### Fit and check models
-
-Choose a response model, interpret its effects and check its
-assumptions. Start with the shared diagnostics concepts, then follow a
-complete workflow for grouped surveys, mixed models or spatial surveys.
-
-- [Model diagnostics: distributions, uncertainty and
-  dependence](https://gavinsimpson.github.io/gratia/articles/model-checking.md):
-- [Posterior predictive checks and approximate leave-one-out
-  comparisons](https://gavinsimpson.github.io/gratia/articles/bayesplot-loo.md):
-- [Combining surveys with different response
-  distributions](https://gavinsimpson.github.io/gratia/articles/gfam-support.md):
-- [Working with shape-constrained additive
-  models](https://gavinsimpson.github.io/gratia/articles/scam-support.md):
-- [Smooth trends and repeated measurements with
-  glmmTMB](https://gavinsimpson.github.io/gratia/articles/glmmTMB-support.md):
-- [Depth effects and spatial variation in a trawl
-  survey](https://gavinsimpson.github.io/gratia/articles/sdmTMB-support.md):
-
-### Predictions, effects and response distributions
-
-- [Comparing treatments and finding rates of
-  change](https://gavinsimpson.github.io/gratia/articles/prediction-comparisons.md):
-- [Read smooth effects, interactions and
-  surfaces](https://gavinsimpson.github.io/gratia/articles/smooth-effects.md):
-- [Variance components in
-  GAMs](https://gavinsimpson.github.io/gratia/articles/variance-components.md):
-- [Intervals for shape-constrained
-  smooths](https://gavinsimpson.github.io/gratia/articles/shape-constrained-intervals.md):
-- [Choose a smooth for the spatial
-  question](https://gavinsimpson.github.io/gratia/articles/spatial-smooths.md):
-- [Checking different response
-  distributions](https://gavinsimpson.github.io/gratia/articles/response-distributions.md):
-- [Predictions, plots and derivatives with transformed
-  covariates](https://gavinsimpson.github.io/gratia/articles/transformed-covariates.md):
-
 ### Getting started and customising an analysis
 
 - [Getting started with
   gratia](https://gavinsimpson.github.io/gratia/articles/gratia.md):
 - [Creating prediction grids with
   data_slice()](https://gavinsimpson.github.io/gratia/articles/data-slices.md):
-- [Customising
+- [Customising gratia
   plots](https://gavinsimpson.github.io/gratia/articles/custom-plotting.md):
-- [Posterior
-  Simulation](https://gavinsimpson.github.io/gratia/articles/posterior-simulation.md):
+- [Posterior simulation of GAM smooths, fitted values and
+  responses](https://gavinsimpson.github.io/gratia/articles/posterior-simulation.md):
 - [Updating sampling code for gratia
   0.12.0](https://gavinsimpson.github.io/gratia/articles/sampling-migration.md):
+
+### Fit and check models
+
+Choose a response model, interpret its effects and check its
+assumptions. Start with the shared diagnostics concepts, then follow a
+complete workflow for grouped surveys, mixed models or spatial surveys.
+
+- [Residual diagnostics and posterior predictive checks with
+  gratia](https://gavinsimpson.github.io/gratia/articles/model-checking.md):
+- [Posterior predictive checks with bayesplot and model comparisons with
+  loo](https://gavinsimpson.github.io/gratia/articles/bayesplot-loo.md):
+- [Working with mgcv::gfam() models in
+  gratia](https://gavinsimpson.github.io/gratia/articles/gfam-support.md):
+- [Working with scam models in
+  gratia](https://gavinsimpson.github.io/gratia/articles/scam-support.md):
+- [Working with glmmTMB models in
+  gratia](https://gavinsimpson.github.io/gratia/articles/glmmTMB-support.md):
+- [Working with sdmTMB models in
+  gratia](https://gavinsimpson.github.io/gratia/articles/sdmTMB-support.md):
+
+### Predictions, effects and response distributions
+
+- [Comparing treatments and estimating rates of
+  change](https://gavinsimpson.github.io/gratia/articles/prediction-comparisons.md):
+- [Plotting group-specific smooths and parametric
+  interactions](https://gavinsimpson.github.io/gratia/articles/smooth-effects.md):
+- [Estimating and interpreting variance components in
+  GAMs](https://gavinsimpson.github.io/gratia/articles/variance-components.md):
+- [Shape-constrained intervals and coefficient confidence
+  sets](https://gavinsimpson.github.io/gratia/articles/shape-constrained-intervals.md):
+- [Specialist spatial
+  smooths](https://gavinsimpson.github.io/gratia/articles/spatial-smooths.md):
+- [Model diagnostics for distributional, discrete and censored
+  responses](https://gavinsimpson.github.io/gratia/articles/response-distributions.md):
+- [Predictions, plots and derivatives with transformed
+  covariates](https://gavinsimpson.github.io/gratia/articles/transformed-covariates.md):

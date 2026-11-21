@@ -1,4 +1,4 @@
-# Comparing treatments and finding rates of change
+# Comparing treatments and estimating rates of change
 
 Does chilling reduce carbon dioxide uptake, and does the answer depend
 on carbon dioxide concentration or plant origin? When does increasing

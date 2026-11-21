@@ -1,4 +1,4 @@
-# Intervals for shape-constrained smooths
+# Shape-constrained intervals and coefficient confidence sets
 
 A smooth fitted with an increasing or convex shape constraint can still
 have interval endpoints that lack that shape.

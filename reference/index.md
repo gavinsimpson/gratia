@@ -6,7 +6,7 @@ Visualise fitted models with
 [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md) and
 customise individual plots with
 [`assemble()`](https://gavinsimpson.github.io/gratia/reference/assemble.md).
-See [Customising
+See [Customising gratia
 plots](https://gavinsimpson.github.io/gratia/articles/custom-plotting.md).
 
 - [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md) :
@@ -327,8 +327,9 @@ and
 [sampling_diagnostics()](https://gavinsimpson.github.io/gratia/reference/sampling_diagnostics.md).
 For coefficient draws, use
 [post_draws()](https://gavinsimpson.github.io/gratia/reference/post_draws.md)
-in the advanced helpers. See [Posterior
-Simulation](https://gavinsimpson.github.io/gratia/articles/posterior-simulation.md)
+in the advanced helpers. See [Posterior simulation of GAM smooths,
+fitted values and
+responses](https://gavinsimpson.github.io/gratia/articles/posterior-simulation.md)
 and the [sampling migration
 guide](https://gavinsimpson.github.io/gratia/articles/sampling-migration.md).
 

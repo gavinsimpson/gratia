@@ -73,7 +73,7 @@ simulate(
   numeric or `NULL`; a random seed for the simulations. An explicit seed
   restores the previous random-number state, including its absence, when
   simulation finishes or fails. With `NULL`, simulation advances or
-  initializes the random-number state.
+  initialises the random-number state.
 
 - conditioning:
 

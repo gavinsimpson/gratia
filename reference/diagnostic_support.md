@@ -75,7 +75,7 @@ This table applies to the supported response families described below.
 
 - `gamm`/`gamm4` and direct `lme`/`merMod` fits use their full
   predictors. Gaussian nlme variance weights and residual covariance are
-  retained. Non-Gaussian `gamm` fits use penalized quasi-likelihood
+  retained. Non-Gaussian `gamm` fits use penalised quasi-likelihood
   (PQL). Without residual correlation, these support approximate
   response checks and PPCs based on their fitted working parameters. PQL
   residual correlation acts on the working response used for fitting; it
@@ -130,7 +130,7 @@ This table applies to the supported response families described below.
   response simulation and posterior predictive checks are unavailable.
   Selection, switching, ordinal, fixed-margin, censored and survival
   models are not supported by these diagnostic methods. Diagnostics also
-  reject models that use a modeled response in another response's mean
+  reject models that use a modelled response in another response's mean
   formula or in an auxiliary formula. The complete set of reference
   simulations and appraisal panels requires conditioning through the
   fitted copula, which these methods do not provide. Smooth plots remain
@@ -197,7 +197,7 @@ epsilon-adjusted observations. Distribution functions supplied by
 callers are preserved.
 
 GEV and sinh-arcsinh checks use stable response means and correct
-residual centering and signs for both observed and simulated responses.
+residual centring and signs for both observed and simulated responses.
 Their deviance magnitudes follow the fitting package's definitions: GEV
 uses the square root of its saturated log-likelihood contrast;
 sinh-arcsinh uses zero log density as its reference. If a sinh-arcsinh
@@ -243,7 +243,7 @@ references hold fitted effects fixed, while conditional PPCs include
 uncertainty in those fitted effects. Specify `"marginal"` to simulate
 new effects instead.
 
-Conditional glmmTMB/lme4 response likelihoods factorize given all random
+Conditional glmmTMB/lme4 response likelihoods factorise given all random
 effects, including temporal and spatial effects. Marginal responses may
 be dependent because they share those effects. An independent effect for
 each observation need not create dependence between observations. The
@@ -265,7 +265,7 @@ when calculating reference bands.
 Gaussian identity-link AR1 BAM retains joint response simulation, with
 new independent series starting at `AR.start` boundaries. For
 non-Gaussian or nonidentity models fitted with `discrete = TRUE` and
-nonzero `rho`, BAM applies AR1 to working residuals as a generalized
+nonzero `rho`, BAM applies AR1 to working residuals as a generalised
 estimating equations (GEE) approximation. This does not specify a unique
 joint response distribution. The restriction applies to supported
 `extended.family` and GLM families. See
@@ -358,7 +358,7 @@ PIT is `(number below + U * (ties + 1))/(R + 1)`, where `U` is uniform
 on `(0, 1)`. The extra rank position is for the observation being
 checked, which keeps normal scores finite even outside the simulated
 range. Observed and simulated responses use the same reference sample,
-centering and residual definitions. These ranks need not equal the
+centring and residual definitions. These ranks need not equal the
 empirical CDF at an observation.
 
 `options(gratia.diagnostics.marginal_draws = 249L)` sets the reference

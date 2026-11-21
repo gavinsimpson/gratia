@@ -1,4 +1,4 @@
-# Model diagnostics: distributions, uncertainty and dependence
+# Residual diagnostics and posterior predictive checks with gratia
 
 ## Choose the model feature you want to check
 
@@ -11,9 +11,9 @@ predictive checks to investigate these patterns in GAMs, linear models
 and mixed models.
 
 We check the response distribution, variation between groups and
-dependence between observations made in sequence. [Checking different
-response
-distributions](https://gavinsimpson.github.io/gratia/articles/response-distributions.md)
+dependence between observations made in sequence. [Model diagnostics for
+distributional, discrete and censored
+responses](https://gavinsimpson.github.io/gratia/articles/response-distributions.md)
 extends the examples to distributional parameters, censoring and
 weights. The articles on
 [`mgcv::gfam()`](https://gavinsimpson.github.io/gratia/articles/gfam-support.md),
@@ -356,7 +356,7 @@ growth_fit <- lme(distance ~ Sex * age_c, random = ~ age_c | Subject,
 summary(growth_fit)$tTable
 #>                      Value  Std.Error DF   t-value      p-value
 #> (Intercept)     24.9687500 0.48600071 79 51.375953 1.812713e-62
-#> SexFemale       -2.3210227 0.76141679 25 -3.048295 5.375053e-03
+#> SexFemale       -2.3210227 0.76141678 25 -3.048295 5.375053e-03
 #> age_c            0.7843750 0.08599951 79  9.120691 5.654754e-14
 #> SexFemale:age_c -0.3048295 0.13473534 79 -2.262432 2.641752e-02
 ```

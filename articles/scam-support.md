@@ -1,4 +1,4 @@
-# Working with shape-constrained additive models
+# Working with scam models in gratia
 
 This article shows how to plot smooths fitted with {scam}, extract
 estimates and intervals, sample fitted functions, and check predictions.

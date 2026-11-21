@@ -59,7 +59,7 @@ residual_correlation_plot(
 
 - seed:
 
-  optional seed for randomized residuals.
+  optional seed for randomised residuals.
 
 - ...:
 
@@ -88,7 +88,7 @@ Use `type = "surrogate"` for
 calculate correlations of residuals on the latent logistic scale; see
 [`surrogate_residuals()`](https://gavinsimpson.github.io/gratia/reference/surrogate_residuals.md).
 
-BAM's generalized estimating equations (GEE) AR1 correction acts on the
+BAM's generalised estimating equations (GEE) AR1 correction acts on the
 weighted working response used for fitting. Whitening these working
 residuals can reveal remaining serial structure. The stored `std.rsd` in
 current mgcv adjusts its final residuals for AR1 correlation, which need

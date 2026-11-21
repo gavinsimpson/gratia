@@ -1,4 +1,4 @@
-# Customising plots
+# Customising gratia plots
 
 ## Apply a theme to every panel
 

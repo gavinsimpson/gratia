@@ -1,4 +1,4 @@
-# Choose a smooth for the spatial question
+# Specialist spatial smooths
 
 What counts as nearby depends on the setting. Districts can be
 neighbours because their boundaries touch. Locations in a lake can be

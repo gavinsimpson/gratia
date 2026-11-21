@@ -149,7 +149,7 @@ partial_derivatives(object, ..., unconditional = FALSE)
   number of cores for generating random variables from a multivariate
   normal distribution. Passed to
   [`mvnfast::rmvn()`](https://rdrr.io/pkg/mvnfast/man/rmvn.html).
-  Parallelization will take place only if OpenMP is supported (but
+  Parallelisation will take place only if OpenMP is supported (but
   appears to work on Windows with current `R`).
 
 - partial_match:

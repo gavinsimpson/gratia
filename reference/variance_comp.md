@@ -161,7 +161,7 @@ With `type = "penalty"`, models fitted by
 penalty, including penalties supplied through `paraPen`. Fixed smoothing
 parameters are included, and terms sharing a smoothing parameter each
 have their own rows. A smooth with several penalties has several rows.
-Unpenalized parametric terms have no variance parameter and are omitted.
+Unpenalised parametric terms have no variance parameter and are omitted.
 
 The variance component is the fitted scale parameter divided by the
 smoothing parameter. With `rescale = TRUE`, the smoothing parameter is
@@ -190,7 +190,7 @@ the fitted covariance parameters support this calculation. Bounds are
 `pdTens` tensor-product blocks. The estimated residual scale is labelled
 `scale`; a fixed scale is omitted. With residual variance weights,
 `scale` is the baseline variance before those weights are applied. For
-models fitted by penalized quasi-likelihood (PQL), these are approximate
+models fitted by penalised quasi-likelihood (PQL), these are approximate
 components of the working mixed model.
 
 For [`gamm4::gamm4()`](https://rdrr.io/pkg/gamm4/man/gamm4.html) fits,

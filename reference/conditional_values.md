@@ -4,7 +4,7 @@ Generate predicted values from a GAM, conditional upon supplied values
 of covariates. `conditional_values()` is modelled after
 [`marginaleffects::plot_predictions()`](https://rdrr.io/pkg/marginaleffects/man/plot_predictions.html),
 but with an intentionally simpler, more restrictive functionality. The
-intended use case is for quickly visualizing predicted values from a
+intended use case is for quickly visualising predicted values from a
 fitted GAM on the response scale. For more complex model predictions,
 you are strongly encouraged to use
 [`marginaleffects::plot_predictions()`](https://rdrr.io/pkg/marginaleffects/man/plot_predictions.html).

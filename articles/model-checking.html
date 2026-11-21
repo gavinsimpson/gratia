@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Model diagnostics: distributions, uncertainty and dependence • gratia</title>
+<title>Residual diagnostics and posterior predictive checks with gratia • gratia</title>
 <!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="../favicon-96x96.png">
 <link rel="icon" type="”image/svg+xml”" href="../favicon.svg">
 <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
@@ -16,7 +16,7 @@
 <script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><link href="../extra.css" rel="stylesheet">
-<meta property="og:title" content="Model diagnostics: distributions, uncertainty and dependence">
+<meta property="og:title" content="Residual diagnostics and posterior predictive checks with gratia">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -26,7 +26,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-75</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-76</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -40,28 +40,28 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><hr class="dropdown-divider"></li>
-    <li><h6 class="dropdown-header" data-toc-skip>Models</h6></li>
-    <li><a class="dropdown-item" href="../articles/model-checking.html">Model diagnostics: distributions, uncertainty and dependence</a></li>
-    <li><a class="dropdown-item" href="../articles/bayesplot-loo.html">Posterior predictive checks and approximate leave-one-out comparisons</a></li>
-    <li><a class="dropdown-item" href="../articles/gfam-support.html">Combining surveys with different response distributions</a></li>
-    <li><a class="dropdown-item" href="../articles/scam-support.html">Working with shape-constrained additive models</a></li>
-    <li><a class="dropdown-item" href="../articles/glmmTMB-support.html">Smooth trends and repeated measurements with glmmTMB</a></li>
-    <li><a class="dropdown-item" href="../articles/sdmTMB-support.html">Depth effects and spatial variation in a trawl survey</a></li>
-    <li><hr class="dropdown-divider"></li>
-    <li><h6 class="dropdown-header" data-toc-skip>Workflows</h6></li>
-    <li><a class="dropdown-item" href="../articles/prediction-comparisons.html">Comparing treatments and finding rates of change</a></li>
-    <li><a class="dropdown-item" href="../articles/smooth-effects.html">Read smooth effects, interactions and surfaces</a></li>
-    <li><a class="dropdown-item" href="../articles/variance-components.html">Variance components in GAMs</a></li>
-    <li><a class="dropdown-item" href="../articles/shape-constrained-intervals.html">Intervals for shape-constrained smooths</a></li>
-    <li><a class="dropdown-item" href="../articles/spatial-smooths.html">Choose a smooth for the spatial question</a></li>
-    <li><a class="dropdown-item" href="../articles/response-distributions.html">Checking different response distributions</a></li>
-    <li><a class="dropdown-item" href="../articles/transformed-covariates.html">Predictions, plots and derivatives with transformed covariates</a></li>
-    <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Essentials</h6></li>
     <li><a class="dropdown-item" href="../articles/data-slices.html">Creating prediction grids with data_slice()</a></li>
-    <li><a class="dropdown-item" href="../articles/custom-plotting.html">Customising plots</a></li>
-    <li><a class="dropdown-item" href="../articles/posterior-simulation.html">Posterior Simulation</a></li>
+    <li><a class="dropdown-item" href="../articles/custom-plotting.html">Customising gratia plots</a></li>
+    <li><a class="dropdown-item" href="../articles/posterior-simulation.html">Posterior simulation of GAM smooths, fitted values and responses</a></li>
     <li><a class="dropdown-item" href="../articles/sampling-migration.html">Updating sampling code for gratia 0.12.0</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Models</h6></li>
+    <li><a class="dropdown-item" href="../articles/model-checking.html">Residual diagnostics and posterior predictive checks with gratia</a></li>
+    <li><a class="dropdown-item" href="../articles/bayesplot-loo.html">Posterior predictive checks with bayesplot and model comparisons with loo</a></li>
+    <li><a class="dropdown-item" href="../articles/gfam-support.html">Working with mgcv::gfam() models in gratia</a></li>
+    <li><a class="dropdown-item" href="../articles/scam-support.html">Working with scam models in gratia</a></li>
+    <li><a class="dropdown-item" href="../articles/glmmTMB-support.html">Working with glmmTMB models in gratia</a></li>
+    <li><a class="dropdown-item" href="../articles/sdmTMB-support.html">Working with sdmTMB models in gratia</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Workflows</h6></li>
+    <li><a class="dropdown-item" href="../articles/prediction-comparisons.html">Comparing treatments and estimating rates of change</a></li>
+    <li><a class="dropdown-item" href="../articles/smooth-effects.html">Plotting group-specific smooths and parametric interactions</a></li>
+    <li><a class="dropdown-item" href="../articles/variance-components.html">Estimating and interpreting variance components in GAMs</a></li>
+    <li><a class="dropdown-item" href="../articles/shape-constrained-intervals.html">Shape-constrained intervals and coefficient confidence sets</a></li>
+    <li><a class="dropdown-item" href="../articles/spatial-smooths.html">Specialist spatial smooths</a></li>
+    <li><a class="dropdown-item" href="../articles/response-distributions.html">Model diagnostics for distributional, discrete and censored responses</a></li>
+    <li><a class="dropdown-item" href="../articles/transformed-covariates.html">Predictions, plots and derivatives with transformed covariates</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
@@ -84,7 +84,7 @@
 
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-      <img src="../logo.png" class="logo" alt=""><h1>Model diagnostics: distributions, uncertainty and dependence</h1>
+      <img src="../logo.png" class="logo" alt=""><h1>Residual diagnostics and posterior predictive checks with gratia</h1>
             
       
       <small class="dont-index">Source: <a href="https://github.com/gavinsimpson/gratia/blob/main/vignettes/articles/model-checking.Rmd" class="external-link"><code>vignettes/articles/model-checking.Rmd</code></a></small>
@@ -104,9 +104,9 @@ around the mean curve. {gratia} provides residual diagnostics and
 posterior predictive checks to investigate these patterns in GAMs,
 linear models and mixed models.</p>
 <p>We check the response distribution, variation between groups and
-dependence between observations made in sequence. <a href="response-distributions.html">Checking different response
-distributions</a> extends the examples to distributional parameters,
-censoring and weights. The articles on <a href="gfam-support.html"><code>mgcv::gfam()</code></a>, <a href="glmmTMB-support.html">{glmmTMB}</a> and <a href="sdmTMB-support.html">{sdmTMB}</a> illustrate diagnostics for those
+dependence between observations made in sequence. <a href="response-distributions.html">Model diagnostics for distributional,
+discrete and censored responses</a> extends the examples to
+distributional parameters, censoring and weights. The articles on <a href="gfam-support.html"><code>mgcv::gfam()</code></a>, <a href="glmmTMB-support.html">{glmmTMB}</a> and <a href="sdmTMB-support.html">{sdmTMB}</a> illustrate diagnostics for those
 model classes.</p>
 <p>These examples require gratia 0.12.0 or later, R &gt;= 4.4.0 and
 {mgcv} &gt;= 1.9-4. We load mgcv and gratia for fitting and diagnostics,
@@ -405,7 +405,7 @@ child, very detailed individual curves are not supported.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">growth_fit</span><span class="op">)</span><span class="op">$</span><span class="va">tTable</span></span>
 <span><span class="co">#&gt;                      Value  Std.Error DF   t-value      p-value</span></span>
 <span><span class="co">#&gt; (Intercept)     24.9687500 0.48600071 79 51.375953 1.812713e-62</span></span>
-<span><span class="co">#&gt; SexFemale       -2.3210227 0.76141679 25 -3.048295 5.375053e-03</span></span>
+<span><span class="co">#&gt; SexFemale       -2.3210227 0.76141678 25 -3.048295 5.375053e-03</span></span>
 <span><span class="co">#&gt; age_c            0.7843750 0.08599951 79  9.120691 5.654754e-14</span></span>
 <span><span class="co">#&gt; SexFemale:age_c -0.3048295 0.13473534 79 -2.262432 2.641752e-02</span></span></code></pre></div>
 <p>The age coefficient describes mean growth in the reference sex, and

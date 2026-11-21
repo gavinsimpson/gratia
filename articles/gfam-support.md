@@ -1,4 +1,4 @@
-# Combining surveys with different response distributions
+# Working with mgcv::gfam() models in gratia
 
 This article shows how {gratia} works with models fitted using
 [`mgcv::gfam()`](https://rdrr.io/pkg/mgcv/man/gfam.html). This family

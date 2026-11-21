@@ -652,7 +652,7 @@ distributional parameter as described in
 [`draw.gam()`](https://gavinsimpson.github.io/gratia/reference/draw.gam.md).
 Custom labels, including `subtitle`, can be passed through `...`. Use
 `cyclic = "polar"` to draw one-dimensional cyclic smooths with polar
-coordinates; `polar_args` customizes the coordinate display as described
+coordinates; `polar_args` customises the coordinate display as described
 in
 [`draw.gam()`](https://gavinsimpson.github.io/gratia/reference/draw.gam.md).
 

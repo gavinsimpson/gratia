@@ -1,4 +1,4 @@
-# Smooth trends and repeated measurements with glmmTMB
+# Working with glmmTMB models in gratia
 
 A smooth describes a relationship without requiring it to be linear.
 {glmmTMB} can estimate these relationships alongside its other model
@@ -109,7 +109,7 @@ smooths(nile_tmb)
 #> [1] "s(year)"
 head(smooth_coefs(nile_tmb, select = "s(year)"))
 #>   s(year).1   s(year).2   s(year).3   s(year).4   s(year).5   s(year).6 
-#>   13.965792 -111.874312  -11.759876  -21.067622   -6.673338    9.788104
+#>   18.174609 -115.231114   -2.991595  -24.387354  -15.572794   13.125102
 trend <- smooth_estimates(nile_tmb, select = "s(year)",
   interval = "credible")
 head(trend)
@@ -324,7 +324,7 @@ summary(plant_tmb)
 #> TypeMississippi                  -0.31784    0.09327   -3.41 0.000655 ***
 #> Treatmentchilled                 -0.13966    0.09931   -1.41 0.159638    
 #> TypeMississippi:Treatmentchilled -0.27192    0.18888   -1.44 0.149972    
-#> s(log_conc)1                      0.46392    0.04158   11.16  < 2e-16 ***
+#> s(log_conc)1                     -0.46392    0.04158  -11.16  < 2e-16 ***
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
@@ -424,9 +424,9 @@ appraise(plant_tmb, type = "quantile", seed = 73)
 The lowest quantile score stands out below the normal reference: one
 measurement is substantially lower than its fitted distribution would
 typically produce. Inspect the fitted curve for that plant to see
-whether other measurements show a similar departure. [Read smooth
-effects, interactions and
-surfaces](https://gavinsimpson.github.io/gratia/articles/smooth-effects.md)
+whether other measurements show a similar departure. [Plotting
+group-specific smooths and parametric
+interactions](https://gavinsimpson.github.io/gratia/articles/smooth-effects.md)
 explores more flexible plant-specific curves.
 
 The check above holds the fitted plant effects and smooth fixed. With

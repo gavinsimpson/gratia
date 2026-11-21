@@ -169,7 +169,7 @@ scalable_residuals_hist_plot(
 
 - seed:
 
-  Random seed for QQ calculations or randomized residuals. Explicit
+  Random seed for QQ calculations or randomised residuals. Explicit
   seeds preserve the caller's RNG state, including an absent state.
 
 - level:
@@ -322,7 +322,7 @@ Grouped-family models retain the residual defaults, component reference
 distributions, predictor ranks and layout controls of
 [`appraise()`](https://gavinsimpson.github.io/gratia/reference/appraise.md).
 QQ bin limits apply separately to each component. Pooled residual
-heatmaps summarize the component mixture rather than colouring
+heatmaps summarise the component mixture rather than colouring
 individual observations; observed-versus-fitted appraisals always
 separate components. Pooled histograms use faint component-coloured
 fills with opaque stepped upper boundaries, retaining common bin edges
@@ -335,7 +335,7 @@ relevant, matching
 Supply `caption = ""` to omit the caption.
 
 Kernel density estimates are calculated on a fixed grid before plotting.
-Each predictor slice is normalized to integrate to one over the
+Each predictor slice is normalised to integrate to one over the
 displayed residual grid. Bandwidths, rather than `density_bins`, control
 smoothing; increase grid resolution when using small bandwidths. A
 square-root fill transformation reveals low-density regions while

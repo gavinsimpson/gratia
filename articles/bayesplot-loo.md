@@ -1,4 +1,4 @@
-# Posterior predictive checks and approximate leave-one-out comparisons
+# Posterior predictive checks with bayesplot and model comparisons with loo
 
 {gratia} provides methods for checking a fitted model with {bayesplot}
 and comparing its predictive performance with {loo}. The bayesplot

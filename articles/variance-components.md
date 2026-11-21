@@ -1,4 +1,4 @@
-# Variance components in GAMs
+# Estimating and interpreting variance components in GAMs
 
 Use
 [`variance_comp()`](https://gavinsimpson.github.io/gratia/reference/variance_comp.md)

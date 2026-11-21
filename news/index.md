@@ -4,6 +4,16 @@
 
 ### User visible changes
 
+- **Breaking change:** gratia has removed its
+  [`fixef()`](https://rdrr.io/pkg/nlme/man/fixed.effects.html) re-export
+  and the methods it registered for that generic. Use
+  [`gratia::fixed_effects()`](https://gavinsimpson.github.io/gratia/reference/fixed_effects.gam.md)
+  for GAMs, GAMMs, GLMs and linear models supported by gratia. For
+  models fitted directly with nlme or lme4, use
+  [`nlme::fixef()`](https://rdrr.io/pkg/nlme/man/fixed.effects.html) or
+  [`lme4::fixef()`](https://rdrr.io/pkg/nlme/man/fixed.effects.html),
+  respectively.
+
 - Help examples use fewer model fits and repeated plots to focus on each
   function’s main use and reduce execution time.
 
@@ -43,7 +53,7 @@
   `gratia.alpha.interval` inside
   [`theme()`](https://ggplot2.tidyverse.org/reference/theme.html). See
   [`gratia_theme_get()`](https://gavinsimpson.github.io/gratia/reference/gratia_theme_get.md)
-  and the Customizing plots article for migration examples.
+  and the Customising gratia plots article for migration examples.
 
   gratia now requires ggplot2 \>= 4.0.3 and patchwork \>= 1.3.2.
 
@@ -366,13 +376,27 @@
   preparation of the fitted GAM component with
   [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md).
 
-- [`assemble()`](https://gavinsimpson.github.io/gratia/reference/assemble.md)
+- **Plots and smooth estimates for
+  [`GJRM::gamlss()`](https://rdrr.io/pkg/GJRM/man/gamlss.html)**
+
+  [`assemble()`](https://gavinsimpson.github.io/gratia/reference/assemble.md)
   now supports models fitted by
   [`GJRM::gamlss()`](https://rdrr.io/pkg/GJRM/man/gamlss.html),
   returning a named list of smooth and parametric plots across
   equations. It shares model preparation, selection and scale handling
   with
   [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md).
+
+  Direct calls to
+  [`smooth_estimates()`](https://gavinsimpson.github.io/gratia/reference/smooth_estimates.md)
+  now work for
+  [`GJRM::gamlss()`](https://rdrr.io/pkg/GJRM/man/gamlss.html) models
+  ([\#352](https://github.com/gavinsimpson/gratia/issues/352)).
+  Estimates use the final fitted coefficients and covariance, with
+  smooth selection across equations and parameter labels retained for
+  drawing saved estimates. Frequentist covariance also comes from the
+  final fit, and gratia warns and uses the fitted Bayesian covariance
+  when the requested smoothing-parameter correction is unavailable.
 
 - [`assemble()`](https://gavinsimpson.github.io/gratia/reference/assemble.md)
   now supports glmmTMB models, returning named plots for smooths, native
@@ -392,7 +416,7 @@
   smooth estimates retain these boundaries; supplied evaluation points
   are unchanged.
 
-  `polar_args` customizes the polar coordinate display. Radial padding
+  `polar_args` customises the polar coordinate display. Radial padding
   separates interval bands from the outer observation rug. Radial axes
   appear inside the circle by default; override their position through
   `polar_args`.
@@ -800,7 +824,9 @@
   Probability integral transform (PIT) residuals map observations to
   fitted probabilities, randomising over probability mass for discrete
   responses. Quantile residuals convert those probabilities to
-  standard-normal scores.
+  standard-normal scores. QQ and worm-plot subtitles distinguish this
+  fixed normal reference from the normal approximation for traditional
+  residuals.
 
   Prepared diagnostic objects carry the selected conditioning and sdmTMB
   field choices through residual and plotting methods.
@@ -1366,6 +1392,14 @@
 
 ### Bug fixes
 
+- [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md),
+  [`assemble()`](https://gavinsimpson.github.io/gratia/reference/assemble.md)
+  and
+  [`smooth_estimates()`](https://gavinsimpson.github.io/gratia/reference/smooth_estimates.md)
+  again work with smooths that provide their own
+  [`eval_smooth()`](https://gavinsimpson.github.io/gratia/reference/eval_smooth.md)
+  method, such as monotone smooths fitted with mvgam.
+
 - [`add_fitted()`](https://gavinsimpson.github.io/gratia/reference/add_fitted.md)
   no longer emits a tibble deprecation warning for multinomial
   predictions with unnamed columns. The existing `V1`, `V2`, … column
@@ -1517,17 +1551,6 @@
   zero-inflation and dispersion predictors, excluding native random
   effects. Models without smooths return zero
   ([\#240](https://github.com/gavinsimpson/gratia/issues/240)).
-
-- Direct calls to
-  [`smooth_estimates()`](https://gavinsimpson.github.io/gratia/reference/smooth_estimates.md)
-  now work for
-  [`GJRM::gamlss()`](https://rdrr.io/pkg/GJRM/man/gamlss.html) models
-  ([\#352](https://github.com/gavinsimpson/gratia/issues/352)).
-  Estimates use the final fitted coefficients and covariance, with
-  smooth selection across equations and parameter labels retained for
-  drawing saved estimates. Frequentist covariance also comes from the
-  final fit; unavailable smoothing-parameter corrections warn and use
-  its Bayesian covariance.
 
 - B-spline evaluation handles empty data and factor-by calls whose
   evaluation data omit fitted levels, including constrained tensor

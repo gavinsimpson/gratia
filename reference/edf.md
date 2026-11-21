@@ -74,7 +74,7 @@ Wood (2017; pp. 252) describes an alternative EDF for the model
 \$\$\mathrm{EDF} = 2\mathrm{tr}(\mathbf{F}) -
 \mathrm{tr}(\mathbf{FF}),\$\$ where \\\mathrm{tr}\\ is the matrix trace
 and \\\mathbf{F}\\ is a matrix mapping unpenalised coefficient estimates
-to the penalized coefficient estimates. The trace of \\\mathbf{F}\\ is
+to the penalised coefficient estimates. The trace of \\\mathbf{F}\\ is
 effectively the average shrinkage of the coefficients multiplied by the
 number of coefficients (Wood, 2017). Smooth-specific EDFs then are
 obtained by summing up the relevant elements of

@@ -1,4 +1,4 @@
-# Checking different response distributions
+# Model diagnostics for distributional, discrete and censored responses
 
 [Model
 diagnostics](https://gavinsimpson.github.io/gratia/articles/model-checking.md)
@@ -314,9 +314,8 @@ between one and two describes the sum of a Poisson-distributed number of
 positive Gamma amounts. The sum is zero when that number is zero. The
 model links the zero probability and positive distribution through the
 mean, dispersion and power. A delta model instead estimates separate
-occurrence and positive components. See [Depth effects and spatial
-variation in a trawl
-survey](https://gavinsimpson.github.io/gratia/articles/sdmTMB-support.md).
+occurrence and positive components. See [Working with sdmTMB models in
+gratia](https://gavinsimpson.github.io/gratia/articles/sdmTMB-support.md).
 We simulate rainfall amounts whose expected value increases with
 elevation:
 

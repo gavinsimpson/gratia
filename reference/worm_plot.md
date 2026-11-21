@@ -301,7 +301,9 @@ separately for each component. Ordinary and scalable displays share
 their draw. See
 [`surrogate_residuals()`](https://gavinsimpson.github.io/gratia/reference/surrogate_residuals.md).
 
-Subtitles name the method. Captions identify conditioning and field
+Subtitles distinguish quantile residuals with a standard-normal
+reference from the normal approximation for traditional residuals, and
+otherwise name the method. Captions identify conditioning and field
 choices, joint simulation bands or omitted bands. Routine pointwise
 bands are unlabelled. Supply `caption` to replace this text, or
 `caption = ""` to omit it. Ordinary and scalable QQ and worm plots use

@@ -9,12 +9,12 @@ gratia methods; historical unclassed lists are not supported.
 
 Smooths, parametric effects, predictions, derivatives, simulations, and
 posterior draws describe the population GAM component. Terms supplied
-through `random` are excluded, including their realized effects,
+through `random` are excluded, including their realised effects,
 predictive variation, and uncertainty.
 [`conditional_values()`](https://gavinsimpson.github.io/gratia/reference/conditional_values.md)
 and
 [`conditional_differences()`](https://gavinsimpson.github.io/gratia/reference/conditional_differences.md)
-condition on covariate values, not on realized group effects. Group
+condition on covariate values, not on realised group effects. Group
 variables occurring only in `random` are not required in prediction
 data, so new groups receive the same population predictions. Use the
 `mer` component with lme4 for predictions conditional on group effects

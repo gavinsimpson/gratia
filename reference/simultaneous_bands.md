@@ -19,7 +19,7 @@ covariance. With \\V=LL^T\\, set \\u(x)=L^Td(x)/\sqrt{d(x)^TVd(x)}\\.
 The method integrates \\\kappa=\int_a^b\\u'(x)\\\\dx\\ and chooses \\c\\
 so that \$\$2\\1-\Phi(c)\\+\kappa\exp(-c^2/2)/\pi=1-\mathrm{level}.\$\$
 This expression bounds the two-sided exceedance probability by counting
-threshold crossings of the standardized Gaussian process. Repeated paths
+threshold crossings of the standardised Gaussian process. Repeated paths
 can make it conservative. Regular components separated by zero variance
 receive separate endpoint contributions. Polynomial knots divide
 numerical integration, but do not add endpoint contributions when the
@@ -29,7 +29,7 @@ separately.
 Under the selected Gaussian approximation, the band has at least the
 requested simultaneous probability over the stated interval, subject to
 numerical accuracy. Bayesian covariance gives an approximate posterior
-interpretation. Frequentist covariance calibrates centered Gaussian
+interpretation. Frequentist covariance calibrates centred Gaussian
 sampling errors; coverage of an unknown fixed curve also depends on
 smoothing bias. The `unconditional` covariance correction retains its
 existing meaning and does not integrate the full smoothing-parameter

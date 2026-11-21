@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-75</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-76</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -19,28 +19,28 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><hr class="dropdown-divider"></li>
-    <li><h6 class="dropdown-header" data-toc-skip>Models</h6></li>
-    <li><a class="dropdown-item" href="../articles/model-checking.html">Model diagnostics: distributions, uncertainty and dependence</a></li>
-    <li><a class="dropdown-item" href="../articles/bayesplot-loo.html">Posterior predictive checks and approximate leave-one-out comparisons</a></li>
-    <li><a class="dropdown-item" href="../articles/gfam-support.html">Combining surveys with different response distributions</a></li>
-    <li><a class="dropdown-item" href="../articles/scam-support.html">Working with shape-constrained additive models</a></li>
-    <li><a class="dropdown-item" href="../articles/glmmTMB-support.html">Smooth trends and repeated measurements with glmmTMB</a></li>
-    <li><a class="dropdown-item" href="../articles/sdmTMB-support.html">Depth effects and spatial variation in a trawl survey</a></li>
-    <li><hr class="dropdown-divider"></li>
-    <li><h6 class="dropdown-header" data-toc-skip>Workflows</h6></li>
-    <li><a class="dropdown-item" href="../articles/prediction-comparisons.html">Comparing treatments and finding rates of change</a></li>
-    <li><a class="dropdown-item" href="../articles/smooth-effects.html">Read smooth effects, interactions and surfaces</a></li>
-    <li><a class="dropdown-item" href="../articles/variance-components.html">Variance components in GAMs</a></li>
-    <li><a class="dropdown-item" href="../articles/shape-constrained-intervals.html">Intervals for shape-constrained smooths</a></li>
-    <li><a class="dropdown-item" href="../articles/spatial-smooths.html">Choose a smooth for the spatial question</a></li>
-    <li><a class="dropdown-item" href="../articles/response-distributions.html">Checking different response distributions</a></li>
-    <li><a class="dropdown-item" href="../articles/transformed-covariates.html">Predictions, plots and derivatives with transformed covariates</a></li>
-    <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Essentials</h6></li>
     <li><a class="dropdown-item" href="../articles/data-slices.html">Creating prediction grids with data_slice()</a></li>
-    <li><a class="dropdown-item" href="../articles/custom-plotting.html">Customising plots</a></li>
-    <li><a class="dropdown-item" href="../articles/posterior-simulation.html">Posterior Simulation</a></li>
+    <li><a class="dropdown-item" href="../articles/custom-plotting.html">Customising gratia plots</a></li>
+    <li><a class="dropdown-item" href="../articles/posterior-simulation.html">Posterior simulation of GAM smooths, fitted values and responses</a></li>
     <li><a class="dropdown-item" href="../articles/sampling-migration.html">Updating sampling code for gratia 0.12.0</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Models</h6></li>
+    <li><a class="dropdown-item" href="../articles/model-checking.html">Residual diagnostics and posterior predictive checks with gratia</a></li>
+    <li><a class="dropdown-item" href="../articles/bayesplot-loo.html">Posterior predictive checks with bayesplot and model comparisons with loo</a></li>
+    <li><a class="dropdown-item" href="../articles/gfam-support.html">Working with mgcv::gfam() models in gratia</a></li>
+    <li><a class="dropdown-item" href="../articles/scam-support.html">Working with scam models in gratia</a></li>
+    <li><a class="dropdown-item" href="../articles/glmmTMB-support.html">Working with glmmTMB models in gratia</a></li>
+    <li><a class="dropdown-item" href="../articles/sdmTMB-support.html">Working with sdmTMB models in gratia</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Workflows</h6></li>
+    <li><a class="dropdown-item" href="../articles/prediction-comparisons.html">Comparing treatments and estimating rates of change</a></li>
+    <li><a class="dropdown-item" href="../articles/smooth-effects.html">Plotting group-specific smooths and parametric interactions</a></li>
+    <li><a class="dropdown-item" href="../articles/variance-components.html">Estimating and interpreting variance components in GAMs</a></li>
+    <li><a class="dropdown-item" href="../articles/shape-constrained-intervals.html">Shape-constrained intervals and coefficient confidence sets</a></li>
+    <li><a class="dropdown-item" href="../articles/spatial-smooths.html">Specialist spatial smooths</a></li>
+    <li><a class="dropdown-item" href="../articles/response-distributions.html">Model diagnostics for distributional, discrete and censored responses</a></li>
+    <li><a class="dropdown-item" href="../articles/transformed-covariates.html">Predictions, plots and derivatives with transformed covariates</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="active nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -62,14 +62,15 @@
 <h2 class="pkg-version" data-toc-text="development version" id="gratia-development-version">gratia (development version)<a class="anchor" aria-label="anchor" href="#gratia-development-version"></a></h2>
 <div class="section level3">
 <h3 id="user-visible-changes-development-version">User visible changes<a class="anchor" aria-label="anchor" href="#user-visible-changes-development-version"></a></h3>
-<ul><li><p>Help examples use fewer model fits and repeated plots to focus on each function’s main use and reduce execution time.</p></li>
+<ul><li><p><strong>Breaking change:</strong> gratia has removed its <code><a href="https://rdrr.io/pkg/nlme/man/fixed.effects.html" class="external-link">fixef()</a></code> re-export and the methods it registered for that generic. Use <code><a href="../reference/fixed_effects.gam.html">gratia::fixed_effects()</a></code> for GAMs, GAMMs, GLMs and linear models supported by gratia. For models fitted directly with nlme or lme4, use <code><a href="https://rdrr.io/pkg/nlme/man/fixed.effects.html" class="external-link">nlme::fixef()</a></code> or <code><a href="https://rdrr.io/pkg/nlme/man/fixed.effects.html" class="external-link">lme4::fixef()</a></code>, respectively.</p></li>
+<li><p>Help examples use fewer model fits and repeated plots to focus on each function’s main use and reduce execution time.</p></li>
 <li><p>gratia no longer requires ggokabeito; default plot colours and their ordering are unchanged. Unused curl and svglite suggestions have been removed, and ggdist, distributional and hexbin are now listed as website dependencies because they are used only in a website article.</p></li>
 <li><p><code>grouped_by</code> is deprecated in <code><a href="../reference/draw.html">draw()</a></code> and <code><a href="../reference/assemble.html">assemble()</a></code>. Include <code>"factor-by"</code> in the new <code>grouped</code> argument to overlay factor-by curves, or omit it to draw them separately. Explicit uses of <code>grouped_by</code> still update factor-by grouping, including ordered factors, while retaining the requested grouping of <code>sz</code> and <code>fs</code> curves.</p></li>
 <li><p><code><a href="../reference/draw.basis.html">draw.basis()</a></code> now draws contour lines on surface plots by default (<code>contour = TRUE</code>), matching <code><a href="../reference/draw.gam.html">draw.gam()</a></code>. Use <code>contour = FALSE</code> to restore the previous appearance.</p></li>
 <li>
 <p><strong>Plot appearance and theme migration</strong></p>
 <p>Plot aesthetic arguments for colours, opacity and line widths are deprecated in favour of ggplot2 component themes (<a href="https://github.com/gavinsimpson/gratia/issues/215" class="external-link">#215</a>). Existing default appearances are unchanged, and explicitly supplied arguments remain fixed overrides during migration.</p>
-<p>Apply <code><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme()</a></code> with <code>&amp;</code> to every panel in a patchwork, or with <code>+</code> to a single plot. For example, replace <code>smooth_col</code> with <code>geom.gratia.smooth = element_geom(colour = ...)</code> and <code>ci_alpha</code> with <code>gratia.alpha.interval</code> inside <code><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme()</a></code>. See <code><a href="../reference/gratia_theme_get.html">gratia_theme_get()</a></code> and the Customizing plots article for migration examples.</p>
+<p>Apply <code><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme()</a></code> with <code>&amp;</code> to every panel in a patchwork, or with <code>+</code> to a single plot. For example, replace <code>smooth_col</code> with <code>geom.gratia.smooth = element_geom(colour = ...)</code> and <code>ci_alpha</code> with <code>gratia.alpha.interval</code> inside <code><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme()</a></code>. See <code><a href="../reference/gratia_theme_get.html">gratia_theme_get()</a></code> and the Customising gratia plots article for migration examples.</p>
 <p>gratia now requires ggplot2 &gt;= 4.0.3 and patchwork &gt;= 1.3.2.</p>
 </li>
 <li><p>Native <code><a href="https://rdrr.io/pkg/mgcv/man/scasm.html" class="external-link">mgcv::scasm()</a></code> smooth estimation, drawing and <code><a href="https://rdrr.io/r/stats/confint.html" class="external-link">confint()</a></code> now default to <code>overall_uncertainty = FALSE</code>. An explicit request for unavailable overall mean uncertainty warns once (<a href="https://github.com/gavinsimpson/gratia/issues/372" class="external-link">#372</a>, <a href="https://github.com/gavinsimpson/gratia/issues/373" class="external-link">#373</a>).</p></li>
@@ -145,12 +146,16 @@
 <p>Separate curves use the usual black line and translucent black interval. Set <code>grouped = FALSE</code> to separate all factor-related curves, or <code>show_ci = FALSE</code> to hide their intervals.</p>
 </li>
 <li><p><code><a href="../reference/assemble.html">assemble()</a></code> now supports models fitted by <code><a href="https://rdrr.io/pkg/mgcv/man/gamm.html" class="external-link">mgcv::gamm()</a></code>, returning named plots of smooth and parametric contributions. It shares preparation of the fitted GAM component with <code><a href="../reference/draw.html">draw()</a></code>.</p></li>
-<li><p><code><a href="../reference/assemble.html">assemble()</a></code> now supports models fitted by <code><a href="https://rdrr.io/pkg/GJRM/man/gamlss.html" class="external-link">GJRM::gamlss()</a></code>, returning a named list of smooth and parametric plots across equations. It shares model preparation, selection and scale handling with <code><a href="../reference/draw.html">draw()</a></code>.</p></li>
+<li>
+<p><strong>Plots and smooth estimates for <code><a href="https://rdrr.io/pkg/GJRM/man/gamlss.html" class="external-link">GJRM::gamlss()</a></code></strong></p>
+<p><code><a href="../reference/assemble.html">assemble()</a></code> now supports models fitted by <code><a href="https://rdrr.io/pkg/GJRM/man/gamlss.html" class="external-link">GJRM::gamlss()</a></code>, returning a named list of smooth and parametric plots across equations. It shares model preparation, selection and scale handling with <code><a href="../reference/draw.html">draw()</a></code>.</p>
+<p>Direct calls to <code><a href="../reference/smooth_estimates.html">smooth_estimates()</a></code> now work for <code><a href="https://rdrr.io/pkg/GJRM/man/gamlss.html" class="external-link">GJRM::gamlss()</a></code> models (<a href="https://github.com/gavinsimpson/gratia/issues/352" class="external-link">#352</a>). Estimates use the final fitted coefficients and covariance, with smooth selection across equations and parameter labels retained for drawing saved estimates. Frequentist covariance also comes from the final fit, and gratia warns and uses the fitted Bayesian covariance when the requested smoothing-parameter correction is unavailable.</p>
+</li>
 <li><p><code><a href="../reference/assemble.html">assemble()</a></code> now supports glmmTMB models, returning named plots for smooths, native random effects and parametric terms. It shares model preparation and argument checks with <code><a href="../reference/draw.html">draw()</a></code>.</p></li>
 <li>
 <p><strong>Polar plots of cyclic smooths</strong></p>
 <p><code><a href="../reference/draw.html">draw()</a></code> and <code><a href="../reference/assemble.html">assemble()</a></code> can draw one-dimensional cyclic smooths with <code>cyclic = "polar"</code>, including factor-by and one-dimensional tensor smooths across supported model classes. Fitted cycle boundaries configure the angular axis and automatic evaluation grids span a complete cycle. Saved smooth estimates retain these boundaries; supplied evaluation points are unchanged.</p>
-<p><code>polar_args</code> customizes the polar coordinate display. Radial padding separates interval bands from the outer observation rug. Radial axes appear inside the circle by default; override their position through <code>polar_args</code>.</p>
+<p><code>polar_args</code> customises the polar coordinate display. Radial padding separates interval bands from the outer observation rug. Radial axes appear inside the circle by default; override their position through <code>polar_args</code>.</p>
 </li>
 <li><p><code><a href="../reference/draw.basis.html">draw.basis()</a></code> now plots basis functions of three- and four-covariate smooths as separate surfaces with conditioning facets (<a href="https://github.com/gavinsimpson/gratia/issues/258" class="external-link">#258</a>, <a href="https://github.com/gavinsimpson/gratia/issues/259" class="external-link">#259</a>). <code><a href="../reference/basis.html">basis()</a></code> and <code><a href="../reference/draw.basis.html">draw.basis()</a></code> accept <code>variables</code> to choose the axes and conditioning order. Automatic grids use the existing <code>n_2d</code>, <code>n_3d</code>, and <code>n_4d</code> controls, and saved bases retain their chosen covariate order.</p></li>
 <li>
@@ -244,7 +249,7 @@
 <li>
 <p><strong>Residual diagnostics and posterior predictive checks</strong></p>
 <p>Residual diagnostics and posterior predictive checks now cover <code>lm</code>, <code>glm</code>, <code>gam</code>/<code>bam</code>, <code>gamm</code>/<code>gamm4</code>, glmmTMB, univariate GJRM and sdmTMB models using their fitted response distributions. See <code><a href="../reference/diagnostic_support.html">?diagnostic_support</a></code> for supported families, conditioning choices and limitations.</p>
-<p>Probability integral transform (PIT) residuals map observations to fitted probabilities, randomising over probability mass for discrete responses. Quantile residuals convert those probabilities to standard-normal scores.</p>
+<p>Probability integral transform (PIT) residuals map observations to fitted probabilities, randomising over probability mass for discrete responses. Quantile residuals convert those probabilities to standard-normal scores. QQ and worm-plot subtitles distinguish this fixed normal reference from the normal approximation for traditional residuals.</p>
 <p>Prepared diagnostic objects carry the selected conditioning and sdmTMB field choices through residual and plotting methods.</p>
 </li>
 <li>
@@ -384,7 +389,8 @@
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-development-version">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
-<ul><li><p><code><a href="../reference/add_fitted.html">add_fitted()</a></code> no longer emits a tibble deprecation warning for multinomial predictions with unnamed columns. The existing <code>V1</code>, <code>V2</code>, … column names are preserved (<a href="https://github.com/gavinsimpson/gratia/issues/443" class="external-link">#443</a>).</p></li>
+<ul><li><p><code><a href="../reference/draw.html">draw()</a></code>, <code><a href="../reference/assemble.html">assemble()</a></code> and <code><a href="../reference/smooth_estimates.html">smooth_estimates()</a></code> again work with smooths that provide their own <code><a href="../reference/eval_smooth.html">eval_smooth()</a></code> method, such as monotone smooths fitted with mvgam.</p></li>
+<li><p><code><a href="../reference/add_fitted.html">add_fitted()</a></code> no longer emits a tibble deprecation warning for multinomial predictions with unnamed columns. The existing <code>V1</code>, <code>V2</code>, … column names are preserved (<a href="https://github.com/gavinsimpson/gratia/issues/443" class="external-link">#443</a>).</p></li>
 <li>
 <p><strong>Response derivatives</strong></p>
 <p><code><a href="../reference/response_derivatives.html">response_derivatives()</a></code> now retains unavailable prediction rows with missing estimates, standard errors and intervals under both uncertainty methods, while respecting explicit <code>na.action</code> requests (<a href="https://github.com/gavinsimpson/gratia/issues/437" class="external-link">#437</a>). Original row order and response identifiers are preserved.</p>
@@ -414,7 +420,6 @@
 <li><p><code><a href="../reference/partial_residuals.html">partial_residuals()</a></code> and <code><a href="../reference/add_partial_residuals.html">add_partial_residuals()</a></code> now give an informative error for models without working residuals or working weights, including mgcv’s location-scale families. <code>draw(residuals = TRUE)</code> warns once and draws the smooths without partial residuals for these models (<a href="https://github.com/gavinsimpson/gratia/issues/414" class="external-link">#414</a>).</p></li>
 <li><p><code><a href="../reference/draw.difference_smooth.html">draw.difference_smooth()</a></code> now uses supplied <code>xlab</code> and <code>caption</code> values when drawing differences between curves.</p></li>
 <li><p><code><a href="../reference/n_smooths.html">n_smooths()</a></code> now counts smooth terms in glmmTMB models across the conditional, zero-inflation and dispersion predictors, excluding native random effects. Models without smooths return zero (<a href="https://github.com/gavinsimpson/gratia/issues/240" class="external-link">#240</a>).</p></li>
-<li><p>Direct calls to <code><a href="../reference/smooth_estimates.html">smooth_estimates()</a></code> now work for <code><a href="https://rdrr.io/pkg/GJRM/man/gamlss.html" class="external-link">GJRM::gamlss()</a></code> models (<a href="https://github.com/gavinsimpson/gratia/issues/352" class="external-link">#352</a>). Estimates use the final fitted coefficients and covariance, with smooth selection across equations and parameter labels retained for drawing saved estimates. Frequentist covariance also comes from the final fit; unavailable smoothing-parameter corrections warn and use its Bayesian covariance.</p></li>
 <li><p>B-spline evaluation handles empty data and factor-by calls whose evaluation data omit fitted levels, including constrained tensor products. <code><a href="../reference/smooth_estimates.html">smooth_estimates()</a></code> retains estimate, standard error and predictor columns and their types when no evaluation rows remain. Nested output keeps each selected smooth with its empty data table.</p></li>
 <li>
 <p><strong>Sampling diagnostics and workers</strong></p>

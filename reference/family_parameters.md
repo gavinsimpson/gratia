@@ -47,7 +47,7 @@ native representation: for example,
 [`mgcv::ziplss()`](https://rdrr.io/pkg/mgcv/man/ziplss.html) uses an
 identity link for log rate, while natural rate is the exponential of
 that predictor. The sinh-arcsinh skewness and tailweight parameters
-control distribution shape; they are not the response's standardized
+control distribution shape; they are not the response's standardised
 skewness and kurtosis.
 
 [`link()`](https://gavinsimpson.github.io/gratia/reference/link.md) and

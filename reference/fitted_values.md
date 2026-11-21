@@ -279,7 +279,7 @@ fitting observations. Predictions are unchanged: an unobserved
 combination is not necessarily non-estimable, particularly in additive
 models. Numeric-by-factor range extrapolation is not checked. Missing
 predictors and genuinely new factor levels retain their usual prediction
-behavior.
+behaviour.
 
 Simultaneous intervals jointly cover the model's underlying expected
 responses, or linear predictors on the link scale, at all valid
@@ -295,7 +295,7 @@ sets. These are uncertainty intervals for model predictions, not
 prediction intervals for future observations.
 
 Simultaneous intervals use joint Gaussian coefficient draws and a
-critical value based on the maximum absolute standardized deviation over
+critical value based on the maximum absolute standardised deviation over
 the supplied rows. Their limits are computed on the link scale and
 transformed if `scale = "response"`; `.se` remains on the link scale.
 The simulation covariance may be positive semidefinite. Supported

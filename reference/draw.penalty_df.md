@@ -34,7 +34,7 @@ draw(
 
 - normalize:
 
-  logical; normalize the penalty to the range -1, 1?
+  logical; normalise the penalty to the range -1, 1?
 
 - as_matrix:
 

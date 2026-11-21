@@ -1,4 +1,4 @@
-# Posterior Simulation
+# Posterior simulation of GAM smooths, fitted values and responses
 
 Posterior simulation represents uncertainty in a fitted GAM by drawing
 model coefficients and evaluating smooths or predictions at each draw.
@@ -109,7 +109,7 @@ the univariate examples here, each column contains one simulated
 response dataset, with rows corresponding to observations.
 [`derivative_samples()`](https://gavinsimpson.github.io/gratia/reference/derivative_samples.md)
 evaluates rates of change using the same coefficient draws at
-neighbouring covariate values. See [Comparing treatments and finding
+neighbouring covariate values. See [Comparing treatments and estimating
 rates of
 change](https://gavinsimpson.github.io/gratia/articles/prediction-comparisons.md)
 for examples of response derivatives.

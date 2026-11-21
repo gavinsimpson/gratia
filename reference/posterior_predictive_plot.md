@@ -99,7 +99,7 @@ posterior_predictive_plot(
 
 - scalable:
 
-  logical or `NULL`; summarize posterior response draws on a common
+  logical or `NULL`; summarise posterior response draws on a common
   grid, using temporary disk storage instead of retaining all responses
   in memory. `NULL` enables this at `scalable_threshold` observations.
 
@@ -176,7 +176,7 @@ series boundaries stored in `AR.start`. Gaussian `gamm` and `gamm4`
 models draw fixed and random effects together, keeping covariance
 parameters at fitted values; marginal checks draw new effects. For
 [`mgcv::gamm()`](https://rdrr.io/pkg/mgcv/man/gamm.html) fits estimated
-by penalized quasi-likelihood (PQL), the sampler uses the Gaussian
+by penalised quasi-likelihood (PQL), the sampler uses the Gaussian
 approximation used in fitting and then generates responses from the
 fitted response family. This is supported only when the Gaussian working
 residuals are uncorrelated. Correlation in those working residuals does
