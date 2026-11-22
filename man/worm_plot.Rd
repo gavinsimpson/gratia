@@ -229,30 +229,10 @@ simulated residuals method (\code{method = "simulated"}). To avoid confusion,
 \code{method = "direct"} is deprecated in favour of \code{method = "uniform"}.
 }
 \examples{
-load_mgcv()
-## simulate binomial data...
-dat <- data_sim("eg1", n = 200, dist = "binary", scale = .33, seed = 0)
-p <- binomial()$linkinv(dat$f) # binomial p
-n <- sample(c(1, 3), 200, replace = TRUE) # binomial n
-dat <- transform(dat, y = rbinom(n, n, p), n = n)
-m <- gam(y / n ~ s(x0) + s(x1) + s(x2) + s(x3),
-  family = binomial, data = dat, weights = n,
-  method = "REML"
-)
-
-## The default uses inverse-CDF sampling of randomised uniform quantiles.
-## Note no reference bands are drawn with this method.
-worm_plot(m)
-
-## Alternatively simulate new data from the model, which
-## allows construction of reference intervals for the Q-Q plot
-worm_plot(m,
-  method = "simulate", point_col = "steelblue",
-  point_alpha = 0.4
-)
-
-## ... or request a normal approximation for the residuals.
-worm_plot(m, method = "normal")
+# Fit stopping distance as a smooth function of speed.
+m <- mgcv::gam(dist ~ s(speed, k = 5), data = cars, method = "REML")
+# Plot how the ordered residuals differ from their reference quantiles.
+worm_plot(m, type = "quantile", seed = 42)
 }
 \seealso{
 \link{gamm4_support}

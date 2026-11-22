@@ -95,14 +95,14 @@
 #' @seealso [quantile_residuals()], [appraise()], [diagnostic_support]
 #' @export
 #' @examples
-#' load_mgcv()
+#' # Turn a latent signal with logistic noise into four ordered categories.
 #' set.seed(359)
-#' dat <- data.frame(x = runif(200, -2, 2))
+#' dat <- data.frame(x = runif(120, -2, 2))
 #' latent <- sin(dat$x) + rlogis(nrow(dat))
 #' dat$y <- findInterval(latent, c(-1, 0, 2)) + 1L
-#' fit <- gam(y ~ s(x), data = dat, family = ocat(R = 4), method = "REML")
+#' fit <- mgcv::gam(y ~ s(x, k = 5), data = dat,
+#'   family = mgcv::ocat(R = 4), method = "REML")
 #' head(surrogate_residuals(fit, seed = 42))
-#' appraise(fit, type = "surrogate", seed = 42)
 surrogate_residuals <- function(model, seed = NULL, ...) {
   UseMethod("surrogate_residuals")
 }

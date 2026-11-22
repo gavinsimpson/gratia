@@ -848,20 +848,11 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
 #' \dontshow{
 #' op <- options(pillar.sigfig = 3, cli.unicode = FALSE)
 #' }
-#' dat <- data_sim("eg1", n = 1000, dist = "normal", scale = 2, seed = 2)
-#' m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
+#' dat <- data_sim("eg1", n = 120, seed = 2)
+#' m <- gam(y ~ s(x0, k = 6) + s(x2, k = 6), data = dat, method = "REML")
 #'
-#' fs <- fitted_samples(m1, n_draws = 5, seed = 42)
-#' \donttest{
-#' fs
-#' }
-#'
-#' # can generate own set of draws and use them
-#' drws <- generate_draws(m1, n_draws = 2, seed = 24)
-#' fs2 <- fitted_samples(m1, method = "user", draws = drws)
-#' \donttest{
-#' fs2
-#' }
+#' # Draw from the posterior of the expected response at the observed rows
+#' fitted_samples(m, n_draws = 5, seed = 42)
 #' \dontshow{
 #' options(op)
 #' }
@@ -1236,33 +1227,12 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
 #' \dontshow{
 #' op <- options(pillar.sigfig = 3, cli.unicode = FALSE)
 #' }
-#' dat <- data_sim("eg1", n = 1000, dist = "normal", scale = 2, seed = 2)
-#' m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
+#' dat <- data_sim("eg1", n = 120, seed = 2)
+#' m <- gam(y ~ s(x0, k = 6) + s(x2, k = 6), data = dat, method = "REML")
 #'
-#' predicted_samples(m, n_draws = 5, seed = 42)
-#'
-#' ## Can pass arguments to predict.gam()
-#' \dontshow{
-#' set.seed(6791)
-#' }
-#' newd <- data.frame(
-#'   x0 = runif(10), x1 = runif(10), x2 = runif(10),
-#'   x3 = runif(10)
-#' )
-#'
-#' ## Exclude s(x2)
-#' predicted_samples(m, n_draws = 5, data = newd, exclude = "s(x2)", seed = 25)
-#'
-#' ## Exclude s(x1)
-#' predicted_samples(m, n_draws = 5, data = newd, exclude = "s(x1)", seed = 25)
-#'
-#' ## Select which terms --- result should be the same as previous
-#' ## but note that we have to include any parametric terms, including the
-#' ## constant term
-#' predicted_samples(m,
-#'   n_draws = 5, data = newd, seed = 25,
-#'   terms = c("Intercept", "s(x0)", "s(x2)", "s(x3)")
-#' )
+#' # Simulate responses at new predictor values using the fitted model
+#' newd <- data.frame(x0 = c(0.2, 0.5, 0.8), x2 = 0.5)
+#' predicted_samples(m, n_draws = 5, data = newd, seed = 42)
 #' \dontshow{
 #' options(op)
 #' }
@@ -1461,27 +1431,12 @@ posterior_location_response_draws <- function(fitted, distribution, rows) {
 #'
 #' @examples
 #' load_mgcv()
-#' \dontshow{
-#' op <- options(cli.unicode = FALSE, pillar.sigfig = 3)
-#' }
-#' dat <- data_sim("eg1", n = 400, seed = 2)
-#' m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
+#' dat <- data_sim("eg1", n = 120, seed = 2)
+#' m <- gam(y ~ s(x0, k = 6) + s(x2, k = 6), data = dat, method = "REML")
 #'
-#' sms <- smooth_samples(m1, select = "s(x0)", n_draws = 5, seed = 42)
-#' \donttest{
-#' sms
-#' }
-#'
-#' ## A factor by example (with a spurious covariate x0)
-#' dat <- data_sim("eg4", n = 1000, seed = 2)
-#'
-#' ## fit model...
-#' m2 <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = dat)
-#' sms <- smooth_samples(m2, n_draws = 5, seed = 42)
+#' # Plot five posterior draws of the smooth of x2
+#' sms <- smooth_samples(m, select = "s(x2)", n_draws = 5, n_grid = 40, seed = 42)
 #' draw(sms)
-#' \dontshow{
-#' options(op)
-#' }
 `smooth_samples` <- function(
   model,
   ...
@@ -2004,32 +1959,23 @@ calculate_smooth_samples <- function(sm, data, model, betas, label, Xp = NULL) {
 #'   was evaluated.
 #'
 #' @examples
-#'
+#' library("ggplot2")
 #' load_mgcv()
-#' df <- data_sim("eg1", dist = "negbin", scale = 0.25, seed = 42)
+#' df <- data_sim("eg1", n = 160, dist = "negbin", scale = 0.25, seed = 42)
 #'
-#' # fit the GAM (note: for execution time reasons using bam())
-#' m <- bam(y ~ s(x0) + s(x1) + s(x2) + s(x3),
-#'   data = df, family = nb(), method = "fREML")
+#' m <- gam(y ~ s(x0, k = 6) + s(x2, k = 6), data = df,
+#'   family = nb(), method = "REML")
 #'
-#' # data slice through data along x2 - all other covariates will be set to
-#' # typical values (value closest to median)
-#' ds <- data_slice(m, x2 = evenly(x2, n = 200))
+#' # Vary x2 while holding x0 at a typical value
+#' ds <- data_slice(m, x2 = evenly(x2, n = 50))
 #'
-#' # samples from posterior of derivatives
+#' # Draw and plot 20 curves for the derivative with respect to x2
 #' fd_samp <- derivative_samples(m,
-#'   data = ds, type = "central",
-#'   focal = "x2", eps = 0.01, seed = 21, n_draws = 100
+#'   data = ds, type = "central", focal = "x2", eps = 0.01,
+#'   seed = 21, n_draws = 20
 #' )
-#'
-#' # plot the first 20 posterior draws
-#' if (requireNamespace("ggplot2") && requireNamespace("dplyr")) {
-#'   library("ggplot2")
-#'   fd_samp |>
-#'     dplyr::filter(.draw <= 20) |>
-#'     ggplot(aes(x = x2, y = .derivative, group = .draw)) +
-#'     geom_line(alpha = 0.5)
-#' }
+#' ggplot(fd_samp, aes(x = x2, y = .derivative, group = .draw)) +
+#'   geom_line(alpha = 0.5)
 `derivative_samples.gam` <- function(
   model,
   ...,

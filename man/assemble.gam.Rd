@@ -485,22 +485,13 @@ plot lists. See \code{\link[=draw_label_control]{draw_label_control()}} for the 
 \examples{
 load_mgcv()
 
-# simulate some data
-df1 <- data_sim("eg1", n = 400, dist = "normal", scale = 2, seed = 2)
-# fit GAM
-m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df1, method = "REML")
+# Fit smooths for two predictors in a simulated data set.
+dat <- data_sim("eg1", n = 100, seed = 2)
+model <- gam(y ~ s(x0, k = 6) + s(x1, k = 6), data = dat, method = "REML")
 
-# assemble plots of all smooths
-assemble(m1)
-
-# can be passed to patchwork::wrap_plots()
-suppressPackageStartupMessages(library("patchwork"))
-assemble(m1) |> wrap_plots(ncol = 2, nrow = 2)
-
-# Prepare individual plots from a GAMM
-m2 <- gamm(y ~ s(x0) + x1, data = df1, method = "REML")
-gamm_plots <- assemble(m2)
-gamm_plots[[1]]
+# Arrange the returned plots in one column and apply a common theme.
+plots <- assemble(model, n = 40)
+patchwork::wrap_plots(plots, ncol = 1) & ggplot2::theme_minimal()
 }
 \author{
 Gavin L. Simpson

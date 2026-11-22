@@ -28,26 +28,14 @@
 #'
 #' @export
 #' @examples
-#' load_mgcv()
-#' \dontshow{
-#' op <- options(cli.unicode = FALSE, pillar.sigfig = 6)
-#' }
-#' df <- data_sim("eg1", n = 1000, dist = "poisson", scale = 0.1, seed = 6)
-#'
-#' # A poisson example
-#' m <- gam(y ~ s(x0, bs = "cr") + s(x1, bs = "cr") + s(x2, bs = "cr") +
-#'   s(x3, bs = "cr"), family = poisson(), data = df, method = "REML")
-#' rg <- rootogram(m)
-#' rg
-#' draw(rg) # plot the rootogram
-#'
-#' # A Gaussian example
-#' df <- data_sim("eg1", dist = "normal", seed = 2)
-#' m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = "REML")
-#' draw(rootogram(m, breaks = "FD"), type = "suspended")
-#' \dontshow{
-#' options(op)
-#' }
+#' # Simulate Poisson counts with a mean that varies smoothly with x.
+#' set.seed(6)
+#' dat <- data.frame(x = runif(120))
+#' dat$y <- rpois(nrow(dat), exp(1 + sin(2 * pi * dat$x)))
+#' m <- mgcv::gam(y ~ s(x, k = 6), family = poisson(),
+#'   data = dat, method = "REML")
+#' # Compare observed and fitted frequencies for each count.
+#' draw(rootogram(m))
 `rootogram` <- function(object, ...) {
   UseMethod("rootogram")
 }
@@ -226,19 +214,11 @@
 #' @importFrom ggplot2 ggplot aes geom_rect geom_point geom_line labs geom_hline
 #'
 #' @examples
-#' load_mgcv()
-#' df <- data_sim("eg1", n = 1000, dist = "poisson", scale = 0.1, seed = 6)
-#'
-#' # A poisson example
-#' m <- gam(y ~ s(x0, bs = "cr") + s(x1, bs = "cr") + s(x2, bs = "cr") +
-#'   s(x3, bs = "cr"), family = poisson(), data = df, method = "REML")
-#' rg <- rootogram(m)
-#'
-#' # plot the rootogram
-#' draw(rg)
-#'
-#' # change the type of rootogram
-#' draw(rg, type = "suspended")
+#' # Fit a Poisson model for the counts under each spray treatment.
+#' m <- mgcv::gam(count ~ spray, family = poisson(),
+#'   data = InsectSprays, method = "REML")
+#' # Draw a suspended rootogram to show the differences from fitted frequencies.
+#' draw(rootogram(m), type = "suspended")
 #' @inheritSection draw Label layout
 `draw.rootogram` <- function(object,
                              type = c("hanging", "standing", "suspended"),

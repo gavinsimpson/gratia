@@ -395,15 +395,14 @@ sdmtmb_smooth_model <- function(
 #' @examples
 #' if (requireNamespace("sdmTMB", quietly = TRUE)) {
 #'   load_mgcv()
-#'   # Simulate nonlinear and linear effects with Gaussian noise
+#'   # Simulate a nonlinear mean with Gaussian noise
 #'   set.seed(42)
-#'   d <- data.frame(x = runif(150), z = runif(150))
-#'   d$y <- 1 + sin(6 * d$x) + 0.5 * d$z + rnorm(150, sd = 0.3)
+#'   d <- data.frame(x = runif(80))
+#'   d$y <- 1 + sin(6 * d$x) + rnorm(80, sd = 0.3)
 #'
-#'   # Fit without a spatial field and draw the linear and smooth effects
-#'   m <- sdmTMB::sdmTMB(y ~ z + s(x, k = 6), data = d, spatial = "off")
-#'   smooths(m)
-#'   draw(m)
+#'   # Fit without a spatial field and draw the smooth effect
+#'   m <- sdmTMB::sdmTMB(y ~ s(x, k = 6), data = d, spatial = "off")
+#'   draw(m, n = 50)
 #' }
 NULL
 

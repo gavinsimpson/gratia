@@ -560,20 +560,12 @@ plot lists. See \code{\link[=draw_label_control]{draw_label_control()}} for the 
 \examples{
 load_mgcv()
 
-# Simulate data and fit a GAM
-df1 <- data_sim("eg1", n = 200, dist = "normal", scale = 2, seed = 2)
-m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df1, method = "REML")
+# Fit smooths for two predictors in a simulated data set.
+dat <- data_sim("eg1", n = 100, seed = 2)
+model <- gam(y ~ s(x0, k = 6) + s(x1, k = 6), data = dat, method = "REML")
 
-# Plot all smooths
-draw(m1)
-
-# Draw a complete cycle in polar coordinates, using fitted knot boundaries
-m_cycle <- gam(y ~ s(x0, bs = "cc", k = 10), data = df1,
-  knots = list(x0 = c(0, 1)), method = "REML")
-draw(m_cycle, cyclic = "polar")
-
-# See https://gavinsimpson.github.io/gratia/articles/custom-plotting.html
-# for more examples. Use the & operator to modify the theme of all panels.
+# Apply the same theme to both smooth plots.
+draw(model, n = 40) & ggplot2::theme_minimal()
 }
 \author{
 Gavin L. Simpson

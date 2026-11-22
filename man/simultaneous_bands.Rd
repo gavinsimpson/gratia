@@ -94,19 +94,15 @@ not added to plot captions.
 \examples{
 load_mgcv()
 set.seed(4)
-dat <- data.frame(x = seq(0, 1, length.out = 100))
-dat$y <- sin(6 * dat$x) + rnorm(100, sd = 0.2)
-model <- gam(y ~ s(x, bs = "cr", k = 8), data = dat, method = "REML")
+dat <- data.frame(x = seq(0, 1, length.out = 80))
+dat$y <- sin(6 * dat$x) + rnorm(80, sd = 0.2)
+model <- gam(y ~ s(x, bs = "cr", k = 6), data = dat, method = "REML")
+# Plot a simultaneous confidence band over the fitted domain
 band <- smooth_estimates(model,
-  interval = "simultaneous",
+  interval = "simultaneous", n = 50,
   simultaneous_method = "tube", simultaneous_domain = c(0, 1)
 )
 draw(band)
-rate <- derivatives(model,
-  type = "central", interval = "simultaneous",
-  simultaneous_method = "tube"
-)
-attr(rate, "interval_info")$curves[[1]]$critical
 }
 \references{
 Sun, J. and Loader, C. R. (1994). Simultaneous confidence bands for linear

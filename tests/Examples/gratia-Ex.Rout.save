@@ -310,15 +310,11 @@ detaching ‘package:mgcv’
 > ### ** Examples
 > 
 > load_mgcv()
-> df <- data_sim("eg1", n = 200, seed = 42)
-> m <- gam(y ~ s(x0) + te(x1, x2, k = c(5, 5)) + s(x3),
+> df <- data_sim("eg1", n = 120, seed = 42)
+> # Estimate the effect of x1 in a model where it interacts with x2
+> m <- gam(y ~ s(x0, k = 5) + te(x1, x2, k = c(4, 4)),
 +   data = df, method = "REML")
-> a <- ale(m, focal = "x1")
-> draw(a)
-> 
-> # Standard deviation in its natural units, rather than reciprocal SD
-> ml <- gam(list(y ~ s(x1), ~ x2), data = df, family = gaulss())
-> ale(ml, "x2", parameter = "scale", scale = "response") |> draw()
+> draw(ale(m, focal = "x1", n_bins = 12))
 > 
 > 
 > 
@@ -340,20 +336,14 @@ detaching ‘package:mgcv’
 > 
 > ### ** Examples
 > 
-> load_mgcv()
-> # Simulate an additive Gaussian response and fit a GAM
-> dat <- data_sim("eg1", n = 200, scale = 2, seed = 2)
-> mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
-> 
-> # Inspect residuals, fitted values and the residual distribution
+> # Fit stopping distance as a smooth function of speed.
+> mod <- mgcv::gam(dist ~ s(speed, k = 5), data = cars, method = "REML")
+> # Inspect residuals, fitted values and the residual distribution.
 > appraise(mod, seed = 42)
 > 
 > 
 > 
 > cleanEx()
-
-detaching ‘package:mgcv’
-
 > nameEx("assemble.gam")
 > ### * assemble.gam
 > 
@@ -367,36 +357,19 @@ detaching ‘package:mgcv’
 > 
 > load_mgcv()
 > 
-> # simulate some data
-> df1 <- data_sim("eg1", n = 400, dist = "normal", scale = 2, seed = 2)
-> # fit GAM
-> m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df1, method = "REML")
+> # Fit smooths for two predictors in a simulated data set.
+> dat <- data_sim("eg1", n = 100, seed = 2)
+> model <- gam(y ~ s(x0, k = 6) + s(x1, k = 6), data = dat, method = "REML")
 > 
-> # assemble plots of all smooths
-> assemble(m1)
-
--- Assembly of 4 plots --
-
-1. s(x0)
-2. s(x1)
-3. s(x2)
-4. s(x3)
-
-> 
-> # can be passed to patchwork::wrap_plots()
-> suppressPackageStartupMessages(library("patchwork"))
-> assemble(m1) |> wrap_plots(ncol = 2, nrow = 2)
-> 
-> # Prepare individual plots from a GAMM
-> m2 <- gamm(y ~ s(x0) + x1, data = df1, method = "REML")
-> gamm_plots <- assemble(m2)
-> gamm_plots[[1]]
+> # Arrange the returned plots in one column and apply a common theme.
+> plots <- assemble(model, n = 40)
+> patchwork::wrap_plots(plots, ncol = 1) & ggplot2::theme_minimal()
 > 
 > 
 > 
 > cleanEx()
 
-detaching ‘package:patchwork’, ‘package:mgcv’
+detaching ‘package:mgcv’
 
 > nameEx("basis")
 > ### * basis
@@ -470,43 +443,20 @@ detaching ‘package:mgcv’
 > op <- options(cli.unicode = FALSE, pillar.sigfig = 5)
 > ## End(Don't show)
 > load_mgcv()
-> dat <- data_sim("eg1", seed = 2)
-> 
-> ## models to compare smooths across - artificially create differences
-> m1 <- gam(y ~ s(x0, k = 5) + s(x1, k = 5) + s(x2, k = 5) + s(x3, k = 5),
-+   data = dat, method = "REML"
-+ )
-> m2 <- gam(y ~ s(x0, bs = "ts") + s(x1, bs = "ts") + s(x2, bs = "ts") +
-+   s(x3, bs = "ts"), data = dat, method = "REML")
-> 
-> ## build comparisons
-> comp <- compare_smooths(m1, m2)
-> comp
-# A tibble: 8 x 5
-  .model .smooth .type         .by   data              
-  <chr>  <chr>   <chr>         <chr> <list>            
-1 m1     s(x0)   TPRS          <NA>  <tibble [100 x 3]>
-2 m2     s(x0)   TPRS (shrink) <NA>  <tibble [100 x 3]>
-3 m1     s(x1)   TPRS          <NA>  <tibble [100 x 3]>
-4 m2     s(x1)   TPRS (shrink) <NA>  <tibble [100 x 3]>
-5 m1     s(x2)   TPRS          <NA>  <tibble [100 x 3]>
-6 m2     s(x2)   TPRS (shrink) <NA>  <tibble [100 x 3]>
-7 m1     s(x3)   TPRS          <NA>  <tibble [100 x 3]>
-8 m2     s(x3)   TPRS (shrink) <NA>  <tibble [100 x 3]>
-> ## notice that the result is a nested tibble
-> 
-> draw(comp)
-> 
-> # Simulate a noisy response over two continuous covariates, x and z
-> surf <- data_sim("eg2", n = 100, seed = 7)
-> # Fit two small bases to the same surface data
-> coarse <- gam(y ~ s(x, z, k = 10), data = surf, method = "REML")
-> fine <- gam(y ~ s(x, z, k = 15), data = surf, method = "REML")
-> # Compare surfaces on shared axes and a shared colour scale
-> surfaces <- compare_smooths(coarse, fine, n_2d = 20)
-> draw(surfaces)
-> # Show coarse minus fine, with a colour scale centred on zero
-> draw(surfaces, show = "difference", pair = c("coarse", "fine"))
+> # Simulate a noisy curve and fit two smooths with different basis sizes.
+> dat <- data_sim("gwf2", n = 100, seed = 2)
+> coarse <- gam(y ~ s(x, k = 5), data = dat, method = "REML")
+> fine <- gam(y ~ s(x, k = 10), data = dat, method = "REML")
+>
+> # Compare the two smooths on the same grid and plot them together.
+> comparison <- compare_smooths(coarse, fine, n = 40)
+> comparison
+# A tibble: 2 x 5
+  .model .smooth .type .by   data
+  <chr>  <chr>   <chr> <chr> <list>
+1 coarse s(x)    TPRS  <NA>  <tibble [40 x 3]>
+2 fine   s(x)    TPRS  <NA>  <tibble [40 x 3]>
+> draw(comparison)
 > ## Don't show: 
 > options(op)
 > ## End(Don't show)
@@ -530,27 +480,28 @@ detaching ‘package:mgcv’
 > ### ** Examples
 > 
 > load_mgcv()
-> # Simulate group-specific curves with Gaussian noise and fit factor-by smooths
-> df <- data_sim("eg4", n = 300, seed = 2)
-> m <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = df, method = "REML")
+> # Simulate data and fit separate curves of x2 for two groups
+> df <- data_sim("eg4", n = 180, seed = 2)
+> df <- droplevels(subset(df, fac %in% c("1", "2")))
+> m <- gam(y ~ fac + s(x2, by = fac, k = 6), data = df, method = "REML")
 > 
 > # Compare fitted responses over x2, including the parametric group effects
-> cd <- conditional_differences(m, by = "fac", condition = "x2")
+> cd <- conditional_differences(m, by = "fac", condition = "x2", n_vals = 40)
 > cd
-# A tibble: 300 x 9
-   .contrast .level_1 .level_2 .diff   .se .lower_ci .upper_ci      x2    x0
-       <int> <fct>    <fct>    <dbl> <dbl>     <dbl>     <dbl>   <dbl> <dbl>
- 1         1 1        2         3.13 0.868      1.42      4.83 0.00325 0.468
- 2         1 1        2         3.17 0.830      1.54      4.80 0.0133  0.468
- 3         1 1        2         3.22 0.794      1.66      4.77 0.0234  0.468
- 4         1 1        2         3.26 0.760      1.77      4.75 0.0334  0.468
- 5         1 1        2         3.31 0.729      1.88      4.74 0.0435  0.468
- 6         1 1        2         3.35 0.700      1.98      4.73 0.0536  0.468
- 7         1 1        2         3.40 0.675      2.07      4.72 0.0636  0.468
- 8         1 1        2         3.44 0.652      2.16      4.72 0.0737  0.468
- 9         1 1        2         3.48 0.631      2.24      4.72 0.0837  0.468
-10         1 1        2         3.52 0.613      2.32      4.72 0.0938  0.468
-# i 290 more rows
+# A tibble: 40 x 8
+   .contrast .level_1 .level_2 .diff   .se .lower_ci .upper_ci       x2
+       <int> <fct>    <fct>    <dbl> <dbl>     <dbl>     <dbl>    <dbl>
+ 1         1 1        2         3.58 0.816      1.98      5.18 0.000663
+ 2         1 1        2         3.62 0.750      2.15      5.09 0.0262
+ 3         1 1        2         3.66 0.695      2.30      5.03 0.0518
+ 4         1 1        2         3.70 0.653      2.42      4.98 0.0774
+ 5         1 1        2         3.74 0.625      2.52      4.97 0.103
+ 6         1 1        2         3.78 0.608      2.59      4.97 0.129
+ 7         1 1        2         3.81 0.599      2.63      4.98 0.154
+ 8         1 1        2         3.83 0.593      2.66      4.99 0.180
+ 9         1 1        2         3.84 0.589      2.69      4.99 0.205
+10         1 1        2         3.84 0.584      2.70      4.99 0.231
+# i 30 more rows
 > draw(cd)
 > 
 > 
@@ -926,38 +877,29 @@ detaching ‘package:mgcv’
 > 
 > ### ** Examples
 > 
-> 
+> library("ggplot2")
 > load_mgcv()
-> df <- data_sim("eg1", dist = "negbin", scale = 0.25, seed = 42)
+> df <- data_sim("eg1", n = 160, dist = "negbin", scale = 0.25, seed = 42)
 > 
-> # fit the GAM (note: for execution time reasons using bam())
-> m <- bam(y ~ s(x0) + s(x1) + s(x2) + s(x3),
-+   data = df, family = nb(), method = "fREML")
+> m <- gam(y ~ s(x0, k = 6) + s(x2, k = 6), data = df,
++   family = nb(), method = "REML")
 > 
-> # data slice through data along x2 - all other covariates will be set to
-> # typical values (value closest to median)
-> ds <- data_slice(m, x2 = evenly(x2, n = 200))
+> # Vary x2 while holding x0 at a typical value
+> ds <- data_slice(m, x2 = evenly(x2, n = 50))
 > 
-> # samples from posterior of derivatives
+> # Draw and plot 20 curves for the derivative with respect to x2
 > fd_samp <- derivative_samples(m,
-+   data = ds, type = "central",
-+   focal = "x2", eps = 0.01, seed = 21, n_draws = 100
++   data = ds, type = "central", focal = "x2", eps = 0.01,
++   seed = 21, n_draws = 20
 + )
-> 
-> # plot the first 20 posterior draws
-> if (requireNamespace("ggplot2") && requireNamespace("dplyr")) {
-+   library("ggplot2")
-+   fd_samp |>
-+     dplyr::filter(.draw <= 20) |>
-+     ggplot(aes(x = x2, y = .derivative, group = .draw)) +
-+     geom_line(alpha = 0.5)
-+ }
+> ggplot(fd_samp, aes(x = x2, y = .derivative, group = .draw)) +
++   geom_line(alpha = 0.5)
 > 
 > 
 > 
 > cleanEx()
 
-detaching ‘package:ggplot2’, ‘package:mgcv’
+detaching ‘package:mgcv’, ‘package:ggplot2’
 
 > nameEx("derivatives")
 > ### * derivatives
@@ -1051,11 +993,11 @@ detaching ‘package:mgcv’
 > 
 > ### ** Examples
 > 
+> # Fit a Poisson model for the counts under each spray treatment.
 > fit <- mgcv::gam(count ~ spray, family = poisson(),
 +   data = InsectSprays, method = "REML")
-> head(dharma_residuals(fit, n = 250, seed = 42))
-[1] 0.11794871 0.01707461 0.92111982 0.52857546 0.50754329 0.24789548
-> appraise(fit, type = "dharma", n_dharma = 250, seed = 42)
+> head(dharma_residuals(fit, n = 100, seed = 42))
+[1] 0.15602973 0.03086798 0.93475444 0.50948439 0.52625366 0.34200785
 > 
 > 
 > 
@@ -1073,47 +1015,29 @@ detaching ‘package:mgcv’
 > ### ** Examples
 > 
 > load_mgcv()
-> # Simulate group-specific curves with Gaussian noise and fit factor-by smooths
-> df <- data_sim("eg4", n = 300, seed = 42)
-> m <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = df, method = "REML")
+> # Simulate data and fit separate curves of x2 for two groups
+> df <- data_sim("eg4", n = 180, seed = 42)
+> df <- droplevels(subset(df, fac %in% c("1", "2")))
+> m <- gam(y ~ fac + s(x2, by = fac, k = 6), data = df, method = "REML")
 > 
-> # Compare the centred smooth shapes for each pair of factor levels
-> sm_dif <- difference_smooths(m, select = "s(x2)")
+> # Compare the centred smooth shapes between the two groups
+> sm_dif <- difference_smooths(m, select = "s(x2)", n = 50)
 > sm_dif
-# A tibble: 300 x 9
+# A tibble: 50 x 9
    .smooth .by   .level_1 .level_2 .diff   .se .lower_ci .upper_ci      x2
    <chr>   <chr> <chr>    <chr>    <dbl> <dbl>     <dbl>     <dbl>   <dbl>
- 1 s(x2)   fac   1        2         2.53 0.646      1.26      3.80 0.00359
- 2 s(x2)   fac   1        2         2.49 0.622      1.27      3.71 0.0136 
- 3 s(x2)   fac   1        2         2.45 0.598      1.28      3.62 0.0236 
- 4 s(x2)   fac   1        2         2.41 0.575      1.28      3.54 0.0336 
- 5 s(x2)   fac   1        2         2.37 0.553      1.29      3.45 0.0435 
- 6 s(x2)   fac   1        2         2.33 0.531      1.29      3.37 0.0535 
- 7 s(x2)   fac   1        2         2.29 0.511      1.29      3.29 0.0635 
- 8 s(x2)   fac   1        2         2.25 0.490      1.29      3.21 0.0735 
- 9 s(x2)   fac   1        2         2.21 0.471      1.29      3.13 0.0835 
-10 s(x2)   fac   1        2         2.17 0.453      1.28      3.06 0.0935 
-# i 290 more rows
+ 1 s(x2)   fac   1        2         1.56 0.983 -0.364         3.49 0.00143
+ 2 s(x2)   fac   1        2         1.57 0.891 -0.178         3.31 0.0214
+ 3 s(x2)   fac   1        2         1.57 0.804 -0.000757      3.15 0.0414
+ 4 s(x2)   fac   1        2         1.58 0.723  0.163         3.00 0.0614
+ 5 s(x2)   fac   1        2         1.58 0.650  0.311         2.86 0.0813
+ 6 s(x2)   fac   1        2         1.59 0.586  0.437         2.73 0.101
+ 7 s(x2)   fac   1        2         1.58 0.533  0.540         2.63 0.121
+ 8 s(x2)   fac   1        2         1.58 0.491  0.617         2.54 0.141
+ 9 s(x2)   fac   1        2         1.57 0.459  0.671         2.47 0.161
+10 s(x2)   fac   1        2         1.55 0.435  0.702         2.41 0.181
+# i 40 more rows
 > draw(sm_dif)
-> 
-> # Compare rates of change instead of smooth values, using the same fit
-> slope_dif <- difference_smooths(m, select = "s(x2)", order = 1)
-> slope_dif
-# A tibble: 300 x 10
-   .smooth .focal .by   .level_1 .level_2 .diff   .se .lower_ci .upper_ci
-   <chr>   <chr>  <chr> <chr>    <chr>    <dbl> <dbl>     <dbl>     <dbl>
- 1 s(x2)   x2     fac   1        2        -4.03  2.98     -9.88      1.82
- 2 s(x2)   x2     fac   1        2        -4.03  2.98     -9.88      1.82
- 3 s(x2)   x2     fac   1        2        -4.03  2.98     -9.86      1.80
- 4 s(x2)   x2     fac   1        2        -4.03  2.96     -9.82      1.77
- 5 s(x2)   x2     fac   1        2        -4.03  2.93     -9.76      1.71
- 6 s(x2)   x2     fac   1        2        -4.02  2.88     -9.68      1.63
- 7 s(x2)   x2     fac   1        2        -4.02  2.83     -9.58      1.54
- 8 s(x2)   x2     fac   1        2        -4.02  2.78     -9.46      1.43
- 9 s(x2)   x2     fac   1        2        -4.01  2.72     -9.34      1.31
-10 s(x2)   x2     fac   1        2        -4.01  2.66     -9.21      1.20
-# i 290 more rows
-# i 1 more variable: x2 <dbl>
 > 
 > 
 > 
@@ -1228,16 +1152,15 @@ detaching ‘package:mgcv’
 > 
 > ### ** Examples
 > 
-> 
 > load_mgcv()
-> # simulate some data; a factor smooth example
-> df <- data_sim("eg4", seed = 42)
-> # fit GAM
-> m <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = df, method = "REML")
+> # Fit separate smooths for two groups from a simulated data set.
+> dat <- data_sim("eg4", n = 120, seed = 42)
+> dat <- droplevels(subset(dat, fac %in% c("1", "2")))
+> model <- gam(y ~ fac + s(x2, by = fac, k = 5), data = dat, method = "REML")
 > 
-> # calculate the differences between pairs of smooths the f_j(x2) term
-> diffs <- difference_smooths(m, select = "s(x2)")
-> draw(diffs)
+> # Plot the estimated difference between the two smooths.
+> differences <- difference_smooths(model, select = "s(x2)", n = 40)
+> draw(differences)
 > 
 > 
 > 
@@ -1258,20 +1181,12 @@ detaching ‘package:mgcv’
 > 
 > load_mgcv()
 > 
-> # Simulate data and fit a GAM
-> df1 <- data_sim("eg1", n = 200, dist = "normal", scale = 2, seed = 2)
-> m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df1, method = "REML")
+> # Fit smooths for two predictors in a simulated data set.
+> dat <- data_sim("eg1", n = 100, seed = 2)
+> model <- gam(y ~ s(x0, k = 6) + s(x1, k = 6), data = dat, method = "REML")
 > 
-> # Plot all smooths
-> draw(m1)
-> 
-> # Draw a complete cycle in polar coordinates, using fitted knot boundaries
-> m_cycle <- gam(y ~ s(x0, bs = "cc", k = 10), data = df1,
-+   knots = list(x0 = c(0, 1)), method = "REML")
-> draw(m_cycle, cyclic = "polar")
-> 
-> # See https://gavinsimpson.github.io/gratia/articles/custom-plotting.html
-> # for more examples. Use the & operator to modify the theme of all panels.
+> # Apply the same theme to both smooth plots.
+> draw(model, n = 40) & ggplot2::theme_minimal()
 > 
 > 
 > 
@@ -1292,19 +1207,15 @@ detaching ‘package:mgcv’
 > 
 > if (requireNamespace("GJRM", quietly = TRUE)) {
 +   load_mgcv()
-+   # Simulate a nonlinear mean with a binary group effect and Gaussian noise
++   # Simulate a response whose mean and standard deviation vary with x.
 +   set.seed(0)
-+   n <- 100
-+   x1 <- round(runif(n))
-+   x2 <- runif(n)
-+   x3 <- runif(n)
-+   f1 <- function(x) cos(pi * 2 * x) + sin(pi * x)
-+   y1 <- -1.55 + 2 * x1 + f1(x2) + rnorm(n)
-+   dataSim <- data.frame(y1, x1, x2, x3)
++   n <- 80
++   x <- runif(n)
++   dat <- data.frame(x = x, y = sin(2 * pi * x) + rnorm(n, sd = exp(x)))
 + 
-+   # Fit smooths for the mean and scale, then plot both model components
-+   m <- GJRM::gamlss(list(y1 ~ x1 + s(x2), ~ s(x3, k = 6)), data = dataSim)
-+   draw(m)
++   # Fit and plot the smooths for the mean and standard deviation.
++   model <- GJRM::gamlss(list(y ~ s(x, k = 5), ~ s(x, k = 4)), data = dat)
++   draw(model, n = 40)
 + }
 > 
 > 
@@ -1351,13 +1262,12 @@ detaching ‘package:mgcv’
 > ### ** Examples
 > 
 > load_mgcv()
-> # Fit different spline bases to simulated Gaussian responses
-> dat <- data_sim("eg1", n = 200, seed = 42)
-> m <- gam(y ~ s(x0) + s(x1, bs = "cr") + s(x2, bs = "bs"),
-+   data = dat, method = "REML")
+> # Fit a cubic regression spline to simulated data.
+> dat <- data_sim("eg1", n = 80, seed = 42)
+> model <- gam(y ~ s(x0, bs = "cr", k = 6), data = dat, method = "REML")
 > 
-> # Display the penalty matrices for the fitted smooths
-> draw(penalty(m))
+> # Plot the smooth's penalty matrix.
+> draw(penalty(model))
 > 
 > 
 > 
@@ -1376,26 +1286,15 @@ detaching ‘package:mgcv’
 > 
 > ### ** Examples
 > 
-> load_mgcv()
-> df <- data_sim("eg1", n = 1000, dist = "poisson", scale = 0.1, seed = 6)
-> 
-> # A poisson example
-> m <- gam(y ~ s(x0, bs = "cr") + s(x1, bs = "cr") + s(x2, bs = "cr") +
-+   s(x3, bs = "cr"), family = poisson(), data = df, method = "REML")
-> rg <- rootogram(m)
-> 
-> # plot the rootogram
-> draw(rg)
-> 
-> # change the type of rootogram
-> draw(rg, type = "suspended")
+> # Fit a Poisson model for the counts under each spray treatment.
+> m <- mgcv::gam(count ~ spray, family = poisson(),
++   data = InsectSprays, method = "REML")
+> # Draw a suspended rootogram to show the differences from fitted frequencies.
+> draw(rootogram(m), type = "suspended")
 > 
 > 
 > 
 > cleanEx()
-
-detaching ‘package:mgcv’
-
 > nameEx("draw.sampling_diagnostics")
 > ### * draw.sampling_diagnostics
 > 
@@ -1408,13 +1307,14 @@ detaching ‘package:mgcv’
 > ### ** Examples
 > 
 > load_mgcv()
-> dat <- data_sim("eg1", n = 100, seed = 42)
+> dat <- data_sim("eg1", n = 80, seed = 42)
 > model <- gam(y ~ s(x0, k = 5), data = dat, method = "REML")
-> b <- post_draws(model, n_draws = 400, chains = 4, method = "mh",
-+   burnin = 100, seed = 281)
+>
+> # Plot the first coefficient's trace from two short chains.
+> b <- post_draws(model, n_draws = 120, chains = 2, method = "mh",
++   burnin = 30, seed = 281)
 > diagnostics <- sampling_diagnostics(b)
-> draw(diagnostics, select = 1:2)
-> draw(diagnostics, type = "rank", select = 1:2, n_bins = 10)
+> draw(diagnostics, select = 1L)
 > 
 > 
 > 
@@ -1520,21 +1420,14 @@ detaching ‘package:mgcv’
 > 
 > ### ** Examples
 > 
-> # Wrap categorical tick labels and stagger them across two rows.
-> layout <- draw_label_control(axes = list(wrap = 12, n_dodge = 2))
-> 
-> # Reuse one configuration for legend text and colour-bar layout.
-> layout <- draw_label_control(
-+   axes = list(wrap = 12),
-+   legend = list(wrap = 20, title_wrap = 20, ncol = 2),
-+   colourbar = list(title_wrap = 20, height = grid::unit(35, "mm"))
-+ )
-> 
-> # Draw a model with the requested layout.
 > load_mgcv()
-> dat <- data_sim("eg4", n = 100, seed = 42)
-> model <- gam(y ~ fac + s(x2, by = fac, k = 5), data = dat, method = "REML")
-> draw(model, label_control = layout)
+> dat <- data_sim("eg4", n = 80, seed = 42)
+> levels(dat$fac) <- c("Coastal meadow", "Lowland forest", "Upland grassland")
+> model <- gam(y ~ fac + s(x2, k = 5), data = dat, method = "REML")
+>
+> # Wrap the group names on the effect plot and stagger them across two rows.
+> layout <- draw_label_control(axes = list(wrap = 10, n_dodge = 2))
+> draw(parametric_effects(model, terms = "fac"), label_control = layout)
 > 
 > 
 > 
@@ -1827,14 +1720,25 @@ detaching ‘package:mgcv’
 > ## Don't show: 
 > op <- options(pillar.sigfig = 3, cli.unicode = FALSE)
 > ## End(Don't show)
-> dat <- data_sim("eg1", n = 1000, dist = "normal", scale = 2, seed = 2)
-> m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
-> 
-> fs <- fitted_samples(m1, n_draws = 5, seed = 42)
-> 
-> # can generate own set of draws and use them
-> drws <- generate_draws(m1, n_draws = 2, seed = 24)
-> fs2 <- fitted_samples(m1, method = "user", draws = drws)
+> dat <- data_sim("eg1", n = 120, seed = 2)
+> m <- gam(y ~ s(x0, k = 6) + s(x2, k = 6), data = dat, method = "REML")
+>
+> # Draw from the posterior of the expected response at the observed rows
+> fitted_samples(m, n_draws = 5, seed = 42)
+# A tibble: 600 x 4
+    .row .draw .parameter .fitted
+   <int> <int> <chr>        <dbl>
+ 1     1     1 mean          5.15
+ 2     2     1 mean         13.1
+ 3     3     1 mean          8.32
+ 4     4     1 mean          5.76
+ 5     5     1 mean          4.94
+ 6     6     1 mean          4.91
+ 7     7     1 mean         10.6
+ 8     8     1 mean          7.43
+ 9     9     1 mean         13.0
+10    10     1 mean         11.1
+# i 590 more rows
 > ## Don't show: 
 > options(op)
 > ## End(Don't show)
@@ -1992,13 +1896,12 @@ detaching ‘package:lme4’, ‘package:Matrix’, ‘package:mgcv’
 +   load_mgcv()
 +   # Simulate a nonlinear mean with Gaussian noise
 +   set.seed(42)
-+   d <- data.frame(x = runif(150))
-+   d$y <- sin(6 * d$x) + rnorm(150, sd = 0.2)
++   d <- data.frame(x = runif(80))
++   d$y <- sin(6 * d$x) + rnorm(80, sd = 0.2)
 + 
 +   # Fit and draw a smooth using glmmTMB
-+   m <- glmmTMB::glmmTMB(y ~ s(x, k = 8), data = d, REML = TRUE)
-+   n_smooths(m)
-+   draw(m)
++   m <- glmmTMB::glmmTMB(y ~ s(x, k = 6), data = d, REML = TRUE)
++   draw(m, n = 50)
 + }
 > 
 > 
@@ -2272,20 +2175,20 @@ detaching ‘package:mgcv’
 > if (requireNamespace("loo", quietly = TRUE)) {
 +   load_mgcv()
 +   m <- gam(mpg ~ s(wt, k = 5), data = mtcars, method = "REML")
-+   loo::loo(m, n_draws = 500, seed = 42)
++   loo::loo(m, n_draws = 300, seed = 42)
 + }
 
-Computed from 500 by 32 log-likelihood matrix.
+Computed from 300 by 32 log-likelihood matrix.
 
          Estimate  SE
-elpd_loo    -78.5 3.8
-p_loo         2.9 0.8
-looic       156.9 7.5
+elpd_loo    -78.6 3.8
+p_loo         3.0 0.8
+looic       157.2 7.6
 ------
 MCSE of elpd_loo is 0.1.
 MCSE and ESS estimates assume independent draws (r_eff=1).
 
-All Pareto k estimates are good (k < 0.63).
+All Pareto k estimates are good (k < 0.6).
 See help('pareto-k-diagnostic') for details.
 > 
 > 
@@ -2370,33 +2273,24 @@ detaching ‘package:mgcv’
 > 
 > ### ** Examples
 > 
-> ## simulate data with concurvity...
-> library("tibble")
+> # Simulate predictors that are related nonlinearly
 > load_mgcv()
 > set.seed(8)
-> n <- 200
-> df <- tibble(
-+   t = sort(runif(n)),
-+   x = gw_f2(t) + rnorm(n) * 3,
-+   y = sin(4 * pi * t) + exp(x / 20) + rnorm(n) * 0.3
-+ )
+> n <- 100
+> t <- sort(runif(n))
+> x <- gw_f2(t) + rnorm(n, sd = 3)
+> y <- sin(4 * pi * t) + exp(x / 20) + rnorm(n, sd = 0.3)
+> df <- data.frame(t = t, x = x, y = y)
 > 
-> ## fit model
-> m <- gam(y ~ s(t, k = 15) + s(x, k = 15), data = df, method = "REML")
-> 
-> ## overall concurvity
-> o_conc <- concrvity(m)
-> draw(o_conc)
-> 
-> ## pairwise concurvity
-> p_conc <- concrvity(m, pairwise = TRUE)
-> draw(p_conc)
+> # Fit both smooths and plot their overall concurvity
+> m <- gam(y ~ s(t, k = 8) + s(x, k = 8), data = df, method = "REML")
+> draw(model_concurvity(m))
 > 
 > 
 > 
 > cleanEx()
 
-detaching ‘package:mgcv’, ‘package:tibble’
+detaching ‘package:mgcv’
 
 > nameEx("model_constant")
 > ### * model_constant
@@ -2830,21 +2724,14 @@ detaching ‘package:mgcv’
 > 
 > ### ** Examples
 > 
-> load_mgcv()
-> dat <- data_sim("eg1", n = 100, seed = 2)
-> mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3),
-+   data = dat,
-+   method = "REML"
-+ )
+> # Fit stopping distance as a smooth function of speed.
+> mod <- mgcv::gam(dist ~ s(speed, k = 5), data = cars, method = "REML")
+> # Compare the observed distances with 20 replicated datasets.
 > posterior_predictive_plot(mod, n = 20, seed = 42)
-> appraise(mod, ppcheck = TRUE, n_ppc = 20, seed = 42)
 > 
 > 
 > 
 > cleanEx()
-
-detaching ‘package:mgcv’
-
 > nameEx("pp_check")
 > ### * pp_check
 > 
@@ -2888,89 +2775,30 @@ detaching ‘package:mgcv’
 > ## Don't show: 
 > op <- options(pillar.sigfig = 3, cli.unicode = FALSE)
 > ## End(Don't show)
-> dat <- data_sim("eg1", n = 1000, dist = "normal", scale = 2, seed = 2)
-> m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
+> dat <- data_sim("eg1", n = 120, seed = 2)
+> m <- gam(y ~ s(x0, k = 6) + s(x2, k = 6), data = dat, method = "REML")
 > 
-> predicted_samples(m, n_draws = 5, seed = 42)
-# A tibble: 5,000 x 3
+> # Simulate responses at new predictor values using the fitted model
+> newd <- data.frame(x0 = c(0.2, 0.5, 0.8), x2 = 0.5)
+> predicted_samples(m, n_draws = 5, data = newd, seed = 42)
+# A tibble: 15 x 3
     .row .draw .response
    <int> <int>     <dbl>
- 1     1     1      8.93
- 2     2     1      4.23
- 3     3     1      7.71
- 4     4     1      8.51
- 5     5     1     10.1 
- 6     6     1      8.20
- 7     7     1      8.95
- 8     8     1      7.20
- 9     9     1     18.1 
-10    10     1     12.7 
-# i 4,990 more rows
-> 
-> ## Can pass arguments to predict.gam()
-> ## Don't show: 
-> set.seed(6791)
-> ## End(Don't show)
-> newd <- data.frame(
-+   x0 = runif(10), x1 = runif(10), x2 = runif(10),
-+   x3 = runif(10)
-+ )
-> 
-> ## Exclude s(x2)
-> predicted_samples(m, n_draws = 5, data = newd, exclude = "s(x2)", seed = 25)
-# A tibble: 50 x 3
-    .row .draw .response
-   <int> <int>     <dbl>
- 1     1     1      9.42
- 2     2     1      6.97
- 3     3     1      8.10
- 4     4     1      9.95
- 5     5     1      6.75
- 6     6     1     10.3 
- 7     7     1     10.8 
- 8     8     1     10.5 
- 9     9     1      8.43
-10    10     1     12.2 
-# i 40 more rows
-> 
-> ## Exclude s(x1)
-> predicted_samples(m, n_draws = 5, data = newd, exclude = "s(x1)", seed = 25)
-# A tibble: 50 x 3
-    .row .draw .response
-   <int> <int>     <dbl>
- 1     1     1      6.05
- 2     2     1      5.28
- 3     3     1      5.96
- 4     4     1     13.7 
- 5     5     1      4.36
- 6     6     1      5.11
- 7     7     1     12.5 
- 8     8     1      5.66
- 9     9     1     12.6 
-10    10     1      8.38
-# i 40 more rows
-> 
-> ## Select which terms --- result should be the same as previous
-> ## but note that we have to include any parametric terms, including the
-> ## constant term
-> predicted_samples(m,
-+   n_draws = 5, data = newd, seed = 25,
-+   terms = c("Intercept", "s(x0)", "s(x2)", "s(x3)")
-+ )
-# A tibble: 50 x 3
-    .row .draw .response
-   <int> <int>     <dbl>
- 1     1     1    -1.94 
- 2     2     1    -2.71 
- 3     3     1    -2.03 
- 4     4     1     5.73 
- 5     5     1    -3.63 
- 6     6     1    -2.87 
- 7     7     1     4.48 
- 8     8     1    -2.33 
- 9     9     1     4.65 
-10    10     1     0.395
-# i 40 more rows
+ 1     1     1     11.7
+ 2     2     1      7.89
+ 3     3     1      9.49
+ 4     1     2      9.66
+ 5     2     2     10.6
+ 6     3     2      8.19
+ 7     1     3     12.1
+ 8     2     3      9.19
+ 9     3     3     14.1
+10     1     4      7.74
+11     2     4     13.1
+12     3     4     14.8
+13     1     5      4.08
+14     2     5      8.68
+15     3     5      8.12
 > ## Don't show: 
 > options(op)
 > ## End(Don't show)
@@ -2995,38 +2823,18 @@ detaching ‘package:mgcv’
 > 
 > ### ** Examples
 > 
-> load_mgcv()
-> ## simulate binomial data...
-> dat <- data_sim("eg1", n = 200, dist = "binary", scale = .33, seed = 0)
-> p <- binomial()$linkinv(dat$f) # binomial p
-> n <- sample(c(1, 3), 200, replace = TRUE) # binomial n
-> dat <- transform(dat, y = rbinom(n, n, p), n = n)
-> m <- gam(y / n ~ s(x0) + s(x1) + s(x2) + s(x3),
-+   family = binomial, data = dat, weights = n,
-+   method = "REML"
-+ )
-> 
-> ## Q-Q plot; default using direct randomisation of uniform quantiles
-> qq_plot(m)
-> 
-> ## Alternatively simulate new data from the model, which
-> ## allows construction of reference intervals for the Q-Q plot
-> qq_plot(m,
-+   method = "simulate",
-+   seed = 42,
-+   point_col = "steelblue",
-+   point_alpha = 0.4
-+ )
-> 
-> ## ... or request a normal approximation for the residuals.
-> qq_plot(m, method = "normal")
+> # Simulate counts of successes with a probability that varies with x.
+> set.seed(5)
+> dat <- data.frame(x = seq(-1, 1, length.out = 80), trials = 5L)
+> dat$success <- rbinom(nrow(dat), dat$trials, plogis(2 * sin(pi * dat$x)))
+> m <- mgcv::gam(cbind(success, trials - success) ~ s(x, k = 6),
++   family = binomial(), data = dat, method = "REML")
+> # Compare randomised quantile residuals with standard normal quantiles.
+> qq_plot(m, type = "quantile", seed = 42)
 > 
 > 
 > 
 > cleanEx()
-
-detaching ‘package:mgcv’
-
 > nameEx("random_effect_samples")
 > ### * random_effect_samples
 > 
@@ -3153,23 +2961,15 @@ Levels: a b c d e
 > 
 > ### ** Examples
 > 
-> load_mgcv()
-> dat <- data_sim("eg1", n = 400, seed = 2)
-> m <- gam(y ~ x2 + s(x0) + s(x1), data = dat, method = "REML")
-> # A curve against x2 suggests reconsidering its linear effect.
+> # Simulate a response with nonlinear covariate effects.
+> dat <- data_sim("eg1", n = 120, scale = 1, seed = 2)
+> m <- mgcv::gam(y ~ x2 + s(x1, k = 6), data = dat, method = "REML")
+> # Look for curvature after fitting a straight-line effect for x2.
 > residuals_covariate_plot(m, covariates = "x2", type = "pearson")
-> # Check a covariate omitted from the model.
-> residuals_covariate_plot(m, covariates = "x3", data = dat)
-> # Inspect individual covariates and possible remaining interaction structure.
-> scalable_residuals_covariate_plot(m, covariates = c("x0", "x2"),
-+   pairs = list(c("x0", "x2")), bins = 6, type = "quantile", seed = 42)
 > 
 > 
 > 
 > cleanEx()
-
-detaching ‘package:mgcv’
-
 > nameEx("response_derivatives")
 > ### * response_derivatives
 > 
@@ -3185,68 +2985,33 @@ detaching ‘package:mgcv’
 > 
 > 
 > library("ggplot2")
-> library("patchwork")
 > load_mgcv()
-> ## Don't show: 
-> op <- options(pillar.sigfig = 3, cli.unicode = FALSE)
-> ## End(Don't show)
-> df <- data_sim("eg1", dist = "negbin", scale = 0.25, seed = 42)
 > 
-> # fit the GAM (note: for execution time reasons using bam())
-> m <- bam(y ~ s(x0) + s(x1) + s(x2) + s(x3),
-+   data = df, family = nb(), method = "fREML"
+> # Simulate counts whose mean varies smoothly with four covariates.
+> dat <- data_sim("eg1", n = 120, dist = "negbin", scale = 0.25, seed = 42)
+> m <- gam(y ~ s(x0, k = 5) + s(x1, k = 5) + s(x2, k = 5) + s(x3, k = 5),
++   data = dat, family = nb(), method = "REML"
 + )
 > 
-> # data slice through data along x2 - all other covariates will be set to
-> # typical values (value closest to median)
-> ds <- data_slice(m, x2 = evenly(x2, n = 100))
-> 
-> # fitted values along x2
-> fv <- fitted_values(m, data = ds)
-> 
-> # response derivatives - ideally n_sim = >10000
-> y_d <- response_derivatives(m,
-+   data = ds, type = "central", focal = "x2",
-+   eps = 0.01, seed = 21, n_sim = 1000
+> # Estimate how the expected count changes with x2 at typical values
+> # of the other covariates.
+> slice <- data_slice(m, x2 = evenly(x2, n = 30))
+> derivatives <- response_derivatives(m,
++   data = slice, type = "central", focal = "x2",
++   eps = 0.01, seed = 21, n_sim = 200
 + )
 > 
-> # draw fitted values along x2
-> p1 <- fv |>
-+   ggplot(aes(x = x2, y = .fitted)) +
-+   geom_ribbon(aes(ymin = .lower_ci, ymax = .upper_ci, y = NULL),
-+     alpha = 0.2
-+   ) +
-+   geom_line() +
-+   labs(
-+     title = "Estimated count as a function of x2",
-+     y = "Estimated count"
-+   )
-> 
-> # pointwise normal intervals from the delta method
-> y_delta <- response_derivatives(m, data = ds, focal = "x2",
-+   type = "central", uncertainty = "delta")
-> 
-> # draw response derivatives
-> p2 <- y_d |>
-+   ggplot(aes(x = x2, y = .derivative)) +
+> # Plot the derivative and its pointwise credible interval.
+> ggplot(derivatives, aes(x = x2, y = .derivative)) +
 +   geom_ribbon(aes(ymin = .lower_ci, ymax = .upper_ci), alpha = 0.2) +
 +   geom_line() +
-+   labs(
-+     title = "Estimated 1st derivative of estimated count",
-+     y = "First derivative"
-+   )
-> 
-> # draw both panels
-> p1 + p2 + plot_layout(nrow = 2)
-> ## Don't show: 
-> options(op)
-> ## End(Don't show)
++   labs(y = "First derivative of the expected count")
 > 
 > 
 > 
 > cleanEx()
 
-detaching ‘package:mgcv’, ‘package:patchwork’, ‘package:ggplot2’
+detaching ‘package:mgcv’, ‘package:ggplot2’
 
 > nameEx("rootogram")
 > ### * rootogram
@@ -3259,47 +3024,18 @@ detaching ‘package:mgcv’, ‘package:patchwork’, ‘package:ggplot2’
 > 
 > ### ** Examples
 > 
-> load_mgcv()
-> ## Don't show: 
-> op <- options(cli.unicode = FALSE, pillar.sigfig = 6)
-> ## End(Don't show)
-> df <- data_sim("eg1", n = 1000, dist = "poisson", scale = 0.1, seed = 6)
-> 
-> # A poisson example
-> m <- gam(y ~ s(x0, bs = "cr") + s(x1, bs = "cr") + s(x2, bs = "cr") +
-+   s(x3, bs = "cr"), family = poisson(), data = df, method = "REML")
-> rg <- rootogram(m)
-> rg
-# A tibble: 21 x 3
-    .bin .observed   .fitted
-   <dbl>     <int>     <dbl>
- 1     0       113 116.640  
- 2     1       236 227.869  
- 3     2       230 239.168  
- 4     3       200 181.679  
- 5     4        94 113.432  
- 6     5        68  62.4881 
- 7     6        27  31.6795 
- 8     7        22  15.1323 
- 9     8         4   6.88637
-10     9         3   2.99628
-# i 11 more rows
-> draw(rg) # plot the rootogram
-> 
-> # A Gaussian example
-> df <- data_sim("eg1", dist = "normal", seed = 2)
-> m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = "REML")
-> draw(rootogram(m, breaks = "FD"), type = "suspended")
-> ## Don't show: 
-> options(op)
-> ## End(Don't show)
+> # Simulate Poisson counts with a mean that varies smoothly with x.
+> set.seed(6)
+> dat <- data.frame(x = runif(120))
+> dat$y <- rpois(nrow(dat), exp(1 + sin(2 * pi * dat$x)))
+> m <- mgcv::gam(y ~ s(x, k = 6), family = poisson(),
++   data = dat, method = "REML")
+> # Compare observed and fitted frequencies for each count.
+> draw(rootogram(m))
 > 
 > 
 > 
 > cleanEx()
-
-detaching ‘package:mgcv’
-
 > nameEx("scalable_qq_plot")
 > ### * scalable_qq_plot
 > 
@@ -3313,20 +3049,14 @@ detaching ‘package:mgcv’
 > 
 > ### ** Examples
 > 
-> load_mgcv()
-> dat <- data_sim("eg1", n = 400, seed = 2)
-> m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat)
-> scalable_qq_plot(m, seed = 42)
-> scalable_residuals_linpred_plot(m)
-> scalable_observed_fitted_plot(m, density_bins = c(30, 40))
-> appraise(m, scalable = TRUE, seed = 42)
+> # Fit stopping distance as a smooth function of speed.
+> m <- mgcv::gam(dist ~ s(speed, k = 5), data = cars, method = "REML")
+> # Use fewer bins than observations so the aggregation is visible.
+> scalable_qq_plot(m, type = "quantile", qq_bins = 20)
 > 
 > 
 > 
 > cleanEx()
-
-detaching ‘package:mgcv’
-
 > nameEx("sdmTMB-methods")
 > ### * sdmTMB-methods
 > 
@@ -3343,15 +3073,14 @@ detaching ‘package:mgcv’
 > 
 > if (requireNamespace("sdmTMB", quietly = TRUE)) {
 +   load_mgcv()
-+   # Simulate nonlinear and linear effects with Gaussian noise
++   # Simulate a nonlinear mean with Gaussian noise
 +   set.seed(42)
-+   d <- data.frame(x = runif(150), z = runif(150))
-+   d$y <- 1 + sin(6 * d$x) + 0.5 * d$z + rnorm(150, sd = 0.3)
++   d <- data.frame(x = runif(80))
++   d$y <- 1 + sin(6 * d$x) + rnorm(80, sd = 0.3)
 + 
-+   # Fit without a spatial field and draw the linear and smooth effects
-+   m <- sdmTMB::sdmTMB(y ~ z + s(x, k = 6), data = d, spatial = "off")
-+   smooths(m)
-+   draw(m)
++   # Fit without a spatial field and draw the smooth effect
++   m <- sdmTMB::sdmTMB(y ~ s(x, k = 6), data = d, spatial = "off")
++   draw(m, n = 50)
 + }
 > 
 > 
@@ -3458,20 +3187,15 @@ detaching ‘package:mgcv’
 > 
 > load_mgcv()
 > set.seed(4)
-> dat <- data.frame(x = seq(0, 1, length.out = 100))
-> dat$y <- sin(6 * dat$x) + rnorm(100, sd = 0.2)
-> model <- gam(y ~ s(x, bs = "cr", k = 8), data = dat, method = "REML")
+> dat <- data.frame(x = seq(0, 1, length.out = 80))
+> dat$y <- sin(6 * dat$x) + rnorm(80, sd = 0.2)
+> model <- gam(y ~ s(x, bs = "cr", k = 6), data = dat, method = "REML")
+> # Plot a simultaneous confidence band over the fitted domain
 > band <- smooth_estimates(model,
-+   interval = "simultaneous",
++   interval = "simultaneous", n = 50,
 +   simultaneous_method = "tube", simultaneous_domain = c(0, 1)
 + )
 > draw(band)
-> rate <- derivatives(model,
-+   type = "central", interval = "simultaneous",
-+   simultaneous_method = "tube"
-+ )
-> attr(rate, "interval_info")$curves[[1]]$critical
-[1] 3.015127
 > 
 > 
 > 
@@ -3595,73 +3319,28 @@ detaching ‘package:mgcv’
 > ## Don't show: 
 > op <- options(cli.unicode = FALSE, pillar.sigfig = 6)
 > ## End(Don't show)
-> dat <- data_sim("eg1", n = 400, dist = "normal", scale = 2, seed = 2)
-> m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
+> # Simulate a Gaussian response with smooth effects and fit a GAM.
+> dat <- data_sim("eg1", n = 120, dist = "normal", scale = 2, seed = 2)
+> m <- gam(y ~ s(x0, k = 5) + s(x1, k = 5) + s(x2, k = 5) + s(x3, k = 5),
++   data = dat, method = "REML"
++ )
 > 
-> ## evaluate all smooths
-> smooth_estimates(m1)
-# A tibble: 400 x 9
-   .smooth .type .by   .estimate      .se         x0    x1    x2    x3
-   <chr>   <chr> <chr>     <dbl>    <dbl>      <dbl> <dbl> <dbl> <dbl>
- 1 s(x0)   TPRS  <NA>  -0.966542 0.316118 0.00710904    NA    NA    NA
- 2 s(x0)   TPRS  <NA>  -0.925391 0.297170 0.0171157     NA    NA    NA
- 3 s(x0)   TPRS  <NA>  -0.884233 0.279256 0.0271224     NA    NA    NA
- 4 s(x0)   TPRS  <NA>  -0.843050 0.262594 0.0371291     NA    NA    NA
- 5 s(x0)   TPRS  <NA>  -0.801824 0.247376 0.0471358     NA    NA    NA
- 6 s(x0)   TPRS  <NA>  -0.760536 0.233728 0.0571425     NA    NA    NA
- 7 s(x0)   TPRS  <NA>  -0.719175 0.221701 0.0671492     NA    NA    NA
- 8 s(x0)   TPRS  <NA>  -0.677736 0.211261 0.0771559     NA    NA    NA
- 9 s(x0)   TPRS  <NA>  -0.636220 0.202303 0.0871626     NA    NA    NA
-10 s(x0)   TPRS  <NA>  -0.594641 0.194685 0.0971693     NA    NA    NA
-# i 390 more rows
-> 
-> ## or selected smooths
-> smooth_estimates(m1, select = c("s(x0)", "s(x1)"))
-# A tibble: 200 x 7
-   .smooth .type .by   .estimate      .se         x0    x1
-   <chr>   <chr> <chr>     <dbl>    <dbl>      <dbl> <dbl>
- 1 s(x0)   TPRS  <NA>  -0.966542 0.316118 0.00710904    NA
- 2 s(x0)   TPRS  <NA>  -0.925391 0.297170 0.0171157     NA
- 3 s(x0)   TPRS  <NA>  -0.884233 0.279256 0.0271224     NA
- 4 s(x0)   TPRS  <NA>  -0.843050 0.262594 0.0371291     NA
- 5 s(x0)   TPRS  <NA>  -0.801824 0.247376 0.0471358     NA
- 6 s(x0)   TPRS  <NA>  -0.760536 0.233728 0.0571425     NA
- 7 s(x0)   TPRS  <NA>  -0.719175 0.221701 0.0671492     NA
- 8 s(x0)   TPRS  <NA>  -0.677736 0.211261 0.0771559     NA
- 9 s(x0)   TPRS  <NA>  -0.636220 0.202303 0.0871626     NA
-10 s(x0)   TPRS  <NA>  -0.594641 0.194685 0.0971693     NA
-# i 190 more rows
-> 
-> # Direct evaluation of a GJRM distributional model
-> if (requireNamespace("GJRM", quietly = TRUE)) {
-+   set.seed(82)
-+   d <- data.frame(x = runif(100), z = runif(100))
-+   d$y <- sin(6 * d$x) + rnorm(100, sd = exp(0.3 * d$z))
-+   m <- GJRM::gamlss(list(y ~ s(x, k = 4), ~ s(z, k = 4)), data = d)
-+   estimates <- smooth_estimates(m, n = 50)
-+   draw(estimates)
-+ }
-> 
-> # parallel processing of smooths
-> if (requireNamespace("mirai") && requireNamespace("carrier")) {
-+   library("mirai")
-+   daemons(2)                          # only low for CRAN requirements
-+   smooth_estimates(m1)
-+ }
-# A tibble: 400 x 9
-   .smooth .type .by   .estimate      .se         x0    x1    x2    x3
-   <chr>   <chr> <chr>     <dbl>    <dbl>      <dbl> <dbl> <dbl> <dbl>
- 1 s(x0)   TPRS  <NA>  -0.966542 0.316118 0.00710904    NA    NA    NA
- 2 s(x0)   TPRS  <NA>  -0.925391 0.297170 0.0171157     NA    NA    NA
- 3 s(x0)   TPRS  <NA>  -0.884233 0.279256 0.0271224     NA    NA    NA
- 4 s(x0)   TPRS  <NA>  -0.843050 0.262594 0.0371291     NA    NA    NA
- 5 s(x0)   TPRS  <NA>  -0.801824 0.247376 0.0471358     NA    NA    NA
- 6 s(x0)   TPRS  <NA>  -0.760536 0.233728 0.0571425     NA    NA    NA
- 7 s(x0)   TPRS  <NA>  -0.719175 0.221701 0.0671492     NA    NA    NA
- 8 s(x0)   TPRS  <NA>  -0.677736 0.211261 0.0771559     NA    NA    NA
- 9 s(x0)   TPRS  <NA>  -0.636220 0.202303 0.0871626     NA    NA    NA
-10 s(x0)   TPRS  <NA>  -0.594641 0.194685 0.0971693     NA    NA    NA
-# i 390 more rows
+> # Evaluate each smooth at 30 points along its covariate.
+> smooth_estimates(m, n = 30)
+# A tibble: 120 x 9
+   .smooth .type .by    .estimate      .se         x0    x1    x2    x3
+   <chr>   <chr> <chr>      <dbl>    <dbl>      <dbl> <dbl> <dbl> <dbl>
+ 1 s(x0)   TPRS  <NA>  -1.65658   0.683317 0.00710904    NA    NA    NA
+ 2 s(x0)   TPRS  <NA>  -1.41136   0.574920 0.0409640     NA    NA    NA
+ 3 s(x0)   TPRS  <NA>  -1.16715   0.481517 0.0748189     NA    NA    NA
+ 4 s(x0)   TPRS  <NA>  -0.925483  0.410526 0.108674      NA    NA    NA
+ 5 s(x0)   TPRS  <NA>  -0.688216  0.366087 0.142529      NA    NA    NA
+ 6 s(x0)   TPRS  <NA>  -0.457536  0.344974 0.176384      NA    NA    NA
+ 7 s(x0)   TPRS  <NA>  -0.235937  0.337949 0.210239      NA    NA    NA
+ 8 s(x0)   TPRS  <NA>  -0.0260496 0.336297 0.244094      NA    NA    NA
+ 9 s(x0)   TPRS  <NA>   0.169496  0.335512 0.277949      NA    NA    NA
+10 s(x0)   TPRS  <NA>   0.348126  0.334785 0.311803      NA    NA    NA
+# i 110 more rows
 > ## Don't show: 
 > options(op)
 > ## End(Don't show)
@@ -3670,7 +3349,7 @@ detaching ‘package:mgcv’
 > 
 > cleanEx()
 
-detaching ‘package:mirai’, ‘package:mgcv’
+detaching ‘package:mgcv’
 
 > nameEx("smooth_label")
 > ### * smooth_label
@@ -3721,24 +3400,12 @@ detaching ‘package:mgcv’
 > ### ** Examples
 > 
 > load_mgcv()
-> ## Don't show: 
-> op <- options(cli.unicode = FALSE, pillar.sigfig = 3)
-> ## End(Don't show)
-> dat <- data_sim("eg1", n = 400, seed = 2)
-> m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
+> dat <- data_sim("eg1", n = 120, seed = 2)
+> m <- gam(y ~ s(x0, k = 6) + s(x2, k = 6), data = dat, method = "REML")
 > 
-> sms <- smooth_samples(m1, select = "s(x0)", n_draws = 5, seed = 42)
-> 
-> ## A factor by example (with a spurious covariate x0)
-> dat <- data_sim("eg4", n = 1000, seed = 2)
-> 
-> ## fit model...
-> m2 <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = dat)
-> sms <- smooth_samples(m2, n_draws = 5, seed = 42)
+> # Plot five posterior draws of the smooth of x2
+> sms <- smooth_samples(m, select = "s(x2)", n_draws = 5, n_grid = 40, seed = 42)
 > draw(sms)
-> ## Don't show: 
-> options(op)
-> ## End(Don't show)
 > 
 > 
 > 
@@ -3758,22 +3425,19 @@ detaching ‘package:mgcv’
 > 
 > ### ** Examples
 > 
-> load_mgcv()
+> # Turn a latent signal with logistic noise into four ordered categories.
 > set.seed(359)
-> dat <- data.frame(x = runif(200, -2, 2))
+> dat <- data.frame(x = runif(120, -2, 2))
 > latent <- sin(dat$x) + rlogis(nrow(dat))
 > dat$y <- findInterval(latent, c(-1, 0, 2)) + 1L
-> fit <- gam(y ~ s(x), data = dat, family = ocat(R = 4), method = "REML")
+> fit <- mgcv::gam(y ~ s(x, k = 5), data = dat,
++   family = mgcv::ocat(R = 4), method = "REML")
 > head(surrogate_residuals(fit, seed = 42))
-[1]  3.8326093  0.8855870 -0.3476107  0.1092911 -0.4888706  1.4880031
-> appraise(fit, type = "surrogate", seed = 42)
+[1]  0.2892662  0.3114139 -2.2699851  1.7008338 -1.1363163  1.3888662
 > 
 > 
 > 
 > cleanEx()
-
-detaching ‘package:mgcv’
-
 > nameEx("theta")
 > ### * theta
 > 
@@ -3871,30 +3535,10 @@ detaching ‘package:mgcv’
 > 
 > ### ** Examples
 > 
-> load_mgcv()
-> ## simulate binomial data...
-> dat <- data_sim("eg1", n = 200, dist = "binary", scale = .33, seed = 0)
-> p <- binomial()$linkinv(dat$f) # binomial p
-> n <- sample(c(1, 3), 200, replace = TRUE) # binomial n
-> dat <- transform(dat, y = rbinom(n, n, p), n = n)
-> m <- gam(y / n ~ s(x0) + s(x1) + s(x2) + s(x3),
-+   family = binomial, data = dat, weights = n,
-+   method = "REML"
-+ )
-> 
-> ## The default uses inverse-CDF sampling of randomised uniform quantiles.
-> ## Note no reference bands are drawn with this method.
-> worm_plot(m)
-> 
-> ## Alternatively simulate new data from the model, which
-> ## allows construction of reference intervals for the Q-Q plot
-> worm_plot(m,
-+   method = "simulate", point_col = "steelblue",
-+   point_alpha = 0.4
-+ )
-> 
-> ## ... or request a normal approximation for the residuals.
-> worm_plot(m, method = "normal")
+> # Fit stopping distance as a smooth function of speed.
+> m <- mgcv::gam(dist ~ s(speed, k = 5), data = cars, method = "REML")
+> # Plot how the ordered residuals differ from their reference quantiles.
+> worm_plot(m, type = "quantile", seed = 42)
 > 
 > 
 > 

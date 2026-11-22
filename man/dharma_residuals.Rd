@@ -61,10 +61,10 @@ An explicit \code{seed} preserves the caller's random-number state. With
 \code{seed = NULL}, simulation and tie randomisation advance the current state.
 }
 \examples{
+# Fit a Poisson model for the counts under each spray treatment.
 fit <- mgcv::gam(count ~ spray, family = poisson(),
   data = InsectSprays, method = "REML")
-head(dharma_residuals(fit, n = 250, seed = 42))
-appraise(fit, type = "dharma", n_dharma = 250, seed = 42)
+head(dharma_residuals(fit, n = 100, seed = 42))
 }
 \references{
 Hartig, F. DHARMa: Residual Diagnostics for Hierarchical (Multi-Level / Mixed)

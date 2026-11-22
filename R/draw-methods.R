@@ -949,16 +949,15 @@ plot_multivariate_basis <- function(object, variables, subtitle = NULL, ...) {
 #' @export
 #'
 #' @examples
-#'
 #' load_mgcv()
-#' # simulate some data; a factor smooth example
-#' df <- data_sim("eg4", seed = 42)
-#' # fit GAM
-#' m <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = df, method = "REML")
+#' # Fit separate smooths for two groups from a simulated data set.
+#' dat <- data_sim("eg4", n = 120, seed = 42)
+#' dat <- droplevels(subset(dat, fac %in% c("1", "2")))
+#' model <- gam(y ~ fac + s(x2, by = fac, k = 5), data = dat, method = "REML")
 #'
-#' # calculate the differences between pairs of smooths the f_j(x2) term
-#' diffs <- difference_smooths(m, select = "s(x2)")
-#' draw(diffs)
+#' # Plot the estimated difference between the two smooths.
+#' differences <- difference_smooths(model, select = "s(x2)", n = 40)
+#' draw(differences)
 #' @inheritSection draw Label layout
 `draw.difference_smooth` <- function(object,
                                      select = NULL,
@@ -1299,13 +1298,12 @@ difference_value_label <- function(object) {
 #'
 #' @examples
 #' load_mgcv()
-#' # Fit different spline bases to simulated Gaussian responses
-#' dat <- data_sim("eg1", n = 200, seed = 42)
-#' m <- gam(y ~ s(x0) + s(x1, bs = "cr") + s(x2, bs = "bs"),
-#'   data = dat, method = "REML")
+#' # Fit a cubic regression spline to simulated data.
+#' dat <- data_sim("eg1", n = 80, seed = 42)
+#' model <- gam(y ~ s(x0, bs = "cr", k = 6), data = dat, method = "REML")
 #'
-#' # Display the penalty matrices for the fitted smooths
-#' draw(penalty(m))
+#' # Plot the smooth's penalty matrix.
+#' draw(penalty(model))
 #' @inheritSection draw Label layout
 `draw.penalty_df` <- function(object,
                               normalize = FALSE,

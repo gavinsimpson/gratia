@@ -44,10 +44,10 @@
 #' Hartig, F. DHARMa: Residual Diagnostics for Hierarchical (Multi-Level / Mixed)
 #' Regression Models. \doi{10.32614/CRAN.package.DHARMa}.
 #' @examples
+#' # Fit a Poisson model for the counts under each spray treatment.
 #' fit <- mgcv::gam(count ~ spray, family = poisson(),
 #'   data = InsectSprays, method = "REML")
-#' head(dharma_residuals(fit, n = 250, seed = 42))
-#' appraise(fit, type = "dharma", n_dharma = 250, seed = 42)
+#' head(dharma_residuals(fit, n = 100, seed = 42))
 #' @export
 dharma_residuals <- function(model, n = 250L, seed = NULL,
                              conditioning = NULL, ...) {

@@ -96,6 +96,6 @@ proportional to the number of observations times the number of draws.
 if (requireNamespace("loo", quietly = TRUE)) {
   load_mgcv()
   m <- gam(mpg ~ s(wt, k = 5), data = mtcars, method = "REML")
-  loo::loo(m, n_draws = 500, seed = 42)
+  loo::loo(m, n_draws = 300, seed = 42)
 }
 }

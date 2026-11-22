@@ -285,20 +285,11 @@ load_mgcv()
 \dontshow{
 op <- options(pillar.sigfig = 3, cli.unicode = FALSE)
 }
-dat <- data_sim("eg1", n = 1000, dist = "normal", scale = 2, seed = 2)
-m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
+dat <- data_sim("eg1", n = 120, seed = 2)
+m <- gam(y ~ s(x0, k = 6) + s(x2, k = 6), data = dat, method = "REML")
 
-fs <- fitted_samples(m1, n_draws = 5, seed = 42)
-\donttest{
-fs
-}
-
-# can generate own set of draws and use them
-drws <- generate_draws(m1, n_draws = 2, seed = 24)
-fs2 <- fitted_samples(m1, method = "user", draws = drws)
-\donttest{
-fs2
-}
+# Draw from the posterior of the expected response at the observed rows
+fitted_samples(m, n_draws = 5, seed = 42)
 \dontshow{
 options(op)
 }

@@ -265,13 +265,12 @@ glmmtmb_smooth_model <- function(object, component = NULL, covariance = TRUE) {
 #'   load_mgcv()
 #'   # Simulate a nonlinear mean with Gaussian noise
 #'   set.seed(42)
-#'   d <- data.frame(x = runif(150))
-#'   d$y <- sin(6 * d$x) + rnorm(150, sd = 0.2)
+#'   d <- data.frame(x = runif(80))
+#'   d$y <- sin(6 * d$x) + rnorm(80, sd = 0.2)
 #'
 #'   # Fit and draw a smooth using glmmTMB
-#'   m <- glmmTMB::glmmTMB(y ~ s(x, k = 8), data = d, REML = TRUE)
-#'   n_smooths(m)
-#'   draw(m)
+#'   m <- glmmTMB::glmmTMB(y ~ s(x, k = 6), data = d, REML = TRUE)
+#'   draw(m, n = 50)
 #' }
 NULL
 

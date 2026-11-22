@@ -222,12 +222,13 @@ fits, and smoothing-parameter uncertainty is unsupported; use
 }
 \examples{
 load_mgcv()
-# Simulate group-specific curves with Gaussian noise and fit factor-by smooths
-df <- data_sim("eg4", n = 300, seed = 2)
-m <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = df, method = "REML")
+# Simulate data and fit separate curves of x2 for two groups
+df <- data_sim("eg4", n = 180, seed = 2)
+df <- droplevels(subset(df, fac \%in\% c("1", "2")))
+m <- gam(y ~ fac + s(x2, by = fac, k = 6), data = df, method = "REML")
 
 # Compare fitted responses over x2, including the parametric group effects
-cd <- conditional_differences(m, by = "fac", condition = "x2")
+cd <- conditional_differences(m, by = "fac", condition = "x2", n_vals = 40)
 cd
 draw(cd)
 }

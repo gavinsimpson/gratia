@@ -263,31 +263,14 @@
 #' \dontshow{
 #' op <- options(cli.unicode = FALSE, pillar.sigfig = 6)
 #' }
-#' dat <- data_sim("eg1", n = 400, dist = "normal", scale = 2, seed = 2)
-#' m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
+#' # Simulate a Gaussian response with smooth effects and fit a GAM.
+#' dat <- data_sim("eg1", n = 120, dist = "normal", scale = 2, seed = 2)
+#' m <- gam(y ~ s(x0, k = 5) + s(x1, k = 5) + s(x2, k = 5) + s(x3, k = 5),
+#'   data = dat, method = "REML"
+#' )
 #'
-#' ## evaluate all smooths
-#' smooth_estimates(m1)
-#'
-#' ## or selected smooths
-#' smooth_estimates(m1, select = c("s(x0)", "s(x1)"))
-#'
-#' # Direct evaluation of a GJRM distributional model
-#' if (requireNamespace("GJRM", quietly = TRUE)) {
-#'   set.seed(82)
-#'   d <- data.frame(x = runif(100), z = runif(100))
-#'   d$y <- sin(6 * d$x) + rnorm(100, sd = exp(0.3 * d$z))
-#'   m <- GJRM::gamlss(list(y ~ s(x, k = 4), ~ s(z, k = 4)), data = d)
-#'   estimates <- smooth_estimates(m, n = 50)
-#'   draw(estimates)
-#' }
-#'
-#' # parallel processing of smooths
-#' if (requireNamespace("mirai") && requireNamespace("carrier")) {
-#'   library("mirai")
-#'   daemons(2)                          # only low for CRAN requirements
-#'   smooth_estimates(m1)
-#' }
+#' # Evaluate each smooth at 30 points along its covariate.
+#' smooth_estimates(m, n = 30)
 #' \dontshow{
 #' options(op)
 #' }

@@ -273,18 +273,15 @@ results, in addition to the final output.
 
 \examples{
 load_mgcv()
-# Simulate group-specific curves with Gaussian noise and fit factor-by smooths
-df <- data_sim("eg4", n = 300, seed = 42)
-m <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = df, method = "REML")
+# Simulate data and fit separate curves of x2 for two groups
+df <- data_sim("eg4", n = 180, seed = 42)
+df <- droplevels(subset(df, fac \%in\% c("1", "2")))
+m <- gam(y ~ fac + s(x2, by = fac, k = 6), data = df, method = "REML")
 
-# Compare the centred smooth shapes for each pair of factor levels
-sm_dif <- difference_smooths(m, select = "s(x2)")
+# Compare the centred smooth shapes between the two groups
+sm_dif <- difference_smooths(m, select = "s(x2)", n = 50)
 sm_dif
 draw(sm_dif)
-
-# Compare rates of change instead of smooth values, using the same fit
-slope_dif <- difference_smooths(m, select = "s(x2)", order = 1)
-slope_dif
 }
 \seealso{
 \code{\link[=derivatives]{derivatives()}}, \code{\link[=partial_derivatives]{partial_derivatives()}}

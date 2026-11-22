@@ -120,14 +120,10 @@
 #' @seealso [appraise()], [posterior_samples()]
 #' @export
 #' @examples
-#' load_mgcv()
-#' dat <- data_sim("eg1", n = 100, seed = 2)
-#' mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3),
-#'   data = dat,
-#'   method = "REML"
-#' )
+#' # Fit stopping distance as a smooth function of speed.
+#' mod <- mgcv::gam(dist ~ s(speed, k = 5), data = cars, method = "REML")
+#' # Compare the observed distances with 20 replicated datasets.
 #' posterior_predictive_plot(mod, n = 20, seed = 42)
-#' appraise(mod, ppcheck = TRUE, n_ppc = 20, seed = 42)
 posterior_predictive_plot <- function(
   model,
   n = 50,

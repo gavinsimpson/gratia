@@ -47,27 +47,18 @@ supported}
 Concurvity of an estimated GAM
 }
 \examples{
-## simulate data with concurvity...
-library("tibble")
+# Simulate predictors that are related nonlinearly
 load_mgcv()
 set.seed(8)
-n <- 200
-df <- tibble(
-  t = sort(runif(n)),
-  x = gw_f2(t) + rnorm(n) * 3,
-  y = sin(4 * pi * t) + exp(x / 20) + rnorm(n) * 0.3
-)
+n <- 100
+t <- sort(runif(n))
+x <- gw_f2(t) + rnorm(n, sd = 3)
+y <- sin(4 * pi * t) + exp(x / 20) + rnorm(n, sd = 0.3)
+df <- data.frame(t = t, x = x, y = y)
 
-## fit model
-m <- gam(y ~ s(t, k = 15) + s(x, k = 15), data = df, method = "REML")
-
-## overall concurvity
-o_conc <- concrvity(m)
-draw(o_conc)
-
-## pairwise concurvity
-p_conc <- concrvity(m, pairwise = TRUE)
-draw(p_conc)
+# Fit both smooths and plot their overall concurvity
+m <- gam(y ~ s(t, k = 8) + s(x, k = 8), data = df, method = "REML")
+draw(model_concurvity(m))
 }
 \seealso{
 \link{gamm4_support}

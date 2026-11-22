@@ -172,31 +172,14 @@ qq_plot.default <- function(model, ...) {
 #' @export
 #'
 #' @examples
-#' load_mgcv()
-#' ## simulate binomial data...
-#' dat <- data_sim("eg1", n = 200, dist = "binary", scale = .33, seed = 0)
-#' p <- binomial()$linkinv(dat$f) # binomial p
-#' n <- sample(c(1, 3), 200, replace = TRUE) # binomial n
-#' dat <- transform(dat, y = rbinom(n, n, p), n = n)
-#' m <- gam(y / n ~ s(x0) + s(x1) + s(x2) + s(x3),
-#'   family = binomial, data = dat, weights = n,
-#'   method = "REML"
-#' )
-#'
-#' ## Q-Q plot; default using direct randomisation of uniform quantiles
-#' qq_plot(m)
-#'
-#' ## Alternatively simulate new data from the model, which
-#' ## allows construction of reference intervals for the Q-Q plot
-#' qq_plot(m,
-#'   method = "simulate",
-#'   seed = 42,
-#'   point_col = "steelblue",
-#'   point_alpha = 0.4
-#' )
-#'
-#' ## ... or request a normal approximation for the residuals.
-#' qq_plot(m, method = "normal")
+#' # Simulate counts of successes with a probability that varies with x.
+#' set.seed(5)
+#' dat <- data.frame(x = seq(-1, 1, length.out = 80), trials = 5L)
+#' dat$success <- rbinom(nrow(dat), dat$trials, plogis(2 * sin(pi * dat$x)))
+#' m <- mgcv::gam(cbind(success, trials - success) ~ s(x, k = 6),
+#'   family = binomial(), data = dat, method = "REML")
+#' # Compare randomised quantile residuals with standard normal quantiles.
+#' qq_plot(m, type = "quantile", seed = 42)
 `qq_plot.gam` <- function(model,
   method = NULL,
   type = NULL,
@@ -945,30 +928,10 @@ worm_plot.default <- function(model, ...) {
 #' @importFrom stringr str_to_title
 #'
 #' @examples
-#' load_mgcv()
-#' ## simulate binomial data...
-#' dat <- data_sim("eg1", n = 200, dist = "binary", scale = .33, seed = 0)
-#' p <- binomial()$linkinv(dat$f) # binomial p
-#' n <- sample(c(1, 3), 200, replace = TRUE) # binomial n
-#' dat <- transform(dat, y = rbinom(n, n, p), n = n)
-#' m <- gam(y / n ~ s(x0) + s(x1) + s(x2) + s(x3),
-#'   family = binomial, data = dat, weights = n,
-#'   method = "REML"
-#' )
-#'
-#' ## The default uses inverse-CDF sampling of randomised uniform quantiles.
-#' ## Note no reference bands are drawn with this method.
-#' worm_plot(m)
-#'
-#' ## Alternatively simulate new data from the model, which
-#' ## allows construction of reference intervals for the Q-Q plot
-#' worm_plot(m,
-#'   method = "simulate", point_col = "steelblue",
-#'   point_alpha = 0.4
-#' )
-#'
-#' ## ... or request a normal approximation for the residuals.
-#' worm_plot(m, method = "normal")
+#' # Fit stopping distance as a smooth function of speed.
+#' m <- mgcv::gam(dist ~ s(speed, k = 5), data = cars, method = "REML")
+#' # Plot how the ordered residuals differ from their reference quantiles.
+#' worm_plot(m, type = "quantile", seed = 42)
 `worm_plot.gam` <- function(
   model,
   method = NULL,

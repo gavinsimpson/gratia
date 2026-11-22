@@ -99,33 +99,12 @@ load_mgcv()
 \dontshow{
 op <- options(pillar.sigfig = 3, cli.unicode = FALSE)
 }
-dat <- data_sim("eg1", n = 1000, dist = "normal", scale = 2, seed = 2)
-m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
+dat <- data_sim("eg1", n = 120, seed = 2)
+m <- gam(y ~ s(x0, k = 6) + s(x2, k = 6), data = dat, method = "REML")
 
-predicted_samples(m, n_draws = 5, seed = 42)
-
-## Can pass arguments to predict.gam()
-\dontshow{
-set.seed(6791)
-}
-newd <- data.frame(
-  x0 = runif(10), x1 = runif(10), x2 = runif(10),
-  x3 = runif(10)
-)
-
-## Exclude s(x2)
-predicted_samples(m, n_draws = 5, data = newd, exclude = "s(x2)", seed = 25)
-
-## Exclude s(x1)
-predicted_samples(m, n_draws = 5, data = newd, exclude = "s(x1)", seed = 25)
-
-## Select which terms --- result should be the same as previous
-## but note that we have to include any parametric terms, including the
-## constant term
-predicted_samples(m,
-  n_draws = 5, data = newd, seed = 25,
-  terms = c("Intercept", "s(x0)", "s(x2)", "s(x3)")
-)
+# Simulate responses at new predictor values using the fitted model
+newd <- data.frame(x0 = c(0.2, 0.5, 0.8), x2 = 0.5)
+predicted_samples(m, n_draws = 5, data = newd, seed = 42)
 \dontshow{
 options(op)
 }

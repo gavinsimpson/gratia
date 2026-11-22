@@ -213,16 +213,11 @@ response, family component and \code{by} group. Missing plotting values are
 reported and omitted separately for each requested plot.
 }
 \examples{
-load_mgcv()
-dat <- data_sim("eg1", n = 400, seed = 2)
-m <- gam(y ~ x2 + s(x0) + s(x1), data = dat, method = "REML")
-# A curve against x2 suggests reconsidering its linear effect.
+# Simulate a response with nonlinear covariate effects.
+dat <- data_sim("eg1", n = 120, scale = 1, seed = 2)
+m <- mgcv::gam(y ~ x2 + s(x1, k = 6), data = dat, method = "REML")
+# Look for curvature after fitting a straight-line effect for x2.
 residuals_covariate_plot(m, covariates = "x2", type = "pearson")
-# Check a covariate omitted from the model.
-residuals_covariate_plot(m, covariates = "x3", data = dat)
-# Inspect individual covariates and possible remaining interaction structure.
-scalable_residuals_covariate_plot(m, covariates = c("x0", "x2"),
-  pairs = list(c("x0", "x2")), bins = 6, type = "quantile", seed = 42)
 }
 \seealso{
 \code{\link[=appraise]{appraise()}}, \code{\link[=residuals_linpred_plot]{residuals_linpred_plot()}}, \code{\link[=partial_residuals]{partial_residuals()}}

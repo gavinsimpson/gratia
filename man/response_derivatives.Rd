@@ -189,62 +189,27 @@ derivatives remain available when the response mean does not exist.
 \examples{
 
 library("ggplot2")
-library("patchwork")
 load_mgcv()
-\dontshow{
-op <- options(pillar.sigfig = 3, cli.unicode = FALSE)
-}
-df <- data_sim("eg1", dist = "negbin", scale = 0.25, seed = 42)
 
-# fit the GAM (note: for execution time reasons using bam())
-m <- bam(y ~ s(x0) + s(x1) + s(x2) + s(x3),
-  data = df, family = nb(), method = "fREML"
+# Simulate counts whose mean varies smoothly with four covariates.
+dat <- data_sim("eg1", n = 120, dist = "negbin", scale = 0.25, seed = 42)
+m <- gam(y ~ s(x0, k = 5) + s(x1, k = 5) + s(x2, k = 5) + s(x3, k = 5),
+  data = dat, family = nb(), method = "REML"
 )
 
-# data slice through data along x2 - all other covariates will be set to
-# typical values (value closest to median)
-ds <- data_slice(m, x2 = evenly(x2, n = 100))
-
-# fitted values along x2
-fv <- fitted_values(m, data = ds)
-
-# response derivatives - ideally n_sim = >10000
-y_d <- response_derivatives(m,
-  data = ds, type = "central", focal = "x2",
-  eps = 0.01, seed = 21, n_sim = 1000
+# Estimate how the expected count changes with x2 at typical values
+# of the other covariates.
+slice <- data_slice(m, x2 = evenly(x2, n = 30))
+derivatives <- response_derivatives(m,
+  data = slice, type = "central", focal = "x2",
+  eps = 0.01, seed = 21, n_sim = 200
 )
 
-# draw fitted values along x2
-p1 <- fv |>
-  ggplot(aes(x = x2, y = .fitted)) +
-  geom_ribbon(aes(ymin = .lower_ci, ymax = .upper_ci, y = NULL),
-    alpha = 0.2
-  ) +
-  geom_line() +
-  labs(
-    title = "Estimated count as a function of x2",
-    y = "Estimated count"
-  )
-
-# pointwise normal intervals from the delta method
-y_delta <- response_derivatives(m, data = ds, focal = "x2",
-  type = "central", uncertainty = "delta")
-
-# draw response derivatives
-p2 <- y_d |>
-  ggplot(aes(x = x2, y = .derivative)) +
+# Plot the derivative and its pointwise credible interval.
+ggplot(derivatives, aes(x = x2, y = .derivative)) +
   geom_ribbon(aes(ymin = .lower_ci, ymax = .upper_ci), alpha = 0.2) +
   geom_line() +
-  labs(
-    title = "Estimated 1st derivative of estimated count",
-    y = "First derivative"
-  )
-
-# draw both panels
-p1 + p2 + plot_layout(nrow = 2)
-\dontshow{
-options(op)
-}
+  labs(y = "First derivative of the expected count")
 }
 \seealso{
 \link{gamm4_support}

@@ -51,13 +51,14 @@
 #' @export
 #' @examples
 #' load_mgcv()
-#' dat <- data_sim("eg1", n = 100, seed = 42)
+#' dat <- data_sim("eg1", n = 80, seed = 42)
 #' model <- gam(y ~ s(x0, k = 5), data = dat, method = "REML")
-#' b <- post_draws(model, n_draws = 400, chains = 4, method = "mh",
-#'   burnin = 100, seed = 281)
+#'
+#' # Plot the first coefficient's trace from two short chains.
+#' b <- post_draws(model, n_draws = 120, chains = 2, method = "mh",
+#'   burnin = 30, seed = 281)
 #' diagnostics <- sampling_diagnostics(b)
-#' draw(diagnostics, select = 1:2)
-#' draw(diagnostics, type = "rank", select = 1:2, n_bins = 10)
+#' draw(diagnostics, select = 1L)
 #' @inheritSection draw Label layout
 draw.sampling_diagnostics <- function(object, type = c("trace", "rank"),
     select = NULL, n_bins = 20L, scales = NULL, ncol = NULL, nrow = NULL,

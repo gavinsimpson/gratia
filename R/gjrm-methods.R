@@ -58,19 +58,15 @@
 #' @examples
 #' if (requireNamespace("GJRM", quietly = TRUE)) {
 #'   load_mgcv()
-#'   # Simulate a nonlinear mean with a binary group effect and Gaussian noise
+#'   # Simulate a response whose mean and standard deviation vary with x.
 #'   set.seed(0)
-#'   n <- 100
-#'   x1 <- round(runif(n))
-#'   x2 <- runif(n)
-#'   x3 <- runif(n)
-#'   f1 <- function(x) cos(pi * 2 * x) + sin(pi * x)
-#'   y1 <- -1.55 + 2 * x1 + f1(x2) + rnorm(n)
-#'   dataSim <- data.frame(y1, x1, x2, x3)
+#'   n <- 80
+#'   x <- runif(n)
+#'   dat <- data.frame(x = x, y = sin(2 * pi * x) + rnorm(n, sd = exp(x)))
 #'
-#'   # Fit smooths for the mean and scale, then plot both model components
-#'   m <- GJRM::gamlss(list(y1 ~ x1 + s(x2), ~ s(x3, k = 6)), data = dataSim)
-#'   draw(m)
+#'   # Fit and plot the smooths for the mean and standard deviation.
+#'   model <- GJRM::gamlss(list(y ~ s(x, k = 5), ~ s(x, k = 4)), data = dat)
+#'   draw(model, n = 40)
 #' }
 #' @inheritSection draw Label layout
 `draw.gamlss` <- function(object,
