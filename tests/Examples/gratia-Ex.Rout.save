@@ -2031,6 +2031,7 @@ detaching ‘package:mgcv’
 <theme> List of 2
  $ palette.colour.discrete:function (n)  
  $ palette.fill.discrete  :function (n)  
+ - attr(*, "class")= chr "gg"
  @ complete: logi FALSE
  @ validate: logi TRUE
 > 
@@ -2064,6 +2065,7 @@ detaching ‘package:mgcv’
 <theme> List of 2
  $ palette.colour.discrete:function (n)  
  $ palette.fill.discrete  :function (n)  
+ - attr(*, "class")= chr "gg"
  @ complete: logi FALSE
  @ validate: logi TRUE
 > 
