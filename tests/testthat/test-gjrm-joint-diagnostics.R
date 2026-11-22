@@ -92,12 +92,13 @@ test_that("joint appraisals keep four panels and facet every panel by response",
         p <- plots[[i]]
         expect_s3_class(p, "ggplot")
         expect_s3_class(p$facet, "FacetWrap")
-        if (full_test_run() || i == 1L) {
+        if (full_test_run()) {
           built <- ggplot2::ggplot_build(p)
           expect_equal(nrow(built$layout$layout), length(m$margins))
         }
       }
-      if (full_test_run()) expect_silent(patchwork::patchworkGrob(plots))
+      skip_on_cran()
+      expect_silent(patchwork::patchworkGrob(plots))
       selected <- appraise(m, response = 2, seed = 17, scalable = scalable)
       expect_length(selected, 4L)
       expect_equal(nrow(ggplot2::ggplot_build(selected[[1]])$layout$layout), 1L)

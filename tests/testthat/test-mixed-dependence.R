@@ -126,11 +126,12 @@ test_that("native lme and merMod dispatch through the shared diagnostics", {
     expect_length(r, 80L)
     expect_true(is.na(r[2L]))
     expect_s3_class(qq_plot(m), "ggplot")
-    expect_s3_class(appraise(m, scalable = TRUE), "patchwork")
+    if (full_test_run()) expect_s3_class(appraise(m, scalable = TRUE), "patchwork")
   }
 })
 
 test_that("native mixed posterior draws and PPCs reuse joint kernels and rows", {
+  skip_on_cran()
   skip_if_not_installed("nlme")
   skip_if_not_installed("lme4")
   set.seed(301)
@@ -225,6 +226,7 @@ test_that("uncorrelated PQL PPC draws use the approximate family response law", 
 })
 
 test_that("native grouped-binomial posterior draws preserve the trial scale", {
+  skip_on_cran()
   skip_if_not_installed("lme4")
   withr::local_options(gratia.diagnostics.marginal_draws = 29L)
   set.seed(263)

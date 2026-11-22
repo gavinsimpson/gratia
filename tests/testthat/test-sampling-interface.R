@@ -1,6 +1,14 @@
+test_that("posterior_samples works for a simple GAM", {
+  expect_silent(sm <- posterior_samples(m_1_smooth, n_draws = 5, seed = 42))
+  expect_s3_class(sm, c("posterior_samples", "tbl_df", "tbl", "data.frame"))
+  expect_identical(nrow(sm), 5L * nrow(quick_eg1))
+  expect_identical(ncol(sm), 3L)
+  expect_named(sm, expected = c(".row", ".draw", ".response"))
+})
+
 test_that("obsolete sampling arguments fail before matching or evaluation", {
   m <- sampling_interface_model
-  functions <- list(
+  functions <- test_cases_for_cran(list(
     posterior_samples,
     fitted_samples,
     smooth_samples,
@@ -11,7 +19,7 @@ test_that("obsolete sampling arguments fail before matching or evaluation", {
     gaussian_draws,
     mh_draws,
     user_draws
-  )
+  ), list(posterior_samples, derivative_samples))
   old <- c(
     n = "n_draws",
     n_sim = "n_draws",
@@ -38,12 +46,12 @@ test_that("obsolete sampling arguments fail before matching or evaluation", {
     expect_error(fun(m, 10), "Sampling controls must be named", fixed = TRUE)
     expect_error(fun(m, n_d = 10), "not supported|Supply 'n_draws'")
   }
-  for (fun in list(
+  for (fun in test_cases_for_cran(list(
     add_fitted_samples,
     add_smooth_samples,
     add_posterior_samples,
     add_predicted_samples
-  )) {
+  ), list(add_fitted_samples))) {
     expect_error(
       fun(mtcars, m, n = 10),
       "Argument 'n' has been removed",
@@ -136,7 +144,7 @@ test_that("supplied draws determine counts and retain coefficient diagnostics", 
   skip_if_not_installed("posterior")
   m <- sampling_interface_model
   b <- post_draws(m, n_draws = 40, chains = 4, seed = 9, diagnostics = TRUE)
-  functions <- list(
+  functions <- test_cases_for_cran(list(
     fitted_samples,
     posterior_samples,
     smooth_samples,
@@ -144,7 +152,7 @@ test_that("supplied draws determine counts and retain coefficient diagnostics", 
     post_draws,
     generate_draws,
     user_draws
-  )
+  ), list(posterior_samples, fitted_samples, derivative_samples, user_draws))
   for (fun in functions) {
     args <- list(model = m, draws = b)
     if (!identical(fun, user_draws)) {

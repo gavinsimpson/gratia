@@ -1,22 +1,23 @@
 skip_if_not_installed("GJRM", minimum_version = "0.2-6")
 
 test_that("joint GJRM smooths use the final equation coefficients and covariance", {
-  m <- gjrm_joint_fixture()
+  m <- gjrm_joint_fixture(test_cases_for_cran("normal", "binary_cont"))
   d <- data.frame(x = c(.7, .2, .7, .4), z = c(.8, .3, .1, .6),
     a = .5, group = factor(c("a", "b", "c", "a"), levels = letters[1:9]))
   labels <- smooths(m)
-  expect_identical(labels,
-    c("s(x)", "s(group)", "s.1(x)", "s(z)", "s.3(z)", "s.4(z)"))
+  expect_identical(labels, test_cases_for_cran(
+    c("s(x)", "s(group)", "s.1(x)", "s(z)", "s.3(z)", "s.4(z)"),
+    c("s(x)", "s.1(x)", "s(z)", "s.3(z)")))
   offset <- 0L
   smooth_index <- 0L
-  for (equation in seq_len(5)) {
+  for (equation in seq_len(test_cases_for_cran(5L, 4L))) {
     g <- m[[paste0("gam", equation)]]
     columns <- offset + seq_len(m[[paste0("X", equation, ".d2")]])
     for (sm in g$smooth) {
       smooth_index <- smooth_index + 1L
       X <- mgcv::PredictMat(sm, d)
       j <- columns[sm$first.para:sm$last.para]
-      for (frequentist in c(FALSE, TRUE)) {
+      for (frequentist in test_cases_for_cran(c(FALSE, TRUE), FALSE)) {
         values <- smooth_estimates(m, select = smooth_index, data = d,
           overall_uncertainty = FALSE, frequentist = frequentist)
         V <- if (frequentist) m$Ve else m$Vb
@@ -28,6 +29,12 @@ test_that("joint GJRM smooths use the final equation coefficients and covariance
     }
     offset <- offset + length(columns)
   }
+  if (!full_test_run()) {
+    panels <- assemble(m, select = 4L, n = 8, rug = FALSE)
+    expect_identical(names(panels), labels[4L])
+    expect_identical(panels[[1]]$labels$subtitle, "Dependence (theta)")
+  }
+  skip_on_cran()
   # Intermediate GAM coefficients must have no effect on final-fit smooths.
   altered <- m
   for (i in seq_len(5)) {
@@ -39,6 +46,7 @@ test_that("joint GJRM smooths use the final equation coefficients and covariance
 })
 
 test_that("joint smooth selection and saved estimates retain equation identity", {
+  skip_on_cran()
   m <- gjrm_joint_fixture()
   labels <- smooths(m)
   all <- smooth_estimates(m, n = 8)

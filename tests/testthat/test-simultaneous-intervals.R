@@ -61,6 +61,7 @@ test_that("joint interval inputs and covariance are validated", {
 })
 
 test_that("modern derivative adapters preserve the original joint calculation", {
+  skip_on_cran()
   # Reference to the pre-refactor calculation, including one batch per smooth.
   original <- function(x, Xi, level, Vb, n_sim, ncores) {
     draws <- mvnfast::rmvn(n_sim, rep(0, nrow(Vb)), Vb, ncores = ncores)

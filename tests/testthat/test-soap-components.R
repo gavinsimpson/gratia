@@ -16,7 +16,9 @@ test_that("soap component classes have distinct supported types", {
 })
 
 test_that("split component estimates and standard errors match mgcv by position", {
-  for (model in list(m_soap_sep, m_soap_sep_known, m_soap_tensor)) {
+  models <- test_cases_for_cran(list(m_soap_sep, m_soap_sep_known, m_soap_tensor),
+    list(m_soap_sep_known))
+  for (model in models) {
     d <- model.frame(model)[1:8, ]
     reference <- predict(model, newdata = d, type = "terms", se.fit = TRUE)
     estimates <- smooth_estimates(model, data = d, unnest = FALSE,
@@ -119,6 +121,7 @@ test_that("component 3D plots retain soap domain boundaries", {
 })
 
 test_that("fixed soap component fill ranges ignore missing boundary values", {
+  skip_on_cran()
   panels <- assemble(m_soap_sep, scales = "fixed", n_2d = 10, rug = FALSE)
   limits <- lapply(panels, function(p) {
     ggplot2::ggplot_build(p)$plot$scales$get_scales("fill")$get_limits()
@@ -139,6 +142,7 @@ test_that("fixed soap component fill ranges ignore missing boundary values", {
 })
 
 test_that("soap component fitting is unaffected by attaching sf", {
+  skip_on_cran()
   skip_if_not_installed("sf")
   withr::local_package("sf")
   model <- update(m_soap_sep)
@@ -152,30 +156,32 @@ test_that("soap component fitting is unaffected by attaching sf", {
 })
 
 test_that("tensor components sharing both label and type retain fitted indices", {
-  model <- m_soap_tensor
+  model <- test_cases_for_cran(m_soap_tensor, m_soap_tensor_small)
   sm <- smooth_estimates(model, n_2d = 7, n_3d = 2)
   expect_identical(unique(sm$.smooth_id), 1:2)
   expect_length(split_smooth_components(sm), 2L)
   nested <- smooth_estimates(model, n_2d = 7, n_3d = 2, unnest = FALSE)
   expect_identical(nested$.smooth_id, 1:2)
   expect_false(".smooth_id" %in% names(smooth_estimates(m_soap_sep, n_2d = 7)))
-  for (grouped in c(FALSE, TRUE)) {
+  for (grouped in test_cases_for_cran(c(FALSE, TRUE), FALSE)) {
     panels <- assemble(model, n_2d = 7, n_3d = 2, grouped = if (grouped) c("factor-by", "sz", "fs") else c("sz", "fs"),
       residuals = TRUE)
     expect_length(panels, 2L)
     expect_silent(lapply(panels, ggplot2::ggplot_build))
-    for (values in list(sm, nested)) {
+    for (values in test_cases_for_cran(list(sm, nested), list(sm))) {
       drawn <- draw(values, grouped = if (grouped) c("factor-by", "sz", "fs") else c("sz", "fs"))
       expect_silent(ggplot2::ggplot_build(drawn))
     }
   }
-  # Bracket and dplyr subsets keep the explicit identity column intact.
-  second <- sm[sm$.smooth_id == 2L, ]
-  expect_identical(unique(second$.smooth_id), 2L)
-  expect_length(split_smooth_components(second), 1L)
-  expect_silent(ggplot2::ggplot_build(draw(second)))
-  filtered <- dplyr::filter(sm, .smooth_id == 1L)
-  expect_identical(unique(filtered$.smooth_id), 1L)
-  expect_silent(ggplot2::ggplot_build(draw(filtered)))
+  if (full_test_run()) {
+    # Bracket and dplyr subsets keep the explicit identity column intact.
+    second <- sm[sm$.smooth_id == 2L, ]
+    expect_identical(unique(second$.smooth_id), 2L)
+    expect_length(split_smooth_components(second), 1L)
+    expect_silent(ggplot2::ggplot_build(draw(second)))
+    filtered <- dplyr::filter(sm, .smooth_id == 1L)
+    expect_identical(unique(filtered$.smooth_id), 1L)
+    expect_silent(ggplot2::ggplot_build(draw(filtered)))
+  }
   expect_identical(smooths(model), c("te(v,w,time)", "te(v,w,time)"))
 })

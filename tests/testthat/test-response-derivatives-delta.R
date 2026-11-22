@@ -28,7 +28,9 @@ test_that("delta derivatives agree with analytic log and logit gradients", {
 
 test_that("identity and linear predictor derivatives use analytic covariance", {
   m <- response_delta_fixture(gaussian())
-  for (ord in 1:2) for (type in c("forward", "backward", "central")) {
+  orders <- test_cases_for_cran(1:2, 1L)
+  types <- test_cases_for_cran(c("forward", "backward", "central"), "central")
+  for (ord in orders) for (type in types) {
     a <- response_derivatives(m, focal = "x", n = 4, order = ord,
       type = type, uncertainty = "delta")
     b <- response_derivatives(m, focal = "x", n = 4, order = ord,

@@ -17,11 +17,10 @@ a feature, include a small test for its public behaviour in the CRAN selection.
 The weekly GitHub Actions jobs and local full runs still run all test files.
 
 `test-function-core.R` keeps compact moment, plotting, theme, label and utility
-checks alongside the existing focused numerical tests. `test-parallel-core.R`
-uses one worker pool to compare derivatives, partial derivatives, smooth samples,
-smooth differences and ALE with their serial results, including random-number
-state and worker error handling. Additional worker/model combinations run only
-in the full suite.
+checks alongside the existing focused numerical tests. The full suite includes
+`test-parallel-core.R`, which compares derivatives, partial derivatives, smooth
+samples, smooth differences and ALE with their serial results. It also checks
+random-number state and worker error handling.
 
 Run the CRAN selection explicitly:
 
@@ -95,9 +94,9 @@ snapshots remain in place.
   snapshots, or in separate tests. `expect_doppelganger()` honours the explicit
   `VDIFFR_RUN_TESTS` switch both locally and on CI.
 - Prefer small data/grids/draw counts to exclusions when they preserve the
-  contract. The family-quantile plots use three representative families on
-  CRAN. The full suite checks all eight, with fewer observations in the
-  Tweedie fits to limit the cost of numerical integration.
+  contract. The full suite checks family-quantile plots for eight families,
+  with fewer observations in the Tweedie fits to limit the cost of numerical
+  integration.
 - Measure shared setup and top-level code as well as test-body durations. A
   reported skip may happen after substantial computation.
 
@@ -151,7 +150,7 @@ these times before and after the changes:
 
 Elapsed time fell by 55.4%, and CPU time by 53.4%. Broader plot and coordinate
 matrices, model/family combinations, native likelihood profiles and research
-sampler tests now run in the full tier. The CRAN worker check shares one pool
+sampler tests moved to the full tier. The CRAN worker check shared one pool
 across the main operations. These measurements cover the test suite; package
 installation, examples and vignettes are outside the timer.
 

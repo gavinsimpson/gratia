@@ -1,7 +1,7 @@
 test_that("one QQ core retains exact references in memory and on disk", {
   withr::local_seed(101)
-  for (nr in c(1L, 2L, 31L)) {
-    for (n in c(1L, 2L, 7L)) {
+  for (nr in test_cases_for_cran(c(1L, 2L, 31L), 31L)) {
+    for (n in test_cases_for_cran(c(1L, 2L, 7L), 7L)) {
       y <- rnorm(nr)
       for (discrete in c(FALSE, TRUE)) {
         draw <- function(p) if (discrete) rpois(length(p), 1) else rnorm(length(p))
@@ -42,7 +42,7 @@ test_that("LM and GLM dispersion and seeded references agree across entry points
   for (m in models) {
     expected <- if (inherits(m, "glm")) summary(m)$dispersion else summary(m)$sigma^2
     expect_equal(diagnostic_data(m)$source$sig2, expected)
-    for (method in c("uniform", "simulate")) {
+    for (method in test_cases_for_cran(c("uniform", "simulate"), "simulate")) {
       q <- qq_plot(m, method = method, n_uniform = 3, n_simulate = 4, seed = 42)
       a <- appraise(m, method = method, n_uniform = 3, n_simulate = 4,
         seed = 42, scalable = FALSE)

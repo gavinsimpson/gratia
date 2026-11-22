@@ -59,7 +59,7 @@ sdmtmb_expect_build <- function(plots) {
 
 test_that("sdmTMB effects reproduce native ML and REML predictions", {
   d <- sdmtmb_test_data()
-  for (reml in c(FALSE, TRUE)) {
+  for (reml in test_cases_for_cran(c(FALSE, TRUE), FALSE)) {
     m <- sdmtmb_test_fit(y ~ z + s(x, k = 6), d, reml = reml)
     a <- sdmtmb_expect_native(m, d[1:12, ])
     expect_s3_class(a, "gratia_mixed_smooth")
@@ -78,6 +78,7 @@ test_that("sdmTMB effects reproduce native ML and REML predictions", {
     expect_equal(unname(a$Vp), unname(a$coefficient_transform %*%
       V[idx, idx] %*% t(a$coefficient_transform)), tolerance = 1e-7)
   }
+  skip_on_cran()
   m <- sdmtmb_test_fit(y ~ s(x, k = 6), d)
   p <- predict(m, newdata = d, se_fit = TRUE, re_form = NA)
   expect_equal(smooth_estimates(m, data = d)$.se, p$est_se, tolerance = 1e-6)
@@ -259,6 +260,7 @@ test_that("sdmTMB evaluation and plots use shared GAM controls", {
 })
 
 test_that("unavailable sdmTMB reports and metadata fail explicitly", {
+  skip_on_cran()
   d <- sdmtmb_test_data()
   m <- sdmtmb_test_fit(y ~ z + s(x, k = 5), d)
   expected <- smooth_estimates(m, n = 8)
@@ -289,6 +291,7 @@ test_that("unavailable sdmTMB reports and metadata fail explicitly", {
 })
 
 test_that("sdmTMB methods require recent fits made with RTMB", {
+  skip_on_cran()
   d <- sdmtmb_test_data()
   m <- sdmTMB::sdmTMB(y ~ s(x, k = 5), data = d, spatial = "off",
     control = sdmTMB::sdmTMBcontrol(backend = "tmb"))

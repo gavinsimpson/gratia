@@ -168,11 +168,12 @@ test_that("actual gamm4 draws tolerate rank-deficient covariance", {
 
 test_that("gamm4 diagnostics and simulations retain family-specific behavior", {
   models <- test_cases_for_cran(
-    list(gamm4_gaussian, gamm4_binomial, gamm4_poisson), list(gamm4_poisson))
+    list(gamm4_gaussian, gamm4_binomial, gamm4_poisson), list(gamm4_binomial))
   for (m in models) {
     expect_equal(simulate(m, nsim = 3, seed = 14, conditioning = "gam_component"),
       simulate.gam(m$gam, nsim = 3, seed = 14))
     expect_gamm4_equivalent(m, "quantile_residuals", seed = 14, conditioning = "gam_component")
+    skip_on_cran()
     expect_s3_class(qq_plot(m, type = "response", method = "simulate", n_simulate = 5, seed = 14), "ggplot")
     expect_s3_class(worm_plot(m, type = "response", method = "simulate", n_simulate = 5, seed = 14), "ggplot")
     expect_s3_class(appraise(m, method = "normal"), "patchwork")
@@ -189,7 +190,10 @@ test_that("gamm4 diagnostics and simulations retain family-specific behavior", {
 })
 
 test_that("gamm4 variance components include smooths and genuine random effects", {
-  for (m in list(gamm4_gaussian, gamm4_binomial, gamm4_poisson, gamm4_surface)) {
+  models <- test_cases_for_cran(
+    list(gamm4_gaussian, gamm4_binomial, gamm4_poisson, gamm4_surface),
+    list(gamm4_gaussian))
+  for (m in models) {
     v <- variance_comp(m, rescale = FALSE, interval_method = "none")
     expected <- as.data.frame(lme4::VarCorr(m$mer))
     take <- is.na(expected$var2)
@@ -217,6 +221,7 @@ test_that("gamm4 variance components include smooths and genuine random effects"
 })
 
 test_that("weighted gamm4 fits preserve excluded and subset rows", {
+  skip_on_cran()
   m <- gamm4_missing
   expect_equal(NROW(model.frame(m$gam)), 158L)
   expect_equal(nrow(fitted_values(m)), 160L)
@@ -251,7 +256,9 @@ test_that("weighted gamm4 fits preserve excluded and subset rows", {
 
 test_that("gamm4 estimates and user draws agree with prediction algebra", {
   nd <- gamm4_data[1:8, ]
-  for (m in list(gamm4_gaussian, gamm4_binomial, gamm4_poisson)) {
+  models <- test_cases_for_cran(
+    list(gamm4_gaussian, gamm4_binomial, gamm4_poisson), list(gamm4_gaussian))
+  for (m in models) {
     X <- predict(m$gam, newdata = nd, type = "lpmatrix")
     beta <- coef(m$gam)
     offset <- if (family_name(m) == "poisson") nd$off else rep(0, 8)
@@ -298,7 +305,9 @@ test_that("gamm4 simultaneous intervals and parallel smooth computations agree",
 
 
 test_that("gamm4 family-specific utilities keep useful unsupported errors", {
-  for (m in list(gamm4_gaussian, gamm4_binomial, gamm4_poisson)) {
+  models <- test_cases_for_cran(
+    list(gamm4_gaussian, gamm4_binomial, gamm4_poisson), list(gamm4_binomial))
+  for (m in models) {
     expect_false(has_theta(m))
     expect_error(theta(m), "No additional parameters")
     expect_error(nb_theta(m), "Only negative binomial")
@@ -309,6 +318,7 @@ test_that("gamm4 family-specific utilities keep useful unsupported errors", {
 
 
 test_that("generalized gamm4 simulations and QQ data remain valid", {
+  skip_on_cran()
   for (m in list(gamm4_binomial, gamm4_poisson)) {
     expect_equal(diagnostic_weights(m$gam), m$gam$prior.weights)
     qq <- qq_plot(m, type = "response", method = "simulate", n_simulate = 5, seed = 15)
@@ -326,7 +336,9 @@ test_that("generalized gamm4 simulations and QQ data remain valid", {
 
 
 test_that("generalized gamm4 partial residuals use conditional working residuals", {
-  for (m in list(gamm4_gaussian, gamm4_binomial, gamm4_poisson)) {
+  models <- test_cases_for_cran(
+    list(gamm4_gaussian, gamm4_binomial, gamm4_poisson), list(gamm4_binomial))
+  for (m in models) {
     conditional <- residuals(m$mer, type = "working")
     partial <- predict(m$gam, type = "terms")[, "s(x)"] +
       conditional * sqrt(m$gam$weights)

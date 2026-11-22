@@ -9,7 +9,9 @@ expect_draw_build <- function(plots) {
 }
 
 test_that("drawing preserves selection, transformations and argument errors", {
-  for (select in list(2, "s(x1)", c(FALSE, TRUE, FALSE, FALSE))) {
+  selections <- test_cases_for_cran(
+    list(2, "s(x1)", c(FALSE, TRUE, FALSE, FALSE)), list("s(x1)"))
+  for (select in selections) {
     p <- draw(m_gam, select = select, n = 8, rug = FALSE)
     expect_length(p, 1L)
     expect_equal(unique(p[[1]]$data$.smooth), "s(x1)")
@@ -29,15 +31,18 @@ test_that("drawing preserves selection, transformations and argument errors", {
 
 test_that("drawing handles small smooth grids and derived objects", {
   expect_draw_build(draw(smooth_estimates(su_m_bivar_te, n_2d = 5)))
-  expect_draw_build(draw(smooth_estimates(m_univar_t2, n = 8)))
   expect_draw_build(draw(derivatives(m_1_smooth, n = 8), add_change = TRUE))
-  expect_draw_build(draw(partial_derivatives(su_m_bivar_te, focal = "x", n = 8)))
-  sm <- smooth_estimates(m_1_smooth, n = 8)
-  d <- derivatives(m_1_smooth, n = 8)
-  expect_draw_build(draw(add_sizer(sm, derivatives = d, type = "sizer")))
+  if (full_test_run()) {
+    expect_draw_build(draw(smooth_estimates(m_univar_t2, n = 8)))
+    expect_draw_build(draw(partial_derivatives(su_m_bivar_te, focal = "x", n = 8)))
+    sm <- smooth_estimates(m_1_smooth, n = 8)
+    d <- derivatives(m_1_smooth, n = 8)
+    expect_draw_build(draw(add_sizer(sm, derivatives = d, type = "sizer")))
+  }
 })
 
 test_that("ordered factor labels and grouped panels survive drawing", {
+  skip_on_cran()
   withr::local_seed(901)
   d <- data.frame(x = rep(seq(0, 1, length.out = 20), 3),
     f = ordered(rep(letters[1:3], each = 20)))
@@ -70,6 +75,7 @@ test_that("parametric drawing retains values and validation", {
 })
 
 test_that("small four dimensional smooths can be evaluated and drawn", {
+  skip_on_cran()
   withr::local_seed(903)
   d <- data.frame(x = runif(100), z = runif(100), u = runif(100), v = runif(100))
   d$y <- sin(d$x * 4) + d$z + rnorm(100)
@@ -93,6 +99,7 @@ test_that("small tensor random effects retain curves and surfaces", {
 })
 
 test_that("small AR and matrix covariate models can be drawn", {
+  skip_on_cran()
   withr::local_seed(905)
   d <- data.frame(x = seq(0, 1, length.out = 60))
   d$y <- sin(d$x * 4) + rnorm(60)
@@ -105,6 +112,7 @@ test_that("small AR and matrix covariate models can be drawn", {
 })
 
 test_that("small bivariate smooth differences preserve factor comparisons", {
+  skip_on_cran()
   withr::local_seed(906)
   d <- data.frame(x = runif(80), z = runif(80), f = factor(rep(1:2, 40)))
   d$y <- sin(d$x * 4) + as.numeric(d$f) + rnorm(80)

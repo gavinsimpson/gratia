@@ -82,6 +82,7 @@ test_that("soap derivative simultaneous intervals and plots retain the boundary 
 })
 
 test_that("finite differences without a smooth offset retain native estimates and uncertainty", {
+  skip_on_cran()
   d <- withr::with_seed(27, {
     d <- data.frame(x = runif(90), y = runif(90))
     d$z <- sin(d$x) + d$y^2 + rnorm(90, sd = .1)

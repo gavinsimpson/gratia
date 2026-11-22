@@ -38,9 +38,10 @@ test_that("assemble gamlss returns named plots using final model estimates", {
     X <- mgcv::PredictMat(sm, p$data)
     cols <- gjrm_gamlss_ind(m, i)[sm$first.para:sm$last.para]
     expect_equal(p$data$.estimate, drop(X %*% m$coefficients[cols]))
-    expect_silent(ggplot2::ggplotGrob(p))
+    expect_plot_render(p)
   }
   expect_s3_class(draw(m, n = 9, rug = FALSE), "patchwork")
+  skip_on_cran()
   drawn <- draw(m, n = 9, rug = FALSE, wrap = FALSE)
   expect_identical(names(drawn), names(plots))
   for (i in seq_along(plots)) {
@@ -50,6 +51,7 @@ test_that("assemble gamlss returns named plots using final model estimates", {
 })
 
 test_that("gamlss resolves deprecated grouping once across its equations", {
+  skip_on_cran()
   withr::local_options(lifecycle_verbosity = "warning")
   m <- assemble_gamlss_fixture()
   for (entry in list(assemble, draw)) {
@@ -136,6 +138,7 @@ test_that("assemble gamlss handles parametric-only single and empty plot lists",
 })
 
 test_that("assemble and draw gamlss validate the same controls", {
+  skip_on_cran()
   m <- assemble_gamlss_fixture()
   message_for <- function(fun, arguments) {
     tryCatch(do.call(fun, c(list(object = m), arguments)),

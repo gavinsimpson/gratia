@@ -14,6 +14,7 @@ test_that("sdmTMB fitted diagnostics agree with native conditional calibration",
 })
 
 test_that("sdmTMB delta diagnostics calibrate the entire response mixture", {
+  skip_on_cran()
   skip_if_not_installed("sdmTMB", minimum_version = "1.2.0")
   set.seed(345)
   d <- data.frame(x = seq(-1, 1, length.out = 80))
@@ -47,7 +48,6 @@ test_that("sdmTMB delta diagnostics calibrate the entire response mixture", {
   expect_equal(model_row_map(positive),
     ifelse(d$y > 0, cumsum(d$y > 0), NA_integer_))
   expect_s3_class(posterior_predictive_plot(m, n = 2L, seed = 12), "ggplot")
-  skip_on_cran()
   expect_s3_class(posterior_predictive_plot(m, n = 2L, seed = 12,
     conditioning = "marginal"), "ggplot")
 })
@@ -106,6 +106,7 @@ test_that("sdmTMB diagnostics retain fitted IID effects", {
 })
 
 test_that("sdmTMB spatial calibration retains the fitted field", {
+  skip_on_cran()
   skip_if_not_installed("sdmTMB", minimum_version = "1.2.0")
   set.seed(202)
   d <- data.frame(x = runif(50), north = runif(50))

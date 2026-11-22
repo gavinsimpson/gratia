@@ -6,7 +6,7 @@ test_that("B-spline tensor estimates and uncertainty agree with mgcv", {
     list(b_tensor_fixture(1L), b_tensor_fixture(), b_tensor_fixture(3L),
       b_tensor_fixture(penalty_order = 3.2), b_tensor_fixture(by = "numeric"),
       b_tensor_fixture(by = "factor")),
-    list(b_tensor_fixture(), b_tensor_fixture(by = "factor")))
+    list(b_tensor_fixture(by = "factor")))
   for (model in models) {
     d <- model.frame(model)[1:8, ]
     reference <- predict(model, newdata = d, type = "terms", se.fit = TRUE)
@@ -120,10 +120,12 @@ test_that("B-spline tensor plots support curves, surfaces and factor-by smooths"
     panels <- assemble(model, parametric = FALSE, n = 8, n_2d = 8, n_3d = 2)
     expect_length(panels, length(model$smooth))
     expect_silent(lapply(panels, ggplot2::ggplot_build))
-    expect_plot_render(panels[[1L]], cran = TRUE)
-    estimates <- smooth_estimates(model, n = 8, n_2d = 8, n_3d = 2)
-    expect_silent(ggplot2::ggplot_build(draw(estimates)))
-    b <- basis(model, n = 8, n_2d = 8, n_3d = 2)
-    expect_silent(ggplot2::ggplot_build(draw(b)))
+    if (full_test_run()) {
+      expect_plot_render(panels[[1L]])
+      estimates <- smooth_estimates(model, n = 8, n_2d = 8, n_3d = 2)
+      expect_silent(ggplot2::ggplot_build(draw(estimates)))
+      b <- basis(model, n = 8, n_2d = 8, n_3d = 2)
+      expect_silent(ggplot2::ggplot_build(draw(b)))
+    }
   }
 })

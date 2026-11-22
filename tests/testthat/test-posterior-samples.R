@@ -273,18 +273,6 @@ test_that("smooth_samples example output doesn't change", {
   expect_snapshot(samples)
 })
 
-test_that("posterior_samples works for a simple GAM", {
-  expect_silent(sm <- posterior_samples(m_1_smooth, n_draws = 5, seed = 42))
-  expect_s3_class(sm, c(
-    "posterior_samples", "tbl_df",
-    "tbl", "data.frame"
-  ))
-  ## 1000 == 5 * 200 (nrow(dat))
-  expect_identical(NROW(sm), 1500L)
-  expect_identical(NCOL(sm), 3L) # 3 cols
-  expect_named(sm, expected = ps_nams)
-})
-
 test_that("posterior_samples works for a multi-smooth tweedie GAM", {
   expect_silent(sm <- posterior_samples(m_tw, n_draws = 5, seed = 42))
   expect_s3_class(sm, c(

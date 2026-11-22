@@ -65,7 +65,7 @@ expect_difference_derivative_native <- function(actual, model, data, order,
 }
 
 test_that("smooth difference derivatives retain joint coefficient covariance", {
-  for (surface in c(FALSE, TRUE)) {
+  for (surface in test_cases_for_cran(c(FALSE, TRUE), FALSE)) {
     f <- difference_derivative_fixture(surface)
     m <- f$model
     for (order in test_cases_for_cran(1:2, if (surface) 2L else 1L)) {
@@ -229,6 +229,7 @@ test_that("derivative intervals use each comparison design and preserve seed sco
 })
 
 test_that("derivative arguments reject unsupported requests without altering order zero", {
+  skip_on_cran()
   f <- difference_derivative_fixture(TRUE)
   calculate <- function(...) difference_smooths(f$model, select = f$select, n_2d = 3, ...)
   expect_identical(calculate(), calculate(order = 0L))

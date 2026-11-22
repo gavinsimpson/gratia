@@ -50,7 +50,9 @@ test_that("binomial encodings use trials once and retain frequency weights", {
 })
 
 test_that("extended likelihoods retain fitted nuisance parameters", {
-  for (m in list(m_nb, m_betar, m_scat, m_ocat, m_tw)) {
+  models <- test_cases_for_cran(list(m_nb, m_betar, m_scat, m_ocat, m_tw),
+    list(m_nb, m_ocat))
+  for (m in models) {
     B <- rbind(coef(m), coef(m) + .002)
     ll <- log_lik(m, method = "user", draws = B)
     mu <- m$family$linkinv(predict(m, type = "lpmatrix") %*% t(B))
@@ -185,6 +187,7 @@ test_that("ordinal and hurdle Poisson log masses retain extreme predictor tails"
 })
 
 test_that("GEV observations outside a draw's support have zero density", {
+  skip_on_cran()
   m <- m_gevlss
   lpi <- attr(predict(m, type = "lpmatrix"), "lpi")
   B <- matrix(0, 1L, length(coef(m)))
@@ -275,6 +278,7 @@ test_that("multinomial likelihoods select observed-category probabilities", {
 })
 
 test_that("Gaussian location-scale likelihoods respect native precision links", {
+  skip_on_cran()
   m <- m_gaulss
   B <- rbind(coef(m), coef(m) + .002)
   X <- predict(m, type = "lpmatrix")
@@ -470,7 +474,7 @@ test_that("Gamma and inverse Gaussian likelihoods agree with native totals", {
 })
 
 test_that("grouped Gamma and inverse Gaussian likelihoods retain their densities", {
-  for (unit_weights in c(FALSE, TRUE)) {
+  for (unit_weights in test_cases_for_cran(c(FALSE, TRUE), FALSE)) {
     m <- log_lik_grouped_fixture(unit_weights)
     B <- rbind(coef(m), coef(m) + c(.1, -.03, .05))
     ll <- log_lik(m, method = "user", draws = B)

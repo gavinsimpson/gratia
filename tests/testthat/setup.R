@@ -127,9 +127,9 @@ su_m_factor_by_gamm <- gamm(y ~ fac + s(x2, by = fac) + s(x0),
   data = su_eg4, REML = TRUE
 )
 
-su_m_factor_by_gamm4 <- gamm4(y ~ fac + s(x2, by = fac) + s(x0),
+delayedAssign("su_m_factor_by_gamm4", gamm4(y ~ fac + s(x2, by = fac) + s(x0),
   data = su_eg4, REML = TRUE
-)
+))
 
 su_m_factor_by_bam <- bam(y ~ fac + s(x2, by = fac) + s(x0), data = su_eg4)
 
@@ -245,12 +245,12 @@ sim_betar <- function(n = 400, seed = 3) {
   df
 }
 
-m_betar <- gam(
+delayedAssign("m_betar", gam(
   y ~ s(x0) + s(x1) + s(x2) + s(x3),
   method = "REML",
   family = betar(link="logit"),
   data = sim_betar()
-)
+))
 
 ## Gammals model
 sim_gammals <- function(n = 400, seed = 9) {
@@ -277,7 +277,7 @@ sim_gammals <- function(n = 400, seed = 9) {
   )
 }
 
-m_gammals <- gam(
+delayedAssign("m_gammals", gam(
   list(
     y ~ s(x0) + s(x2),
       ~ s(x1) + s(x3)
@@ -285,7 +285,7 @@ m_gammals <- gam(
   method = "REML",
   family = gammals(),
   data = sim_gammals()
-)
+))
 
 ## Gumbls model
 sim_gumbls <- function(n = 400, seed = 9) {
@@ -308,7 +308,7 @@ sim_gumbls <- function(n = 400, seed = 9) {
   )
 }
 
-m_gumbls <- gam(
+delayedAssign("m_gumbls", gam(
   list(
     y ~ s(x0) + s(x1),
       ~ s(x2) + s(x3)
@@ -316,7 +316,7 @@ m_gumbls <- gam(
   method = "REML",
   family = gumbls(),
   data = sim_gammals()
-)
+))
 
 # gevlss model
 sim_gevlss <- function(n = 500, seed = 9) {
@@ -361,10 +361,10 @@ delayedAssign("m_gevlss", suppressWarnings(
   )
 ))
 
-m_scat <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3),
+delayedAssign("m_scat", gam(y ~ s(x0) + s(x1) + s(x2) + s(x3),
   data = su_eg1,
   family = scat(), method = "REML"
-)
+))
 
 # models with univariate tensor products
 delayedAssign("m_univar_te",
@@ -394,10 +394,10 @@ m_negbin <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3),
   data = df_pois,
   method = "REML", family = negbin(25)
 )
-m_tw <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3),
+delayedAssign("m_tw", gam(y ~ s(x0) + s(x1) + s(x2) + s(x3),
   data = df_pois,
   method = "REML", family = tw()
-)
+))
 
 ## -- fs smooths ----------------------------------------------------------------
 
@@ -728,13 +728,23 @@ m_soap_sep_known <- gam(
 # Soap components can also form the bivariate margins of tensor products.
 soap_tensor_data <- withr::with_seed(376,
   transform(soap_data, time = runif(nrow(soap_data))))
-m_soap_tensor <- gam(
+delayedAssign("m_soap_tensor", gam(
   y ~ te(v, w, time, d = c(2, 1), k = c(10, 4), bs = c("sf", "cr"),
     xt = list(list(bnd = soap_fsb, nmax = 40), NULL)) +
     te(v, w, time, d = c(2, 1), k = c(10, 4), bs = c("sw", "cr"),
       xt = list(list(bnd = soap_fsb, nmax = 40), NULL)),
   data = soap_tensor_data, method = "REML", knots = soap_knots
-)
+))
+
+# A smaller fit retains both tensor components and their shared label.
+delayedAssign("m_soap_tensor_small", gam(
+  y ~ te(v, w, time, d = c(2, 1), k = c(7, 3), bs = c("sf", "cr"),
+    xt = list(list(bnd = soap_fsb, nmax = 25), NULL)) +
+    te(v, w, time, d = c(2, 1), k = c(7, 3), bs = c("sw", "cr"),
+      xt = list(list(bnd = soap_fsb, nmax = 25), NULL)),
+  data = head(soap_tensor_data, 160L), method = "REML",
+  knots = subset(soap_knots, v %in% c(0, 1, 2) & abs(w) == 0.3)
+))
 
 # -- End Soap films -----------------------------------------------------------
 

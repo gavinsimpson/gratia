@@ -7,7 +7,9 @@ surrogate_oracle <- function(model, seed) {
 }
 
 test_that("surrogate residuals follow the truncated logistic construction", {
-  for (fam in list(mgcv::ocat(R = 4), mgcv::ocat(theta = c(1, 2)))) {
+  families <- test_cases_for_cran(
+    list(mgcv::ocat(R = 4), mgcv::ocat(theta = c(1, 2))), list(mgcv::ocat(R = 4)))
+  for (fam in families) {
     m <- surrogate_test_fit(family = fam)
     r <- surrogate_residuals(m, seed = 12)
     expect_type(r, "double")
@@ -34,6 +36,7 @@ test_that("surrogate residuals follow the truncated logistic construction", {
 })
 
 test_that("binary outcomes, absent categories and bam fits keep category indices", {
+  skip_on_cran()
   dat <- surrogate_test_data()
   binary <- dat
   binary$y <- ifelse(dat$y == 1L, 1L, 2L)
@@ -72,6 +75,7 @@ test_that("extreme tails and close thresholds retain finite residuals", {
 })
 
 test_that("surrogate seeds preserve or advance the caller state as requested", {
+  skip_on_cran()
   m <- surrogate_test_fit()
   withr::local_preserve_seed()
   set.seed(44)
@@ -135,7 +139,7 @@ test_that("QQ, worm and ordinary panels share logistic residuals and references"
     q$data$residuals)
   expect_equal(scalable_worm_plot(m, type = "surrogate", seed = 21)$data$residuals,
     w$data$residuals)
-  for (scalable in c(FALSE, TRUE)) {
+  for (scalable in test_cases_for_cran(c(FALSE, TRUE), FALSE)) {
     a <- appraise(m, type = "surrogate", seed = 21, scalable = scalable,
       density_method = "histogram")
     expect_equal(a[[1]]$data$residuals, sort(r))
@@ -163,6 +167,7 @@ test_that("QQ, worm and ordinary panels share logistic residuals and references"
 })
 
 test_that("appraisal shares one unseeded draw across panels", {
+  skip_on_cran()
   m <- surrogate_test_fit()
   withr::local_preserve_seed()
   for (scalable in c(FALSE, TRUE)) {
@@ -184,6 +189,7 @@ test_that("appraisal shares one unseeded draw across panels", {
 })
 
 test_that("surrogate plots preserve missing-row alignment", {
+  skip_on_cran()
   dat <- surrogate_test_data()
   dat$y[c(8, 20)] <- NA
   m <- mgcv::gam(y ~ s(x, k = 6) + offset(off), data = dat,
@@ -216,6 +222,7 @@ test_that("surrogate plots preserve missing-row alignment", {
 })
 
 test_that("surrogate references retain native diagnostic theme settings", {
+  skip_on_cran()
   m <- surrogate_test_fit()
   settings <- ggplot2::theme(
     geom.gratia.diagnostic.point = ggplot2::element_geom(colour = "purple"),
@@ -235,6 +242,7 @@ test_that("surrogate references retain native diagnostic theme settings", {
 })
 
 test_that("unsupported models and reference methods fail explicitly", {
+  skip_on_cran()
   m <- surrogate_test_fit()
   normal <- mgcv::gam(y ~ x, data = surrogate_test_data())
   expect_error(surrogate_residuals(normal), "mgcv::ocat")
@@ -255,6 +263,7 @@ test_that("unsupported models and reference methods fail explicitly", {
 })
 
 test_that("dependent marginal checks do not acquire independent reference bands", {
+  skip_on_cran()
   m <- surrogate_test_fit()
   # Non-Gaussian BAM's GEE correction does not define joint response draws.
   m$AR1.rho <- .4
@@ -265,6 +274,7 @@ test_that("dependent marginal checks do not acquire independent reference bands"
 })
 
 test_that("known-parameter surrogate residuals have the logistic reference", {
+  skip_on_cran()
   withr::local_seed(359)
   n <- 30000L
   eta <- runif(n, -2, 2)

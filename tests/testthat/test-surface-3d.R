@@ -224,6 +224,7 @@ test_that("tensor types and higher dimensional slices render in 3D", {
 })
 
 test_that("3D height transformations, SEs and isotropic proportions are preserved", {
+  skip_on_cran()
   d <- mesh_data()
   names(d)[3] <- ".estimate"
   d$.lower_ci <- d$.estimate - 0.4
@@ -317,10 +318,12 @@ test_that("soap model drawing and spherical fallback preserve their domains", {
   skip_if_not_installed("geometry")
   p <- draw(m_soap, surface = "3d", n_2d = 12, rug = FALSE)[[1]]
   expect_s3_class(p$coordinates, "Coord3D")
-  expect_plot_render(p)
-  sm <- smooth_estimates(m_soap, n_2d = 12, clip = FALSE)
-  p <- draw(sm, surface = "3d")[[1]]
-  expect_plot_render(p)
+  if (full_test_run()) {
+    expect_plot_render(p)
+    sm <- smooth_estimates(m_soap, n_2d = 12, clip = FALSE)
+    p <- draw(sm, surface = "3d")[[1]]
+    expect_plot_render(p)
+  }
   sm <- smooth_estimates(m_sos, n_2d = 5)
   expect_message(
     p <- draw(sm, surface = "3d", contour = FALSE)[[1]],

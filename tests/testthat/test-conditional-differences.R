@@ -40,7 +40,8 @@ test_that("response contrasts transform endpoints and use the joint gradient", {
 test_that("simulation pairs shared draws before summarising on either scale", {
   f <- conditional_difference_fixture(poisson())
   m <- f$model
-  betas <- generate_draws(m, n_draws = 101, seed = 7, mvn_method = "mgcv")
+  n_draws <- test_cases_for_cran(101L, 21L)
+  betas <- generate_draws(m, n_draws = n_draws, seed = 7, mvn_method = "mgcv")
   for (scale in c("link", "response")) {
     cd <- conditional_differences(m, "a", list(x = c(0.2, 0.8), exposure = 2),
       scale = scale, uncertainty = "simulation", method = "user", draws = betas,
@@ -152,10 +153,12 @@ test_that("bam, MH samples, and plotting are supported", {
   m <- bam(y ~ a + s(x, by = a, k = 5), data = f$data)
   cd <- conditional_differences(m, "a", "x", n_vals = 3)
   expect_s3_class(cd, "conditional_differences")
-  mh <- conditional_differences(f$model, "a", list(x = 0.5),
-    uncertainty = "simulation", method = "mh", n_sim = 10, burnin = 90, seed = 8)
-  expect_true(all(is.finite(mh$.se)))
-  for (by in list("a", c("a", "b"))) {
+  if (full_test_run()) {
+    mh <- conditional_differences(f$model, "a", list(x = 0.5),
+      uncertainty = "simulation", method = "mh", n_sim = 10, burnin = 90, seed = 8)
+    expect_true(all(is.finite(mh$.se)))
+  }
+  for (by in test_cases_for_cran(list("a", c("a", "b")), list("a"))) {
     cd <- conditional_differences(f$model, by, c("x", "b")[!c("x", "b") %in% by],
       n_vals = 3)
     expect_silent(built <- ggplot2::ggplot_build(draw(cd)))
@@ -163,6 +166,7 @@ test_that("bam, MH samples, and plotting are supported", {
     expect_identical(attr(cd[1:2, ], "by"), by)
     expect_identical(attr(cd[1:2, ], "channels"), attr(cd, "channels"))
   }
+  skip_on_cran()
   discrete <- conditional_differences(f$model, "a", "b")
   expect_silent(ggplot2::ggplot_build(draw(discrete)))
 })
@@ -186,6 +190,7 @@ test_that("invalid inputs fail explicitly", {
     method = "user", draws = matrix(1, 2, 2)), "draws")
   expect_error(conditional_differences(m, "a", "x", uncertainty = "simulation",
     method = "inla"), "not yet implemented")
+  skip_on_cran()
   unsupported <- gam(list(y ~ a + x, ~ 1), data = f$data, family = gaulss())
   expect_error(conditional_differences(unsupported, "a", "x"), "not supported")
 })

@@ -35,7 +35,7 @@ test_that("smooth coefficients reconstruct mixed model predictors in formula ord
 
 test_that("joint covariance matches native ML and REML prediction intervals", {
   d <- tmb_data()
-  for (reml in c(FALSE, TRUE)) {
+  for (reml in test_cases_for_cran(c(FALSE, TRUE), FALSE)) {
     m <- glmmTMB::glmmTMB(y ~ s(x, k = 6), d, REML = reml)
     expect_identical(n_smooths(m), 1L)
     expect_identical(n_smooths(m), length(smooths(m)))
@@ -160,12 +160,12 @@ test_that("native residuals are preserved for observed and replaced responses", 
   expect_equal(glmmtmb_residuals(m, "response", d$y + 1),
     unname(residuals(m, "response")) + 1)
   expect_identical(unname(model.response(model.frame(m))), d$y)
+  expect_s3_class(observed_fitted_plot(m), "ggplot")
+  skip_on_cran()
   expect_s3_class(appraise(m, n_simulate = 5, seed = 42), "patchwork")
   expect_s3_class(worm_plot(m, n_simulate = 5, seed = 42), "ggplot")
   expect_s3_class(residuals_linpred_plot(m), "ggplot")
   expect_s3_class(residuals_hist_plot(m), "ggplot")
-  expect_s3_class(observed_fitted_plot(m), "ggplot")
-  skip_on_cran()
   # The grouped-family automatic default must preserve native model defaults.
   for (fun in list(residuals_linpred_plot, residuals_hist_plot)) {
     expect_equal(fun(m)$data$residuals, unname(residuals(m, type = "pearson")))
@@ -205,6 +205,7 @@ test_that("diagnostics align excluded rows and binomial counts", {
 })
 
 test_that("conditional response generators have correct moments and support", {
+  skip_on_cran()
   set.seed(92)
   n <- 40000L; mu <- rep(2, n); phi <- rep(.7, n)
   for (fam in c("gaussian", "poisson", "nbinom1", "nbinom2", "Gamma", "tweedie")) {
