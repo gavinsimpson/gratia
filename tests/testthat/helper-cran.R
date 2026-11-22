@@ -2,21 +2,19 @@
 # on CRAN. The Makefile and CI workflows set NOT_CRAN explicitly.
 full_test_run <- function() identical(Sys.getenv("NOT_CRAN"), "true")
 
-# These files exercise the main workflows and native model adapters on CRAN.
-# The full suite also runs the other function-specific tests.
+# These files exercise the main workflows and selected native model adapters.
+# The help examples cover basic GJRM, glmmTMB and sdmTMB usage on CRAN.
 cran_test_filter <- function(filter = NULL, invert = FALSE) {
   files <- c(
-    "assemble-gamlss", "b-spline-tensor", "by-variables",
+    "b-spline-tensor", "by-variables",
     "conditional-differences", "diagnostic-core", "difference-smooth-derivatives",
     "draw-core", "fixed-effects-smooths", "function-core",
     "gamm4", "gfam-context", "gfam-diagnostics",
-    "gjrm-joint-diagnostics", "gjrm-joint-smooths", "glmmtmb",
     "log-lik", "mixed-dependence", "mrf",
     "response-derivatives-delta", "rootograms-gaussian", "sampling-interface",
-    "scales", "scam-gam-api", "scasm-integration",
-    "sdmtmb", "sdmtmb-diagnostic-adapters", "simultaneous-intervals",
+    "scales", "scam-gam-api", "scasm-integration", "simultaneous-intervals",
     "soap-components", "soap-derivatives-offset", "surface-3d",
-    "surrogate-residuals", "third-party-smooths", "tube-intervals"
+    "surrogate-residuals", "third-party-smooths"
   )
   if (!is.null(filter)) files <- grep(filter, files, value = TRUE, invert = invert)
   if (!length(files)) return(NULL)

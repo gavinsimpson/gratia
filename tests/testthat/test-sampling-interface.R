@@ -141,6 +141,7 @@ test_that("draw counts, grid resolution and model names are consistent", {
 })
 
 test_that("supplied draws determine counts and retain coefficient diagnostics", {
+  skip_on_cran()
   skip_if_not_installed("posterior")
   m <- sampling_interface_model
   b <- post_draws(m, n_draws = 40, chains = 4, seed = 9, diagnostics = TRUE)

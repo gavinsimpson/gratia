@@ -34,7 +34,8 @@ sampling_check_names <- function(args, derivative = FALSE, gaussian = FALSE) {
       old[1L],
       "' has been removed. Use ",
       replacements[[old[1L]]],
-      ". See vignette('sampling-migration').",
+      ". See the sampling migration guide at ",
+      "https://gavinsimpson.github.io/gratia/articles/sampling-migration.html",
       call. = FALSE
     )
   }

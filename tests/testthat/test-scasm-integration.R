@@ -42,6 +42,7 @@ test_that("bootstrap fitted limits match native mgcv and retain Gaussian SEs", {
 })
 
 test_that("location-scale bootstrap limits use existing parameter transformations", {
+  skip_on_cran()
   d <- data_sim("sc_location_scale", n = 120, seed = 2)
   m <- withr::with_seed(2, mgcv::scasm(list(
     y ~ s(x, bs = "sc", xt = "c-", k = 6),
@@ -119,6 +120,7 @@ test_that("confint preserves bootstrap bounds through shifts and transformations
 })
 
 test_that("replacing saved intervals records their Gaussian source and coverage", {
+  skip_on_cran()
   m <- scasm_integration_fixture()
   bootstrap <- smooth_estimates(m, n = 12, interval = "confidence")
   simultaneous <- smooth_estimates(m, n = 12, interval = "simultaneous",

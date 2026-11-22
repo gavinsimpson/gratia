@@ -218,6 +218,7 @@ test_that("SCAM model matrices and concurvity omit plateau coefficients fixed to
 })
 
 test_that("SCAM concurvity does not depend on model-matrix registration", {
+  skip_on_cran()
   s <- mgcv::s
   d <- scam_api_fixture$data
   m <- scam::scam(y ~ s(z, bs = "mpi", k = 6) +
@@ -365,6 +366,7 @@ test_that("SCAM likelihood and predictive-check external generics dispatch", {
 })
 
 test_that("SCAM shifts and added terms use zero when the intercept is absent", {
+  skip_on_cran()
   d <- scam_api_fixture$data[1:5, ]
   for (m in scam_api_fixture[c("model", "no_intercept")]) {
     intercept <- if ("(Intercept)" %in% names(coef(m))) unname(coef(m)["(Intercept)"]) else 0

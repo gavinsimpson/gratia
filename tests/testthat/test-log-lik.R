@@ -4,7 +4,9 @@ log_lik_values <- function(x) matrix(as.numeric(x), nrow = nrow(x))
 
 test_that("ordinary likelihoods retain native weights, scale and offsets", {
   d <- log_lik_test_data()
-  for (name in c("gaussian", "poisson", "Gamma", "inverse.gaussian")) {
+  families <- test_cases_for_cran(c("gaussian", "poisson", "Gamma", "inverse.gaussian"),
+    c("gaussian", "poisson"))
+  for (name in families) {
     m <- log_lik_ordinary_fixture(name)
     f <- m$family
     d$y <- m$y
@@ -51,7 +53,7 @@ test_that("binomial encodings use trials once and retain frequency weights", {
 
 test_that("extended likelihoods retain fitted nuisance parameters", {
   models <- test_cases_for_cran(list(m_nb, m_betar, m_scat, m_ocat, m_tw),
-    list(m_nb, m_ocat))
+    list(m_nb))
   for (m in models) {
     B <- rbind(coef(m), coef(m) + .002)
     ll <- log_lik(m, method = "user", draws = B)
@@ -77,9 +79,8 @@ test_that("extended likelihoods retain fitted nuisance parameters", {
 })
 
 test_that("general-family likelihoods agree with native full-data likelihoods", {
-  models <- test_cases_for_cran(
-    list(m_gaulss, m_gammals, m_gumbls, m_gevlss, m_twlss, m_ziplss),
-    list(m_gaulss, m_ziplss))
+  skip_on_cran()
+  models <- list(m_gaulss, m_gammals, m_gumbls, m_gevlss, m_twlss, m_ziplss)
   for (m in models) {
     B <- rbind(coef(m), coef(m) + .0001)
     ll <- log_lik(m, method = "user", draws = B)
@@ -147,6 +148,7 @@ test_that("distributional likelihoods agree with normalized densities", {
 })
 
 test_that("single-predictor hurdle Poisson likelihoods include truncation constants", {
+  skip_on_cran()
   d <- log_lik_test_data()
   d$y <- rep(c(0, 0, 1, 2, 1, 3), 12)
   m <- mgcv::gam(y ~ x + offset(off), data = d,
@@ -165,6 +167,7 @@ test_that("single-predictor hurdle Poisson likelihoods include truncation consta
 })
 
 test_that("ordinal and hurdle Poisson log masses retain extreme predictor tails", {
+  skip_on_cran()
   ordinal <- mgcv::ocat(R = 4)
   cuts <- ordinal$getTheta(TRUE)
   expected <- c(plogis(cuts[1] - 1000, log.p = TRUE),
@@ -200,6 +203,7 @@ test_that("GEV observations outside a draw's support have zero density", {
 })
 
 test_that("fixed-power Tweedie likelihoods retain fitted dispersion and weights", {
+  skip_on_cran()
   d <- log_lik_test_data()
   d$y <- withr::with_seed(9, mgcv::rTweedie(exp(.5 + d$x), p = 1.5, phi = .7))
   m <- mgcv::gam(y ~ x + offset(off), data = d, weights = w,
@@ -220,6 +224,7 @@ test_that("fixed-power Tweedie likelihoods retain fitted dispersion and weights"
 })
 
 test_that("extended-family weights multiply normalized log densities", {
+  skip_on_cran()
   d <- log_lik_test_data()
   for (name in c("nb", "betar", "scat")) {
     f <- switch(name, nb = mgcv::nb(theta = 3),
@@ -244,6 +249,7 @@ test_that("extended-family weights multiply normalized log densities", {
 })
 
 test_that("multivariate normal likelihoods retain joint response covariance", {
+  skip_on_cran()
   m <- m_mvn
   B <- rbind(coef(m), coef(m) + .002)
   X <- predict(m, type = "lpmatrix")
@@ -262,6 +268,7 @@ test_that("multivariate normal likelihoods retain joint response covariance", {
 })
 
 test_that("multinomial likelihoods select observed-category probabilities", {
+  skip_on_cran()
   d <- log_lik_test_data()
   d$z <- rev(d$x)^2
   d$off2 <- -.2 + .1 * d$x
@@ -358,6 +365,7 @@ test_that("unsupported observation likelihoods and invalid draws fail clearly", 
 })
 
 test_that("family likelihood hooks receive each draw's parameter values", {
+  skip_on_cran()
   d <- log_lik_test_data()
   m <- mgcv::gam(y ~ x + offset(off), data = d, method = "REML")
   m$family$family <- "custom Gaussian likelihood"
@@ -380,6 +388,7 @@ test_that("family likelihood hooks receive each draw's parameter values", {
 })
 
 test_that("grouped likelihood hooks receive their own fitted rows and scales", {
+  skip_on_cran()
   m <- gfam_model
   families <- m$family$getfl()
   families[[2]]$gratia_diagnostics <- function(mu, wt, scale, y, eta) {
@@ -448,6 +457,7 @@ test_that("one-observation callbacks agree with matrix extraction for every fami
 })
 
 test_that("Gamma and inverse Gaussian likelihoods agree with native totals", {
+  skip_on_cran()
   for (unit_weights in c(FALSE, TRUE)) {
     for (name in c("Gamma", "inverse.gaussian")) {
       m <- log_lik_ordinary_fixture(name, unit_weights)
@@ -474,7 +484,8 @@ test_that("Gamma and inverse Gaussian likelihoods agree with native totals", {
 })
 
 test_that("grouped Gamma and inverse Gaussian likelihoods retain their densities", {
-  for (unit_weights in test_cases_for_cran(c(FALSE, TRUE), FALSE)) {
+  skip_on_cran()
+  for (unit_weights in c(FALSE, TRUE)) {
     m <- log_lik_grouped_fixture(unit_weights)
     B <- rbind(coef(m), coef(m) + c(.1, -.03, .05))
     ll <- log_lik(m, method = "user", draws = B)

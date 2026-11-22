@@ -254,6 +254,7 @@ test_that("an explicit seed restores the absence of a caller RNG state", {
 
 
 test_that("scalar censored-family components have latent reference diagnostics", {
+  skip_on_cran()
   for (name in test_cases_for_cran(names(gfam_censored_models), "cnorm")) {
     model <- gfam_censored_models[[name]]
     for (method in test_cases_for_cran(c("uniform", "simulate"), "simulate")) {

@@ -3,7 +3,7 @@ test_that("one QQ core retains exact references in memory and on disk", {
   for (nr in test_cases_for_cran(c(1L, 2L, 31L), 31L)) {
     for (n in test_cases_for_cran(c(1L, 2L, 7L), 7L)) {
       y <- rnorm(nr)
-      for (discrete in c(FALSE, TRUE)) {
+      for (discrete in test_cases_for_cran(c(FALSE, TRUE), FALSE)) {
         draw <- function(p) if (discrete) rpois(length(p), 1) else rnorm(length(p))
         before <- list.files(tempdir(), pattern = "^gratia-qq-")
         a <- withr::with_seed(42, qq_reference_draws(y, draw, identity, n,
@@ -37,8 +37,9 @@ test_that("LM and GLM dispersion and seeded references agree across entry points
   withr::local_seed(17)
   dat <- data.frame(x = runif(100), w = rep(c(.2, 2), 50))
   dat$y <- rgamma(100, shape = 3, scale = exp(dat$x) / 3)
-  models <- list(lm(y ~ x, weights = w, data = dat),
-    glm(y ~ x, family = Gamma(link = "log"), data = dat))
+  glm_model <- glm(y ~ x, family = Gamma(link = "log"), data = dat)
+  models <- test_cases_for_cran(list(lm(y ~ x, weights = w, data = dat), glm_model),
+    list(glm_model))
   for (m in models) {
     expected <- if (inherits(m, "glm")) summary(m)$dispersion else summary(m)$sigma^2
     expect_equal(diagnostic_data(m)$source$sig2, expected)
@@ -46,10 +47,12 @@ test_that("LM and GLM dispersion and seeded references agree across entry points
       q <- qq_plot(m, method = method, n_uniform = 3, n_simulate = 4, seed = 42)
       a <- appraise(m, method = method, n_uniform = 3, n_simulate = 4,
         seed = 42, scalable = FALSE)
-      s <- appraise(m, method = method, n_uniform = 3, n_simulate = 4,
-        seed = 42, scalable = TRUE)
       expect_equal(q$data$theoretical, a[[1]]$data$theoretical)
-      expect_equal(q$data$theoretical, s[[1]]$data$theoretical)
+      if (full_test_run()) {
+        s <- appraise(m, method = method, n_uniform = 3, n_simulate = 4,
+          seed = 42, scalable = TRUE)
+        expect_equal(q$data$theoretical, s[[1]]$data$theoretical)
+      }
     }
   }
 })
@@ -65,6 +68,7 @@ test_that("calibrated PIT QQ and worm bands use a uniform reference", {
   expect_equal(w$data$residuals, q$data$residuals - q$data$theoretical)
   expect_equal(w$data$lower, q$data$lower - q$data$theoretical)
   expect_error(qq_plot(m, type = "pit", method = "simulate"), "fixed")
+  skip_on_cran()
   for (scalable in c(FALSE, TRUE)) {
     a <- appraise(m, type = "pit", seed = 23, scalable = scalable)
     expect_equal(a[[1]]$data$residuals, q$data$residuals)
@@ -89,6 +93,7 @@ test_that("new LM calibrated residuals restore exclusions and preserve RNG absen
 })
 
 test_that("multinomial native residual layouts match simulated references", {
+  skip_on_cran()
   withr::local_seed(87)
   dat <- data.frame(x = runif(100), y = sample(0:2, 100, TRUE))
   m <- mgcv::gam(list(y ~ x, ~x), data = dat, family = mgcv::multinom(K = 2))
@@ -139,6 +144,7 @@ test_that("BAM AR1 simulation and calibrated bands retain residual dependence", 
 })
 
 test_that("prepared diagnostic sources preserve original fitting-row identities", {
+  skip_on_cran()
   dat <- data.frame(y = c(1, 4, NA, 3, 5, 2), x = seq_len(6))
   m <- lm(y ~ x, data = dat, na.action = na.exclude)
   prepared <- diagnostic_data(m)

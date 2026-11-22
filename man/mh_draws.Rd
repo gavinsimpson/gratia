@@ -89,9 +89,9 @@ An explicit seed restores the caller's random-number state on exit.}
 Posterior samples using Metropolis Hastings
 }
 \details{
-Sampling controls must be named. Removed arguments produce migration errors;
-see \code{vignette("sampling-migration")}. Explicit controls that the selected
-method cannot use are rejected.
+Sampling controls must be named. Removed arguments produce errors pointing to
+the \href{https://gavinsimpson.github.io/gratia/articles/sampling-migration.html}{sampling migration guide}.
+Explicit controls that the selected method cannot use are rejected.
 
 For SCAM models, Gaussian draws approximate the distribution of the unrestricted
 fitting coefficients using \code{Vp} (or \code{Ve} with \code{frequentist = TRUE}), then apply

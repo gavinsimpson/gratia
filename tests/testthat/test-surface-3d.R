@@ -133,6 +133,7 @@ test_that("scattered meshes triangulate masked points before discarding faces", 
 })
 
 test_that("scattered surfaces cannot bridge separated support regions", {
+  skip_on_cran()
   skip_if_not_installed("geometry")
   skip_if_not_installed("sf")
   left <- data.frame(x = c(0, 0.1, 0, 0.05), y = c(0, 0, 0.1, 0.03))

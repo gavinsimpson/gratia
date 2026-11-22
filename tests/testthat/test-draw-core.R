@@ -124,6 +124,7 @@ test_that("small bivariate smooth differences preserve factor comparisons", {
 })
 
 test_that("soap boundaries and clipping work on a small grid", {
+  skip_on_cran()
   uncut <- smooth_estimates(m_soap, n_2d = 8, clip = FALSE)
   clipped <- smooth_estimates(m_soap, n_2d = 8, clip = TRUE)
   bnd <- boundary(get_smooth(m_soap, "s(v,w)"))

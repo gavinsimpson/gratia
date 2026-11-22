@@ -69,6 +69,7 @@ test_that("label controls wrap labels without changing plotted values", {
 })
 
 test_that("3D confidence surfaces retain the estimated interval heights", {
+  skip_on_cran()
   skip_if_not_installed("ggcube", "0.3.0")
   sm <- smooth_estimates(su_m_bivar_te, n_2d = 4, dist = 0)
   p <- draw(sm, surface = "3d", ci_3d = TRUE, contour = FALSE)[[1L]]

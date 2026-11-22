@@ -208,7 +208,7 @@ supplied coefficient draws determine their count and chain mapping. Obsolete
 names and positional controls produce migration errors. MH workers use
 `n_cores`; Gaussian sampling threads use `n_threads`.
 
-See [the migration vignette](../../vignettes/sampling-migration.Rmd) for the
+See [the sampling migration guide](../../vignettes/articles/sampling-migration.Rmd) for the
 complete mappings and examples. The benchmark scripts use the renamed
 arguments; the measurements above describe the original sampling implementation
 and were not rerun for this interface change. The subsequent validation record

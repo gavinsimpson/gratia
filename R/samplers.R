@@ -69,9 +69,9 @@
 #' @param ... arguments passed to methods.
 #'
 #' @details
-#' Sampling controls must be named. Removed arguments produce migration errors;
-#' see `vignette("sampling-migration")`. Explicit controls that the selected
-#' method cannot use are rejected.
+#' Sampling controls must be named. Removed arguments produce errors pointing to
+#' the [sampling migration guide](https://gavinsimpson.github.io/gratia/articles/sampling-migration.html).
+#' Explicit controls that the selected method cannot use are rejected.
 #'
 #' For SCAM models, Gaussian draws approximate the distribution of the unrestricted
 #' fitting coefficients using `Vp` (or `Ve` with `frequentist = TRUE`), then apply

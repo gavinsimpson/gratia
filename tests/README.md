@@ -14,7 +14,9 @@ and research sampler variants also belong there. The CRAN check driver,
 `cran_test_filter()` in `testthat/helper-cran.R`. Selected files can use
 `skip_on_cran()` or smaller case lists for expensive repetitions. When adding
 a feature, include a small test for its public behaviour in the CRAN selection.
-The weekly GitHub Actions jobs and local full runs still run all test files.
+For GJRM, glmmTMB and sdmTMB, the help examples fit and draw native models on
+CRAN when the packages are available. The weekly GitHub Actions jobs and local
+full runs include the detailed adapter tests.
 
 `test-function-core.R` keeps compact moment, plotting, theme, label and utility
 checks alongside the existing focused numerical tests. The full suite includes

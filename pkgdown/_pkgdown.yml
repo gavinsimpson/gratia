@@ -36,7 +36,7 @@ articles:
       - articles/data-slices
       - articles/custom-plotting
       - articles/posterior-simulation
-      - sampling-migration
+      - articles/sampling-migration
   - title: Fit and check models
     navbar: Models
     desc: >
@@ -59,7 +59,7 @@ articles:
       - articles/shape-constrained-intervals
       - articles/spatial-smooths
       - articles/response-distributions
-      - transformed-covariates
+      - articles/transformed-covariates
 
 reference:
   - title: Plot models and effects

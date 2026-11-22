@@ -81,12 +81,13 @@ delayedAssign("su_m_penalty", gam(
   method = "REML"
 ))
 
-su_m_bivar <- gam(y ~ s(x, z, k = 40), data = su_eg2, method = "REML")
+delayedAssign("su_m_bivar",
+  gam(y ~ s(x, z, k = 40), data = su_eg2, method = "REML"))
 
-su_m_bivar_ds <- gam(y ~ s(x, z, k = 20, bs = "ds"),
+delayedAssign("su_m_bivar_ds", gam(y ~ s(x, z, k = 20, bs = "ds"),
   data = su_eg2[seq_len(100), ],
   method = "REML"
-)
+))
 
 delayedAssign("su_m_trivar",
   gam(y ~ s(x0, x1, x2), data = su_eg1, method = "REML"))
@@ -107,9 +108,9 @@ delayedAssign("su_m_bivar_t2",
 delayedAssign("su_m_trivar_te",
   gam(y ~ te(x0, x1, x2, k = c(3, 3, 3)), data = su_eg1, method = "REML"))
 
-su_m_trivar_t2 <- gam(y ~ t2(x0, x1, x2, k = c(3, 3, 3)),
+delayedAssign("su_m_trivar_t2", gam(y ~ t2(x0, x1, x2, k = c(3, 3, 3)),
   data = su_eg1, method = "REML"
-)
+))
 
 su_m_cont_by <- gam(y ~ s(x2, by = x1), data = su_eg3, method = "REML")
 
@@ -133,18 +134,18 @@ delayedAssign("su_m_factor_by_gamm4", gamm4(y ~ fac + s(x2, by = fac) + s(x0),
 
 su_m_factor_by_bam <- bam(y ~ fac + s(x2, by = fac) + s(x0), data = su_eg4)
 
-su_m_factor_by_x2 <- gam(y ~ fac + s(x2, by = fac),
+delayedAssign("su_m_factor_by_x2", gam(y ~ fac + s(x2, by = fac),
   data = su_eg4, method = "REML"
-)
+))
 
 delayedAssign("su_m_su_eg4", gam(y ~ s(x0) + s(x1) + s(x2, by = fac),
   data = su_eg4, method = "REML"
 ))
 
 if (packageVersion("mgcv") >= "1.8.41") {
-  m_sz <- gam(y ~ s(x2) + s(fac, x2, bs = "sz") + s(x0),
+  delayedAssign("m_sz", gam(y ~ s(x2) + s(fac, x2, bs = "sz") + s(x0),
     data = su_eg4, method = "REML"
-  )
+  ))
 
   # two factor sz smooth example from ?smooth.construct.sz.smooth.spec
   ## Example involving 2 factors
@@ -210,21 +211,21 @@ m_gam <- su_m_univar_4
 
 m_gamm <- su_gamm_univar_4
 
-m_bam <- bam(y ~ s(x0) + s(x1) + s(x2) + s(x3),
+delayedAssign("m_bam", bam(y ~ s(x0) + s(x1) + s(x2) + s(x3),
   data = su_eg1,
   method = "fREML"
-)
+))
 
-m_gamgcv <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3),
+delayedAssign("m_gamgcv", gam(y ~ s(x0) + s(x1) + s(x2) + s(x3),
   data = su_eg1,
   method = "GCV.Cp"
-)
+))
 
-m_gamm4 <- gamm4(y ~ s(x0) + s(x1) + s(x2) + s(x3),
+delayedAssign("m_gamm4", gamm4(y ~ s(x0) + s(x1) + s(x2) + s(x3),
   data = su_eg1,
   REML = TRUE
-)
-m_gamm4_real <- m_gamm4
+))
+delayedAssign("m_gamm4_real", m_gamm4)
 
 
 m_gaulss <- gam(list(y ~ s(x0) + s(x1) + s(x2) + s(x3), ~1),
@@ -382,18 +383,18 @@ CO2 <- datasets::CO2
 ## -- rootogram models ---------------------------------------------------------
 df_pois <- data_sim("eg1", dist = "poisson", n = 500L, scale = 0.2, seed = 42)
 ## fit the model
-b_pois <- bam(y ~ s(x0) + s(x1) + s(x2) + s(x3),
+delayedAssign("b_pois", bam(y ~ s(x0) + s(x1) + s(x2) + s(x3),
   data = df_pois,
   method = "fREML", family = poisson()
-)
+))
 m_nb <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3),
   data = df_pois,
   method = "REML", family = nb()
 )
-m_negbin <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3),
+delayedAssign("m_negbin", gam(y ~ s(x0) + s(x1) + s(x2) + s(x3),
   data = df_pois,
   method = "REML", family = negbin(25)
-)
+))
 delayedAssign("m_tw", gam(y ~ s(x0) + s(x1) + s(x2) + s(x3),
   data = df_pois,
   method = "REML", family = tw()
@@ -424,9 +425,9 @@ df_fs <- withr::with_seed(0, {
 
   data.frame(y = y, x0 = x0, x1 = x1, x2 = x2, fac = fac)
 })
-m_fs <- gam(y ~ s(x0) + s(x1, fac, bs = "fs", k = 5) + s(x2, k = 20),
+delayedAssign("m_fs", gam(y ~ s(x0) + s(x1, fac, bs = "fs", k = 5) + s(x2, k = 20),
   data = df_fs, method = "ML"
-)
+))
 
 delayedAssign("m_fs_gamm", gamm(
   y ~ s(x0) + s(x1, fac, bs = "fs", k = 5) + s(x2, k = 20),
@@ -446,9 +447,9 @@ su_re$fac <- withr::with_seed(
 )
 su_re$X <- model.matrix(~ fac - 1, data = su_re)
 su_re <- withr::with_seed(42, transform(su_re, y = y + X %*% rnorm(10) * 0.5))
-rm1 <- gam(y ~ s(fac, bs = "re") + s(x0) + s(x1) + s(x2) + s(x3),
+delayedAssign("rm1", gam(y ~ s(fac, bs = "re") + s(x0) + s(x1) + s(x2) + s(x3),
   data = su_re, method = "ML"
-)
+))
 #-- A factor by GAM with random effects ----------------------------------------
 su_re2 <- su_eg4
 su_re2$ranef <- withr::with_seed(
@@ -474,9 +475,9 @@ delayedAssign("m_2_fac", gam(y ~ fac * ff + s(x0) + s(x1) + s(x2),
   data = df_2_fac, method = "REML"
 ))
 # a GAM with parametric terms (factor and linear) and smooth terms
-m_para_sm <- gam(y ~ fac * ff + x0 + s(x1) + s(x2),
+delayedAssign("m_para_sm", gam(y ~ fac * ff + x0 + s(x1) + s(x2),
   data = df_2_fac, method = "REML"
-)
+))
 # a GAM with parametric terms (factor and linear)
 delayedAssign("m_only_para", gam(y ~ fac * ff + x0 + x1 + x2,
   data = df_2_fac, method = "REML"
@@ -528,7 +529,8 @@ sim_scam <- function(n, seed = NULL) {
 }
 scam_dat <- sim_scam(n = 200, seed = 4)
 ## fit model, get results, and plot...
-m_scam <- scam(y ~ s(x1, bs = "cr") + s(x2, bs = "mpi"), data = scam_dat)
+delayedAssign("m_scam",
+  scam(y ~ s(x1, bs = "cr") + s(x2, bs = "mpi"), data = scam_dat))
 delayedAssign("m_scam_micx",
   scam(y ~ s(x1, bs = "cr") + s(x2, bs = "micx"), data = scam_dat))
 delayedAssign("m_scam_micv",
@@ -540,9 +542,9 @@ su_eg1_ocat <- data_sim("eg1",
   n = 200, dist = "ordered categorical",
   n_cat = n_categories, seed = 42
 )
-m_ocat <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3),
+delayedAssign("m_ocat", gam(y ~ s(x0) + s(x1) + s(x2) + s(x3),
   family = ocat(R = n_categories), data = su_eg1_ocat, method = "REML"
-)
+))
 
 # Simon's spline on the sphere example from ?smooth.construct.sos.smooth.spec
 sim_sos_eg_data <- function(n = 400, seed = NULL) {
@@ -597,10 +599,10 @@ cens_df <- quick_eg1 |>
   )
 cens_df$y_cens <- with(cens_df, cbind(y, censored))
 
-m_censor <- gam(y_cens ~ s(x0) + s(x1) + s(x2) + s(x3),
+delayedAssign("m_censor", gam(y_cens ~ s(x0) + s(x1) + s(x2) + s(x3),
   data = cens_df,
   family = cnorm(), method = "REML"
-)
+))
 
 # examples for logical variables - examples if from mgcViz::pterms
 logi_df <- data_sim("eg1", n = 600, dist = "normal", scale = 20, seed = 3) |>
@@ -643,10 +645,10 @@ ziplss_data <- function(seed = 0) {
   df
 }
 ziplss_df <- ziplss_data()
-m_ziplss <- gam(list(
+delayedAssign("m_ziplss", gam(list(
   y ~ s(x2) + x3,
   ~ s(x0) + x1
-), family = ziplss(), data = ziplss_df)
+), family = ziplss(), data = ziplss_df))
 
 # TWLSS example from ?mgcv::twlss
 twlss_df <- withr::with_seed(3, gamSim(1,
@@ -658,9 +660,9 @@ twlss_df <- withr::with_seed(3, gamSim(1,
     phi = 0.5
   ))) ## Tweedie response
 ## Fit a fixed p Tweedie, with wrong link ...
-m_twlss <- gam(list(y ~ s(x0) + s(x1) + s(x2) + s(x3), ~1, ~1),
+delayedAssign("m_twlss", gam(list(y ~ s(x0) + s(x1) + s(x2) + s(x3), ~1, ~1),
   family = twlss(), data = twlss_df
-)
+))
 
 # -- Soap films ---------------------------------------------------------------
 # soap film model from ?soap
@@ -833,14 +835,14 @@ sim_multinom_data <- function(n = 1000, seed) {
   dat
 }
 multinom_df <- sim_multinom_data(n = 1000, seed = 12345)
-m_multinom <- gam(
+delayedAssign("m_multinom", gam(
   list(
     y ~ s(x1) + s(x2),
       ~ s(x1) + s(x2)
   ),
   family = multinom(K = 2),
   data = multinom_df
-)
+))
 
 # ziP() example - issue #341
 zip_data <- function(seed = 0, n = 400, theta = c(-2, 0.3)) {
@@ -866,7 +868,8 @@ zip_data <- function(seed = 0, n = 400, theta = c(-2, 0.3)) {
   df
 }
 zip_df <- zip_data(seed = 1)
-  m_ziP <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), family = ziP(), data = zip_df)
+delayedAssign("m_ziP",
+  gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), family = ziP(), data = zip_df))
 
 # Secondary examples are fitted once, on demand, after the CRAN guard.
 secondary_models <- make_secondary_models(environment())
@@ -1236,7 +1239,7 @@ delayedAssign("gfam_rank_model", local(withr::with_seed(26703, {
     na.action = na.exclude)
 })))
 
-gfam_gamma_model <- local(withr::with_seed(26704, {
+delayedAssign("gfam_gamma_model", local(withr::with_seed(26704, {
   d <- data.frame(family_id = rep(1:3, c(30, 35, 40)), x = runif(105))
   mu <- exp(.2 + .4 * d$x)
   d$y <- numeric(nrow(d))
@@ -1248,7 +1251,7 @@ gfam_gamma_model <- local(withr::with_seed(26704, {
   d$y[i] <- rpois(sum(i), mu[i])
   gam(cbind(y, family_id) ~ factor(family_id) + s(x, k = 4), data = d,
     family = gfam(list(Gamma(link = "log"), gaussian(), poisson())), method = "REML")
-}))
+})))
 
 conditional_difference_fixture <- function(family = stats::gaussian()) {
   shared_test_fixture(paste("conditional-difference", family$family, family$link, sep = ":"), {

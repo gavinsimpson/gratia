@@ -60,8 +60,8 @@
   produce migration errors.
 
   `derivative_samples()` takes `model` rather than `object`; `add_*()`
-  sampling helpers take `data` rather than `object`. See
-  `vignette("sampling-migration")`.
+  sampling helpers take `data` rather than `object`. See the
+  [sampling migration guide](https://gavinsimpson.github.io/gratia/articles/sampling-migration.html).
 
   Coefficient and `*_samples()` functions require an explicit `n_draws`
   when generating draws; supplied coefficient draws determine their own
@@ -923,8 +923,9 @@
   functions of covariates such as `s(log(x))`, including transformed
   offsets and an `envir` argument for local functions and constants.
   Stored evaluated covariates allow smooth plotting when the original data
-  or functions are unavailable. See
-  `vignette("transformed-covariates", package = "gratia")` for examples.
+  or functions are unavailable. See the
+  [article on transformed covariates](https://gavinsimpson.github.io/gratia/articles/transformed-covariates.html)
+  for examples.
 
   Automatic smooth grids retain transformed coordinates, and
   `derivatives()` and `partial_derivatives()` can differentiate with

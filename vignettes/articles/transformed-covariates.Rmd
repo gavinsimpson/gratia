@@ -13,7 +13,7 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 
 A model fitted with `s(log(x))` uses a transformed covariate, but we may want
 to predict at supplied values of `x`, plot the result against `x`, or estimate
-change per unit of `x`. This vignette shows how to make those choices while
+change per unit of `x`. This article shows how to make those choices while
 keeping the model's transformation intact.
 
 We load {gratia} and {mgcv} for the examples:
