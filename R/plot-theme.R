@@ -72,7 +72,9 @@
 #' \dontshow{
 #' pal <- utils::removeSource(pal)
 #' }
+#' \dontdiff{
 #' theme(palette.colour.discrete = pal, palette.fill.discrete = pal)
+#' }
 gratia_theme_get <- function() {
   value <- getOption("gratia.plot.theme")
   check_gratia_theme(value)

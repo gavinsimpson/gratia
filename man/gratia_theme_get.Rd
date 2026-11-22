@@ -88,5 +88,7 @@ pal <- gratia_palette("tol_banded_16")
 \dontshow{
 pal <- utils::removeSource(pal)
 }
+\dontdiff{
 theme(palette.colour.discrete = pal, palette.fill.discrete = pal)
+}
 }

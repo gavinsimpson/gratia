@@ -34,10 +34,12 @@
 #' pal <- utils::removeSource(pal)
 #' }
 #' pal(5)
+#' \dontdiff{
 #' ggplot2::theme(
 #'   palette.colour.discrete = pal,
 #'   palette.fill.discrete = pal
 #' )
+#' }
 gratia_palette <- function(name = "default", reverse = FALSE) {
   palettes <- gratia_tol_palettes()
   name <- match.arg(name, c("default", names(palettes)))

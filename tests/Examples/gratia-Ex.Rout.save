@@ -2024,6 +2024,7 @@ detaching ‘package:mgcv’
 > ## End(Don't show)
 > pal(5)
 [1] "#CC6677" "#332288" "#DDCC77" "#117733" "#88CCEE"
+> ## IGNORE_RDIFF_BEGIN
 > ggplot2::theme(
 +   palette.colour.discrete = pal,
 +   palette.fill.discrete = pal
@@ -2034,6 +2035,7 @@ detaching ‘package:mgcv’
  - attr(*, "class")= chr "gg"
  @ complete: logi FALSE
  @ validate: logi TRUE
+> ## IGNORE_RDIFF_END
 > 
 > 
 > 
@@ -2061,6 +2063,7 @@ detaching ‘package:mgcv’
 > ## Don't show: 
 > pal <- utils::removeSource(pal)
 > ## End(Don't show)
+> ## IGNORE_RDIFF_BEGIN
 > theme(palette.colour.discrete = pal, palette.fill.discrete = pal)
 <theme> List of 2
  $ palette.colour.discrete:function (n)  
@@ -2068,6 +2071,7 @@ detaching ‘package:mgcv’
  - attr(*, "class")= chr "gg"
  @ complete: logi FALSE
  @ validate: logi TRUE
+> ## IGNORE_RDIFF_END
 > 
 > 
 > 

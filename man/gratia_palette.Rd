@@ -44,8 +44,10 @@ pal <- gratia_palette("tol_muted")
 pal <- utils::removeSource(pal)
 }
 pal(5)
+\dontdiff{
 ggplot2::theme(
   palette.colour.discrete = pal,
   palette.fill.discrete = pal
 )
+}
 }
