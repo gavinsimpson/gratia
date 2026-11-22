@@ -134,6 +134,7 @@ test_that("uniform QQ and worm plots use the extended quantile helpers", {
     list(fam = mgcv::ziplss(), y = ifelse(runif(n) < .3, 0,
       qpois(runif(n, exp(-4), 1), 4)), nlp = 2)
   )
+  cases <- test_cases_for_cran(cases, cases[c(1L, 2L, 4L)])
   for (case in cases) {
     # These are routing/finite-output checks, not distributional accuracy
     # estimates. Tweedie quantiles require costly numerical CDF inversion,

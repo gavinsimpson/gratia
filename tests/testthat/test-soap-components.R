@@ -62,6 +62,7 @@ test_that("component clipping preserves holes, boundary loops and offsets", {
 })
 
 test_that("split component plotting keeps separate panels and observations", {
+  skip_on_cran()
   for (grouped in c(FALSE, TRUE)) {
     for (surface in c("raster", "tile")) {
       panels <- assemble(m_soap_sep, n_2d = 7, grouped = if (grouped) c("factor-by", "sz", "fs") else c("sz", "fs"),
@@ -95,6 +96,7 @@ test_that("split component plotting keeps separate panels and observations", {
 })
 
 test_that("component 3D plots retain soap domain boundaries", {
+  skip_on_cran()
   skip_if_not_installed("ggcube")
   skip_if_not_installed("sf")
   skip_if_not_installed("geometry")

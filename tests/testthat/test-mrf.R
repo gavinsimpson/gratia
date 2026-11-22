@@ -29,19 +29,25 @@ mrf_native_check <- function(model, data = NULL, select = 1L,
 }
 
 test_that("MRF area estimates match native predictions across parameterizations", {
-  for (name in c("full", "low", "penalty_model", "disconnected", "polygon", "bam")) {
+  models <- test_cases_for_cran(
+    c("full", "low", "penalty_model", "disconnected", "polygon", "bam"), "full")
+  for (name in models) {
     m <- mrf_models[[name]]
-    for (overall in c(FALSE, TRUE)) mrf_native_check(m, overall = overall)
-    mrf_native_check(m, unconditional = TRUE)
-    mrf_native_check(m, frequentist = TRUE)
+    mrf_native_check(m)
+    if (full_test_run()) {
+      mrf_native_check(m, overall = TRUE)
+      mrf_native_check(m, unconditional = TRUE)
+      mrf_native_check(m, frequentist = TRUE)
+    }
   }
+  skip_on_cran()
   expect_false(is.null(mrf_models$low$smooth[[1]]$P))
   expect_gt(length(mrf_models$areas), length(smooth_coefs(mrf_models$low$smooth[[1]],
     model = mrf_models$low)))
 })
 
 test_that("MRF automatic grids cover the fitted area domain in factor order", {
-  for (name in c("full", "low", "unobserved", "unobserved_full")) {
+  for (name in test_cases_for_cran(c("full", "low", "unobserved", "unobserved_full"), "full")) {
     m <- mrf_models[[name]]
     d <- smooth_data(m, id = 1, n = 2)
     expect_equal(as.character(d$area), mrf_models$areas)
@@ -60,6 +66,7 @@ test_that("MRF automatic grids cover the fitted area domain in factor order", {
         X[, j] * coef(m)[m$smooth[[1]]$first.para + j - 1L], ignore_attr = TRUE)
     }
   }
+  skip_on_cran()
   # This region exists only in the smooth's knots, not the fitting factor.
   expect_false(mrf_models$areas[8] %in% levels(mrf_models$unobserved$model$area))
 })
@@ -87,6 +94,7 @@ test_that("MRF supplied rows preserve labels, order, repetition and missingness"
 })
 
 test_that("MRF transformed factors retain evaluated and raw area coordinates", {
+  skip_on_cran()
   m <- mrf_models$transformed
   sm <- mrf_native_check(m)
   expect_equal(as.character(sm[["factor(area)"]]), mrf_models$areas)
@@ -98,6 +106,7 @@ test_that("MRF transformed factors retain evaluated and raw area coordinates", {
 })
 
 test_that("MRF by variables preserve their native multiplier and grouping", {
+  skip_on_cran()
   for (level in c("B", "A")) {
     d <- data.frame(area = mrf_models$areas, fac = factor(level, levels = c("B", "A")))
     which <- if (level == "B") 1L else 2L
@@ -130,6 +139,7 @@ test_that("MRF plots show labelled area effects and existing interval semantics"
   expect_equal(built$data[[1]]$ymin, unname(sm$.lower_ci))
   expect_equal(built$data[[1]]$ymax, unname(sm$.upper_ci))
   expect_identical(built$layout$panel_scales_x[[1]]$get_limits(), mrf_models$areas)
+  skip_on_cran()
   p2 <- assemble(m, select = 1, ci_level = 0.8, rug = FALSE,
     constant = 2, fun = exp)[[1]]
   expect_equal(p2$data$.estimate, exp(sm$.estimate + 2))
@@ -145,12 +155,14 @@ test_that("MRF plots show labelled area effects and existing interval semantics"
 })
 
 test_that("MRF descriptive QQ plots retain identity and expected quantiles", {
-  p <- assemble(mrf_models$low, rug = FALSE, mrf_plot = "qq")[[1]]
+  m <- test_cases_for_cran(mrf_models$low, mrf_models$full)
+  p <- assemble(m, rug = FALSE, mrf_plot = "qq")[[1]]
   b <- ggplot_build(p)
   expect_true(all(p$data$.type == "MRF"))
   expect_equal(b$data[[1]]$x, qnorm(ppoints(8)))
   expect_equal(b$data[[1]]$y, unname(sort(p$data$.estimate)))
   expect_true(all(is.finite(b$data[[2]]$slope)))
+  skip_on_cran()
   expect_s3_class(draw(smooth_estimates(mrf_models$low), mrf_plot = "qq"), "patchwork")
   missing <- smooth_estimates(mrf_models$low,
     data = data.frame(area = c("r1", NA, "r2")))
@@ -174,6 +186,7 @@ test_that("MRF descriptive QQ plots retain identity and expected quantiles", {
 })
 
 test_that("grouped MRF panels keep area effects and QQ groups separate", {
+  skip_on_cran()
   for (type in c("effects", "qq")) {
     p <- assemble(mrf_models$by, parametric = FALSE, grouped = c("factor-by", "sz", "fs"),
       rug = FALSE, mrf_plot = type)[[1]]

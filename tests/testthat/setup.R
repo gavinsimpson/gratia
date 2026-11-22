@@ -52,34 +52,34 @@ su_eg2 <- data_sim("eg2", n = 2000, dist = "normal", scale = 0.5, seed = 42)
 su_eg3 <- data_sim("eg3", n = 400, seed = 32)
 su_eg4 <- data_sim("eg4", n = 400, dist = "normal", scale = 2, seed = 1)
 
-su_m_quick_eg1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3),
+delayedAssign("su_m_quick_eg1", gam(y ~ s(x0) + s(x1) + s(x2) + s(x3),
   data = quick_eg1,
   method = "REML"
-)
+))
 
 m_tiny_eg1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3),
   data = tiny_eg1,
   method = "REML"
 )
 
-su_m_quick_eg1_shrink <- gam(
+delayedAssign("su_m_quick_eg1_shrink", gam(
   y ~ s(x0, bs = "ts") + s(x1, bs = "cs") +
     s(x2, bs = "ts") + s(x3, bs = "ts"),
   data = quick_eg1,
   method = "REML"
-)
+))
 
 su_m_univar_4 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3),
   data = su_eg1,
   method = "REML"
 )
 
-su_m_penalty <- gam(
+delayedAssign("su_m_penalty", gam(
   y ~ s(x0, bs = "cr") + s(x1, bs = "bs") +
     s(x2, k = 15) + s(x3, bs = "ps"),
   data = su_eg1,
   method = "REML"
-)
+))
 
 su_m_bivar <- gam(y ~ s(x, z, k = 40), data = su_eg2, method = "REML")
 
@@ -88,7 +88,8 @@ su_m_bivar_ds <- gam(y ~ s(x, z, k = 20, bs = "ds"),
   method = "REML"
 )
 
-su_m_trivar <- gam(y ~ s(x0, x1, x2), data = su_eg1, method = "REML")
+delayedAssign("su_m_trivar",
+  gam(y ~ s(x0, x1, x2), data = su_eg1, method = "REML"))
 
 su_m_bivar_te <- gam(y ~ te(x, z, k = c(5, 5)), data = su_eg2, method = "REML")
 
@@ -96,15 +97,15 @@ delayedAssign("su_gamm_bivar_te", gamm(y ~ te(x, z, k = c(5, 5)),
   data = su_eg2, method = "REML"
 ))
 
-su_m_bivar_ti <- gam(y ~ s(x, k = 5) + s(z, k = 5) + ti(x, z, k = c(5, 5)),
-  data = su_eg2, method = "REML"
-)
+delayedAssign("su_m_bivar_ti",
+  gam(y ~ s(x, k = 5) + s(z, k = 5) + ti(x, z, k = c(5, 5)),
+    data = su_eg2, method = "REML"))
 
-su_m_bivar_t2 <- gam(y ~ t2(x, z, k = c(5, 5)), data = su_eg2, method = "REML")
+delayedAssign("su_m_bivar_t2",
+  gam(y ~ t2(x, z, k = c(5, 5)), data = su_eg2, method = "REML"))
 
-su_m_trivar_te <- gam(y ~ te(x0, x1, x2, k = c(3, 3, 3)),
-  data = su_eg1, method = "REML"
-)
+delayedAssign("su_m_trivar_te",
+  gam(y ~ te(x0, x1, x2, k = c(3, 3, 3)), data = su_eg1, method = "REML"))
 
 su_m_trivar_t2 <- gam(y ~ t2(x0, x1, x2, k = c(3, 3, 3)),
   data = su_eg1, method = "REML"
@@ -117,10 +118,10 @@ su_m_factor_by <- gam(y ~ fac + s(x2, by = fac) + s(x0),
 )
 
 # for issue #285
-su_m_factor_by_re <- gam(y ~ s(fac, bs = "re") + s(x2) +
+delayedAssign("su_m_factor_by_re", gam(y ~ s(fac, bs = "re") + s(x2) +
     s(x2, by = fac, m = 1) + s(x0),
   data = su_eg4, method = "REML"
-)
+))
 
 su_m_factor_by_gamm <- gamm(y ~ fac + s(x2, by = fac) + s(x0),
   data = su_eg4, REML = TRUE
@@ -136,9 +137,9 @@ su_m_factor_by_x2 <- gam(y ~ fac + s(x2, by = fac),
   data = su_eg4, method = "REML"
 )
 
-su_m_su_eg4 <- gam(y ~ s(x0) + s(x1) + s(x2, by = fac),
+delayedAssign("su_m_su_eg4", gam(y ~ s(x0) + s(x1) + s(x2, by = fac),
   data = su_eg4, method = "REML"
-)
+))
 
 if (packageVersion("mgcv") >= "1.8.41") {
   m_sz <- gam(y ~ s(x2) + s(fac, x2, bs = "sz") + s(x0),
@@ -181,11 +182,11 @@ if (packageVersion("mgcv") >= "1.8.41") {
   }
   su_eg_sz_2_factor <- two_factor_sz_example(seed = 42)
   # using bam as it is so much faster
-  m_sz_2f <- bam(
+  delayedAssign("m_sz_2f", bam(
     y ~ s(x) + s(f1, x, bs = "sz") + s(f2, x, bs = "sz") +
       s(f1, f2, x, bs = "sz", id = 1),
     data = su_eg_sz_2_factor, method = "fREML"
-  )
+  ))
 }
 
 # Also used by the core data_slice tests; only its large model is secondary.
@@ -201,9 +202,9 @@ su_gamm_univar_4 <- gamm(y ~ s(x0) + s(x1) + s(x2) + s(x3),
 
 m_1_smooth <- gam(y ~ s(x0), data = quick_eg1, method = "REML")
 
-m_1_smooth_offset <- gam(y ~ s(x0) + offset(log(off)),
+delayedAssign("m_1_smooth_offset", gam(y ~ s(x0) + offset(log(off)),
   data = quick_eg1_off, method = "REML"
-)
+))
 
 m_gam <- su_m_univar_4
 
@@ -346,8 +347,8 @@ sim_gevlss <- function(n = 500, seed = 9) {
 
 # this produces a couple of warnings; think some parameter went (close to) out
 # of bounds during fitting. Simon uses this example in ?gevlss so it is OK
-suppressWarnings(
-    m_gevlss <- gam(
+delayedAssign("m_gevlss", suppressWarnings(
+  gam(
     list(
       y ~ s(x2),
         ~ s(x0),
@@ -358,7 +359,7 @@ suppressWarnings(
     data = sim_gevlss(),
     optimizer = "efs" # for robustness
   )
-)
+))
 
 m_scat <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3),
   data = su_eg1,
@@ -366,8 +367,10 @@ m_scat <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3),
 )
 
 # models with univariate tensor products
-m_univar_te <- gam(y ~ te(x2), data = quick_eg1, method = "REML")
-m_univar_ti <- gam(y ~ ti(x2), data = quick_eg1, method = "REML")
+delayedAssign("m_univar_te",
+  gam(y ~ te(x2), data = quick_eg1, method = "REML"))
+delayedAssign("m_univar_ti",
+  gam(y ~ ti(x2), data = quick_eg1, method = "REML"))
 m_univar_t2 <- gam(y ~ t2(x2), data = quick_eg1, method = "REML")
 
 m_lm <- lm(y ~ x0 + x1 + x2 + x3, data = quick_eg1)
@@ -454,9 +457,9 @@ su_re2$ranef <- withr::with_seed(
 )
 su_re2$X <- model.matrix(~ ranef - 1, data = su_re2)
 su_re2 <- withr::with_seed(42, transform(su_re2, y = y + X %*% rnorm(20) * 0.5))
-rm2 <- gam(y ~ fac + s(ranef, bs = "re", by = fac) + s(x0) + s(x1) + s(x2),
-  data = su_re2, method = "ML"
-)
+delayedAssign("rm2",
+  gam(y ~ fac + s(ranef, bs = "re", by = fac) + s(x0) + s(x1) + s(x2),
+    data = su_re2, method = "ML"))
 
 # A standard GAM with multiple factors
 df_2_fac <- withr::with_seed(
@@ -467,22 +470,22 @@ df_2_fac <- withr::with_seed(
   )
 )
 # a GAM with multiple factor parametric terms
-m_2_fac <- gam(y ~ fac * ff + s(x0) + s(x1) + s(x2),
+delayedAssign("m_2_fac", gam(y ~ fac * ff + s(x0) + s(x1) + s(x2),
   data = df_2_fac, method = "REML"
-)
+))
 # a GAM with parametric terms (factor and linear) and smooth terms
 m_para_sm <- gam(y ~ fac * ff + x0 + s(x1) + s(x2),
   data = df_2_fac, method = "REML"
 )
 # a GAM with parametric terms (factor and linear)
-m_only_para <- gam(y ~ fac * ff + x0 + x1 + x2,
+delayedAssign("m_only_para", gam(y ~ fac * ff + x0 + x1 + x2,
   data = df_2_fac, method = "REML"
-)
+))
 
 # a GAM with weird parametric terms
-m_poly <- gam(y ~ fac + ff + log(x0) + x1 + poly(x2, 2, raw = TRUE),
+delayedAssign("m_poly", gam(y ~ fac + ff + log(x0) + x1 + poly(x2, 2, raw = TRUE),
   data = df_2_fac, method = "REML"
-)
+))
 
 # -- scam models --------------------------------------------------------------
 # utils::data(smallAges, package = "gratia")
@@ -492,14 +495,14 @@ sw <- scam(Date ~ s(Depth, k = 5, bs = "mpd"),
   data = smallAges,
   weights = 1 / smallAges$Error, gamma = 1.4
 )
-sw_mdcx <- scam(Date ~ s(Depth, k = 5, bs = "mdcx"),
+delayedAssign("sw_mdcx", scam(Date ~ s(Depth, k = 5, bs = "mdcx"),
   data = smallAges,
   weights = 1 / smallAges$Error, gamma = 1.4
-)
-sw_mdcv <- scam(Date ~ s(Depth, k = 5, bs = "mdcv"),
+))
+delayedAssign("sw_mdcv", scam(Date ~ s(Depth, k = 5, bs = "mdcv"),
   data = smallAges,
   weights = 1 / smallAges$Error, gamma = 1.4
-)
+))
 
 # this should be folded into data_sim()
 sim_scam <- function(n, seed = NULL) {
@@ -526,8 +529,10 @@ sim_scam <- function(n, seed = NULL) {
 scam_dat <- sim_scam(n = 200, seed = 4)
 ## fit model, get results, and plot...
 m_scam <- scam(y ~ s(x1, bs = "cr") + s(x2, bs = "mpi"), data = scam_dat)
-m_scam_micx <- scam(y ~ s(x1, bs = "cr") + s(x2, bs = "micx"), data = scam_dat)
-m_scam_micv <- scam(y ~ s(x1, bs = "cr") + s(x2, bs = "micv"), data = scam_dat)
+delayedAssign("m_scam_micx",
+  scam(y ~ s(x1, bs = "cr") + s(x2, bs = "micx"), data = scam_dat))
+delayedAssign("m_scam_micv",
+  scam(y ~ s(x1, bs = "cr") + s(x2, bs = "micv"), data = scam_dat))
 
 # Ordered categorical model ocat()
 n_categories <- 4
@@ -570,14 +575,17 @@ sim_sos_eg_data <- function(n = 400, seed = NULL) {
   out
 }
 sos_df <- sim_sos_eg_data(n = 400, seed = 0)
-m_sos <- gam(y ~ s(latitude, longitude, bs = "sos", k = 60), data = sos_df)
+delayedAssign("m_sos",
+  gam(y ~ s(latitude, longitude, bs = "sos", k = 60), data = sos_df))
 # Arbitrary SOS coordinate names must retain latitude/longitude ordering.
 sos_named_df <- setNames(as.data.frame(sos_df), c("north", "east", "y"))
-m_sos_named <- gam(y ~ s(north, east, bs = "sos", k = 20), data = sos_named_df)
+delayedAssign("m_sos_named",
+  gam(y ~ s(north, east, bs = "sos", k = 20), data = sos_named_df))
 sos_by_df <- sos_named_df
 sos_by_df$region <- factor(rep(c("a", "b"), length.out = nrow(sos_by_df)))
-m_sos_by <- gam(y ~ region + s(north, east, bs = "sos", by = region, k = 15),
-  data = sos_by_df)
+delayedAssign("m_sos_by",
+  gam(y ~ region + s(north, east, bs = "sos", by = region, k = 15),
+    data = sos_by_df))
 
 
 
@@ -600,11 +608,11 @@ logi_df <- data_sim("eg1", n = 600, dist = "normal", scale = 20, seed = 3) |>
     fac = as.factor(sample(c("A1", "A2", "A3"), 600, replace = TRUE)),
     logi = as.logical(sample(c(TRUE, FALSE), 600, replace = TRUE))
   )
-m_logical <- gam(
+delayedAssign("m_logical", gam(
   y ~ x0 + x1 + I(x1^2) + s(x2, bs = "cr", k = 12) + fac +
     x3:fac + I(x1 * x2) + logi,
   data = logi_df
-)
+))
 
 # ziplss example
 ziplss_data <- function(seed = 0) {
@@ -743,11 +751,11 @@ df_284 <- df_284 |>
     ),
     var = as.factor(rep(letters[1:2], 400/2))
   )
-m_284 <- gam(
+delayedAssign("m_284", gam(
   y ~ month + var + s(x0) + s(x1) + s(x2) + s(x3),
   data = df_284,
   method = "REML"
-)
+))
 
 # multivariate normal model
 sim_mvn_data <- function(n = 300, seed) {
@@ -873,18 +881,22 @@ withr::with_seed(11011, {
     random = ~(1 | group), data = gamm4_data)
   gamm4_binomial <- gamm4::gamm4(binary ~ fac + z + s(x, k = 5),
     random = ~(1 | group), data = gamm4_data, family = binomial())
-  gamm4_poisson <- gamm4::gamm4(count ~ fac + z + s(x, k = 5) + offset(off),
-    random = ~(1 | group), data = gamm4_data, family = poisson())
-  gamm4_surface <- gamm4::gamm4(y ~ fac + t2(x, z, k = c(4, 4)),
-    random = ~(1 | group), data = gamm4_data)
-  gamm4_by <- gamm4::gamm4(y ~ fac + s(x, by = fac, k = 5),
-    random = ~(1 | group), data = gamm4_data)
   gamm4_na_data <- gamm4_data
   gamm4_na_data$x[c(8, 14)] <- NA_real_
-  gamm4_missing <- gamm4::gamm4(y ~ fac + z + s(x, k = 5),
-    random = ~(1 | group), data = gamm4_na_data, weights = weight,
-    subset = seq_len(160), na.action = na.exclude)
 })
+delayedAssign("gamm4_poisson", withr::with_seed(11011,
+  gamm4::gamm4(count ~ fac + z + s(x, k = 5) + offset(off),
+    random = ~(1 | group), data = gamm4_data, family = poisson())))
+delayedAssign("gamm4_surface", withr::with_seed(11011,
+  gamm4::gamm4(y ~ fac + t2(x, z, k = c(4, 4)),
+    random = ~(1 | group), data = gamm4_data)))
+delayedAssign("gamm4_by", withr::with_seed(11011,
+  gamm4::gamm4(y ~ fac + s(x, by = fac, k = 5),
+    random = ~(1 | group), data = gamm4_data)))
+delayedAssign("gamm4_missing", withr::with_seed(11011,
+  gamm4::gamm4(y ~ fac + z + s(x, k = 5),
+    random = ~(1 | group), data = gamm4_na_data, weights = weight,
+    subset = seq_len(160), na.action = na.exclude)))
 
 
 # Small grouped-family models shared by fitted draws and response simulation.
@@ -968,7 +980,7 @@ withr::with_seed(107, {
 
 
 # Incomplete categorical support, shared by prediction-message regressions.
-withr::with_seed(164, {
+delayedAssign("factor_support_fixtures", local(withr::with_seed(164, {
   factor_support_data <- expand.grid(
     a = factor(c("A", "B")), b = factor(c("low", "high")), replicate = 1:30
   )
@@ -1027,7 +1039,17 @@ withr::with_seed(164, {
     data = factor_support_observed, family = ocat(R = 3), method = "REML")
   factor_support_binary <- gam(binary ~ a + s(x, k = 5),
     data = factor_support_observed, family = binomial(), method = "REML")
-})
+  environment()
+})))
+delayedAssign("factor_support_data", factor_support_fixtures$factor_support_data)
+delayedAssign("factor_support_models", factor_support_fixtures$factor_support_models)
+delayedAssign("factor_support_subset", factor_support_fixtures$factor_support_subset)
+delayedAssign("factor_support_missing", factor_support_fixtures$factor_support_missing)
+delayedAssign("factor_support_transformed", factor_support_fixtures$factor_support_transformed)
+delayedAssign("factor_support_local", factor_support_fixtures$factor_support_local)
+delayedAssign("factor_support_three", factor_support_fixtures$factor_support_three)
+delayedAssign("factor_support_response", factor_support_fixtures$factor_support_response)
+delayedAssign("factor_support_binary", factor_support_fixtures$factor_support_binary)
 
 # Small shared fixtures for random-effect tensor plotting (#169).
 withr::with_seed(169, {
@@ -1037,37 +1059,46 @@ withr::with_seed(169, {
     g = ordered(rep(c("B", "A"), each = 110), levels = c("B", "A")))
   tensor_re_data$y <- sin(4 * tensor_re_data$x) + tensor_re_data$z +
     as.numeric(tensor_re_data$f) / 4 + rnorm(220, sd = 0.2)
-  tensor_re_models <- lapply(c("te", "ti", "t2"), function(constructor) {
+})
+delayedAssign("tensor_re_four", withr::with_seed(169,
+  gam(y ~ ti(x, z, f, g,
+    bs = c("tp", "tp", "re", "re"), k = c(3, 3, 4, 3)),
+    data = tensor_re_data, method = "REML")))
+delayedAssign("tensor_re_slices", withr::with_seed(169,
+  gam(y ~ t2(f, x, z, u,
+    bs = c("re", "tp", "tp", "tp"), k = c(4, 3, 3, 3)),
+    data = tensor_re_data, method = "REML")))
+
+# Fit the additional models only when the full tensor plotting tests use them.
+delayedAssign("tensor_re_models", withr::with_seed(169,
+  lapply(c(te = "te", ti = "ti", t2 = "t2"), function(constructor) {
     gam(as.formula(paste0("y ~ s(u, k = 4) + ", constructor,
       "(f, x, z, bs = c('re', 'tp', 'tp'), k = c(4, 3, 3))")),
       data = tensor_re_data, method = "REML")
   })
-  names(tensor_re_models) <- c("te", "ti", "t2")
-  tensor_re_four <- gam(y ~ ti(x, z, f, g,
-    bs = c("tp", "tp", "re", "re"), k = c(3, 3, 4, 3)),
-    data = tensor_re_data, method = "REML")
-  tensor_re_slices <- gam(y ~ t2(f, x, z, u,
-    bs = c("re", "tp", "tp", "tp"), k = c(4, 3, 3, 3)),
-    data = tensor_re_data, method = "REML")
-  tensor_re_curves <- gam(y ~ te(f, x, g,
+))
+delayedAssign("tensor_re_curves", withr::with_seed(169,
+  gam(y ~ te(f, x, g,
     bs = c("re", "tp", "re"), k = c(4, 3, 3)),
-    data = tensor_re_data, method = "REML")
-  tensor_re_numeric <- gam(y ~ ti(x, z, u,
+    data = tensor_re_data, method = "REML")))
+delayedAssign("tensor_re_numeric", withr::with_seed(169,
+  gam(y ~ ti(x, z, u,
     bs = c("tp", "tp", "re"), k = c(3, 3, 3)),
-    data = tensor_re_data, method = "REML")
-  tensor_re_raw <- gam(y ~ ti(f, log(x), z,
+    data = tensor_re_data, method = "REML")))
+delayedAssign("tensor_re_raw", withr::with_seed(169,
+  gam(y ~ ti(f, log(x), z,
     bs = c("re", "tp", "tp"), k = c(4, 3, 3)),
-    data = tensor_re_data, method = "REML")
-})
+    data = tensor_re_data, method = "REML")))
 
 withr::with_seed(1691, {
   tensor_re_category_data <- expand.grid(f = factor(c("c", "a", "b"),
       levels = c("c", "a", "b")), g = ordered(c("B", "A"), levels = c("B", "A")),
     h = factor(c("ii", "i"), levels = c("ii", "i")), replicate = 1:5)
   tensor_re_category_data$y <- rnorm(nrow(tensor_re_category_data))
-  tensor_re_categories <- gam(y ~ te(f, g, h, bs = "re", k = c(3, 3, 3)),
-    data = tensor_re_category_data, method = "REML")
 })
+delayedAssign("tensor_re_categories", withr::with_seed(1691,
+  gam(y ~ te(f, g, h, bs = "re", k = c(3, 3, 3)),
+    data = tensor_re_category_data, method = "REML")))
 
 
 
@@ -1075,19 +1106,19 @@ withr::with_seed(1693, {
   tensor_re_many_data <- data.frame(x = runif(170),
     f = factor(rep(sprintf("level%02d", 1:17), 10)))
   tensor_re_many_data$y <- sin(4 * tensor_re_many_data$x) + rnorm(170)
-  tensor_re_many <- gam(y ~ te(x, f, bs = c("tp", "re"), k = c(3, 17)),
-    data = tensor_re_many_data, method = "REML")
 })
+delayedAssign("tensor_re_many", withr::with_seed(1693,
+  gam(y ~ te(x, f, bs = c("tp", "re"), k = c(3, 17)),
+    data = tensor_re_many_data, method = "REML")))
 
-withr::with_seed(1695, {
-  tensor_re_numeric_surface <- gam(y ~ te(u, x, z,
+delayedAssign("tensor_re_numeric_surface", withr::with_seed(1695,
+  gam(y ~ te(u, x, z,
     bs = c("re", "tp"), d = c(1, 2), k = c(3, 6)),
-    data = tensor_re_data, method = "REML")
-})
+    data = tensor_re_data, method = "REML")))
 
 # Shared MRF fixtures: area order differs from the penalty parameterization;
 # the final fitted-domain area has no observations in one model.
-mrf_models <- local(withr::with_seed(903, {
+delayedAssign("mrf_models", local(withr::with_seed(903, {
   areas <- c("r4", "r1", "r7", "r2", "r8", "r3", "r6", "r5")
   nb <- stats::setNames(lapply(seq_along(areas), function(i) {
     areas[intersect(seq_along(areas), c(i - 1L, i + 1L))]
@@ -1100,40 +1131,42 @@ mrf_models <- local(withr::with_seed(903, {
   dimnames(S) <- list(areas, areas)
   for (a in areas) S[a, nb[[a]]] <- -1
   # Two components are a valid intrinsic MRF with multiple null directions.
-  disconnected <- S
-  disconnected[areas[4], areas[5]] <- disconnected[areas[5], areas[4]] <- 0
-  disconnected[cbind(4:5, 4:5)] <- disconnected[cbind(4:5, 4:5)] - 1
+  disconnected_penalty <- S
+  disconnected_penalty[areas[4], areas[5]] <- disconnected_penalty[areas[5], areas[4]] <- 0
+  disconnected_penalty[cbind(4:5, 4:5)] <- disconnected_penalty[cbind(4:5, 4:5)] - 1
   polys <- stats::setNames(lapply(seq_along(areas), function(i) {
     cbind(c(i - 1, i, i, i - 1, i - 1), c(0, 0, 1, 1, 0))
   }), areas)
   xt <- list(nb = nb)
-  out <- list(data = d, areas = areas, nb = nb, penalty = S,
-    full = gam(y ~ s(area, bs = "mrf", xt = xt) + s(x, k = 5),
-      data = d, method = "REML"),
-    low = gam(y ~ s(area, bs = "mrf", k = 5, xt = xt),
-      data = d, method = "REML"),
-    penalty_model = gam(y ~ s(area, bs = "mrf", xt = list(penalty = S)),
-      data = d, method = "REML"),
-    disconnected = gam(y ~ s(area, bs = "mrf", xt = list(penalty = disconnected)),
-      data = d, method = "REML"),
-    polygon = gam(y ~ s(area, bs = "mrf", k = 5, xt = list(polys = polys)),
-      data = d, method = "REML"),
-    by = gam(y ~ fac + s(area, bs = "mrf", by = fac, xt = xt),
-      data = d, method = "REML"),
-    numeric_by = gam(y ~ s(area, bs = "mrf", by = z, xt = xt),
-      data = d, method = "REML"),
-    bam = bam(y ~ s(area, bs = "mrf", k = 5, xt = xt),
+  data <- d
+  penalty <- S
+  delayedAssign("full",
+    gam(y ~ s(area, bs = "mrf", xt = xt) + s(x, k = 5), data = d, method = "REML"))
+  delayedAssign("low",
+    gam(y ~ s(area, bs = "mrf", k = 5, xt = xt), data = d, method = "REML"))
+  delayedAssign("penalty_model", gam(y ~ s(area, bs = "mrf", xt = list(penalty = S)),
+    data = d, method = "REML"))
+  delayedAssign("disconnected",
+    gam(y ~ s(area, bs = "mrf", xt = list(penalty = disconnected_penalty)),
+      data = d, method = "REML"))
+  delayedAssign("polygon", gam(y ~ s(area, bs = "mrf", k = 5, xt = list(polys = polys)),
+    data = d, method = "REML"))
+  delayedAssign("by", gam(y ~ fac + s(area, bs = "mrf", by = fac, xt = xt),
+    data = d, method = "REML"))
+  delayedAssign("numeric_by", gam(y ~ s(area, bs = "mrf", by = z, xt = xt),
+    data = d, method = "REML"))
+  delayedAssign("bam", mgcv::bam(y ~ s(area, bs = "mrf", k = 5, xt = xt),
       data = d, method = "fREML", drop.unused.levels = FALSE))
   absent <- d[as.character(d$area) != areas[8], ]
   absent$area <- droplevels(absent$area)
-  out$unobserved <- gam(y ~ s(area, bs = "mrf", k = 5, xt = xt),
-    data = absent, knots = list(area = factor(areas)), method = "REML")
-  out$unobserved_full <- gam(y ~ s(area, bs = "mrf", xt = xt),
-    data = absent, knots = list(area = factor(areas)), method = "REML")
-  out$transformed <- gam(y ~ s(factor(area), bs = "mrf", k = 5, xt = xt),
-    data = d, method = "REML")
-  out
-}))
+  delayedAssign("unobserved", gam(y ~ s(area, bs = "mrf", k = 5, xt = xt),
+    data = absent, knots = list(area = factor(areas)), method = "REML"))
+  delayedAssign("unobserved_full", gam(y ~ s(area, bs = "mrf", xt = xt),
+    data = absent, knots = list(area = factor(areas)), method = "REML"))
+  delayedAssign("transformed", gam(y ~ s(factor(area), bs = "mrf", k = 5, xt = xt),
+    data = d, method = "REML"))
+  environment()
+})))
 
 # Compact shared fixtures for smooth simultaneous-band numerical/plot tests.
 smooth_band_data <- withr::with_seed(314, local({
@@ -1142,10 +1175,11 @@ smooth_band_data <- withr::with_seed(314, local({
   d$y <- sin(6 * d$x) + d$z^2 + as.numeric(d$f) + rnorm(160, sd = 0.3)
   d
 }))
-smooth_band_model <- gam(y ~ f + s(x, k = 8) + s(z, k = 6),
-  data = smooth_band_data, method = "REML")
-smooth_band_transformed <- gam(y ~ s(log(x + 1), k = 8) + s(z, by = x, k = 6),
-  data = smooth_band_data, method = "REML")
+delayedAssign("smooth_band_model", gam(y ~ f + s(x, k = 8) + s(z, k = 6),
+  data = smooth_band_data, method = "REML"))
+delayedAssign("smooth_band_transformed",
+  gam(y ~ s(log(x + 1), k = 8) + s(z, by = x, k = 6),
+    data = smooth_band_data, method = "REML"))
 
 
 # Scalar, uncensored observations from families that also support censoring.
@@ -1182,7 +1216,7 @@ withr::with_seed(26702, {
 
 # Unequal component sizes, disjoint predictors, tied and constant predictors.
 # The formula keeps its private fitting data without leaking temporary names.
-gfam_rank_model <- local(withr::with_seed(26703, {
+delayedAssign("gfam_rank_model", local(withr::with_seed(26703, {
   d <- data.frame(family_id = rep(1:3, c(15, 25, 9)),
     x = c(rep(c(0, 1, 2), 5), rep(0:4, 5), rep(0, 9)))
   d$y <- c(-7, 10, 30)[d$family_id] + .2 * d$x + rnorm(nrow(d), sd = .3)
@@ -1190,7 +1224,7 @@ gfam_rank_model <- local(withr::with_seed(26703, {
   gam(cbind(y, family_id) ~ factor(family_id) + x, data = d,
     family = gfam(list(gaussian(), gaussian(), gaussian())), method = "REML",
     na.action = na.exclude)
-}))
+})))
 
 gfam_gamma_model <- local(withr::with_seed(26704, {
   d <- data.frame(family_id = rep(1:3, c(30, 35, 40)), x = runif(105))

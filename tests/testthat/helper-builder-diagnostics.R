@@ -14,6 +14,12 @@ builder_spatial_test_filter <- function() {
 }
 
 builder_test_check <- function(filter = NULL, invert = FALSE) {
+  source("testthat/helper-cran.R", local = TRUE)
+  if (!full_test_run()) {
+    filter <- cran_test_filter(filter, invert)
+    if (is.null(filter)) return(invisible(NULL))
+    invert <- FALSE
+  }
   progress <- Sys.getenv("GRATIA_TEST_PROGRESS")
   if (!nzchar(progress)) {
     return(testthat::test_check("gratia", filter = filter, invert = invert))

@@ -47,11 +47,13 @@ test_that("sdmTMB delta diagnostics calibrate the entire response mixture", {
   expect_equal(model_row_map(positive),
     ifelse(d$y > 0, cumsum(d$y > 0), NA_integer_))
   expect_s3_class(posterior_predictive_plot(m, n = 2L, seed = 12), "ggplot")
+  skip_on_cran()
   expect_s3_class(posterior_predictive_plot(m, n = 2L, seed = 12,
     conditioning = "marginal"), "ggplot")
 })
 
 test_that("sdmTMB diagnostics identify unsupported dispersion formulas", {
+  skip_on_cran()
   skip_if_not_installed("sdmTMB", minimum_version = "1.2.0")
   withr::local_seed(346)
   d <- data.frame(x = seq(-1, 1, length.out = 80))
@@ -62,6 +64,7 @@ test_that("sdmTMB diagnostics identify unsupported dispersion formulas", {
 })
 
 test_that("sdmTMB binomial counts use trial-sized probability bounds", {
+  skip_on_cran()
   skip_if_not_installed("sdmTMB", minimum_version = "1.2.0")
   set.seed(42)
   d <- data.frame(x = runif(60), n = sample(3:10, 60, replace = TRUE))
@@ -85,10 +88,8 @@ test_that("sdmTMB binomial counts use trial-sized probability bounds", {
 })
 
 test_that("sdmTMB diagnostics retain fitted IID effects", {
+  skip_on_cran()
   skip_if_not_installed("sdmTMB", minimum_version = "1.2.0")
-  if (!full_test_run()) {
-    withr::local_options(gratia.diagnostics.marginal_draws = 29L)
-  }
   set.seed(112)
   d <- data.frame(x = runif(80), g = factor(rep(1:8, each = 10)))
   d$y <- d$x + rep(rnorm(8, sd = 2), each = 10) + rnorm(80, sd = 0.4)

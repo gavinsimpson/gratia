@@ -38,6 +38,7 @@ test_that("tube degeneracies and covariance validation are explicit", {
 })
 
 test_that("tube basis providers recover fitted matrices and derivatives", {
+  skip_on_cran()
   x <- seq(.05, .95, length.out = 11)
   for (bs in c("cr", "cs", "ps", "tp", "ts")) {
     f <- tube_fixture(bs)
@@ -120,6 +121,7 @@ test_that("smooth tube bands retain uncertainty settings and ignore simulation c
 })
 
 test_that("derivative and difference tube adapters preserve their quantities", {
+  skip_on_cran()
   f <- tube_fixture()
   nd <- data.frame(x = seq(.15, .85, length.out = 9))
   for (order in 1:2) {

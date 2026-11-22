@@ -13,6 +13,7 @@ test_that("post_draws() works for a GAM", {
 })
 
 test_that("post_draws() works for a GAM", {
+  skip_on_cran()
   expect_silent(drws1 <- post_draws(m_gam, n_draws = 20, method = "mh",
     burnin = 100, thin = 2, t_df = 4, rw_scale = 0.3, seed = 2))
   expect_silent(drws2 <- post_draws(m_gam, n_draws = 20, method = "mh",
@@ -78,6 +79,7 @@ test_that("generate_draws() works for a GAM, 1 draw only", {
 })
 
 test_that("generate_draws() works for a GAM with MH", {
+  skip_on_cran()
   expect_silent(drws1 <- generate_draws(m_gam, n_draws = 20, method = "mh",
     burnin = 100, thin = 2, t_df = 4, rw_scale = 0.3, seed = 2))
   expect_silent(drws2 <- generate_draws(m_gam, n_draws = 20, method = "mh",

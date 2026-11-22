@@ -24,7 +24,11 @@ run_tests <- function() {
   options(Ncpus = as.integer(cpu_count))
   options(device = function(...) grDevices::pdf(file = NULL))
   filter <- Sys.getenv("GRATIA_TEST_FILTER")
-  if (!nzchar(filter)) filter <- NULL
+  if (!nzchar(filter)) {
+    source(system.file("tests", "testthat", "helper-cran.R", package = package),
+      local = TRUE)
+    filter <- if (full_test_run()) NULL else cran_test_filter()
+  }
   testthat::test_package(package, filter = filter, reporter = "summary",
     stop_on_failure = TRUE, stop_on_warning = TRUE)
 }

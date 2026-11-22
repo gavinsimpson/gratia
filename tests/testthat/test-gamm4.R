@@ -1,5 +1,8 @@
 test_that("current gamm4 objects validate for Gaussian and generalized fits", {
-  for (m in list(gamm4_gaussian, gamm4_binomial, gamm4_poisson)) {
+  models <- test_cases_for_cran(
+    list(gamm4_gaussian, gamm4_binomial, gamm4_poisson),
+    list(gamm4_gaussian, gamm4_binomial))
+  for (m in models) {
     expect_s3_class(m, "gamm4")
     expect_true(is_gamm4(m))
     expect_true(is.gamm4(m))
@@ -23,7 +26,9 @@ test_that("current gamm4 objects validate for Gaussian and generalized fits", {
 })
 
 test_that("model utilities dispatch on gamm4 and preserve GAM results", {
-  for (m in list(gamm4_gaussian, gamm4_binomial, gamm4_poisson)) {
+  models <- test_cases_for_cran(
+    list(gamm4_gaussian, gamm4_binomial, gamm4_poisson), list(gamm4_gaussian))
+  for (m in models) {
     for (operation in c("basis_size", "smooths", "smooth_dim", "smooth_terms",
       "n_smooths", "term_names", "parametric_terms", "model_vars", "model_terms",
       "n_eta", "dispersion", "fixed_effects", "model_constant", "penalty",
@@ -50,7 +55,9 @@ test_that("model utilities dispatch on gamm4 and preserve GAM results", {
 })
 
 test_that("gamm4 smooths, effects, intervals and plots work across families", {
-  for (m in list(gamm4_gaussian, gamm4_binomial, gamm4_poisson)) {
+  models <- test_cases_for_cran(
+    list(gamm4_gaussian, gamm4_binomial, gamm4_poisson), list(gamm4_binomial))
+  for (m in models) {
     expect_gamm4_equivalent(m, "smooth_estimates", n = 8)
     expect_gamm4_equivalent(m, "basis", n = 8)
     suppressWarnings(expect_gamm4_equivalent(m, "datagen", smooth = "s(x)", n = 8))
@@ -62,6 +69,7 @@ test_that("gamm4 smooths, effects, intervals and plots work across families", {
     expect_s3_class(draw(m, n = 8, rug = FALSE), "patchwork")
     expect_s3_class(assemble(m, n = 8, rug = FALSE), "assembled_plots")
   }
+  skip_on_cran()
   expect_gamm4_equivalent(gamm4_by, "difference_smooths", select = "s(x)", n = 8)
   expect_gamm4_equivalent(gamm4_by, "smooth_estimates", n = 8)
   expect_gamm4_equivalent(gamm4_surface, "smooth_estimates", n = 5, dist = 0)
@@ -70,6 +78,7 @@ test_that("gamm4 smooths, effects, intervals and plots work across families", {
 })
 
 test_that("gamm4 predictions and derivatives describe the population GAM", {
+  skip_on_cran()
   nd <- gamm4_data[1:8, ]
   for (m in list(gamm4_gaussian, gamm4_binomial, gamm4_poisson)) {
     expect_gamm4_equivalent(m, "fitted_values", data = nd)
@@ -103,6 +112,7 @@ test_that("gamm4 predictions and derivatives describe the population GAM", {
 })
 
 test_that("Gaussian and user gamm4 posterior draws work and preserve RNG", {
+  skip_on_cran()
   nd <- gamm4_data[1:8, ]
   for (m in list(gamm4_gaussian, gamm4_binomial, gamm4_poisson)) {
     for (operation in c("posterior_samples", "fitted_samples", "predicted_samples")) {
@@ -157,7 +167,9 @@ test_that("actual gamm4 draws tolerate rank-deficient covariance", {
 })
 
 test_that("gamm4 diagnostics and simulations retain family-specific behavior", {
-  for (m in list(gamm4_gaussian, gamm4_binomial, gamm4_poisson)) {
+  models <- test_cases_for_cran(
+    list(gamm4_gaussian, gamm4_binomial, gamm4_poisson), list(gamm4_poisson))
+  for (m in models) {
     expect_equal(simulate(m, nsim = 3, seed = 14, conditioning = "gam_component"),
       simulate.gam(m$gam, nsim = 3, seed = 14))
     expect_gamm4_equivalent(m, "quantile_residuals", seed = 14, conditioning = "gam_component")
@@ -262,6 +274,7 @@ test_that("gamm4 estimates and user draws agree with prediction algebra", {
 })
 
 test_that("gamm4 simultaneous intervals and parallel smooth computations agree", {
+  skip_on_cran()
   m <- gamm4_gaussian
   nd <- gamm4_data[1:8, ]
   set.seed(913)

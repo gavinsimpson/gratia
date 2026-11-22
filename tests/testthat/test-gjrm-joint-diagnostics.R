@@ -1,6 +1,7 @@
 skip_if_not_installed("GJRM", minimum_version = "0.2-6")
 
 test_that("joint normal diagnostics use both responses' final marginal distributions", {
+  skip_on_cran()
   m <- gjrm_joint_fixture()
   n <- length(m$y1)
   d <- diagnostic_data(m, seed = 75)
@@ -50,7 +51,7 @@ test_that("joint normal diagnostics use both responses' final marginal distribut
 })
 
 test_that("binary and mixed joint diagnostics randomise within the correct probability masses", {
-  for (kind in c("binary", "binary_cont", "trivariate")) {
+  for (kind in test_cases_for_cran(c("binary", "binary_cont", "trivariate"), "binary_cont")) {
     m <- gjrm_joint_fixture(kind)
     withr::local_seed(99)
     before <- .Random.seed
@@ -83,7 +84,7 @@ test_that("joint appraisals keep four panels and facet every panel by response",
   for (kind in test_cases_for_cran(c("normal", "binary_cont", "trivariate"),
     "binary_cont")) {
     m <- gjrm_joint_fixture(kind)
-    for (scalable in c(FALSE, TRUE)) {
+    for (scalable in test_cases_for_cran(c(FALSE, TRUE), TRUE)) {
       plots <- appraise(m, seed = 17, scalable = scalable, qq_bins = 20)
       expect_s3_class(plots, "patchwork")
       expect_length(plots, 4L)
@@ -91,10 +92,12 @@ test_that("joint appraisals keep four panels and facet every panel by response",
         p <- plots[[i]]
         expect_s3_class(p, "ggplot")
         expect_s3_class(p$facet, "FacetWrap")
-        built <- ggplot2::ggplot_build(p)
-        expect_equal(nrow(built$layout$layout), length(m$margins))
+        if (full_test_run() || i == 1L) {
+          built <- ggplot2::ggplot_build(p)
+          expect_equal(nrow(built$layout$layout), length(m$margins))
+        }
       }
-      expect_silent(patchwork::patchworkGrob(plots))
+      if (full_test_run()) expect_silent(patchwork::patchworkGrob(plots))
       selected <- appraise(m, response = 2, seed = 17, scalable = scalable)
       expect_length(selected, 4L)
       expect_equal(nrow(ggplot2::ggplot_build(selected[[1]])$layout$layout), 1L)
@@ -103,6 +106,7 @@ test_that("joint appraisals keep four panels and facet every panel by response",
 })
 
 test_that("joint standalone diagnostics and prepared data retain response facets", {
+  skip_on_cran()
   m <- gjrm_joint_fixture("binary_cont")
   d <- diagnostic_data(m, seed = 18)
   for (fun in list(qq_plot, worm_plot, residuals_linpred_plot,
@@ -123,6 +127,7 @@ test_that("joint standalone diagnostics and prepared data retain response facets
 })
 
 test_that("joint diagnostics reject unsupported models and invalid response choices", {
+  skip_on_cran()
   m <- gjrm_joint_fixture()
   for (response in list(0, 3, 1.5, Inf, NA_integer_, TRUE, "y1", 1:2)) {
     expect_error(diagnostic_data(m, response = response), "response")
@@ -146,6 +151,7 @@ test_that("joint diagnostics reject unsupported models and invalid response choi
 })
 
 test_that("joint count and continuous margins use their own final scale parameters", {
+  skip_on_cran()
   m <- gjrm_joint_fixture("count_cont")
   mu <- exp(as.vector(m$eta1))
   dispersion <- as.vector(m$sigma21)
@@ -168,6 +174,7 @@ test_that("joint count and continuous margins use their own final scale paramete
 })
 
 test_that("joint diagnostic rows follow the retained fitting observations after omissions", {
+  skip_on_cran()
   m <- gjrm_joint_fixture("omitted")
   expect_equal(length(m$y1), 178L)
   d <- diagnostic_data(m, seed = 71)
@@ -189,6 +196,7 @@ test_that("joint diagnostic rows follow the retained fitting observations after 
 })
 
 test_that("joint residual plots against covariates retain responses and fitting rows", {
+  skip_on_cran()
   m <- gjrm_joint_fixture("omitted")
   for (fun in list(residuals_covariate_plot, scalable_residuals_covariate_plot)) {
     p <- fun(m, covariates = "z", smooth = FALSE, seed = 82)

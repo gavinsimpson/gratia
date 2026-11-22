@@ -37,6 +37,7 @@ test_that("streamed PITs match a matrix calculation including ties and endpoints
 })
 
 test_that("invalid observations, simulations and counts have specific errors", {
+  skip_on_cran()
   p <- dharma_test_proxy(function() c(0, 1, 2))
   for (n in list(0, -1, 1.5, NA_real_, Inf, c(1, 2), TRUE, "10"))
     expect_error(dharma_residuals(p, n = n), "integer")
@@ -53,6 +54,7 @@ test_that("invalid observations, simulations and counts have specific errors", {
 })
 
 test_that("explicit seeds preserve RNG state, while NULL advances it", {
+  skip_on_cran()
   withr::local_preserve_seed()
   p <- dharma_test_proxy(function() rpois(3, 1))
   set.seed(123)
@@ -109,6 +111,7 @@ test_that("extraction, QQ, worm and ordinary panels share the residual definitio
 })
 
 test_that("simulation counts and seeds invalidate cached DHARMa residuals", {
+  skip_on_cran()
   draws <- 0L
   p <- dharma_test_proxy(function() { draws <<- draws + 1L; rpois(3, 1) })
   d <- prepare_diagnostic_data(p, "dharma", seed = 2, n_dharma = 7)
@@ -133,6 +136,7 @@ test_that("simulation counts and seeds invalidate cached DHARMa residuals", {
 })
 
 test_that("missing rows are restored once and binomial encodings agree", {
+  skip_on_cran()
   withr::local_seed(5)
   dat <- data.frame(x = seq_len(40), n = rep(10, 40), y = rbinom(40, 10, .4))
   dat$x[3] <- NA_real_
@@ -152,6 +156,7 @@ test_that("missing rows are restored once and binomial encodings agree", {
 })
 
 test_that("generators need neither CDFs nor response moments", {
+  skip_on_cran()
   p <- dharma_test_proxy(function() rpois(3, 1))
   expect_null(p$distribution$cdf)
   expect_s3_class(qq_plot(p, type = "dharma", n_dharma = 10, seed = 2), "ggplot")
@@ -166,6 +171,7 @@ test_that("generators need neither CDFs nor response moments", {
 })
 
 test_that("dependent and marginal-only simulators omit independence-based bands", {
+  skip_on_cran()
   p <- dharma_test_proxy(function() rep(rpois(1, 1), 3), independent = FALSE)
   q <- qq_plot(p, type = "dharma", n_dharma = 20, seed = 3)
   expect_false("lower" %in% names(q$data))
@@ -177,7 +183,9 @@ test_that("dependent and marginal-only simulators omit independence-based bands"
 })
 
 test_that("grouped residuals retain component order, pooling and facets", {
-  for (m in list(gfam_model, gfam_bam, gfam_missing_model)) {
+  models <- test_cases_for_cran(list(gfam_model, gfam_bam, gfam_missing_model),
+    list(gfam_missing_model))
+  for (m in models) {
     r <- dharma_residuals(m, n = 20, seed = 21)
     q <- qq_plot(m, type = "dharma", n_dharma = 20, seed = 21)
     expect_equal(sort(q$data$residuals), sort(r[is.finite(r)]))
@@ -192,6 +200,7 @@ test_that("grouped residuals retain component order, pooling and facets", {
 })
 
 test_that("multivariate and censored response encodings are rejected", {
+  skip_on_cran()
   p <- dharma_test_proxy(function() 1:3)
   p$y <- matrix(1:6, nrow = 3)
   expect_error(dharma_residuals(p, n = 3), "multivariate")
@@ -200,6 +209,7 @@ test_that("multivariate and censored response encodings are rejected", {
 })
 
 test_that("glmmTMB adapters use DHARMa residuals before conventional calculations", {
+  skip_on_cran()
   skip_if_not_installed("glmmTMB", minimum_version = "1.1.15.2")
   withr::local_seed(32)
   dat <- data.frame(x = runif(60), g = factor(rep(1:6, each = 10)))
@@ -216,6 +226,7 @@ test_that("glmmTMB adapters use DHARMa residuals before conventional calculation
 })
 
 test_that("gamm and native mixed-model adapters retain their conditioning defaults", {
+  skip_on_cran()
   skip_if_not_installed("nlme")
   skip_if_not_installed("lme4")
   withr::local_seed(14)
@@ -232,6 +243,7 @@ test_that("gamm and native mixed-model adapters retain their conditioning defaul
 })
 
 test_that("family generators extend support without requiring analytic CDFs", {
+  skip_on_cran()
   # An unknown family name prevents the analytic-family fallback from helping.
   m <- dharma_poisson_model
   m$family$family <- "Custom count distribution"
@@ -275,6 +287,7 @@ test_that("scalable summaries retain endpoint residuals and labels", {
 })
 
 test_that("sdmTMB component and field options reach the response generator", {
+  skip_on_cran()
   skip_if_not_installed("sdmTMB", minimum_version = "1.2.0")
   withr::local_seed(25)
   d <- data.frame(x = seq(-1, 1, length.out = 50))
@@ -296,6 +309,7 @@ test_that("sdmTMB component and field options reach the response generator", {
 })
 
 test_that("GJRM diagnostics use the final fitted response distribution", {
+  skip_on_cran()
   skip_if_not_installed("GJRM")
   withr::local_seed(7)
   d <- data.frame(x = runif(80))
@@ -308,6 +322,7 @@ test_that("GJRM diagnostics use the final fitted response distribution", {
 })
 
 test_that("extended and distributional mgcv families use their own generators", {
+  skip_on_cran()
   models <- list(m_gaulss, m_betar, m_gammals, m_gumbls, m_scat, m_nb, m_tw,
     m_ocat, m_ziplss, m_twlss)
   for (m in models) {
@@ -320,6 +335,7 @@ test_that("extended and distributional mgcv families use their own generators", 
 })
 
 test_that("abbreviated DHARMa types retain the requested simulation count", {
+  skip_on_cran()
   m <- dharma_poisson_model
   r <- dharma_residuals(m, n = 7, seed = 2)
   q <- qq_plot(m, type = "dharma", n_dharma = 7, seed = 2)
@@ -348,6 +364,7 @@ test_that("abbreviated DHARMa types retain the requested simulation count", {
 })
 
 test_that("ordered diagnostics reuse prepared DHARMa residuals by default", {
+  skip_on_cran()
   draws <- 0L
   p <- dharma_test_proxy(function() { draws <<- draws + 1L; rpois(3, 1) })
   d <- prepare_diagnostic_data(p, "dharma", seed = 2, n_dharma = 7)
@@ -365,6 +382,7 @@ test_that("ordered diagnostics reuse prepared DHARMa residuals by default", {
 })
 
 test_that("DHARMa appraisal retains conditioning for posterior predictive panels", {
+  skip_on_cran()
   skip_if_not_installed("glmmTMB", minimum_version = "1.1.15.2")
   withr::local_seed(32)
   dat <- data.frame(x = runif(60), g = factor(rep(1:6, each = 10)))

@@ -67,6 +67,7 @@ test_that("gamlss resolves deprecated grouping once across its equations", {
 })
 
 test_that("assemble gamlss selects smooth and parametric terms across equations", {
+  skip_on_cran()
   m <- assemble_gamlss_fixture()
   for (selection in list("s.1(x)", 2, c(FALSE, TRUE))) {
     plots <- assemble(m, select = selection, n = 9, rug = FALSE)
@@ -83,6 +84,7 @@ test_that("assemble gamlss selects smooth and parametric terms across equations"
 })
 
 test_that("assemble gamlss forwards prediction rows and interval controls", {
+  skip_on_cran()
   m <- assemble_gamlss_fixture()
   data <- data.frame(x = c(.8, .2, .8, .4))
   env <- new.env(parent = environment())
@@ -102,6 +104,7 @@ test_that("assemble gamlss forwards prediction rows and interval controls", {
 })
 
 test_that("assemble gamlss shares fixed effect ranges and polar options", {
+  skip_on_cran()
   m <- assemble_gamlss_fixture("polar")
   args <- list(start = -pi / 2, r.axis.inside = FALSE)
   plots <- assemble(m, cyclic = "polar", polar_args = args,
@@ -118,6 +121,7 @@ test_that("assemble gamlss shares fixed effect ranges and polar options", {
 })
 
 test_that("assemble gamlss handles parametric-only single and empty plot lists", {
+  skip_on_cran()
   m <- assemble_gamlss_fixture("parametric")
   expect_identical(names(assemble(m, n = 9)), "a")
   expect_equal(assemble(m, n = 9), draw(m, n = 9, wrap = FALSE))

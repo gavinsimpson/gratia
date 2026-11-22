@@ -46,9 +46,9 @@ test_that("soap partial derivatives include fixed boundary values for every sten
   model <- soap_derivative_fixture()
   d <- data.frame(x = seq(-.5, .5, length.out = 8), y = .2)
   expect_true(any(abs(attr(mgcv::PredictMat(model$smooth[[1]], d), "offset")) > 0))
-  for (order in 1:2) {
-    for (type in c("forward", "backward", "central")) {
-      for (wrt in c("smooth", "covariate")) {
+  for (order in test_cases_for_cran(1:2, 1L)) {
+    for (type in test_cases_for_cran(c("forward", "backward", "central"), "central")) {
+      for (wrt in test_cases_for_cran(c("smooth", "covariate"), "covariate")) {
         actual <- partial_derivatives(model, data = d, focal = "x", order = order,
           type = type, eps = .01, wrt = wrt)
         expected <- soap_native_derivative(model, d, order, type, .01, "link")

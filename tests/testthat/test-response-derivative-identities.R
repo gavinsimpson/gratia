@@ -82,6 +82,7 @@ test_that("multivariate summaries keep each response on both scales", {
 })
 
 test_that("grouped summaries retain family and category identities in row order", {
+  skip_on_cran()
   nd <- gfam_data[c(3, 1, 2, 3), ]
   expected <- data.frame(.row = 1:4, .family = nd$family_id,
     .derivative = native_response_slope(gfam_model, nd, "x"))

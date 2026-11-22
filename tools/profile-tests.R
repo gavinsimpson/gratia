@@ -15,9 +15,15 @@ environment <- Sys.getenv(c("NOT_CRAN", "VDIFFR_RUN_TESTS", "GRATIA_RUN_HGAM",
   "TESTTHAT_PARALLEL", "TESTTHAT_CPUS", "OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS"))
 print(environment)
 print(sessionInfo())
+helper <- system.file("tests", "testthat", "helper-cran.R", package = "gratia")
+if (nzchar(helper)) source(helper)
+# Older installed revisions have no file list for CRAN.
+use_cran_filter <- exists("cran_test_filter", mode = "function", inherits = FALSE) &&
+  !full_test_run()
 # Paper examples have their own runner and are never part of this profile.
 timing <- system.time(result <- testthat::test_package("gratia",
-  filter = "hgam-paper", invert = TRUE, reporter = "summary",
+  filter = if (use_cran_filter) cran_test_filter() else "^hgam-paper$",
+  invert = !use_cran_filter, reporter = "summary",
   stop_on_failure = FALSE, stop_on_warning = FALSE))
 frame <- as.data.frame(result)
 saveRDS(result, file.path(output, "results.rds"))

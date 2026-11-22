@@ -42,7 +42,10 @@ test_that("every LSS family returns natural parameters from joint draws", {
     }
     p
   }
-  for (name in c("gaulss", "gammals", "gumbls", "gevlss", "shash", "ziplss", "twlss")) {
+  families <- test_cases_for_cran(
+    c("gaulss", "gammals", "gumbls", "gevlss", "shash", "ziplss", "twlss"),
+    c("gaulss", "ziplss"))
+  for (name in families) {
     model <- lss_test_models(name)
     nd <- data.frame(x = c(.2, .8), o1 = .03, o2 = -.04, o3 = .02, o4 = -.01)
     if (name == "shash") nd[c("o1", "o2", "o3", "o4")] <- 0

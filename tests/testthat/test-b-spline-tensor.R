@@ -2,9 +2,11 @@
 skip_if_not_installed("mgcv", "1.9-5")
 
 test_that("B-spline tensor estimates and uncertainty agree with mgcv", {
-  models <- list(b_tensor_fixture(1L), b_tensor_fixture(), b_tensor_fixture(3L),
-    b_tensor_fixture(penalty_order = 3.2), b_tensor_fixture(by = "numeric"),
-    b_tensor_fixture(by = "factor"))
+  models <- test_cases_for_cran(
+    list(b_tensor_fixture(1L), b_tensor_fixture(), b_tensor_fixture(3L),
+      b_tensor_fixture(penalty_order = 3.2), b_tensor_fixture(by = "numeric"),
+      b_tensor_fixture(by = "factor")),
+    list(b_tensor_fixture(), b_tensor_fixture(by = "factor")))
   for (model in models) {
     d <- model.frame(model)[1:8, ]
     reference <- predict(model, newdata = d, type = "terms", se.fit = TRUE)
@@ -25,6 +27,7 @@ test_that("B-spline tensor estimates and uncertainty agree with mgcv", {
 })
 
 test_that("B-spline tensor basis and penalties retain mgcv's matrices", {
+  skip_on_cran()
   for (order in c(3, 3.2)) {
     model <- b_tensor_fixture(penalty_order = order)
     sm <- model$smooth[[1L]]
@@ -57,6 +60,7 @@ test_that("B-spline tensor basis and penalties retain mgcv's matrices", {
 })
 
 test_that("B-spline tensor grids stay inside the fitted knot range", {
+  skip_on_cran()
   model <- b_tensor_fixture(3L)
   sm <- model$smooth[[1L]]
   d <- smooth_data(model, id = 1L, n_2d = 4, n_3d = 2)
@@ -78,6 +82,7 @@ test_that("B-spline tensor grids stay inside the fitted knot range", {
 })
 
 test_that("B-spline tensor derivatives and coefficient draws agree with mgcv", {
+  skip_on_cran()
   model <- b_tensor_fixture()
   d <- data.frame(x0 = seq(.2, .8, length.out = 6), x1 = .5)
   draws <- rbind(coef(model), coef(model) + .03)
@@ -107,12 +112,15 @@ test_that("B-spline tensor derivatives and coefficient draws agree with mgcv", {
 })
 
 test_that("B-spline tensor plots support curves, surfaces and factor-by smooths", {
-  for (model in list(b_tensor_fixture(1L), b_tensor_fixture(),
-      b_tensor_fixture(3L), b_tensor_fixture(by = "factor"))) {
+  models <- test_cases_for_cran(
+    list(b_tensor_fixture(1L), b_tensor_fixture(), b_tensor_fixture(3L),
+      b_tensor_fixture(by = "factor")),
+    list(b_tensor_fixture()))
+  for (model in models) {
     panels <- assemble(model, parametric = FALSE, n = 8, n_2d = 8, n_3d = 2)
     expect_length(panels, length(model$smooth))
     expect_silent(lapply(panels, ggplot2::ggplot_build))
-    expect_plot_render(panels[[1L]], cran = length(model$smooth[[1L]]$term) == 1L)
+    expect_plot_render(panels[[1L]], cran = TRUE)
     estimates <- smooth_estimates(model, n = 8, n_2d = 8, n_3d = 2)
     expect_silent(ggplot2::ggplot_build(draw(estimates)))
     b <- basis(model, n = 8, n_2d = 8, n_3d = 2)

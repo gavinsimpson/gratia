@@ -68,8 +68,8 @@ test_that("smooth difference derivatives retain joint coefficient covariance", {
   for (surface in c(FALSE, TRUE)) {
     f <- difference_derivative_fixture(surface)
     m <- f$model
-    for (order in 1:2) {
-      for (type in c("central", "forward", "backward")) {
+    for (order in test_cases_for_cran(1:2, if (surface) 2L else 1L)) {
+      for (type in test_cases_for_cran(c("central", "forward", "backward"), "central")) {
         D <- difference_derivative_reference(m, f$data, order, type, .001)
         for (freq in c(FALSE, TRUE)) {
           for (unc in c(FALSE, TRUE)) {

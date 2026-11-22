@@ -46,7 +46,9 @@ gfam_reference_oracle <- function(model, n, method) {
 }
 
 test_that("grouped observed residuals use component scales and genuine Pearson residuals", {
-  for (model in list(gfam_model, gfam_bam, gfam_missing_model)) {
+  models <- test_cases_for_cran(list(gfam_model, gfam_bam, gfam_missing_model),
+    list(gfam_missing_model))
+  for (model in models) {
     context <- gfam_diagnostic_context(model)
     compact <- model_used_rows(model)
     for (type in c("deviance", "response", "pearson")) {
@@ -93,6 +95,7 @@ test_that("grouped QQ and worm references match independent weighted calculation
 })
 
 test_that("grouped defaults choose available reference methods including Tweedie", {
+  skip_on_cran()
   expect_identical(diagnostic_method(gfam_model), "simulate")
   expect_identical(diagnostic_method(gfam_extended_model), "simulate")
   expect_identical(diagnostic_method(gfam_extended_model, "uniform"), "uniform")
@@ -128,6 +131,7 @@ test_that("full grouped appraisal uses consistent residual and mean panels", {
 })
 
 test_that("multiple Gaussian scales and fitted extended theta are retained", {
+  skip_on_cran()
   model <- gfam_gaussian_model
   context <- gfam_diagnostic_context(model)
   scales <- exp(model$family$getTheta())
@@ -148,6 +152,7 @@ test_that("multiple Gaussian scales and fitted extended theta are retained", {
 })
 
 test_that("ordinal deviance diagnostics retain native component signs and limitations", {
+  skip_on_cran()
   model <- gfam_ordinal_model
   context <- gfam_diagnostic_context(model)
   rows <- which(context$index == 1L)
@@ -172,6 +177,7 @@ test_that("ordinal deviance diagnostics retain native component signs and limita
 })
 
 test_that("grouped diagnostics preserve RNG and fitted parameter closures", {
+  skip_on_cran()
   for (model in list(gfam_model, gfam_extended_model, gfam_ordinal_model)) {
     theta <- model$family$getTheta()
     families <- serialize(model$family$getfl(), NULL)
@@ -197,6 +203,7 @@ test_that("grouped diagnostics draw representative QQ, worm and appraisal plots"
 
 
 test_that("single fitting rows and invalid sample counts have defined behavior", {
+  skip_on_cran()
   model <- gfam_model
   model$model <- model$model[1L, , drop = FALSE]
   model$offset <- model$offset[1L]
@@ -233,6 +240,7 @@ test_that("ordinal inverse-CDF references and calibrated residuals are available
 })
 
 test_that("an explicit seed restores the absence of a caller RNG state", {
+  skip_on_cran()
   if (exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
     old <- get(".Random.seed", envir = .GlobalEnv)
     on.exit(assign(".Random.seed", old, envir = .GlobalEnv), add = TRUE)
@@ -246,9 +254,9 @@ test_that("an explicit seed restores the absence of a caller RNG state", {
 
 
 test_that("scalar censored-family components have latent reference diagnostics", {
-  for (name in names(gfam_censored_models)) {
+  for (name in test_cases_for_cran(names(gfam_censored_models), "cnorm")) {
     model <- gfam_censored_models[[name]]
-    for (method in c("uniform", "simulate")) {
+    for (method in test_cases_for_cran(c("uniform", "simulate"), "simulate")) {
       p <- qq_plot(model, type = "deviance", method = method, seed = 7, n_uniform = 3, n_simulate = 3)
       expect_identical(p$labels$subtitle, paste("Method:", method))
       expect_true(all(is.finite(unlist(p$data[vapply(p$data, is.numeric, logical(1))]))))
@@ -269,6 +277,7 @@ test_that("scalar censored-family components have latent reference diagnostics",
 })
 
 test_that("normal grouped references use the same observed residuals", {
+  skip_on_cran()
   for (type in c("deviance", "response", "pearson")) {
     p <- qq_plot(gfam_model, method = "normal", type = type, by_family = FALSE)
     expect_equal(p$data$theoretical, qnorm(ppoints(length(gfam_model$y))))
@@ -278,6 +287,7 @@ test_that("normal grouped references use the same observed residuals", {
 
 
 test_that("beta and scaled-t diagnostics use native fitted component residuals", {
+  skip_on_cran()
   for (name in names(gfam_custom_models)) {
     model <- gfam_custom_models[[name]]
     index <- attr(model$family$getfl(), "fi")
@@ -355,16 +365,12 @@ gfam_component_reference_oracle <- function(model, component, n, method, type) {
 }
 
 test_that("family-faceted QQ and worm calibrate each component independently", {
-  models <- list(gfam_model, gfam_bam, gfam_missing_model)
-  cran_cases <- list(c("uniform:deviance", "simulate:pearson"),
-    "uniform:response", "simulate:deviance")
-  for (j in seq_along(models)) {
-    model <- models[[j]]
+  models <- test_cases_for_cran(list(gfam_model, gfam_bam, gfam_missing_model),
+    list(gfam_model))
+  for (model in models) {
     compact <- model_used_rows(model)
-    for (method in c("uniform", "simulate")) {
-      for (type in c("deviance", "response", "pearson")) {
-        if (!full_test_run() &&
-            !(paste(method, type, sep = ":") %in% cran_cases[[j]])) next
+    for (method in test_cases_for_cran(c("uniform", "simulate"), "simulate")) {
+      for (type in test_cases_for_cran(c("deviance", "response", "pearson"), "pearson")) {
         expected <- withr::with_seed(267, lapply(1:3, function(i)
           gfam_component_reference_oracle(compact, i, 4, method, type)))
         qq <- qq_plot(model, method = method, type = type, seed = 267,
@@ -390,6 +396,7 @@ test_that("family-faceted QQ and worm calibrate each component independently", {
 })
 
 test_that("every diagnostic facets by indexed family with free axes", {
+  skip_on_cran()
   models <- list(gfam_model, gfam_missing_model, gfam_gaussian_model)
   for (j in seq_along(models)) {
     model <- models[[j]]
@@ -420,6 +427,7 @@ test_that("every diagnostic facets by indexed family with free axes", {
 })
 
 test_that("normal QQ reference lines and worm bands are component-specific", {
+  skip_on_cran()
   model <- gfam_gaussian_model
   for (type in c("deviance", "response", "pearson")) {
     p <- qq_plot(model, method = "normal", type = type)
@@ -445,7 +453,8 @@ test_that("normal QQ reference lines and worm bands are component-specific", {
 })
 
 test_that("pooled grouped diagnostics remain an explicit option", {
+  expect_false(".family" %in% names(qq_plot(gfam_model, type = "deviance", by_family = FALSE)$data))
+  skip_on_cran()
   vdiffr::expect_doppelganger("grouped-family pooled appraisal",
     appraise(gfam_model, type = "deviance", method = "uniform", seed = 267, by_family = FALSE))
-  expect_false(".family" %in% names(qq_plot(gfam_model, type = "deviance", by_family = FALSE)$data))
 })

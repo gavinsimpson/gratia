@@ -42,6 +42,7 @@ test_that("grid meshes preserve holes and reject conflicting vertices", {
 })
 
 test_that("3D faces retain diverging fills and train the vertex range", {
+  skip_on_cran()
   d <- mesh_data()
   p <- mesh_plot(d, contour = FALSE)
   expect_s3_class(p$coordinates, "Coord3D")
@@ -64,6 +65,7 @@ test_that("3D faces retain diverging fills and train the vertex range", {
 })
 
 test_that("contours follow retained mesh faces at their true heights", {
+  skip_on_cran()
   d <- mesh_data()
   d$effect[d$x == 0 & d$y == 0] <- NA_real_
   mesh <- surface_mesh(d, "x", "y", "effect")
@@ -86,6 +88,7 @@ test_that("contours follow retained mesh faces at their true heights", {
 })
 
 test_that("observation floor projections do not train the effect axis", {
+  skip_on_cran()
   d <- mesh_data()
   p <- mesh_plot(d, rug = data.frame(x = 0, y = 0), contour = FALSE)
   scene <- p$layers[[1]]$data
@@ -97,6 +100,7 @@ test_that("observation floor projections do not train the effect axis", {
 })
 
 test_that("facets keep separate topology, a common palette, and empty slices", {
+  skip_on_cran()
   d <- mesh_data()
   d <- rbind(
     transform(d, slice = "a"), transform(d, slice = "b", effect = effect * 4),
@@ -115,6 +119,7 @@ test_that("facets keep separate topology, a common palette, and empty slices", {
 })
 
 test_that("scattered meshes triangulate masked points before discarding faces", {
+  skip_on_cran()
   skip_if_not_installed("geometry")
   d <- data.frame(
     x = c(-1, 1, 1, -1, 0, 0.2),
@@ -142,6 +147,7 @@ test_that("scattered surfaces cannot bridge separated support regions", {
 })
 
 test_that("soap domains preserve holes and floor boundary loops", {
+  skip_on_cran()
   skip_if_not_installed("sf")
   d <- mesh_data(7)
   outer <- data.frame(x = c(-1, -1, 1, 1, -1), y = c(-1, 1, 1, -1, -1), loop = 1)
@@ -173,6 +179,7 @@ surface_model <- function() {
 }
 
 test_that("all model and estimate entry points forward 3D surfaces", {
+  skip_on_cran()
   d <- surface_model()
   m <- mgcv::gam(y ~ te(x, z, k = c(4, 4)) + s(w, k = 4) + x:z:f, data = d)
   for (p in list(
@@ -197,6 +204,7 @@ test_that("all model and estimate entry points forward 3D surfaces", {
 })
 
 test_that("tensor types and higher dimensional slices render in 3D", {
+  skip_on_cran()
   d <- surface_model()
   for (term in c(
     "te(x,z,k=c(3,3))", "ti(x,z,k=c(3,3))", "t2(x,z,k=c(3,3))",
@@ -242,6 +250,7 @@ test_that("3D height transformations, SEs and isotropic proportions are preserve
 })
 
 test_that("numeric interactions keep shared fixed ranges and transformed heights", {
+  skip_on_cran()
   d <- surface_model()
   m <- mgcv::gam(y ~ x:z + x:w, data = d)
   pe <- parametric_effects(m, n_2d = 5, dist = 0)
@@ -275,6 +284,7 @@ test_that("representative 3D surfaces have visual coverage", {
 
 
 test_that("named view lists are validated without changing themes or other panels", {
+  skip_on_cran()
   d <- mesh_data()
   view <- list(yaw = 45, persp = FALSE)
   a <- mesh_plot(d, surface_3d = view)
@@ -320,6 +330,7 @@ test_that("soap model drawing and spherical fallback preserve their domains", {
 })
 
 test_that("scattered direct estimates and model assembly share support masking", {
+  skip_on_cran()
   skip_if_not_installed("geometry")
   skip_if_not_installed("sf")
   d <- surface_model()
@@ -336,6 +347,7 @@ test_that("scattered direct estimates and model assembly share support masking",
 })
 
 test_that("fixed model ranges span smooth and parametric surfaces after transformation", {
+  skip_on_cran()
   d <- surface_model()
   m <- mgcv::gam(y ~ te(x, z, k = c(3, 3)) + x:w, data = d)
   p <- assemble(m,
@@ -370,6 +382,7 @@ test_that("grid faces cannot cross known gaps between valid corners", {
 
 
 test_that("default back faces stay lit and explicit lights take precedence", {
+  skip_on_cran()
   d <- mesh_data()
   a <- mesh_plot(d)
   b <- mesh_plot(d, surface_3d = list(yaw = 45))
@@ -402,6 +415,7 @@ test_that("coplanar contours are painted with their owning faces", {
 })
 
 test_that("opaque surfaces hide floor observations in the rendered scene", {
+  skip_on_cran()
   d <- mesh_data(8)
   d$effect <- 0.5
   p <- mesh_plot(d, rug = d, contour = FALSE,
@@ -427,6 +441,7 @@ test_that("opaque surfaces hide floor observations in the rendered scene", {
 })
 
 test_that("original-scale 3D smooths retain support masking and nested metadata", {
+  skip_on_cran()
   skip_if_not_installed("sf")
   d <- surface_model()
   d$x <- exp(d$x)

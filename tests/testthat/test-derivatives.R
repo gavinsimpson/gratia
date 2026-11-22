@@ -158,6 +158,7 @@ test_that("derivatives() returns derivatives for all smooths in a GAMM", {
 })
 
 test_that("derivatives() returns second derivatives for all smooths in a GAMM", {
+  skip_on_cran()
   expect_silent(df <- derivatives(su_gamm_univar_4, order = 2))
   expect_s3_class(df, "derivatives")
   expect_s3_class(df, "tbl_df")
@@ -261,6 +262,7 @@ test_that("derivatives() returns derivatives for all smooths in a factor by GAM"
 })
 
 test_that("derivatives() returns derivatives for all smooths in a factor by GAM", {
+  skip_on_cran()
   expect_silent(df <- derivatives(su_m_factor_by_x2, order = 2))
   expect_s3_class(df, "derivatives")
   expect_s3_class(df, "tbl_df")
@@ -529,6 +531,7 @@ test_that("derivatives preserves noncontiguous selections when excluding random 
 })
 
 test_that("derivatives works with models that include random effects", {
+  skip_on_cran()
   expect_silent(d <- derivatives(rm1))
   expect_s3_class(d, "derivatives")
   expect_s3_class(d, "tbl_df")

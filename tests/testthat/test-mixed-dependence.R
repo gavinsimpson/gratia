@@ -44,6 +44,7 @@ test_that("native mer models distinguish conditional and shared marginal effects
 })
 
 test_that("non-Gaussian marginal mer calibration uses native joint draws", {
+  skip_on_cran()
   skip_if_not_installed("lme4")
   set.seed(73)
   d <- data.frame(g = factor(rep(1:10, each = 12)), x = runif(120))
@@ -97,6 +98,7 @@ test_that("correlated PQL keeps marginal families without inventing a copula", {
 })
 
 test_that("observation-specific GLMM effects leave marginal responses independent", {
+  skip_on_cran()
   skip_if_not_installed("lme4")
   set.seed(214)
   d <- data.frame(id = factor(seq_len(100)),
@@ -159,6 +161,7 @@ test_that("native mixed posterior draws and PPCs reuse joint kernels and rows", 
 })
 
 test_that("simulation-integrated laws do not claim native canonical deviances", {
+  skip_on_cran()
   skip_if_not_installed("lme4")
   set.seed(47)
   d <- data.frame(g = factor(rep(1:10, each = 10)), x = runif(100))
@@ -196,6 +199,7 @@ test_that("proxy conditioning overrides reprepare the original native model", {
 })
 
 test_that("uncorrelated PQL PPC draws use the approximate family response law", {
+  skip_on_cran()
   skip_if_not_installed("nlme")
   set.seed(192)
   d <- data.frame(g = factor(rep(1:10, each = 10)), time = rep(1:10, 10),

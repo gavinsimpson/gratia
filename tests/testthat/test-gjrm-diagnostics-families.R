@@ -52,7 +52,7 @@ gjrm_additional_fixture <- local({
 
 test_that("GJRM additional families use final likelihood parameters and response moments", {
   skip_if_not_installed("GJRM")
-  for (fam in c("BE", "LO", "WEI", "IG", "GU", "rGU")) {
+  for (fam in test_cases_for_cran(c("BE", "LO", "WEI", "IG", "GU", "rGU"), "BE")) {
     m <- gjrm_additional_fixture(fam)
     eta <- as.vector(m$eta1)
     sigma <- as.vector(m$sigma2)
@@ -125,6 +125,7 @@ test_that("GJRM additional families use final likelihood parameters and response
 })
 
 test_that("GJRM additional families support ordinary and scalable residual plots", {
+  skip_on_cran()
   skip_if_not_installed("GJRM")
   withr::local_seed(23)
   for (fam in c("BE", "LO", "WEI", "IG", "GU", "rGU")) {
@@ -168,6 +169,7 @@ test_that("GJRM additional families support ordinary and scalable residual plots
 })
 
 test_that("GJRM additional posterior checks work with varying and implicit constant scales", {
+  skip_on_cran()
   skip_if_not_installed("GJRM")
   for (fam in c("BE", "LO", "WEI", "IG", "GU", "rGU")) {
     for (constant in c(FALSE, TRUE)) {
@@ -191,6 +193,7 @@ test_that("GJRM additional posterior checks work with varying and implicit const
 })
 
 test_that("GJRM posterior checks retain coefficient covariance and both predictor offsets", {
+  skip_on_cran()
   skip_if_not_installed("GJRM")
   original <- gjrm_response_distribution
   seen <- NULL

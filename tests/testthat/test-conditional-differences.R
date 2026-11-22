@@ -59,6 +59,7 @@ test_that("simulation pairs shared draws before summarising on either scale", {
 })
 
 test_that("simulation is reproducible and preserves the caller RNG", {
+  skip_on_cran()
   f <- conditional_difference_fixture()
   m <- f$model
   withr::local_seed(21)
@@ -108,6 +109,7 @@ test_that("joint factors, level subsets and conditioning strata are distinct", {
 })
 
 test_that("incomplete factor grids compare only shared strata", {
+  skip_on_cran()
   f <- conditional_difference_fixture()
   d <- subset(f$data, !(a == "C" & b == "high"))
   m <- gam(y ~ a + b + s(x, k = 5), data = d, method = "REML")
@@ -189,6 +191,7 @@ test_that("invalid inputs fail explicitly", {
 })
 
 test_that("random smooths and random intercepts can be explicitly excluded", {
+  skip_on_cran()
   withr::local_seed(54)
   d <- data.frame(x = runif(150), a = factor(rep(c("A", "B"), 75)),
     subject = factor(rep(1:5, each = 30)), word = factor(rep(1:3, 50)))

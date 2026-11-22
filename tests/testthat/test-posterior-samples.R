@@ -41,6 +41,7 @@ test_that("independent redraws per smooth are rejected", {
 })
 
 test_that("smooth_samples works for a simple GAM MH sampling", {
+  skip_on_cran()
   expect_silent(sm <- smooth_samples(m_1_smooth,
     n_draws = 5, n_grid = 100,
     method = "mh", seed = 42
@@ -162,6 +163,7 @@ test_that("fitted_samples works for a simple GAM", {
 })
 
 test_that("fitted_samples works for a multi-smooth GAM", {
+  skip_on_cran()
   expect_silent(sm <- fitted_samples(m_gam, n_draws = 5, seed = 42))
   expect_s3_class(sm, c(
     "fitted_samples", "tbl_df",
@@ -186,6 +188,7 @@ test_that("fitted_samples works for a multi-smooth factor by GAM", {
 })
 
 test_that("fitted_samples sets seed when seed not provided", {
+  skip_on_cran()
   expect_silent(fitted_samples(m_gam, seed = NULL, n_draws = 1L))
 })
 
@@ -211,6 +214,7 @@ test_that("predicted_samples works for a simple GAM", {
 })
 
 test_that("predicted_samples works for a multi-smooth GAM", {
+  skip_on_cran()
   expect_silent(sm <- predicted_samples(m_gam, n_draws = 5, seed = 42))
   expect_s3_class(sm, c(
     "predicted_samples", "tbl_df",
@@ -235,6 +239,7 @@ test_that("predicted_samples works for a multi-smooth factor by GAM", {
 })
 
 test_that("predicted_samples sets seed when seed not provided", {
+  skip_on_cran()
   expect_silent(predicted_samples(m_gam, seed = NULL, n_draws = 1L))
 })
 

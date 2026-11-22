@@ -122,6 +122,7 @@ test_that("response draws retain group dependence and existing uncertainty choic
 })
 
 test_that("partial selection, offsets, NA restoration and BAM remain supported", {
+  skip_on_cran()
   m <- random_effect_fixture()
   d <- attr(m, "fixture_data")
   d$off <- seq(.1, .4, length.out = nrow(d))
@@ -151,6 +152,7 @@ test_that("partial selection, offsets, NA restoration and BAM remain supported",
 })
 
 test_that("fixed and shared smoothing parameters retain their penalty mapping", {
+  skip_on_cran()
   m <- random_effect_fixture(stats::gaussian())
   d <- attr(m, "fixture_data")
   m <- mgcv::gam(y ~ s(x, k = 5) + s(g, bs = "re"), data = d,
@@ -167,6 +169,7 @@ test_that("fixed and shared smoothing parameters retain their penalty mapping", 
 })
 
 test_that("new interfaces preserve RNG state and unchanged defaults", {
+  skip_on_cran()
   m <- random_effect_fixture()
   nd <- attr(m, "fixture_data")[1:3, ]
   calls <- list(function() random_effect_samples(m, data = nd, n_draws = 2, seed = 2),
@@ -214,6 +217,7 @@ test_that("unsupported requests are rejected explicitly", {
 })
 
 test_that("all-missing predictions, response weights and covariance metadata are retained", {
+  skip_on_cran()
   m <- random_effect_fixture()
   nd <- data.frame(x = c(NA_real_, NA_real_), g = c("new", "new"))
   set.seed(5)
@@ -245,6 +249,7 @@ test_that("all-missing predictions, response weights and covariance metadata are
 })
 
 test_that("fitting offsets retain each prediction interface's existing convention", {
+  skip_on_cran()
   m <- random_effect_fixture()
   d <- attr(m, "fixture_data")
   d$off <- rep(.4, nrow(d))
@@ -279,6 +284,7 @@ test_that("conditional values and chain identifiers use integrated predictions",
 })
 
 test_that("transformed predictors and grouping expressions are evaluated consistently", {
+  skip_on_cran()
   m <- random_effect_fixture()
   d <- attr(m, "fixture_data")
   d$id <- as.integer(d$g)
@@ -336,6 +342,7 @@ random_effect_full_covariance <- function(model, data) {
 }
 
 test_that("large random-effect variances do not give false quadrature convergence", {
+  skip_on_cran()
   integrator <- marginal_integrator("quadrature", 40L, 5000L)
   eta <- c(0, 1)
   v <- rep(10000, 2)
@@ -387,6 +394,7 @@ test_that("large random-effect variances do not give false quadrature convergenc
 })
 
 test_that("minimum smoothing parameters cannot silently change new-effect covariance", {
+  skip_on_cran()
   d <- attr(random_effect_fixture(), "fixture_data")
   # Keep bounds outside the call as well: evaluating the call later would use
   # changed bounds, so it cannot reconstruct the fitted distribution safely.
@@ -411,6 +419,7 @@ test_that("minimum smoothing parameters cannot silently change new-effect covari
 })
 
 test_that("factor-by fs curves keep their by levels when another group is replaced", {
+  skip_on_cran()
   d <- attr(random_effect_fixture(), "fixture_data")
   d$f <- factor(rep(c("A", "B"), length.out = nrow(d)))
   m <- mgcv::gam(y ~ x + s(f, bs = "re") + s(x, g, bs = "fs", k = 4, by = f),

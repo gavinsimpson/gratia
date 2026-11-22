@@ -19,6 +19,8 @@ test_that("transformed smooth matrices match native predictions across fitters",
     bam = function(f) mgcv::bam(f, data = d),
     discrete = function(f) mgcv::bam(f, data = d, discrete = TRUE)
   )
+  formulas <- test_cases_for_cran(formulas, formulas[c(1L, 3L, 6L)])
+  fitters <- test_cases_for_cran(fitters, fitters[c("gam", "discrete")])
   for (fitter in names(fitters)) for (f in formulas) {
     if (fitter == "discrete" && grepl("t2(", deparse(f), fixed = TRUE)) next
     m <- fitters[[fitter]](f)

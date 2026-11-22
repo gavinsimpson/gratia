@@ -51,7 +51,9 @@ test_that("KDE handles constant, tied, singleton and non-finite observations", {
 })
 
 test_that("KDE controls reach scalable appraisals without changing count heatmaps", {
-  for (model in list(m_tiny_eg1, b_pois, gfam_model, gfam_missing_model)) {
+  models <- test_cases_for_cran(
+    list(m_tiny_eg1, b_pois, gfam_model, gfam_missing_model), list(m_tiny_eg1))
+  for (model in models) {
     set.seed(91)
     before <- .Random.seed
     d <- diagnostic_data(model, seed = 31)

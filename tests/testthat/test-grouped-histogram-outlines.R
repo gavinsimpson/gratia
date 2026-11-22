@@ -1,5 +1,7 @@
 test_that("pooled histograms draw matching opaque outlines above faint fills", {
-  for (model in list(gfam_model, gfam_missing_model, gfam_gaussian_model)) {
+  skip_on_cran()
+  models <- list(gfam_model, gfam_missing_model, gfam_gaussian_model)
+  for (model in models) {
     ordinary <- residuals_hist_plot(model, seed = 42, n_bins = 8)
     scalable <- scalable_residuals_hist_plot(model, seed = 42, n_bins = 8)
     for (p in list(ordinary, scalable)) {
@@ -53,6 +55,7 @@ test_that("histogram outlines retain empty bins, widths and indexed components",
 })
 
 test_that("faceted and single-family histograms retain their existing style", {
+  skip_on_cran()
   for (fun in list(residuals_hist_plot, scalable_residuals_hist_plot)) {
     faceted <- fun(gfam_model, by_family = TRUE, seed = 42)
     expect_length(faceted$layers, 1L)

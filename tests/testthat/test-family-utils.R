@@ -114,7 +114,8 @@ single_link_families <- list(
   cpois = function() cpois()
 )
 
-for (family_id in names(single_link_families)) {
+for (family_id in test_cases_for_cran(names(single_link_families),
+  c("gaussian", "binomial", "nb", "cnorm"))) {
   test_that(paste("link extraction works for", family_id), {
     fam <- single_link_families[[family_id]]()
     for (parameter in list(NULL, "location", "mu")) {
@@ -140,6 +141,7 @@ for (family_id in names(single_link_families)) {
 
 for (family_id in c("clognorm", "elf")) {
   test_that(paste("link extraction works for optional family", family_id), {
+    skip_on_cran()
     if (family_id == "clognorm") {
       skip_if_not_installed("mgcvUtils")
       # Loading mgcvUtils replaces simulate.gam globally. Restore the method
@@ -195,7 +197,8 @@ multi_link_families <- list(
       skewness = 3L, epsilon = 3L, kurtosis = 4L, delta = 4L))
 )
 
-for (family_id in names(multi_link_families)) {
+for (family_id in test_cases_for_cran(names(multi_link_families),
+  c("gaulss", "twlss"))) {
   test_that(paste("link extraction resolves all parameters for", family_id), {
     spec <- multi_link_families[[family_id]]
     fam <- spec$make()

@@ -9,9 +9,12 @@ on the test tier.
 The full suite checks broader combinations of model classes, families,
 constructors, coordinate transformations, labels, themes and interval methods.
 Large simulation convergence comparisons, native likelihood-profile matrices
-and research sampler variants also belong there. File-level `skip_on_cran()`
-guards run before the fixtures or plotting work in these combination files.
-The weekly GitHub Actions jobs and local full runs retain these checks.
+and research sampler variants also belong there. The CRAN check driver,
+`make test` and the profiler select representative test files through
+`cran_test_filter()` in `testthat/helper-cran.R`. Selected files can use
+`skip_on_cran()` or smaller case lists for expensive repetitions. When adding
+a feature, include a small test for its public behaviour in the CRAN selection.
+The weekly GitHub Actions jobs and local full runs still run all test files.
 
 `test-function-core.R` keeps compact moment, plotting, theme, label and utility
 checks alongside the existing focused numerical tests. `test-parallel-core.R`
@@ -20,11 +23,10 @@ smooth differences and ALE with their serial results, including random-number
 state and worker error handling. Additional worker/model combinations run only
 in the full suite.
 
-Run the core suite explicitly:
+Run the CRAN selection explicitly:
 
-```r
-Sys.setenv(NOT_CRAN = "false", VDIFFR_RUN_TESTS = "false")
-testthat::test_local()
+```sh
+make test
 ```
 
 Run the broader numerical/integration suite without image comparisons:
@@ -93,14 +95,15 @@ snapshots remain in place.
   snapshots, or in separate tests. `expect_doppelganger()` honours the explicit
   `VDIFFR_RUN_TESTS` switch both locally and on CI.
 - Prefer small data/grids/draw counts to exclusions when they preserve the
-  contract. The family-quantile tests still cover all eight families on CRAN;
-  only the costly Tweedie integration fixtures use fewer observations.
+  contract. The family-quantile plots use three representative families on
+  CRAN. The full suite checks all eight, with fewer observations in the
+  Tweedie fits to limit the cost of numerical integration.
 - Measure shared setup and top-level code as well as test-body durations. A
   reported skip may happen after substantial computation.
 
 For an installed-package check, export `NOT_CRAN=false` (core) or `NOT_CRAN=true`
-(broader suite) before `R CMD check`. The existing Makefile targets
-`check-test-cran` and `check` respectively set these variables.
+(broader suite) before `R CMD check`. Both `make check` and
+`make check-test-cran` select the CRAN tests.
 
 To select the CRAN tests through devtools without adding `--as-cran`, explicitly
 disable devtools' `cran` option:

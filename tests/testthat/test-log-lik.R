@@ -75,8 +75,10 @@ test_that("extended likelihoods retain fitted nuisance parameters", {
 })
 
 test_that("general-family likelihoods agree with native full-data likelihoods", {
-  for (m in list(m_gaulss, m_gammals, m_gumbls, m_gevlss,
-      m_twlss, m_ziplss)) {
+  models <- test_cases_for_cran(
+    list(m_gaulss, m_gammals, m_gumbls, m_gevlss, m_twlss, m_ziplss),
+    list(m_gaulss, m_ziplss))
+  for (m in models) {
     B <- rbind(coef(m), coef(m) + .0001)
     ll <- log_lik(m, method = "user", draws = B)
     X <- predict(m, type = "lpmatrix")
@@ -89,6 +91,7 @@ test_that("general-family likelihoods agree with native full-data likelihoods", 
 })
 
 test_that("distributional likelihoods agree with normalized densities", {
+  skip_on_cran()
   d <- log_lik_test_data()
   shash <- mgcv::gam(list(y ~ x, ~ 1, ~ 1, ~ 1), family = mgcv::shash(), data = d)
   for (name in c("gammals", "gumbls", "gevlss", "shash", "twlss", "ziplss")) {
@@ -407,6 +410,7 @@ test_that("zero fitting weights and zero binomial trials contribute zero", {
 })
 
 test_that("one-observation callbacks agree with matrix extraction for every family", {
+  skip_on_cran()
   d <- log_lik_test_data()
   shash <- mgcv::gam(list(y ~ x, ~ 1, ~ 1, ~ 1), data = d,
     family = mgcv::shash())
