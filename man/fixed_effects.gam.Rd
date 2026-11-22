@@ -38,7 +38,7 @@ fixed_effects(object, ...)
 Extract fixed effects estimates from a fitted model
 }
 \details{
-Starting with gratia 0.12.0, use \code{fixed_effects()} for the models listed
+Starting with gratia 0.12.1, use \code{fixed_effects()} for the models listed
 above if you previously called \code{gratia::fixef()} or a \code{fixef()} method
 supplied by gratia. For models fitted directly with nlme or lme4, use
 \code{\link[nlme:fixef]{nlme::fixef()}} or \code{\link[lme4:fixef]{lme4::fixef()}}, respectively.

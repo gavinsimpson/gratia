@@ -1,4 +1,11 @@
-# gratia (development version)
+# gratia 0.12.1
+
+## CRAN submission
+
+* Version 0.12.0 went unreleased because the test suite took over 16 minutes
+  during CRAN's Windows incoming check. Version 0.12.1 includes the changes
+  planned for 0.12.0 and runs a shorter set of representative tests on CRAN.
+  The full suite remains available locally and in GitHub Actions.
 
 ## User visible changes
 

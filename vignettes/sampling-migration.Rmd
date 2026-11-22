@@ -1,13 +1,13 @@
 ---
-title: "Updating sampling code for gratia 0.12.0"
+title: "Updating sampling code for gratia 0.12.1"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Updating sampling code for gratia 0.12.0}
+  %\VignetteIndexEntry{Updating sampling code for gratia 0.12.1}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
-{gratia} 0.12.0 gives sampling arguments the same meaning across
+{gratia} 0.12.1 gives sampling arguments the same meaning across
 `posterior_samples()`, `fitted_samples()`, `smooth_samples()`,
 `derivative_samples()`, their `add_*()` helpers, and coefficient draw functions.
 Name the sampling arguments in your calls. You can still pass the model by

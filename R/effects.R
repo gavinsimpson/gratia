@@ -12,7 +12,7 @@
 #' @param ... arguments passed to other methods
 #'
 #' @details
-#' Starting with gratia 0.12.0, use `fixed_effects()` for the models listed
+#' Starting with gratia 0.12.1, use `fixed_effects()` for the models listed
 #' above if you previously called `gratia::fixef()` or a `fixef()` method
 #' supplied by gratia. For models fitted directly with nlme or lme4, use
 #' [nlme::fixef()] or [lme4::fixef()], respectively.

@@ -1,24 +1,33 @@
+## Resubmission
+
+Version 0.12.0 went unreleased because the test suite took 16 minutes 20
+seconds during CRAN's Windows incoming check. Version 0.12.1 runs
+representative tests of the main package functions on CRAN and keeps the
+detailed tests in the full suite for local and GitHub Actions runs.
+[0.12.0 Windows incoming log](https://win-builder.r-project.org/incoming_pretest/gratia_0.12.0_20261122_163602/Windows/00check.log)
+
 ## R CMD check results
 
-The checks below cover the source for gratia `0.12.0`.
+Version 0.12.1 passed `R CMD check --as-cran` on macOS Tahoe 26.7.3 (arm64)
+with R 4.6.2. The check reported 0 errors, 0 warnings and 0 notes. Tests
+took 61 seconds. `NOT_CRAN=false` selected the CRAN tests,
+`VDIFFR_RUN_TESTS=false` disabled visual comparisons, and
+`GRATIA_RUN_HGAM=false` kept the paper examples out of the run.
 
-All checks finished with 0 errors and 0 warnings.
-
-- Local macOS Tahoe 26.7.3 (arm64), R 4.6.2, using `R CMD check --as-cran`.
-  0 NOTEs. Visual snapshots ran.
-- Win-builder on Windows Server 2022 (x86_64), R-devel (2026-11-17 r90926).
-  0 NOTEs. [Win-builder R-devel log](https://win-builder.r-project.org/dMs6fW9SAqi4/00check.log)
-- Win-builder on Windows Server 2022 (x86_64), R-release (R 4.6.2).
-  0 NOTEs. [Win-builder R-release log](https://win-builder.r-project.org/1J1NcXZUjvSk/00check.log)
-- The package has also been checked on Linux, Windows, and MacOS X through GitHub Actions. 0 NOTES.
+The previous 0.12.0 candidate passed Win-builder on Windows Server 2022
+with 0 errors, 0 warnings and 0 notes on both R-release and R-devel.
+[Win-builder R-release log](https://win-builder.r-project.org/1J1NcXZUjvSk/00check.log)
+[Win-builder R-devel log](https://win-builder.r-project.org/dMs6fW9SAqi4/00check.log)
 
 ## Reverse dependency check results
 
 The GitHub Actions workflow used the `most` setting to check six CRAN reverse
-dependencies against gratia `0.11.2` from CRAN and the `0.12.0` release
+dependencies against gratia `0.11.2` from CRAN and the previous `0.12.0`
 candidate. Five checked cleanly with both versions. galamm had the same
-compiled-code NOTE with both versions because the runner strips shared-library
-symbols. No regressions were found. [GitHub Actions comparison](https://github.com/gavinsimpson/gratia/actions/runs/44926990710/job/136923763025)
+compiled-code NOTE on both because the runner strips shared-library symbols.
+No regressions were found. Changes since that candidate cover package tests,
+documentation and release metadata.
+[GitHub Actions comparison](https://github.com/gavinsimpson/gratia/actions/runs/44926990710/job/136923763025)
 
 With `_R_CHECK_FORCE_SUGGESTS_=FALSE`, checks continued without the suggested
 packages cmdstanr and INLA (gdpar), and gurobi (smimodel). Functionality that

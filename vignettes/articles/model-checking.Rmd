@@ -33,7 +33,7 @@ The articles on [`mgcv::gfam()`](gfam-support.html),
 [{glmmTMB}](glmmTMB-support.html) and [{sdmTMB}](sdmTMB-support.html) illustrate
 diagnostics for those model classes.
 
-These examples require gratia 0.12.0 or later, R >= 4.4.0 and {mgcv} >= 1.9-4.
+These examples require gratia 0.12.1 or later, R >= 4.4.0 and {mgcv} >= 1.9-4.
 We load mgcv and gratia for fitting and diagnostics, and {dplyr} and {ggplot2} for
 working with the results. The growth
 example also needs the optional {nlme}, {lme4} and {gamm4} packages (gamm4 >= 0.2-7).
