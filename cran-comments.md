@@ -19,6 +19,14 @@ with 0 errors, 0 warnings and 0 notes on both R-release and R-devel.
 [Win-builder R-release log](https://win-builder.r-project.org/1J1NcXZUjvSk/00check.log)
 [Win-builder R-devel log](https://win-builder.r-project.org/dMs6fW9SAqi4/00check.log)
 
+## CRAN check NOTE for 0.11.2
+
+The Debian Linux R-devel checks with GCC and Clang report an Rd contents NOTE
+for gratia 0.11.2 because `fixef.Rd` documents arguments without a `\usage`
+section. Version 0.12.1 removes the `fixef()` re-export and its help page,
+resolving the NOTE.
+[CRAN check results for gratia](https://cran.r-project.org/web/checks/check_results_gratia.html)
+
 ## Reverse dependency check results
 
 The GitHub Actions workflow used the `most` setting to check six CRAN reverse
