@@ -216,7 +216,7 @@ test_that("scalable plot objects contain bounded data and build without original
     logical(1)
   )))
   expect_silent(ggplot_build(scalable_qq_plot(m_tiny_eg1, method = "normal")))
-  vdiffr::expect_doppelganger(
+  expect_doppelganger(
     "scalable-appraise",
     appraise(
       m_tiny_eg1,

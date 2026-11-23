@@ -288,8 +288,8 @@ test_that("glmmTMB plots render consistently", {
   skip_on_cran()
   skip_on_cran()
   m <- glmmtmb_gaussian_fixture()$model
-  vdiffr::expect_doppelganger("glmmTMB smooth", draw(m, select = "s(x)"))
-  vdiffr::expect_doppelganger("glmmTMB appraise", appraise(m, n_simulate = 20, seed = 928))
+  expect_doppelganger("glmmTMB smooth", draw(m, select = "s(x)"))
+  expect_doppelganger("glmmTMB appraise", appraise(m, n_simulate = 20, seed = 928))
 })
 
 test_that("fitted Gamma dispersion is converted from sigma to shape", {

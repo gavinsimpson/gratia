@@ -207,10 +207,10 @@ test_that("grouped MRF panels keep area effects and QQ groups separate", {
 
 test_that("basic MRF plots have visual regression coverage", {
   skip_on_cran()
-  vdiffr::expect_doppelganger("MRF area effects",
+  expect_doppelganger("MRF area effects",
     draw(mrf_models$low, rug = FALSE))
-  vdiffr::expect_doppelganger("MRF descriptive QQ",
+  expect_doppelganger("MRF descriptive QQ",
     draw(mrf_models$low, rug = FALSE, mrf_plot = "qq"))
-  vdiffr::expect_doppelganger("MRF grouped area effects",
+  expect_doppelganger("MRF grouped area effects",
     draw(mrf_models$by, parametric = FALSE, grouped = c("factor-by", "sz", "fs"), rug = FALSE))
 })

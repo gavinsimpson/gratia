@@ -276,10 +276,10 @@ test_that("quantile defaults preserve absent RNG states as well as ordinary-mode
 test_that("default quantile and explicit traditional displays have visual coverage", {
   skip_on_cran()
   skip_on_cran()
-  vdiffr::expect_doppelganger("grouped-family calibrated QQ", qq_plot(gfam_model, seed = 267))
-  vdiffr::expect_doppelganger("grouped-family calibrated worm", worm_plot(gfam_model, seed = 267))
-  vdiffr::expect_doppelganger("grouped-family calibrated appraisal", appraise(gfam_model, seed = 267))
-  vdiffr::expect_doppelganger("grouped-family rank pooled appraisal", appraise(gfam_rank_model, seed = 267))
+  expect_doppelganger("grouped-family calibrated QQ", qq_plot(gfam_model, seed = 267))
+  expect_doppelganger("grouped-family calibrated worm", worm_plot(gfam_model, seed = 267))
+  expect_doppelganger("grouped-family calibrated appraisal", appraise(gfam_model, seed = 267))
+  expect_doppelganger("grouped-family rank pooled appraisal", appraise(gfam_rank_model, seed = 267))
 })
 
 

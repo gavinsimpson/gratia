@@ -256,6 +256,6 @@ test_that("new glmmTMB effect plots have stable rendering", {
   skip_on_cran()
   d <- tmb_effect_data()
   m <- glmmTMB::glmmTMB(y ~ x + s(w, k = 5) + (1 + x | g), data = d, REML = TRUE)
-  vdiffr::expect_doppelganger("glmmTMB parametric and random QQ", draw(m))
-  vdiffr::expect_doppelganger("glmmTMB random lines", draw(m, ranef_lines = TRUE))
+  expect_doppelganger("glmmTMB parametric and random QQ", draw(m))
+  expect_doppelganger("glmmTMB random lines", draw(m, ranef_lines = TRUE))
 })

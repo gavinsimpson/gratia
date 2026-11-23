@@ -195,10 +195,10 @@ test_that("grouped diagnostics preserve RNG and fitted parameter closures", {
 
 test_that("grouped diagnostics draw representative QQ, worm and appraisal plots", {
   skip_on_cran()
-  vdiffr::expect_doppelganger("grouped-family QQ uniform", qq_plot(gfam_model, type = "deviance", method = "uniform", seed = 267))
-  vdiffr::expect_doppelganger("grouped-family worm simulation",
+  expect_doppelganger("grouped-family QQ uniform", qq_plot(gfam_model, type = "deviance", method = "uniform", seed = 267))
+  expect_doppelganger("grouped-family worm simulation",
     worm_plot(gfam_model, type = "deviance", method = "simulate", seed = 267))
-  vdiffr::expect_doppelganger("grouped-family appraisal", appraise(gfam_model, type = "deviance", method = "uniform", seed = 267))
+  expect_doppelganger("grouped-family appraisal", appraise(gfam_model, type = "deviance", method = "uniform", seed = 267))
 })
 
 
@@ -456,6 +456,6 @@ test_that("normal QQ reference lines and worm bands are component-specific", {
 test_that("pooled grouped diagnostics remain an explicit option", {
   expect_false(".family" %in% names(qq_plot(gfam_model, type = "deviance", by_family = FALSE)$data))
   skip_on_cran()
-  vdiffr::expect_doppelganger("grouped-family pooled appraisal",
+  expect_doppelganger("grouped-family pooled appraisal",
     appraise(gfam_model, type = "deviance", method = "uniform", seed = 267, by_family = FALSE))
 })
