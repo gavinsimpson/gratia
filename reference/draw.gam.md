@@ -61,8 +61,8 @@ draw(
   surface = c("raster", "tile", "3d"),
   surface_3d = list(),
   ci_3d = FALSE,
-  ci_3d_alpha = 0.15,
-  ci_3d_col = "grey60",
+  ci_3d_alpha = 0.42,
+  ci_3d_col = "#344054",
   back_transform = FALSE,
   re_levels = NULL,
   mrf_plot = c("effects", "qq"),
@@ -437,7 +437,7 @@ draw(
   Deprecated; use
   [`gratia_theme_get()`](https://gavinsimpson.github.io/gratia/reference/gratia_theme_get.md)
   theme settings instead. Numeric between 0 and 1; opacity of both
-  interval surfaces, independent of `ci_alpha`. Defaults to `0.15`.
+  interval surfaces, independent of `ci_alpha`. Defaults to `0.42`.
 
 - ci_3d_col:
 
@@ -445,7 +445,7 @@ draw(
   [`gratia_theme_get()`](https://gavinsimpson.github.io/gratia/reference/gratia_theme_get.md)
   theme settings instead. One R colour; fill of both interval surfaces,
   independent of `ci_col` and the estimate's continuous fill scale.
-  Defaults to `"grey60"`.
+  Defaults to `"#344054"`.
 
 - back_transform:
 

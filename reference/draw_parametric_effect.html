@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.12.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.12.1-1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -55,7 +55,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Internal function to draw an individual parametric effect</h1>
-      <small class="dont-index">Source: <a href="https://github.com/gavinsimpson/gratia/blob/v0.12.1/R/parametric-effects.R" class="external-link"><code>R/parametric-effects.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/gavinsimpson/gratia/blob/main/R/parametric-effects.R" class="external-link"><code>R/parametric-effects.R</code></a></small>
       <div class="d-none name"><code>draw_parametric_effect.Rd</code></div>
     </div>
 
@@ -90,8 +90,8 @@
 <span>  surface <span class="op">=</span> <span class="st">"raster"</span>,</span>
 <span>  surface_3d <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  ci_3d <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  ci_3d_alpha <span class="op">=</span> <span class="fl">0.15</span>,</span>
-<span>  ci_3d_col <span class="op">=</span> <span class="st">"grey60"</span>,</span>
+<span>  ci_3d_alpha <span class="op">=</span> <span class="fl">0.42</span>,</span>
+<span>  ci_3d_col <span class="op">=</span> <span class="st">"#344054"</span>,</span>
 <span>  continuous_fill <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  discrete_colour <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  discrete_fill <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -242,13 +242,13 @@ Smooth bounds follow <code>interval</code>; parametric bounds remain pointwise.<
 <dt id="arg-ci-d-alpha">ci_3d_alpha<a class="anchor" aria-label="anchor" href="#arg-ci-d-alpha"></a></dt>
 <dd><p>Deprecated; use <code><a href="gratia_theme_get.html">gratia_theme_get()</a></code> theme
 settings instead. Numeric between 0 and 1; opacity of both interval
-surfaces, independent of <code>ci_alpha</code>. Defaults to <code>0.15</code>.</p></dd>
+surfaces, independent of <code>ci_alpha</code>. Defaults to <code>0.42</code>.</p></dd>
 
 
 <dt id="arg-ci-d-col">ci_3d_col<a class="anchor" aria-label="anchor" href="#arg-ci-d-col"></a></dt>
 <dd><p>Deprecated; use <code><a href="gratia_theme_get.html">gratia_theme_get()</a></code> theme
 settings instead. One R colour; fill of both interval surfaces, independent
-of <code>ci_col</code> and the estimate's continuous fill scale. Defaults to <code>"grey60"</code>.</p></dd>
+of <code>ci_col</code> and the estimate's continuous fill scale. Defaults to <code>"#344054"</code>.</p></dd>
 
 
 <dt id="arg-continuous-fill">continuous_fill<a class="anchor" aria-label="anchor" href="#arg-continuous-fill"></a></dt>
