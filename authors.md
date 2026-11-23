@@ -12,7 +12,7 @@
 ## Citation
 
 Source:
-[`inst/CITATION`](https://github.com/gavinsimpson/gratia/blob/main/inst/CITATION)
+[`inst/CITATION`](https://github.com/gavinsimpson/gratia/blob/v0.12.1/inst/CITATION)
 
 Simpson G (2024). “gratia: An R package for exploring generalized
 additive models.” *Journal of Open Source Software*, **9**(104), 6962.
