@@ -12,7 +12,7 @@ Version 0.12.1 passed `R CMD check --as-cran` on macOS Tahoe 26.7.3 (arm64)
 with R 4.6.2. The check reported 0 errors, 0 warnings and 0 notes. Tests
 took 61 seconds. `NOT_CRAN=false` selected the CRAN tests,
 `VDIFFR_RUN_TESTS=false` disabled visual comparisons, and
-`GRATIA_RUN_HGAM=false` kept the paper examples out of the run.
+`GRATIA_RUN_HGAM=false` kept the paper examples out of the run (both of which do not run on CRAN anyway).
 
 The previous 0.12.0 candidate passed Win-builder on Windows Server 2022
 with 0 errors, 0 warnings and 0 notes on both R-release and R-devel.
