@@ -11,7 +11,7 @@
 - [Posterior simulation of GAM smooths, fitted values and
   responses](https://gavinsimpson.github.io/gratia/articles/posterior-simulation.md):
 - [Updating sampling code for gratia
-  0.12.0](https://gavinsimpson.github.io/gratia/articles/sampling-migration.md):
+  0.12.1](https://gavinsimpson.github.io/gratia/articles/sampling-migration.md):
 
 ### Fit and check models
 

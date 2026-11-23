@@ -301,26 +301,27 @@ SCAM fits, and smoothing-parameter uncertainty is unsupported; use
 
 ``` r
 load_mgcv()
-# Simulate group-specific curves with Gaussian noise and fit factor-by smooths
-df <- data_sim("eg4", n = 300, seed = 2)
-m <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = df, method = "REML")
+# Simulate data and fit separate curves of x2 for two groups
+df <- data_sim("eg4", n = 180, seed = 2)
+df <- droplevels(subset(df, fac %in% c("1", "2")))
+m <- gam(y ~ fac + s(x2, by = fac, k = 6), data = df, method = "REML")
 
 # Compare fitted responses over x2, including the parametric group effects
-cd <- conditional_differences(m, by = "fac", condition = "x2")
+cd <- conditional_differences(m, by = "fac", condition = "x2", n_vals = 40)
 cd
-#> # A tibble: 300 x 9
-#>    .contrast .level_1 .level_2 .diff   .se .lower_ci .upper_ci      x2    x0
-#>        <int> <fct>    <fct>    <dbl> <dbl>     <dbl>     <dbl>   <dbl> <dbl>
-#>  1         1 1        2         3.13 0.868      1.42      4.83 0.00325 0.468
-#>  2         1 1        2         3.17 0.830      1.54      4.80 0.0133  0.468
-#>  3         1 1        2         3.22 0.794      1.66      4.77 0.0234  0.468
-#>  4         1 1        2         3.26 0.760      1.77      4.75 0.0334  0.468
-#>  5         1 1        2         3.31 0.729      1.88      4.74 0.0435  0.468
-#>  6         1 1        2         3.35 0.700      1.98      4.73 0.0536  0.468
-#>  7         1 1        2         3.40 0.675      2.07      4.72 0.0636  0.468
-#>  8         1 1        2         3.44 0.652      2.16      4.72 0.0737  0.468
-#>  9         1 1        2         3.48 0.631      2.24      4.72 0.0837  0.468
-#> 10         1 1        2         3.52 0.613      2.32      4.72 0.0938  0.468
-#> # i 290 more rows
+#> # A tibble: 40 x 8
+#>    .contrast .level_1 .level_2 .diff   .se .lower_ci .upper_ci       x2
+#>        <int> <fct>    <fct>    <dbl> <dbl>     <dbl>     <dbl>    <dbl>
+#>  1         1 1        2         3.58 0.816      1.98      5.18 0.000663
+#>  2         1 1        2         3.62 0.750      2.15      5.09 0.0262  
+#>  3         1 1        2         3.66 0.695      2.30      5.03 0.0518  
+#>  4         1 1        2         3.70 0.653      2.42      4.98 0.0774  
+#>  5         1 1        2         3.74 0.625      2.52      4.97 0.103   
+#>  6         1 1        2         3.78 0.608      2.59      4.97 0.129   
+#>  7         1 1        2         3.81 0.599      2.63      4.98 0.154   
+#>  8         1 1        2         3.83 0.593      2.66      4.99 0.180   
+#>  9         1 1        2         3.84 0.589      2.69      4.99 0.205   
+#> 10         1 1        2         3.84 0.584      2.70      4.99 0.231   
+#> # i 30 more rows
 draw(cd)
 ```

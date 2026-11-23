@@ -159,14 +159,13 @@ for the available settings.
 ## Examples
 
 ``` r
-
 load_mgcv()
-# simulate some data; a factor smooth example
-df <- data_sim("eg4", seed = 42)
-# fit GAM
-m <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = df, method = "REML")
+# Fit separate smooths for two groups from a simulated data set.
+dat <- data_sim("eg4", n = 120, seed = 42)
+dat <- droplevels(subset(dat, fac %in% c("1", "2")))
+model <- gam(y ~ fac + s(x2, by = fac, k = 5), data = dat, method = "REML")
 
-# calculate the differences between pairs of smooths the f_j(x2) term
-diffs <- difference_smooths(m, select = "s(x2)")
-draw(diffs)
+# Plot the estimated difference between the two smooths.
+differences <- difference_smooths(model, select = "s(x2)", n = 40)
+draw(differences)
 ```

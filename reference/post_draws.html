@@ -11,7 +11,7 @@ Generate posterior draws from a fitted model"><meta property="og:image" content=
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-76</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.12.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -27,7 +27,7 @@ Generate posterior draws from a fitted model"><meta property="og:image" content=
     <li><a class="dropdown-item" href="../articles/data-slices.html">Creating prediction grids with data_slice()</a></li>
     <li><a class="dropdown-item" href="../articles/custom-plotting.html">Customising gratia plots</a></li>
     <li><a class="dropdown-item" href="../articles/posterior-simulation.html">Posterior simulation of GAM smooths, fitted values and responses</a></li>
-    <li><a class="dropdown-item" href="../articles/sampling-migration.html">Updating sampling code for gratia 0.12.0</a></li>
+    <li><a class="dropdown-item" href="../articles/sampling-migration.html">Updating sampling code for gratia 0.12.1</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Models</h6></li>
     <li><a class="dropdown-item" href="../articles/model-checking.html">Residual diagnostics and posterior predictive checks with gratia</a></li>
@@ -274,9 +274,9 @@ in the unrestricted fitting coordinates. Only for <code><a href="https://rdrr.io
 </dl></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>Sampling controls must be named. Removed arguments produce migration errors;
-see <code><a href="../articles/sampling-migration.html">vignette("sampling-migration")</a></code>. Explicit controls that the selected
-method cannot use are rejected.</p>
+    <p>Sampling controls must be named. Removed arguments produce errors pointing to
+the <a href="https://gavinsimpson.github.io/gratia/articles/sampling-migration.html">sampling migration guide</a>.
+Explicit controls that the selected method cannot use are rejected.</p>
 <p>For SCAM models, Gaussian draws approximate the distribution of the unrestricted
 fitting coefficients using <code>Vp</code> (or <code>Ve</code> with <code>frequentist = TRUE</code>), then apply
 scam's fitted exponential or <code>notExp()</code> transformation. This is an approximation

@@ -435,72 +435,26 @@ than dropping the boundary.
 
 ``` r
 load_mgcv()
-dat <- data_sim("eg1", n = 400, dist = "normal", scale = 2, seed = 2)
-m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
+# Simulate a Gaussian response with smooth effects and fit a GAM.
+dat <- data_sim("eg1", n = 120, dist = "normal", scale = 2, seed = 2)
+m <- gam(y ~ s(x0, k = 5) + s(x1, k = 5) + s(x2, k = 5) + s(x3, k = 5),
+  data = dat, method = "REML"
+)
 
-## evaluate all smooths
-smooth_estimates(m1)
-#> # A tibble: 400 x 9
-#>    .smooth .type .by   .estimate      .se         x0    x1    x2    x3
-#>    <chr>   <chr> <chr>     <dbl>    <dbl>      <dbl> <dbl> <dbl> <dbl>
-#>  1 s(x0)   TPRS  NA    -0.966542 0.316118 0.00710904    NA    NA    NA
-#>  2 s(x0)   TPRS  NA    -0.925391 0.297170 0.0171157     NA    NA    NA
-#>  3 s(x0)   TPRS  NA    -0.884233 0.279256 0.0271224     NA    NA    NA
-#>  4 s(x0)   TPRS  NA    -0.843050 0.262594 0.0371291     NA    NA    NA
-#>  5 s(x0)   TPRS  NA    -0.801824 0.247376 0.0471358     NA    NA    NA
-#>  6 s(x0)   TPRS  NA    -0.760536 0.233728 0.0571425     NA    NA    NA
-#>  7 s(x0)   TPRS  NA    -0.719175 0.221701 0.0671492     NA    NA    NA
-#>  8 s(x0)   TPRS  NA    -0.677736 0.211261 0.0771559     NA    NA    NA
-#>  9 s(x0)   TPRS  NA    -0.636220 0.202303 0.0871626     NA    NA    NA
-#> 10 s(x0)   TPRS  NA    -0.594641 0.194685 0.0971693     NA    NA    NA
-#> # i 390 more rows
-
-## or selected smooths
-smooth_estimates(m1, select = c("s(x0)", "s(x1)"))
-#> # A tibble: 200 x 7
-#>    .smooth .type .by   .estimate      .se         x0    x1
-#>    <chr>   <chr> <chr>     <dbl>    <dbl>      <dbl> <dbl>
-#>  1 s(x0)   TPRS  NA    -0.966542 0.316118 0.00710904    NA
-#>  2 s(x0)   TPRS  NA    -0.925391 0.297170 0.0171157     NA
-#>  3 s(x0)   TPRS  NA    -0.884233 0.279256 0.0271224     NA
-#>  4 s(x0)   TPRS  NA    -0.843050 0.262594 0.0371291     NA
-#>  5 s(x0)   TPRS  NA    -0.801824 0.247376 0.0471358     NA
-#>  6 s(x0)   TPRS  NA    -0.760536 0.233728 0.0571425     NA
-#>  7 s(x0)   TPRS  NA    -0.719175 0.221701 0.0671492     NA
-#>  8 s(x0)   TPRS  NA    -0.677736 0.211261 0.0771559     NA
-#>  9 s(x0)   TPRS  NA    -0.636220 0.202303 0.0871626     NA
-#> 10 s(x0)   TPRS  NA    -0.594641 0.194685 0.0971693     NA
-#> # i 190 more rows
-
-# Direct evaluation of a GJRM distributional model
-if (requireNamespace("GJRM", quietly = TRUE)) {
-  set.seed(82)
-  d <- data.frame(x = runif(100), z = runif(100))
-  d$y <- sin(6 * d$x) + rnorm(100, sd = exp(0.3 * d$z))
-  m <- GJRM::gamlss(list(y ~ s(x, k = 4), ~ s(z, k = 4)), data = d)
-  estimates <- smooth_estimates(m, n = 50)
-  draw(estimates)
-}
-
-
-# parallel processing of smooths
-if (requireNamespace("mirai") && requireNamespace("carrier")) {
-  library("mirai")
-  daemons(2)                          # only low for CRAN requirements
-  smooth_estimates(m1)
-}
-#> # A tibble: 400 x 9
-#>    .smooth .type .by   .estimate      .se         x0    x1    x2    x3
-#>    <chr>   <chr> <chr>     <dbl>    <dbl>      <dbl> <dbl> <dbl> <dbl>
-#>  1 s(x0)   TPRS  NA    -0.966542 0.316118 0.00710904    NA    NA    NA
-#>  2 s(x0)   TPRS  NA    -0.925391 0.297170 0.0171157     NA    NA    NA
-#>  3 s(x0)   TPRS  NA    -0.884233 0.279256 0.0271224     NA    NA    NA
-#>  4 s(x0)   TPRS  NA    -0.843050 0.262594 0.0371291     NA    NA    NA
-#>  5 s(x0)   TPRS  NA    -0.801824 0.247376 0.0471358     NA    NA    NA
-#>  6 s(x0)   TPRS  NA    -0.760536 0.233728 0.0571425     NA    NA    NA
-#>  7 s(x0)   TPRS  NA    -0.719175 0.221701 0.0671492     NA    NA    NA
-#>  8 s(x0)   TPRS  NA    -0.677736 0.211261 0.0771559     NA    NA    NA
-#>  9 s(x0)   TPRS  NA    -0.636220 0.202303 0.0871626     NA    NA    NA
-#> 10 s(x0)   TPRS  NA    -0.594641 0.194685 0.0971693     NA    NA    NA
-#> # i 390 more rows
+# Evaluate each smooth at 30 points along its covariate.
+smooth_estimates(m, n = 30)
+#> # A tibble: 120 x 9
+#>    .smooth .type .by    .estimate      .se         x0    x1    x2    x3
+#>    <chr>   <chr> <chr>      <dbl>    <dbl>      <dbl> <dbl> <dbl> <dbl>
+#>  1 s(x0)   TPRS  NA    -1.65658   0.683317 0.00710904    NA    NA    NA
+#>  2 s(x0)   TPRS  NA    -1.41136   0.574920 0.0409640     NA    NA    NA
+#>  3 s(x0)   TPRS  NA    -1.16715   0.481517 0.0748189     NA    NA    NA
+#>  4 s(x0)   TPRS  NA    -0.925483  0.410526 0.108674      NA    NA    NA
+#>  5 s(x0)   TPRS  NA    -0.688216  0.366087 0.142529      NA    NA    NA
+#>  6 s(x0)   TPRS  NA    -0.457536  0.344974 0.176384      NA    NA    NA
+#>  7 s(x0)   TPRS  NA    -0.235937  0.337949 0.210239      NA    NA    NA
+#>  8 s(x0)   TPRS  NA    -0.0260496 0.336297 0.244094      NA    NA    NA
+#>  9 s(x0)   TPRS  NA     0.169496  0.335512 0.277949      NA    NA    NA
+#> 10 s(x0)   TPRS  NA     0.348126  0.334785 0.311803      NA    NA    NA
+#> # i 110 more rows
 ```

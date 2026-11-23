@@ -140,84 +140,28 @@ Gavin L. Simpson
 
 ``` r
 load_mgcv()
-dat <- data_sim("eg1", n = 1000, dist = "normal", scale = 2, seed = 2)
-m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
+dat <- data_sim("eg1", n = 120, seed = 2)
+m <- gam(y ~ s(x0, k = 6) + s(x2, k = 6), data = dat, method = "REML")
 
-predicted_samples(m, n_draws = 5, seed = 42)
-#> # A tibble: 5,000 x 3
+# Simulate responses at new predictor values using the fitted model
+newd <- data.frame(x0 = c(0.2, 0.5, 0.8), x2 = 0.5)
+predicted_samples(m, n_draws = 5, data = newd, seed = 42)
+#> # A tibble: 15 x 3
 #>     .row .draw .response
 #>    <int> <int>     <dbl>
-#>  1     1     1      8.93
-#>  2     2     1      4.23
-#>  3     3     1      7.71
-#>  4     4     1      8.51
-#>  5     5     1     10.1 
-#>  6     6     1      8.20
-#>  7     7     1      8.95
-#>  8     8     1      7.20
-#>  9     9     1     18.1 
-#> 10    10     1     12.7 
-#> # i 4,990 more rows
-
-## Can pass arguments to predict.gam()
-newd <- data.frame(
-  x0 = runif(10), x1 = runif(10), x2 = runif(10),
-  x3 = runif(10)
-)
-
-## Exclude s(x2)
-predicted_samples(m, n_draws = 5, data = newd, exclude = "s(x2)", seed = 25)
-#> # A tibble: 50 x 3
-#>     .row .draw .response
-#>    <int> <int>     <dbl>
-#>  1     1     1      9.42
-#>  2     2     1      6.97
-#>  3     3     1      8.10
-#>  4     4     1      9.95
-#>  5     5     1      6.75
-#>  6     6     1     10.3 
-#>  7     7     1     10.8 
-#>  8     8     1     10.5 
-#>  9     9     1      8.43
-#> 10    10     1     12.2 
-#> # i 40 more rows
-
-## Exclude s(x1)
-predicted_samples(m, n_draws = 5, data = newd, exclude = "s(x1)", seed = 25)
-#> # A tibble: 50 x 3
-#>     .row .draw .response
-#>    <int> <int>     <dbl>
-#>  1     1     1      6.05
-#>  2     2     1      5.28
-#>  3     3     1      5.96
-#>  4     4     1     13.7 
-#>  5     5     1      4.36
-#>  6     6     1      5.11
-#>  7     7     1     12.5 
-#>  8     8     1      5.66
-#>  9     9     1     12.6 
-#> 10    10     1      8.38
-#> # i 40 more rows
-
-## Select which terms --- result should be the same as previous
-## but note that we have to include any parametric terms, including the
-## constant term
-predicted_samples(m,
-  n_draws = 5, data = newd, seed = 25,
-  terms = c("Intercept", "s(x0)", "s(x2)", "s(x3)")
-)
-#> # A tibble: 50 x 3
-#>     .row .draw .response
-#>    <int> <int>     <dbl>
-#>  1     1     1    -1.94 
-#>  2     2     1    -2.71 
-#>  3     3     1    -2.03 
-#>  4     4     1     5.73 
-#>  5     5     1    -3.63 
-#>  6     6     1    -2.87 
-#>  7     7     1     4.48 
-#>  8     8     1    -2.33 
-#>  9     9     1     4.65 
-#> 10    10     1     0.395
-#> # i 40 more rows
+#>  1     1     1     11.7 
+#>  2     2     1      7.89
+#>  3     3     1      9.49
+#>  4     1     2      9.66
+#>  5     2     2     10.6 
+#>  6     3     2      8.19
+#>  7     1     3     12.1 
+#>  8     2     3      9.19
+#>  9     3     3     14.1 
+#> 10     1     4      7.74
+#> 11     2     4     13.1 
+#> 12     3     4     14.8 
+#> 13     1     5      4.08
+#> 14     2     5      8.68
+#> 15     3     5      8.12
 ```

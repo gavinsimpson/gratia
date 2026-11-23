@@ -11,7 +11,7 @@ one-dimensional cubic splines, including the space between returned points."><me
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-76</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.12.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -27,7 +27,7 @@ one-dimensional cubic splines, including the space between returned points."><me
     <li><a class="dropdown-item" href="../articles/data-slices.html">Creating prediction grids with data_slice()</a></li>
     <li><a class="dropdown-item" href="../articles/custom-plotting.html">Customising gratia plots</a></li>
     <li><a class="dropdown-item" href="../articles/posterior-simulation.html">Posterior simulation of GAM smooths, fitted values and responses</a></li>
-    <li><a class="dropdown-item" href="../articles/sampling-migration.html">Updating sampling code for gratia 0.12.0</a></li>
+    <li><a class="dropdown-item" href="../articles/sampling-migration.html">Updating sampling code for gratia 0.12.1</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Models</h6></li>
     <li><a class="dropdown-item" href="../articles/model-checking.html">Residual diagnostics and posterior predictive checks with gratia</a></li>
@@ -185,21 +185,16 @@ Series B</em>, <strong>85</strong>, 842–868. <a href="https://doi.org/10.1093/
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="load_mgcv.html">load_mgcv</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">4</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, length.out <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">dat</span><span class="op">$</span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">sin</a></span><span class="op">(</span><span class="fl">6</span> <span class="op">*</span> <span class="va">dat</span><span class="op">$</span><span class="va">x</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">100</span>, sd <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu">gam</span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">x</span>, bs <span class="op">=</span> <span class="st">"cr"</span>, k <span class="op">=</span> <span class="fl">8</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">dat</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, length.out <span class="op">=</span> <span class="fl">80</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">dat</span><span class="op">$</span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">sin</a></span><span class="op">(</span><span class="fl">6</span> <span class="op">*</span> <span class="va">dat</span><span class="op">$</span><span class="va">x</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">80</span>, sd <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu">gam</span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">x</span>, bs <span class="op">=</span> <span class="st">"cr"</span>, k <span class="op">=</span> <span class="fl">6</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">dat</span>, method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># Plot a simultaneous confidence band over the fitted domain</span></span></span>
 <span class="r-in"><span><span class="va">band</span> <span class="op">&lt;-</span> <span class="fu"><a href="smooth_estimates.html">smooth_estimates</a></span><span class="op">(</span><span class="va">model</span>,</span></span>
-<span class="r-in"><span>  interval <span class="op">=</span> <span class="st">"simultaneous"</span>,</span></span>
+<span class="r-in"><span>  interval <span class="op">=</span> <span class="st">"simultaneous"</span>, n <span class="op">=</span> <span class="fl">50</span>,</span></span>
 <span class="r-in"><span>  simultaneous_method <span class="op">=</span> <span class="st">"tube"</span>, simultaneous_domain <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="draw.html">draw</a></span><span class="op">(</span><span class="va">band</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="simultaneous_bands-1.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span><span class="va">rate</span> <span class="op">&lt;-</span> <span class="fu"><a href="derivatives.html">derivatives</a></span><span class="op">(</span><span class="va">model</span>,</span></span>
-<span class="r-in"><span>  type <span class="op">=</span> <span class="st">"central"</span>, interval <span class="op">=</span> <span class="st">"simultaneous"</span>,</span></span>
-<span class="r-in"><span>  simultaneous_method <span class="op">=</span> <span class="st">"tube"</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">rate</span>, <span class="st">"interval_info"</span><span class="op">)</span><span class="op">$</span><span class="va">curves</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">critical</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 3.015127</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

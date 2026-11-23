@@ -26,7 +26,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-76</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.12.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -44,7 +44,7 @@
     <li><a class="dropdown-item" href="../articles/data-slices.html">Creating prediction grids with data_slice()</a></li>
     <li><a class="dropdown-item" href="../articles/custom-plotting.html">Customising gratia plots</a></li>
     <li><a class="dropdown-item" href="../articles/posterior-simulation.html">Posterior simulation of GAM smooths, fitted values and responses</a></li>
-    <li><a class="dropdown-item" href="../articles/sampling-migration.html">Updating sampling code for gratia 0.12.0</a></li>
+    <li><a class="dropdown-item" href="../articles/sampling-migration.html">Updating sampling code for gratia 0.12.1</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Models</h6></li>
     <li><a class="dropdown-item" href="../articles/model-checking.html">Residual diagnostics and posterior predictive checks with gratia</a></li>
@@ -87,7 +87,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>Predictions, plots and derivatives with transformed covariates</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/gavinsimpson/gratia/blob/main/vignettes/transformed-covariates.Rmd" class="external-link"><code>vignettes/transformed-covariates.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/gavinsimpson/gratia/blob/main/vignettes/articles/transformed-covariates.Rmd" class="external-link"><code>vignettes/articles/transformed-covariates.Rmd</code></a></small>
       <div class="d-none name"><code>transformed-covariates.Rmd</code></div>
     </div>
 
@@ -96,7 +96,7 @@
 <p>A model fitted with <code>s(log(x))</code> uses a transformed
 covariate, but we may want to predict at supplied values of
 <code>x</code>, plot the result against <code>x</code>, or estimate
-change per unit of <code>x</code>. This vignette shows how to make those
+change per unit of <code>x</code>. This article shows how to make those
 choices while keeping the model’s transformation intact.</p>
 <p>We load {gratia} and {mgcv} for the examples:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">

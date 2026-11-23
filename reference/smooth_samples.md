@@ -303,33 +303,10 @@ Gavin L. Simpson
 
 ``` r
 load_mgcv()
-dat <- data_sim("eg1", n = 400, seed = 2)
-m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
+dat <- data_sim("eg1", n = 120, seed = 2)
+m <- gam(y ~ s(x0, k = 6) + s(x2, k = 6), data = dat, method = "REML")
 
-sms <- smooth_samples(m1, select = "s(x0)", n_draws = 5, seed = 42)
-# \donttest{
-sms
-#> # A tibble: 1,000 x 8
-#>    .smooth .term .type .by    .row .draw .value      x0
-#>    <chr>   <chr> <chr> <chr> <int> <int>  <dbl>   <dbl>
-#>  1 s(x0)   s(x0) TPRS  NA        1     1 -0.386 0.00711
-#>  2 s(x0)   s(x0) TPRS  NA        1     2 -0.546 0.00711
-#>  3 s(x0)   s(x0) TPRS  NA        1     3 -0.724 0.00711
-#>  4 s(x0)   s(x0) TPRS  NA        1     4 -1.22  0.00711
-#>  5 s(x0)   s(x0) TPRS  NA        1     5 -1.15  0.00711
-#>  6 s(x0)   s(x0) TPRS  NA        2     1 -0.391 0.0121 
-#>  7 s(x0)   s(x0) TPRS  NA        2     2 -0.538 0.0121 
-#>  8 s(x0)   s(x0) TPRS  NA        2     3 -0.714 0.0121 
-#>  9 s(x0)   s(x0) TPRS  NA        2     4 -1.19  0.0121 
-#> 10 s(x0)   s(x0) TPRS  NA        2     5 -1.12  0.0121 
-#> # i 990 more rows
-# }
-
-## A factor by example (with a spurious covariate x0)
-dat <- data_sim("eg4", n = 1000, seed = 2)
-
-## fit model...
-m2 <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = dat)
-sms <- smooth_samples(m2, n_draws = 5, seed = 42)
+# Plot five posterior draws of the smooth of x2
+sms <- smooth_samples(m, select = "s(x2)", n_draws = 5, n_grid = 40, seed = 42)
 draw(sms)
 ```

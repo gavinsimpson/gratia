@@ -66,33 +66,12 @@ Using Rootograms. *Am. Stat.* **70**, 296–303.
 ## Examples
 
 ``` r
-load_mgcv()
-df <- data_sim("eg1", n = 1000, dist = "poisson", scale = 0.1, seed = 6)
-
-# A poisson example
-m <- gam(y ~ s(x0, bs = "cr") + s(x1, bs = "cr") + s(x2, bs = "cr") +
-  s(x3, bs = "cr"), family = poisson(), data = df, method = "REML")
-rg <- rootogram(m)
-rg
-#> # A tibble: 21 x 3
-#>     .bin .observed   .fitted
-#>    <dbl>     <int>     <dbl>
-#>  1     0       113 116.640  
-#>  2     1       236 227.869  
-#>  3     2       230 239.168  
-#>  4     3       200 181.679  
-#>  5     4        94 113.432  
-#>  6     5        68  62.4881 
-#>  7     6        27  31.6795 
-#>  8     7        22  15.1323 
-#>  9     8         4   6.88637
-#> 10     9         3   2.99628
-#> # i 11 more rows
-draw(rg) # plot the rootogram
-
-
-# A Gaussian example
-df <- data_sim("eg1", dist = "normal", seed = 2)
-m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = df, method = "REML")
-draw(rootogram(m, breaks = "FD"), type = "suspended")
+# Simulate Poisson counts with a mean that varies smoothly with x.
+set.seed(6)
+dat <- data.frame(x = runif(120))
+dat$y <- rpois(nrow(dat), exp(1 + sin(2 * pi * dat$x)))
+m <- mgcv::gam(y ~ s(x, k = 6), family = poisson(),
+  data = dat, method = "REML")
+# Compare observed and fitted frequencies for each count.
+draw(rootogram(m))
 ```

@@ -1,6 +1,6 @@
-# Updating sampling code for gratia 0.12.0
+# Updating sampling code for gratia 0.12.1
 
-{gratia} 0.12.0 gives sampling arguments the same meaning across
+{gratia} 0.12.1 gives sampling arguments the same meaning across
 [`posterior_samples()`](https://gavinsimpson.github.io/gratia/reference/posterior_samples.md),
 [`fitted_samples()`](https://gavinsimpson.github.io/gratia/reference/fitted_samples.md),
 [`smooth_samples()`](https://gavinsimpson.github.io/gratia/reference/smooth_samples.md),

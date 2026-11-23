@@ -301,30 +301,21 @@ Gavin L. Simpson
 ## Examples
 
 ``` r
-
+library("ggplot2")
 load_mgcv()
-df <- data_sim("eg1", dist = "negbin", scale = 0.25, seed = 42)
+df <- data_sim("eg1", n = 160, dist = "negbin", scale = 0.25, seed = 42)
 
-# fit the GAM (note: for execution time reasons using bam())
-m <- bam(y ~ s(x0) + s(x1) + s(x2) + s(x3),
-  data = df, family = nb(), method = "fREML")
+m <- gam(y ~ s(x0, k = 6) + s(x2, k = 6), data = df,
+  family = nb(), method = "REML")
 
-# data slice through data along x2 - all other covariates will be set to
-# typical values (value closest to median)
-ds <- data_slice(m, x2 = evenly(x2, n = 200))
+# Vary x2 while holding x0 at a typical value
+ds <- data_slice(m, x2 = evenly(x2, n = 50))
 
-# samples from posterior of derivatives
+# Draw and plot 20 curves for the derivative with respect to x2
 fd_samp <- derivative_samples(m,
-  data = ds, type = "central",
-  focal = "x2", eps = 0.01, seed = 21, n_draws = 100
+  data = ds, type = "central", focal = "x2", eps = 0.01,
+  seed = 21, n_draws = 20
 )
-
-# plot the first 20 posterior draws
-if (requireNamespace("ggplot2") && requireNamespace("dplyr")) {
-  library("ggplot2")
-  fd_samp |>
-    dplyr::filter(.draw <= 20) |>
-    ggplot(aes(x = x2, y = .derivative, group = .draw)) +
-    geom_line(alpha = 0.5)
-}
+ggplot(fd_samp, aes(x = x2, y = .derivative, group = .draw)) +
+  geom_line(alpha = 0.5)
 ```

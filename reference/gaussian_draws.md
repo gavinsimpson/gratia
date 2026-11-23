@@ -125,9 +125,9 @@ gaussian_draws(
 
 ## Details
 
-Sampling controls must be named. Removed arguments produce migration
-errors; see
-[`vignette("sampling-migration")`](https://gavinsimpson.github.io/gratia/articles/sampling-migration.md).
+Sampling controls must be named. Removed arguments produce errors
+pointing to the [sampling migration
+guide](https://gavinsimpson.github.io/gratia/articles/sampling-migration.html).
 Explicit controls that the selected method cannot use are rejected.
 
 For SCAM models, Gaussian draws approximate the distribution of the

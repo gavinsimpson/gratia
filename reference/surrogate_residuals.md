@@ -167,13 +167,13 @@ Statistical Association, 113(522), 845–854.
 ## Examples
 
 ``` r
-load_mgcv()
+# Turn a latent signal with logistic noise into four ordered categories.
 set.seed(359)
-dat <- data.frame(x = runif(200, -2, 2))
+dat <- data.frame(x = runif(120, -2, 2))
 latent <- sin(dat$x) + rlogis(nrow(dat))
 dat$y <- findInterval(latent, c(-1, 0, 2)) + 1L
-fit <- gam(y ~ s(x), data = dat, family = ocat(R = 4), method = "REML")
+fit <- mgcv::gam(y ~ s(x, k = 5), data = dat,
+  family = mgcv::ocat(R = 4), method = "REML")
 head(surrogate_residuals(fit, seed = 42))
-#> [1]  3.8326093  0.8855870 -0.3476107  0.1092911 -0.4888706  1.4880031
-appraise(fit, type = "surrogate", seed = 42)
+#> [1]  0.2892662  0.3114139 -2.2699851  1.7008338 -1.1363163  1.3888662
 ```

@@ -365,14 +365,8 @@ doi:10.1080/10618600.2019.1629942.
 ## Examples
 
 ``` r
-load_mgcv()
-dat <- data_sim("eg1", n = 400, seed = 2)
-m <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat)
-scalable_qq_plot(m, seed = 42)
-
-scalable_residuals_linpred_plot(m)
-
-scalable_observed_fitted_plot(m, density_bins = c(30, 40))
-
-appraise(m, scalable = TRUE, seed = 42)
+# Fit stopping distance as a smooth function of speed.
+m <- mgcv::gam(dist ~ s(speed, k = 5), data = cars, method = "REML")
+# Use fewer bins than observations so the aggregation is visible.
+scalable_qq_plot(m, type = "quantile", qq_bins = 20)
 ```

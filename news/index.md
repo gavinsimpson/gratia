@@ -1,6 +1,14 @@
 # Changelog
 
-## gratia (development version)
+## gratia 0.12.1
+
+### CRAN submission
+
+- Version 0.12.0 went unreleased because the test suite took over 16
+  minutes during CRAN’s Windows incoming check. Version 0.12.1 includes
+  the changes planned for 0.12.0 and runs a shorter set of
+  representative tests on CRAN. The full suite remains available locally
+  and in GitHub Actions.
 
 ### User visible changes
 
@@ -75,8 +83,8 @@
 
   [`derivative_samples()`](https://gavinsimpson.github.io/gratia/reference/derivative_samples.md)
   takes `model` rather than `object`; `add_*()` sampling helpers take
-  `data` rather than `object`. See
-  [`vignette("sampling-migration")`](https://gavinsimpson.github.io/gratia/articles/sampling-migration.md).
+  `data` rather than `object`. See the [sampling migration
+  guide](https://gavinsimpson.github.io/gratia/articles/sampling-migration.html).
 
   Coefficient and `*_samples()` functions require an explicit `n_draws`
   when generating draws; supplied coefficient draws determine their own
@@ -1204,8 +1212,9 @@
   support functions of covariates such as `s(log(x))`, including
   transformed offsets and an `envir` argument for local functions and
   constants. Stored evaluated covariates allow smooth plotting when the
-  original data or functions are unavailable. See
-  [`vignette("transformed-covariates", package = "gratia")`](https://gavinsimpson.github.io/gratia/articles/transformed-covariates.md)
+  original data or functions are unavailable. See the [article on
+  transformed
+  covariates](https://gavinsimpson.github.io/gratia/articles/transformed-covariates.html)
   for examples.
 
   Automatic smooth grids retain transformed coordinates, and

@@ -99,9 +99,9 @@ Mixed) Regression Models.
 ## Examples
 
 ``` r
+# Fit a Poisson model for the counts under each spray treatment.
 fit <- mgcv::gam(count ~ spray, family = poisson(),
   data = InsectSprays, method = "REML")
-head(dharma_residuals(fit, n = 250, seed = 42))
-#> [1] 0.11794871 0.01707461 0.92111982 0.52857546 0.50754329 0.24789548
-appraise(fit, type = "dharma", n_dharma = 250, seed = 42)
+head(dharma_residuals(fit, n = 100, seed = 42))
+#> [1] 0.15602973 0.03086798 0.93475444 0.50948439 0.52625366 0.34200785
 ```

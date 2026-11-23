@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-76</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.12.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -23,7 +23,7 @@
     <li><a class="dropdown-item" href="../articles/data-slices.html">Creating prediction grids with data_slice()</a></li>
     <li><a class="dropdown-item" href="../articles/custom-plotting.html">Customising gratia plots</a></li>
     <li><a class="dropdown-item" href="../articles/posterior-simulation.html">Posterior simulation of GAM smooths, fitted values and responses</a></li>
-    <li><a class="dropdown-item" href="../articles/sampling-migration.html">Updating sampling code for gratia 0.12.0</a></li>
+    <li><a class="dropdown-item" href="../articles/sampling-migration.html">Updating sampling code for gratia 0.12.1</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Models</h6></li>
     <li><a class="dropdown-item" href="../articles/model-checking.html">Residual diagnostics and posterior predictive checks with gratia</a></li>
@@ -59,9 +59,13 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="development version" id="gratia-development-version">gratia (development version)<a class="anchor" aria-label="anchor" href="#gratia-development-version"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.12.1" id="gratia-0121">gratia 0.12.1<a class="anchor" aria-label="anchor" href="#gratia-0121"></a></h2>
 <div class="section level3">
-<h3 id="user-visible-changes-development-version">User visible changes<a class="anchor" aria-label="anchor" href="#user-visible-changes-development-version"></a></h3>
+<h3 id="cran-submission-0-12-1">CRAN submission<a class="anchor" aria-label="anchor" href="#cran-submission-0-12-1"></a></h3>
+<ul><li>Version 0.12.0 went unreleased because the test suite took over 16 minutes during CRAN’s Windows incoming check. Version 0.12.1 includes the changes planned for 0.12.0 and runs a shorter set of representative tests on CRAN. The full suite remains available locally and in GitHub Actions.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="user-visible-changes-0-12-1">User visible changes<a class="anchor" aria-label="anchor" href="#user-visible-changes-0-12-1"></a></h3>
 <ul><li><p><strong>Breaking change:</strong> gratia has removed its <code><a href="https://rdrr.io/pkg/nlme/man/fixed.effects.html" class="external-link">fixef()</a></code> re-export and the methods it registered for that generic. Use <code><a href="../reference/fixed_effects.gam.html">gratia::fixed_effects()</a></code> for GAMs, GAMMs, GLMs and linear models supported by gratia. For models fitted directly with nlme or lme4, use <code><a href="https://rdrr.io/pkg/nlme/man/fixed.effects.html" class="external-link">nlme::fixef()</a></code> or <code><a href="https://rdrr.io/pkg/nlme/man/fixed.effects.html" class="external-link">lme4::fixef()</a></code>, respectively.</p></li>
 <li><p>Help examples use fewer model fits and repeated plots to focus on each function’s main use and reduce execution time.</p></li>
 <li><p>gratia no longer requires ggokabeito; default plot colours and their ordering are unchanged. Unused curl and svglite suggestions have been removed, and ggdist, distributional and hexbin are now listed as website dependencies because they are used only in a website article.</p></li>
@@ -77,7 +81,7 @@
 <li>
 <p><strong>Sampling arguments (breaking changes)</strong></p>
 <p><strong>Breaking change:</strong> Sampling functions now use <code>n_draws</code> for the total retained draw count and <code>n_grid</code> for automatically constructed evaluation grids. Sampling controls must be named. Obsolete names, including <code>n</code>, <code>n_sim</code>, <code>n_vals</code>, <code>freq</code>, <code>newdata</code>, and <code>ncores</code>, produce migration errors.</p>
-<p><code><a href="../reference/derivative_samples.html">derivative_samples()</a></code> takes <code>model</code> rather than <code>object</code>; <code>add_*()</code> sampling helpers take <code>data</code> rather than <code>object</code>. See <code><a href="../articles/sampling-migration.html">vignette("sampling-migration")</a></code>.</p>
+<p><code><a href="../reference/derivative_samples.html">derivative_samples()</a></code> takes <code>model</code> rather than <code>object</code>; <code>add_*()</code> sampling helpers take <code>data</code> rather than <code>object</code>. See the <a href="https://gavinsimpson.github.io/gratia/articles/sampling-migration.html">sampling migration guide</a>.</p>
 <p>Coefficient and <code>*_samples()</code> functions require an explicit <code>n_draws</code> when generating draws; supplied coefficient draws determine their own count and chains. Likelihood, LOO, WAIC and bayesplot wrappers use <code>n_draws</code> with their documented defaults.</p>
 <p>Derivative sampling now defaults to a grid resolution of 200, matching smooth sampling; supply <code>n_grid = 100</code> for the previous derivative resolution.</p>
 <p>Gaussian threads use <code>n_threads</code>, while <code>n_cores</code> limits concurrent MH chains. Explicit controls that do not apply to the selected sampler are rejected.</p>
@@ -110,7 +114,7 @@
 <li><p>glmmTMB support now requires the released version 1.1.15.2 or later, so the development version of glmmTMB is no longer needed.</p></li>
 </ul></div>
 <div class="section level3">
-<h3 id="new-features-development-version">New features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>
+<h3 id="new-features-0-12-1">New features<a class="anchor" aria-label="anchor" href="#new-features-0-12-1"></a></h3>
 <ul><li><p>mgcv’s B-spline tensor products (<code>bs = "bt"</code>, available from mgcv 1.9-5) are supported in smooth estimates, drawing, basis and penalty extraction, derivatives and smooth sampling. <code><a href="../reference/smooth_type.html">smooth_type()</a></code> returns <code>"B spline tensor"</code> for these smooths.</p></li>
 <li><p><code><a href="../reference/compare_smooths.html">compare_smooths()</a></code> evaluates two-variable smooths at common locations, and <code><a href="../reference/draw.html">draw()</a></code> compares their surfaces in side-by-side facets with shared axes and colours. Use <code>show = "difference"</code> and <code>pair</code> to plot one model’s smooth contribution minus another’s, with a colour scale centred on zero (<a href="https://github.com/gavinsimpson/gratia/issues/435" class="external-link">#435</a>). Conditioning values retain separate panels, constant surfaces omit contours, and labels for distribution parameters are preserved.</p></li>
 <li><p><code><a href="../reference/draw.compare_smooths.html">draw.compare_smooths()</a></code> accepts <code>ci_level</code> to set the coverage of its pointwise intervals, matching <code><a href="../reference/draw.gam.html">draw.gam()</a></code>. Unsupported <code>coverage</code> and <code>level</code> arguments now give an error directing callers to <code>ci_level</code>, including when supplied alongside it (<a href="https://github.com/gavinsimpson/gratia/issues/436" class="external-link">#436</a>).</p></li>
@@ -345,7 +349,7 @@
 <li><p><code><a href="../reference/parametric_effects.html">parametric_effects()</a></code> and <code><a href="../reference/draw.html">draw()</a></code> now support parametric interactions, including higher-order interactions. Numeric interactions use surfaces and conditioning facets; numeric-by-factor interactions use grouped curves; factor interactions use grouped estimates and intervals. Interaction surfaces centre the default diverging palette at zero, using a common fill range across facets; fixed scales expand the fill range as for smooth surfaces (<a href="https://github.com/gavinsimpson/gratia/issues/411" class="external-link">#411</a>).</p></li>
 <li>
 <p><strong>Functions of covariates</strong></p>
-<p>Smooth evaluation, plotting, bases, sampling and prediction now support functions of covariates such as <code>s(log(x))</code>, including transformed offsets and an <code>envir</code> argument for local functions and constants. Stored evaluated covariates allow smooth plotting when the original data or functions are unavailable. See <code><a href="../articles/transformed-covariates.html">vignette("transformed-covariates", package = "gratia")</a></code> for examples.</p>
+<p>Smooth evaluation, plotting, bases, sampling and prediction now support functions of covariates such as <code>s(log(x))</code>, including transformed offsets and an <code>envir</code> argument for local functions and constants. Stored evaluated covariates allow smooth plotting when the original data or functions are unavailable. See the <a href="https://gavinsimpson.github.io/gratia/articles/transformed-covariates.html">article on transformed covariates</a> for examples.</p>
 <p>Automatic smooth grids retain transformed coordinates, and <code><a href="../reference/derivatives.html">derivatives()</a></code> and <code><a href="../reference/partial_derivatives.html">partial_derivatives()</a></code> can differentiate with respect to raw covariates using <code>wrt = "covariate"</code>. Evaluation failures at new data produce actionable errors. Parametric effects and data slices recover raw covariates consistently.</p>
 <p><code><a href="../reference/simulate.html">simulate()</a></code> and <code><a href="../reference/add_fitted.html">add_fitted()</a></code> also accept <code>envir</code> for local functions in offsets and smooth expressions.</p>
 </li>
@@ -388,7 +392,7 @@
 <li><p><code><a href="../reference/link.html">link()</a></code>, <code><a href="../reference/link.html">inv_link()</a></code> and other family utilities now support <code><a href="https://rdrr.io/pkg/mgcv/man/cpois.html" class="external-link">cpois()</a></code>, <code><a href="https://rdrr.io/pkg/mgcv/man/clog.html" class="external-link">clog()</a></code> and <code><a href="https://rdrr.io/pkg/mgcv/man/bcg.html" class="external-link">bcg()</a></code>. These families also work with <code><a href="../reference/fitted_values.html">fitted_values()</a></code>. Single-link families can use their supplied link functions without needing a recognised family name.</p></li>
 </ul></div>
 <div class="section level3">
-<h3 id="bug-fixes-development-version">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
+<h3 id="bug-fixes-0-12-1">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-12-1"></a></h3>
 <ul><li><p><code><a href="../reference/draw.html">draw()</a></code>, <code><a href="../reference/assemble.html">assemble()</a></code> and <code><a href="../reference/smooth_estimates.html">smooth_estimates()</a></code> again work with smooths that provide their own <code><a href="../reference/eval_smooth.html">eval_smooth()</a></code> method, such as monotone smooths fitted with mvgam.</p></li>
 <li><p><code><a href="../reference/add_fitted.html">add_fitted()</a></code> no longer emits a tibble deprecation warning for multinomial predictions with unnamed columns. The existing <code>V1</code>, <code>V2</code>, … column names are preserved (<a href="https://github.com/gavinsimpson/gratia/issues/443" class="external-link">#443</a>).</p></li>
 <li>

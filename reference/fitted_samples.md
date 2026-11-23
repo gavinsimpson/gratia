@@ -389,46 +389,23 @@ Gavin L. Simpson
 
 ``` r
 load_mgcv()
-dat <- data_sim("eg1", n = 1000, dist = "normal", scale = 2, seed = 2)
-m1 <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
+dat <- data_sim("eg1", n = 120, seed = 2)
+m <- gam(y ~ s(x0, k = 6) + s(x2, k = 6), data = dat, method = "REML")
 
-fs <- fitted_samples(m1, n_draws = 5, seed = 42)
-# \donttest{
-fs
-#> # A tibble: 5,000 x 4
+# Draw from the posterior of the expected response at the observed rows
+fitted_samples(m, n_draws = 5, seed = 42)
+#> # A tibble: 600 x 4
 #>     .row .draw .parameter .fitted
 #>    <int> <int> <chr>        <dbl>
-#>  1     1     1 mean          6.34
-#>  2     2     1 mean          5.08
-#>  3     3     1 mean          6.84
-#>  4     4     1 mean          7.71
-#>  5     5     1 mean          9.23
-#>  6     6     1 mean          8.03
-#>  7     7     1 mean          6.19
-#>  8     8     1 mean          7.28
-#>  9     9     1 mean         14.0 
-#> 10    10     1 mean         12.7 
-#> # i 4,990 more rows
-# }
-
-# can generate own set of draws and use them
-drws <- generate_draws(m1, n_draws = 2, seed = 24)
-fs2 <- fitted_samples(m1, method = "user", draws = drws)
-# \donttest{
-fs2
-#> # A tibble: 2,000 x 4
-#>     .row .draw .parameter .fitted
-#>    <int> <int> <chr>        <dbl>
-#>  1     1     1 mean          6.30
-#>  2     2     1 mean          5.12
-#>  3     3     1 mean          7.40
-#>  4     4     1 mean          7.42
-#>  5     5     1 mean          9.40
-#>  6     6     1 mean          8.04
-#>  7     7     1 mean          5.83
-#>  8     8     1 mean          7.30
-#>  9     9     1 mean         14.3 
-#> 10    10     1 mean         13.1 
-#> # i 1,990 more rows
-# }
+#>  1     1     1 mean          5.15
+#>  2     2     1 mean         13.1 
+#>  3     3     1 mean          8.32
+#>  4     4     1 mean          5.76
+#>  5     5     1 mean          4.94
+#>  6     6     1 mean          4.91
+#>  7     7     1 mean         10.6 
+#>  8     8     1 mean          7.43
+#>  9     9     1 mean         13.0 
+#> 10    10     1 mean         11.1 
+#> # i 590 more rows
 ```

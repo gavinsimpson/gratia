@@ -112,11 +112,10 @@ for the available settings.
 
 ``` r
 load_mgcv()
-# Fit different spline bases to simulated Gaussian responses
-dat <- data_sim("eg1", n = 200, seed = 42)
-m <- gam(y ~ s(x0) + s(x1, bs = "cr") + s(x2, bs = "bs"),
-  data = dat, method = "REML")
+# Fit a cubic regression spline to simulated data.
+dat <- data_sim("eg1", n = 80, seed = 42)
+model <- gam(y ~ s(x0, bs = "cr", k = 6), data = dat, method = "REML")
 
-# Display the penalty matrices for the fitted smooths
-draw(penalty(m))
+# Plot the smooth's penalty matrix.
+draw(penalty(model))
 ```

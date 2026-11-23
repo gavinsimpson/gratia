@@ -48,7 +48,7 @@ fixed_effects(object, ...)
 
 ## Details
 
-Starting with gratia 0.12.0, use `fixed_effects()` for the models listed
+Starting with gratia 0.12.1, use `fixed_effects()` for the models listed
 above if you previously called
 [`gratia::fixef()`](https://rdrr.io/pkg/nlme/man/fixed.effects.html) or
 a [`fixef()`](https://rdrr.io/pkg/nlme/man/fixed.effects.html) method

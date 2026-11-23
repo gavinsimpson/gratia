@@ -276,14 +276,9 @@ Statistical Society: Series B, 82, 1059–1086.
 
 ``` r
 load_mgcv()
-df <- data_sim("eg1", n = 200, seed = 42)
-m <- gam(y ~ s(x0) + te(x1, x2, k = c(5, 5)) + s(x3),
+df <- data_sim("eg1", n = 120, seed = 42)
+# Estimate the effect of x1 in a model where it interacts with x2
+m <- gam(y ~ s(x0, k = 5) + te(x1, x2, k = c(4, 4)),
   data = df, method = "REML")
-a <- ale(m, focal = "x1")
-draw(a)
-
-
-# Standard deviation in its natural units, rather than reciprocal SD
-ml <- gam(list(y ~ s(x1), ~ x2), data = df, family = gaulss())
-ale(ml, "x2", parameter = "scale", scale = "response") |> draw()
+draw(ale(m, focal = "x1", n_bins = 12))
 ```

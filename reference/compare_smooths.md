@@ -124,43 +124,18 @@ drawn by this method.
 
 ``` r
 load_mgcv()
-dat <- data_sim("eg1", seed = 2)
+# Simulate a noisy curve and fit two smooths with different basis sizes.
+dat <- data_sim("gwf2", n = 100, seed = 2)
+coarse <- gam(y ~ s(x, k = 5), data = dat, method = "REML")
+fine <- gam(y ~ s(x, k = 10), data = dat, method = "REML")
 
-## models to compare smooths across - artificially create differences
-m1 <- gam(y ~ s(x0, k = 5) + s(x1, k = 5) + s(x2, k = 5) + s(x3, k = 5),
-  data = dat, method = "REML"
-)
-m2 <- gam(y ~ s(x0, bs = "ts") + s(x1, bs = "ts") + s(x2, bs = "ts") +
-  s(x3, bs = "ts"), data = dat, method = "REML")
-
-## build comparisons
-comp <- compare_smooths(m1, m2)
-comp
-#> # A tibble: 8 x 5
-#>   .model .smooth .type         .by   data              
-#>   <chr>  <chr>   <chr>         <chr> <list>            
-#> 1 m1     s(x0)   TPRS          NA    <tibble [100 x 3]>
-#> 2 m2     s(x0)   TPRS (shrink) NA    <tibble [100 x 3]>
-#> 3 m1     s(x1)   TPRS          NA    <tibble [100 x 3]>
-#> 4 m2     s(x1)   TPRS (shrink) NA    <tibble [100 x 3]>
-#> 5 m1     s(x2)   TPRS          NA    <tibble [100 x 3]>
-#> 6 m2     s(x2)   TPRS (shrink) NA    <tibble [100 x 3]>
-#> 7 m1     s(x3)   TPRS          NA    <tibble [100 x 3]>
-#> 8 m2     s(x3)   TPRS (shrink) NA    <tibble [100 x 3]>
-## notice that the result is a nested tibble
-
-draw(comp)
-
-
-# Simulate a noisy response over two continuous covariates, x and z
-surf <- data_sim("eg2", n = 100, seed = 7)
-# Fit two small bases to the same surface data
-coarse <- gam(y ~ s(x, z, k = 10), data = surf, method = "REML")
-fine <- gam(y ~ s(x, z, k = 15), data = surf, method = "REML")
-# Compare surfaces on shared axes and a shared colour scale
-surfaces <- compare_smooths(coarse, fine, n_2d = 20)
-draw(surfaces)
-
-# Show coarse minus fine, with a colour scale centred on zero
-draw(surfaces, show = "difference", pair = c("coarse", "fine"))
+# Compare the two smooths on the same grid and plot them together.
+comparison <- compare_smooths(coarse, fine, n = 40)
+comparison
+#> # A tibble: 2 x 5
+#>   .model .smooth .type .by   data             
+#>   <chr>  <chr>   <chr> <chr> <list>           
+#> 1 coarse s(x)    TPRS  NA    <tibble [40 x 3]>
+#> 2 fine   s(x)    TPRS  NA    <tibble [40 x 3]>
+draw(comparison)
 ```

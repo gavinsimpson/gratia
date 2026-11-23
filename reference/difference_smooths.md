@@ -355,46 +355,27 @@ worker inputs and returned results, in addition to the final output.
 
 ``` r
 load_mgcv()
-# Simulate group-specific curves with Gaussian noise and fit factor-by smooths
-df <- data_sim("eg4", n = 300, seed = 42)
-m <- gam(y ~ fac + s(x2, by = fac) + s(x0), data = df, method = "REML")
+# Simulate data and fit separate curves of x2 for two groups
+df <- data_sim("eg4", n = 180, seed = 42)
+df <- droplevels(subset(df, fac %in% c("1", "2")))
+m <- gam(y ~ fac + s(x2, by = fac, k = 6), data = df, method = "REML")
 
-# Compare the centred smooth shapes for each pair of factor levels
-sm_dif <- difference_smooths(m, select = "s(x2)")
+# Compare the centred smooth shapes between the two groups
+sm_dif <- difference_smooths(m, select = "s(x2)", n = 50)
 sm_dif
-#> # A tibble: 300 x 9
+#> # A tibble: 50 x 9
 #>    .smooth .by   .level_1 .level_2 .diff   .se .lower_ci .upper_ci      x2
 #>    <chr>   <chr> <chr>    <chr>    <dbl> <dbl>     <dbl>     <dbl>   <dbl>
-#>  1 s(x2)   fac   1        2         2.53 0.646      1.26      3.80 0.00359
-#>  2 s(x2)   fac   1        2         2.49 0.622      1.27      3.71 0.0136 
-#>  3 s(x2)   fac   1        2         2.45 0.598      1.28      3.62 0.0236 
-#>  4 s(x2)   fac   1        2         2.41 0.575      1.28      3.54 0.0336 
-#>  5 s(x2)   fac   1        2         2.37 0.553      1.29      3.45 0.0435 
-#>  6 s(x2)   fac   1        2         2.33 0.531      1.29      3.37 0.0535 
-#>  7 s(x2)   fac   1        2         2.29 0.511      1.29      3.29 0.0635 
-#>  8 s(x2)   fac   1        2         2.25 0.490      1.29      3.21 0.0735 
-#>  9 s(x2)   fac   1        2         2.21 0.471      1.29      3.13 0.0835 
-#> 10 s(x2)   fac   1        2         2.17 0.453      1.28      3.06 0.0935 
-#> # i 290 more rows
+#>  1 s(x2)   fac   1        2         1.56 0.983 -0.364         3.49 0.00143
+#>  2 s(x2)   fac   1        2         1.57 0.891 -0.178         3.31 0.0214 
+#>  3 s(x2)   fac   1        2         1.57 0.804 -0.000757      3.15 0.0414 
+#>  4 s(x2)   fac   1        2         1.58 0.723  0.163         3.00 0.0614 
+#>  5 s(x2)   fac   1        2         1.58 0.650  0.311         2.86 0.0813 
+#>  6 s(x2)   fac   1        2         1.59 0.586  0.437         2.73 0.101  
+#>  7 s(x2)   fac   1        2         1.58 0.533  0.540         2.63 0.121  
+#>  8 s(x2)   fac   1        2         1.58 0.491  0.617         2.54 0.141  
+#>  9 s(x2)   fac   1        2         1.57 0.459  0.671         2.47 0.161  
+#> 10 s(x2)   fac   1        2         1.55 0.435  0.702         2.41 0.181  
+#> # i 40 more rows
 draw(sm_dif)
-
-
-# Compare rates of change instead of smooth values, using the same fit
-slope_dif <- difference_smooths(m, select = "s(x2)", order = 1)
-slope_dif
-#> # A tibble: 300 x 10
-#>    .smooth .focal .by   .level_1 .level_2 .diff   .se .lower_ci .upper_ci
-#>    <chr>   <chr>  <chr> <chr>    <chr>    <dbl> <dbl>     <dbl>     <dbl>
-#>  1 s(x2)   x2     fac   1        2        -4.03  2.98     -9.88      1.82
-#>  2 s(x2)   x2     fac   1        2        -4.03  2.98     -9.88      1.82
-#>  3 s(x2)   x2     fac   1        2        -4.03  2.98     -9.86      1.80
-#>  4 s(x2)   x2     fac   1        2        -4.03  2.96     -9.82      1.77
-#>  5 s(x2)   x2     fac   1        2        -4.03  2.93     -9.76      1.71
-#>  6 s(x2)   x2     fac   1        2        -4.02  2.88     -9.68      1.63
-#>  7 s(x2)   x2     fac   1        2        -4.02  2.83     -9.58      1.54
-#>  8 s(x2)   x2     fac   1        2        -4.02  2.78     -9.46      1.43
-#>  9 s(x2)   x2     fac   1        2        -4.01  2.72     -9.34      1.31
-#> 10 s(x2)   x2     fac   1        2        -4.01  2.66     -9.21      1.20
-#> # i 290 more rows
-#> # i 1 more variable: x2 <dbl>
 ```

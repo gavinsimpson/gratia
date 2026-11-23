@@ -26,7 +26,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2-76</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.12.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -44,7 +44,7 @@
     <li><a class="dropdown-item" href="../articles/data-slices.html">Creating prediction grids with data_slice()</a></li>
     <li><a class="dropdown-item" href="../articles/custom-plotting.html">Customising gratia plots</a></li>
     <li><a class="dropdown-item" href="../articles/posterior-simulation.html">Posterior simulation of GAM smooths, fitted values and responses</a></li>
-    <li><a class="dropdown-item" href="../articles/sampling-migration.html">Updating sampling code for gratia 0.12.0</a></li>
+    <li><a class="dropdown-item" href="../articles/sampling-migration.html">Updating sampling code for gratia 0.12.1</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Models</h6></li>
     <li><a class="dropdown-item" href="../articles/model-checking.html">Residual diagnostics and posterior predictive checks with gratia</a></li>
@@ -108,7 +108,7 @@ dependence between observations made in sequence. <a href="response-distribution
 discrete and censored responses</a> extends the examples to
 distributional parameters, censoring and weights. The articles on <a href="gfam-support.html"><code>mgcv::gfam()</code></a>, <a href="glmmTMB-support.html">{glmmTMB}</a> and <a href="sdmTMB-support.html">{sdmTMB}</a> illustrate diagnostics for those
 model classes.</p>
-<p>These examples require gratia 0.12.0 or later, R &gt;= 4.4.0 and
+<p>These examples require gratia 0.12.1 or later, R &gt;= 4.4.0 and
 {mgcv} &gt;= 1.9-4. We load mgcv and gratia for fitting and diagnostics,
 and {dplyr} and {ggplot2} for working with the results. The growth
 example also needs the optional {nlme}, {lme4} and {gamm4} packages
@@ -405,7 +405,7 @@ child, very detailed individual curves are not supported.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">growth_fit</span><span class="op">)</span><span class="op">$</span><span class="va">tTable</span></span>
 <span><span class="co">#&gt;                      Value  Std.Error DF   t-value      p-value</span></span>
 <span><span class="co">#&gt; (Intercept)     24.9687500 0.48600071 79 51.375953 1.812713e-62</span></span>
-<span><span class="co">#&gt; SexFemale       -2.3210227 0.76141679 25 -3.048295 5.375053e-03</span></span>
+<span><span class="co">#&gt; SexFemale       -2.3210227 0.76141678 25 -3.048295 5.375053e-03</span></span>
 <span><span class="co">#&gt; age_c            0.7843750 0.08599951 79  9.120691 5.654754e-14</span></span>
 <span><span class="co">#&gt; SexFemale:age_c -0.3048295 0.13473534 79 -2.262432 2.641752e-02</span></span></code></pre></div>
 <p>The age coefficient describes mean growth in the reference sex, and

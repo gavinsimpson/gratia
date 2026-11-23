@@ -99,18 +99,9 @@ to compute the data for the rootogram.
 ## Examples
 
 ``` r
-load_mgcv()
-df <- data_sim("eg1", n = 1000, dist = "poisson", scale = 0.1, seed = 6)
-
-# A poisson example
-m <- gam(y ~ s(x0, bs = "cr") + s(x1, bs = "cr") + s(x2, bs = "cr") +
-  s(x3, bs = "cr"), family = poisson(), data = df, method = "REML")
-rg <- rootogram(m)
-
-# plot the rootogram
-draw(rg)
-
-
-# change the type of rootogram
-draw(rg, type = "suspended")
+# Fit a Poisson model for the counts under each spray treatment.
+m <- mgcv::gam(count ~ spray, family = poisson(),
+  data = InsectSprays, method = "REML")
+# Draw a suspended rootogram to show the differences from fitted frequencies.
+draw(rootogram(m), type = "suspended")
 ```

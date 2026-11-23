@@ -90,22 +90,3 @@ use `&` to affect every panel. Plots delegated to bayesplot retain that
 package's styling.
 
 ## Examples
-
-``` r
-library("ggplot2")
-old <- gratia_theme_set(theme(
-  geom.gratia.smooth = element_geom(colour = "navy"),
-  gratia.alpha.interval = 0.15
-))
-gratia_theme_update(geom.gratia.contour = element_geom(colour = "grey40"))
-gratia_theme_set(old)
-
-pal <- gratia_palette("tol_banded_16")
-theme(palette.colour.discrete = pal, palette.fill.discrete = pal)
-#> <theme>List of 2
-#>  $ palette.colour.discrete:function (n)  
-#>  $ palette.fill.discrete  :function (n)  
-#>  - attr(*, "class")= chr "gg"
-#>  @ complete: logi FALSE
-#>  @ validate: logi TRUE
-```

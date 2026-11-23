@@ -122,19 +122,19 @@ proportional to the number of observations times the number of draws.
 if (requireNamespace("loo", quietly = TRUE)) {
   load_mgcv()
   m <- gam(mpg ~ s(wt, k = 5), data = mtcars, method = "REML")
-  loo::loo(m, n_draws = 500, seed = 42)
+  loo::loo(m, n_draws = 300, seed = 42)
 }
 #> 
-#> Computed from 500 by 32 log-likelihood matrix.
+#> Computed from 300 by 32 log-likelihood matrix.
 #> 
 #>          Estimate  SE
-#> elpd_loo    -78.5 3.8
-#> p_loo         2.9 0.8
-#> looic       156.9 7.5
+#> elpd_loo    -78.6 3.8
+#> p_loo         3.0 0.8
+#> looic       157.2 7.6
 #> ------
 #> MCSE of elpd_loo is 0.1.
 #> MCSE and ESS estimates assume independent draws (r_eff=1).
 #> 
-#> All Pareto k estimates are good (k < 0.63).
+#> All Pareto k estimates are good (k < 0.6).
 #> See help('pareto-k-diagnostic') for details.
 ```

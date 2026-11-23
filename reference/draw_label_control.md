@@ -74,19 +74,12 @@ control.
 ## Examples
 
 ``` r
-# Wrap categorical tick labels and stagger them across two rows.
-layout <- draw_label_control(axes = list(wrap = 12, n_dodge = 2))
-
-# Reuse one configuration for legend text and colour-bar layout.
-layout <- draw_label_control(
-  axes = list(wrap = 12),
-  legend = list(wrap = 20, title_wrap = 20, ncol = 2),
-  colourbar = list(title_wrap = 20, height = grid::unit(35, "mm"))
-)
-
-# Draw a model with the requested layout.
 load_mgcv()
-dat <- data_sim("eg4", n = 100, seed = 42)
-model <- gam(y ~ fac + s(x2, by = fac, k = 5), data = dat, method = "REML")
-draw(model, label_control = layout)
+dat <- data_sim("eg4", n = 80, seed = 42)
+levels(dat$fac) <- c("Coastal meadow", "Lowland forest", "Upland grassland")
+model <- gam(y ~ fac + s(x2, k = 5), data = dat, method = "REML")
+
+# Wrap the group names on the effect plot and stagger them across two rows.
+layout <- draw_label_control(axes = list(wrap = 10, n_dodge = 2))
+draw(parametric_effects(model, terms = "fac"), label_control = layout)
 ```

@@ -489,11 +489,8 @@ and optionally
 ## Examples
 
 ``` r
-load_mgcv()
-# Simulate an additive Gaussian response and fit a GAM
-dat <- data_sim("eg1", n = 200, scale = 2, seed = 2)
-mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
-
-# Inspect residuals, fitted values and the residual distribution
+# Fit stopping distance as a smooth function of speed.
+mod <- mgcv::gam(dist ~ s(speed, k = 5), data = cars, method = "REML")
+# Inspect residuals, fitted values and the residual distribution.
 appraise(mod, seed = 42)
 ```

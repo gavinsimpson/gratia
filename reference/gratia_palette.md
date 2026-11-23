@@ -48,19 +48,3 @@ when larger sets of colours are required. See
 <https://sronpersonalpages.nl/~pault/> for the definitions and examples.
 
 ## Examples
-
-``` r
-pal <- gratia_palette("tol_muted")
-pal(5)
-#> [1] "#CC6677" "#332288" "#DDCC77" "#117733" "#88CCEE"
-ggplot2::theme(
-  palette.colour.discrete = pal,
-  palette.fill.discrete = pal
-)
-#> <theme>List of 2
-#>  $ palette.colour.discrete:function (n)  
-#>  $ palette.fill.discrete  :function (n)  
-#>  - attr(*, "class")= chr "gg"
-#>  @ complete: logi FALSE
-#>  @ validate: logi TRUE
-```
