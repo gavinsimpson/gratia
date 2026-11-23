@@ -29,7 +29,7 @@ ci3d_data <- function() {
   d
 }
 
-expect_ci3d <- function(p, alpha = 0.15, colour = "grey60") {
+expect_ci3d <- function(p, alpha = 0.42, colour = "#344054") {
   scene <- ci3d_scene(p)
   estimate <- scene[scene$.surface_role %in% "estimate", ]
   lower <- scene[scene$.surface_role %in% "lower", ]

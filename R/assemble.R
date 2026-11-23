@@ -120,7 +120,7 @@
   surface = c("raster", "tile", "3d"),
   surface_3d = list(),
   ci_3d = FALSE,
-  ci_3d_alpha = 0.15, ci_3d_col = "grey60",
+  ci_3d_alpha = 0.42, ci_3d_col = "#344054",
   back_transform = FALSE,
   re_levels = NULL,
   mrf_plot = c("effects", "qq"),

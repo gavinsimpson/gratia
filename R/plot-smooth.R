@@ -474,7 +474,7 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
   labels = labs(), surface = c("raster", "tile", "3d"),
   surface_3d = list(),
   ci_3d = FALSE,
-  ci_3d_alpha = 0.15, ci_3d_col = "grey60", continuous_fill = NULL,
+  ci_3d_alpha = 0.42, ci_3d_col = "#344054", continuous_fill = NULL,
   contour = TRUE, contour_col = "black", n_contour = NULL, angle = NULL,
   facet = NULL, coord = NULL, rug = NULL, boundary = NULL, boundary_group = NULL,
   mapping = NULL, contour_mapping = NULL, contour_na_rm = TRUE,
@@ -611,7 +611,7 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
   surface = c("raster", "tile", "3d"),
   surface_3d = list(),
   ci_3d = FALSE,
-  ci_3d_alpha = 0.15, ci_3d_col = "grey60",
+  ci_3d_alpha = 0.42, ci_3d_col = "#344054",
   surface_support = NULL,
   ...
 ) {
@@ -667,7 +667,7 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
   surface = c("raster", "tile", "3d"),
   surface_3d = list(),
   ci_3d = FALSE,
-  ci_3d_alpha = 0.15, ci_3d_col = "grey60",
+  ci_3d_alpha = 0.42, ci_3d_col = "#344054",
   surface_support = NULL,
   ...
 ) {
@@ -731,7 +731,7 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
   surface = c("raster", "tile", "3d"),
   surface_3d = list(),
   ci_3d = FALSE,
-  ci_3d_alpha = 0.15, ci_3d_col = "grey60",
+  ci_3d_alpha = 0.42, ci_3d_col = "#344054",
   surface_support = NULL,
   ...
 ) {
@@ -776,7 +776,7 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
   surface = c("raster", "tile", "3d"),
   surface_3d = list(),
   ci_3d = FALSE,
-  ci_3d_alpha = 0.15, ci_3d_col = "grey60",
+  ci_3d_alpha = 0.42, ci_3d_col = "#344054",
   surface_support = NULL,
   ...
 ) {
@@ -1185,7 +1185,7 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
   angle = NULL,
   surface = "raster", surface_3d = list(),
   ci_3d = FALSE,
-  ci_3d_alpha = 0.15, ci_3d_col = "grey60",
+  ci_3d_alpha = 0.42, ci_3d_col = "#344054",
   grouped_by = FALSE, facet_vars = NULL,
   ...
 ) {
@@ -1354,7 +1354,7 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
   surface = c("raster", "tile", "3d"),
   surface_3d = list(),
   ci_3d = FALSE,
-  ci_3d_alpha = 0.15, ci_3d_col = "grey60",
+  ci_3d_alpha = 0.42, ci_3d_col = "#344054",
   surface_support = NULL,
   ...
 ) {

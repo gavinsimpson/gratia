@@ -56,8 +56,8 @@
   surface = c("raster", "tile", "3d"),
   surface_3d = list(),
   ci_3d = FALSE,
-  ci_3d_alpha = 0.15,
-  ci_3d_col = "grey60",
+  ci_3d_alpha = 0.42,
+  ci_3d_col = "#344054",
   back_transform = FALSE,
   re_levels = NULL,
   mrf_plot = c("effects", "qq"),
@@ -312,11 +312,11 @@ Smooth bounds follow \code{interval}; parametric bounds remain pointwise.}
 
 \item{ci_3d_alpha}{Deprecated; use \code{\link[=gratia_theme_get]{gratia_theme_get()}} theme
 settings instead. Numeric between 0 and 1; opacity of both interval
-surfaces, independent of \code{ci_alpha}. Defaults to \code{0.15}.}
+surfaces, independent of \code{ci_alpha}. Defaults to \code{0.42}.}
 
 \item{ci_3d_col}{Deprecated; use \code{\link[=gratia_theme_get]{gratia_theme_get()}} theme
 settings instead. One R colour; fill of both interval surfaces, independent
-of \code{ci_col} and the estimate's continuous fill scale. Defaults to \code{"grey60"}.}
+of \code{ci_col} and the estimate's continuous fill scale. Defaults to \code{"#344054"}.}
 
 \item{back_transform}{logical; plot covariates on their original scale?
 Defaults to \code{FALSE}, using model coordinates such as \code{log(x)} for a term

@@ -210,10 +210,10 @@
 #'   Smooth bounds follow `interval`; parametric bounds remain pointwise.
 #' @param ci_3d_alpha Deprecated; use [gratia_theme_get()] theme
 #'   settings instead. Numeric between 0 and 1; opacity of both interval
-#'   surfaces, independent of `ci_alpha`. Defaults to `0.15`.
+#'   surfaces, independent of `ci_alpha`. Defaults to `0.42`.
 #' @param ci_3d_col Deprecated; use [gratia_theme_get()] theme
 #'   settings instead. One R colour; fill of both interval surfaces, independent
-#'   of `ci_col` and the estimate's continuous fill scale. Defaults to `"grey60"`.
+#'   of `ci_col` and the estimate's continuous fill scale. Defaults to `"#344054"`.
 #' @param surface_3d named list of view options passed to [ggcube::coord_3d()],
 #'   for example `list(yaw = 45, persp = FALSE)`. The default [base::list()] uses the
 #'   default view with `ggcube::light(backface_scale = 1)`, preserving equal
@@ -417,7 +417,7 @@
   surface = c("raster", "tile", "3d"),
   surface_3d = list(),
   ci_3d = FALSE,
-  ci_3d_alpha = 0.15, ci_3d_col = "grey60",
+  ci_3d_alpha = 0.42, ci_3d_col = "#344054",
   back_transform = FALSE,
   re_levels = NULL,
   mrf_plot = c("effects", "qq"),
@@ -484,7 +484,7 @@ draw_gam_impl <- function(
   surface = c("raster", "tile", "3d"),
   surface_3d = list(),
   ci_3d = FALSE,
-  ci_3d_alpha = 0.15, ci_3d_col = "grey60",
+  ci_3d_alpha = 0.42, ci_3d_col = "#344054",
   back_transform = FALSE,
   re_levels = NULL,
   mrf_plot = c("effects", "qq"),

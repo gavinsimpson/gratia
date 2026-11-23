@@ -1,3 +1,11 @@
+# gratia (development version)
+
+## User visible changes
+
+* The lower and upper 3D interval surfaces in `draw()` now use a darker fill
+  (`#344054`) at 42% opacity so the bounds are easier to see against the
+  default grey background (#448).
+
 # gratia 0.12.1
 
 ## CRAN submission

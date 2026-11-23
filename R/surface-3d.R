@@ -562,7 +562,7 @@ prepare_surface_3d <- function(
   object, x_var, y_var, fill_var, fill_limits,
   fill_title, labels, continuous_fill, contour, contour_col, n_contour,
   facet, facet_vars, rug, boundary, boundary_group, surface_3d, isotropic,
-  support, z_limits, ci_3d = FALSE, ci_3d_alpha = 0.15, ci_3d_col = "grey60"
+  support, z_limits, ci_3d = FALSE, ci_3d_alpha = 0.42, ci_3d_col = "#344054"
 ) {
   surface_dependency("ggcube", "3D surface plotting")
   if (utils::packageVersion("ggcube") < "0.3.0") {
