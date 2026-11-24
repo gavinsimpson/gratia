@@ -3,13 +3,20 @@ name: Secondary tests
 on:
   workflow_dispatch:
   workflow_call:
+    inputs:
+      check:
+        description: Secondary checks to run
+        type: string
+        default: all
 
 permissions:
   contents: read
 
 jobs:
   visual:
+    if: inputs.check == '' || inputs.check == 'all' || inputs.check == 'visual'
     runs-on: macos-26
+    timeout-minutes: 180
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       NOT_CRAN: "true"
@@ -36,6 +43,7 @@ jobs:
         run: R CMD INSTALL .
         shell: bash
       - name: Run tests including visual snapshots
+        timeout-minutes: 90
         env:
           VDIFFR_LOG_PATH: "${{ runner.temp }}/vdiffr.log"
         run: |
@@ -44,14 +52,16 @@ jobs:
           testthat::test_local(stop_on_failure = TRUE)
         shell: Rscript {0}
       - uses: actions/upload-artifact@v7
-        if: failure()
+        if: failure() || cancelled()
         with:
           name: visual-test-failures
+          if-no-files-found: ignore
           path: |
             tests/testthat/_snaps
             ${{ runner.temp }}/vdiffr.log
 
   paper-examples:
+    if: inputs.check == '' || inputs.check == 'all' || inputs.check == 'paper-examples'
     runs-on: ubuntu-latest
     timeout-minutes: 120
     env:
@@ -72,6 +82,7 @@ jobs:
         run: R CMD INSTALL .
         shell: bash
       - name: Run paper-sized integration examples
+        timeout-minutes: 90
         run: |
           elapsed <- system.time(results <- testthat::test_local(
             filter = "^hgam-paper$", reporter = "summary", stop_on_failure = FALSE
@@ -100,4 +111,5 @@ jobs:
         with:
           name: hgam-test-timings
           path: hgam-test-timings.csv
+          if-no-files-found: ignore
           retention-days: 90

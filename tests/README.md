@@ -63,24 +63,50 @@ macOS and Windows with R release. Visual comparisons and the paper-sized HGAM
 examples are disabled in these checks. The complete pkgdown website also builds
 on every push and pull request; pushes update the development website.
 
-The weekly workflow runs on Mondays at 04:17 UTC. It checks main against the
-last successful scheduled run and skips the expensive jobs when the commit has
-not changed. A failed suite is retried the following week. A manual weekly run
-always runs the full suite on the selected ref.
+## Weekly GitHub Actions checks
 
-The weekly suite includes broader package checks on Linux, macOS and Windows,
-Windows ARM, R devel, macOS oldrel, development glmmTMB, the separate sdmTMB
-compatibility jobs, coverage, visual comparisons and the paper-sized HGAM
-examples. The oldrel job uses the CRAN-core tests; the other package checks and
-coverage use the broader suite. Optional inlaws, bayesplot and loo integration
-checks run after the weekly Linux R-release package check, so their failures
-cannot prevent that package check from running. The individual secondary,
-sdmTMB and coverage workflows can also be run manually.
+**Weekly checks** runs on Mondays at 04:17 UTC. It includes package checks with
+released dependencies on Linux, macOS and Windows, including Windows ARM and
+macOS R oldrel. It also runs the separate sdmTMB compatibility jobs, coverage,
+visual comparisons and the paper-sized HGAM examples. The oldrel job uses the
+CRAN-core tests. The other package checks and coverage use the broader suite.
+The optional bayesplot and loo integration checks run after the Linux R-release
+package check, so their failures cannot prevent that package check from running.
 
-The weekly macOS visual job uses a fixed R version and Apple Accelerate BLAS,
-matching the local baseline environment; image differences should be reviewed,
-not automatically accepted. Existing platform restrictions on legacy numerical
-snapshots remain in place.
+**Weekly upstream compatibility** runs on Mondays at 04:27 UTC. It checks
+R devel, development glmmTMB and inlaws from GitHub. Both scheduled workflows
+run even when `main` has no new commits, so they can detect changes in upstream
+dependencies.
+
+Weekly package checks record the R, runner and dependency versions in the job
+summary, including the commit for packages installed from GitHub. On failure,
+the check logs and test progress are available as an artifact. The package check
+step has a 90-minute limit so a stalled test leaves time to collect those logs.
+
+To run all weekly and upstream checks on demand, use the default `check=all`
+setting in **Weekly checks**. Use the `check` input to run a single check.
+
+```sh
+gh workflow run weekly-checks.yaml --ref main
+gh workflow run weekly-checks.yaml --ref main -f check=glmmtmb-development
+```
+
+Other choices include `r-devel`, `package-windows-arm`, `visual`,
+`paper-examples`, `sdmtmb-linux`, `sdmtmb-windows-arm` and `coverage`. To run
+only the spatial tests from the Windows ARM package job, use
+`-f check=windows-arm-spatial`. To run only the upstream checks, use
+**Weekly upstream compatibility**, or run
+`gh workflow run weekly-upstream.yaml --ref main`. That workflow also accepts
+`-f check=glmmtmb-development` to run just the development glmmTMB check.
+The secondary, sdmTMB and coverage workflows also support manual runs.
+
+A fresh dispatch uses the current commit of the selected ref. A rerun from
+an earlier workflow run uses that run's original commit. Dispatch a fresh run
+against `main` to verify a fix that has since been merged.
+
+The weekly macOS visual job uses R 4.6.2 with R's reference BLAS to match the
+snapshot baselines. Review image differences before accepting them. Some
+legacy numerical snapshots have platform restrictions.
 
 ## Fixtures and assertions
 

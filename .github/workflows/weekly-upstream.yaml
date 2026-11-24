@@ -1,0 +1,39 @@
+name: Weekly upstream compatibility
+run-name: Weekly upstream compatibility (${{ inputs.check || 'scheduled' }})
+
+on:
+  schedule:
+    - cron: '27 4 * * 1'
+  workflow_dispatch:
+    inputs:
+      check:
+        description: Upstream check to run on the selected branch
+        type: choice
+        default: all
+        options:
+          - all
+          - r-devel
+          - glmmtmb-development
+          - inlaws
+  workflow_call:
+    inputs:
+      check:
+        description: Upstream check to run
+        type: string
+        default: all
+
+permissions:
+  contents: read
+
+jobs:
+  compatibility:
+    uses: ./.github/workflows/R-CMD-check.yaml
+    with:
+      group: weekly-upstream
+      check: ${{ inputs.check != 'all' && inputs.check || '' }}
+      config: >-
+        {
+          "r-devel": {"id": "r-devel", "os": "ubuntu-latest", "r": "devel", "http-user-agent": "release", "tests": "full", "not_cran": "true"},
+          "glmmtmb-development": {"id": "glmmtmb-development", "os": "ubuntu-latest", "r": "release", "tests": "full", "not_cran": "true", "glmmtmb": "development"},
+          "inlaws": {"id": "inlaws", "os": "ubuntu-latest", "r": "release", "tests": "inlaws integration", "not_cran": "true"}
+        }

@@ -9,28 +9,38 @@ on:
   workflow_call:
     inputs:
       config:
-        description: R and platform combinations for package checks
+        description: JSON object of package checks keyed by check name
         required: true
+        type: string
+      check:
+        description: Select one check from the supplied configuration
+        type: string
+      group:
+        description: Concurrency group for the supplied configuration
         type: string
 
 name: R-CMD-check
 
 concurrency:
-  group: R-CMD-check-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  group: R-CMD-check-${{ github.workflow }}-${{ github.ref }}-${{ inputs.group || 'default' }}-${{ inputs.check || 'all' }}
+  cancel-in-progress: ${{ !inputs.config }}
 
 jobs:
   R-CMD-check:
     runs-on: ${{ matrix.config.os }}
+    timeout-minutes: ${{ inputs.config && 180 || 360 }}
 
-    name: ${{ matrix.config.os }} (${{ matrix.config.r }}, ${{ matrix.config.tests }}, glmmTMB ${{ matrix.config.glmmtmb || 'release' }})
+    name: ${{ matrix.config.id == 'inlaws' && 'inlaws development integration' || format('{0} ({1}, {2}, glmmTMB {3})', matrix.config.os, matrix.config.r, matrix.config.tests, matrix.config.glmmtmb || 'release') }}
 
     strategy:
       fail-fast: false
       matrix:
-        # The weekly workflow supplies the broader compatibility matrix.
+        # Weekly checks can select one configuration or run all supplied configurations.
         config: >-
-          ${{ fromJSON(inputs.config || '[
+          ${{ inputs.config && (
+            inputs.check && fromJSON(format('[{0}]', toJSON(fromJSON(inputs.config)[inputs.check]))) ||
+            fromJSON(inputs.config).*
+          ) || fromJSON('[
             {"os": "macOS-latest", "r": "release", "tests": "CRAN core", "not_cran": "false"},
             {"os": "windows-latest", "r": "release", "tests": "CRAN core", "not_cran": "false"},
             {"os": "ubuntu-latest", "r": "release", "tests": "CRAN core", "not_cran": "false"}
@@ -65,7 +75,7 @@ jobs:
           print(sessionInfo())
 
       - name: Install ghostscript on Linux
-        if: runner.os == 'Linux'
+        if: runner.os == 'Linux' && matrix.config.id != 'inlaws'
         run: |
           sudo apt-get update
           sudo apt-get -y install ghostscript
@@ -81,6 +91,39 @@ jobs:
             ${{ runner.os == 'macOS' && 'TMB=?source&reinstall' || '' }}
           pak-version: stable
           needs: check
+
+      - name: Record the check environment
+        if: inputs.config != ''
+        shell: Rscript {0}
+        run: |
+          describe_package <- function(package) {
+            if (!length(find.package(package, quiet = TRUE))) {
+              return(paste(package, "unavailable"))
+            }
+            desc <- utils::packageDescription(package)
+            paste(c(package, desc$Version, desc$RemoteSha), collapse = " ")
+          }
+          packages <- c("mgcv", "Matrix", "TMB", "glmmTMB", "GJRM", "ggplot2",
+            "testthat", "vdiffr", "sf", "s2")
+          details <- c(
+            paste("gratia commit", Sys.getenv("GITHUB_SHA")),
+            paste("Runner", Sys.getenv("RUNNER_OS"), Sys.getenv("RUNNER_ARCH"),
+              Sys.getenv("ImageOS"), Sys.getenv("ImageVersion")),
+            paste(R.version.string, R.version$platform),
+            paste("BLAS", extSoftVersion()["BLAS"]),
+            vapply(packages, describe_package, character(1))
+          )
+          if (Sys.getenv("RUNNER_ARCH") == "ARM64" &&
+              Sys.getenv("RUNNER_OS") == "Windows" &&
+              requireNamespace("sf", quietly = TRUE)) {
+            versions <- sf::sf_extSoftVersion()
+            details <- c(details, paste(names(versions), versions),
+              paste("PROJ search path", sf::sf_proj_info("path")))
+          }
+          writeLines(details, file.path(Sys.getenv("RUNNER_TEMP"), "check-environment.txt"))
+          cat("### Check environment\n\n", paste0("- ", details, collapse = "\n"),
+            "\n", sep = "", file = Sys.getenv("GITHUB_STEP_SUMMARY"), append = TRUE)
+          writeLines(details)
 
       - name: Run focused macOS oldrel threshold tests
         if: runner.os == 'macOS' && matrix.config.r == 'oldrel'
@@ -98,28 +141,49 @@ jobs:
         shell: bash
 
       - uses: r-lib/actions/check-r-package@v2
+        if: matrix.config.id != 'inlaws' && matrix.config.id != 'windows-arm-spatial'
+        timeout-minutes: ${{ inputs.config && 90 || 360 }}
         env:
           GRATIA_ISOLATE_SPATIAL_TESTS: ${{ runner.os == 'Windows' && runner.arch == 'ARM64' && 'true' || 'false' }}
-          GRATIA_TEST_PROGRESS: ${{ (runner.os == 'macOS' && matrix.config.r == 'oldrel' || runner.os == 'Windows' && runner.arch == 'ARM64') && format('{0}/check-test-progress.log', runner.temp) || '' }}
+          GRATIA_TEST_PROGRESS: ${{ inputs.config && format('{0}/check-test-progress.log', runner.temp) || '' }}
         with:
           upload-snapshots: true
           build_args: 'c("--no-manual","--compact-vignettes=gs+qpdf")'
 
-      # Optional integrations run weekly, after the package check has finished.
+      - name: Run the isolated Windows ARM spatial tests
+        if: matrix.config.id == 'windows-arm-spatial'
+        timeout-minutes: 30
+        env:
+          GRATIA_RUN_HGAM: "false"
+          GRATIA_TEST_PROGRESS: ${{ runner.temp }}/check-test-progress.log
+        shell: Rscript {0}
+        run: |
+          source("tests/testthat/helper-builder-diagnostics.R")
+          Sys.setenv(GRATIA_TEST_FILTER = builder_spatial_test_filter())
+          source("tools/run-tests.R")
+
       - name: Check optional inlaws diagnostic integration
-        if: ${{ !cancelled() && runner.os == 'Linux' && matrix.config.r == 'release' && matrix.config.tests == 'full' && matrix.config.glmmtmb != 'development' }}
+        if: matrix.config.id == 'inlaws'
+        timeout-minutes: 30
         shell: Rscript {0}
         run: |
           pak::pkg_install("gam-mafia/inlaws")
+          desc <- utils::packageDescription("inlaws")
+          detail <- paste("inlaws", desc$Version, desc$RemoteSha)
+          write(detail, file.path(Sys.getenv("RUNNER_TEMP"), "check-environment.txt"),
+            append = TRUE)
+          cat("- ", detail, "\n", sep = "", file = Sys.getenv("GITHUB_STEP_SUMMARY"),
+            append = TRUE)
           source("tools/test-inlaws-diagnostics.R")
 
       - name: Check optional bayesplot and loo integration
-        if: ${{ !cancelled() && runner.os == 'Linux' && matrix.config.r == 'release' && matrix.config.tests == 'full' && matrix.config.glmmtmb != 'development' }}
+        if: ${{ !cancelled() && matrix.config.id == 'package-ubuntu' }}
+        timeout-minutes: 30
         run: Rscript --vanilla inst/validation/optional-bayesplot-loo.R
         shell: bash
 
       - name: Show test progress and check output
-        if: always() && (runner.os == 'macOS' && matrix.config.r == 'oldrel' || runner.os == 'Windows' && runner.arch == 'ARM64')
+        if: always() && inputs.config != '' && (failure() || cancelled())
         shell: bash
         run: |
           for log in "$RUNNER_TEMP/threshold-test-progress.log" "$RUNNER_TEMP/check-test-progress.log"; do
@@ -134,12 +198,13 @@ jobs:
           fi
 
       - name: Upload test progress and check logs
-        if: always() && (runner.os == 'macOS' && matrix.config.r == 'oldrel' || runner.os == 'Windows' && runner.arch == 'ARM64')
+        if: always() && inputs.config != '' && (failure() || cancelled())
         uses: actions/upload-artifact@v7
         with:
-          name: ${{ runner.os }}-${{ runner.arch }}-${{ matrix.config.r }}-check-logs
+          name: ${{ matrix.config.id }}-check-logs
           if-no-files-found: ignore
           path: |
+            ${{ runner.temp }}/check-environment.txt
             ${{ runner.temp }}/threshold-test-progress.log
             ${{ runner.temp }}/check-test-progress.log
             check/**/tests/test-*.Rout*

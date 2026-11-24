@@ -1,77 +1,86 @@
 name: Weekly checks
+run-name: Weekly checks (${{ inputs.check || 'scheduled' }})
 
 on:
   schedule:
     - cron: '17 4 * * 1'
   workflow_dispatch:
+    inputs:
+      check:
+        description: Check to run on the selected branch
+        type: choice
+        default: all
+        options:
+          - all
+          - packages
+          - package-ubuntu
+          - package-macos
+          - package-macos-oldrel
+          - package-windows
+          - package-windows-arm
+          - windows-arm-spatial
+          - visual
+          - paper-examples
+          - sdmtmb-linux
+          - sdmtmb-windows-arm
+          - coverage
+          - r-devel
+          - glmmtmb-development
+          - inlaws
 
 permissions:
   contents: read
-  actions: read
 
 concurrency:
-  group: weekly-checks-${{ github.ref }}
+  group: weekly-checks-${{ github.ref }}-${{ inputs.check || 'scheduled' }}
 
 jobs:
-  changes:
-    name: Check whether the weekly suite is needed
-    runs-on: ubuntu-latest
-    outputs:
-      run: ${{ steps.changes.outputs.run }}
-    steps:
-      - uses: actions/github-script@v8
-        id: changes
-        with:
-          script: |
-            // Manual runs always exercise the full suite on the selected ref.
-            if (context.eventName === 'workflow_dispatch') {
-              core.setOutput('run', 'true');
-              core.info('Running the weekly suite by request.');
-              return;
-            }
-            const { data } = await github.rest.actions.listWorkflowRuns({
-              ...context.repo,
-              workflow_id: 'weekly-checks.yaml',
-              branch: context.payload.repository.default_branch,
-              event: 'schedule',
-              status: 'success',
-              per_page: 1
-            });
-            const previous = data.workflow_runs[0];
-            const changed = !previous || previous.head_sha !== context.sha;
-            core.setOutput('run', String(changed));
-            core.info(changed
-              ? 'Running: main has not passed the weekly suite at this commit.'
-              : 'Skipping: main is unchanged since the last successful weekly run.');
-
   package-checks:
-    needs: changes
-    if: needs.changes.outputs.run == 'true'
+    if: ${{ !inputs.check || inputs.check == 'all' || inputs.check == 'packages' || startsWith(inputs.check, 'package-') }}
     uses: ./.github/workflows/R-CMD-check.yaml
     with:
+      group: weekly-packages
+      check: ${{ startsWith(inputs.check, 'package-') && inputs.check || '' }}
       config: >-
-        [
-          {"os": "macOS-latest", "r": "release", "tests": "full", "not_cran": "true"},
-          {"os": "macOS-latest", "r": "oldrel", "tests": "CRAN core", "not_cran": "false"},
-          {"os": "windows-latest", "r": "release", "tests": "full", "not_cran": "true"},
-          {"os": "windows-11-arm", "r": "release", "tests": "full", "not_cran": "true"},
-          {"os": "ubuntu-latest", "r": "devel", "http-user-agent": "release", "tests": "full", "not_cran": "true"},
-          {"os": "ubuntu-latest", "r": "release", "tests": "full", "not_cran": "true"},
-          {"os": "ubuntu-latest", "r": "release", "tests": "full", "not_cran": "true", "glmmtmb": "development"}
-        ]
+        {
+          "package-ubuntu": {"id": "package-ubuntu", "os": "ubuntu-latest", "r": "release", "tests": "full", "not_cran": "true"},
+          "package-macos": {"id": "package-macos", "os": "macOS-latest", "r": "release", "tests": "full", "not_cran": "true"},
+          "package-macos-oldrel": {"id": "package-macos-oldrel", "os": "macOS-latest", "r": "oldrel", "tests": "CRAN core", "not_cran": "false"},
+          "package-windows": {"id": "package-windows", "os": "windows-latest", "r": "release", "tests": "full", "not_cran": "true"},
+          "package-windows-arm": {"id": "package-windows-arm", "os": "windows-11-arm", "r": "release", "tests": "full", "not_cran": "true"}
+        }
 
   secondary:
-    needs: changes
-    if: needs.changes.outputs.run == 'true'
+    if: ${{ !inputs.check || inputs.check == 'all' || inputs.check == 'visual' || inputs.check == 'paper-examples' }}
     uses: ./.github/workflows/test-secondary.yaml
+    with:
+      check: ${{ inputs.check || 'all' }}
+
+  windows-arm-spatial:
+    # Use the same test selection as the isolated phase of the full ARM check.
+    if: inputs.check == 'windows-arm-spatial'
+    uses: ./.github/workflows/R-CMD-check.yaml
+    with:
+      group: weekly-windows-arm-spatial
+      config: >-
+        {
+          "windows-arm-spatial": {"id": "windows-arm-spatial", "os": "windows-11-arm", "r": "release", "tests": "spatial only", "not_cran": "true"}
+        }
 
   sdmtmb:
-    needs: changes
-    if: needs.changes.outputs.run == 'true'
+    if: ${{ !inputs.check || inputs.check == 'all' || startsWith(inputs.check, 'sdmtmb-') }}
     uses: ./.github/workflows/test-sdmtmb.yaml
+    with:
+      check: ${{ inputs.check || 'all' }}
 
   coverage:
-    needs: changes
-    if: needs.changes.outputs.run == 'true'
+    if: ${{ !inputs.check || inputs.check == 'all' || inputs.check == 'coverage' }}
     uses: ./.github/workflows/test-coverage.yaml
     secrets: inherit
+
+  upstream:
+    # The upstream workflow has its own schedule. A manual run can include it.
+    if: ${{ github.event_name == 'workflow_dispatch' && contains(fromJSON('["all","r-devel","glmmtmb-development","inlaws"]'), inputs.check) }}
+    uses: ./.github/workflows/weekly-upstream.yaml
+    with:
+      check: ${{ inputs.check }}
