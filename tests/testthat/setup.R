@@ -1295,8 +1295,9 @@ adjustment_fixture <- function() {
   })
 }
 
-tube_fixture <- function(bs = "cr", by = FALSE) {
-  shared_test_fixture(paste("tube", bs, by, sep = ":"), {
+tube_fixture <- function(bs = "cr", by = FALSE, m = NA) {
+  key <- paste("tube", bs, by, paste(m, collapse = ":"), sep = ":")
+  shared_test_fixture(key, {
     withr::local_seed(7021)
     d <- data.frame(
       x = seq(0, 1, length.out = 90),
@@ -1305,9 +1306,9 @@ tube_fixture <- function(bs = "cr", by = FALSE) {
     d$y <- sin(5 * d$x) + if (by) as.integer(d$group) * d$x else 0
     d$y <- d$y + rnorm(90, sd = .3)
     model <- if (by) {
-      mgcv::gam(y ~ group + s(x, by = group, bs = bs, k = 6), data = d, method = "REML")
+      mgcv::gam(y ~ group + s(x, by = group, bs = bs, k = 6, m = m), data = d, method = "REML")
     } else {
-      mgcv::gam(y ~ s(x, bs = bs, k = 6), data = d, method = "REML")
+      mgcv::gam(y ~ s(x, bs = bs, k = 6, m = m), data = d, method = "REML")
     }
     list(model = model, data = d)
   })

@@ -39,12 +39,13 @@ test_that("tube degeneracies and covariance validation are explicit", {
 
 test_that("tube basis providers recover fitted matrices and derivatives", {
   skip_on_cran()
-  x <- seq(.05, .95, length.out = 11)
-  for (bs in c("cr", "cs", "ps", "tp", "ts")) {
+  for (bs in c("cr", "cs", "ps", "tp", "ts", "bs", "cc", "cp")) {
     f <- tube_fixture(bs)
     sm <- f$model$smooth[[1]]
+    x <- seq(.05, .95, length.out = 11)
+    if (bs %in% c("cc", "cp")) x <- c(0, .0001, x, .9999, 1)
     nd <- data.frame(x = x)
-    basis <- tube_basis(f$model, sm, nd, c(.05, .95))
+    basis <- tube_basis(f$model, sm, nd, range(x))
     X <- smooth_predict_matrix(sm, nd, f$model)
     expect_equal(unname(basis$evaluate(x)), unname(X), tolerance = 1e-8, info = bs)
     h <- 1e-5
@@ -68,6 +69,88 @@ test_that("tube basis providers recover fitted matrices and derivatives", {
         )
       }
     }
+  }
+})
+
+test_that("cubic B-splines and cyclic splines produce tube bands", {
+  skip_on_cran()
+  nd <- data.frame(x = c(0, .001, .2, .5, .8, .999, 1))
+  for (bs in c("bs", "cc", "cp")) {
+    f <- tube_fixture(bs)
+    band <- smooth_estimates(f$model, data = nd, interval = "simultaneous",
+      simultaneous_method = "tube")
+    ref <- smooth_estimates(f$model, data = nd)
+    expect_equal(band$.estimate, ref$.estimate)
+    expect_equal(band$.se, ref$.se)
+    info <- attr(band, "interval_info")
+    expect_identical(info$calibration, "tube")
+    expect_equal(info$curves[[1]]$interval, c(0, 1))
+    expect_equal(band$.lower_ci, band$.estimate - band$.crit * band$.se)
+    expect_true(all(is.finite(band$.upper_ci)))
+  }
+})
+
+test_that("cyclic derivative tube bands wrap stencils across the period boundary", {
+  skip_on_cran()
+  nd <- data.frame(x = c(0, .001, .2, .5, .8, .999, 1))
+  for (bs in c("cc", "cp")) {
+    f <- tube_fixture(bs)
+    band <- derivatives(f$model, data = nd, order = 2, type = "central", eps = .01,
+      interval = "simultaneous", simultaneous_method = "tube")
+    ref <- derivatives(f$model, data = nd, order = 2, type = "central", eps = .01)
+    expect_equal(band$.derivative, ref$.derivative, tolerance = 1e-7)
+    expect_equal(band$.se, ref$.se, tolerance = 1e-7)
+    expect_equal(unname(band$.lower_ci[1L]), unname(band$.lower_ci[nrow(band)]), tolerance = 1e-7)
+    expect_equal(unname(band$.upper_ci[1L]), unname(band$.upper_ci[nrow(band)]), tolerance = 1e-7)
+    expect_equal(attr(band, "interval_info")$curves[[1]]$interval, c(0, 1))
+    expect_error(smooth_estimates(f$model, data = nd, interval = "simultaneous",
+      simultaneous_method = "tube", simultaneous_domain = c(-.1, 1)),
+      "fitted.*(period|support)")
+
+    zero <- derivatives(f$model, data = nd, order = 2, type = "central", eps = 1,
+      interval = "simultaneous", simultaneous_method = "tube")
+    expect_equal(unname(zero$.derivative), rep(0, nrow(nd)))
+    expect_equal(unname(zero$.se), rep(0, nrow(nd)))
+    expect_identical(attr(zero, "interval_info")$curves[[1]]$status, "deterministic")
+
+    sm <- f$model$smooth[[1L]]
+    basis <- tube_basis(f$model, sm, nd, c(0, 1))
+    idx <- smooth_coef_indices(sm)
+    for (h in c(.8, 1.1, 2.37)) {
+      for (order in 1:2) {
+        for (type in c("forward", "backward", "central")) {
+          evaluate <- tube_derivative_evaluator(basis, order, type, h, c(0, 1))
+          ref <- smooth_finite_difference(f$model, sm, nd, "x", "smooth", type, order, h)
+          expect_equal(evaluate(nd$x), unname(ref[, idx, drop = FALSE]),
+            tolerance = 1e-8, info = paste(bs, h, order, type))
+        }
+      }
+    }
+  }
+})
+
+test_that("tube bands cover differences of B-splines and cyclic splines", {
+  skip_on_cran()
+  for (bs in c("bs", "cc", "cp")) {
+    f <- tube_fixture(bs, by = TRUE)
+    nd <- expand.grid(x = seq(.1, .9, length.out = 8), group = levels(f$data$group))
+    band <- difference_smooths(f$model, select = "s(x)", data = nd, group_means = TRUE,
+      interval = "simultaneous", simultaneous_method = "tube")
+    ref <- difference_smooths(f$model, select = "s(x)", data = nd, group_means = TRUE)
+    expect_equal(band$.diff, ref$.diff)
+    expect_equal(band$.se, ref$.se)
+    expect_identical(attr(band, "interval_info")$calibration, "tube")
+    expect_length(attr(band, "interval_info")$curves, 3L)
+  }
+})
+
+test_that("tube bands reject noncubic B-splines and P-splines", {
+  skip_on_cran()
+  for (bs in c("bs", "ps", "cp")) {
+    m <- if (bs == "bs") c(2, 1) else c(1, 1)
+    f <- tube_fixture(bs, m = m)
+    expect_error(smooth_estimates(f$model, interval = "simultaneous",
+      simultaneous_method = "tube"), "cubic")
   }
 })
 

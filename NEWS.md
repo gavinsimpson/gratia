@@ -6,6 +6,14 @@
   (`#344054`) at 42% opacity so the bounds are easier to see against the
   default grey background (#448).
 
+## New features
+
+* `smooth_estimates()`, `derivatives()`, and `difference_smooths()` now support
+  tube simultaneous bands for one-dimensional cubic B-splines (`bs = "bs"`),
+  cyclic cubic regression splines (`bs = "cc"`), and cyclic cubic P-splines
+  (`bs = "cp"`). Derivative calculations wrap around the fitted period when
+  a finite-difference stencil crosses one of its endpoints.
+
 # gratia 0.12.1
 
 ## CRAN submission

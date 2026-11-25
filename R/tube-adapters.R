@@ -69,31 +69,18 @@ tube_derivative_intervals <- function(results, tasks, model, level, domain, cont
     }
     d <- results[[i]]$data
     resolved <- tube_domain(domain, coordinate, d[[coordinate]])
-    deltas <- if (task$order == 1L) {
-      switch(task$tube_type,
-        forward = c(0, task$h),
-        backward = c(-task$h, 0),
-        central = c(-task$h / 2, task$h / 2)
-      )
-    } else {
-      switch(task$tube_type,
-        forward = c(0, task$h, 2 * task$h),
-        backward = c(-2 * task$h, -task$h, 0),
-        central = c(-task$h, 0, task$h)
-      )
-    }
-    limits <- resolved$interval + range(deltas)
-    basis <- tube_basis(model, sm, task$data, limits)
-    evaluate <- tube_derivative_evaluator(basis, task$order, task$tube_type, task$h)
+    basis <- tube_basis(model, sm, task$data, resolved$interval)
+    evaluate <- tube_derivative_evaluator(
+      basis, task$order, task$tube_type, task$h, resolved$interval
+    )
     X <- evaluate(d[[coordinate]])
     # Same finite-difference functional, evaluated by integration rather than
     # cancellation-prone subtraction. The default simulation path is unchanged.
     d$.derivative <- stats::setNames(drop(X %*% task$betas), names(d$.derivative))
     d$.se <- stats::setNames(sqrt(pmax(0, rowSums((X %*% task$V) * X))), names(d$.se))
-    breaks <- as.vector(outer(basis$knots, deltas, "-"))
     band <- tube_band(
       d$.derivative, d$.se, X, task$V, evaluate,
-      resolved$interval, breaks, level, control
+      resolved$interval, attr(evaluate, "breakpoints"), level, control
     )
     d$.crit <- rep(band$critical, nrow(d))
     d$.lower_ci <- band$lower

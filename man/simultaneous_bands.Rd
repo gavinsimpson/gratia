@@ -38,10 +38,13 @@ does not integrate the full smoothing-parameter posterior. Numerical
 integration error estimates are diagnostics, not certified error bounds.
 \subsection{Supported quantities}{
 
-Ordinary one-dimensional cubic regression splines (\code{"cr"}, \code{"cs"}),
-cubic P-splines (\code{"ps"} with their ordinary cubic degree), and ordinary
-cubic thin plate bases (\code{"tp"}, \code{"ts"}) are supported. Factor-by smooths
-define separate curves. Numeric by multipliers must be fixed throughout
+Supported one-dimensional bases include cubic regression splines
+(\code{"cr"}, \code{"cs"}, \code{"cc"}), cubic B-splines (\code{"bs"}), cubic P-splines
+(\code{"ps"}, \code{"cp"}), and ordinary cubic thin plate bases (\code{"tp"}, \code{"ts"}).
+The \code{"cc"} and \code{"cp"} bases are cyclic. B-spline knots inside the fitted
+interval and cyclic P-spline knots must be distinct so that the first two
+derivatives are continuous there. Factor-by smooths define separate
+curves. Numeric by multipliers must be fixed throughout
 each curve. Unconstrained GAMs and their BAM, GAMM, and GAMM4 adapters use
 their fitted prediction basis and covariance. Surfaces, constrained models,
 shape enforcement, and unsupported bases produce an error; there is no
@@ -66,9 +69,11 @@ group contributions must be constant along the curve.
 list keyed by coordinate. By default it is the range of returned evaluation
 coordinates, including gaps. A single evaluation location requires an
 explicit interval. All returned points must lie inside the domain, which
-must lie inside the fitted spline support; derivative stencils must also
-remain inside that support. The domain does not imply that each compared
-group has observations throughout it. With a fixed domain, \code{n} changes
+must lie inside the fitted spline support. For cyclic splines, the support
+is the fitted period and derivative stencils can wrap around its endpoints.
+For other splines, derivative stencils must stay within the fitted support.
+The domain does not imply that each compared group has observations
+throughout it. With a fixed domain, \code{n} changes
 output density but does not change calibration. Connecting plotted bounds
 by straight segments is a rendering approximation to the continuous band.
 

@@ -63,8 +63,11 @@ tube_domain <- function(domain, coordinate, x) {
 # Obtain derivatives in the fitted basis, retaining its constraints and column
 # transformations. Native prediction determines the change of basis once.
 tube_basis <- function(model, smooth, data, domain) {
+  regression <- inherits(smooth, c("cr.smooth", "cs.smooth", "cyclic.smooth"))
+  b_spline <- inherits(smooth, c("Bspline.smooth", "pspline.smooth", "cpspline.smooth"))
+  cyclic <- inherits(smooth, c("cyclic.smooth", "cpspline.smooth"))
   if (smooth$dim != 1L || length(smooth$term) != 1L ||
-    !inherits(smooth, c("cr.smooth", "cs.smooth", "pspline.smooth", "tprs.smooth", "ts.smooth"))) {
+    !(regression || b_spline || inherits(smooth, c("tprs.smooth", "ts.smooth")))) {
     cli::cli_abort("Tube bands require a supported one-dimensional cubic spline; smooth {.val {smooth$label}} is unsupported. Use simulation instead.")
   }
   coordinate <- smooth$term
@@ -76,24 +79,46 @@ tube_basis <- function(model, smooth, data, domain) {
     (is.null(data[[by]]) || length(unique(data[[by]])) != 1L)) {
     cli::cli_abort("Tube bands require a fixed numeric by multiplier within each curve.")
   }
-  if (inherits(smooth, c("cr.smooth", "cs.smooth"))) {
+  if (regression) {
     knots <- as.numeric(smooth$xp)
-    cardinal <- lapply(seq_along(knots), function(j) {
-      stats::splinefun(knots, as.numeric(seq_along(knots) == j), method = "natural")
+    n_basis <- length(knots) - as.integer(cyclic)
+    columns <- seq_len(n_basis)
+    cardinal <- lapply(columns, function(j) {
+      y <- as.numeric(columns == j)
+      if (cyclic) y <- c(y, y[1L])
+      stats::splinefun(knots, y, method = if (cyclic) "periodic" else "natural")
     })
     raw <- function(x, deriv) vapply(cardinal, function(f) f(x, deriv = deriv), numeric(length(x)))
     support <- range(knots)
-  } else if (inherits(smooth, "pspline.smooth")) {
-    if (smooth$m[1L] != 2 || !identical(smooth$mono, 0)) {
-      cli::cli_abort("Tube bands currently require unconstrained cubic P-splines.")
+  } else if (b_spline) {
+    penalized_bs <- inherits(smooth, "Bspline.smooth")
+    degree <- if (penalized_bs) smooth$m[1L] else smooth$m[1L] + 1L
+    if (degree != 3L) {
+      cli::cli_abort("Tube bands currently require cubic B-splines and cubic P-splines.")
     }
-    knots <- sort(unique(smooth$knots))
-    k <- smooth$m[1L] + 2L
-    support <- range(smooth$knots[c(k, length(smooth$knots) - k + 1L)])
-    raw <- function(x, deriv) {
-      sm <- smooth
-      sm$deriv <- deriv
-      mgcv::Predict.matrix(sm, stats::setNames(list(x), coordinate))
+    knots <- smooth$knots
+    if (cyclic) {
+      if (anyDuplicated(knots)) cli::cli_abort("Tube bands require distinct cyclic P-spline knots.")
+      support <- range(knots)
+      raw <- function(x, deriv) {
+        outside <- x < support[1L] | x > support[2L]
+        x[outside] <- support[1L] + (x[outside] - support[1L]) %% diff(support)
+        mgcv::cSplineDes(x, knots, ord = degree + 1L, derivs = deriv)
+      }
+    } else {
+      if (!penalized_bs && !identical(smooth$mono, 0)) {
+        cli::cli_abort("Tube bands currently require unconstrained cubic P-splines.")
+      }
+      k <- degree + 1L
+      support <- range(knots[c(k, length(knots) - k + 1L)])
+      if (penalized_bs && anyDuplicated(knots[knots > support[1L] & knots < support[2L]])) {
+        cli::cli_abort("Tube bands require distinct interior B-spline knots.")
+      }
+      raw <- function(x, deriv) {
+        sm <- smooth
+        sm$deriv <- deriv
+        mgcv::Predict.matrix(sm, stats::setNames(list(x), coordinate))
+      }
     }
   } else {
     m <- smooth$p.order[1L]
@@ -126,15 +151,21 @@ tube_basis <- function(model, smooth, data, domain) {
       cbind(radial, poly) %*% UZ
     }
   }
-  tolerance <- 1e-10 * max(1, diff(support))
-  if (domain[1L] < support[1L] - tolerance || domain[2L] > support[2L] + tolerance) {
-    cli::cli_abort("The tube domain must lie within the fitted spline support.")
+  if (cyclic && (domain[1L] < support[1L] || domain[2L] > support[2L])) {
+    cli::cli_abort("The tube domain for a cyclic spline must lie within its fitted period.")
   }
-  # Include fitted coordinates as well as evenly spaced locations so the raw
-  # basis has full column rank even for unevenly placed knots.
+  tube_check_support(domain, support)
+  # Include knots and, for B-spline bases, points within each span. With
+  # user-supplied knots, short spans can contain no evenly spaced points.
+  inner <- sort(unique(knots[knots >= support[1L] & knots <= support[2L]]))
+  if (b_spline) {
+    left <- utils::head(inner, -1L)
+    widths <- diff(inner)
+    inner <- c(inner, left + widths / 3, left + 2 * widths / 3)
+  }
   at <- sort(unique(c(
     seq(support[1L], support[2L], length.out = max(51L, 4L * smooth$bs.dim)),
-    knots[knots >= support[1L] & knots <= support[2L]]
+    inner
   )))
   nd <- data[rep(1L, length(at)), , drop = FALSE]
   nd[[coordinate]] <- at
@@ -149,6 +180,7 @@ tube_basis <- function(model, smooth, data, domain) {
   }
   list(
     coordinate = coordinate, support = support, knots = sort(unique(knots)),
+    period = if (cyclic) diff(support),
     evaluate = function(x, deriv = 0L) {
       if (!deriv %in% 0:3) cli::cli_abort("Only derivatives through order three are available for the cubic tube basis.")
       raw(x, deriv) %*% transform
@@ -156,18 +188,14 @@ tube_basis <- function(model, smooth, data, domain) {
   )
 }
 
-# A finite difference equals an integral of a derivative. Evaluating this
-# identity with Gaussian quadrature on each polynomial piece avoids subtracting
-# nearly equal basis values, especially for second derivatives.
-tube_derivative_evaluator <- function(basis, order, type, h) {
-  nodes <- c(
-    -0.8611363115940526, -0.3399810435848563,
-    0.3399810435848563, 0.8611363115940526
-  )
-  weights <- c(
-    0.3478548451374539, 0.6521451548625461,
-    0.6521451548625461, 0.3478548451374539
-  )
+tube_check_support <- function(domain, support) {
+  tolerance <- 1e-10 * max(1, diff(support))
+  if (domain[1L] < support[1L] - tolerance || domain[2L] > support[2L] + tolerance) {
+    cli::cli_abort("The tube domain must lie within the fitted spline support.")
+  }
+}
+
+tube_derivative_stencil <- function(order, type, h, period) {
   center <- if (order == 1L) {
     switch(type,
       forward = h / 2,
@@ -182,12 +210,60 @@ tube_derivative_evaluator <- function(basis, order, type, h) {
     )
   }
   radius <- if (order == 1L) h / 2 else h
-  function(x, deriv = 0L) {
+  scale <- 1
+  if (!is.null(period)) {
+    if (abs(center) >= period) center <- sign(center) * (abs(center) %% period)
+    # Whole cycles cancel in the difference, but its denominator still uses
+    # the requested step. For a first difference, adding half a cycle to its
+    # radius also shifts its centre by half a cycle.
+    spacing <- if (order == 1L) period / 2 else period
+    if (radius > spacing / 2) {
+      cycle <- radius %% period
+      turns <- round(cycle / spacing)
+      step <- cycle - turns * spacing
+      if (order == 1L && turns %% 2L == 1L) center <- center + spacing
+      scale <- (step / radius)^order
+      radius <- abs(step)
+    }
+  }
+  offsets <- center + c(-radius, if (order == 2L) 0, radius)
+  list(center = center, radius = radius, scale = scale, offsets = offsets)
+}
+
+# A finite difference equals an integral of a derivative. Evaluating this
+# identity with Gaussian quadrature on each polynomial piece avoids subtracting
+# nearly equal basis values, especially for second derivatives.
+tube_derivative_evaluator <- function(basis, order, type, h, domain = NULL) {
+  stencil <- tube_derivative_stencil(order, type, h, basis$period)
+  knots <- basis$knots
+  if (is.null(basis$period)) {
+    if (!is.null(domain)) tube_check_support(domain + range(stencil$offsets), basis$support)
+  } else {
+    limits <- (domain %||% basis$support) + range(stencil$offsets)
+    period <- basis$period
+    cycles <- floor((limits - basis$support[1L]) / period)
+    knots <- as.vector(outer(
+      utils::head(knots, -1L), seq.int(cycles[1L], cycles[2L]) * period, "+"
+    ))
+  }
+  if (stencil$scale == 0) {
+    return(function(x, deriv = 0L) 0 * basis$evaluate(x, deriv))
+  }
+  nodes <- c(
+    -0.8611363115940526, -0.3399810435848563,
+    0.3399810435848563, 0.8611363115940526
+  )
+  weights <- c(
+    0.3478548451374539, 0.6521451548625461,
+    0.6521451548625461, 0.3478548451374539
+  )
+  radius <- stencil$radius
+  evaluate <- function(x, deriv = 0L) {
     rows <- lapply(x, function(at) {
-      middle <- at + center
+      middle <- at + stencil$center
       cuts <- c(
         -1, 1, if (order == 2L) 0,
-        (basis$knots - middle) / radius
+        (knots - middle) / radius
       )
       cuts <- sort(unique(cuts[cuts >= -1 & cuts <= 1]))
       left <- utils::head(cuts, -1L)
@@ -198,8 +274,10 @@ tube_derivative_evaluator <- function(basis, order, type, h) {
       w <- w * if (order == 1L) 0.5 else 1 - abs(z)
       drop(crossprod(w, basis$evaluate(middle + radius * z, order + deriv)))
     })
-    do.call(rbind, rows)
+    stencil$scale * do.call(rbind, rows)
   }
+  attr(evaluate, "breakpoints") <- as.vector(outer(knots, stencil$offsets, "-"))
+  evaluate
 }
 
 tube_covariance_root <- function(V) {
