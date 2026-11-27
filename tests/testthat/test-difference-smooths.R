@@ -162,3 +162,55 @@ test_that("difference_smooths() works for a gam model with re for mean", {
   expect_silent(ds <- difference_smooths(su_m_factor_by_re, select = "s(x2)"))
   expect_s3_class(ds, c("difference_smooth", "tbl_df", "tbl", "data.frame"))
 })
+
+test_that("difference_smooths() selects exact smooth and group-mean columns", {
+  df <- droplevels(subset(su_eg4, fac %in% c("1", "2")))
+  m <- gam(
+    y ~ fac + s(x0, by = fac, k = 6) + s(x2, by = fac, k = 6),
+    data = df, method = "REML"
+  )
+
+  d_nogm <- difference_smooths(m, select = "s(x2)", n = 5)
+  d_gm <- difference_smooths(m, select = "s(x2)", group_means = TRUE, n = 5)
+  d_gm_vec <- difference_smooths(
+    m,
+    select = c("s(x2):fac1", "s(x2):fac2"),
+    partial_match = FALSE,
+    group_means = TRUE,
+    n = 5
+  )
+
+  # Group-mean shift for level 1 minus level 2 is -coef(m)[["fac2"]]
+  expect_equal(
+    unname(d_gm$.diff - d_nogm$.diff),
+    rep(-unname(coef(m)[["fac2"]]), nrow(d_nogm))
+  )
+  expect_equal(d_gm_vec$.diff, d_gm$.diff)
+  expect_equal(d_gm_vec$.se, d_gm$.se)
+
+  # Prefix-overlapping factor levels ("1" and "10") with vector select
+  df_pref <- su_eg4
+  levels(df_pref$fac) <- c("1", "10", "2")
+  m_pref <- gam(
+    y ~ fac + s(x2, by = fac, k = 6),
+    data = df_pref, method = "REML"
+  )
+  d_pref <- difference_smooths(
+    m_pref,
+    select = c("s(x2):fac1", "s(x2):fac10"),
+    partial_match = FALSE,
+    group_means = TRUE,
+    n = 5
+  )
+  expect_identical(nrow(d_pref), 5L)
+  expect_equal(
+    unname(d_pref$.diff - difference_smooths(
+      m_pref,
+      select = c("s(x2):fac1", "s(x2):fac10"),
+      partial_match = FALSE,
+      group_means = FALSE,
+      n = 5
+    )$.diff),
+    rep(-unname(coef(m_pref)[["fac10"]]), 5L)
+  )
+})
