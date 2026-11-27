@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.12.1-1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.12.1-2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -100,7 +100,8 @@
 <span>  back_transform <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  time_varying_info <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  time_varying_style <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ribbon"</span>, <span class="st">"pointrange"</span><span class="op">)</span>,</span>
-<span>  <span class="va">...</span></span>
+<span>  <span class="va">...</span>,</span>
+<span>  contour_labels <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -192,8 +193,7 @@ drawn passed to the <code>angle</code> argument of <code><a href="https://ggplot
 
 
 <dt id="arg-contour">contour<a class="anchor" aria-label="anchor" href="#arg-contour"></a></dt>
-<dd><p>logical; should contours be draw on the plot using
-<code><a href="https://ggplot2.tidyverse.org/reference/geom_contour.html" class="external-link">ggplot2::geom_contour()</a></code>.</p></dd>
+<dd><p>Logical. Draw contour lines on surfaces?</p></dd>
 
 
 <dt id="arg-contour-col">contour_col<a class="anchor" aria-label="anchor" href="#arg-contour-col"></a></dt>
@@ -312,6 +312,13 @@ terms keep their usual displays.</p></dd>
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>additional arguments passed to <code><a href="https://patchwork.data-imaginist.com/reference/wrap_plots.html" class="external-link">patchwork::wrap_plots()</a></code>.</p></dd>
+
+
+<dt id="arg-contour-labels">contour_labels<a class="anchor" aria-label="anchor" href="#arg-contour-labels"></a></dt>
+<dd><p>Logical. Label contour lines on two-dimensional
+surfaces with their values? Defaults to <code>FALSE</code>. Labels require the
+geomtextpath package and are drawn only where contours are enabled. If
+geomtextpath is unavailable, the contour lines are drawn without labels.</p></dd>
 
 </dl></div>
 

@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.12.1-1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.12.1-2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -63,6 +63,11 @@
 <div class="section level3">
 <h3 id="user-visible-changes-development-version">User visible changes<a class="anchor" aria-label="anchor" href="#user-visible-changes-development-version"></a></h3>
 <ul><li>The lower and upper 3D interval surfaces in <code><a href="../reference/draw.html">draw()</a></code> now use a darker fill (<code>#344054</code>) at 42% opacity so the bounds are easier to see against the default grey background (<a href="https://github.com/gavinsimpson/gratia/issues/448" class="external-link">#448</a>).</li>
+</ul></div>
+<div class="section level3">
+<h3 id="new-features-development-version">New features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>
+<ul><li><p>Set <code>contour_labels = TRUE</code> in <code><a href="../reference/draw.html">draw()</a></code> or <code><a href="../reference/assemble.html">assemble()</a></code> to label contour lines on 2D surfaces. This option uses the geomtextpath package (<a href="https://github.com/gavinsimpson/gratia/issues/210" class="external-link">#210</a>).</p></li>
+<li><p><code><a href="../reference/smooth_estimates.html">smooth_estimates()</a></code>, <code><a href="../reference/derivatives.html">derivatives()</a></code>, and <code><a href="../reference/difference_smooths.html">difference_smooths()</a></code> now support tube simultaneous bands for one-dimensional cubic B-splines (<code>bs = "bs"</code>), cyclic cubic regression splines (<code>bs = "cc"</code>), and cyclic cubic P-splines (<code>bs = "cp"</code>). Derivative calculations wrap around the fitted period when a finite-difference stencil crosses one of its endpoints.</p></li>
 </ul></div>
 </div>
     <div class="section level2">

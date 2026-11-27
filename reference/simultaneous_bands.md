@@ -38,14 +38,17 @@ certified error bounds.
 
 ### Supported quantities
 
-Ordinary one-dimensional cubic regression splines (`"cr"`, `"cs"`),
-cubic P-splines (`"ps"` with their ordinary cubic degree), and ordinary
-cubic thin plate bases (`"tp"`, `"ts"`) are supported. Factor-by smooths
-define separate curves. Numeric by multipliers must be fixed throughout
-each curve. Unconstrained GAMs and their BAM, GAMM, and GAMM4 adapters
-use their fitted prediction basis and covariance. Surfaces, constrained
-models, shape enforcement, and unsupported bases produce an error; there
-is no automatic switch to simulation.
+Supported one-dimensional bases include cubic regression splines
+(`"cr"`, `"cs"`, `"cc"`), cubic B-splines (`"bs"`), cubic P-splines
+(`"ps"`, `"cp"`), and ordinary cubic thin plate bases (`"tp"`, `"ts"`).
+The `"cc"` and `"cp"` bases are cyclic. B-spline knots inside the fitted
+interval and cyclic P-spline knots must be distinct so that the first
+two derivatives are continuous there. Factor-by smooths define separate
+curves. Numeric by multipliers must be fixed throughout each curve.
+Unconstrained GAMs and their BAM, GAMM, and GAMM4 adapters use their
+fitted prediction basis and covariance. Surfaces, constrained models,
+shape enforcement, and unsupported bases produce an error; there is no
+automatic switch to simulation.
 
 First and second derivative bands retain the requested finite-difference
 functional, stencil, and step. The operator is evaluated using integrals
@@ -65,12 +68,14 @@ parametric group contributions must be constant along the curve.
 named list keyed by coordinate. By default it is the range of returned
 evaluation coordinates, including gaps. A single evaluation location
 requires an explicit interval. All returned points must lie inside the
-domain, which must lie inside the fitted spline support; derivative
-stencils must also remain inside that support. The domain does not imply
-that each compared group has observations throughout it. With a fixed
-domain, `n` changes output density but does not change calibration.
-Connecting plotted bounds by straight segments is a rendering
-approximation to the continuous band.
+domain, which must lie inside the fitted spline support. For cyclic
+splines, the support is the fitted period and derivative stencils can
+wrap around its endpoints. For other splines, derivative stencils must
+stay within the fitted support. The domain does not imply that each
+compared group has observations throughout it. With a fixed domain, `n`
+changes output density but does not change calibration. Connecting
+plotted bounds by straight segments is a rendering approximation to the
+continuous band.
 
 `tube_control` accepts `rel_tol = 1e-6`, `abs_tol = 1e-8`,
 `subdivisions = 1000L`, and `root_tol = 1e-8`. Integration is split at

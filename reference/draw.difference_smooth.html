@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.12.1-1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.12.1-2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -89,7 +89,8 @@
 <span>  caption <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  angle <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span>,</span>
-<span>  variables <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  variables <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  contour_labels <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -120,7 +121,8 @@ stored.</p></dd>
 
 
 <dt id="arg-contour">contour<a class="anchor" aria-label="anchor" href="#arg-contour"></a></dt>
-<dd><p>logical; should contour lines be added to smooth surfaces?</p></dd>
+<dd><p>Logical. Set this to
+<code>TRUE</code> to draw contour lines and allow contour labels.</p></dd>
 
 
 <dt id="arg-contour-col">contour_col<a class="anchor" aria-label="anchor" href="#arg-contour-col"></a></dt>
@@ -194,6 +196,13 @@ in plotting order. The first two are the x and y axes; the third defines
 facets for three covariates, or facet rows for four covariates; the fourth
 defines facet columns. <code>NULL</code> uses the order saved with the estimates.
 Drawing rearranges evaluated points without generating a new grid.</p></dd>
+
+
+<dt id="arg-contour-labels">contour_labels<a class="anchor" aria-label="anchor" href="#arg-contour-labels"></a></dt>
+<dd><p>Logical. Label contour lines on two-dimensional
+surfaces with their values? Defaults to <code>FALSE</code>. Labels require the
+geomtextpath package and are drawn only where contours are enabled. If
+geomtextpath is unavailable, the contour lines are drawn without labels.</p></dd>
 
 </dl></div>
     <div class="section level2">

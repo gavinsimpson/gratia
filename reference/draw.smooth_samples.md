@@ -28,7 +28,8 @@ draw(
   ncol = NULL,
   nrow = NULL,
   guides = "keep",
-  ...
+  ...,
+  contour_labels = FALSE
 )
 ```
 
@@ -101,7 +102,8 @@ draw(
 
 - contour:
 
-  logical; should contour lines be added to smooth surfaces?
+  Logical. Set this to `TRUE` to draw contour lines and allow contour
+  labels.
 
 - contour_col:
 
@@ -156,6 +158,13 @@ draw(
 
   arguments to be passed to
   [`patchwork::wrap_plots()`](https://patchwork.data-imaginist.com/reference/wrap_plots.html).
+
+- contour_labels:
+
+  Logical. Label contour lines on two-dimensional surfaces with their
+  values? Defaults to `FALSE`. Labels require the geomtextpath package
+  and are drawn only where contours are enabled. If geomtextpath is
+  unavailable, the contour lines are drawn without labels.
 
 ## Label layout
 

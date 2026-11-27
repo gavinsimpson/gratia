@@ -20,7 +20,8 @@ draw(
   contour = TRUE,
   n_contour = NULL,
   continuous_fill = NULL,
-  ...
+  ...,
+  contour_labels = FALSE
 )
 ```
 
@@ -96,6 +97,13 @@ draw(
 
   arguments passed to
   [`patchwork::wrap_plots()`](https://patchwork.data-imaginist.com/reference/wrap_plots.html).
+
+- contour_labels:
+
+  Logical. Label contour lines on two-dimensional surfaces with their
+  values? Defaults to `FALSE`. Labels require the geomtextpath package
+  and are drawn only where contours are enabled. If geomtextpath is
+  unavailable, the contour lines are drawn without labels.
 
 ## Details
 

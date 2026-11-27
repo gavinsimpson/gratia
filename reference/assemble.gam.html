@@ -13,7 +13,7 @@ fitted gam component."><meta property="og:image" content="https://gavinsimpson.g
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.12.1-1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.12.1-2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -145,7 +145,8 @@ fitted <code>gam</code> component.</p>
 <span>  polar_args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  grouped <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sz"</span>, <span class="st">"fs"</span><span class="op">)</span>,</span>
 <span>  show_ci <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"factor-by"</span>, <span class="st">"sz"</span><span class="op">)</span>,</span>
-<span>  time_varying_style <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ribbon"</span>, <span class="st">"pointrange"</span><span class="op">)</span></span>
+<span>  time_varying_style <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ribbon"</span>, <span class="st">"pointrange"</span><span class="op">)</span>,</span>
+<span>  contour_labels <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'gamm'</span></span>
@@ -298,8 +299,7 @@ the distinct values?</p></dd>
 
 
 <dt id="arg-contour">contour<a class="anchor" aria-label="anchor" href="#arg-contour"></a></dt>
-<dd><p>logical; should contours be draw on the plot using
-<code><a href="https://ggplot2.tidyverse.org/reference/geom_contour.html" class="external-link">ggplot2::geom_contour()</a></code>.</p></dd>
+<dd><p>Logical. Draw contour lines on surfaces?</p></dd>
 
 
 <dt id="arg-grouped-by">grouped_by<a class="anchor" aria-label="anchor" href="#arg-grouped-by"></a></dt>
@@ -651,6 +651,13 @@ Ordinary smooths and parametric effects retain their intervals.</p></dd>
 a line, points and interval ribbon (<code>"ribbon"</code>, the default), or points
 and interval bars with a connecting line (<code>"pointrange"</code>). Other model
 terms keep their usual displays.</p></dd>
+
+
+<dt id="arg-contour-labels">contour_labels<a class="anchor" aria-label="anchor" href="#arg-contour-labels"></a></dt>
+<dd><p>Logical. Label contour lines on two-dimensional
+surfaces with their values? Defaults to <code>FALSE</code>. Labels require the
+geomtextpath package and are drawn only where contours are enabled. If
+geomtextpath is unavailable, the contour lines are drawn without labels.</p></dd>
 
 
 <dt id="arg-centre">centre<a class="anchor" aria-label="anchor" href="#arg-centre"></a></dt>

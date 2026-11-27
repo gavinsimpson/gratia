@@ -35,7 +35,8 @@ draw(
   discrete_fill = NULL,
   back_transform = FALSE,
   time_varying_style = c("ribbon", "pointrange"),
-  subtitle = NULL
+  subtitle = NULL,
+  contour_labels = FALSE
 )
 ```
 
@@ -124,8 +125,7 @@ draw(
 
 - contour:
 
-  logical; should contours be draw on the plot using
-  [`ggplot2::geom_contour()`](https://ggplot2.tidyverse.org/reference/geom_contour.html).
+  Logical. Draw contour lines on surfaces?
 
 - contour_col:
 
@@ -242,6 +242,13 @@ draw(
 
   Character or expression; replace the automatic predictor subtitle on
   every panel. `NULL` uses the automatic label and `""` suppresses it.
+
+- contour_labels:
+
+  Logical. Label contour lines on two-dimensional surfaces with their
+  values? Defaults to `FALSE`. Labels require the geomtextpath package
+  and are drawn only where contours are enabled. If geomtextpath is
+  unavailable, the contour lines are drawn without labels.
 
 ## Label layout
 

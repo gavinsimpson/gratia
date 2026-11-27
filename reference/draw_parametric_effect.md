@@ -40,7 +40,8 @@ draw_parametric_effect(
   back_transform = FALSE,
   time_varying_info = NULL,
   time_varying_style = c("ribbon", "pointrange"),
-  ...
+  ...,
+  contour_labels = FALSE
 )
 ```
 
@@ -135,8 +136,7 @@ draw_parametric_effect(
 
 - contour:
 
-  logical; should contours be draw on the plot using
-  [`ggplot2::geom_contour()`](https://ggplot2.tidyverse.org/reference/geom_contour.html).
+  Logical. Draw contour lines on surfaces?
 
 - contour_col:
 
@@ -265,3 +265,10 @@ draw_parametric_effect(
 
   additional arguments passed to
   [`patchwork::wrap_plots()`](https://patchwork.data-imaginist.com/reference/wrap_plots.html).
+
+- contour_labels:
+
+  Logical. Label contour lines on two-dimensional surfaces with their
+  values? Defaults to `FALSE`. Labels require the geomtextpath package
+  and are drawn only where contours are enabled. If geomtextpath is
+  unavailable, the contour lines are drawn without labels.

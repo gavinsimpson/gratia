@@ -82,7 +82,8 @@ draw(
   polar_args = list(),
   grouped = c("sz", "fs"),
   show_ci = c("factor-by", "sz"),
-  time_varying_style = c("ribbon", "pointrange")
+  time_varying_style = c("ribbon", "pointrange"),
+  contour_labels = FALSE
 )
 
 # S3 method for class 'gamm'
@@ -250,8 +251,7 @@ draw(
 
 - contour:
 
-  logical; should contours be draw on the plot using
-  [`ggplot2::geom_contour()`](https://ggplot2.tidyverse.org/reference/geom_contour.html).
+  Logical. Draw contour lines on surfaces?
 
 - grouped_by:
 
@@ -632,6 +632,13 @@ draw(
   interval ribbon (`"ribbon"`, the default), or points and interval bars
   with a connecting line (`"pointrange"`). Other model terms keep their
   usual displays.
+
+- contour_labels:
+
+  Logical. Label contour lines on two-dimensional surfaces with their
+  values? Defaults to `FALSE`. Labels require the geomtextpath package
+  and are drawn only where contours are enabled. If geomtextpath is
+  unavailable, the contour lines are drawn without labels.
 
 - centre:
 

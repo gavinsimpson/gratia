@@ -29,7 +29,8 @@ draw(
   caption = NULL,
   angle = NULL,
   ...,
-  variables = NULL
+  variables = NULL,
+  contour_labels = FALSE
 )
 ```
 
@@ -60,7 +61,8 @@ draw(
 
 - contour:
 
-  logical; should contour lines be added to smooth surfaces?
+  Logical. Set this to `TRUE` to draw contour lines and allow contour
+  labels.
 
 - contour_col:
 
@@ -145,6 +147,13 @@ draw(
   for three covariates, or facet rows for four covariates; the fourth
   defines facet columns. `NULL` uses the order saved with the estimates.
   Drawing rearranges evaluated points without generating a new grid.
+
+- contour_labels:
+
+  Logical. Label contour lines on two-dimensional surfaces with their
+  values? Defaults to `FALSE`. Labels require the geomtextpath package
+  and are drawn only where contours are enabled. If geomtextpath is
+  unavailable, the contour lines are drawn without labels.
 
 ## Label layout
 

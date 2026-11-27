@@ -11,7 +11,7 @@ one-dimensional cubic splines, including the space between returned points."><me
 
     <a class="navbar-brand me-2" href="../index.html">gratia</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.12.1-1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.12.1-2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -100,10 +100,13 @@ integration error estimates are diagnostics, not certified error bounds.</p><div
 <h3 id="supported-quantities">Supported quantities<a class="anchor" aria-label="anchor" href="#supported-quantities"></a></h3>
 
 
-<p>Ordinary one-dimensional cubic regression splines (<code>"cr"</code>, <code>"cs"</code>),
-cubic P-splines (<code>"ps"</code> with their ordinary cubic degree), and ordinary
-cubic thin plate bases (<code>"tp"</code>, <code>"ts"</code>) are supported. Factor-by smooths
-define separate curves. Numeric by multipliers must be fixed throughout
+<p>Supported one-dimensional bases include cubic regression splines
+(<code>"cr"</code>, <code>"cs"</code>, <code>"cc"</code>), cubic B-splines (<code>"bs"</code>), cubic P-splines
+(<code>"ps"</code>, <code>"cp"</code>), and ordinary cubic thin plate bases (<code>"tp"</code>, <code>"ts"</code>).
+The <code>"cc"</code> and <code>"cp"</code> bases are cyclic. B-spline knots inside the fitted
+interval and cyclic P-spline knots must be distinct so that the first two
+derivatives are continuous there. Factor-by smooths define separate
+curves. Numeric by multipliers must be fixed throughout
 each curve. Unconstrained GAMs and their BAM, GAMM, and GAMM4 adapters use
 their fitted prediction basis and covariance. Surfaces, constrained models,
 shape enforcement, and unsupported bases produce an error; there is no
@@ -129,9 +132,11 @@ group contributions must be constant along the curve.</p>
 list keyed by coordinate. By default it is the range of returned evaluation
 coordinates, including gaps. A single evaluation location requires an
 explicit interval. All returned points must lie inside the domain, which
-must lie inside the fitted spline support; derivative stencils must also
-remain inside that support. The domain does not imply that each compared
-group has observations throughout it. With a fixed domain, <code>n</code> changes
+must lie inside the fitted spline support. For cyclic splines, the support
+is the fitted period and derivative stencils can wrap around its endpoints.
+For other splines, derivative stencils must stay within the fitted support.
+The domain does not imply that each compared group has observations
+throughout it. With a fixed domain, <code>n</code> changes
 output density but does not change calibration. Connecting plotted bounds
 by straight segments is a rendering approximation to the continuous band.</p>
 <p><code>tube_control</code> accepts <code>rel_tol = 1e-6</code>, <code>abs_tol = 1e-8</code>,

@@ -10,6 +10,25 @@
   easier to see against the default grey background
   ([\#448](https://github.com/gavinsimpson/gratia/issues/448)).
 
+### New features
+
+- Set `contour_labels = TRUE` in
+  [`draw()`](https://gavinsimpson.github.io/gratia/reference/draw.md) or
+  [`assemble()`](https://gavinsimpson.github.io/gratia/reference/assemble.md)
+  to label contour lines on 2D surfaces. This option uses the
+  geomtextpath package
+  ([\#210](https://github.com/gavinsimpson/gratia/issues/210)).
+
+- [`smooth_estimates()`](https://gavinsimpson.github.io/gratia/reference/smooth_estimates.md),
+  [`derivatives()`](https://gavinsimpson.github.io/gratia/reference/derivatives.md),
+  and
+  [`difference_smooths()`](https://gavinsimpson.github.io/gratia/reference/difference_smooths.md)
+  now support tube simultaneous bands for one-dimensional cubic
+  B-splines (`bs = "bs"`), cyclic cubic regression splines
+  (`bs = "cc"`), and cyclic cubic P-splines (`bs = "cp"`). Derivative
+  calculations wrap around the fitted period when a finite-difference
+  stencil crosses one of its endpoints.
+
 ## gratia 0.12.1
 
 CRAN release: 2026-11-23

@@ -22,7 +22,8 @@ draw(
   n_contour = 10,
   contour_col = "black",
   ...,
-  variables = NULL
+  variables = NULL,
+  contour_labels = FALSE
 )
 ```
 
@@ -81,8 +82,7 @@ draw(
 
 - contour:
 
-  logical; should contours be draw on the plot using
-  [`ggplot2::geom_contour()`](https://ggplot2.tidyverse.org/reference/geom_contour.html).
+  Logical. Draw contour lines on surfaces?
 
 - n_contour:
 
@@ -114,6 +114,13 @@ draw(
   again to change grid resolution or conditioning values. Continuous
   covariates must precede factors. Spherical smooths retain their
   latitude/longitude convention and do not support reordering.
+
+- contour_labels:
+
+  Logical. Label contour lines on two-dimensional surfaces with their
+  values? Defaults to `FALSE`. Labels require the geomtextpath package
+  and are drawn only where contours are enabled. If geomtextpath is
+  unavailable, the contour lines are drawn without labels.
 
 ## Value
 
