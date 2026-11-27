@@ -257,10 +257,17 @@
   )
   coefs <- coef(model)
 
+  all_smooth_cols <- unlist(
+    lapply(model$smooth, smooth_coef_indices),
+    use.names = FALSE
+  )
+
   calculate <- function() {
     tasks <- pmap(pairs, prepare_difference,
       select = select, by_var = by_var,
-      smooth_var = smooth_var, data = data, Xp = Xp, V = V,
+      smooth_var = smooth_var, smooths = smooths,
+      all_smooth_cols = all_smooth_cols,
+      data = data, Xp = Xp, V = V,
       coefs = coefs, group_means = group_means,
       interval = interval, ci_level = ci_level, n_sim = n_sim, n_cores = n_cores)
     result <- smooth_task_map(tasks, "calculate_difference")
@@ -373,27 +380,29 @@ difference_smooth_pairs <- function(smooths, select, data, derivative = FALSE) {
 `prepare_difference` <- function(f1, f2, select, by_var, smooth_var, data, Xp, V,
                               coefs, group_means = FALSE,
                               interval = "confidence", ci_level = 0.95,
-                              n_sim = 10000, n_cores = 1) {
+                              n_sim = 10000, n_cores = 1,
+                              smooths = NULL, all_smooth_cols = integer()) {
   ## make sure f1 and f2 are characters
   f1 <- as.character(f1)
   f2 <- as.character(f2)
   cnames <- colnames(Xp)
 
-  # what are we keeping?
-  keep <- if (isTRUE(group_means)) {
-    # still need to fix this to accept length(select) > 1L - Done, but not clean
-    if (length(select) > 1L) {
-      rg1 <- select[str_detect(select, paste0(":", by_var, f1))]
-      rg2 <- select[str_detect(select, paste0(":", by_var, f2))]
-    } else {
-      # columns of Xp associated with pair of smooths, including parametric
-      # terms for the group means
-      rg1 <- paste0(by_var, f1)
-      rg2 <- paste0(by_var, f2)
-    }
-    # coefs for smooths to be included
-    c1 <- str_detect(cnames, fixed(rg1))
-    c2 <- str_detect(cnames, fixed(rg2))
+  pair_smooths <- smooths[vapply(
+    smooths,
+    function(sm) by_level(sm) %in% c(f1, f2),
+    logical(1L)
+  )]
+  sm_cols <- unlist(lapply(pair_smooths, smooth_coef_indices), use.names = FALSE)
+  keep <- seq_along(cnames) %in% sm_cols
+
+  if (isTRUE(group_means)) {
+    para_cols <- !(seq_along(cnames) %in% all_smooth_cols)
+    targets <- paste0(by_var, c(f1, f2))
+    c_para <- para_cols & vapply(
+      strsplit(cnames, ":", fixed = TRUE),
+      function(parts) any(parts %in% targets),
+      logical(1L)
+    )
     # group means could also be added via a random effect smooth
     # check for s(by_var).1 in colnames of Xp
     cg <- str_detect(
@@ -402,19 +411,7 @@ difference_smooth_pairs <- function(smooths, select, data, derivative = FALSE) {
     )
     # set the intercept to be included also
     c0 <- str_detect(cnames, fixed("(Intercept)"))
-    (c0 | c1 | c2 | cg)
-  } else {
-    # columns of Xp associated with the pair of smooths, but not group means
-    if (length(select) > 1L) {
-      rg1 <- select[str_detect(select, paste0(":", by_var, f1))]
-      rg2 <- select[str_detect(select, paste0(":", by_var, f2))]
-    } else {
-      rg1 <- mgcv_by_smooth_labels(select, by_var, f1)
-      rg2 <- mgcv_by_smooth_labels(select, by_var, f2)
-    }
-    c1 <- str_detect(cnames, fixed(rg1))
-    c2 <- str_detect(cnames, fixed(rg2))
-    (c1 | c2)
+    keep <- keep | c0 | c_para | cg
   }
 
   rows <- difference_smooth_rows(data, by_var, f1, f2, smooth_var)
