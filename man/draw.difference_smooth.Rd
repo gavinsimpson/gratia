@@ -27,7 +27,8 @@
   caption = NULL,
   angle = NULL,
   ...,
-  variables = NULL
+  variables = NULL,
+  contour_labels = FALSE
 )
 }
 \arguments{
@@ -45,7 +46,8 @@ stored.}
 
 \item{ref_line}{logical;}
 
-\item{contour}{logical; should contour lines be added to smooth surfaces?}
+\item{contour}{Logical. Set this to
+\code{TRUE} to draw contour lines and allow contour labels.}
 
 \item{contour_col}{Deprecated; use \code{\link[=gratia_theme_get]{gratia_theme_get()}} theme
 settings instead. Colour specification for contour lines.}
@@ -94,6 +96,11 @@ in plotting order. The first two are the x and y axes; the third defines
 facets for three covariates, or facet rows for four covariates; the fourth
 defines facet columns. \code{NULL} uses the order saved with the estimates.
 Drawing rearranges evaluated points without generating a new grid.}
+
+\item{contour_labels}{Logical. Label contour lines on two-dimensional
+surfaces with their values? Defaults to \code{FALSE}. Labels require the
+geomtextpath package and are drawn only where contours are enabled. If
+geomtextpath is unavailable, the contour lines are drawn without labels.}
 }
 \description{
 Plot differences of smooths

@@ -545,7 +545,7 @@ characters")
     ...,
     surface = c("raster", "tile", "3d"), surface_3d = list(),
     continuous_fill = NULL, contour = TRUE, n_contour = NULL,
-    ci_3d = FALSE, zlab = NULL) {
+    ci_3d = FALSE, zlab = NULL, contour_labels = FALSE) {
   channels <- attr(object, "channels")
   surface <- match.arg(surface)
   if (length(channels$x) == 2L) {
@@ -553,7 +553,7 @@ characters")
       facet_scales = facet_scales, xlab = xlab, ylab = ylab, zlab = zlab,
       surface = surface, surface_3d = surface_3d,
       continuous_fill = continuous_fill, contour = contour,
-      n_contour = n_contour, ci_3d = ci_3d))
+      n_contour = n_contour, ci_3d = ci_3d, contour_labels = contour_labels))
   }
 
   # if using colour channel of faceting, fix the number of signif digits
@@ -686,7 +686,7 @@ characters")
 draw_conditional_surface <- function(object, channels, facet_scales = "fixed",
     xlab = NULL, ylab = NULL, zlab = NULL, surface = "raster",
     surface_3d = list(), continuous_fill = NULL, contour = TRUE,
-    n_contour = NULL, ci_3d = FALSE) {
+    n_contour = NULL, ci_3d = FALSE, contour_labels = FALSE) {
   difference <- inherits(object, "conditional_differences")
   object$.estimate <- if (difference) object$.diff else object$.fitted
   value_label <- if (difference) {
@@ -729,6 +729,7 @@ draw_conditional_surface <- function(object, channels, facet_scales = "fixed",
     continuous_fill = continuous_fill,
     contour = isTRUE(contour) && nrow(contour_data) > 0L,
     contour_data = contour_data, n_contour = n_contour,
+    contour_labels = contour_labels,
     ci_3d = ci_3d, facet = facet, facet_vars = facet_vars,
     irregular_cells = TRUE,
     z_limits = if (difference) NULL else fill_limits)

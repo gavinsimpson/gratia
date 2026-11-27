@@ -44,7 +44,8 @@
   cyclic = c("cartesian", "polar"),
   polar_args = list(),
   grouped = c("sz", "fs"),
-  show_ci = c("factor-by", "sz")
+  show_ci = c("factor-by", "sz"),
+  contour_labels = FALSE
 )
 }
 \arguments{
@@ -61,8 +62,7 @@ endpoint transformation alone does not preserve non-monotone band coverage.
 Function \code{fun} will be applied after adding any \code{constant}, if
 provided.}
 
-\item{contour}{logical; should contours be draw on the plot using
-\code{\link[ggplot2:geom_contour]{ggplot2::geom_contour()}}.}
+\item{contour}{Logical. Draw contour lines on surfaces?}
 
 \item{grouped_by}{Deprecated; use \code{grouped}. Explicit \code{TRUE} adds
 \code{"factor-by"} to \code{grouped}; \code{FALSE} removes it, retaining the other types.}
@@ -261,6 +261,11 @@ hide all their ribbons. The default, \code{c("factor-by", "sz")}, retains
 existing interval visibility; including \code{"fs"} enables its intervals.
 Controls display only, independently of \code{interval} and \code{grouped}.
 Ordinary smooths and parametric effects retain their intervals.}
+
+\item{contour_labels}{Logical. Label contour lines on two-dimensional
+surfaces with their values? Defaults to \code{FALSE}. Labels require the
+geomtextpath package and are drawn only where contours are enabled. If
+geomtextpath is unavailable, the contour lines are drawn without labels.}
 }
 \description{
 Plot the result of a call to \code{smooth_estimates()}

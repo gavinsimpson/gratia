@@ -372,7 +372,7 @@
                          contour = TRUE,
                          n_contour = 10,
                          contour_col = "black",
-                         ..., variables = NULL) {
+                         ..., variables = NULL, contour_labels = FALSE) {
   gratia_plot_arguments(c("contour_col"), environment())
   sm_l <- basis_plot_groups(object)
   sm_plts <- map(sm_l,
@@ -384,7 +384,7 @@
     subtitle = subtitle,
     caption = caption,
     angle = angle,
-    contour = contour,
+    contour = contour, contour_labels = contour_labels,
     n_contour = n_contour,
     contour_col = contour_col,
     ..., variables = variables
@@ -451,7 +451,7 @@ basis_plot_groups <- function(object) {
                          contour = TRUE,
                          n_contour = 10,
                          contour_col = "black",
-                         ..., variables = NULL) {
+                         ..., variables = NULL, contour_labels = FALSE) {
   smooth_var <- basis_plot_variables(object, variables)
   if (is.null(title)) title <- unique(object$.smooth)
   n_sms <- length(smooth_var)
@@ -468,18 +468,19 @@ basis_plot_groups <- function(object) {
       labeller = labeller, xlab = xlab, ylab = ylab,
       title = title, subtitle = subtitle, caption = caption,
       angle = angle, contour = contour, n_contour = n_contour,
-      contour_col = contour_col, ..., variables = smooth_var
+      contour_col = contour_col, contour_labels = contour_labels,
+      ..., variables = smooth_var
     ),
     plot_multivariate_basis(object, variables = smooth_var,
       legend = legend, labeller = labeller, xlab = xlab, ylab = ylab,
       title = title, subtitle = subtitle, caption = caption,
       angle = angle, contour = contour, n_contour = n_contour,
-      contour_col = contour_col, ...),
+      contour_col = contour_col, contour_labels = contour_labels, ...),
     plot_multivariate_basis(object, variables = smooth_var,
       legend = legend, labeller = labeller, xlab = xlab, ylab = ylab,
       title = title, subtitle = subtitle, caption = caption,
       angle = angle, contour = contour, n_contour = n_contour,
-      contour_col = contour_col, ...)
+      contour_col = contour_col, contour_labels = contour_labels, ...)
   )
 
   plt
@@ -519,7 +520,8 @@ basis_plot_groups <- function(object) {
                                    contour = TRUE,
                                    n_contour = 10,
                                    contour_col = "black",
-                                   ..., variables = NULL, fill_limits = NULL) {
+                                   ..., variables = NULL, fill_limits = NULL,
+                                   contour_labels = FALSE) {
   smooth_var <- basis_plot_variables(object, variables)
   coord <- if (str_detect(object[[".type"]][1L], "TPRS")) coord_equal() else NULL
   plt <- prepare_surface_plot(object,
@@ -531,7 +533,7 @@ basis_plot_groups <- function(object) {
       title = title, subtitle = subtitle, caption = caption),
     facet = prepare_basis_facet(object, smooth_var, labeller = labeller),
     coord = coord, contour = contour, contour_col = contour_col,
-    n_contour = n_contour,
+    n_contour = n_contour, contour_labels = contour_labels,
     contour_stat = StatBasisContour,
     contour_mapping = aes(z = .data[[".value"]],
       group = .data[[".bf"]], fill = NULL),
@@ -613,7 +615,8 @@ plot_multivariate_basis <- function(object, variables, subtitle = NULL, ...) {
 #' @param colour Deprecated; use [gratia_theme_get()] theme
 #'   settings instead. The colour to use to draw the posterior smooths. Passed to
 #'   [ggplot2::geom_line()] as argument `colour`.
-#' @param contour logical; should contour lines be added to smooth surfaces?
+#' @param contour Logical. Set this to
+#'   `TRUE` to draw contour lines and allow contour labels.
 #' @param xlab character or expression; the label for the x axis. If not
 #'   supplied, a suitable label will be generated from `object`.
 #' @param ylab character or expression; the label for the y axis. If not
@@ -665,7 +668,7 @@ plot_multivariate_basis <- function(object, variables, subtitle = NULL, ...) {
                                   partial_match = FALSE,
                                   angle = NULL,
                                   ncol = NULL, nrow = NULL,
-                                  guides = "keep", ...) {
+                                  guides = "keep", ..., contour_labels = FALSE) {
   gratia_plot_arguments(c("contour_col", "alpha", "colour"), environment())
   scales <- match.arg(scales)
 
@@ -691,7 +694,7 @@ plot_multivariate_basis <- function(object, variables, subtitle = NULL, ...) {
     xlab = xlab, ylab = ylab,
     title = title, subtitle = subtitle, caption = caption,
     rug = rug, alpha = alpha, colour = colour,
-    contour = contour, n_contour = n_contour,
+    contour = contour, n_contour = n_contour, contour_labels = contour_labels,
     contour_col = contour_col, angle = angle
   )
 
@@ -723,7 +726,8 @@ plot_multivariate_basis <- function(object, variables, subtitle = NULL, ...) {
                                      colour = "black",
                                      contour = FALSE,
                                      contour_col = "black",
-                                     n_contour = NULL, angle = NULL, ...) {
+                                     n_contour = NULL, angle = NULL, ...,
+                                     contour_labels = FALSE) {
   # handle the seed nicely
   if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
     runif(1)
@@ -778,6 +782,7 @@ plot_multivariate_basis <- function(object, variables, subtitle = NULL, ...) {
     )
   } else if (identical(n_xvars, 2L)) {
     draw_2d_posterior_smooths(object,
+      contour_labels = contour_labels,
       contour = contour,
       contour_col = contour_col,
       n_contour = n_contour,
@@ -866,7 +871,7 @@ plot_multivariate_basis <- function(object, variables, subtitle = NULL, ...) {
                                         title = NULL,
                                         subtitle = NULL,
                                         caption = NULL,
-                                        angle = NULL) {
+                                        angle = NULL, contour_labels = FALSE) {
   xvars <- unique(object[[".term"]])
   xvars <- vars_from_label(xvars)
 
@@ -896,7 +901,8 @@ plot_multivariate_basis <- function(object, variables, subtitle = NULL, ...) {
     labels = labs(title = title, x = xlab, y = ylab, subtitle = subtitle,
       caption = caption),
     contour = contour, contour_col = contour_col, n_contour = n_contour,
-    contour_na_rm = FALSE, angle = angle, facet = facet_wrap(~.draw),
+    contour_labels = contour_labels, contour_na_rm = FALSE,
+    angle = angle, facet = facet_wrap(~.draw),
     coord = coord, legend_position = NULL)
 
 }
@@ -919,7 +925,8 @@ plot_multivariate_basis <- function(object, variables, subtitle = NULL, ...) {
 #'
 #' @param rug logical;
 #' @param ref_line logical;
-#' @param contour logical; should contour lines be added to smooth surfaces?
+#' @param contour Logical. Set this to
+#'   `TRUE` to draw contour lines and allow contour labels.
 #' @param ci_alpha Deprecated; use [gratia_theme_get()] theme
 #'   settings instead. Numeric; alpha transparency for confidence or simultaneous
 #'   interval.
@@ -979,7 +986,7 @@ plot_multivariate_basis <- function(object, variables, subtitle = NULL, ...) {
                                      subtitle = NULL,
                                      caption = NULL,
                                      angle = NULL, ...,
-                                     variables = NULL) {
+                                     variables = NULL, contour_labels = FALSE) {
   tube_check_saved_controls(names(match.call(expand.dots = FALSE)$...))
   gratia_plot_arguments(c("contour_col", "ci_alpha", "ci_col", "smooth_col", "line_col"), environment())
   scales <- match.arg(scales)
@@ -1026,7 +1033,7 @@ plot_multivariate_basis <- function(object, variables, subtitle = NULL, ...) {
     rug = rug,
     ref_line = ref_line,
     ci_col = ci_col,
-    contour = contour,
+    contour = contour, contour_labels = contour_labels,
     contour_col = contour_col,
     n_contour = n_contour,
     xlab = xlab, ylab = ylab, title = title,
@@ -1074,7 +1081,7 @@ difference_value_label <- function(object) {
                               xlab = NULL, ylab = NULL,
                               title = NULL, subtitle = NULL, caption = NULL,
                               angle = NULL, variables = NULL,
-                              fill_limits = NULL) {
+                              fill_limits = NULL, contour_labels = FALSE) {
   label <- unique(object[[".smooth"]])
   xvars <- validate_plot_variables(variables,
     difference_plot_variables(object, label))
@@ -1091,7 +1098,7 @@ difference_value_label <- function(object) {
     )
   } else if (identical(n_xvars, 2L)) {
     draw_2d_difference(object, xvars,
-      contour = contour,
+      contour = contour, contour_labels = contour_labels,
       contour_col = contour_col, n_contour = n_contour,
       xlab = xlab, ylab = ylab,
       title = title, subtitle = subtitle,
@@ -1099,7 +1106,7 @@ difference_value_label <- function(object) {
     )
   } else if (identical(n_xvars, 3L)) {
     draw_3d_difference(object, xvars,
-      contour = contour,
+      contour = contour, contour_labels = contour_labels,
       contour_col = contour_col, n_contour = n_contour,
       xlab = xlab, ylab = ylab,
       title = title, subtitle = subtitle,
@@ -1107,7 +1114,7 @@ difference_value_label <- function(object) {
     )
   } else if (identical(n_xvars, 4L)) {
     draw_4d_difference(object, xvars,
-      contour = contour,
+      contour = contour, contour_labels = contour_labels,
       contour_col = contour_col, n_contour = n_contour,
       xlab = xlab, ylab = ylab,
       title = title, subtitle = subtitle,
@@ -1191,7 +1198,7 @@ difference_value_label <- function(object) {
                                  title = NULL,
                                  subtitle = NULL,
                                  caption = NULL, angle = NULL,
-                                 fill_limits = NULL) {
+                                 fill_limits = NULL, contour_labels = FALSE) {
   if (is.null(xlab)) {
     xlab <- xvars[1]
   }
@@ -1223,7 +1230,8 @@ difference_value_label <- function(object) {
     labels = labs(title = plt_title, x = xlab, y = ylab,
       subtitle = plt_subtitle, caption = caption),
     contour = contour, contour_col = contour_col, n_contour = n_contour,
-    contour_na_rm = FALSE, angle = angle, legend_position = NULL)
+    contour_labels = contour_labels, contour_na_rm = FALSE,
+    angle = angle, legend_position = NULL)
 
 }
 
@@ -1236,9 +1244,10 @@ difference_value_label <- function(object) {
                                  title = NULL,
                                  subtitle = NULL,
                                  caption = NULL, angle = NULL,
-                                 fill_limits = NULL) {
+                                 fill_limits = NULL, contour_labels = FALSE) {
   if (is.null(fill_limits)) fill_limits <- surface_fill_limits(object$.diff)
   draw_2d_difference(object, xvars, contour = contour,
+    contour_labels = contour_labels,
     contour_col = contour_col, n_contour = n_contour,
     xlab = xlab, ylab = ylab, title = title, subtitle = subtitle,
     caption = caption, angle = angle, fill_limits = fill_limits) +
@@ -1252,9 +1261,10 @@ difference_value_label <- function(object) {
                                  title = NULL,
                                  subtitle = NULL,
                                  caption = NULL, angle = NULL,
-                                 fill_limits = NULL) {
+                                 fill_limits = NULL, contour_labels = FALSE) {
   if (is.null(fill_limits)) fill_limits <- surface_fill_limits(object$.diff)
   draw_2d_difference(object, xvars, contour = contour,
+    contour_labels = contour_labels,
     contour_col = contour_col, n_contour = n_contour,
     xlab = xlab, ylab = ylab, title = title, subtitle = subtitle,
     caption = caption, angle = angle, fill_limits = fill_limits) +

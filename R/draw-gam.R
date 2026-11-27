@@ -150,8 +150,11 @@
 #'   smooths or plot locations of data for higher dimensions.
 #' @param distinct_rug logical; should the data for the rug plots be reduced to
 #'   the distinct values?
-#' @param contour logical; should contours be draw on the plot using
-#'   [ggplot2::geom_contour()].
+#' @param contour Logical. Draw contour lines on surfaces?
+#' @param contour_labels Logical. Label contour lines on two-dimensional
+#'   surfaces with their values? Defaults to `FALSE`. Labels require the
+#'   geomtextpath package and are drawn only where contours are enabled. If
+#'   geomtextpath is unavailable, the contour lines are drawn without labels.
 #' @param grouped character or `FALSE`; factor smooth types whose curves share
 #'   a panel. Choose any of `"factor-by"`, `"sz"`, and `"fs"`, or `FALSE` to
 #'   separate all their curves. The default, `c("sz", "fs")`, overlays `sz`
@@ -431,7 +434,8 @@
   simultaneous_domain = NULL, tube_control = list(),
   cyclic = c("cartesian", "polar"), polar_args = list(),
   grouped = c("sz", "fs"), show_ci = c("factor-by", "sz"),
-  time_varying_style = c("ribbon", "pointrange")
+  time_varying_style = c("ribbon", "pointrange"),
+  contour_labels = FALSE
 ) {
   .call <- match.call()
   .call[[1L]] <- if (is_scasm_model(object)) draw.scasm else draw_gam_impl
@@ -498,7 +502,8 @@ draw_gam_impl <- function(
   simultaneous_domain = NULL, tube_control = list(),
   cyclic = c("cartesian", "polar"), polar_args = list(),
   grouped = c("sz", "fs"), show_ci = c("factor-by", "sz"),
-  time_varying_style = c("ribbon", "pointrange")
+  time_varying_style = c("ribbon", "pointrange"),
+  contour_labels = FALSE
 ) {
   time_varying_style <- match.arg(time_varying_style)
   surface <- match.arg(surface)

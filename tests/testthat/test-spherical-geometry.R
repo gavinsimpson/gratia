@@ -234,3 +234,31 @@ test_that("spherical rugs have their own theme and hidden bounds stay invisible"
   }, logical(1))))
   expect_silent(ggplot2::ggplotGrob(p))
 })
+
+test_that("labelled spherical contours retain every piece at the antimeridian", {
+  skip_if_not_installed("sf", "1.0-0")
+  skip_if_not_installed("geomtextpath", "0.2.0")
+  d <- spherical_test_grid(seq(-60, 60, length.out = 21),
+    seq(160, 200, length.out = 21))
+  d$.estimate <- d$north / 60 + (d$east - 180) / 200
+  crs <- "+proj=wintri"
+  plain <- spherical_plot(d, n_contour = 6, crs = crs)
+  labelled <- spherical_plot(d, n_contour = 6, crs = crs, contour_labels = TRUE) +
+    ggplot2::theme(geom.gratia.contour = ggplot2::element_geom(colour = "steelblue"))
+  original <- plain$layers[[3L]]$data
+  paths <- labelled$layers[[3L]]$data
+  n_parts <- vapply(sf::st_geometry(original), function(line) {
+    if (inherits(line, "MULTILINESTRING")) length(line) else 1L
+  }, integer(1L))
+  expect_true(any(n_parts > 1L))
+  expect_equal(paths$level, rep(original$level, n_parts))
+  expect_true(all(sf::st_geometry_type(paths) == "LINESTRING"))
+
+  drawn <- ggplot2::ggplot_build(labelled)$data[[3L]]
+  expect_equal(as.numeric(drawn$label), paths$level)
+  expect_identical(unique(drawn$colour), "steelblue")
+  expect_identical(drawn$linecolour, drawn$colour)
+  expect_no_warning(grob <- ggplot2::ggplotGrob(labelled))
+  grob_names <- grid::grid.ls(grid::grid.force(grob), print = FALSE)$name
+  expect_true(any(grepl("textpath", grob_names, fixed = TRUE)))
+})

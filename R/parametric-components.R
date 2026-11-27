@@ -121,7 +121,7 @@ draw_parametric_component <- function(object, info, ci_level, ci_col, ci_alpha,
     line_col, constant, fun, xlab, ylab, title, subtitle, caption, rug, ylim,
     angle, contour, contour_col, n_contour, surface, surface_3d,
     ci_3d, ci_3d_alpha, ci_3d_col, continuous_fill,
-    discrete_colour, discrete_fill) {
+    discrete_colour, discrete_fill, contour_labels = FALSE) {
   if (!all(c(".lower_ci", ".upper_ci") %in% names(object))) {
     crit <- coverage_normal(ci_level)
     object$.lower_ci <- object$.partial - crit * object$.se
@@ -181,6 +181,7 @@ draw_parametric_component <- function(object, info, ci_level, ci_col, ci_alpha,
       surface = surface, surface_3d = surface_3d,
       ci_3d = ci_3d, ci_3d_alpha = ci_3d_alpha, ci_3d_col = ci_3d_col,
       continuous_fill = continuous_fill, contour = contour,
+      contour_labels = contour_labels,
       contour_data = contour_data,
       contour_col = contour_col, n_contour = n_contour, angle = angle,
       facet = parametric_component_facets(extra, cols, numeric, labels),

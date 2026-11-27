@@ -352,7 +352,8 @@ draw.parametric_effects <- function(object,
                                     discrete_colour = NULL, discrete_fill = NULL,
                                     back_transform = FALSE,
                                     time_varying_style = c("ribbon", "pointrange"),
-                                    subtitle = NULL) {
+                                    subtitle = NULL,
+                                    contour_labels = FALSE) {
   gratia_plot_arguments(c("ci_col", "ci_alpha", "line_col", "contour_col", "ci_3d_alpha", "ci_3d_col"), environment())
   check_back_transform(back_transform)
   time_varying_style <- match.arg(time_varying_style)
@@ -416,7 +417,8 @@ draw.parametric_effects <- function(object,
         time_varying_info = time_varying_info,
         time_varying_style = time_varying_style,
         back_transform = back_transform,
-        contour = contour, contour_col = contour_col, n_contour = n_contour,
+        contour = contour, contour_labels = contour_labels,
+        contour_col = contour_col, n_contour = n_contour,
         surface = surface, surface_3d = surface_3d,
         ci_3d = ci_3d, ci_3d_alpha = ci_3d_alpha, ci_3d_col = ci_3d_col,
         continuous_fill = continuous_fill,
@@ -485,7 +487,7 @@ draw.parametric_effects <- function(object,
                                      back_transform = FALSE,
                                      time_varying_info = NULL,
                                      time_varying_style = c("ribbon", "pointrange"),
-                                     ...) {
+                                     ..., contour_labels = FALSE) {
   term <- unique(object$.term)
   info <- term_info[[term]]
   # Older saved interactions can use `.model` as a covariate column.
@@ -512,7 +514,8 @@ draw.parametric_effects <- function(object,
       line_col = line_col, constant = constant, fun = fun,
       xlab = xlab, ylab = ylab, title = title, subtitle = subtitle,
       caption = caption, rug = rug, ylim = ylim, angle = angle,
-      contour = contour, contour_col = contour_col, n_contour = n_contour,
+      contour = contour, contour_labels = contour_labels,
+      contour_col = contour_col, n_contour = n_contour,
       surface = surface, surface_3d = surface_3d,
       ci_3d = ci_3d, ci_3d_alpha = ci_3d_alpha, ci_3d_col = ci_3d_col,
       continuous_fill = continuous_fill,

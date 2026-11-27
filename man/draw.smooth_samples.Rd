@@ -26,7 +26,8 @@
   ncol = NULL,
   nrow = NULL,
   guides = "keep",
-  ...
+  ...,
+  contour_labels = FALSE
 )
 }
 \arguments{
@@ -68,7 +69,8 @@ interval.}
 settings instead. The colour to use to draw the posterior smooths. Passed to
 \code{\link[ggplot2:geom_line]{ggplot2::geom_line()}} as argument \code{colour}.}
 
-\item{contour}{logical; should contour lines be added to smooth surfaces?}
+\item{contour}{Logical. Set this to
+\code{TRUE} to draw contour lines and allow contour labels.}
 
 \item{contour_col}{Deprecated; use \code{\link[=gratia_theme_get]{gratia_theme_get()}} theme
 settings instead. Colour specification for contour lines.}
@@ -101,6 +103,11 @@ spread the plots}
 \code{"auto"}. Passed to \code{\link[patchwork:plot_layout]{patchwork::plot_layout()}}}
 
 \item{...}{arguments to be passed to \code{\link[patchwork:wrap_plots]{patchwork::wrap_plots()}}.}
+
+\item{contour_labels}{Logical. Label contour lines on two-dimensional
+surfaces with their values? Defaults to \code{FALSE}. Labels require the
+geomtextpath package and are drawn only where contours are enabled. If
+geomtextpath is unavailable, the contour lines are drawn without labels.}
 }
 \description{
 Plot posterior smooths

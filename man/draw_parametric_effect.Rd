@@ -39,7 +39,8 @@ draw_parametric_effect(
   back_transform = FALSE,
   time_varying_info = NULL,
   time_varying_style = c("ribbon", "pointrange"),
-  ...
+  ...,
+  contour_labels = FALSE
 )
 }
 \arguments{
@@ -94,8 +95,7 @@ drawn passed to the \code{angle} argument of \code{\link[ggplot2:guide_axis]{ggp
 
 \item{term_info}{Internal per-term covariate and plotting metadata.}
 
-\item{contour}{logical; should contours be draw on the plot using
-\code{\link[ggplot2:geom_contour]{ggplot2::geom_contour()}}.}
+\item{contour}{Logical. Draw contour lines on surfaces?}
 
 \item{contour_col}{Deprecated; use \code{\link[=gratia_theme_get]{gratia_theme_get()}} theme
 settings instead. Colour specification for contour lines.}
@@ -182,6 +182,11 @@ and interval bars with a connecting line (\code{"pointrange"}). Other model
 terms keep their usual displays.}
 
 \item{...}{additional arguments passed to \code{\link[patchwork:wrap_plots]{patchwork::wrap_plots()}}.}
+
+\item{contour_labels}{Logical. Label contour lines on two-dimensional
+surfaces with their values? Defaults to \code{FALSE}. Labels require the
+geomtextpath package and are drawn only where contours are enabled. If
+geomtextpath is unavailable, the contour lines are drawn without labels.}
 }
 \description{
 Internal function to draw an individual parametric effect

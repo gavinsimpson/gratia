@@ -134,7 +134,8 @@
   simultaneous_domain = NULL, tube_control = list(),
   cyclic = c("cartesian", "polar"), polar_args = list(),
   grouped = c("sz", "fs"), show_ci = c("factor-by", "sz"),
-  time_varying_style = c("ribbon", "pointrange")
+  time_varying_style = c("ribbon", "pointrange"),
+  contour_labels = FALSE
 ) {
   factor_controls <- resolve_factor_plot_controls(grouped, show_ci, grouped_by,
     "assemble.gam")
@@ -363,6 +364,7 @@
       constant = constant,
       fun = fun,
       contour = contour,
+      contour_labels = contour_labels,
       contour_col = contour_col,
       n_contour = n_contour,
       ci_alpha = ci_alpha,
@@ -460,7 +462,8 @@
               time_varying_info = attr(para, "time_varying_info"),
               time_varying_style = time_varying_style,
               back_transform = back_transform,
-              contour = contour, contour_col = contour_col, n_contour = n_contour,
+              contour = contour, contour_labels = contour_labels,
+              contour_col = contour_col, n_contour = n_contour,
               surface = surface, surface_3d = surface_3d,
               ci_3d = ci_3d, ci_3d_alpha = ci_3d_alpha, ci_3d_col = ci_3d_col,
               continuous_fill = continuous_fill,

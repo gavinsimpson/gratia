@@ -1576,7 +1576,8 @@ smooth_estimates.gjrm <- smooth_estimates.gamlss
                                     cyclic = c("cartesian", "polar"),
                                     polar_args = list(),
                                     grouped = c("sz", "fs"),
-                                    show_ci = c("factor-by", "sz")) {
+                                    show_ci = c("factor-by", "sz"),
+                                    contour_labels = FALSE) {
   factor_controls <- resolve_factor_plot_controls(grouped, show_ci, grouped_by,
     "draw.smooth_estimates")
   grouped <- factor_controls$grouped
@@ -1643,6 +1644,7 @@ smooth_estimates.gjrm <- smooth_estimates.gamlss
     constant = constant,
     fun = fun,
     contour = contour,
+    contour_labels = contour_labels,
     contour_col = contour_col,
     n_contour = n_contour,
     ci_alpha = ci_alpha,
@@ -1722,7 +1724,7 @@ smooth_estimates.gjrm <- smooth_estimates.gamlss
                                     cyclic = "cartesian", polar_args = list(),
                                     cyclic_info = NULL,
                                     variables = NULL,
-                                    ...) {
+                                    ..., contour_labels = FALSE) {
   factor_plot <- attr(object, "factor_plot")
   if (!is.null(factor_plot)) grouped_by <- factor_plot$grouped_by
   check_shape_effect_transform(interval_info, constant, fun)
@@ -1971,6 +1973,7 @@ smooth_estimates.gjrm <- smooth_estimates.gamlss
     constant = constant,
     fun = fun,
     contour = contour,
+    contour_labels = contour_labels,
     contour_col = contour_col,
     n_contour = n_contour,
     ci_alpha = ci_alpha,

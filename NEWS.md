@@ -8,6 +8,9 @@
 
 ## New features
 
+* Set `contour_labels = TRUE` in `draw()` or `assemble()` to label contour
+  lines on 2D surfaces. This option uses the geomtextpath package (#210).
+
 * `smooth_estimates()`, `derivatives()`, and `difference_smooths()` now support
   tube simultaneous bands for one-dimensional cubic B-splines (`bs = "bs"`),
   cyclic cubic regression splines (`bs = "cc"`), and cyclic cubic P-splines

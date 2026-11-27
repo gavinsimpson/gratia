@@ -20,7 +20,8 @@
   n_contour = 10,
   contour_col = "black",
   ...,
-  variables = NULL
+  variables = NULL,
+  contour_labels = FALSE
 )
 }
 \arguments{
@@ -52,8 +53,7 @@ drawn passed to the \code{angle} argument of \code{\link[ggplot2:guide_axis]{ggp
 \item{guides}{character; one of \code{"keep"} (the default), \code{"collect"}, or
 \code{"auto"}. Passed to \code{\link[patchwork:plot_layout]{patchwork::plot_layout()}}}
 
-\item{contour}{logical; should contours be draw on the plot using
-\code{\link[ggplot2:geom_contour]{ggplot2::geom_contour()}}.}
+\item{contour}{Logical. Draw contour lines on surfaces?}
 
 \item{n_contour}{numeric; the number of contour bins. Will result in
 \code{n_contour - 1} contour lines being drawn. See \code{\link[ggplot2:geom_contour]{ggplot2::geom_contour()}}.}
@@ -74,6 +74,11 @@ Drawing saved estimates can change the order but uses only points already
 evaluated; evaluate again to change grid resolution or conditioning values.
 Continuous covariates must precede factors. Spherical smooths retain their
 latitude/longitude convention and do not support reordering.}
+
+\item{contour_labels}{Logical. Label contour lines on two-dimensional
+surfaces with their values? Defaults to \code{FALSE}. Labels require the
+geomtextpath package and are drawn only where contours are enabled. If
+geomtextpath is unavailable, the contour lines are drawn without labels.}
 }
 \value{
 A \code{patchwork} object.

@@ -111,6 +111,21 @@ test_that("surface comparisons use both axes and fixed facets in model order", {
   expect_null(p$labels$caption)
 })
 
+test_that("surface comparisons can label contours in both display modes", {
+  skip_if_not_installed("geomtextpath", "0.2.0")
+  cs <- surface_comparison()
+  for (show in c("models", "difference")) {
+    plain <- ggplot_build(draw(cs, show = show, n_contour = 5)[[1]])$data[[2L]]
+    labelled <- ggplot_build(draw(cs, show = show, n_contour = 5,
+      contour_labels = TRUE)[[1]])$data[[2L]]
+    cols <- c("x", "y", "level", "group", "PANEL")
+    expect_gt(nrow(labelled), 0L)
+    expect_equal(labelled[cols], plain[cols])
+    expect_length(labelled$label, nrow(labelled))
+    expect_true(all(nzchar(labelled$label, keepNA = TRUE)))
+  }
+})
+
 test_that("surface differences match independent predictions, irrespective of row order", {
   cs <- surface_comparison()
   nd <- cs$data[[1]][c("x", "z")]

@@ -77,7 +77,8 @@
   polar_args = list(),
   grouped = c("sz", "fs"),
   show_ci = c("factor-by", "sz"),
-  time_varying_style = c("ribbon", "pointrange")
+  time_varying_style = c("ribbon", "pointrange"),
+  contour_labels = FALSE
 )
 
 \method{draw}{gamm}(object, ...)
@@ -193,8 +194,7 @@ smooths or plot locations of data for higher dimensions.}
 \item{distinct_rug}{logical; should the data for the rug plots be reduced to
 the distinct values?}
 
-\item{contour}{logical; should contours be draw on the plot using
-\code{\link[ggplot2:geom_contour]{ggplot2::geom_contour()}}.}
+\item{contour}{Logical. Draw contour lines on surfaces?}
 
 \item{grouped_by}{Deprecated; use \code{grouped}. Explicit \code{TRUE} adds
 \code{"factor-by"} to \code{grouped}; \code{FALSE} removes it, retaining the other types.}
@@ -450,6 +450,11 @@ Ordinary smooths and parametric effects retain their intervals.}
 a line, points and interval ribbon (\code{"ribbon"}, the default), or points
 and interval bars with a connecting line (\code{"pointrange"}). Other model
 terms keep their usual displays.}
+
+\item{contour_labels}{Logical. Label contour lines on two-dimensional
+surfaces with their values? Defaults to \code{FALSE}. Labels require the
+geomtextpath package and are drawn only where contours are enabled. If
+geomtextpath is unavailable, the contour lines are drawn without labels.}
 
 \item{centre}{character; for SCAM models, \code{"model"} retains each fitted
 smooth contribution. \code{"plot"} subtracts the evaluation-grid mean from

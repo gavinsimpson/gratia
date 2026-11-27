@@ -294,13 +294,69 @@ geom_gratia_rug <- function(...) gratia_geom("rug", ggplot2::geom_rug(...))
 geom_gratia_surface_rect <- function(...) gratia_geom("surface", ggplot2::geom_rect(...))
 geom_gratia_surface_raster <- function(...) gratia_geom("surface", ggplot2::geom_raster(...))
 geom_gratia_surface_tile <- function(...) gratia_geom("surface", ggplot2::geom_tile(...))
-geom_gratia_contour <- function(...) gratia_geom("contour", ggplot2::geom_contour(...))
+geom_gratia_contour <- function(..., stat = "contour", contour_labels = FALSE) {
+  if (!isTRUE(contour_labels) || !can_label_contours()) {
+    return(gratia_geom("contour", ggplot2::geom_contour(..., stat = stat)))
+  }
+  if (identical(stat, "contour")) stat <- ggplot2::StatContour
+  defaults <- stat$default_aes
+  # Let the original statistic compute paths and levels, including basis slices.
+  defaults$label <- ggplot2::aes(
+    label = ggplot2::after_stat(format_contour_levels(.data$level))
+  )$label
+  label_stat <- ggplot2::ggproto(NULL, stat, default_aes = defaults)
+  layer <- geomtextpath::geom_textcontour(..., stat = label_stat, remove_long = TRUE)
+
+  # Match the line defaults of geom_contour() while keeping text styling.
+  native <- layer$geom
+  defaults <- native$default_aes
+  line_aes <- c("linewidth", "linetype")
+  defaults[line_aes] <- ggplot2::GeomContour$default_aes[line_aes]
+  layer$geom <- ggplot2::ggproto(NULL, native, default_aes = defaults)
+  gratia_geom("contour", layer)
+}
 geom_gratia_smooth_point <- function(...) gratia_geom("smooth", ggplot2::geom_point(...))
 geom_gratia_boundary_path <- function(...) gratia_geom("boundary", ggplot2::geom_path(...))
 geom_gratia_reference_abline <- function(...) gratia_geom("reference", ggplot2::geom_abline(...))
 geom_gratia_smooth_pointrange <- function(...) gratia_geom("smooth", ggplot2::geom_pointrange(...))
 geom_gratia_surface_sf <- function(...) gratia_geom("surface", ggplot2::geom_sf(...))
-geom_gratia_contour_sf <- function(...) gratia_geom("contour", ggplot2::geom_sf(...))
+geom_gratia_contour_sf <- function(data, ..., contour_labels = FALSE) {
+  if (!isTRUE(contour_labels) || !nrow(data) || !can_label_contours()) {
+    return(gratia_geom("contour", ggplot2::geom_sf(data = data, ...)))
+  }
+  # Convert mixed geometry to multipart first so splitting keeps every piece.
+  data <- sf::st_cast(data, "MULTILINESTRING")
+  data <- sf::st_cast(data, "LINESTRING", warn = FALSE)
+  mapping <- ggplot2::aes(
+    label = format_contour_levels(.data$level),
+    linecolour = ggplot2::after_scale(.data$colour)
+  )
+  layer <- geomtextpath::geom_textsf(mapping, data = data, ...,
+    remove_long = TRUE, show.legend = FALSE)
+  gratia_geom("contour", layer)
+}
+
+can_label_contours <- function() {
+  version <- list(op = ">=", version = package_version("0.2.0"))
+  if (requireNamespace("geomtextpath", quietly = TRUE, versionCheck = version)) {
+    return(TRUE)
+  }
+  command <- 'install.packages("geomtextpath")'
+  cli::cli_inform(c(
+    "Drawing unlabelled contours because labels require the {.pkg geomtextpath} package (version 0.2.0 or later).",
+    "i" = "Install it with {.code {command}}."
+  ), .frequency = "once", .frequency_id = "gratia-contour-labels")
+  FALSE
+}
+
+format_contour_levels <- function(level) {
+  values <- unique(level)
+  for (digits in 7:17) {
+    labels <- trimws(formatC(values, digits = digits, format = "g"))
+    if (!anyDuplicated(labels)) break
+  }
+  labels[match(level, values)]
+}
 geom_gratia_increase_line <- function(...) gratia_geom("increase", ggplot2::geom_line(...))
 geom_gratia_decrease_line <- function(...) gratia_geom("decrease", ggplot2::geom_line(...))
 geom_gratia_basis_line <- function(...) gratia_geom("basis", ggplot2::geom_line(...))

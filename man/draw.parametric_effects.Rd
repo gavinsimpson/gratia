@@ -33,7 +33,8 @@
   discrete_fill = NULL,
   back_transform = FALSE,
   time_varying_style = c("ribbon", "pointrange"),
-  subtitle = NULL
+  subtitle = NULL,
+  contour_labels = FALSE
 )
 }
 \arguments{
@@ -84,8 +85,7 @@ spread the plots}
 \item{guides}{character; one of \code{"keep"} (the default), \code{"collect"}, or
 \code{"auto"}. Passed to \code{\link[patchwork:plot_layout]{patchwork::plot_layout()}}}
 
-\item{contour}{logical; should contours be draw on the plot using
-\code{\link[ggplot2:geom_contour]{ggplot2::geom_contour()}}.}
+\item{contour}{Logical. Draw contour lines on surfaces?}
 
 \item{contour_col}{Deprecated; use \code{\link[=gratia_theme_get]{gratia_theme_get()}} theme
 settings instead. Colour specification for contour lines.}
@@ -168,6 +168,11 @@ terms keep their usual displays.}
 \item{subtitle}{Character or expression; replace the automatic predictor
 subtitle on every panel. \code{NULL} uses the automatic label and \code{""}
 suppresses it.}
+
+\item{contour_labels}{Logical. Label contour lines on two-dimensional
+surfaces with their values? Defaults to \code{FALSE}. Labels require the
+geomtextpath package and are drawn only where contours are enabled. If
+geomtextpath is unavailable, the contour lines are drawn without labels.}
 }
 \description{
 Plot estimated effects for model parametric terms

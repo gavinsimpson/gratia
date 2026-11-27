@@ -440,6 +440,7 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
 #' @param continuous_fill Optional ggplot2 fill scale. `NULL` uses the diverging
 #'   RdBu distiller scale.
 #' @param contour Logical; add contour lines for `fill_var`?
+#' @param contour_labels Logical; label 2D contour lines with their values?
 #' @param contour_col Deprecated; use [gratia_theme_get()] theme
 #'   settings instead. Fixed colour for contour lines.
 #' @param n_contour Optional number of contour bins passed to [ggplot2::geom_contour()].
@@ -483,7 +484,8 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
   fill_guide = guide_colourbar(title = fill_title, direction = "vertical"),
   legend_position = "right", tile_colour = NA,
   facet_vars = character(), surface_support = NULL, isotropic = FALSE,
-  z_limits = fill_limits, contour_stat = "contour", irregular_cells = FALSE
+  z_limits = fill_limits, contour_stat = "contour", irregular_cells = FALSE,
+  contour_labels = FALSE
 ) {
   surface <- match.arg(surface)
   validate_surface_3d(surface_3d)
@@ -555,7 +557,7 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
     }
     plt <- plt + geom_gratia_contour(contour_mapping, data = contour_data,
       colour = contour_col, bins = n_contour, na.rm = contour_na_rm,
-      stat = contour_stat)
+      stat = contour_stat, contour_labels = contour_labels)
   }
   plt <- plt + labels + continuous_fill
   if (!is.null(fill_limits)) {
@@ -613,7 +615,7 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
   ci_3d = FALSE,
   ci_3d_alpha = 0.42, ci_3d_col = "#344054",
   surface_support = NULL,
-  ...
+  ..., contour_labels = FALSE
 ) {
   surface <- match.arg(surface)
   validate_surface_3d(surface_3d)
@@ -635,7 +637,8 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
     fill_var = prepared$fill_var, fill_limits = prepared$fill_limits,
     fill_title = prepared$fill_title, labels = labels,
     continuous_fill = continuous_fill, contour = contour,
-    contour_col = contour_col, n_contour = n_contour, angle = angle, rug = rug,
+    contour_labels = contour_labels, contour_col = contour_col,
+    n_contour = n_contour, angle = angle, rug = rug,
     surface_support = surface_support, isotropic = inherits(object, "isotropic_smooth")
   )
 }
@@ -669,7 +672,7 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
   ci_3d = FALSE,
   ci_3d_alpha = 0.42, ci_3d_col = "#344054",
   surface_support = NULL,
-  ...
+  ..., contour_labels = FALSE
 ) {
   surface <- match.arg(surface)
   validate_surface_3d(surface_3d)
@@ -697,7 +700,8 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
     fill_var = prepared$fill_var, fill_limits = prepared$fill_limits,
     fill_title = prepared$fill_title, labels = labels,
     continuous_fill = continuous_fill, contour = contour,
-    contour_col = contour_col, n_contour = n_contour, angle = angle,
+    contour_labels = contour_labels, contour_col = contour_col,
+    n_contour = n_contour, angle = angle,
     facet = facet_wrap(vars(.data[[variables[3]]])), coord = coord,
     facet_vars = variables[3], surface_support = surface_support
   )
@@ -733,7 +737,7 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
   ci_3d = FALSE,
   ci_3d_alpha = 0.42, ci_3d_col = "#344054",
   surface_support = NULL,
-  ...
+  ..., contour_labels = FALSE
 ) {
   surface <- match.arg(surface)
   validate_surface_3d(surface_3d)
@@ -759,7 +763,8 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
     fill_var = prepared$fill_var, fill_limits = prepared$fill_limits,
     fill_title = prepared$fill_title, labels = labels,
     continuous_fill = continuous_fill, contour = contour,
-    contour_col = contour_col, n_contour = n_contour, angle = angle,
+    contour_labels = contour_labels, contour_col = contour_col,
+    n_contour = n_contour, angle = angle,
     facet = facet_grid(rows = vars(.data[[variables[3]]]),
       cols = vars(.data[[variables[4]]]),
       as.table = is.factor(object[[variables[3]]])), coord = coord,
@@ -1187,7 +1192,7 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
   ci_3d = FALSE,
   ci_3d_alpha = 0.42, ci_3d_col = "#344054",
   grouped_by = FALSE, facet_vars = NULL,
-  ...
+  ..., contour_labels = FALSE
 ) {
   if (surface == "3d") message("Spherical smooths retain their geographic rendering.")
   # handle splines on the sphere
@@ -1311,7 +1316,7 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
         for (v in panel) paths[[v]] <- group$data[[v]][rep(1L, nrow(paths))]
         paths <- sos_project(paths, crs = crs)
         plt <- plt + geom_gratia_contour_sf(data = paths, inherit.aes = FALSE,
-          colour = contour_col, fill = NA)
+          colour = contour_col, fill = NA, contour_labels = contour_labels)
       }
     }
   }
@@ -1356,7 +1361,7 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
   ci_3d = FALSE,
   ci_3d_alpha = 0.42, ci_3d_col = "#344054",
   surface_support = NULL,
-  ...
+  ..., contour_labels = FALSE
 ) {
   surface <- match.arg(surface)
   validate_surface_3d(surface_3d)
@@ -1380,7 +1385,8 @@ surface_fill_limits <- function(values, symmetric = TRUE, ylim = NULL) {
     fill_var = prepared$fill_var, fill_limits = prepared$fill_limits,
     fill_title = prepared$fill_title, labels = labels,
     continuous_fill = continuous_fill, contour = contour,
-    contour_col = contour_col, n_contour = n_contour, angle = angle,
+    contour_labels = contour_labels, contour_col = contour_col,
+    n_contour = n_contour, angle = angle,
     rug = rug, coord = coord_fixed(ratio = 1), boundary = boundary,
     boundary_group = ".loop"
   )

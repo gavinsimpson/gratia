@@ -366,7 +366,7 @@ draw.conditional_differences <- function(object, facet_scales = "fixed",
     discrete_colour = NULL, discrete_fill = NULL, xlab = NULL, ylab = NULL, ...,
     surface = c("raster", "tile", "3d"), surface_3d = list(),
     continuous_fill = NULL, contour = TRUE, n_contour = NULL,
-    ci_3d = FALSE, zlab = NULL) {
+    ci_3d = FALSE, zlab = NULL, contour_labels = FALSE) {
   channels <- attr(object, "channels")
   by <- attr(object, "by")
   labels <- lapply(by, function(nm) {
@@ -385,7 +385,7 @@ draw.conditional_differences <- function(object, facet_scales = "fixed",
       facet_scales = facet_scales, xlab = xlab, ylab = ylab, zlab = zlab,
       surface = surface, surface_3d = surface_3d,
       continuous_fill = continuous_fill, contour = contour,
-      n_contour = n_contour, ci_3d = ci_3d))
+      n_contour = n_contour, ci_3d = ci_3d, contour_labels = contour_labels))
   }
   facets <- c(".comparison", channels$f_col, channels$f_row)
   channels$f_col <- channels$f_row <- NULL

@@ -42,6 +42,7 @@ Suggests:
     bayesplot,
     loo,
     ggcube (>= 0.3.0),
+    geomtextpath (>= 0.2.0),
     geometry,
     qgam,
     tweedie (>= 2.3.5),

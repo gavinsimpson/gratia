@@ -165,6 +165,7 @@
 #'   `coverage` and `level` are not accepted, even when `ci_level` is also supplied.
 #' @param contour logical; add contour lines? These require two numeric axes
 #'   and at least one grid cell with four finite corner values that are not all equal.
+#' @inheritParams draw.gam
 #' @param surface character; `"raster"` or `"tile"` for surface displays.
 #'   Irregular numeric grids use rectangles bounded by coordinate midpoints.
 #' @param select,partial_match select smooths from the comparison, using the
@@ -196,7 +197,7 @@
                                    surface = c("raster", "tile"),
                                    contour = TRUE, n_contour = NULL,
                                    continuous_fill = NULL,
-                                   ...) {
+                                   ..., contour_labels = FALSE) {
   check_interval_level(ci_level, "ci_level", ...names())
   show <- match.arg(show)
   surface <- match.arg(surface)
@@ -222,7 +223,8 @@
     plot_comparison_of_smooths(x, coverage = ci_level, variables = variables,
       model_order = model_order, show = show, pair = pair,
       surface = surface, contour = contour, n_contour = n_contour,
-      continuous_fill = continuous_fill, auxiliary = info[[label]]$auxiliary)
+      continuous_fill = continuous_fill, auxiliary = info[[label]]$auxiliary,
+      contour_labels = contour_labels)
   })
   layout <- prepare_plot_layout(length(plts), ncol = ncol, nrow = nrow)
   wrap_plots(plts, byrow = TRUE, ncol = layout$ncol, nrow = layout$nrow,
@@ -293,7 +295,7 @@ comparison_surface_difference <- function(object, pair, auxiliary = NULL) {
     variables = vars_from_label(unique(object$.smooth)),
     model_order = unique(object$.model), show = "models", pair = NULL,
     surface = "raster", contour = TRUE, n_contour = NULL,
-    continuous_fill = NULL, auxiliary = NULL, ...) {
+    continuous_fill = NULL, auxiliary = NULL, ..., contour_labels = FALSE) {
   label <- unique(object$.smooth)
   types <- unique(object$.type)
   isotropic <- all(types %in% c("TPRS (2d)", "TPRS (shrink) (2d)",
@@ -363,7 +365,8 @@ comparison_surface_difference <- function(object, pair, auxiliary = NULL) {
       plt <- plot_smooth.sos(object, variables = variables, title = label,
         grouped_by = show == "models", contour = contour, n_contour = n_contour,
         continuous_fill = continuous_fill, caption = FALSE, subtitle = "",
-        facet_vars = c(if (show == "models") ".model", conditioning))
+        facet_vars = c(if (show == "models") ".model", conditioning),
+        contour_labels = contour_labels)
       return(plt + facet + labs(fill = fill_title) +
         guides(fill = guide_colourbar(title = fill_title, direction = "vertical")))
     }
@@ -381,6 +384,7 @@ comparison_surface_difference <- function(object, pair, auxiliary = NULL) {
       boundary = boundary, boundary_group = ".boundary_group",
       contour = isTRUE(contour) && nrow(contours) > 0L, contour_data = contours,
       n_contour = n_contour, continuous_fill = continuous_fill,
+      contour_labels = contour_labels,
       irregular_cells = all(vapply(object[variables], is.numeric, logical(1)))))
   }
   object <- unnest(object, cols = all_of("data"))

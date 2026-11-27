@@ -18,7 +18,8 @@
   contour = TRUE,
   n_contour = NULL,
   continuous_fill = NULL,
-  ...
+  ...,
+  contour_labels = FALSE
 )
 }
 \arguments{
@@ -62,6 +63,11 @@ and at least one grid cell with four finite corner values that are not all equal
 continuous variables.}
 
 \item{...}{arguments passed to \code{\link[patchwork:wrap_plots]{patchwork::wrap_plots()}}.}
+
+\item{contour_labels}{Logical. Label contour lines on two-dimensional
+surfaces with their values? Defaults to \code{FALSE}. Labels require the
+geomtextpath package and are drawn only where contours are enabled. If
+geomtextpath is unavailable, the contour lines are drawn without labels.}
 }
 \description{
 Plot comparisons of smooths

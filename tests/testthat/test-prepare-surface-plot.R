@@ -309,3 +309,81 @@ test_that("spherical surfaces retain their geographic geometry and projection", 
   expect_equal(a$data, b$data)
   expect_equal(a$labels, b$labels)
 })
+
+test_that("contour labels preserve paths, levels, and styling", {
+  skip_if_not_installed("geomtextpath", "0.2.0")
+  d <- expand.grid(
+    x = seq(-1, 1, length.out = 31),
+    y = seq(-1, 1, length.out = 31),
+    slice = c("masked", "constant")
+  )
+  d$.estimate <- (d$x + d$y) / 10000
+  d$.estimate[d$slice == "constant"] <- 0
+  d$.estimate[d$slice == "masked" & d$x^2 + d$y^2 < 0.35] <- NA_real_
+
+  plot <- function(labels, colour = "black") {
+    prepare_surface_plot(d, "x", "y", ".estimate", surface = "tile",
+      contour_labels = labels, contour_col = colour, n_contour = 6,
+      contour_stat = StatBasisContour, facet = ggplot2::facet_wrap(~slice)) +
+      ggplot2::theme(geom.gratia.contour = ggplot2::element_geom(
+        colour = "grey35", linewidth = 0.7
+      ))
+  }
+
+  plain <- ggplot2::ggplot_build(plot(FALSE))
+  expect_no_warning(labelled <- ggplot2::ggplot_build(plot(TRUE)))
+  paths <- labelled$data[[2L]]
+  geometry <- c("x", "y", "level", "group", "PANEL")
+  expect_gt(nrow(paths), 0L)
+  expect_identical(paths[geometry], plain$data[[2L]][geometry])
+  expect_equal(length(unique(paths$label)), length(unique(paths$level)))
+  expect_equal(as.numeric(paths$label), paths$level)
+  expect_identical(unique(paths$colour), "grey35")
+  expect_identical(unique(paths$linewidth), 0.7)
+  expect_false(any(paths$PANEL %in%
+    labelled$layout$layout$PANEL[labelled$layout$layout$slice == "constant"]))
+
+  colour <- structure("navy", gratia.plot.argument = TRUE)
+  explicit <- ggplot2::ggplot_build(plot(TRUE, colour))$data[[2L]]
+  expect_identical(unique(explicit$colour), "navy")
+})
+
+test_that("contour labels distinguish levels on small and narrow scales", {
+  expect_equal(format_contour_levels(c(-1e-13, 0, 2e-13, -1e-13)),
+    c("-1e-13", "0", "2e-13", "-1e-13"))
+  expect_length(unique(format_contour_levels(c(1, 1 + 2 * .Machine$double.eps))), 2L)
+})
+
+test_that("opt-in contour labels reach both model and smooth estimate plots", {
+  skip_if_not_installed("geomtextpath", "0.2.0")
+  labelled <- function(plot) {
+    any(vapply(plot$layers, function(layer) inherits(layer$geom, "GeomTextcontour"),
+      logical(1L)))
+  }
+  plots <- assemble(su_m_bivar, contour_labels = TRUE)
+  expect_true(labelled(plots[[1L]]))
+  expect_true(labelled(draw(su_m_bivar, contour_labels = TRUE)[[1L]]))
+  estimates <- smooth_estimates(su_m_bivar, n = 30)
+  expect_true(labelled(draw(estimates, contour_labels = TRUE)[[1L]]))
+  expect_false(labelled(draw(estimates, contour = FALSE, contour_labels = TRUE)[[1L]]))
+})
+
+test_that("missing geomtextpath gives an install message and keeps contours", {
+  unavailable <- can_label_contours
+  environment(unavailable) <- list2env(
+    list(requireNamespace = function(...) FALSE),
+    parent = environment(can_label_contours)
+  )
+  local_mocked_bindings(can_label_contours = unavailable)
+  withr::local_options(list(rlib_message_verbosity = "verbose"))
+  d <- surface_plot_data()
+  expect_message(
+    labelled <- prepare_surface_plot(d, "x", "y", ".estimate", contour_labels = TRUE),
+    'install.packages("geomtextpath")', fixed = TRUE
+  )
+  plain <- prepare_surface_plot(d, "x", "y", ".estimate")
+  expect_identical(ggplot2::ggplot_build(labelled)$data, ggplot2::ggplot_build(plain)$data)
+  expect_no_message(off <- prepare_surface_plot(d, "x", "y", ".estimate",
+    contour = FALSE, contour_labels = TRUE))
+  expect_false("GeomContour" %in% surface_plot_geoms(off))
+})

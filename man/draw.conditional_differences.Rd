@@ -18,7 +18,8 @@
   contour = TRUE,
   n_contour = NULL,
   ci_3d = FALSE,
-  zlab = NULL
+  zlab = NULL,
+  contour_labels = FALSE
 )
 }
 \arguments{
@@ -66,6 +67,11 @@ when \code{surface = "3d"}? Defaults to \code{FALSE}.}
 \item{zlab}{character; label for the surface fill legend and 3D height axis.
 Defaults to the prediction label, or the difference and its scale for
 conditional differences.}
+
+\item{contour_labels}{Logical. Label contour lines on two-dimensional
+surfaces with their values? Defaults to \code{FALSE}. Labels require the
+geomtextpath package and are drawn only where contours are enabled. If
+geomtextpath is unavailable, the contour lines are drawn without labels.}
 }
 \description{
 Display conditional differences as curves with pointwise or simultaneous
